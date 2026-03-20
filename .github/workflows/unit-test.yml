@@ -61,47 +61,25 @@ jobs:
         java: [ '8', '11' ]
         shard:
           - name: spi-common-eventbus
-            modules: >-
-              dolphinscheduler-spi,
-              dolphinscheduler-common,
-              dolphinscheduler-eventbus,
-              dolphinscheduler-meter,
-              dolphinscheduler-authentication
+            modules: "dolphinscheduler-spi,dolphinscheduler-common,dolphinscheduler-eventbus,dolphinscheduler-meter,dolphinscheduler-authentication"
 
           - name: dao-registry
-            modules: >-
-              dolphinscheduler-dao,
-              dolphinscheduler-dao-plugin,
-              dolphinscheduler-registry
+            modules: "dolphinscheduler-dao,dolphinscheduler-dao-plugin,dolphinscheduler-registry"
 
           - name: service-api
-            modules: >-
-              dolphinscheduler-service,
-              dolphinscheduler-api,
-              dolphinscheduler-yarn-aop
+            modules: "dolphinscheduler-service,dolphinscheduler-api,dolphinscheduler-yarn-aop"
 
           - name: alert-scheduler
-            modules: >-
-              dolphinscheduler-alert,
-              dolphinscheduler-scheduler-plugin
+            modules: "dolphinscheduler-alert,dolphinscheduler-scheduler-plugin"
 
           - name: task-datasource-storage
-            modules: >-
-              dolphinscheduler-task-plugin,
-              dolphinscheduler-datasource-plugin,
-              dolphinscheduler-storage-plugin
+            modules: "dolphinscheduler-task-plugin,dolphinscheduler-datasource-plugin,dolphinscheduler-storage-plugin"
 
           - name: master-worker-extract
-            modules: >-
-              dolphinscheduler-extract,
-              dolphinscheduler-master,
-              dolphinscheduler-worker,
-              dolphinscheduler-task-executor
+            modules: "dolphinscheduler-extract,dolphinscheduler-master,dolphinscheduler-worker,dolphinscheduler-task-executor"
 
           - name: tools-standalone
-            modules: >-
-              dolphinscheduler-tools,
-              dolphinscheduler-standalone-server
+            modules: "dolphinscheduler-tools,dolphinscheduler-standalone-server"
 
     timeout-minutes: 60
     steps:
@@ -134,8 +112,9 @@ jobs:
       - name: Run Unit Tests (${{ matrix.shard.name }})
         run: |
           export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
+          MODULES=$(echo "${{ matrix.shard.modules }}" | tr -d ' ')
           ./mvnw clean verify -B \
-            -pl ${{ matrix.shard.modules }} \
+            -pl "$MODULES" \
             -am \
             -Dmaven.test.skip=false \
             -Dspotless.skip=true \
