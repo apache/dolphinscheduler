@@ -42,7 +42,7 @@ public class WorkflowInstanceMetricsTestCase extends AbstractMasterIntegrationTe
     @Test
     @DisplayName("Test workflow instance metrics for a successful workflow")
     public void testWorkflowInstanceMetrics_with_oneSuccessTask() {
-        final String yaml = "/it/start/workflow_with_one_fake_task_success.yaml";
+        final String yaml = "/it/metrics/workflow_with_one_fake_task_success_for_metrics.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
         final long workflowDefinitionCode = workflow.getCode();
@@ -76,7 +76,7 @@ public class WorkflowInstanceMetricsTestCase extends AbstractMasterIntegrationTe
     @Test
     @DisplayName("Test workflow instance metrics for serial discard strategy")
     public void testWorkflowInstanceMetrics_with_serialDiscardStrategy() {
-        final String yaml = "/it/start/workflow_with_serial_discard_strategy.yaml";
+        final String yaml = "/it/metrics/workflow_with_serial_discard_strategy_for_metrics.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getOneWorkflow();
         final long workflowDefinitionCode = workflow.getCode();
