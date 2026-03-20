@@ -119,23 +119,19 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
 
-      # Install all modules into local Maven repository (skip tests) first,
-      # so each shard can run tests independently without -am pulling in
-      # unrelated modules from aggregator parents
-      - name: Install all modules (skip tests)
-        run: |
-          export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m"
-          ./mvnw install -B \
-            -DskipTests \
-            -Dspotless.skip=true \
-            -Danalyze.skip=true
-
+      # Use -am (--also-make) so Maven automatically builds all upstream
+      # dependency modules before running tests in the target module.
+      # DskipTests=true skips tests in dependency modules; only the
+      # target module (-pl) runs its unit tests via verify.
       - name: Run Unit Tests (${{ matrix.module }})
         run: |
           export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
           ./mvnw verify -B \
             -pl "${{ matrix.module }}" \
+            -am \
+            -DskipTests=true \
             -Dmaven.test.skip=false \
+            -pl "${{ matrix.module }}" \
             -Dspotless.skip=true \
             -DskipUT=false \
             -Danalyze.skip=true

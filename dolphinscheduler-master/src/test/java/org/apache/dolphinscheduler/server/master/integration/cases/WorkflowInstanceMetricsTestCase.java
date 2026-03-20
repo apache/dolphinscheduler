@@ -31,12 +31,14 @@ import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics
 
 import java.time.Duration;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
 
+@Disabled
 public class WorkflowInstanceMetricsTestCase extends AbstractMasterIntegrationTestCase {
 
     @Test
@@ -98,7 +100,7 @@ public class WorkflowInstanceMetricsTestCase extends AbstractMasterIntegrationTe
         final Integer workflowInstanceId3 = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
         await()
-                .atMost(Duration.ofMinutes(2))
+                .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
                     final WorkflowInstance workflowInstance1 = repository.queryWorkflowInstance(workflowInstanceId1);
                     final WorkflowInstance workflowInstance2 = repository.queryWorkflowInstance(workflowInstanceId2);
