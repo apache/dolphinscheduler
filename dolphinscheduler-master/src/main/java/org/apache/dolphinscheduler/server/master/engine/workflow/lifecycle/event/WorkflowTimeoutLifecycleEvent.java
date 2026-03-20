@@ -45,7 +45,7 @@ public class WorkflowTimeoutLifecycleEvent extends AbstractWorkflowLifecycleLife
 
     public static WorkflowTimeoutLifecycleEvent of(IWorkflowExecutionRunnable workflowExecutionRunnable) {
         final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
-        checkState(workflowInstance != null, "The workflow instance must be initialized.");
+        checkState(workflowInstance != null, "The workflow instance must be initialized before creating workflow timeout event.");
 
         final int timeout = workflowInstance.getTimeout();
         checkState(timeout > 0, "The workflow timeout: %s must > 0 minutes", timeout);
