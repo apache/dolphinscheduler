@@ -225,7 +225,7 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param id data source id
-     * @return A Result object containing true if the connection is successful, false otherwise.
+     * @return A Result wrapping {@code true} if the connection is successful; otherwise, throws an exception.
      */
     @Operation(summary = "connectionTest", description = "CONNECT_DATA_SOURCE_TEST_NOTES")
     @Parameters({
