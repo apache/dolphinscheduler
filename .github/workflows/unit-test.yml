@@ -51,7 +51,7 @@ jobs:
               - '!(docs/**)'
 
   unit-test:
-    name: Unit-Test (Java ${{ matrix.java }} | Shard ${{ matrix.shard }})
+    name: Unit-Test (Java ${{ matrix.java }} | ${{ matrix.shard.name }})
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
@@ -60,28 +60,49 @@ jobs:
       matrix:
         java: [ '8', '11' ]
         shard:
-          - modules: >-
+          - name: spi-common-eventbus
+            modules: >-
+              dolphinscheduler-spi,
               dolphinscheduler-common,
-              dolphinscheduler-data-quality,
-              dolphinscheduler-api
-            name: core-api
-          - modules: >-
-              dolphinscheduler-service,
+              dolphinscheduler-eventbus,
+              dolphinscheduler-meter,
+              dolphinscheduler-authentication
+
+          - name: dao-registry
+            modules: >-
               dolphinscheduler-dao,
-              dolphinscheduler-registry/dolphinscheduler-registry-plugins
-            name: service-dao
-          - modules: >-
+              dolphinscheduler-dao-plugin,
+              dolphinscheduler-registry
+
+          - name: service-api
+            modules: >-
+              dolphinscheduler-service,
+              dolphinscheduler-api,
+              dolphinscheduler-yarn-aop
+
+          - name: alert-scheduler
+            modules: >-
+              dolphinscheduler-alert,
+              dolphinscheduler-scheduler-plugin
+
+          - name: task-datasource-storage
+            modules: >-
               dolphinscheduler-task-plugin,
               dolphinscheduler-datasource-plugin,
               dolphinscheduler-storage-plugin
-            name: plugins
-          - modules: >-
+
+          - name: master-worker-extract
+            modules: >-
+              dolphinscheduler-extract,
               dolphinscheduler-master,
               dolphinscheduler-worker,
-              dolphinscheduler-alert,
-              dolphinscheduler-extract,
-              dolphinscheduler-tools
-            name: master-worker-alert
+              dolphinscheduler-task-executor
+
+          - name: tools-standalone
+            modules: >-
+              dolphinscheduler-tools,
+              dolphinscheduler-standalone-server
+
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
@@ -110,7 +131,7 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
 
-      - name: Run Unit Tests (Shard ${{ matrix.shard.name }})
+      - name: Run Unit Tests (${{ matrix.shard.name }})
         run: |
           export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
           ./mvnw clean verify -B \
@@ -150,7 +171,7 @@ jobs:
   sonar:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
-    needs: unit-test
+    needs: [ paths-filter, unit-test ]
     if: ${{ always() && (needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push') }}
     timeout-minutes: 30
     steps:
