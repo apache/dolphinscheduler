@@ -39,6 +39,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 
 import com.amazonaws.services.emrserverless.AWSEMRServerless;
 import com.amazonaws.services.emrserverless.model.AWSEMRServerlessException;
@@ -48,6 +50,7 @@ import com.amazonaws.services.emrserverless.model.JobRun;
 import com.amazonaws.services.emrserverless.model.StartJobRunResult;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 public class EmrServerlessTaskTest {
 
     private static final String APPLICATION_ID = "00abcdefgh123456";
@@ -202,6 +205,29 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
+    public void testInit() throws Exception {
+        String taskParams = buildEmrServerlessTaskParameters();
+        TaskExecutionContext ctx = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(ctx.getTaskParams()).thenReturn(taskParams);
+        Mockito.lenient().when(ctx.getTaskName()).thenReturn("test-init-task");
+        Mockito.lenient().when(ctx.getTaskInstanceId()).thenReturn(100);
+
+        EmrServerlessTask task = Mockito.spy(new EmrServerlessTask(ctx));
+        AWSEMRServerless mockClient = Mockito.mock(AWSEMRServerless.class);
+        Mockito.doReturn(mockClient).when(task).createEmrServerlessClient();
+
+        task.init();
+
+        // Verify initialization
+        Assertions.assertNotNull(task.getParameters());
+        Assertions.assertTrue(task.getParameters() instanceof EmrServerlessParameters);
+        EmrServerlessParameters params = (EmrServerlessParameters) task.getParameters();
+        Assertions.assertEquals(APPLICATION_ID, params.getApplicationId());
+        Assertions.assertEquals(EXECUTION_ROLE_ARN, params.getExecutionRoleArn());
+        Mockito.verify(task).createEmrServerlessClient();
+    }
+
+    @Test
     public void testParametersCheck() {
         EmrServerlessParameters params = new EmrServerlessParameters();
 
@@ -241,6 +267,59 @@ public class EmrServerlessTaskTest {
         Assertions.assertThrows(TaskException.class, () -> {
             badJsonTask.handle(taskCallBack);
         });
+    }
+
+    @Test
+    public void testHandle_PollingFailure() throws Exception {
+        // Submit succeeds
+        StartJobRunResult startResult = Mockito.mock(StartJobRunResult.class);
+        Mockito.when(emrServerlessClient.startJobRun(any())).thenReturn(startResult);
+        Mockito.when(startResult.getJobRunId()).thenReturn(JOB_RUN_ID);
+
+        // First poll returns RUNNING, second poll throws exception
+        GetJobRunResult runningResult = Mockito.mock(GetJobRunResult.class);
+        JobRun runningJobRun = Mockito.mock(JobRun.class);
+        Mockito.when(runningResult.getJobRun()).thenReturn(runningJobRun);
+        Mockito.when(runningJobRun.getState()).thenReturn("RUNNING");
+
+        Mockito.when(emrServerlessClient.getJobRun(any()))
+                .thenReturn(runningResult)
+                .thenThrow(new AWSEMRServerlessException("Network error"));
+
+        emrServerlessTask.handle(taskCallBack);
+        // When polling fails, task should set exit code to FAILURE
+        Assertions.assertEquals(EXIT_CODE_FAILURE, emrServerlessTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testMapStateToExitCode() throws Exception {
+        // Test SUCCESS state
+        mockJobRunStates("SUCCESS");
+        emrServerlessTask.handle(taskCallBack);
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, emrServerlessTask.getExitStatusCode());
+
+        // Re-init for next test
+        before();
+        mockJobRunStates("FAILED");
+        emrServerlessTask.handle(taskCallBack);
+        Assertions.assertEquals(EXIT_CODE_FAILURE, emrServerlessTask.getExitStatusCode());
+
+        // Re-init for next test
+        before();
+        mockJobRunStates("CANCELLED");
+        emrServerlessTask.handle(taskCallBack);
+        Assertions.assertEquals(EXIT_CODE_KILL, emrServerlessTask.getExitStatusCode());
+
+        // Re-init for unknown state (should default to FAILURE)
+        before();
+        mockJobRunStates("UNKNOWN_STATE");
+        emrServerlessTask.handle(taskCallBack);
+        Assertions.assertEquals(EXIT_CODE_FAILURE, emrServerlessTask.getExitStatusCode());
+    }
+
+    @Test
+    public void testGetApplicationIds() throws Exception {
+        Assertions.assertTrue(emrServerlessTask.getApplicationIds().isEmpty());
     }
 
     // --- Helper methods ---
