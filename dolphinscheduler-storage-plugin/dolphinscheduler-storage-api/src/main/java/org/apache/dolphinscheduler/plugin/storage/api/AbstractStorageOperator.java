@@ -23,6 +23,8 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import com.google.common.base.Preconditions;
 import com.google.common.io.Files;
@@ -38,26 +40,42 @@ public abstract class AbstractStorageOperator implements StorageOperator {
 
     @Override
     public ResourceMetadata getResourceMetaData(String resourceAbsolutePath) {
-        String storageBaseDirectory = getStorageBaseDirectory();
-        String resourceSegment = StringUtils.substringAfter(resourceAbsolutePath, storageBaseDirectory);
-        String[] segments = StringUtils.split(resourceSegment, File.separator, 3);
-        if (segments.length == 0) {
+        Path storageBasePath = Paths.get(getStorageBaseDirectory())
+                .toAbsolutePath()
+                .normalize();
+
+        Path resourcePath = Paths.get(resourceAbsolutePath)
+                .toAbsolutePath()
+                .normalize();
+
+        if (!resourcePath.startsWith(storageBasePath)) {
             throw new IllegalArgumentException("Invalid resource path: " + resourceAbsolutePath);
         }
+
+        Path relativePath = storageBasePath.relativize(resourcePath);
+        String normalizedRelativePath = relativePath.toString().replace("\\", "/");
+        String[] segments = StringUtils.split(normalizedRelativePath, "/", 3);
+
+        if (segments == null || segments.length < 2) {
+            throw new IllegalArgumentException("Invalid resource path: " + resourceAbsolutePath);
+        }
+
         return ResourceMetadata.builder()
-                .resourceAbsolutePath(resourceAbsolutePath)
-                .resourceBaseDirectory(storageBaseDirectory)
-                .isDirectory(Files.getFileExtension(resourceAbsolutePath).isEmpty())
+                .resourceAbsolutePath(resourcePath.toString())
+                .resourceBaseDirectory(storageBasePath.toString())
+                .isDirectory(java.nio.file.Files.isDirectory(resourcePath))
                 .tenant(segments[0])
                 .resourceType(ResourceType.FILE)
                 .resourceRelativePath(segments.length == 2 ? "/" : segments[2])
-                .resourceParentAbsolutePath(StringUtils.substringBeforeLast(resourceAbsolutePath, File.separator))
+                .resourceParentAbsolutePath(
+                        resourcePath.getParent() == null ? null : resourcePath.getParent().toString()
+                )
                 .build();
     }
 
     @Override
     public String getStorageBaseDirectory() {
-        // All directory should end with File.separator
+
         return resourceBaseAbsolutePath;
     }
 
@@ -66,7 +84,6 @@ public abstract class AbstractStorageOperator implements StorageOperator {
         if (StringUtils.isEmpty(tenantCode)) {
             throw new IllegalArgumentException("Tenant code should not be empty");
         }
-        // All directory should end with File.separator
         return FileUtils.concatFilePath(getStorageBaseDirectory(), tenantCode);
     }
 
@@ -87,7 +104,6 @@ public abstract class AbstractStorageOperator implements StorageOperator {
             default:
                 throw new IllegalArgumentException("Resource type: " + resourceType + " not supported");
         }
-        // All directory should end with File.separator
         return resourceBaseDirectory;
     }
 
