@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.api.executor.workflow;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,6 +43,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -146,7 +149,8 @@ public class BackfillWorkflowExecutorDelegateTest {
                 .thenReturn(Optional.of(downstreamWorkflow));
 
         ArgumentCaptor<BackfillWorkflowDTO> captor = ArgumentCaptor.forClass(BackfillWorkflowDTO.class);
-        doReturn(Collections.singletonList(1)).when(backfillWorkflowExecutorDelegate).execute(captor.capture());
+        doReturn(Collections.singletonList(1)).when(backfillWorkflowExecutorDelegate)
+                .executeWithVisitedCodes(captor.capture(), any());
 
         Method method = BackfillWorkflowExecutorDelegate.class.getDeclaredMethod(
                 "doBackfillDependentWorkflow", BackfillWorkflowDTO.class, List.class, Set.class);
@@ -219,7 +223,8 @@ public class BackfillWorkflowExecutorDelegateTest {
                 .thenReturn(Optional.of(downstreamWorkflow));
 
         ArgumentCaptor<BackfillWorkflowDTO> captor = ArgumentCaptor.forClass(BackfillWorkflowDTO.class);
-        doReturn(Collections.singletonList(1)).when(backfillWorkflowExecutorDelegate).execute(captor.capture());
+        doReturn(Collections.singletonList(1)).when(backfillWorkflowExecutorDelegate)
+                .executeWithVisitedCodes(captor.capture(), any());
 
         Method method = BackfillWorkflowExecutorDelegate.class.getDeclaredMethod(
                 "doBackfillDependentWorkflow", BackfillWorkflowDTO.class, List.class, Set.class);
@@ -281,7 +286,7 @@ public class BackfillWorkflowExecutorDelegateTest {
         method.invoke(backfillWorkflowExecutorDelegate, dto, Collections.singletonList("2026-02-01 00:00:00"),
                 visitedCodes);
 
-        verify(backfillWorkflowExecutorDelegate, never()).execute(org.mockito.ArgumentMatchers.any());
+        verify(backfillWorkflowExecutorDelegate, never()).executeWithVisitedCodes(any(), any());
     }
 
     @Test
@@ -324,6 +329,78 @@ public class BackfillWorkflowExecutorDelegateTest {
         method.invoke(backfillWorkflowExecutorDelegate, dto, Collections.singletonList("2026-02-01 00:00:00"),
                 visitedCodes);
 
-        verify(backfillWorkflowExecutorDelegate, never()).execute(org.mockito.ArgumentMatchers.any());
+        verify(backfillWorkflowExecutorDelegate, never()).executeWithVisitedCodes(any(), any());
+    }
+
+    @Test
+    public void testDoBackfillDependentWorkflow_MultiLevelAndCycle() throws Exception {
+        long workflowA = 10L;
+        long workflowB = 20L;
+        long workflowC = 30L;
+
+        WorkflowDefinition upstreamA =
+                WorkflowDefinition.builder().code(workflowA).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition downstreamB =
+                WorkflowDefinition.builder().code(workflowB).releaseState(ReleaseState.ONLINE).warningGroupId(1)
+                        .build();
+        WorkflowDefinition downstreamC =
+                WorkflowDefinition.builder().code(workflowC).releaseState(ReleaseState.ONLINE).warningGroupId(2)
+                        .build();
+
+        BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                .runMode(RunMode.RUN_MODE_SERIAL)
+                .backfillDateList(Collections.<ZonedDateTime>emptyList())
+                .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                .allLevelDependent(true)
+                .executionOrder(ExecutionOrder.ASC_ORDER)
+                .build();
+
+        BackfillWorkflowDTO dtoA = BackfillWorkflowDTO.builder()
+                .workflowDefinition(upstreamA)
+                .backfillParams(params)
+                .build();
+
+        DependentWorkflowDefinition depToB = new DependentWorkflowDefinition();
+        depToB.setWorkflowDefinitionCode(workflowB);
+        DependentWorkflowDefinition depToA = new DependentWorkflowDefinition();
+        depToA.setWorkflowDefinitionCode(workflowA);
+        DependentWorkflowDefinition depToC = new DependentWorkflowDefinition();
+        depToC.setWorkflowDefinitionCode(workflowC);
+
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowA))
+                .thenReturn(Collections.singletonList(depToB));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowB))
+                .thenReturn(Arrays.asList(depToA, depToC));
+        when(workflowDefinitionDao.queryByCode(workflowB)).thenReturn(Optional.of(downstreamB));
+        when(workflowDefinitionDao.queryByCode(workflowC)).thenReturn(Optional.of(downstreamC));
+
+        ArgumentCaptor<BackfillWorkflowDTO> captor = ArgumentCaptor.forClass(BackfillWorkflowDTO.class);
+        doReturn(Collections.singletonList(1)).when(backfillWorkflowExecutorDelegate)
+                .executeWithVisitedCodes(captor.capture(), any());
+
+        Method method = BackfillWorkflowExecutorDelegate.class.getDeclaredMethod(
+                "doBackfillDependentWorkflow", BackfillWorkflowDTO.class, List.class, Set.class);
+        method.setAccessible(true);
+
+        List<String> backfillTimeList = Collections.singletonList("2026-02-01 00:00:00");
+        Set<Long> visitedCodes = new HashSet<>();
+        visitedCodes.add(workflowA);
+
+        // Level 1: A -> B
+        method.invoke(backfillWorkflowExecutorDelegate, dtoA, backfillTimeList, visitedCodes);
+        BackfillWorkflowDTO dtoB = captor.getAllValues().get(0);
+
+        // Level 2: B -> A(cycle, should skip) and B -> C(should trigger)
+        method.invoke(backfillWorkflowExecutorDelegate, dtoB, backfillTimeList, visitedCodes);
+
+        verify(backfillWorkflowExecutorDelegate, times(2)).executeWithVisitedCodes(any(), any());
+        verify(workflowDefinitionDao, never()).queryByCode(workflowA);
+
+        List<Long> triggeredCodes = captor.getAllValues().stream()
+                .map(it -> it.getWorkflowDefinition().getCode())
+                .collect(Collectors.toList());
+        Assertions.assertEquals(Arrays.asList(workflowB, workflowC), triggeredCodes);
+        Assertions.assertTrue(visitedCodes.contains(workflowB));
+        Assertions.assertTrue(visitedCodes.contains(workflowC));
     }
 }
