@@ -278,7 +278,8 @@ public class BackfillWorkflowExecutorDelegateTest {
 
         Set<Long> visitedCodes = new HashSet<>();
         visitedCodes.add(dto.getWorkflowDefinition().getCode());
-        method.invoke(backfillWorkflowExecutorDelegate, dto, Collections.singletonList("2026-02-01 00:00:00"), visitedCodes);
+        method.invoke(backfillWorkflowExecutorDelegate, dto, Collections.singletonList("2026-02-01 00:00:00"),
+                visitedCodes);
 
         verify(backfillWorkflowExecutorDelegate, never()).execute(org.mockito.ArgumentMatchers.any());
     }
@@ -320,7 +321,8 @@ public class BackfillWorkflowExecutorDelegateTest {
 
         Set<Long> visitedCodes = new HashSet<>();
         visitedCodes.add(dto.getWorkflowDefinition().getCode());
-        method.invoke(backfillWorkflowExecutorDelegate, dto, Collections.singletonList("2026-02-01 00:00:00"), visitedCodes);
+        method.invoke(backfillWorkflowExecutorDelegate, dto, Collections.singletonList("2026-02-01 00:00:00"),
+                visitedCodes);
 
         verify(backfillWorkflowExecutorDelegate, never()).execute(org.mockito.ArgumentMatchers.any());
     }
