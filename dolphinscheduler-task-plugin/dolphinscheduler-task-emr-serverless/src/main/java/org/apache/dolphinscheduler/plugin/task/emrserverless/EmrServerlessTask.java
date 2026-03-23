@@ -47,6 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 import com.amazonaws.SdkBaseException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.DefaultAWSCredentialsProviderChain;
+import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.services.emrserverless.AWSEMRServerless;
 import com.amazonaws.services.emrserverless.AWSEMRServerlessClientBuilder;
 import com.amazonaws.services.emrserverless.model.CancelJobRunRequest;
@@ -59,6 +60,7 @@ import com.amazonaws.services.emrserverless.model.StartJobRunResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.common.collect.Sets;
 
 /**
@@ -82,13 +84,14 @@ public class EmrServerlessTask extends AbstractRemoteTask {
     /**
      * ObjectMapper configured for AWS SDK request/response deserialization.
      */
-    static final ObjectMapper objectMapper = new ObjectMapper()
+    static final ObjectMapper objectMapper = JsonMapper.builder()
             .configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
-            .setTimeZone(SystemConstants.DEFAULT_TIME_ZONE)
-            .setPropertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy());
+            .defaultTimeZone(SystemConstants.DEFAULT_TIME_ZONE)
+            .propertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy())
+            .build();
 
     private final TaskExecutionContext taskExecutionContext;
 
@@ -305,10 +308,16 @@ public class EmrServerlessTask extends AbstractRemoteTask {
 
         String region = awsProperties.get(AwsConfigurationKeys.AWS_REGION);
 
-        // Note: unlike S3, EMR Serverless has no local emulator, so we ignore
-        // the endpoint configuration (which may point to a local MinIO/S3 mock)
-        // and always use the standard AWS EMR Serverless endpoint resolved by region.
-        if (StringUtils.isNotEmpty(region)) {
+        // Support custom endpoint for testing with LocalStack or other AWS mocks
+        String endpoint = PropertyUtils.getString("emr.serverless.endpoint", System.getenv("EMR_SERVERLESS_ENDPOINT"));
+        if (StringUtils.isNotBlank(endpoint)) {
+            log.info("Using custom EMR Serverless endpoint: {}", endpoint);
+            if (StringUtils.isEmpty(region)) {
+                region = "us-east-1"; // Default region for LocalStack
+            }
+            builder.withEndpointConfiguration(
+                    new AwsClientBuilder.EndpointConfiguration(endpoint, region));
+        } else if (StringUtils.isNotEmpty(region)) {
             builder.withRegion(region);
         }
 
