@@ -43,7 +43,7 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v4
+      - uses: .github/actions/paths-filter
         id: filter
         with:
           filters: |
