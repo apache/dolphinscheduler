@@ -25,6 +25,3 @@
 	path = .github/actions/auto-assign-action
 	url = https://github.com/kentaro-m/auto-assign-action.git
 	branch = 288f36f
-[submodule ".github/actions/workflow-telemetry-action"]
-	path = .github/actions/workflow-telemetry-action
-	url = https://github.com/catchpoint/workflow-telemetry-action
