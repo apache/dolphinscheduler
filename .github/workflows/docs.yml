@@ -71,6 +71,8 @@ jobs:
       helm-doc: ${{ steps.filter.outputs.helm-doc }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          submodules: true
       - uses: ./.github/actions/paths-filter
         id: filter
         with:

@@ -38,6 +38,8 @@ jobs:
       db-schema: ${{ steps.filter.outputs.db-schema }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          submodules: true
       - uses: ./.github/actions/paths-filter
         id: filter
         with:
