@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.WorkflowFailoverCommandParam;
+import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -48,6 +49,7 @@ public class WorkflowFailover {
                 workflowInstance.getId(),
                 workflowInstance.getState(),
                 WorkflowExecutionStatus.FAILOVER);
+        WorkflowInstanceMetrics.recordWorkflowInstanceFailover(workflowInstance.getWorkflowDefinitionCode());
 
         final WorkflowFailoverCommandParam failoverWorkflowCommandParam = WorkflowFailoverCommandParam.builder()
                 .workflowExecutionStatus(workflowInstance.getState())
