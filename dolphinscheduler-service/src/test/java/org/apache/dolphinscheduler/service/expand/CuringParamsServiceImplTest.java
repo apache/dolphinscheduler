@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 
 import org.apache.commons.collections4.MapUtils;
 
@@ -116,15 +117,15 @@ public class CuringParamsServiceImplTest {
 
         String result2 = curingParamsServiceImpl.curingGlobalParams(1, null, globalParamList,
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
-        Assertions.assertEquals(result2, JSONUtils.toJsonString(globalParamList));
+        Assertions.assertEquals(result2, GlobalParameterUtils.serializeGlobalParameter(globalParamList));
 
         String result3 = curingParamsServiceImpl.curingGlobalParams(1, globalParamMap, globalParamList,
                 CommandType.START_CURRENT_TASK_PROCESS, null, null);
-        Assertions.assertEquals(result3, JSONUtils.toJsonString(globalParamList));
+        Assertions.assertEquals(result3, GlobalParameterUtils.serializeGlobalParameter(globalParamList));
 
         String result4 = curingParamsServiceImpl.curingGlobalParams(1, globalParamMap, globalParamList,
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
-        Assertions.assertEquals(result4, JSONUtils.toJsonString(globalParamList));
+        Assertions.assertEquals(result4, GlobalParameterUtils.serializeGlobalParameter(globalParamList));
 
         // test var $ startsWith
         globalParamMap.put("bizDate", "${system.biz.date}");
@@ -140,7 +141,7 @@ public class CuringParamsServiceImplTest {
 
         String result5 = curingParamsServiceImpl.curingGlobalParams(1, globalParamMap, globalParamList,
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
-        Assertions.assertEquals(result5, JSONUtils.toJsonString(globalParamList));
+        Assertions.assertEquals(result5, GlobalParameterUtils.serializeGlobalParameter(globalParamList));
 
         Property testStartParamProperty = new Property("testStartParam", Direct.IN, DataType.VARCHAR, "");
         globalParamList.add(testStartParamProperty);
@@ -162,7 +163,7 @@ public class CuringParamsServiceImplTest {
 
         String result6 = curingParamsServiceImpl.curingGlobalParams(1, globalParamMap, globalParamList,
                 CommandType.START_CURRENT_TASK_PROCESS, scheduleTime, null);
-        Assertions.assertEquals(result6, JSONUtils.toJsonString(globalParamList));
+        Assertions.assertEquals(result6, GlobalParameterUtils.serializeGlobalParameter(globalParamList));
     }
 
     @Test
@@ -188,7 +189,7 @@ public class CuringParamsServiceImplTest {
         property.setValue("hello world");
         property.setType(DataType.VARCHAR);
         List<Property> properties = Lists.newArrayList(property);
-        workflowInstance.setGlobalParams(JSONUtils.toJsonString(properties));
+        workflowInstance.setGlobalParams(GlobalParameterUtils.serializeGlobalParameter(properties));
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setName("ProcessName-1");

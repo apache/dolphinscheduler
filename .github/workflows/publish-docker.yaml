@@ -33,20 +33,10 @@ jobs:
       packages: write
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
-      - name: Maximize runner space
-        uses: ./.github/actions/maximize-build-space
-        with:
-          root-reserve-mb: 28672
-          temp-reserve-mb: 10240
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Cache local Maven repository
         uses: actions/cache@v4
         with:

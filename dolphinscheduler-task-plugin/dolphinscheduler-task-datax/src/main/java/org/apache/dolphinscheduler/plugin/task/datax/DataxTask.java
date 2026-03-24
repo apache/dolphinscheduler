@@ -55,6 +55,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -309,7 +310,7 @@ public class DataxTask extends AbstractTask {
 
         ObjectNode speed = JSONUtils.createObjectNode();
 
-        speed.put("channel", DATAX_CHANNEL_COUNT);
+        speed.put("channel", Optional.of(dataXParameters.getJobChannel()).orElse(DATAX_CHANNEL_COUNT));
 
         if (dataXParameters.getJobSpeedByte() > 0) {
             speed.put("byte", dataXParameters.getJobSpeedByte());
@@ -333,7 +334,7 @@ public class DataxTask extends AbstractTask {
     private ObjectNode buildDataxCoreJson() {
 
         ObjectNode speed = JSONUtils.createObjectNode();
-        speed.put("channel", DATAX_CHANNEL_COUNT);
+        speed.put("channel", Optional.of(dataXParameters.getJobChannel()).orElse(DATAX_CHANNEL_COUNT));
 
         if (dataXParameters.getJobSpeedByte() > 0) {
             speed.put("byte", dataXParameters.getJobSpeedByte());

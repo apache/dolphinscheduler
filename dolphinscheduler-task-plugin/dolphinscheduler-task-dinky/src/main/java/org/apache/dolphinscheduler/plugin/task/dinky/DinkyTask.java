@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parser.PlaceholderUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -338,7 +339,8 @@ public class DinkyTask extends AbstractRemoteTask {
 
     private Map<String, String> generateVariables() {
         Map<String, String> variables = new ConcurrentHashMap<>();
-        List<Property> propertyList = JSONUtils.toList(taskExecutionContext.getGlobalParams(), Property.class);
+        List<Property> propertyList =
+                GlobalParameterUtils.deserializeGlobalParameter(taskExecutionContext.getGlobalParams());
         if (propertyList != null && !propertyList.isEmpty()) {
             for (Property property : propertyList) {
                 variables.put(property.getProp(), property.getValue());

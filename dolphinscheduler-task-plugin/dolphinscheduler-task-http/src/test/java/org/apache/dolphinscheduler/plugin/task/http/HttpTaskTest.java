@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
@@ -146,6 +147,25 @@ public class HttpTaskTest {
     }
 
     @Test
+    public void testHandleWithComplexHttpBody() throws Exception {
+        String httpBody = "{\"name\":\"tom\",\"scores\":[100,98],\"metadata\":{\"grade\":\"A\"}}";
+        String httpResponse = "{\"status\": \"success\"}";
+        String url = withMockWebServer(DEFAULT_MOCK_PATH, HttpStatus.SC_OK, httpResponse);
+        HttpTask httpTask = generateHttpTask(url, HttpRequestMethod.POST, httpBody,
+                new ArrayList<>(), null, HttpCheckCondition.STATUS_CODE_DEFAULT, "");
+
+        httpTask.handle(null);
+
+        MockWebServer server = getLatestMockWebServer();
+        RecordedRequest recordedRequest = server.takeRequest(1, TimeUnit.SECONDS);
+        Assertions.assertNotNull(recordedRequest);
+        String actualRequestBody = recordedRequest.getBody().readUtf8();
+        Assertions.assertTrue(actualRequestBody.contains("\"scores\":[100,98]"));
+        Assertions.assertTrue(actualRequestBody.contains("\"metadata\":{\"grade\":\"A\"}"));
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+    }
+
+    @Test
     public void testHandleWithHttpParameterParams() throws Exception {
         List<HttpProperty> httpParams = new ArrayList<>();
         HttpProperty property = new HttpProperty();
@@ -241,9 +261,21 @@ public class HttpTaskTest {
                                       String condition, int actualResponseCode,
                                       String actualResponseBody) throws IOException {
         String url = withMockWebServer(mockPath, actualResponseCode, actualResponseBody);
+        return generateHttpTask(url, httpRequestMethod, httpBody, httpParams, prepareParamsMap,
+                httpCheckConditionType, condition);
+    }
+
+    private HttpTask generateHttpTask(String url, HttpRequestMethod httpRequestMethod, String httpBody,
+                                      List<HttpProperty> httpParams,
+                                      Map<String, String> prepareParamsMap, HttpCheckCondition httpCheckConditionType,
+                                      String condition) throws JsonProcessingException {
         String paramData =
                 generateHttpParameters(url, httpRequestMethod, httpBody, httpParams, httpCheckConditionType, condition);
         return generateHttpTaskFromParamData(paramData, prepareParamsMap);
+    }
+
+    private MockWebServer getLatestMockWebServer() {
+        return mockWebServers.get(mockWebServers.size() - 1);
     }
 
     private HttpTask generateHttpTaskFromParamData(String paramData, Map<String, String> prepareParamsMap) {

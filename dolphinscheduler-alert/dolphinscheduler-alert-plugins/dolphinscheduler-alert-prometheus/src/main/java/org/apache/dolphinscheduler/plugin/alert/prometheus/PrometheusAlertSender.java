@@ -53,13 +53,13 @@ public class PrometheusAlertSender {
     private String generatorURL;
     private String annotations;
 
-    public PrometheusAlertSender(Map<String, String> config) {
+    PrometheusAlertSender(Map<String, String> config) {
         url = config.get(PrometheusAlertConstants.NAME_ALERT_MANAGER_URL);
         generatorURL = config.get(PrometheusAlertConstants.NAME_GENERATOR_URL);
         annotations = config.get(PrometheusAlertConstants.NAME_ALERT_MANAGER_ANNOTATIONS);
     }
 
-    public AlertResult sendMessage(AlertData alertData) {
+    AlertResult sendMessage(AlertData alertData) {
         AlertResult alertResult;
         try {
             String resp = sendMsg(alertData);
@@ -104,7 +104,7 @@ public class PrometheusAlertSender {
         }
     }
 
-    public AlertResult checkSendAlertManageMsgResult(String resp) {
+    private AlertResult checkSendAlertManageMsgResult(String resp) {
         AlertResult alertResult = new AlertResult();
         alertResult.setSuccess(false);
 
@@ -119,7 +119,7 @@ public class PrometheusAlertSender {
         return alertResult;
     }
 
-    public String generateContentJson(AlertData alertData) {
+    private String generateContentJson(AlertData alertData) {
         List<HashMap> list = JSONUtils.toList(alertData.getContent(), HashMap.class);
         HashMap<String, String> labels = new HashMap<>();
         if (CollectionUtils.isEmpty(list)) {

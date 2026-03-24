@@ -58,14 +58,4 @@ public class PrometheusAlertSenderTest {
         Assertions.assertFalse(result.isSuccess());
     }
 
-    @Test
-    public void testCheckSendAlertManageMsgResult() {
-        PrometheusAlertSender prometheusAlertSender = new PrometheusAlertSender(config);
-        AlertResult alertResult1 = prometheusAlertSender.checkSendAlertManageMsgResult("");
-        Assertions.assertFalse(alertResult1.isSuccess());
-        Assertions.assertEquals("prometheus alert manager send fail, resp is ", alertResult1.getMessage());
-        AlertResult alertResult2 = prometheusAlertSender.checkSendAlertManageMsgResult("alert success");
-        Assertions.assertTrue(alertResult2.isSuccess());
-        Assertions.assertEquals("prometheus alert manager send success", alertResult2.getMessage());
-    }
 }
