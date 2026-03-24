@@ -131,7 +131,7 @@ jobs:
           java-version: 11
           distribution: 'adopt'
       - name: Collect Workflow Metrics
-        uses: dev-hato/actions-workflow-metrics@v1
+        uses: ./.github/actions/actions-workflow-metrics
       - name: Cache local Maven repository
         uses: actions/cache@v5
         with:

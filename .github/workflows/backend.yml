@@ -120,7 +120,7 @@ jobs:
         with:
           submodules: true
       - name: Collect Workflow Metrics
-        uses: dev-hato/actions-workflow-metrics@v1
+        uses: ./.github/actions/actions-workflow-metrics
       - uses: actions/download-artifact@v4
         name: Download Binary Package
         with:
@@ -149,7 +149,7 @@ jobs:
         with:
           submodules: true
       - name: Collect Workflow Metrics
-        uses: dev-hato/actions-workflow-metrics@v1
+        uses: ./.github/actions/actions-workflow-metrics
       - name: Download Binary Package
         uses: actions/download-artifact@v4
         with:

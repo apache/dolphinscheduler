@@ -99,7 +99,7 @@ jobs:
           submodules: true
 
       - name: Collect Workflow Metrics
-        uses: dev-hato/actions-workflow-metrics@v1
+        uses: ./.github/actions/actions-workflow-metrics
 
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
