@@ -40,7 +40,9 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+        with:
+          submodules: true
+      - uses: ./.github/actions/paths-filter
         id: filter
         with:
           filters: |
@@ -96,10 +98,8 @@ jobs:
         with:
           submodules: true
 
-      - name: Collect Workflow Telemetry
-        uses: ./.github/actions/workflow-telemetry-action
-        with:
-          comment_on_pr: false
+      - name: Collect Workflow Metrics
+        uses: ./.github/actions/actions-workflow-metrics
 
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
@@ -112,7 +112,7 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'adopt'
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
@@ -186,7 +186,7 @@ jobs:
           java-version: 17
           distribution: 'adopt'
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend

@@ -53,7 +53,7 @@ jobs:
         env:
           NIST_NVD_API_KEY: ${{ secrets.NIST_NVD_API_KEY }}
       - name: Upload report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         if: ${{ cancelled() || failure() }}
         continue-on-error: true
         with:
