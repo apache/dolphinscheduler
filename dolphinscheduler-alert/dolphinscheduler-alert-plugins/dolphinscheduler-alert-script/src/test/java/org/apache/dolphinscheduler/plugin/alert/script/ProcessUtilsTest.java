@@ -17,35 +17,52 @@
 
 package org.apache.dolphinscheduler.plugin.alert.script;
 
+import java.io.File;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 
 /**
  * ProcessUtilsTest
  */
 public class ProcessUtilsTest {
 
-    private static final String rootPath = System.getProperty("user.dir");
-
-    private static final String shellFilPath =
-            rootPath + "/dolphinscheduler-alert-plugins/dolphinscheduler-alert-script/src/test/script/shell/test.sh";
-
-    private String[] cmd = {"/bin/sh", "-c", shellFilPath + " -t 1"};
-
     @Test
-    @DisabledOnOs(OS.WINDOWS)
     public void testExecuteScript() {
+        String javaBin = getJavaBin();
+        String[] cmd = {javaBin, "-cp", System.getProperty("java.class.path"),
+                ProcessUtilsTest.class.getName() + "$SimpleMain"};
         int code = ProcessUtils.executeScript(60, cmd);
-        Assertions.assertNotEquals(-1, code);
+        Assertions.assertNotEquals(ProcessUtils.EXECUTE_ERROR_EXIT_CODE, code);
     }
 
     @Test
-    @DisabledOnOs(OS.WINDOWS)
     public void testExecuteScriptTimeout() {
-        String[] sleepCmd = {"/bin/sh", "-c", "sleep 30"};
+        String javaBin = getJavaBin();
+        String[] sleepCmd = {javaBin, "-cp", System.getProperty("java.class.path"),
+                ProcessUtilsTest.class.getName() + "$SleepMain"};
         int code = ProcessUtils.executeScript(2, sleepCmd);
-        Assertions.assertEquals(-2, code);
+        Assertions.assertEquals(ProcessUtils.EXECUTE_TIMEOUT_EXIT_CODE, code);
+    }
+
+    private static String getJavaBin() {
+        String executableName = System.getProperty("os.name").toLowerCase().contains("win")
+                ? "java.exe"
+                : "java";
+        return System.getProperty("java.home") + File.separator + "bin" + File.separator + executableName;
+    }
+
+    public static class SimpleMain {
+
+        public static void main(String[] args) {
+            // Intentionally empty, returning with 0 means success.
+        }
+    }
+
+    public static class SleepMain {
+
+        public static void main(String[] args) throws InterruptedException {
+            Thread.sleep(30_000L);
+        }
     }
 }

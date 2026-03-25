@@ -25,6 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class ProcessUtils {
 
+    static final int EXECUTE_ERROR_EXIT_CODE = -1;
+    static final int EXECUTE_TIMEOUT_EXIT_CODE = 124;
+
     private ProcessUtils() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
@@ -34,11 +37,11 @@ public final class ProcessUtils {
      *
      * @param timeoutSeconds timeout in seconds, if <= 0 waits indefinitely
      * @param cmd cmd params
-     * @return exit code, -1 if error, -2 if timeout
+     * @return exit code, -1 if error, 124 if timeout
      */
     static Integer executeScript(long timeoutSeconds, String... cmd) {
 
-        int exitCode = -1;
+        int exitCode = EXECUTE_ERROR_EXIT_CODE;
 
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
         try {
@@ -57,7 +60,7 @@ public final class ProcessUtils {
                     closeProcessStreams(process);
                     joinGobbler(inputStreamGobbler);
                     joinGobbler(errorStreamGobbler);
-                    return -2;
+                    return EXECUTE_TIMEOUT_EXIT_CODE;
                 }
             } else {
                 process.waitFor();
