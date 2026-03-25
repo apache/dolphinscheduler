@@ -38,7 +38,9 @@ jobs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+        with:
+          submodules: true
+      - uses: ./.github/actions/paths-filter
         id: filter
         with:
           filters: |
@@ -66,7 +68,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Cache local Maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
@@ -83,7 +85,7 @@ jobs:
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
           && du -sh /tmp/standalone-image.tar
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         name: Upload Docker Images
         with:
           name: standalone-image-api-test
@@ -128,12 +130,10 @@ jobs:
         with:
           java-version: 11
           distribution: 'adopt'
-      - name: Collect Workflow Telemetry
-        uses: ./.github/actions/workflow-telemetry-action
-        with:
-          comment_on_pr: false
+      - name: Collect Workflow Metrics
+        uses: ./.github/actions/actions-workflow-metrics
       - name: Cache local Maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
@@ -154,7 +154,7 @@ jobs:
             -DfailIfNoTests=false \
             -Dspotless.skip=true \
             -Dtest=${{ matrix.case.class }} test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         name: Upload Recording
         with:
