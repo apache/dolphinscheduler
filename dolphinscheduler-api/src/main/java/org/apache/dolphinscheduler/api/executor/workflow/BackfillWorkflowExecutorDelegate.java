@@ -184,10 +184,8 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 .dryRun(backfillWorkflowDTO.getDryRun())
                 .build();
 
-        final WorkflowBackfillTriggerResponse backfillTriggerResponse = Clients
-                .withService(IWorkflowControlClient.class)
-                .withHost(masterServer.getHost() + ":" + masterServer.getPort())
-                .backfillTriggerWorkflow(backfillTriggerRequest);
+        final WorkflowBackfillTriggerResponse backfillTriggerResponse =
+                triggerBackfillWorkflow(backfillTriggerRequest, masterServer);
         if (!backfillTriggerResponse.isSuccess()) {
             throw new ServiceException("Backfill workflow failed: " + backfillTriggerResponse.getMessage());
         }
@@ -195,15 +193,17 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         if (backfillParams.getBackfillDependentMode() == ComplementDependentMode.ALL_DEPENDENT) {
             final Set<Long> effectiveVisitedCodes = visitedCodes == null ? new HashSet<>() : visitedCodes;
             effectiveVisitedCodes.add(backfillWorkflowDTO.getWorkflowDefinition().getCode());
-            doBackfillDependentWorkflowForTesting(backfillWorkflowDTO, backfillTimeList, effectiveVisitedCodes);
+            doBackfillDependentWorkflow(backfillWorkflowDTO, backfillTimeList, effectiveVisitedCodes);
         }
         return backfillTriggerResponse.getWorkflowInstanceId();
     }
 
-    void doBackfillDependentWorkflowForTesting(final BackfillWorkflowDTO backfillWorkflowDTO,
-                                               final List<String> backfillTimeList,
-                                               final Set<Long> visitedCodes) {
-        doBackfillDependentWorkflow(backfillWorkflowDTO, backfillTimeList, visitedCodes);
+    protected WorkflowBackfillTriggerResponse triggerBackfillWorkflow(final WorkflowBackfillTriggerRequest request,
+                                                                      final Server masterServer) {
+        return Clients
+                .withService(IWorkflowControlClient.class)
+                .withHost(masterServer.getHost() + ":" + masterServer.getPort())
+                .backfillTriggerWorkflow(request);
     }
 
     private void doBackfillDependentWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
