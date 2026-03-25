@@ -35,8 +35,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
-import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -433,7 +433,8 @@ public class SqlTask extends AbstractTask {
             sqlParameters.setSql(sqlContent);
         } catch (IOException e) {
             log.error("Read sql content from resource file {} error", resourcePathInStorage, e);
-            throw new TaskException(String.format("Read sql content from resource file %s error", resourcePathInStorage),
+            throw new TaskException(
+                    String.format("Read sql content from resource file %s error", resourcePathInStorage),
                     e);
         }
     }

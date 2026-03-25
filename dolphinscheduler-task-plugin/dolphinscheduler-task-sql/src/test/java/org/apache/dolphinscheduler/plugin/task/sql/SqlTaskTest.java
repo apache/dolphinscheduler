@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -374,6 +375,118 @@ class SqlTaskTest {
         Assertions.assertTrue(
                 cause.getMessage().contains("duplicate column name"),
                 "TaskException message should mention duplicate column name");
+    }
+
+    @Test
+    void testGetSqlAndSqlParamsMap_nullPrepareParamsMap_replacesScheduleTimeAndTitlePlaceholder() throws Exception {
+        long scheduleTimeMillis = 1700000000000L;
+        String expectedDate = DateUtils.format(new java.util.Date(scheduleTimeMillis), "yyyyMMdd");
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\",\"title\":\"title-$[yyyyMMdd]\"}");
+        ctx.setScheduleTime(scheduleTimeMillis);
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+
+        // Ensure prepareParamsMap == null
+        ctx.setPrepareParamsMap(null);
+
+        SqlTask task = new SqlTask(ctx);
+
+        Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
+        method.setAccessible(true);
+
+        String inputSql = "select '" + "$[yyyyMMdd]" + "'";
+        SqlBinds binds = (SqlBinds) method.invoke(task, inputSql);
+
+        Assertions.assertEquals("select '" + expectedDate + "'", binds.getSql());
+        SqlParameters loadedParameters = (SqlParameters) task.getParameters();
+        Assertions.assertTrue(loadedParameters.getTitle().matches("title-\\d{8}"));
+    }
+
+    @Test
+    void testGetSqlAndSqlParamsMap_withPrepareParamsMap_coversPrintReplacedSql() throws Exception {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("dt", new Property("dt", Direct.IN, DataType.VARCHAR, "1970"));
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\"}");
+        ctx.setScheduleTime(System.currentTimeMillis());
+        ctx.setTaskInstanceId(1);
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+        ctx.setPrepareParamsMap(prepareParamsMap);
+
+        SqlTask task = new SqlTask(ctx);
+
+        Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
+        method.setAccessible(true);
+
+        String inputSql = "select * from student where dt=${dt}";
+        SqlBinds binds = (SqlBinds) method.invoke(task, inputSql);
+
+        Assertions.assertEquals("select * from student where dt=?", binds.getSql());
+        Assertions.assertNotNull(binds.getParamsMap());
+        Assertions.assertEquals("1970", binds.getParamsMap().get(1).getValue());
+    }
+
+    @Test
+    void testEnsureSqlContent_whenSqlAlreadyPresent_doesNotReadResource() throws Exception {
+        SqlTask task = this.sqlTask;
+
+        Method ensureSqlContent = SqlTask.class.getDeclaredMethod("ensureSqlContent");
+        ensureSqlContent.setAccessible(true);
+
+        // Should early return because sqlParameters.getSql() is not empty.
+        ensureSqlContent.invoke(task);
+    }
+
+    @Test
+    void testEnsureSqlContent_whenResourceMissing_throwsTaskException(@TempDir Path tempDir) throws Exception {
+        SqlParameters sqlParameters = new SqlParameters();
+        sqlParameters.setType("HIVE");
+        sqlParameters.setDatasource(1);
+        sqlParameters.setSql(null);
+        sqlParameters.setSqlResource("/sql/missing.sql");
+
+        DataSourceParameters dataSourceParameters = new DataSourceParameters();
+        dataSourceParameters.setType(DbType.HIVE);
+        dataSourceParameters.setResourceType(ResourceType.DATASOURCE.name());
+
+        ResourceParametersHelper resourceParametersHelper = new ResourceParametersHelper();
+        resourceParametersHelper.put(ResourceType.DATASOURCE, 1, dataSourceParameters);
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(sqlParameters));
+        taskExecutionContext.setScheduleTime(System.currentTimeMillis());
+        taskExecutionContext.setResourceParametersHelper(resourceParametersHelper);
+
+        ResourceContext resourceContext = new ResourceContext();
+        // Point to a file that does not exist to trigger IOException in ensureSqlContent.
+        Path missingLocalPath = tempDir.resolve("missing.sql");
+        resourceContext.addResourceItem(ResourceContext.ResourceItem.builder()
+                .resourceAbsolutePathInStorage(sqlParameters.getSqlResource())
+                .resourceAbsolutePathInLocal(missingLocalPath.toString())
+                .build());
+        taskExecutionContext.setResourceContext(resourceContext);
+
+        SqlTask task = new SqlTask(taskExecutionContext);
+
+        Method ensureSqlContent = SqlTask.class.getDeclaredMethod("ensureSqlContent");
+        ensureSqlContent.setAccessible(true);
+
+        InvocationTargetException thrown = Assertions.assertThrows(
+                InvocationTargetException.class,
+                () -> ensureSqlContent.invoke(task));
+        Assertions.assertInstanceOf(TaskException.class, thrown.getCause());
+    }
+
+    private ResourceParametersHelper getResourceParametersHelperWithDatasourceType(DbType dbType) {
+        DataSourceParameters parameters = new DataSourceParameters();
+        parameters.setType(dbType);
+        parameters.setResourceType(ResourceType.DATASOURCE.name());
+
+        ResourceParametersHelper resourceParametersHelper = new ResourceParametersHelper();
+        resourceParametersHelper.put(ResourceType.DATASOURCE, 1, parameters);
+        return resourceParametersHelper;
     }
 
 }
