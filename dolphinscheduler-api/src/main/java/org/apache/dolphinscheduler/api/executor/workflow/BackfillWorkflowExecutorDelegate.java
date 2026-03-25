@@ -42,7 +42,9 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -118,11 +120,14 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
 
         log.info("In parallel mode, current expectedParallelismNumber: {}", expectedParallelismNumber);
         final List<Integer> workflowInstanceIdList = Lists.newArrayList();
+        final Set<Long> baseVisitedCodes = visitedCodes == null ? new HashSet<>() : visitedCodes;
         for (List<ZonedDateTime> stringDate : splitDateTime(listDate, expectedParallelismNumber)) {
+            // Each parallel chunk should keep its own traversal context to avoid cross-chunk pollution.
+            final Set<Long> chunkVisitedCodes = new HashSet<>(baseVisitedCodes);
             final Integer workflowInstanceId = doBackfillWorkflow(
                     backfillWorkflowDTO,
                     stringDate.stream().map(DateUtils::dateToString).collect(Collectors.toList()),
-                    visitedCodes);
+                    chunkVisitedCodes);
             workflowInstanceIdList.add(workflowInstanceId);
         }
         return workflowInstanceIdList;
@@ -190,9 +195,15 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         if (backfillParams.getBackfillDependentMode() == ComplementDependentMode.ALL_DEPENDENT) {
             final Set<Long> effectiveVisitedCodes = visitedCodes == null ? new HashSet<>() : visitedCodes;
             effectiveVisitedCodes.add(backfillWorkflowDTO.getWorkflowDefinition().getCode());
-            doBackfillDependentWorkflow(backfillWorkflowDTO, backfillTimeList, effectiveVisitedCodes);
+            doBackfillDependentWorkflowForTesting(backfillWorkflowDTO, backfillTimeList, effectiveVisitedCodes);
         }
         return backfillTriggerResponse.getWorkflowInstanceId();
+    }
+
+    void doBackfillDependentWorkflowForTesting(final BackfillWorkflowDTO backfillWorkflowDTO,
+                                               final List<String> backfillTimeList,
+                                               final Set<Long> visitedCodes) {
+        doBackfillDependentWorkflow(backfillWorkflowDTO, backfillTimeList, visitedCodes);
     }
 
     private void doBackfillDependentWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
@@ -209,6 +220,12 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
             log.info("No downstream dependent workflows found for workflow code {}", upstreamWorkflowCode);
             return;
         }
+        final Set<Long> downstreamCodes = downstreamDefinitions.stream()
+                .map(DependentWorkflowDefinition::getWorkflowDefinitionCode)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        final List<WorkflowDefinition> downstreamWorkflowList = workflowDefinitionDao.queryByCodes(downstreamCodes);
+        final Map<Long, WorkflowDefinition> downstreamWorkflowMap = downstreamWorkflowList.stream()
+                .collect(Collectors.toMap(WorkflowDefinition::getCode, workflow -> workflow));
 
         // 2) Convert upstream backfill time from string to ZonedDateTime as the base business dates for downstream
         // backfill
@@ -226,8 +243,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 continue;
             }
 
-            WorkflowDefinition downstreamWorkflow =
-                    workflowDefinitionDao.queryByCode(downstreamCode).orElse(null);
+            WorkflowDefinition downstreamWorkflow = downstreamWorkflowMap.get(downstreamCode);
             if (downstreamWorkflow == null) {
                 log.warn("Skip dependent workflow {}, workflow definition not found", downstreamCode);
                 continue;
