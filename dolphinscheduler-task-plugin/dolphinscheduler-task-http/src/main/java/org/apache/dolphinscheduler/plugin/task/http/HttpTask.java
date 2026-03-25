@@ -41,6 +41,9 @@ import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+
 @Slf4j
 public class HttpTask extends AbstractTask {
 
@@ -251,13 +254,18 @@ public class HttpTask extends AbstractTask {
     private Map<String, Object> getRequestBody() {
         String convertedParams = ParameterUtils.convertParameterPlaceholders(httpParameters.getHttpRequestBody(),
                 ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()));
-        Map<String, String> requestBody = JSONUtils.toMap(convertedParams);
-        if (requestBody == null) {
+        JsonNode requestBodyJsonNode = JSONUtils.parseObject(convertedParams, JsonNode.class);
+        if (requestBodyJsonNode == null) {
             return null;
         }
 
-        return requestBody.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        if (!requestBodyJsonNode.isObject()) {
+            throw new IllegalArgumentException(String.format("Http request body should be a json object, but got: %s",
+                    convertedParams));
+        }
+
+        return JSONUtils.parseObject(requestBodyJsonNode.toString(), new TypeReference<Map<String, Object>>() {
+        });
     }
 
     @Override

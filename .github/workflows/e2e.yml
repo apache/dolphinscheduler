@@ -39,8 +39,10 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+      - uses: ./.github/actions/paths-filter
         id: filter
         with:
           filters: |
@@ -53,7 +55,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Sanity Check
@@ -61,7 +63,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
       - name: Cache local Maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
@@ -78,7 +80,7 @@ jobs:
         run: |
           docker save apache/dolphinscheduler-standalone-server:ci -o /tmp/standalone-image.tar \
           && du -sh /tmp/standalone-image.tar
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         name: Upload Docker Images
         with:
           name: standalone-image-e2e
@@ -140,29 +142,27 @@ jobs:
       - run: df -h
       - name: "node-cleanup"
         run: |
-         sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
-         sudo docker image prune --all --force
-         sudo docker builder prune -a
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          sudo docker builder prune -a
       - run: df -h
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Set up JDK 11
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 11
           distribution: 'adopt'
-      - name: Collect Workflow Telemetry
-        uses: ./.github/actions/workflow-telemetry-action
-        with:
-          comment_on_pr: false
+      - name: Collect Workflow Metrics
+        uses: ./.github/actions/actions-workflow-metrics
       - name: Cache local Maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-e2e
           restore-keys: ${{ runner.os }}-maven-
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         name: Download Docker Images
         with:
           name: standalone-image-e2e
@@ -176,7 +176,7 @@ jobs:
           ./mvnw -B -f dolphinscheduler-e2e/pom.xml -am \
             -DfailIfNoTests=false \
             -Dtest=${{ matrix.case.class }} test
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         if: always()
         name: Upload Recording
         with:

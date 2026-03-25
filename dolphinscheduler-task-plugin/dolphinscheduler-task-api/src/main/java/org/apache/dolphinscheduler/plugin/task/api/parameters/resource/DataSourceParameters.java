@@ -19,38 +19,20 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters.resource;
 
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class DataSourceParameters extends AbstractResourceParameters {
 
     private DbType type;
-
-    public String getResourceType() {
-        return resourceType;
-    }
-
-    public void setResourceType(String resourceType) {
-        this.resourceType = resourceType;
-    }
 
     @JsonProperty(value = "DATASOURCE")
     private String resourceType;
 
     private String connectionParams;
 
-    public DbType getType() {
-        return type;
-    }
-
-    public void setType(DbType type) {
-        this.type = type;
-    }
-
-    public String getConnectionParams() {
-        return connectionParams;
-    }
-
-    public void setConnectionParams(String connectionParams) {
-        this.connectionParams = connectionParams;
-    }
 }

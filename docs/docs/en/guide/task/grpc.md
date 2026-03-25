@@ -12,21 +12,19 @@ This node is used to execute gRPC tasks and supports checking gRPC status codes,
 
 ## Task Parameters
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- For default parameter descriptions, please refer to [DolphinScheduler Task Parameter Appendix]&#40;appendix.md#默认任务参数&#41; under `Default Task Parameters`.)
+- For default parameter descriptions, please refer to [DolphinScheduler Task Parameters Appendix](appendix.md#default-task-parameters) under `Default Task Parameters`.
 
-- For default parameter descriptions, please refer to [DolphinScheduler Task Parameter Appendix](appendix.md) under `Default Task Parameters`.
-
-|  **Task Parameter**  |                                                                         **Description**                                                                         |
-|----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| gRPC Url             | gRPC request URL, must use the `hostname:port` format                                                                                                           |
-| gRPC Credential Type | Supports None (insecure), and client default SSL/TLS credential types                                                                                           |
-| Protobuf Definition  | Protobuf code defining the service in the `.proto` file, will be converted to JSON Descriptor when saved                                                        |
-| gRPC Method          | The rpc method to call, must be defined in the service definition, written as `Greeter/SayHello` format                                                         |
-| Message Content      | Request message defined in JSON, will be merged into the service definition when requesting                                                                     |
-| gRPC Check Condition | Supports default gRPC status code (OK), custom status codes                                                                                                     |
-| gRPC Condition       | When check condition is set to custom response code, must fill in validation content, must match [gRPC status codes](https://grpc.io/docs/guides/status-codes/) |
-| Custom Parameters    | User-defined parameters local to gRPC, will replace content in the script like ${variable}                                                                      |
+|   **Task Parameter**   |                                                                          **Description**                                                                          |
+|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| gRPC Url               | gRPC request URL, must use the `hostname:port` format                                                                                                             |
+| gRPC Credential Type   | Supports None (insecure), and client default SSL/TLS credential types                                                                                             |
+| Protobuf Definition    | Protobuf code defining the service in the `.proto` file, will be converted to JSON Descriptor when saved                                                          |
+| gRPC Method            | The rpc method to call, must be defined in the service definition, written as `Greeter/SayHello` format                                                           |
+| Message Content        | Request message defined in JSON, will be merged into the service definition when requesting                                                                       |
+| gRPC Check Condition   | Supports default gRPC status code (OK), custom status codes                                                                                                       |
+| gRPC Condition         | When check condition is set to custom response code, must fill in validation content, must match [gRPC status codes](https://grpc.io/docs/guides/status-codes/)   |
+| Custom Parameters      | User-defined parameters local to gRPC, will replace content in the script like ${variable}                                                                        |
 
 ## Task Output Parameters
 
