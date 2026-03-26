@@ -291,9 +291,8 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     allLevelDependent ? originalParams.getBackfillDependentMode() : ComplementDependentMode.OFF_MODE;
 
             BackfillWorkflowDTO.BackfillParamsDTO dependentParams = BackfillWorkflowDTO.BackfillParamsDTO.builder()
-                    // When the upstream is PARALLEL, dependent triggers should not re-apply
-                    // chunking on the already sliced date list; force SERIAL to keep
-                    // "traverse dependencies once per upstream date-chunk".
+                    // If upstream runs in PARALLEL mode, force downstream to SERIAL to avoid
+                    // re-chunking the already sliced date list; otherwise keep the original runMode.
                     .runMode(originalParams.getRunMode() == RunMode.RUN_MODE_PARALLEL ? RunMode.RUN_MODE_SERIAL
                             : originalParams.getRunMode())
                     .backfillDateList(upstreamBackfillDates)
@@ -333,7 +332,10 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     downstreamCode, upstreamWorkflowCode,
                     backfillDateTimes.stream().map(DateUtils::dateToString).collect(Collectors.toList()));
 
-            // 4) Mark as visiting before recursive trigger to detect cycles, then trigger downstream backfill
+            // 4) Mark as visiting before recursive trigger to detect cycles, then trigger downstream backfill.
+            // Note: recursion depth equals the dependency chain length, which is typically single-digit
+            // in practice, so stack overflow is not a concern here. Consider switching to iterative
+            // BFS/DFS if very deep chains become a real-world requirement.
             visitedCodes.add(downstreamCode);
             executeWithVisitedCodes(dependentBackfillDTO, visitedCodes);
         }
