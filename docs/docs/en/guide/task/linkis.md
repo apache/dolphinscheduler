@@ -12,9 +12,6 @@ Click [here](https://linkis.apache.org/) for more information about `Apache Link
 
 ## Task Parameter
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 - Please refer to [Linkis-Cli Task Parameters](https://linkis.apache.org/zh-CN/docs/latest/user-guide/linkiscli-manual) `Linkis Support Parameters` section for Linkis parameters.
 

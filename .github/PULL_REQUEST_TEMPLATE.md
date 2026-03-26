@@ -1,6 +1,7 @@
 <!--Thanks very much for contributing to Apache DolphinScheduler, we are happy that you want to help us improve DolphinScheduler! -->
 
 ## Was this PR generated or assisted by AI?
+
 <!--(Please answer YES or NO. If YES, please specify which parts were generated or assisted by AI)-->
 
 ## Purpose of the pull request

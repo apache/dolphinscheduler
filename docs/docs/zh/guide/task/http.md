@@ -12,10 +12,7 @@
 
 ## 任务参数
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
-
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+- 默认参数说明请参考 [DolphinScheduler 任务参数附录](appendix.md) 的 `默认任务参数` 一栏。
 
 | **任务参数** |               **描述**                |
 |----------|-------------------------------------|
@@ -30,11 +27,11 @@
 
 | **任务参数** |       **描述**        |
 |----------|---------------------|
-| response | VARCHAR, http请求返回结果 |
+| response | VARCHAR，HTTP 请求返回结果 |
 
 可以在下游任务中使用 ${taskName.response} 引用任务输出参数。
 
-如，当前task1为http任务, 下游任务可以使用 `${task1.response}` 引用task1的输出参数
+例如，当前 task1 为 HTTP 任务，下游任务可以使用 `${task1.response}` 引用 task1 的输出参数
 
 ## 任务样例
 

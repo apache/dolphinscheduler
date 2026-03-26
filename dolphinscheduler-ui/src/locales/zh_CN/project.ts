@@ -629,6 +629,7 @@ export default {
     datax_job_speed_byte_info: '(KB，0代表不限制)',
     datax_job_speed_record: '限流(记录数)',
     datax_job_speed_record_info: '(0代表不限制)',
+    datax_job_channel: '数据管道数',
     datax_job_runtime_memory: '运行内存',
     datax_job_runtime_memory_xms: '最小内存',
     datax_job_runtime_memory_xmx: '最大内存',
