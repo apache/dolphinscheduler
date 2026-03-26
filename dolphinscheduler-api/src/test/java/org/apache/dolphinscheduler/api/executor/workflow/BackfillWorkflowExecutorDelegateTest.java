@@ -20,6 +20,9 @@ package org.apache.dolphinscheduler.api.executor.workflow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
@@ -33,19 +36,19 @@ import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
-import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.ArrayList;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -220,7 +223,193 @@ public class BackfillWorkflowExecutorDelegateTest {
                         .orElseThrow();
 
         Assertions.assertEquals(downstreamVersion, dependentRequest.getWorkflowVersion());
-        Assertions.assertEquals(Collections.singletonList(dependentTaskDefinitionCode), dependentRequest.getStartNodes());
+        Assertions.assertEquals(Collections.singletonList(dependentTaskDefinitionCode),
+                dependentRequest.getStartNodes());
         Assertions.assertEquals(dependentWorkerGroup, dependentRequest.getWorkerGroup());
+    }
+
+    @Test
+    public void testDoBackfillDependentWorkflow_AllLevelDependentFalse_TriggersDirectOnly() {
+        long upstreamCode = 10L;
+        long directDownstreamCode = 20L;
+
+        WorkflowDefinition upstreamWorkflow =
+                WorkflowDefinition.builder().code(upstreamCode).version(1).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition directDownstreamWorkflow =
+                WorkflowDefinition.builder().code(directDownstreamCode).version(1).releaseState(ReleaseState.ONLINE)
+                        .build();
+
+        DependentWorkflowDefinition directDep = new DependentWorkflowDefinition();
+        directDep.setWorkflowDefinitionCode(directDownstreamCode);
+        directDep.setTaskDefinitionCode(123L);
+        directDep.setWorkflowDefinitionVersion(1);
+
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode))
+                .thenReturn(Collections.singletonList(directDep));
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(directDownstreamCode)))
+                .thenReturn(Collections.singletonList(directDownstreamWorkflow));
+
+        User loginUser = new User();
+        loginUser.setId(1);
+
+        BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                .runMode(RunMode.RUN_MODE_SERIAL)
+                .backfillDateList(Collections.singletonList(ZonedDateTime.parse("2026-02-01T00:00:00Z")))
+                .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                .allLevelDependent(false)
+                .executionOrder(ExecutionOrder.ASC_ORDER)
+                .build();
+
+        BackfillWorkflowDTO upstreamDto = BackfillWorkflowDTO.builder()
+                .loginUser(loginUser)
+                .workflowDefinition(upstreamWorkflow)
+                .workerGroup("wg-upstream")
+                .backfillParams(params)
+                .build();
+
+        Server masterServer = new Server();
+        masterServer.setHost("127.0.0.1");
+        masterServer.setPort(1234);
+        when(registryClient.getRandomServer(RegistryNodeType.MASTER)).thenReturn(Optional.of(masterServer));
+
+        doReturn(WorkflowBackfillTriggerResponse.success(1)).when(backfillWorkflowExecutorDelegate)
+                .triggerBackfillWorkflow(any(), any());
+
+        backfillWorkflowExecutorDelegate.executeWithVisitedCodes(upstreamDto, new HashSet<>());
+
+        // only query dependents for the upstream workflow, downstream triggers should be direct-only
+        verify(workflowLineageService, times(1)).queryDownstreamDependentWorkflowDefinitions(upstreamCode);
+        verify(workflowLineageService, never()).queryDownstreamDependentWorkflowDefinitions(directDownstreamCode);
+        // upstream + direct downstream backfill
+        verify(backfillWorkflowExecutorDelegate, times(2)).triggerBackfillWorkflow(any(), any());
+    }
+
+    @Test
+    public void testDoBackfillDependentWorkflow_CycleSkipped_NoInfiniteRecursion() {
+        long workflowA = 1L;
+        long workflowB = 2L;
+
+        WorkflowDefinition workflowADef =
+                WorkflowDefinition.builder().code(workflowA).version(1).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition workflowBDef =
+                WorkflowDefinition.builder().code(workflowB).version(1).releaseState(ReleaseState.ONLINE).build();
+
+        DependentWorkflowDefinition aDependsB = new DependentWorkflowDefinition();
+        aDependsB.setWorkflowDefinitionCode(workflowB);
+        aDependsB.setTaskDefinitionCode(111L);
+        aDependsB.setWorkflowDefinitionVersion(1);
+
+        DependentWorkflowDefinition bDependsA = new DependentWorkflowDefinition();
+        bDependsA.setWorkflowDefinitionCode(workflowA);
+        bDependsA.setTaskDefinitionCode(222L);
+        bDependsA.setWorkflowDefinitionVersion(1);
+
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowA))
+                .thenReturn(Collections.singletonList(aDependsB));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowB))
+                .thenReturn(Collections.singletonList(bDependsA));
+
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(workflowB)))
+                .thenReturn(Collections.singletonList(workflowBDef));
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(workflowA)))
+                .thenReturn(Collections.singletonList(workflowADef));
+
+        User loginUser = new User();
+        loginUser.setId(1);
+
+        BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                .runMode(RunMode.RUN_MODE_SERIAL)
+                .backfillDateList(Collections.singletonList(ZonedDateTime.parse("2026-02-01T00:00:00Z")))
+                .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                .allLevelDependent(true)
+                .executionOrder(ExecutionOrder.ASC_ORDER)
+                .build();
+
+        BackfillWorkflowDTO upstreamDto = BackfillWorkflowDTO.builder()
+                .loginUser(loginUser)
+                .workflowDefinition(workflowADef)
+                .workerGroup("wg-upstream")
+                .backfillParams(params)
+                .build();
+
+        Server masterServer = new Server();
+        masterServer.setHost("127.0.0.1");
+        masterServer.setPort(1234);
+        when(registryClient.getRandomServer(RegistryNodeType.MASTER)).thenReturn(Optional.of(masterServer));
+
+        doReturn(WorkflowBackfillTriggerResponse.success(1)).when(backfillWorkflowExecutorDelegate)
+                .triggerBackfillWorkflow(any(), any());
+
+        backfillWorkflowExecutorDelegate.executeWithVisitedCodes(upstreamDto, new HashSet<>());
+
+        // should only backfill A and B once each, then cycle A is skipped by visitedCodes
+        verify(workflowLineageService, times(1)).queryDownstreamDependentWorkflowDefinitions(workflowA);
+        verify(workflowLineageService, times(1)).queryDownstreamDependentWorkflowDefinitions(workflowB);
+        verify(backfillWorkflowExecutorDelegate, times(2)).triggerBackfillWorkflow(any(), any());
+    }
+
+    @Test
+    public void testDoBackfillDependentWorkflow_OfflineOrMissingDefinition_NotTriggered() {
+        long upstreamCode = 10L;
+        long offlineDownstreamCode = 20L;
+        long missingDownstreamCode = 30L;
+
+        WorkflowDefinition upstreamWorkflow =
+                WorkflowDefinition.builder().code(upstreamCode).version(1).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition offlineDownstreamWorkflow =
+                WorkflowDefinition.builder().code(offlineDownstreamCode).version(1).releaseState(ReleaseState.OFFLINE)
+                        .build();
+
+        DependentWorkflowDefinition offlineDep = new DependentWorkflowDefinition();
+        offlineDep.setWorkflowDefinitionCode(offlineDownstreamCode);
+        offlineDep.setTaskDefinitionCode(111L);
+        offlineDep.setWorkflowDefinitionVersion(1);
+
+        DependentWorkflowDefinition missingDep = new DependentWorkflowDefinition();
+        missingDep.setWorkflowDefinitionCode(missingDownstreamCode);
+        missingDep.setTaskDefinitionCode(222L);
+        missingDep.setWorkflowDefinitionVersion(1);
+
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode))
+                .thenReturn(Arrays.asList(offlineDep, missingDep));
+
+        // DAO only returns OFFLINE workflow; missingDownstreamCode is absent (map get => null => skip)
+        when(workflowDefinitionDao.queryByCodes(
+                new java.util.LinkedHashSet<>(Arrays.asList(offlineDownstreamCode, missingDownstreamCode))))
+                        .thenReturn(Collections.singletonList(offlineDownstreamWorkflow));
+
+        User loginUser = new User();
+        loginUser.setId(1);
+
+        BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                .runMode(RunMode.RUN_MODE_SERIAL)
+                .backfillDateList(Collections.singletonList(ZonedDateTime.parse("2026-02-01T00:00:00Z")))
+                .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                .allLevelDependent(true)
+                .executionOrder(ExecutionOrder.ASC_ORDER)
+                .build();
+
+        BackfillWorkflowDTO upstreamDto = BackfillWorkflowDTO.builder()
+                .loginUser(loginUser)
+                .workflowDefinition(upstreamWorkflow)
+                .workerGroup("wg-upstream")
+                .backfillParams(params)
+                .build();
+
+        Server masterServer = new Server();
+        masterServer.setHost("127.0.0.1");
+        masterServer.setPort(1234);
+        when(registryClient.getRandomServer(RegistryNodeType.MASTER)).thenReturn(Optional.of(masterServer));
+
+        doReturn(WorkflowBackfillTriggerResponse.success(1)).when(backfillWorkflowExecutorDelegate)
+                .triggerBackfillWorkflow(any(), any());
+
+        backfillWorkflowExecutorDelegate.executeWithVisitedCodes(upstreamDto, new HashSet<>());
+
+        // only upstream is triggered; offline + missing downstream are skipped
+        verify(workflowLineageService, times(1)).queryDownstreamDependentWorkflowDefinitions(upstreamCode);
+        verify(workflowLineageService, never()).queryDownstreamDependentWorkflowDefinitions(offlineDownstreamCode);
+        verify(workflowLineageService, never()).queryDownstreamDependentWorkflowDefinitions(missingDownstreamCode);
+        verify(backfillWorkflowExecutorDelegate, times(1)).triggerBackfillWorkflow(any(), any());
     }
 }
