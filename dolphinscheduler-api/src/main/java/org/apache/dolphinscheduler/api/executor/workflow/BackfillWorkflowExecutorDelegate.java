@@ -226,8 +226,8 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                         .collect(Collectors.groupingBy(DependentWorkflowDefinition::getWorkflowDefinitionCode));
         final Set<Long> downstreamCodes = downstreamDefinitionsByCode.keySet();
         final List<WorkflowDefinition> downstreamWorkflowList = workflowDefinitionDao.queryByCodes(downstreamCodes);
-        // queryByCodes returns multiple versions for the same workflow code, so we must select the correct one
-        // based on DependentWorkflowDefinition.getWorkflowDefinitionVersion().
+        // Each workflow code maps to a single WorkflowDefinition (code is unique in t_ds_workflow_definition).
+        // We still group by code to simplify lookup and keep the code robust if this ever changes.
         final Map<Long, List<WorkflowDefinition>> downstreamWorkflowMapByCode = downstreamWorkflowList.stream()
                 .collect(Collectors.groupingBy(WorkflowDefinition::getCode));
 
