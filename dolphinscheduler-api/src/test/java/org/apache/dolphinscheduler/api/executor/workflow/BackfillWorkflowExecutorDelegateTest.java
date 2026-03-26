@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerRequest;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -44,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.ArrayList;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -132,5 +134,93 @@ public class BackfillWorkflowExecutorDelegateTest {
         Assertions.assertNotSame(dependentVisitedCodes.get(0), dependentVisitedCodes.get(1));
         Assertions.assertTrue(dependentVisitedCodes.get(0).contains(downstreamCode));
         Assertions.assertTrue(dependentVisitedCodes.get(1).contains(downstreamCode));
+    }
+
+    @Test
+    public void testDoBackfillDependentWorkflow_UseDependentRoutingFields() throws Exception {
+        long upstreamCode = 1L;
+        int upstreamVersion = 1;
+        long downstreamCode = 2L;
+        int downstreamVersion = 3;
+        long dependentTaskDefinitionCode = 999L;
+        String dependentWorkerGroup = "wg-dep";
+
+        WorkflowDefinition upstreamWorkflow =
+                WorkflowDefinition.builder()
+                        .code(upstreamCode)
+                        .version(upstreamVersion)
+                        .releaseState(ReleaseState.ONLINE)
+                        .build();
+
+        WorkflowDefinition downstreamWrongVersion =
+                WorkflowDefinition.builder()
+                        .code(downstreamCode)
+                        .version(1)
+                        .releaseState(ReleaseState.ONLINE)
+                        .build();
+
+        WorkflowDefinition downstreamCorrectVersion =
+                WorkflowDefinition.builder()
+                        .code(downstreamCode)
+                        .version(downstreamVersion)
+                        .releaseState(ReleaseState.ONLINE)
+                        .build();
+
+        DependentWorkflowDefinition dependentWorkflowDefinition = new DependentWorkflowDefinition();
+        dependentWorkflowDefinition.setWorkflowDefinitionCode(downstreamCode);
+        dependentWorkflowDefinition.setWorkflowDefinitionVersion(downstreamVersion);
+        dependentWorkflowDefinition.setTaskDefinitionCode(dependentTaskDefinitionCode);
+        dependentWorkflowDefinition.setWorkerGroup(dependentWorkerGroup);
+
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode))
+                .thenReturn(Collections.singletonList(dependentWorkflowDefinition));
+
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(downstreamCode)))
+                .thenReturn(Arrays.asList(downstreamWrongVersion, downstreamCorrectVersion));
+
+        User loginUser = new User();
+        loginUser.setId(10);
+
+        BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                .runMode(RunMode.RUN_MODE_SERIAL)
+                .backfillDateList(Collections.singletonList(ZonedDateTime.parse("2026-02-01T00:00:00Z")))
+                .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                // ensure dependent workflow itself will NOT trigger its own dependencies
+                .allLevelDependent(false)
+                .executionOrder(ExecutionOrder.ASC_ORDER)
+                .build();
+
+        BackfillWorkflowDTO upstreamDto = BackfillWorkflowDTO.builder()
+                .loginUser(loginUser)
+                .workflowDefinition(upstreamWorkflow)
+                .workerGroup("wg-upstream")
+                .backfillParams(params)
+                .build();
+
+        Server masterServer = new Server();
+        masterServer.setHost("127.0.0.1");
+        masterServer.setPort(1234);
+        when(registryClient.getRandomServer(RegistryNodeType.MASTER)).thenReturn(Optional.of(masterServer));
+
+        List<WorkflowBackfillTriggerRequest> capturedRequests = new ArrayList<>();
+        doAnswer(invocation -> {
+            WorkflowBackfillTriggerRequest request = invocation.getArgument(0);
+            capturedRequests.add(request);
+            return WorkflowBackfillTriggerResponse.success(1);
+        }).when(backfillWorkflowExecutorDelegate)
+                .triggerBackfillWorkflow(any(), any());
+
+        backfillWorkflowExecutorDelegate.executeWithVisitedCodes(
+                upstreamDto,
+                new HashSet<>());
+
+        Assertions.assertEquals(2, capturedRequests.size());
+        WorkflowBackfillTriggerRequest dependentRequest =
+                capturedRequests.stream().filter(r -> r.getWorkflowCode() == downstreamCode).findFirst()
+                        .orElseThrow();
+
+        Assertions.assertEquals(downstreamVersion, dependentRequest.getWorkflowVersion());
+        Assertions.assertEquals(Collections.singletonList(dependentTaskDefinitionCode), dependentRequest.getStartNodes());
+        Assertions.assertEquals(dependentWorkerGroup, dependentRequest.getWorkerGroup());
     }
 }

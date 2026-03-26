@@ -222,8 +222,10 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 .map(DependentWorkflowDefinition::getWorkflowDefinitionCode)
                 .collect(Collectors.toCollection(LinkedHashSet::new));
         final List<WorkflowDefinition> downstreamWorkflowList = workflowDefinitionDao.queryByCodes(downstreamCodes);
-        final Map<Long, WorkflowDefinition> downstreamWorkflowMap = downstreamWorkflowList.stream()
-                .collect(Collectors.toMap(WorkflowDefinition::getCode, workflow -> workflow));
+        // queryByCodes returns multiple versions for the same workflow code, so we must select the correct one
+        // based on DependentWorkflowDefinition.getWorkflowDefinitionVersion().
+        final Map<Long, List<WorkflowDefinition>> downstreamWorkflowMapByCode = downstreamWorkflowList.stream()
+                .collect(Collectors.groupingBy(WorkflowDefinition::getCode));
 
         // 2) Reuse upstream business dates for downstream backfill (same instants/zones as the chunk passed to
         // doBackfillWorkflow; avoids List<String> -> system-default parse -> dateToString drift)
@@ -239,7 +241,16 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 continue;
             }
 
-            WorkflowDefinition downstreamWorkflow = downstreamWorkflowMap.get(downstreamCode);
+            WorkflowDefinition downstreamWorkflow = null;
+            List<WorkflowDefinition> workflowCandidates = downstreamWorkflowMapByCode.get(downstreamCode);
+            if (workflowCandidates != null) {
+                downstreamWorkflow =
+                        workflowCandidates.stream()
+                                .filter(workflow -> workflow.getVersion() == dependentWorkflowDefinition
+                                        .getWorkflowDefinitionVersion())
+                                .findFirst()
+                                .orElse(workflowCandidates.get(0));
+            }
             if (downstreamWorkflow == null) {
                 log.warn("Skip dependent workflow {}, workflow definition not found", downstreamCode);
                 continue;
@@ -259,7 +270,11 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     allLevelDependent ? originalParams.getBackfillDependentMode() : ComplementDependentMode.OFF_MODE;
 
             BackfillWorkflowDTO.BackfillParamsDTO dependentParams = BackfillWorkflowDTO.BackfillParamsDTO.builder()
-                    .runMode(originalParams.getRunMode())
+                    // When the upstream is PARALLEL, dependent triggers should not re-apply
+                    // chunking on the already sliced date list; force SERIAL to keep
+                    // "traverse dependencies once per upstream date-chunk".
+                    .runMode(originalParams.getRunMode() == RunMode.RUN_MODE_PARALLEL ? RunMode.RUN_MODE_SERIAL
+                            : originalParams.getRunMode())
                     .backfillDateList(upstreamBackfillDates)
                     .expectedParallelismNumber(originalParams.getExpectedParallelismNumber())
                     // Control whether downstream will continue triggering its own dependencies based on
@@ -272,7 +287,11 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
             BackfillWorkflowDTO dependentBackfillDTO = BackfillWorkflowDTO.builder()
                     .loginUser(backfillWorkflowDTO.getLoginUser())
                     .workflowDefinition(downstreamWorkflow)
-                    .startNodes(null)
+                    // If taskDefinitionCode is 0, it means the dependency is on the entire workflow.
+                    // Otherwise, backfill should start from that dependent node.
+                    .startNodes(dependentWorkflowDefinition.getTaskDefinitionCode() != 0
+                            ? Collections.singletonList(dependentWorkflowDefinition.getTaskDefinitionCode())
+                            : null)
                     .failureStrategy(backfillWorkflowDTO.getFailureStrategy())
                     .taskDependType(backfillWorkflowDTO.getTaskDependType())
                     .execType(backfillWorkflowDTO.getExecType())
@@ -280,7 +299,10 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     .warningGroupId(downstreamWorkflow.getWarningGroupId())
                     .runMode(dependentParams.getRunMode())
                     .workflowInstancePriority(backfillWorkflowDTO.getWorkflowInstancePriority())
-                    .workerGroup(backfillWorkflowDTO.getWorkerGroup())
+                    // Align workerGroup with DependentWorkflowDefinition (fallback to upstream when it's null).
+                    .workerGroup(dependentWorkflowDefinition.getWorkerGroup() != null
+                            ? dependentWorkflowDefinition.getWorkerGroup()
+                            : backfillWorkflowDTO.getWorkerGroup())
                     .tenantCode(backfillWorkflowDTO.getTenantCode())
                     .environmentCode(backfillWorkflowDTO.getEnvironmentCode())
                     .startParamList(backfillWorkflowDTO.getStartParamList())
