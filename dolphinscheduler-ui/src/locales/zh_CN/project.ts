@@ -289,6 +289,7 @@ export default {
     view_log: '查看日志',
     view_output: '查看输出',
     download_log: '下载日志',
+    download_output: '下载输出',
     refresh: '刷新',
     app_id: 'Application ID',
     execute: '执行',

@@ -23,17 +23,16 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.logging.LogClientDelegate;
+import org.apache.dolphinscheduler.api.executor.logging.TaskLogType;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 
 import org.apache.commons.lang3.StringUtils;
@@ -63,9 +62,6 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     private ProjectService projectService;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Autowired
     private LogClientDelegate logClientDelegate;
 
     /**
@@ -79,8 +75,21 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit, String type) {
+    public Result<ResponseTaskLog> queryTaskLog(User loginUser, int taskInstId, int skipLineNum, int limit) {
+        return queryLog(loginUser, taskInstId, skipLineNum, limit, TaskLogType.LOG);
+    }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public Result<ResponseTaskLog> queryTaskOutput(User loginUser, int taskInstId, int skipLineNum, int limit) {
+        return queryLog(loginUser, taskInstId, skipLineNum, limit, TaskLogType.OUTPUT);
+    }
+
+    private Result<ResponseTaskLog> queryLog(User loginUser,
+                                             int taskInstId,
+                                             int skipLineNum,
+                                             int limit,
+                                             TaskLogType taskLogType) {
         TaskInstance taskInstance = taskInstanceDao.queryById(taskInstId);
 
         if (taskInstance == null) {
@@ -93,7 +102,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         }
         projectService.checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), VIEW_LOG);
         Result<ResponseTaskLog> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
-        String log = queryLog(taskInstance, skipLineNum, limit, type);
+        String log = queryLog(taskInstance, skipLineNum, limit, taskLogType);
         int lineNum = log.split("\\r\\n").length;
         result.setData(new ResponseTaskLog(lineNum, log));
         return result;
@@ -107,68 +116,23 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      * @return log byte array
      */
     @Override
-    public byte[] getLogBytes(User loginUser, int taskInstId) {
+    public byte[] getTaskLogBytes(User loginUser, int taskInstId) {
+        return getLogBytes(loginUser, taskInstId, TaskLogType.LOG);
+    }
+
+    @Override
+    public byte[] getTaskOutputBytes(User loginUser, int taskInstId) {
+        return getLogBytes(loginUser, taskInstId, TaskLogType.OUTPUT);
+    }
+
+    private byte[] getLogBytes(User loginUser, int taskInstId, TaskLogType taskLogType) {
         TaskInstance taskInstance = taskInstanceDao.queryById(taskInstId);
         if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
             throw new ServiceException("task instance is null or host is null");
         }
         Project project = projectMapper.queryProjectByTaskInstanceId(taskInstId);
         projectService.checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
-        return getLogBytes(taskInstance);
-    }
-
-    /**
-     * query log
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param taskInstId  task instance id
-     * @param skipLineNum skip line number
-     * @param limit       limit
-     * @return log string data
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public String queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit, String type) {
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, VIEW_LOG);
-        // check whether the task instance can be found
-        TaskInstance task = taskInstanceDao.queryById(taskInstId);
-        if (task == null || StringUtils.isBlank(task.getHost())) {
-            throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND);
-        }
-
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
-        if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
-            throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND, taskInstId);
-        }
-        return queryLog(task, skipLineNum, limit, type);
-    }
-
-    /**
-     * get log bytes
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param taskInstId  task instance id
-     * @return log byte array
-     */
-    @Override
-    public byte[] getLogBytes(User loginUser, long projectCode, int taskInstId) {
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, DOWNLOAD_LOG);
-
-        // check whether the task instance can be found
-        TaskInstance task = taskInstanceDao.queryById(taskInstId);
-        if (task == null || StringUtils.isBlank(task.getHost())) {
-            throw new ServiceException("task instance is null or host is null");
-        }
-
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
-        if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
-            throw new ServiceException("task instance does not exist in project");
-        }
-        return getLogBytes(task);
+        return getLogBytes(taskInstance, taskLogType);
     }
 
     /**
@@ -179,11 +143,8 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      * @param limit        limit
      * @return log string data
      */
-    private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit, String type) {
-        String logPath = taskInstance.getLogPath();
-        if ("output".equals(type)) {
-            logPath = taskInstance.getTaskOutPutLogPath();
-        }
+    private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit, TaskLogType taskLogType) {
+        String logPath = taskLogType.getLogPath(taskInstance);
         log.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host: {}, logPath:{}",
                 taskInstance.getId(), taskInstance.getName(), taskInstance.getHost(), logPath);
         if (StringUtils.isBlank(logPath)) {
@@ -192,7 +153,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         }
 
         StringBuilder sb = new StringBuilder();
-        if (skipLineNum == 0) {
+        if (shouldAppendLogHead(taskLogType) && skipLineNum == 0) {
             String head = String.format(LOG_HEAD_FORMAT,
                     logPath,
                     taskInstance.getHost(),
@@ -201,7 +162,9 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         }
 
         try {
-            String logContent = logClientDelegate.getPartLogString(taskInstance, skipLineNum, limit, type);
+            String logContent = taskLogType == TaskLogType.LOG
+                    ? logClientDelegate.getTaskLogString(taskInstance, skipLineNum, limit)
+                    : logClientDelegate.getTaskOutputString(taskInstance, skipLineNum, limit);
             if (logContent != null) {
                 sb.append(logContent);
             }
@@ -217,9 +180,9 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      * @param taskInstance task instance
      * @return log byte array
      */
-    private byte[] getLogBytes(TaskInstance taskInstance) {
+    private byte[] getLogBytes(TaskInstance taskInstance, TaskLogType taskLogType) {
         String host = taskInstance.getHost();
-        String logPath = taskInstance.getLogPath();
+        String logPath = taskLogType.getLogPath(taskInstance);
 
         byte[] head = String.format(LOG_HEAD_FORMAT,
                 logPath,
@@ -229,11 +192,20 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         byte[] logBytes;
 
         try {
-            logBytes = logClientDelegate.getWholeLogBytes(taskInstance);
+            logBytes = taskLogType == TaskLogType.LOG
+                    ? logClientDelegate.getTaskLogBytes(taskInstance)
+                    : logClientDelegate.getTaskOutputBytes(taskInstance);
+            if (!shouldAppendLogHead(taskLogType)) {
+                return logBytes;
+            }
             return Bytes.concat(head, logBytes);
         } catch (Exception ex) {
             log.error("Download TaskInstance: {} Log Error", taskInstance.getName(), ex);
             throw new ServiceException(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);
         }
+    }
+
+    private boolean shouldAppendLogHead(TaskLogType taskLogType) {
+        return taskLogType == TaskLogType.LOG;
     }
 }

@@ -294,6 +294,7 @@ export default {
     view_log: 'View Log',
     view_output: 'View Output',
     download_log: 'Download Log',
+    download_output: 'Download Output',
     refresh: 'Refresh',
     app_id: 'Application ID',
     execute: 'Execute',

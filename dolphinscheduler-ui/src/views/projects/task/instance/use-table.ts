@@ -21,7 +21,8 @@ import { useAsyncState } from '@vueuse/core'
 import {
   queryTaskListPaging,
   forceSuccess,
-  downloadLog
+  downloadLog,
+  downloadOutput
 } from '@/service/modules/task-instances'
 import { queryTaskOutput } from '@/service/modules/log'
 import { NButton, NIcon, NSpace, NTooltip, NSpin, NEllipsis } from 'naive-ui'
@@ -30,7 +31,8 @@ import {
   AlignLeftOutlined,
   CheckCircleOutlined,
   DownloadOutlined,
-  ExportOutlined
+  EyeOutlined,
+  FileSearchOutlined
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
@@ -197,7 +199,7 @@ export function useTable() {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](4),
+        ...COLUMN_WIDTH_CONFIG['operation'](5),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -273,7 +275,7 @@ export function useTable() {
                       {
                         icon: () =>
                           h(NIcon, null, {
-                            default: () => h(ExportOutlined)
+                            default: () => h(EyeOutlined)
                           })
                       }
                     ),
@@ -300,6 +302,28 @@ export function useTable() {
                       }
                     ),
                   default: () => t('project.task.download_log')
+                }
+              ),
+              h(
+                NTooltip,
+                {},
+                {
+                  trigger: () =>
+                    h(
+                      NButton,
+                      {
+                        circle: true,
+                        type: 'info',
+                        size: 'small',
+                        disabled: !row.host,
+                        onClick: () => downloadOutput(row.id)
+                      },
+                      {
+                        icon: () =>
+                          h(NIcon, null, { default: () => h(FileSearchOutlined) })
+                      }
+                    ),
+                  default: () => t('project.task.download_output')
                 }
               )
             ]

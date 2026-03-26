@@ -63,6 +63,10 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.fabric8.kubernetes.api.model.Affinity;
 import io.fabric8.kubernetes.api.model.AffinityBuilder;
 import io.fabric8.kubernetes.api.model.EnvVar;
@@ -83,6 +87,8 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
  */
 @Slf4j
 public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
+
+    private static final Logger TASK_OUTPUT_LOGGER = LoggerFactory.getLogger(LogUtils.TASK_OUTPUT_LOGGER_NAME);
 
     private Job job;
     protected boolean podLogOutputIsFinished = false;
@@ -268,14 +274,20 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(),
                     taskRequest.getTaskInstanceId());
-            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getTaskOutputLogPath());
+            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
             try (
+                    LogUtils.MDCAutoClosableContext ignored =
+                            LogUtils.withTaskOutputLogPathMDC(taskRequest.getTaskOutputLogPath());
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
                             taskRequest.getTaskAppId(), containerName)) {
                 String line;
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {
-                        log.info("[K8S-pod-log] {}", line);
+                        if (StringUtils.isBlank(taskRequest.getTaskOutputLogPath())) {
+                            log.info("[K8S-pod-log] {}", line);
+                        } else {
+                            TASK_OUTPUT_LOGGER.info(line);
+                        }
                         taskOutputParameterParser.appendParseLog(line);
                     }
                 }
@@ -283,6 +295,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 throw new RuntimeException(e);
             } finally {
                 LogUtils.removeTaskInstanceLogFullPathMDC();
+                LogUtils.removeWorkflowAndTaskInstanceIdMDC();
                 podLogOutputIsFinished = true;
             }
             taskOutputParams = taskOutputParameterParser.getTaskOutputParams();

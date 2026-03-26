@@ -32,8 +32,12 @@ public class RemoteLogClient {
      * @param taskInstance The task instance object, containing information such as the task ID and log path.
      * @return Returns the log content in byte array format.
      */
-    public byte[] getWholeLog(TaskInstance taskInstance) {
-        return LogUtils.getFileContentBytesFromRemote(taskInstance.getLogPath());
+    public byte[] getTaskLogBytes(TaskInstance taskInstance) {
+        return getWholeLog(taskInstance, TaskLogType.LOG);
+    }
+
+    public byte[] getTaskOutputBytes(TaskInstance taskInstance) {
+        return getWholeLog(taskInstance, TaskLogType.OUTPUT);
     }
 
     /**
@@ -46,15 +50,23 @@ public class RemoteLogClient {
      * @return Returns the specified part of the log content in string format.
      */
 
-    public String getPartLog(TaskInstance taskInstance, int skipLineNum, int limit) {
-        return getPartLog(taskInstance, skipLineNum, limit, "log");
+    public String getTaskLogString(TaskInstance taskInstance, int skipLineNum, int limit) {
+        return getPartLog(taskInstance, skipLineNum, limit, TaskLogType.LOG);
     }
 
-    public String getPartLog(TaskInstance taskInstance, int skipLineNum, int limit, String type) {
+    public String getTaskOutputString(TaskInstance taskInstance, int skipLineNum, int limit) {
+        return getPartLog(taskInstance, skipLineNum, limit, TaskLogType.OUTPUT);
+    }
+
+    private byte[] getWholeLog(TaskInstance taskInstance, TaskLogType taskLogType) {
+        return LogUtils.getFileContentBytesFromRemote(taskLogType.getLogPath(taskInstance));
+    }
+
+    private String getPartLog(TaskInstance taskInstance, int skipLineNum, int limit, TaskLogType taskLogType) {
         // todo We can optimize requests by the actual range, reducing disk usage and network traffic.
         return LogUtils.rollViewLogLines(
                 LogUtils.readPartFileContentFromRemote(
-                        "log".equals(type) ? taskInstance.getLogPath() : taskInstance.getTaskOutPutLogPath(),
+                        taskLogType.getLogPath(taskInstance),
                         skipLineNum, limit));
     }
 

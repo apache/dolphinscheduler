@@ -41,8 +41,12 @@ public class LocalLogClient {
      * @param taskInstance The task instance object, containing information needed to retrieve the log.
      * @return The complete log file download response of the task instance, including log content and metadata.
      */
-    public TaskInstanceLogFileDownloadResponse getWholeLog(TaskInstance taskInstance) {
-        return getLocalWholeLog(taskInstance);
+    public TaskInstanceLogFileDownloadResponse getTaskLog(TaskInstance taskInstance) {
+        return getLocalWholeLog(taskInstance, TaskLogType.LOG);
+    }
+
+    public TaskInstanceLogFileDownloadResponse getTaskOutput(TaskInstance taskInstance) {
+        return getLocalWholeLog(taskInstance, TaskLogType.OUTPUT);
     }
 
     /**
@@ -55,25 +59,24 @@ public class LocalLogClient {
      * @param limit The maximum number of lines to read, indicating the maximum number of lines to retrieve in this query.
      * @return The partial log query response, including log content within the specified range and metadata.
      */
-
-    public TaskInstanceLogPageQueryResponse getPartLog(TaskInstance taskInstance, int skipLineNum, int limit) {
-        return getLocalPartLog(taskInstance, skipLineNum, limit, "log");
-    }
-    public TaskInstanceLogPageQueryResponse getPartLog(TaskInstance taskInstance, int skipLineNum, int limit,
-                                                       String type) {
-        return getLocalPartLog(taskInstance, skipLineNum, limit, type);
+    public TaskInstanceLogPageQueryResponse getTaskLog(TaskInstance taskInstance, int skipLineNum, int limit) {
+        return getLocalPartLog(taskInstance, skipLineNum, limit, TaskLogType.LOG);
     }
 
-    private TaskInstanceLogFileDownloadResponse getLocalWholeLog(TaskInstance taskInstance) {
+    public TaskInstanceLogPageQueryResponse getTaskOutput(TaskInstance taskInstance, int skipLineNum, int limit) {
+        return getLocalPartLog(taskInstance, skipLineNum, limit, TaskLogType.OUTPUT);
+    }
+
+    private TaskInstanceLogFileDownloadResponse getLocalWholeLog(TaskInstance taskInstance, TaskLogType taskLogType) {
         TaskInstanceLogFileDownloadRequest request = new TaskInstanceLogFileDownloadRequest(
                 taskInstance.getId(),
-                taskInstance.getLogPath());
+                taskLogType.getLogPath(taskInstance));
         return getProxyLogService(taskInstance).getTaskInstanceWholeLogFileBytes(request);
     }
 
     private TaskInstanceLogPageQueryResponse getLocalPartLog(TaskInstance taskInstance, int skipLineNum,
-                                                             int limit, String type) {
-        String logFilePath = "log".equals(type) ? taskInstance.getLogPath() : taskInstance.getTaskOutPutLogPath();
+                                                             int limit, TaskLogType taskLogType) {
+        String logFilePath = taskLogType.getLogPath(taskInstance);
         TaskInstanceLogPageQueryRequest request = TaskInstanceLogPageQueryRequest
                 .builder()
                 .taskInstanceId(taskInstance.getId())

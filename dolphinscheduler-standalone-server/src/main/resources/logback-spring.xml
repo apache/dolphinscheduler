@@ -54,7 +54,9 @@
     <logger name="org.apache.hadoop" level="WARN"/>
 
     <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-        <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
+        <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter">
+            <key>taskInstanceLogFullPath</key>
+        </filter>
         <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
             <key>taskInstanceLogFullPath</key>
             <logBase>${log.base}</logBase>
@@ -72,6 +74,25 @@
             </appender>
         </sift>
     </appender>
+    <appender name="TASKOUTPUTLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter">
+            <key>taskOutputLogFullPath</key>
+        </filter>
+        <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
+            <key>taskOutputLogFullPath</key>
+            <logBase>${log.base}</logBase>
+        </Discriminator>
+        <sift>
+            <appender name="FILE-${taskOutputLogFullPath}" class="ch.qos.logback.core.FileAppender">
+                <file>${taskOutputLogFullPath}</file>
+                <encoder>
+                    <pattern>%msg%n</pattern>
+                    <charset>UTF-8</charset>
+                </encoder>
+                <append>true</append>
+            </appender>
+        </sift>
+    </appender>
 
     <root level="INFO">
         <if condition="${DOCKER:-false}">
@@ -82,5 +103,9 @@
         <appender-ref ref="STANDALONELOGFILE"/>
         <appender-ref ref="TASKLOGFILE"/>
     </root>
+
+    <logger name="TaskOutput" level="INFO" additivity="false">
+        <appender-ref ref="TASKOUTPUTLOGFILE"/>
+    </logger>
 
 </configuration>

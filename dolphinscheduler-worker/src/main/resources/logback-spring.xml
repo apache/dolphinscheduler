@@ -33,7 +33,9 @@
     </appender>
 
     <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
-        <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
+        <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter">
+            <key>taskInstanceLogFullPath</key>
+        </filter>
         <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
             <key>taskInstanceLogFullPath</key>
             <logBase>${log.base}</logBase>
@@ -45,6 +47,25 @@
                     <pattern>
                         %date{yyyy-MM-dd HH:mm:ss.SSS} %-5level - %message%n
                     </pattern>
+                    <charset>UTF-8</charset>
+                </encoder>
+                <append>true</append>
+            </appender>
+        </sift>
+    </appender>
+    <appender name="TASKOUTPUTLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter">
+            <key>taskOutputLogFullPath</key>
+        </filter>
+        <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
+            <key>taskOutputLogFullPath</key>
+            <logBase>${log.base}</logBase>
+        </Discriminator>
+        <sift>
+            <appender name="FILE-${taskOutputLogFullPath}" class="ch.qos.logback.core.FileAppender">
+                <file>${taskOutputLogFullPath}</file>
+                <encoder>
+                    <pattern>%msg%n</pattern>
                     <charset>UTF-8</charset>
                 </encoder>
                 <append>true</append>
@@ -77,4 +98,8 @@
         <appender-ref ref="TASKLOGFILE"/>
         <appender-ref ref="WORKERLOGFILE"/>
     </root>
+
+    <logger name="TaskOutput" level="INFO" additivity="false">
+        <appender-ref ref="TASKOUTPUTLOGFILE"/>
+    </logger>
 </configuration>

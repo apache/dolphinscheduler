@@ -67,11 +67,17 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Slf4j
 public class SqlTask extends AbstractTask {
+
+    private static final Logger TASK_OUTPUT_LOGGER = LoggerFactory.getLogger(LogUtils.TASK_OUTPUT_LOGGER_NAME);
 
     private final TaskExecutionContext taskExecutionContext;
 
@@ -282,25 +288,7 @@ public class SqlTask extends AbstractTask {
                     : TaskConstants.DEFAULT_DISPLAY_ROWS;
             displayRows = Math.min(displayRows, resultJSONArray.size());
 
-            // Set MDC to output log path for SQL result logging
-            String originalLogPath = LogUtils.getTaskInstanceLogFullPathMdc();
-            try {
-                if (taskExecutionContext.getTaskOutputLogPath() != null) {
-                    LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getTaskOutputLogPath());
-                }
-                log.info("display sql result {} rows as follows:", displayRows);
-                for (int i = 0; i < displayRows; i++) {
-                    String row = JSONUtils.toJsonString(resultJSONArray.get(i));
-                    log.info("row {} : {}", i + 1, row);
-                }
-            } finally {
-                // Restore original log path
-                if (originalLogPath != null) {
-                    LogUtils.setTaskInstanceLogFullPathMDC(originalLogPath);
-                } else {
-                    LogUtils.removeTaskInstanceLogFullPathMDC();
-                }
-            }
+            logSqlResultPreview(columnLabels, resultJSONArray, displayRows);
         }
 
         String result = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
@@ -324,7 +312,10 @@ public class SqlTask extends AbstractTask {
         if (resultSet != null) {
             ResultSetMetaData metaData = resultSet.getMetaData();
             int columnsNum = metaData.getColumnCount();
+<<<<<<< HEAD
             log.info("sql query results is empty");
+=======
+>>>>>>> d2ad3dce8 ([DSIP-99] Save task output to a separate file)
             for (int i = 1; i <= columnsNum; i++) {
                 emptyOfColValues.set(metaData.getColumnLabel(i), JSONUtils.toJsonNode(""));
             }
@@ -333,6 +324,52 @@ public class SqlTask extends AbstractTask {
         }
         resultJSONArray.add(emptyOfColValues);
         return resultJSONArray;
+    }
+
+    private void logSqlResultPreview(String[] columnLabels, ArrayNode resultJSONArray, int displayRows) {
+        if (StringUtils.isBlank(taskExecutionContext.getTaskOutputLogPath())) {
+            doLogSqlResultPreview(columnLabels, resultJSONArray, displayRows);
+            return;
+        }
+
+        try (
+                LogUtils.MDCAutoClosableContext ignored =
+                        LogUtils.withTaskOutputLogPathMDC(taskExecutionContext.getTaskOutputLogPath())) {
+            doLogSqlResultPreview(columnLabels, resultJSONArray, displayRows);
+        }
+    }
+
+    private void doLogSqlResultPreview(String[] columnLabels, ArrayNode resultJSONArray, int displayRows) {
+        logSqlResultLine(String.join("\t", columnLabels));
+        for (int i = 0; i < displayRows; i++) {
+            ObjectNode rowNode = (ObjectNode) resultJSONArray.get(i);
+            List<String> rowValues = new ArrayList<>(columnLabels.length);
+            for (String columnLabel : columnLabels) {
+                rowValues.add(formatSqlResultValue(rowNode.get(columnLabel)));
+            }
+            logSqlResultLine(String.join("\t", rowValues));
+        }
+    }
+
+    private void logSqlResultLine(String line) {
+        if (StringUtils.isBlank(taskExecutionContext.getTaskOutputLogPath())) {
+            log.info(line);
+            return;
+        }
+        TASK_OUTPUT_LOGGER.info(line);
+    }
+
+    private String formatSqlResultValue(com.fasterxml.jackson.databind.JsonNode valueNode) {
+        if (valueNode == null || valueNode.isNull()) {
+            return "NULL";
+        }
+        if (valueNode.getNodeType() == JsonNodeType.STRING) {
+            return valueNode.asText();
+        }
+        if (valueNode.isValueNode()) {
+            return valueNode.asText();
+        }
+        return JSONUtils.toJsonString(valueNode);
     }
 
     /**

@@ -41,6 +41,10 @@ export function downloadLog(id: number): void {
   utils.downloadFile('log/download-log', { taskInstanceId: id })
 }
 
+export function downloadOutput(id: number): void {
+  utils.downloadFile('log/download-output', { taskInstanceId: id })
+}
+
 export function streamTaskStop(projectCode: number, taskId: number): any {
   return axios({
     url: `projects/${projectCode}/task-instances/${taskId}/stop`,

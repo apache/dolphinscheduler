@@ -15,30 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.log;
+package org.apache.dolphinscheduler.api.executor.logging;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.sift.AbstractDiscriminator;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-@Slf4j
-@Getter
-@Setter
-public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
+public enum TaskLogType {
 
-    private String key;
+    LOG {
 
-    private String logBase;
-
-    @Override
-    public String getDiscriminatingValue(ILoggingEvent event) {
-        String taskLogPath = event.getMDCPropertyMap().get(key);
-        if (taskLogPath == null) {
-            log.error("The task log path in MDC key {} is null, please check the logback configuration, log: {}",
-                    key, event);
+        @Override
+        public String getLogPath(TaskInstance taskInstance) {
+            return taskInstance.getLogPath();
         }
-        return taskLogPath;
-    }
+    },
+    OUTPUT {
+
+        @Override
+        public String getLogPath(TaskInstance taskInstance) {
+            return taskInstance.getTaskOutPutLogPath();
+        }
+    };
+
+    public abstract String getLogPath(TaskInstance taskInstance);
 }

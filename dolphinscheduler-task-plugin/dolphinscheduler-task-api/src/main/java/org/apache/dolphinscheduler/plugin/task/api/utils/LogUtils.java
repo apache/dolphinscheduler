@@ -59,6 +59,8 @@ public class LogUtils {
 
     private static final Path TASK_INSTANCE_LOG_BASE_PATH = getTaskInstanceLogBasePath();
     public static final String TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY = "taskInstanceLogFullPath";
+    public static final String TASK_OUTPUT_LOG_FULL_PATH_MDC_KEY = "taskOutputLogFullPath";
+    public static final String TASK_OUTPUT_LOGGER_NAME = "TaskOutput";
 
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
@@ -188,6 +190,10 @@ public class LogUtils {
         return MDC.get(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
 
+    public static String getTaskOutputLogFullPathMdc() {
+        return MDC.get(TASK_OUTPUT_LOG_FULL_PATH_MDC_KEY);
+    }
+
     public static void setTaskInstanceLogFullPathMDC(String taskInstanceLogFullPath) {
         if (taskInstanceLogFullPath == null) {
             log.warn("taskInstanceLogFullPath is null");
@@ -198,6 +204,37 @@ public class LogUtils {
 
     public static void removeTaskInstanceLogFullPathMDC() {
         MDC.remove(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
+    }
+
+    public static void setTaskOutputLogFullPathMDC(String taskOutputLogFullPath) {
+        if (taskOutputLogFullPath == null) {
+            log.warn("taskOutputLogFullPath is null");
+            return;
+        }
+        MDC.put(TASK_OUTPUT_LOG_FULL_PATH_MDC_KEY, taskOutputLogFullPath);
+    }
+
+    public static void removeTaskOutputLogFullPathMDC() {
+        MDC.remove(TASK_OUTPUT_LOG_FULL_PATH_MDC_KEY);
+    }
+
+    public static MDCAutoClosableContext withTaskOutputLogPathMDC(String taskOutputLogFullPath) {
+        final String originalTaskOutputLogFullPath = getTaskOutputLogFullPathMdc();
+        if (taskOutputLogFullPath == null) {
+            removeTaskOutputLogFullPathMDC();
+        } else {
+            setTaskOutputLogFullPathMDC(taskOutputLogFullPath);
+        }
+        return new MDCAutoClosableContext(
+                () -> restoreMDC(TASK_OUTPUT_LOG_FULL_PATH_MDC_KEY, originalTaskOutputLogFullPath));
+    }
+
+    private static void restoreMDC(String key, String value) {
+        if (value == null) {
+            MDC.remove(key);
+            return;
+        }
+        MDC.put(key, value);
     }
 
     public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId,

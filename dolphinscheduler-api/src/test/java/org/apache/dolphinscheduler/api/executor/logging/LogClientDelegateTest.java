@@ -54,7 +54,7 @@ public class LogClientDelegateTest {
 
     @Test
     public void testGetPartLogStringTaskInstanceNullThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> logClientDelegate.getPartLogString(null, 0, 10));
+        assertThrows(IllegalArgumentException.class, () -> logClientDelegate.getTaskLogString(null, 0, 10));
     }
 
     @Test
@@ -64,10 +64,24 @@ public class LogClientDelegateTest {
         taskInstance.setHost("localhost");
         taskInstance.setTaskType("SHELL");
         when(registryClient.checkNodeExists(eq(taskInstance.getHost()), any())).thenReturn(true);
-        when(localLogClient.getPartLog(taskInstance, 0, 10))
+        when(localLogClient.getTaskLog(taskInstance, 0, 10))
                 .thenReturn(new TaskInstanceLogPageQueryResponse("logContent", LogResponseStatus.SUCCESS, ""));
-        String result = logClientDelegate.getPartLogString(taskInstance, 0, 10);
+        String result = logClientDelegate.getTaskLogString(taskInstance, 0, 10);
         assertEquals("logContent", result);
+    }
+
+    @Test
+    public void testGetTaskOutputStringNodeExistsLocalSuccess() {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setHost("localhost");
+        taskInstance.setTaskType("SHELL");
+        when(registryClient.checkNodeExists(eq(taskInstance.getHost()), any())).thenReturn(true);
+        when(localLogClient.getTaskOutput(taskInstance, 0, 10))
+                .thenReturn(new TaskInstanceLogPageQueryResponse("outputContent", LogResponseStatus.SUCCESS, ""));
+
+        String result = logClientDelegate.getTaskOutputString(taskInstance, 0, 10);
+        assertEquals("outputContent", result);
     }
 
     @Test
@@ -78,11 +92,11 @@ public class LogClientDelegateTest {
         taskInstance.setTaskType("SHELL");
 
         when(registryClient.checkNodeExists("localhost", RegistryNodeType.WORKER)).thenReturn(true);
-        when(localLogClient.getPartLog(taskInstance, 0, 10)).thenReturn(
+        when(localLogClient.getTaskLog(taskInstance, 0, 10)).thenReturn(
                 new TaskInstanceLogPageQueryResponse(null, LogResponseStatus.ERROR, "error"));
-        when(remoteLogClient.getPartLog(taskInstance, 0, 10)).thenReturn("remoteLogContent");
+        when(remoteLogClient.getTaskLogString(taskInstance, 0, 10)).thenReturn("remoteLogContent");
 
-        String result = logClientDelegate.getPartLogString(taskInstance, 0, 10);
+        String result = logClientDelegate.getTaskLogString(taskInstance, 0, 10);
         assertEquals("remoteLogContent", result);
     }
 
@@ -94,15 +108,15 @@ public class LogClientDelegateTest {
         taskInstance.setTaskType("SHELL");
 
         when(registryClient.checkNodeExists("localhost", RegistryNodeType.WORKER)).thenReturn(false);
-        when(remoteLogClient.getPartLog(taskInstance, 0, 10)).thenReturn("remoteLogContent");
+        when(remoteLogClient.getTaskLogString(taskInstance, 0, 10)).thenReturn("remoteLogContent");
 
-        String result = logClientDelegate.getPartLogString(taskInstance, 0, 10);
+        String result = logClientDelegate.getTaskLogString(taskInstance, 0, 10);
         assertEquals("remoteLogContent", result);
     }
 
     @Test
     public void testGetWholeLogBytesTaskInstanceNullThrowsException() {
-        assertThrows(IllegalArgumentException.class, () -> logClientDelegate.getWholeLogBytes(null));
+        assertThrows(IllegalArgumentException.class, () -> logClientDelegate.getTaskLogBytes(null));
     }
 
     @Test
@@ -113,10 +127,10 @@ public class LogClientDelegateTest {
         taskInstance.setTaskType("SWITCH");
 
         when(registryClient.checkNodeExists("localhost", RegistryNodeType.MASTER)).thenReturn(true);
-        when(localLogClient.getWholeLog(taskInstance)).thenReturn(
+        when(localLogClient.getTaskLog(taskInstance)).thenReturn(
                 new TaskInstanceLogFileDownloadResponse("logBytes".getBytes(), LogResponseStatus.SUCCESS, null));
 
-        byte[] result = logClientDelegate.getWholeLogBytes(taskInstance);
+        byte[] result = logClientDelegate.getTaskLogBytes(taskInstance);
         assertArrayEquals("logBytes".getBytes(), result);
     }
 
@@ -128,11 +142,11 @@ public class LogClientDelegateTest {
         taskInstance.setTaskType("SWITCH");
 
         when(registryClient.checkNodeExists("localhost", RegistryNodeType.MASTER)).thenReturn(true);
-        when(localLogClient.getWholeLog(taskInstance)).thenReturn(
+        when(localLogClient.getTaskLog(taskInstance)).thenReturn(
                 new TaskInstanceLogFileDownloadResponse(null, LogResponseStatus.ERROR, "error"));
-        when(remoteLogClient.getWholeLog(taskInstance)).thenReturn("remoteLogBytes".getBytes());
+        when(remoteLogClient.getTaskLogBytes(taskInstance)).thenReturn("remoteLogBytes".getBytes());
 
-        byte[] result = logClientDelegate.getWholeLogBytes(taskInstance);
+        byte[] result = logClientDelegate.getTaskLogBytes(taskInstance);
         assertArrayEquals("remoteLogBytes".getBytes(), result);
     }
 
@@ -144,9 +158,9 @@ public class LogClientDelegateTest {
         taskInstance.setTaskType("SWITCH");
 
         when(registryClient.checkNodeExists("localhost", RegistryNodeType.MASTER)).thenReturn(false);
-        when(remoteLogClient.getWholeLog(taskInstance)).thenReturn("remoteLogBytes".getBytes());
+        when(remoteLogClient.getTaskLogBytes(taskInstance)).thenReturn("remoteLogBytes".getBytes());
 
-        byte[] result = logClientDelegate.getWholeLogBytes(taskInstance);
+        byte[] result = logClientDelegate.getTaskLogBytes(taskInstance);
         assertArrayEquals("remoteLogBytes".getBytes(), result);
     }
 }

@@ -17,11 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doNothing;
@@ -34,19 +32,12 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.logging.LogClientDelegate;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-
-import java.text.MessageFormat;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -78,9 +69,6 @@ public class LoggerServiceTest {
     private ProjectService projectService;
 
     @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Mock
     private LogClientDelegate logClientDelegate;
 
     private final int nettyServerPort = 18080;
@@ -93,13 +81,13 @@ public class LoggerServiceTest {
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setExecutorId(loginUser.getId() + 1);
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
-        Result result = loggerService.queryLog(loginUser, 2, 1, 1, "log");
+        Result result = loggerService.queryTaskLog(loginUser, 2, 1, 1);
         // TASK_INSTANCE_NOT_FOUND
         Assertions.assertEquals(Status.TASK_INSTANCE_NOT_FOUND.getCode(), result.getCode().intValue());
 
         try {
             // HOST NOT FOUND OR ILLEGAL
-            result = loggerService.queryLog(loginUser, 1, 1, 1, "log");
+            result = loggerService.queryTaskLog(loginUser, 1, 1, 1);
         } catch (RuntimeException e) {
             Assertions.assertTrue(true);
             logger.error("testQueryDataSourceList error {}", e.getMessage());
@@ -112,27 +100,27 @@ public class LoggerServiceTest {
         doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
                 .checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), VIEW_LOG);
         AssertionsHelper.assertThrowsServiceException(Status.PROJECT_NOT_EXIST,
-                () -> loggerService.queryLog(loginUser, 1, 1, 1, "log"));
+                () -> loggerService.queryTaskLog(loginUser, 1, 1, 1));
 
         // USER_NO_OPERATION_PERM
         doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
                 .checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), VIEW_LOG);
         AssertionsHelper.assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> loggerService.queryLog(loginUser, 1, 1, 1, "log"));
+                () -> loggerService.queryTaskLog(loginUser, 1, 1, 1));
 
         // SUCCESS
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(),
                 VIEW_LOG);
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
-        result = loggerService.queryLog(loginUser, 1, 1, 1, "log");
+        result = loggerService.queryTaskLog(loginUser, 1, 1, 1);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 
-        result = loggerService.queryLog(loginUser, 1, 0, 1, "log");
+        result = loggerService.queryTaskLog(loginUser, 1, 0, 1);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
 
         taskInstance.setLogPath("");
         assertThrowsServiceException(Status.QUERY_TASK_INSTANCE_LOG_ERROR,
-                () -> loggerService.queryLog(loginUser, 1, 1, 1, "log"));
+                () -> loggerService.queryTaskLog(loginUser, 1, 1, 1));
     }
 
     @Test
@@ -140,6 +128,8 @@ public class LoggerServiceTest {
 
         User loginUser = new User();
         loginUser.setId(1);
+        Project project = new Project();
+        project.setCode(1L);
         TaskInstance taskInstance = new TaskInstance();
         taskInstance.setId(1);
         taskInstance.setExecutorId(loginUser.getId() + 1);
@@ -147,7 +137,7 @@ public class LoggerServiceTest {
 
         // task instance is null
         try {
-            loggerService.getLogBytes(loginUser, 2);
+            loggerService.getTaskLogBytes(loginUser, 2);
         } catch (ServiceException e) {
             Assertions.assertEquals(new ServiceException("task instance is null or host is null").getMessage(),
                     e.getMessage());
@@ -156,7 +146,7 @@ public class LoggerServiceTest {
 
         // task instance host is null
         try {
-            loggerService.getLogBytes(loginUser, 1);
+            loggerService.getTaskLogBytes(loginUser, 1);
         } catch (ServiceException e) {
             Assertions.assertEquals(new ServiceException("task instance is null or host is null").getMessage(),
                     e.getMessage());
@@ -166,138 +156,54 @@ public class LoggerServiceTest {
         // PROJECT_NOT_EXIST
         taskInstance.setHost("127.0.0.1:" + nettyServerPort);
         taskInstance.setLogPath("/temp/log");
+        when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
         doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), VIEW_LOG);
+                .checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
         AssertionsHelper.assertThrowsServiceException(Status.PROJECT_NOT_EXIST,
-                () -> loggerService.queryLog(loginUser, 1, 1, 1, "log"));
+                () -> loggerService.getTaskLogBytes(loginUser, 1));
 
         // USER_NO_OPERATION_PERM
         doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), VIEW_LOG);
+                .checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
         AssertionsHelper.assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> loggerService.queryLog(loginUser, 1, 1, 1, "log"));
+                () -> loggerService.getTaskLogBytes(loginUser, 1));
 
         // SUCCESS
-        when(logClientDelegate.getWholeLogBytes(any())).thenReturn(new byte[0]);
-        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(),
-                DOWNLOAD_LOG);
-        when(logClientDelegate.getWholeLogBytes(any())).thenReturn(new byte[0]);
-        byte[] logBytes = loggerService.getLogBytes(loginUser, 1);
+        when(logClientDelegate.getTaskLogBytes(any())).thenReturn(new byte[0]);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
+        when(logClientDelegate.getTaskLogBytes(any())).thenReturn(new byte[0]);
+        byte[] logBytes = loggerService.getTaskLogBytes(loginUser, 1);
         Assertions.assertEquals(42, logBytes.length - String.valueOf(nettyServerPort).length());
     }
 
     @Test
-    public void testQueryLogInSpecifiedProject() {
-        long projectCode = 1L;
+    public void testQueryTaskOutputAndGetOutputBytes() {
 
         User loginUser = new User();
-        loginUser.setId(-1);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        TaskInstance taskInstance = new TaskInstance();
-        when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
-        when(taskInstanceDao.queryById(10)).thenReturn(null);
-
-        assertThrowsServiceException(Status.TASK_INSTANCE_NOT_FOUND,
-                () -> loggerService.queryLog(loginUser, projectCode, 10, 1, 1, "log"));
-
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setProjectCode(projectCode);
-        taskDefinition.setCode(1L);
-
-        // SUCCESS
-        taskInstance.setTaskCode(1L);
-        taskInstance.setId(1);
-        taskInstance.setHost("127.0.0.1:" + nettyServerPort);
-        taskInstance.setLogPath("/temp/log");
-        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, VIEW_LOG);
-        when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
-        when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
-        assertDoesNotThrow(() -> loggerService.queryLog(loginUser, projectCode, 1, 1, 1, "log"));
-
-        taskDefinition.setProjectCode(10);
-        assertThrowsServiceException(Status.TASK_INSTANCE_NOT_FOUND,
-                () -> loggerService.queryLog(loginUser, projectCode, 1, 1, 1, "log"));
-
-        taskDefinition.setProjectCode(1);
-        taskInstance.setId(10);
-        when(taskInstanceDao.queryById(10)).thenReturn(taskInstance);
-
-        when(logClientDelegate.getPartLogString(any(), anyInt(), anyInt())).thenReturn("log content");
-
-        String result = loggerService.queryLog(loginUser, projectCode, 10, 1, 1, "log");
-        assertEquals("log content", result);
-
-        taskInstance.setId(100);
-        when(taskInstanceDao.queryById(100)).thenReturn(taskInstance);
-        doThrow(new ServiceException("query log error")).when(logClientDelegate).getPartLogString(any(), anyInt(),
-                anyInt());
-        assertThrowsServiceException(Status.QUERY_TASK_INSTANCE_LOG_ERROR,
-                () -> loggerService.queryLog(loginUser, projectCode, 10, 1, 1, "log"));
-    }
-
-    @Test
-    public void testGetLogBytesInSpecifiedProject() {
-        long projectCode = 1L;
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
-        User loginUser = new User();
-        loginUser.setId(-1);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
-        TaskInstance taskInstance = new TaskInstance();
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setProjectCode(projectCode);
-        taskDefinition.setCode(1L);
-        // SUCCESS
-        taskInstance.setTaskCode(1L);
-        taskInstance.setId(1);
-        taskInstance.setHost("127.0.0.1:" + nettyServerPort);
-        taskInstance.setLogPath("/temp/log");
-        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, DOWNLOAD_LOG);
-
-        when(taskInstanceDao.queryById(1)).thenReturn(null);
-        assertThrowsServiceException(
-                Status.INTERNAL_SERVER_ERROR_ARGS, () -> loggerService.getLogBytes(loginUser, projectCode, 1));
-
-        when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
-        when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
-        when(logClientDelegate.getWholeLogBytes(any())).thenReturn(new byte[0]);
-        assertDoesNotThrow(() -> loggerService.getLogBytes(loginUser, projectCode, 1));
-
-        taskDefinition.setProjectCode(2L);
-        assertThrowsServiceException(Status.INTERNAL_SERVER_ERROR_ARGS,
-                () -> loggerService.getLogBytes(loginUser, projectCode, 1));
-
-        taskDefinition.setProjectCode(1L);
-        taskInstance.setId(100);
-        when(taskInstanceDao.queryById(100)).thenReturn(taskInstance);
-        doThrow(new ServiceException("download error")).when(logClientDelegate).getWholeLogBytes(any());
-        assertThrowsServiceException(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR,
-                () -> loggerService.getLogBytes(loginUser, projectCode, 100));
-    }
-
-    /**
-     * get mock Project
-     *
-     * @param projectCode projectCode
-     * @return Project
-     */
-    private Project getProject(long projectCode) {
+        loginUser.setId(1);
         Project project = new Project();
-        project.setCode(projectCode);
-        project.setId(1);
-        project.setName("test");
-        project.setUserId(1);
-        return project;
+        project.setCode(1L);
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setExecutorId(loginUser.getId() + 1);
+        taskInstance.setHost("127.0.0.1:" + nettyServerPort);
+        taskInstance.setTaskOutPutLogPath("/temp/output.log");
+        when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
+
+        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(),
+                VIEW_LOG);
+        when(logClientDelegate.getTaskOutputString(any(), anyInt(), anyInt())).thenReturn("output content");
+
+        Result<ResponseTaskLog> result = loggerService.queryTaskOutput(loginUser, 1, 1, 1);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals("output content", result.getData().getMessage());
+
+        when(projectMapper.queryProjectByTaskInstanceId(1)).thenReturn(project);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
+        when(logClientDelegate.getTaskOutputBytes(any())).thenReturn(new byte[0]);
+
+        byte[] outputBytes = loggerService.getTaskOutputBytes(loginUser, 1);
+        Assertions.assertEquals(0, outputBytes.length);
     }
 
-    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
-        result.put(Constants.STATUS, status);
-        if (statusParams != null && statusParams.length > 0) {
-            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
-        } else {
-            result.put(Constants.MSG, status.getMsg());
-        }
-    }
 }

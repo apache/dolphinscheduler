@@ -51,24 +51,34 @@ public class LogClientDelegate {
      * @return A string containing the specified portion of the log.
      */
 
-    public String getPartLogString(TaskInstance taskInstance, int skipLineNum, int limit) {
-        return getPartLogString(taskInstance, skipLineNum, limit, "log");
+    public String getTaskLogString(TaskInstance taskInstance, int skipLineNum, int limit) {
+        return getPartLogString(taskInstance, skipLineNum, limit, TaskLogType.LOG);
     }
 
-    public String getPartLogString(TaskInstance taskInstance, int skipLineNum, int limit, String type) {
+    public String getTaskOutputString(TaskInstance taskInstance, int skipLineNum, int limit) {
+        return getPartLogString(taskInstance, skipLineNum, limit, TaskLogType.OUTPUT);
+    }
+
+    private String getPartLogString(TaskInstance taskInstance, int skipLineNum, int limit, TaskLogType taskLogType) {
         checkArgs(taskInstance);
         if (checkNodeExists(taskInstance)) {
             TaskInstanceLogPageQueryResponse response =
-                    localLogClient.getPartLog(taskInstance, skipLineNum, limit, type);
+                    taskLogType == TaskLogType.LOG
+                            ? localLogClient.getTaskLog(taskInstance, skipLineNum, limit)
+                            : localLogClient.getTaskOutput(taskInstance, skipLineNum, limit);
             if (response.getCode() == LogResponseStatus.SUCCESS) {
                 return response.getLogContent();
             } else {
                 log.warn("get part log string is not success for task instance {}; reason :{}",
                         taskInstance.getId(), response.getMessage());
-                return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit, type);
+                return taskLogType == TaskLogType.LOG
+                        ? remoteLogClient.getTaskLogString(taskInstance, skipLineNum, limit)
+                        : remoteLogClient.getTaskOutputString(taskInstance, skipLineNum, limit);
             }
         } else {
-            return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit, type);
+            return taskLogType == TaskLogType.LOG
+                    ? remoteLogClient.getTaskLogString(taskInstance, skipLineNum, limit)
+                    : remoteLogClient.getTaskOutputString(taskInstance, skipLineNum, limit);
         }
     }
 
@@ -79,19 +89,34 @@ public class LogClientDelegate {
      * @param taskInstance The task instance object, containing information needed for log retrieval.
      * @return A byte array containing the complete log content.
      */
-    public byte[] getWholeLogBytes(TaskInstance taskInstance) {
+    public byte[] getTaskLogBytes(TaskInstance taskInstance) {
+        return getWholeLogBytes(taskInstance, TaskLogType.LOG);
+    }
+
+    public byte[] getTaskOutputBytes(TaskInstance taskInstance) {
+        return getWholeLogBytes(taskInstance, TaskLogType.OUTPUT);
+    }
+
+    private byte[] getWholeLogBytes(TaskInstance taskInstance, TaskLogType taskLogType) {
         checkArgs(taskInstance);
         if (checkNodeExists(taskInstance)) {
-            TaskInstanceLogFileDownloadResponse response = localLogClient.getWholeLog(taskInstance);
+            TaskInstanceLogFileDownloadResponse response =
+                    taskLogType == TaskLogType.LOG
+                            ? localLogClient.getTaskLog(taskInstance)
+                            : localLogClient.getTaskOutput(taskInstance);
             if (response.getCode() == LogResponseStatus.SUCCESS) {
                 return response.getLogBytes();
             } else {
                 log.warn("get whole log bytes is not success for task instance {}; reason :{}", taskInstance.getId(),
                         response.getMessage());
-                return remoteLogClient.getWholeLog(taskInstance);
+                return taskLogType == TaskLogType.LOG
+                        ? remoteLogClient.getTaskLogBytes(taskInstance)
+                        : remoteLogClient.getTaskOutputBytes(taskInstance);
             }
         } else {
-            return remoteLogClient.getWholeLog(taskInstance);
+            return taskLogType == TaskLogType.LOG
+                    ? remoteLogClient.getTaskLogBytes(taskInstance)
+                    : remoteLogClient.getTaskOutputBytes(taskInstance);
         }
     }
 
