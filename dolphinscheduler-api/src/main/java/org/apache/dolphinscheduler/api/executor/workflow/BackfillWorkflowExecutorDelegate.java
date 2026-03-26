@@ -104,19 +104,20 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
     private List<Integer> doParallelBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
                                                      final Set<Long> visitedCodes) {
         final BackfillWorkflowDTO.BackfillParamsDTO backfillParams = backfillWorkflowDTO.getBackfillParams();
-        final List<ZonedDateTime> listDate = backfillParams.getBackfillDateList();
-        final int parallelism = backfillParams.getExpectedParallelismNumber() != null
-                ? backfillParams.getExpectedParallelismNumber() : 0;
-        final int expectedParallelismNumber = Math.min(listDate.size(), Math.max(parallelism, 1));
+        Integer expectedParallelismNumber = backfillParams.getExpectedParallelismNumber();
+
+        List<ZonedDateTime> listDate = backfillParams.getBackfillDateList();
+        if (expectedParallelismNumber != null) {
+            expectedParallelismNumber = Math.min(listDate.size(), expectedParallelismNumber);
+        } else {
+            expectedParallelismNumber = listDate.size();
+        }
 
         log.info("In parallel mode, current expectedParallelismNumber: {}", expectedParallelismNumber);
         final List<Integer> workflowInstanceIdList = Lists.newArrayList();
-        final Set<Long> baseVisitedCodes = visitedCodes == null ? new HashSet<>() : visitedCodes;
-        for (List<ZonedDateTime> dateChunk : splitDateTime(listDate, expectedParallelismNumber)) {
-            // Each parallel chunk should keep its own traversal context to avoid cross-chunk pollution.
-            final Set<Long> chunkVisitedCodes = new HashSet<>(baseVisitedCodes);
-            final Integer workflowInstanceId =
-                    doBackfillWorkflow(backfillWorkflowDTO, dateChunk, chunkVisitedCodes);
+        for (List<ZonedDateTime> stringDate : splitDateTime(listDate, expectedParallelismNumber)) {
+            final Integer workflowInstanceId = doBackfillWorkflow(
+                    backfillWorkflowDTO, stringDate,visitedCodes);
             workflowInstanceIdList.add(workflowInstanceId);
         }
         return workflowInstanceIdList;
