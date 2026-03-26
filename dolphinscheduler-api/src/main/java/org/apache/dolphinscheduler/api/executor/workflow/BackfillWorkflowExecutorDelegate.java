@@ -243,7 +243,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
             // Prevent self-dependency and circular dependency chains.
             // We only traverse each downstream workflow once.
             if (visitedCodes.contains(downstreamCode)) {
-                log.warn("Skip circular dependent workflow {}", downstreamCode);
+                log.warn("Skip already visited dependent workflow {}", downstreamCode);
                 continue;
             }
 
