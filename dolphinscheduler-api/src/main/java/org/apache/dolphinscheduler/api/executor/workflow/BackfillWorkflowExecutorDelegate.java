@@ -17,6 +17,15 @@
 
 package org.apache.dolphinscheduler.api.executor.workflow;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
@@ -37,22 +46,12 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowB
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.service.process.ProcessService;
-
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.Lists;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -105,14 +104,10 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
     private List<Integer> doParallelBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
                                                      final Set<Long> visitedCodes) {
         final BackfillWorkflowDTO.BackfillParamsDTO backfillParams = backfillWorkflowDTO.getBackfillParams();
-        Integer expectedParallelismNumber = backfillParams.getExpectedParallelismNumber();
-
-        List<ZonedDateTime> listDate = backfillParams.getBackfillDateList();
-        if (expectedParallelismNumber != null) {
-            expectedParallelismNumber = Math.min(listDate.size(), expectedParallelismNumber);
-        } else {
-            expectedParallelismNumber = listDate.size();
-        }
+        final List<ZonedDateTime> listDate = backfillParams.getBackfillDateList();
+        final int parallelism = backfillParams.getExpectedParallelismNumber() != null
+                ? backfillParams.getExpectedParallelismNumber() : 0;
+        final int expectedParallelismNumber = Math.max(parallelism, 1);
 
         log.info("In parallel mode, current expectedParallelismNumber: {}", expectedParallelismNumber);
         final List<Integer> workflowInstanceIdList = Lists.newArrayList();
