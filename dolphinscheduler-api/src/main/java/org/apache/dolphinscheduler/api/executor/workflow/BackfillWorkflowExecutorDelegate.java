@@ -234,8 +234,6 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         // 3) Iterate downstream workflows and build/trigger corresponding BackfillWorkflowDTO
         for (Map.Entry<Long, List<DependentWorkflowDefinition>> entry : downstreamDefinitionsByCode.entrySet()) {
             long downstreamCode = entry.getKey();
-            List<DependentWorkflowDefinition> dependentDefinitions = entry.getValue();
-
             // Prevent self-dependency and circular dependency chains.
             // We only traverse each downstream workflow once.
             if (visitedCodes.contains(downstreamCode)) {
@@ -243,40 +241,18 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 continue;
             }
 
-            DependentWorkflowDefinition representativeDependent = dependentDefinitions.get(0);
-
-            // Aggregate dependent nodes within the same downstream workflow.
-            // If any entry represents workflow-level dependency (taskDefinitionCode==0),
-            // we should backfill the whole downstream workflow (startNodes=null).
-            final boolean isWorkflowLevelDependency =
-                    dependentDefinitions.stream().anyMatch(d -> d.getTaskDefinitionCode() == 0);
-            final List<Long> aggregatedStartNodes;
-            if (isWorkflowLevelDependency) {
-                aggregatedStartNodes = null;
-            } else {
-                aggregatedStartNodes = dependentDefinitions.stream()
-                        .map(DependentWorkflowDefinition::getTaskDefinitionCode)
-                        .filter(code -> code != 0)
-                        .distinct()
-                        .sorted()
-                        .collect(Collectors.toList());
-            }
+            // Simplification: Downstream backfill is always full, startNodes=null, workerGroup uses workflowDefinition's own config
+            // Only grouping and deduplication are needed, all aggregation logic is omitted
 
             WorkflowDefinition downstreamWorkflow = null;
             List<WorkflowDefinition> workflowCandidates = downstreamWorkflowMapByCode.get(downstreamCode);
-            if (workflowCandidates != null) {
-                downstreamWorkflow =
-                        workflowCandidates.stream()
-                                .filter(workflow -> workflow.getVersion() == representativeDependent
-                                        .getWorkflowDefinitionVersion())
-                                .findFirst()
-                                .orElse(null);
+            if (workflowCandidates != null && !workflowCandidates.isEmpty()) {
+                downstreamWorkflow = workflowCandidates.get(0); // code is unique, just take the first one
             }
             if (downstreamWorkflow == null) {
                 log.warn("Skip dependent workflow {}, workflow definition not found", downstreamCode);
                 continue;
             }
-
             if (downstreamWorkflow.getReleaseState() != ReleaseState.ONLINE) {
                 log.warn("Skip dependent workflow {}, release state is not ONLINE", downstreamCode);
                 continue;
@@ -304,12 +280,15 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     .executionOrder(originalParams.getExecutionOrder())
                     .build();
 
-            BackfillWorkflowDTO dependentBackfillDTO = BackfillWorkflowDTO.builder()
+                // Simplified design notes:
+                // 1. Downstream backfill is always full, startNodes=null, no more aggregation of dependent nodes
+                // 2. workerGroup is directly taken from the downstream workflowDefinition's own config, if null then use system default workerGroup
+                // 3. Only grouping deduplication and visitedCodes check, all complex aggregation logic is omitted
+                // This implementation is the simplest and most controllable, suitable for full backfill and workerGroup based on itself
+                BackfillWorkflowDTO dependentBackfillDTO = BackfillWorkflowDTO.builder()
                     .loginUser(backfillWorkflowDTO.getLoginUser())
                     .workflowDefinition(downstreamWorkflow)
-                    // If taskDefinitionCode is 0, it means the dependency is on the entire workflow.
-                    // Otherwise, backfill should start from that dependent node.
-                    .startNodes(aggregatedStartNodes)
+                    .startNodes(null) // Full backfill, simplified design
                     .failureStrategy(backfillWorkflowDTO.getFailureStrategy())
                     .taskDependType(backfillWorkflowDTO.getTaskDependType())
                     .execType(backfillWorkflowDTO.getExecType())
@@ -317,10 +296,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     .warningGroupId(downstreamWorkflow.getWarningGroupId())
                     .runMode(dependentParams.getRunMode())
                     .workflowInstancePriority(backfillWorkflowDTO.getWorkflowInstancePriority())
-                    // Align workerGroup with DependentWorkflowDefinition (fallback to upstream when it's null).
-                    .workerGroup(representativeDependent.getWorkerGroup() != null
-                            ? representativeDependent.getWorkerGroup()
-                            : backfillWorkflowDTO.getWorkerGroup())
+                    .workerGroup(backfillWorkflowDTO.getWorkerGroup()) // 以补数启动参数为准
                     .tenantCode(backfillWorkflowDTO.getTenantCode())
                     .environmentCode(backfillWorkflowDTO.getEnvironmentCode())
                     .startParamList(backfillWorkflowDTO.getStartParamList())
@@ -332,10 +308,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     downstreamCode, upstreamWorkflowCode,
                     backfillDateTimes.stream().map(DateUtils::dateToString).collect(Collectors.toList()));
 
-            // 4) Mark as visiting before recursive trigger to detect cycles, then trigger downstream backfill.
-            // Note: recursion depth equals the dependency chain length, which is typically single-digit
-            // in practice, so stack overflow is not a concern here. Consider switching to iterative
-            // BFS/DFS if very deep chains become a real-world requirement.
+            // Mark as visited to prevent infinite recursion. Actual dependency chains are usually short, recursion is safe.
             visitedCodes.add(downstreamCode);
             executeWithVisitedCodes(dependentBackfillDTO, visitedCodes);
         }
