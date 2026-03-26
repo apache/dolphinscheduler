@@ -229,6 +229,83 @@ public class BackfillWorkflowExecutorDelegateTest {
     }
 
     @Test
+    public void testDoBackfillDependentWorkflow_AggregateStartNodesForSameDownstreamWorkflow() {
+        long upstreamCode = 10L;
+        long downstreamCode = 20L;
+
+        WorkflowDefinition upstreamWorkflow =
+                WorkflowDefinition.builder().code(upstreamCode).version(1).releaseState(ReleaseState.ONLINE)
+                        .build();
+
+        WorkflowDefinition downstreamWorkflow =
+                WorkflowDefinition.builder().code(downstreamCode).version(2).releaseState(ReleaseState.ONLINE).build();
+
+        // Two dependent task lineage entries for the same downstream workflow code.
+        DependentWorkflowDefinition depNode1 = new DependentWorkflowDefinition();
+        depNode1.setWorkflowDefinitionCode(downstreamCode);
+        depNode1.setWorkflowDefinitionVersion(2);
+        depNode1.setTaskDefinitionCode(111L);
+        depNode1.setWorkerGroup("wg-dep");
+
+        DependentWorkflowDefinition depNode2 = new DependentWorkflowDefinition();
+        depNode2.setWorkflowDefinitionCode(downstreamCode);
+        depNode2.setWorkflowDefinitionVersion(2);
+        depNode2.setTaskDefinitionCode(222L);
+        depNode2.setWorkerGroup("wg-dep");
+
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode))
+                .thenReturn(Arrays.asList(depNode1, depNode2));
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(downstreamCode)))
+                .thenReturn(Collections.singletonList(downstreamWorkflow));
+
+        User loginUser = new User();
+        loginUser.setId(1);
+
+        BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                .runMode(RunMode.RUN_MODE_SERIAL)
+                .backfillDateList(Collections.singletonList(ZonedDateTime.parse("2026-02-01T00:00:00Z")))
+                .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                // direct-only: prevent downstream recursion; keep assertions simple
+                .allLevelDependent(false)
+                .executionOrder(ExecutionOrder.ASC_ORDER)
+                .build();
+
+        BackfillWorkflowDTO upstreamDto = BackfillWorkflowDTO.builder()
+                .loginUser(loginUser)
+                .workflowDefinition(upstreamWorkflow)
+                .workerGroup("wg-upstream")
+                .backfillParams(params)
+                .build();
+
+        Server masterServer = new Server();
+        masterServer.setHost("127.0.0.1");
+        masterServer.setPort(1234);
+        when(registryClient.getRandomServer(RegistryNodeType.MASTER)).thenReturn(Optional.of(masterServer));
+
+        List<WorkflowBackfillTriggerRequest> capturedRequests = new ArrayList<>();
+        doAnswer(invocation -> {
+            WorkflowBackfillTriggerRequest request = invocation.getArgument(0);
+            capturedRequests.add(request);
+            return WorkflowBackfillTriggerResponse.success(1);
+        }).when(backfillWorkflowExecutorDelegate)
+                .triggerBackfillWorkflow(any(), any());
+
+        backfillWorkflowExecutorDelegate.executeWithVisitedCodes(upstreamDto, new HashSet<>());
+
+        // upstream + downstream only
+        Assertions.assertEquals(2, capturedRequests.size());
+        WorkflowBackfillTriggerRequest downstreamRequest =
+                capturedRequests.stream()
+                        .filter(r -> r.getWorkflowCode() == downstreamCode)
+                        .findFirst()
+                        .orElseThrow();
+
+        Assertions.assertEquals(downstreamWorkflow.getVersion(), downstreamRequest.getWorkflowVersion());
+        Assertions.assertEquals(Arrays.asList(111L, 222L), downstreamRequest.getStartNodes());
+        Assertions.assertEquals("wg-dep", downstreamRequest.getWorkerGroup());
+    }
+
+    @Test
     public void testDoBackfillDependentWorkflow_AllLevelDependentFalse_TriggersDirectOnly() {
         long upstreamCode = 10L;
         long directDownstreamCode = 20L;

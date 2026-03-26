@@ -42,7 +42,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -218,9 +217,14 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
             log.info("No downstream dependent workflows found for workflow code {}", upstreamWorkflowCode);
             return;
         }
-        final Set<Long> downstreamCodes = downstreamDefinitions.stream()
-                .map(DependentWorkflowDefinition::getWorkflowDefinitionCode)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        // downstreamDefinitions may contain multiple entries for the same downstream workflow code
+        // (different dependent task lineage). We should only traverse each downstream workflow once
+        // (visitedCodes check), but trigger all dependent nodes within that downstream workflow by
+        // aggregating distinct taskDefinitionCodes into startNodes.
+        final Map<Long, List<DependentWorkflowDefinition>> downstreamDefinitionsByCode =
+                downstreamDefinitions.stream()
+                        .collect(Collectors.groupingBy(DependentWorkflowDefinition::getWorkflowDefinitionCode));
+        final Set<Long> downstreamCodes = downstreamDefinitionsByCode.keySet();
         final List<WorkflowDefinition> downstreamWorkflowList = workflowDefinitionDao.queryByCodes(downstreamCodes);
         // queryByCodes returns multiple versions for the same workflow code, so we must select the correct one
         // based on DependentWorkflowDefinition.getWorkflowDefinitionVersion().
@@ -232,13 +236,34 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         final List<ZonedDateTime> upstreamBackfillDates = new ArrayList<>(backfillDateTimes);
 
         // 3) Iterate downstream workflows and build/trigger corresponding BackfillWorkflowDTO
-        for (DependentWorkflowDefinition dependentWorkflowDefinition : downstreamDefinitions) {
-            long downstreamCode = dependentWorkflowDefinition.getWorkflowDefinitionCode();
+        for (Map.Entry<Long, List<DependentWorkflowDefinition>> entry : downstreamDefinitionsByCode.entrySet()) {
+            long downstreamCode = entry.getKey();
+            List<DependentWorkflowDefinition> dependentDefinitions = entry.getValue();
 
-            // Prevent self-dependency and circular dependency chains
+            // Prevent self-dependency and circular dependency chains.
+            // We only traverse each downstream workflow once.
             if (visitedCodes.contains(downstreamCode)) {
                 log.warn("Skip circular dependent workflow {}", downstreamCode);
                 continue;
+            }
+
+            DependentWorkflowDefinition representativeDependent = dependentDefinitions.get(0);
+
+            // Aggregate dependent nodes within the same downstream workflow.
+            // If any entry represents workflow-level dependency (taskDefinitionCode==0),
+            // we should backfill the whole downstream workflow (startNodes=null).
+            final boolean isWorkflowLevelDependency =
+                    dependentDefinitions.stream().anyMatch(d -> d.getTaskDefinitionCode() == 0);
+            final List<Long> aggregatedStartNodes;
+            if (isWorkflowLevelDependency) {
+                aggregatedStartNodes = null;
+            } else {
+                aggregatedStartNodes = dependentDefinitions.stream()
+                        .map(DependentWorkflowDefinition::getTaskDefinitionCode)
+                        .filter(code -> code != 0)
+                        .distinct()
+                        .sorted()
+                        .collect(Collectors.toList());
             }
 
             WorkflowDefinition downstreamWorkflow = null;
@@ -246,7 +271,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
             if (workflowCandidates != null) {
                 downstreamWorkflow =
                         workflowCandidates.stream()
-                                .filter(workflow -> workflow.getVersion() == dependentWorkflowDefinition
+                                .filter(workflow -> workflow.getVersion() == representativeDependent
                                         .getWorkflowDefinitionVersion())
                                 .findFirst()
                                 .orElse(null);
@@ -289,9 +314,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     .workflowDefinition(downstreamWorkflow)
                     // If taskDefinitionCode is 0, it means the dependency is on the entire workflow.
                     // Otherwise, backfill should start from that dependent node.
-                    .startNodes(dependentWorkflowDefinition.getTaskDefinitionCode() != 0
-                            ? Collections.singletonList(dependentWorkflowDefinition.getTaskDefinitionCode())
-                            : null)
+                    .startNodes(aggregatedStartNodes)
                     .failureStrategy(backfillWorkflowDTO.getFailureStrategy())
                     .taskDependType(backfillWorkflowDTO.getTaskDependType())
                     .execType(backfillWorkflowDTO.getExecType())
@@ -300,8 +323,8 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     .runMode(dependentParams.getRunMode())
                     .workflowInstancePriority(backfillWorkflowDTO.getWorkflowInstancePriority())
                     // Align workerGroup with DependentWorkflowDefinition (fallback to upstream when it's null).
-                    .workerGroup(dependentWorkflowDefinition.getWorkerGroup() != null
-                            ? dependentWorkflowDefinition.getWorkerGroup()
+                    .workerGroup(representativeDependent.getWorkerGroup() != null
+                            ? representativeDependent.getWorkerGroup()
                             : backfillWorkflowDTO.getWorkerGroup())
                     .tenantCode(backfillWorkflowDTO.getTenantCode())
                     .environmentCode(backfillWorkflowDTO.getEnvironmentCode())
