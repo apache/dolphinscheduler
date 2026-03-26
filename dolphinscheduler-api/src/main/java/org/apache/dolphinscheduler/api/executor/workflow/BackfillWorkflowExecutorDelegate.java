@@ -75,7 +75,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
 
     @Override
     public List<Integer> execute(final BackfillWorkflowDTO backfillWorkflowDTO) {
-        return executeWithVisitedCodes(backfillWorkflowDTO, null);
+        return executeWithVisitedCodes(backfillWorkflowDTO, new HashSet<>());
     }
 
     List<Integer> executeWithVisitedCodes(final BackfillWorkflowDTO backfillWorkflowDTO,
