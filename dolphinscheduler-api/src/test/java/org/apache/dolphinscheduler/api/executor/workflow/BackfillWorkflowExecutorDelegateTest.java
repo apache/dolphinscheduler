@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -105,11 +106,12 @@ public class BackfillWorkflowExecutorDelegateTest {
                 "doBackfillDependentWorkflow", BackfillWorkflowDTO.class, List.class, Set.class);
         method.setAccessible(true);
 
-        List<String> backfillTimeList = Collections.singletonList("2026-02-01 00:00:00");
+        List<ZonedDateTime> backfillDates =
+                Collections.singletonList(DateUtils.stringToZoneDateTime("2026-02-01 00:00:00"));
 
         Set<Long> visitedCodes = new HashSet<>();
         visitedCodes.add(dto.getWorkflowDefinition().getCode());
-        method.invoke(backfillWorkflowExecutorDelegate, dto, backfillTimeList, visitedCodes);
+        method.invoke(backfillWorkflowExecutorDelegate, dto, backfillDates, visitedCodes);
 
         verify(workflowDefinitionDao, never()).queryByCodes(any());
     }
@@ -165,13 +167,13 @@ public class BackfillWorkflowExecutorDelegateTest {
                 "doBackfillDependentWorkflow", BackfillWorkflowDTO.class, List.class, Set.class);
         method.setAccessible(true);
 
-        List<String> backfillTimeList = Arrays.asList(
-                "2026-02-01 00:00:00",
-                "2026-02-02 00:00:00");
+        List<ZonedDateTime> backfillDates = Arrays.asList(
+                DateUtils.stringToZoneDateTime("2026-02-01 00:00:00"),
+                DateUtils.stringToZoneDateTime("2026-02-02 00:00:00"));
 
         Set<Long> visitedCodes = new HashSet<>();
         visitedCodes.add(dto.getWorkflowDefinition().getCode());
-        method.invoke(backfillWorkflowExecutorDelegate, dto, backfillTimeList, visitedCodes);
+        method.invoke(backfillWorkflowExecutorDelegate, dto, backfillDates, visitedCodes);
 
         verify(workflowDefinitionDao)
                 .queryByCodes(new LinkedHashSet<>(Arrays.asList(upstreamCode, downstreamCode)));
@@ -188,7 +190,7 @@ public class BackfillWorkflowExecutorDelegateTest {
         Assertions.assertEquals(params.getExecutionOrder(), capturedParams.getExecutionOrder());
         Assertions.assertEquals(ComplementDependentMode.ALL_DEPENDENT, capturedParams.getBackfillDependentMode());
         Assertions.assertTrue(capturedParams.isAllLevelDependent());
-        Assertions.assertEquals(backfillTimeList.size(), capturedParams.getBackfillDateList().size());
+        Assertions.assertEquals(backfillDates.size(), capturedParams.getBackfillDateList().size());
         Assertions.assertNull(captured.getStartNodes());
     }
 
@@ -240,11 +242,12 @@ public class BackfillWorkflowExecutorDelegateTest {
                 "doBackfillDependentWorkflow", BackfillWorkflowDTO.class, List.class, Set.class);
         method.setAccessible(true);
 
-        List<String> backfillTimeList = Collections.singletonList("2026-02-03 00:00:00");
+        List<ZonedDateTime> backfillDates =
+                Collections.singletonList(DateUtils.stringToZoneDateTime("2026-02-03 00:00:00"));
 
         Set<Long> visitedCodes = new HashSet<>();
         visitedCodes.add(dto.getWorkflowDefinition().getCode());
-        method.invoke(backfillWorkflowExecutorDelegate, dto, backfillTimeList, visitedCodes);
+        method.invoke(backfillWorkflowExecutorDelegate, dto, backfillDates, visitedCodes);
 
         verify(workflowDefinitionDao).queryByCodes(Collections.singleton(downstreamCode));
 
@@ -255,7 +258,7 @@ public class BackfillWorkflowExecutorDelegateTest {
         Assertions.assertNotNull(capturedParams);
         Assertions.assertEquals(ComplementDependentMode.OFF_MODE, capturedParams.getBackfillDependentMode());
         Assertions.assertFalse(capturedParams.isAllLevelDependent());
-        Assertions.assertEquals(backfillTimeList.size(), capturedParams.getBackfillDateList().size());
+        Assertions.assertEquals(backfillDates.size(), capturedParams.getBackfillDateList().size());
         Assertions.assertNull(captured.getStartNodes());
     }
 
@@ -294,7 +297,10 @@ public class BackfillWorkflowExecutorDelegateTest {
 
         Set<Long> visitedCodes = new HashSet<>();
         visitedCodes.add(dto.getWorkflowDefinition().getCode());
-        method.invoke(backfillWorkflowExecutorDelegate, dto, Collections.singletonList("2026-02-01 00:00:00"),
+        method.invoke(
+                backfillWorkflowExecutorDelegate,
+                dto,
+                Collections.singletonList(DateUtils.stringToZoneDateTime("2026-02-01 00:00:00")),
                 visitedCodes);
 
         verify(backfillWorkflowExecutorDelegate, never()).executeWithVisitedCodes(any(), any());
@@ -338,7 +344,10 @@ public class BackfillWorkflowExecutorDelegateTest {
 
         Set<Long> visitedCodes = new HashSet<>();
         visitedCodes.add(dto.getWorkflowDefinition().getCode());
-        method.invoke(backfillWorkflowExecutorDelegate, dto, Collections.singletonList("2026-02-01 00:00:00"),
+        method.invoke(
+                backfillWorkflowExecutorDelegate,
+                dto,
+                Collections.singletonList(DateUtils.stringToZoneDateTime("2026-02-01 00:00:00")),
                 visitedCodes);
 
         verify(backfillWorkflowExecutorDelegate, never()).executeWithVisitedCodes(any(), any());
@@ -396,16 +405,17 @@ public class BackfillWorkflowExecutorDelegateTest {
                 "doBackfillDependentWorkflow", BackfillWorkflowDTO.class, List.class, Set.class);
         method.setAccessible(true);
 
-        List<String> backfillTimeList = Collections.singletonList("2026-02-01 00:00:00");
+        List<ZonedDateTime> backfillDates =
+                Collections.singletonList(DateUtils.stringToZoneDateTime("2026-02-01 00:00:00"));
         Set<Long> visitedCodes = new HashSet<>();
         visitedCodes.add(workflowA);
 
         // Level 1: A -> B
-        method.invoke(backfillWorkflowExecutorDelegate, dtoA, backfillTimeList, visitedCodes);
+        method.invoke(backfillWorkflowExecutorDelegate, dtoA, backfillDates, visitedCodes);
         BackfillWorkflowDTO dtoB = captor.getAllValues().get(0);
 
         // Level 2: B -> A(cycle, should skip) and B -> C(should trigger)
-        method.invoke(backfillWorkflowExecutorDelegate, dtoB, backfillTimeList, visitedCodes);
+        method.invoke(backfillWorkflowExecutorDelegate, dtoB, backfillDates, visitedCodes);
 
         verify(backfillWorkflowExecutorDelegate, times(2)).executeWithVisitedCodes(any(), any());
         verify(workflowDefinitionDao, times(2)).queryByCodes(any());
