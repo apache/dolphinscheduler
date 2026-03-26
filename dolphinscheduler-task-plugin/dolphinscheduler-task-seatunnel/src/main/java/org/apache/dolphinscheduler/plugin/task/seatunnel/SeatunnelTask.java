@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.io.FileUtils;
@@ -161,7 +162,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
     private List<String> generateTaskParameters() {
         Map<String, String> variables = new HashMap<>();
         Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
-        List<Property> propertyList = JSONUtils.toList(taskRequest.getGlobalParams(), Property.class);
+        List<Property> propertyList = GlobalParameterUtils.deserializeGlobalParameter(taskRequest.getGlobalParams());
         if (propertyList != null && !propertyList.isEmpty()) {
             for (Property property : propertyList) {
                 variables.put(property.getProp(), paramsMap.get(property.getProp()).getValue());

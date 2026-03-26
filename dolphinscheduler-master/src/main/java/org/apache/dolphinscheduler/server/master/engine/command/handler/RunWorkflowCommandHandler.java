@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
@@ -123,7 +124,8 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
                 Optional.ofNullable(JSONUtils.parseObject(command.getCommandParam(), ICommandParam.class))
                         .map(ICommandParam::getCommandParams)
                         .orElse(null);
-        final List<Property> globalParamsList = JSONUtils.toList(workflowDefinition.getGlobalParams(), Property.class);
+        final List<Property> globalParamsList =
+                GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams());
         Map<String, Property> finalParams = new HashMap<>();
         if (CollectionUtils.isNotEmpty(globalParamsList)) {
             globalParamsList.forEach(globalParam -> finalParams.put(globalParam.getProp(), globalParam));

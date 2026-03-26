@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.AbstractLogicTask;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
@@ -90,8 +91,7 @@ public class SwitchLogicTask extends AbstractLogicTask<SwitchParameters> {
     private void calculateSwitchBranch() {
         List<SwitchResultVo> switchResultVos = taskParameters.getSwitchResult().getDependTaskList();
         Map<String, Property> globalParams = taskExecutionContext.getPrepareParamsMap();
-        Map<String, Property> varParams = JSONUtils
-                .toList(taskInstance.getVarPool(), Property.class)
+        Map<String, Property> varParams = VarPoolUtils.deserializeVarPool(taskInstance.getVarPool())
                 .stream()
                 .collect(Collectors.toMap(Property::getProp, Property -> Property));
 
