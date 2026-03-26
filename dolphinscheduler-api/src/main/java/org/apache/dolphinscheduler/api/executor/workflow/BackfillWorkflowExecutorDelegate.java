@@ -249,7 +249,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                                 .filter(workflow -> workflow.getVersion() == dependentWorkflowDefinition
                                         .getWorkflowDefinitionVersion())
                                 .findFirst()
-                                .orElse(workflowCandidates.get(0));
+                                .orElse(null);
             }
             if (downstreamWorkflow == null) {
                 log.warn("Skip dependent workflow {}, workflow definition not found", downstreamCode);
