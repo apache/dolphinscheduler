@@ -48,11 +48,18 @@ public class WorkflowDefinitionPage {
                                                  long projectCode,
                                                  File file,
                                                  String workflowDefinitionName) {
+        String fileContent = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+        return createWorkflowDefinition(loginUser, projectCode, fileContent, workflowDefinitionName);
+    }
+
+    public HttpResponse createWorkflowDefinition(User loginUser,
+                                                 long projectCode,
+                                                 String jsonContent,
+                                                 String workflowDefinitionName) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
 
-        String fileContent = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
-        Map<String, Object> fileContentMap = JSONUtils.parseObject(fileContent, new TypeReference<>() {
+        Map<String, Object> fileContentMap = JSONUtils.parseObject(jsonContent, new TypeReference<>() {
         });
         if (fileContentMap == null) {
             throw new RuntimeException("file content parse error");
