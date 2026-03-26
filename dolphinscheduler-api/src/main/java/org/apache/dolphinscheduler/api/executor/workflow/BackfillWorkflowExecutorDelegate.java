@@ -339,7 +339,8 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
 
             // 4) Mark as visiting before recursive trigger to detect cycles, then trigger downstream backfill
             visitedCodes.add(downstreamCode);
-            executeWithVisitedCodes(dependentBackfillDTO, visitedCodes);
+            // Use doBackfillWorkflow to reuse the current upstream date chunk without re-applying runMode chunking
+            doBackfillWorkflow(dependentBackfillDTO, upstreamBackfillDates, visitedCodes);
         }
     }
 }
