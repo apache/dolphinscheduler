@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class ProcessUtils {
 
-    static final int EXECUTE_ERROR_EXIT_CODE = -1;
+    static final int EXECUTE_ERROR_EXIT_CODE = 125;
     static final int EXECUTE_TIMEOUT_EXIT_CODE = 124;
 
     private ProcessUtils() {
@@ -37,7 +37,7 @@ public final class ProcessUtils {
      *
      * @param timeoutSeconds timeout in seconds, if <= 0 waits indefinitely
      * @param cmd cmd params
-     * @return exit code, -1 if error, 124 if timeout
+    * @return exit code, 125 if internal error, 124 if timeout
      */
     static Integer executeScript(long timeoutSeconds, String... cmd) {
 

@@ -27,8 +27,6 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.DisabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 
 /**
  * ScriptSenderTest
@@ -48,18 +46,21 @@ public class ScriptSenderTest {
     }
 
     @Test
-    @DisabledOnOs(OS.WINDOWS)
     public void testScriptSenderTest() {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        Assertions.assertTrue(alertResult.isSuccess());
+        if (isWindows()) {
+            Assertions.assertFalse(alertResult.isSuccess());
+            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
+        } else {
+            Assertions.assertTrue(alertResult.isSuccess());
+        }
         alertResult = scriptSender.sendScriptAlert("error msg title", "test content");
         Assertions.assertFalse(alertResult.isSuccess());
     }
 
     @Test
-    @DisabledOnOs(OS.WINDOWS)
     public void testScriptSenderInjectionTest() {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "' ; calc.exe ; '");
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
@@ -68,13 +69,17 @@ public class ScriptSenderTest {
     }
 
     @Test
-    @DisabledOnOs(OS.WINDOWS)
     public void testUserParamsNPE() {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, null);
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test user params NPE", "test content");
-        Assertions.assertTrue(alertResult.isSuccess());
+        if (isWindows()) {
+            Assertions.assertFalse(alertResult.isSuccess());
+            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
+        } else {
+            Assertions.assertTrue(alertResult.isSuccess());
+        }
     }
 
     @Test
@@ -87,14 +92,17 @@ public class ScriptSenderTest {
     }
 
     @Test
-    @DisabledOnOs(OS.WINDOWS)
     public void testPathError() {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_PATH, "/usr/sbin/abc");
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test path NPE", "test content");
         assertFalse(alertResult.isSuccess());
-        Assertions.assertTrue(alertResult.getMessage().contains("shell script is invalid, only support .sh file"));
+        if (isWindows()) {
+            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
+        } else {
+            Assertions.assertTrue(alertResult.getMessage().contains("shell script is invalid, only support .sh file"));
+        }
     }
 
     @Test
@@ -107,29 +115,45 @@ public class ScriptSenderTest {
     }
 
     @Test
-    @DisabledOnOs(OS.WINDOWS)
     public void testDefaultTimeout() {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        Assertions.assertTrue(alertResult.isSuccess());
+        if (isWindows()) {
+            Assertions.assertFalse(alertResult.isSuccess());
+            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
+        } else {
+            Assertions.assertTrue(alertResult.isSuccess());
+        }
     }
 
     @Test
-    @DisabledOnOs(OS.WINDOWS)
     public void testCustomTimeout() {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TIMEOUT, "30");
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        Assertions.assertTrue(alertResult.isSuccess());
+        if (isWindows()) {
+            Assertions.assertFalse(alertResult.isSuccess());
+            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
+        } else {
+            Assertions.assertTrue(alertResult.isSuccess());
+        }
     }
 
     @Test
-    @DisabledOnOs(OS.WINDOWS)
     public void testInvalidTimeoutFallsBackToDefault() {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TIMEOUT, "notANumber");
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        Assertions.assertTrue(alertResult.isSuccess());
+        Assertions.assertFalse(alertResult.isSuccess());
+        if (isWindows()) {
+            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
+        } else {
+            Assertions.assertEquals("script timeout config is invalid, should be a number", alertResult.getMessage());
+        }
+    }
+
+    private boolean isWindows() {
+        return Boolean.TRUE.equals(org.apache.dolphinscheduler.common.utils.OSUtils.isWindows());
     }
 
 }
