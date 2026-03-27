@@ -117,7 +117,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         final List<Integer> workflowInstanceIdList = Lists.newArrayList();
         for (List<ZonedDateTime> stringDate : splitDateTime(listDate, expectedParallelismNumber)) {
             final Integer workflowInstanceId = doBackfillWorkflow(
-                    backfillWorkflowDTO, stringDate,visitedCodes);
+                    backfillWorkflowDTO, stringDate, visitedCodes);
             workflowInstanceIdList.add(workflowInstanceId);
         }
         return workflowInstanceIdList;
@@ -241,7 +241,8 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 continue;
             }
 
-            // Simplification: Downstream backfill is always full, startNodes=null, workerGroup uses workflowDefinition's own config
+            // Simplification: Downstream backfill is always full, startNodes=null, workerGroup uses
+            // workflowDefinition's own config
             // Only grouping and deduplication are needed, all aggregation logic is omitted
 
             WorkflowDefinition downstreamWorkflow = null;
@@ -280,12 +281,14 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     .executionOrder(originalParams.getExecutionOrder())
                     .build();
 
-                // Simplified design notes:
-                // 1. Downstream backfill is always full, startNodes=null, no more aggregation of dependent nodes
-                // 2. workerGroup is directly taken from the downstream workflowDefinition's own config, if null then use system default workerGroup
-                // 3. Only grouping deduplication and visitedCodes check, all complex aggregation logic is omitted
-                // This implementation is the simplest and most controllable, suitable for full backfill and workerGroup based on itself
-                BackfillWorkflowDTO dependentBackfillDTO = BackfillWorkflowDTO.builder()
+            // Simplified design notes:
+            // 1. Downstream backfill is always full, startNodes=null, no more aggregation of dependent nodes
+            // 2. workerGroup is directly taken from the downstream workflowDefinition's own config, if null then use
+            // system default workerGroup
+            // 3. Only grouping deduplication and visitedCodes check, all complex aggregation logic is omitted
+            // This implementation is the simplest and most controllable, suitable for full backfill and workerGroup
+            // based on itself
+            BackfillWorkflowDTO dependentBackfillDTO = BackfillWorkflowDTO.builder()
                     .loginUser(backfillWorkflowDTO.getLoginUser())
                     .workflowDefinition(downstreamWorkflow)
                     .startNodes(null) // Full backfill, simplified design
@@ -296,7 +299,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     .warningGroupId(downstreamWorkflow.getWarningGroupId())
                     .runMode(dependentParams.getRunMode())
                     .workflowInstancePriority(backfillWorkflowDTO.getWorkflowInstancePriority())
-                    .workerGroup(backfillWorkflowDTO.getWorkerGroup()) // 以补数启动参数为准
+                    .workerGroup(backfillWorkflowDTO.getWorkerGroup())
                     .tenantCode(backfillWorkflowDTO.getTenantCode())
                     .environmentCode(backfillWorkflowDTO.getEnvironmentCode())
                     .startParamList(backfillWorkflowDTO.getStartParamList())
@@ -308,7 +311,8 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     downstreamCode, upstreamWorkflowCode,
                     backfillDateTimes.stream().map(DateUtils::dateToString).collect(Collectors.toList()));
 
-            // Mark as visited to prevent infinite recursion. Actual dependency chains are usually short, recursion is safe.
+            // Mark as visited to prevent infinite recursion. Actual dependency chains are usually short, recursion is
+            // safe.
             visitedCodes.add(downstreamCode);
             executeWithVisitedCodes(dependentBackfillDTO, visitedCodes);
         }
