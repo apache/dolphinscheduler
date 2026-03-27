@@ -17,17 +17,9 @@
 
 package org.apache.dolphinscheduler.api.executor.workflow;
 
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Optional;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
@@ -44,6 +36,16 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowB
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -74,13 +76,16 @@ public class BackfillWorkflowExecutorDelegateTest {
     public void testDownstreamFullBackfill_startNodesAlwaysNull_workerGroupFromWorkflow() {
         long upstreamCode = 1L;
         long downstreamCode = 2L;
-        String downstreamWorkerGroup = "groupA";
-        WorkflowDefinition upstreamWorkflow = WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
-        WorkflowDefinition downstreamWorkflow = WorkflowDefinition.builder().code(downstreamCode).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition upstreamWorkflow =
+                WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition downstreamWorkflow =
+                WorkflowDefinition.builder().code(downstreamCode).releaseState(ReleaseState.ONLINE).build();
         DependentWorkflowDefinition dep = new DependentWorkflowDefinition();
         dep.setWorkflowDefinitionCode(downstreamCode);
-        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode)).thenReturn(Collections.singletonList(dep));
-        when(workflowDefinitionDao.queryByCodes(Collections.singleton(downstreamCode))).thenReturn(Collections.singletonList(downstreamWorkflow));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode))
+                .thenReturn(Collections.singletonList(dep));
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(downstreamCode)))
+                .thenReturn(Collections.singletonList(downstreamWorkflow));
         User loginUser = new User();
         loginUser.setId(1);
         BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
@@ -93,7 +98,7 @@ public class BackfillWorkflowExecutorDelegateTest {
         BackfillWorkflowDTO dto = BackfillWorkflowDTO.builder()
                 .loginUser(loginUser)
                 .workflowDefinition(upstreamWorkflow)
-            .workerGroup("upstreamGroup")
+                .workerGroup("upstreamGroup")
                 .backfillParams(params)
                 .build();
         Server masterServer = new Server();
@@ -109,7 +114,8 @@ public class BackfillWorkflowExecutorDelegateTest {
         backfillWorkflowExecutorDelegate.executeWithVisitedCodes(dto, new HashSet<>());
         // upstream + downstream
         Assertions.assertEquals(2, requests.size());
-        WorkflowBackfillTriggerRequest downstreamReq = requests.stream().filter(r -> r.getWorkflowCode() == downstreamCode).findFirst().orElseThrow();
+        WorkflowBackfillTriggerRequest downstreamReq =
+                requests.stream().filter(r -> r.getWorkflowCode() == downstreamCode).findFirst().orElseThrow();
         Assertions.assertNull(downstreamReq.getStartNodes());
         Assertions.assertEquals("upstreamGroup", downstreamReq.getWorkerGroup());
     }
@@ -118,12 +124,16 @@ public class BackfillWorkflowExecutorDelegateTest {
     public void testDownstreamWorkerGroupNull_fallbackToDefault() {
         long upstreamCode = 1L;
         long downstreamCode = 2L;
-        WorkflowDefinition upstreamWorkflow = WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
-        WorkflowDefinition downstreamWorkflow = WorkflowDefinition.builder().code(downstreamCode).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition upstreamWorkflow =
+                WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition downstreamWorkflow =
+                WorkflowDefinition.builder().code(downstreamCode).releaseState(ReleaseState.ONLINE).build();
         DependentWorkflowDefinition dep = new DependentWorkflowDefinition();
         dep.setWorkflowDefinitionCode(downstreamCode);
-        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode)).thenReturn(Collections.singletonList(dep));
-        when(workflowDefinitionDao.queryByCodes(Collections.singleton(downstreamCode))).thenReturn(Collections.singletonList(downstreamWorkflow));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode))
+                .thenReturn(Collections.singletonList(dep));
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(downstreamCode)))
+                .thenReturn(Collections.singletonList(downstreamWorkflow));
         User loginUser = new User();
         loginUser.setId(1);
         BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
@@ -136,7 +146,7 @@ public class BackfillWorkflowExecutorDelegateTest {
         BackfillWorkflowDTO dto = BackfillWorkflowDTO.builder()
                 .loginUser(loginUser)
                 .workflowDefinition(upstreamWorkflow)
-            .workerGroup("upstreamGroup")
+                .workerGroup("upstreamGroup")
                 .backfillParams(params)
                 .build();
         Server masterServer = new Server();
@@ -150,7 +160,8 @@ public class BackfillWorkflowExecutorDelegateTest {
             return WorkflowBackfillTriggerResponse.success(1);
         }).when(backfillWorkflowExecutorDelegate).triggerBackfillWorkflow(any(), any());
         backfillWorkflowExecutorDelegate.executeWithVisitedCodes(dto, new HashSet<>());
-        WorkflowBackfillTriggerRequest downstreamReq = requests.stream().filter(r -> r.getWorkflowCode() == downstreamCode).findFirst().orElseThrow();
+        WorkflowBackfillTriggerRequest downstreamReq =
+                requests.stream().filter(r -> r.getWorkflowCode() == downstreamCode).findFirst().orElseThrow();
         Assertions.assertEquals("upstreamGroup", downstreamReq.getWorkerGroup());
     }
 
@@ -158,14 +169,18 @@ public class BackfillWorkflowExecutorDelegateTest {
     public void testDownstreamDeduplication_onlyOncePerWorkflow() {
         long upstreamCode = 1L;
         long downstreamCode = 2L;
-        WorkflowDefinition upstreamWorkflow = WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
-        WorkflowDefinition downstreamWorkflow = WorkflowDefinition.builder().code(downstreamCode).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition upstreamWorkflow =
+                WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition downstreamWorkflow =
+                WorkflowDefinition.builder().code(downstreamCode).releaseState(ReleaseState.ONLINE).build();
         DependentWorkflowDefinition dep1 = new DependentWorkflowDefinition();
         dep1.setWorkflowDefinitionCode(downstreamCode);
         DependentWorkflowDefinition dep2 = new DependentWorkflowDefinition();
         dep2.setWorkflowDefinitionCode(downstreamCode);
-        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode)).thenReturn(Arrays.asList(dep1, dep2));
-        when(workflowDefinitionDao.queryByCodes(Collections.singleton(downstreamCode))).thenReturn(Collections.singletonList(downstreamWorkflow));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode))
+                .thenReturn(Arrays.asList(dep1, dep2));
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(downstreamCode)))
+                .thenReturn(Collections.singletonList(downstreamWorkflow));
         User loginUser = new User();
         loginUser.setId(1);
         BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
@@ -200,16 +215,22 @@ public class BackfillWorkflowExecutorDelegateTest {
     @Test
     public void testCycleDependency_noInfiniteRecursion() {
         long codeA = 1L, codeB = 2L;
-        WorkflowDefinition workflowA = WorkflowDefinition.builder().code(codeA).releaseState(ReleaseState.ONLINE).build();
-        WorkflowDefinition workflowB = WorkflowDefinition.builder().code(codeB).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition workflowA =
+                WorkflowDefinition.builder().code(codeA).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition workflowB =
+                WorkflowDefinition.builder().code(codeB).releaseState(ReleaseState.ONLINE).build();
         DependentWorkflowDefinition depAtoB = new DependentWorkflowDefinition();
         depAtoB.setWorkflowDefinitionCode(codeB);
         DependentWorkflowDefinition depBtoA = new DependentWorkflowDefinition();
         depBtoA.setWorkflowDefinitionCode(codeA);
-        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(codeA)).thenReturn(Collections.singletonList(depAtoB));
-        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(codeB)).thenReturn(Collections.singletonList(depBtoA));
-        when(workflowDefinitionDao.queryByCodes(Collections.singleton(codeB))).thenReturn(Collections.singletonList(workflowB));
-        when(workflowDefinitionDao.queryByCodes(Collections.singleton(codeA))).thenReturn(Collections.singletonList(workflowA));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(codeA))
+                .thenReturn(Collections.singletonList(depAtoB));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(codeB))
+                .thenReturn(Collections.singletonList(depBtoA));
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(codeB)))
+                .thenReturn(Collections.singletonList(workflowB));
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(codeA)))
+                .thenReturn(Collections.singletonList(workflowA));
         User loginUser = new User();
         loginUser.setId(1);
         BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
@@ -243,14 +264,18 @@ public class BackfillWorkflowExecutorDelegateTest {
     @Test
     public void testOfflineOrMissingDownstream_skipped() {
         long upstreamCode = 1L, offlineCode = 2L, missingCode = 3L;
-        WorkflowDefinition upstreamWorkflow = WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
-        WorkflowDefinition offlineWorkflow = WorkflowDefinition.builder().code(offlineCode).releaseState(ReleaseState.OFFLINE).build();
+        WorkflowDefinition upstreamWorkflow =
+                WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition offlineWorkflow =
+                WorkflowDefinition.builder().code(offlineCode).releaseState(ReleaseState.OFFLINE).build();
         DependentWorkflowDefinition depOffline = new DependentWorkflowDefinition();
         depOffline.setWorkflowDefinitionCode(offlineCode);
         DependentWorkflowDefinition depMissing = new DependentWorkflowDefinition();
         depMissing.setWorkflowDefinitionCode(missingCode);
-        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode)).thenReturn(Arrays.asList(depOffline, depMissing));
-        when(workflowDefinitionDao.queryByCodes(new LinkedHashSet<>(Arrays.asList(offlineCode, missingCode)))).thenReturn(Collections.singletonList(offlineWorkflow));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(upstreamCode))
+                .thenReturn(Arrays.asList(depOffline, depMissing));
+        when(workflowDefinitionDao.queryByCodes(new LinkedHashSet<>(Arrays.asList(offlineCode, missingCode))))
+                .thenReturn(Collections.singletonList(offlineWorkflow));
         User loginUser = new User();
         loginUser.setId(1);
         BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
