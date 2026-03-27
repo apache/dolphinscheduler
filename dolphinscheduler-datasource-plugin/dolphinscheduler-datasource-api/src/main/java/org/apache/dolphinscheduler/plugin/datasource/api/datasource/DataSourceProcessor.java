@@ -51,7 +51,7 @@ public interface DataSourceProcessor {
     /**
      * create BaseDataSourceParamDTO by connectionJson
      *
-     * @param connectionJson see{@link org.apache.dolphinscheduler.dao.entity.Datasource}
+     * @param connectionJson see{@link org.apache.dolphinscheduler.dao.entity.DataSource}
      * @return {@link BaseDataSourceParamDTO}
      */
     BaseDataSourceParamDTO createDatasourceParamDTO(String connectionJson);
@@ -67,7 +67,7 @@ public interface DataSourceProcessor {
      * deserialize json to datasource connection param
      *
      * @param connectionJson {@code org.apache.dolphinscheduler.dao.entity.DataSource.connectionParams}
-     * @return {@link BaseConnectionParam}
+     * @return {@link ConnectionParam}
      */
     ConnectionParam createConnectionParams(String connectionJson);
 
@@ -96,7 +96,7 @@ public interface DataSourceProcessor {
      * @return {@link Connection}
      */
     // todo: Change to return a ConnectionWrapper
-    Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException, IOException;
+    Connection getConnection(ConnectionParam connectionParam) throws SQLException, IOException;
 
     /**
      * test connection

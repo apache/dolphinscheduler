@@ -565,6 +565,10 @@ master:
     MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.7
     # -- Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
     MASTER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.7
+    # -- Maximum allowed running time for a workflow instance. If the running duration exceeds this value, the instance will be killed. The default value of 0d indicates no limit.
+    MASTER_SERVER_LOAD_PROTECTION_MAX_WORKFLOW_INSTANCE_RUNTIME: 0d
+    # -- Maximum allowed running time for a task instance. If the running duration exceeds this value, the instance will be killed. The default value of 0d indicates no limit.
+    MASTER_SERVER_LOAD_PROTECTION_MAX_TASK_INSTANCE_RUNTIME: 0d
     # -- Master failover interval, the unit is minute
     MASTER_FAILOVER_INTERVAL: "10m"
     # -- Master kill application when handle failover

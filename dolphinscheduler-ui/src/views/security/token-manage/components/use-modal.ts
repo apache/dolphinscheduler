@@ -44,7 +44,7 @@ export function useModal(
           ? (userStore.getUserInfo as UserInfoRes).id
           : null
       ),
-      expireTime: ref(Date.now()),
+      expireTime: null as number | null,
       token: ref(''),
       generalOptions: []
     },
@@ -101,7 +101,7 @@ export function useModal(
   const getToken = () => {
     const data = {
       userId: (userStore.getUserInfo as UserInfoRes).id,
-      expireTime: format(variables.model.expireTime, 'yyyy-MM-dd HH:mm:ss')
+      expireTime: format(variables.model.expireTime!, 'yyyy-MM-dd HH:mm:ss')
     }
 
     useAsyncState(
@@ -129,7 +129,7 @@ export function useModal(
   const submitTokenModal = () => {
     const data = {
       userId: Number(variables.model.userId),
-      expireTime: format(variables.model.expireTime, 'yyyy-MM-dd HH:mm:ss'),
+      expireTime: format(variables.model.expireTime!, 'yyyy-MM-dd HH:mm:ss'),
       token: variables.model.token
     }
 
@@ -138,7 +138,7 @@ export function useModal(
         (userStore.getUserInfo as UserInfoRes).userType === 'GENERAL_USER'
           ? (userStore.getUserInfo as UserInfoRes).id
           : null
-      variables.model.expireTime = Date.now()
+      variables.model.expireTime = null
       variables.model.token = ''
       ctx.emit('confirmModal', props.showModalRef)
     })
@@ -148,7 +148,7 @@ export function useModal(
     const data = {
       id: variables.model.id,
       userId: Number(variables.model.userId),
-      expireTime: format(variables.model.expireTime, 'yyyy-MM-dd HH:mm:ss'),
+      expireTime: format(variables.model.expireTime!, 'yyyy-MM-dd HH:mm:ss'),
       token: variables.model.token
     }
 

@@ -274,6 +274,7 @@ export function formatParams(data: INodeData): {
       taskParams.targetTable = data.targetTable
       taskParams.jobSpeedByte = data.jobSpeedByte
       taskParams.jobSpeedRecord = data.jobSpeedRecord
+      taskParams.jobChannel = data.jobChannel
       taskParams.preStatements = data.preStatements
       taskParams.postStatements = data.postStatements
     } else {

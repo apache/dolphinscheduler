@@ -24,8 +24,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION_EXPORT;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_IMPORT;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_ONLINE_OFFLINE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
@@ -35,22 +33,16 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.Constants.COPY_SUFFIX;
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
 import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
-import static org.apache.dolphinscheduler.common.constants.Constants.IMPORT_SUFFIX;
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOCAL_PARAMS_LIST;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
-import org.apache.dolphinscheduler.api.dto.DagDataSchedule;
 import org.apache.dolphinscheduler.api.dto.TaskCodeVersionDto;
 import org.apache.dolphinscheduler.api.dto.treeview.Instance;
 import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.MetricsCleanUpService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
@@ -59,15 +51,11 @@ import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
-import org.apache.dolphinscheduler.api.utils.FileUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.ConditionType;
-import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
@@ -78,7 +66,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -93,7 +80,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -108,14 +94,14 @@ import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
-import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
-import org.apache.dolphinscheduler.plugin.task.api.enums.SqlType;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.model.TaskNode;
@@ -124,11 +110,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -144,14 +125,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -159,14 +137,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -174,8 +149,6 @@ import com.google.common.collect.Lists;
 @Service
 @Slf4j
 public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements WorkflowDefinitionService {
-
-    private static final String RELEASESTATE = "releaseState";
 
     @Autowired
     private ProjectMapper projectMapper;
@@ -237,13 +210,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private SchedulerService schedulerService;
 
     @Autowired
-    private DataSourceMapper dataSourceMapper;
-
-    @Autowired
     private WorkflowLineageService workflowLineageService;
 
     @Autowired
-    private MetricsCleanUpService metricsCleanUpService;
+    private GlobalParamsValidator globalParamsValidator;
 
     /**
      * create workflow definition
@@ -291,6 +261,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     definition.getName(), definition.getCode());
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, name);
         }
+
+        globalParamsValidator.validate(globalParams);
+
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
@@ -332,31 +305,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (result <= 0) {
             throw new ServiceException(Status.CREATE_WORKFLOW_DEFINITION_LOG_ERROR);
         }
-    }
-
-    /**
-     * create single workflow definition
-     *
-     * @param loginUser             login user
-     * @param workflowCreateRequest the new workflow object will be created
-     * @return New WorkflowDefinition object created just now
-     */
-    @Override
-    @Transactional
-    public WorkflowDefinition createSingleWorkflowDefinition(User loginUser,
-                                                             WorkflowCreateRequest workflowCreateRequest) {
-        WorkflowDefinition workflowDefinition = workflowCreateRequest.convert2WorkflowDefinition();
-        this.createWorkflowValid(loginUser, workflowDefinition);
-
-        workflowDefinition.setCode(CodeGenerateUtils.genCode());
-        workflowDefinition.setUserId(loginUser.getId());
-
-        int create = workflowDefinitionMapper.insert(workflowDefinition);
-        if (create <= 0) {
-            throw new ServiceException(Status.CREATE_WORKFLOW_DEFINITION_ERROR);
-        }
-        this.syncObj2Log(loginUser, workflowDefinition);
-        return workflowDefinition;
     }
 
     protected Map<String, Object> createDagDefine(User loginUser,
@@ -639,46 +587,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     }
 
     /**
-     * Filter resource workflow definitions
-     *
-     * @param loginUser             login user
-     * @param workflowFilterRequest workflow filter requests
-     * @return List workflow definition
-     */
-    @Override
-    public PageInfo<WorkflowDefinition> filterWorkflowDefinition(User loginUser,
-                                                                 WorkflowFilterRequest workflowFilterRequest) {
-        WorkflowDefinition workflowDefinition = workflowFilterRequest.convert2WorkflowDefinition();
-        if (workflowFilterRequest.getProjectName() != null) {
-            Project project = projectMapper.queryByName(workflowFilterRequest.getProjectName());
-            // check user access for project
-            projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
-            workflowDefinition.setProjectCode(project.getCode());
-        }
-
-        Page<WorkflowDefinition> page =
-                new Page<>(workflowFilterRequest.getPageNo(), workflowFilterRequest.getPageSize());
-        IPage<WorkflowDefinition> workflowDefinitionIPage =
-                workflowDefinitionMapper.filterWorkflowDefinition(page, workflowDefinition);
-
-        List<WorkflowDefinition> records = workflowDefinitionIPage.getRecords();
-        for (WorkflowDefinition pd : records) {
-            WorkflowDefinitionLog workflowDefinitionLog =
-                    workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(pd.getCode(), pd.getVersion());
-            User user = userMapper.selectById(workflowDefinitionLog.getOperator());
-            pd.setModifyBy(user.getUserName());
-        }
-
-        workflowDefinitionIPage.setRecords(records);
-        PageInfo<WorkflowDefinition> pageInfo =
-                new PageInfo<>(workflowFilterRequest.getPageNo(), workflowFilterRequest.getPageSize());
-        pageInfo.setTotal((int) workflowDefinitionIPage.getTotal());
-        pageInfo.setTotalList(workflowDefinitionIPage.getRecords());
-
-        return pageInfo;
-    }
-
-    /**
      * query detail of workflow definition
      *
      * @param loginUser   login user
@@ -706,27 +614,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             putMsg(result, Status.SUCCESS);
         }
         return result;
-    }
-
-    /**
-     * query detail of workflow definition
-     *
-     * @param loginUser login user
-     * @param code      workflow definition code
-     * @return workflow definition detail
-     */
-    @Override
-    public WorkflowDefinition getWorkflowDefinition(User loginUser, long code) {
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
-        if (workflowDefinition == null) {
-            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
-        }
-
-        Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
-
-        return workflowDefinition;
     }
 
     @Override
@@ -811,6 +698,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
             return result;
         }
+
+        globalParamsValidator.validate(globalParams);
+
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
@@ -1026,7 +916,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         for (WorkflowDefinition workflowDefinition : workflowDefinitionList) {
             try {
                 this.deleteWorkflowDefinitionByCode(loginUser, workflowDefinition.getCode());
-                metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(workflowDefinition.getCode());
             } catch (Exception e) {
                 throw new ServiceException(Status.DELETE_WORKFLOW_DEFINE_ERROR, workflowDefinition.getName(),
                         e.getMessage());
@@ -1109,7 +998,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         // we delete the workflow definition at last to avoid using transaction here.
         // If delete error, we can call this interface again.
         workflowDefinitionDao.deleteByWorkflowDefinitionCode(workflowDefinition.getCode());
-        metricsCleanUpService.cleanUpWorkflowMetricsByDefinitionCode(code);
 
         // delete workflow lineage (lineage data only keeps one record per workflow code)
         // It's safe to return 0 if no lineage exists (idempotent)
@@ -1123,501 +1011,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             }
         }
         log.info("Success delete workflow definition workflowDefinitionCode: {}", code);
-    }
-
-    /**
-     * batch export workflow definition by codes
-     */
-    @Override
-    public void batchExportWorkflowDefinitionByCodes(User loginUser, long projectCode, String codes,
-                                                     HttpServletResponse response) {
-        if (StringUtils.isEmpty(codes)) {
-            log.warn("workflow definition codes to be exported is empty.");
-            return;
-        }
-        Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION_EXPORT);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return;
-        }
-        Set<Long> defineCodeSet = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
-                .collect(Collectors.toSet());
-        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionMapper.queryByCodes(defineCodeSet);
-        if (CollectionUtils.isEmpty(workflowDefinitionList)) {
-            log.error("workflow definitions to be exported do not exist, workflowDefinitionCodes:{}.", defineCodeSet);
-            return;
-        }
-        // check workflowDefinition exist in project
-        List<WorkflowDefinition> workflowDefinitionListInProject = workflowDefinitionList.stream()
-                .filter(o -> projectCode == o.getProjectCode()).collect(Collectors.toList());
-        List<DagDataSchedule> dagDataSchedules =
-                workflowDefinitionListInProject.stream().map(this::exportWorkflowDagData).collect(Collectors.toList());
-        if (CollectionUtils.isNotEmpty(dagDataSchedules)) {
-            log.info("Start download workflow definition file, workflowDefinitionCodes:{}.", defineCodeSet);
-            downloadWorkflowDefinitionFile(response, dagDataSchedules);
-        } else {
-            log.error("There is no exported workflow dag data.");
-        }
-    }
-
-    /**
-     * download the workflow definition file
-     */
-    protected void downloadWorkflowDefinitionFile(HttpServletResponse response,
-                                                  List<DagDataSchedule> dagDataSchedules) {
-        response.setContentType(MediaType.APPLICATION_JSON_UTF8_VALUE);
-        BufferedOutputStream buff = null;
-        ServletOutputStream out = null;
-        try {
-            out = response.getOutputStream();
-            buff = new BufferedOutputStream(out);
-            buff.write(JSONUtils.toPrettyJsonString(dagDataSchedules).getBytes(StandardCharsets.UTF_8));
-            buff.flush();
-            buff.close();
-        } catch (IOException e) {
-            log.warn("Export workflow definition fail", e);
-        } finally {
-            if (null != buff) {
-                try {
-                    buff.close();
-                } catch (Exception e) {
-                    log.warn("Buffer does not close", e);
-                }
-            }
-            if (null != out) {
-                try {
-                    out.close();
-                } catch (Exception e) {
-                    log.warn("Output stream does not close", e);
-                }
-            }
-        }
-    }
-
-    /**
-     * get export workflow dag data
-     *
-     * @param workflowDefinition workflow definition
-     * @return DagDataSchedule
-     */
-    public DagDataSchedule exportWorkflowDagData(WorkflowDefinition workflowDefinition) {
-        Schedule scheduleObj = scheduleMapper.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
-        DagDataSchedule dagDataSchedule = new DagDataSchedule(processService.genDagData(workflowDefinition));
-        if (scheduleObj != null) {
-            scheduleObj.setReleaseState(ReleaseState.OFFLINE);
-            dagDataSchedule.setSchedule(scheduleObj);
-        }
-        return dagDataSchedule;
-    }
-
-    /**
-     * import workflow definition
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param file        workflow metadata json file
-     * @return import workflow
-     */
-    @Override
-    @Transactional
-    public Map<String, Object> importWorkflowDefinition(User loginUser, long projectCode, MultipartFile file) {
-        Map<String, Object> result;
-        String dagDataScheduleJson = FileUtils.file2String(file);
-        List<DagDataSchedule> dagDataScheduleList = JSONUtils.toList(dagDataScheduleJson, DagDataSchedule.class);
-        Project project = projectMapper.queryByCode(projectCode);
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_IMPORT);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
-        // check file content
-        if (CollectionUtils.isEmpty(dagDataScheduleList)) {
-            log.warn("workflow definition file content is empty.");
-            putMsg(result, Status.DATA_IS_NULL, "fileContent");
-            return result;
-        }
-        for (DagDataSchedule dagDataSchedule : dagDataScheduleList) {
-            if (!checkAndImport(loginUser, projectCode, result, dagDataSchedule)) {
-                return result;
-            }
-        }
-        return result;
-    }
-
-    @Override
-    @Transactional
-    public Map<String, Object> importSqlWorkflowDefinition(User loginUser, long projectCode, MultipartFile file) {
-        Map<String, Object> result;
-        Project project = projectMapper.queryByCode(projectCode);
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_IMPORT);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
-        String workflowDefinitionName =
-                file.getOriginalFilename() == null ? file.getName() : file.getOriginalFilename();
-        int index = workflowDefinitionName.lastIndexOf(".");
-        if (index > 0) {
-            workflowDefinitionName = workflowDefinitionName.substring(0, index);
-        }
-        workflowDefinitionName = getNewName(workflowDefinitionName, IMPORT_SUFFIX);
-
-        WorkflowDefinition workflowDefinition;
-        List<TaskDefinitionLog> taskDefinitionList = new ArrayList<>();
-        List<WorkflowTaskRelationLog> workflowTaskRelationLogList = new ArrayList<>();
-
-        // for Zip Bomb Attack
-        final int THRESHOLD_ENTRIES = 10000;
-        final int THRESHOLD_SIZE = 1000000000; // 1 GB
-        final double THRESHOLD_RATIO = 10;
-        int totalEntryArchive = 0;
-        int totalSizeEntry = 0;
-        // In most cases, there will be only one data source
-        Map<String, DataSource> dataSourceCache = new HashMap<>(1);
-        Map<String, Long> taskNameToCode = new HashMap<>(16);
-        Map<String, List<String>> taskNameToUpstream = new HashMap<>(16);
-        try (
-                ZipInputStream zIn = new ZipInputStream(file.getInputStream());
-                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(zIn))) {
-            // build workflow definition
-            workflowDefinition = new WorkflowDefinition(projectCode,
-                    workflowDefinitionName,
-                    CodeGenerateUtils.genCode(),
-                    "",
-                    "[]", null,
-                    0, loginUser.getId());
-
-            ZipEntry entry;
-            while ((entry = zIn.getNextEntry()) != null) {
-                totalEntryArchive++;
-                int totalSizeArchive = 0;
-                if (!entry.isDirectory()) {
-                    StringBuilder sql = new StringBuilder();
-                    String taskName = null;
-                    String datasourceName = null;
-                    List<String> upstreams = Collections.emptyList();
-                    String line;
-                    while ((line = bufferedReader.readLine()) != null) {
-                        int nBytes = line.getBytes(StandardCharsets.UTF_8).length;
-                        totalSizeEntry += nBytes;
-                        totalSizeArchive += nBytes;
-                        long compressionRatio = totalSizeEntry / entry.getCompressedSize();
-                        if (compressionRatio > THRESHOLD_RATIO) {
-                            throw new IllegalStateException(
-                                    "Ratio between compressed and uncompressed data is highly suspicious, looks like a Zip Bomb Attack.");
-                        }
-                        int commentIndex = line.indexOf("-- ");
-                        if (commentIndex >= 0) {
-                            int colonIndex = line.indexOf(":", commentIndex);
-                            if (colonIndex > 0) {
-                                String key = line.substring(commentIndex + 3, colonIndex).trim().toLowerCase();
-                                String value = line.substring(colonIndex + 1).trim();
-                                switch (key) {
-                                    case "name":
-                                        taskName = value;
-                                        line = line.substring(0, commentIndex);
-                                        break;
-                                    case "upstream":
-                                        upstreams = Arrays.stream(value.split(",")).map(String::trim)
-                                                .filter(s -> !"".equals(s)).collect(Collectors.toList());
-                                        line = line.substring(0, commentIndex);
-                                        break;
-                                    case "datasource":
-                                        datasourceName = value;
-                                        line = line.substring(0, commentIndex);
-                                        break;
-                                    default:
-                                        break;
-                                }
-                            }
-                        }
-                        if (!"".equals(line)) {
-                            sql.append(line).append("\n");
-                        }
-                    }
-                    // import/sql1.sql -> sql1
-                    if (taskName == null) {
-                        taskName = entry.getName();
-                        index = taskName.indexOf("/");
-                        if (index > 0) {
-                            taskName = taskName.substring(index + 1);
-                        }
-                        index = taskName.lastIndexOf(".");
-                        if (index > 0) {
-                            taskName = taskName.substring(0, index);
-                        }
-                    }
-                    DataSource dataSource = dataSourceCache.get(datasourceName);
-                    if (dataSource == null) {
-                        dataSource = queryDatasourceByNameAndUser(datasourceName, loginUser);
-                    }
-                    if (dataSource == null) {
-                        log.error("Datasource does not found, may be its name is illegal.");
-                        putMsg(result, Status.DATASOURCE_NAME_ILLEGAL);
-                        return result;
-                    }
-                    dataSourceCache.put(datasourceName, dataSource);
-
-                    TaskDefinitionLog taskDefinition =
-                            buildNormalSqlTaskDefinition(taskName, dataSource, sql.substring(0, sql.length() - 1));
-
-                    taskDefinitionList.add(taskDefinition);
-                    taskNameToCode.put(taskDefinition.getName(), taskDefinition.getCode());
-                    taskNameToUpstream.put(taskDefinition.getName(), upstreams);
-                }
-
-                if (totalSizeArchive > THRESHOLD_SIZE) {
-                    throw new IllegalStateException(
-                            "the uncompressed data size is too much for the application resource capacity");
-                }
-
-                if (totalEntryArchive > THRESHOLD_ENTRIES) {
-                    throw new IllegalStateException(
-                            "too much entries in this archive, can lead to inodes exhaustion of the system");
-                }
-            }
-        } catch (Exception e) {
-            log.error("Import workflow definition error.", e);
-            putMsg(result, Status.IMPORT_WORKFLOW_DEFINE_ERROR);
-            return result;
-        }
-
-        // build task relation
-        for (Map.Entry<String, Long> entry : taskNameToCode.entrySet()) {
-            List<String> upstreams = taskNameToUpstream.get(entry.getKey());
-            if (CollectionUtils.isEmpty(upstreams)
-                    || (upstreams.size() == 1 && upstreams.contains("root") && !taskNameToCode.containsKey("root"))) {
-                WorkflowTaskRelationLog workflowTaskRelationLog = buildNormalTaskRelation(0, entry.getValue());
-                workflowTaskRelationLogList.add(workflowTaskRelationLog);
-                continue;
-            }
-            for (String upstream : upstreams) {
-                WorkflowTaskRelationLog workflowTaskRelationLog =
-                        buildNormalTaskRelation(taskNameToCode.get(upstream), entry.getValue());
-                workflowTaskRelationLogList.add(workflowTaskRelationLog);
-            }
-        }
-
-        return createDagDefine(loginUser, workflowTaskRelationLogList, workflowDefinition, taskDefinitionList);
-    }
-
-    private WorkflowTaskRelationLog buildNormalTaskRelation(long preTaskCode, long postTaskCode) {
-        WorkflowTaskRelationLog workflowTaskRelationLog = new WorkflowTaskRelationLog();
-        workflowTaskRelationLog.setPreTaskCode(preTaskCode);
-        workflowTaskRelationLog.setPreTaskVersion(0);
-        workflowTaskRelationLog.setPostTaskCode(postTaskCode);
-        workflowTaskRelationLog.setPostTaskVersion(0);
-        workflowTaskRelationLog.setConditionType(ConditionType.NONE);
-        workflowTaskRelationLog.setName("");
-        return workflowTaskRelationLog;
-    }
-
-    private DataSource queryDatasourceByNameAndUser(String datasourceName, User loginUser) {
-        if (isAdmin(loginUser)) {
-            List<DataSource> dataSources = dataSourceMapper.queryDataSourceByName(datasourceName);
-            if (CollectionUtils.isNotEmpty(dataSources)) {
-                return dataSources.get(0);
-            }
-        } else {
-            return dataSourceMapper.queryDataSourceByNameAndUserId(loginUser.getId(), datasourceName);
-        }
-        return null;
-    }
-
-    private TaskDefinitionLog buildNormalSqlTaskDefinition(String taskName, DataSource dataSource,
-                                                           String sql) {
-        TaskDefinitionLog taskDefinition = new TaskDefinitionLog();
-        taskDefinition.setName(taskName);
-        taskDefinition.setFlag(Flag.YES);
-        SqlParameters sqlParameters = new SqlParameters();
-        sqlParameters.setType(dataSource.getType().name());
-        sqlParameters.setDatasource(dataSource.getId());
-        sqlParameters.setSql(sql.substring(0, sql.length() - 1));
-        // it may be a query type, but it can only be determined by parsing SQL
-        sqlParameters.setSqlType(SqlType.NON_QUERY.ordinal());
-        sqlParameters.setLocalParams(Collections.emptyList());
-        taskDefinition.setTaskParams(JSONUtils.toJsonString(sqlParameters));
-        taskDefinition.setCode(CodeGenerateUtils.genCode());
-        taskDefinition.setTaskType("SQL");
-        taskDefinition.setFailRetryTimes(0);
-        taskDefinition.setFailRetryInterval(0);
-        taskDefinition.setTimeoutFlag(TimeoutFlag.CLOSE);
-        taskDefinition.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
-        taskDefinition.setTaskPriority(Priority.MEDIUM);
-        taskDefinition.setEnvironmentCode(-1);
-        taskDefinition.setTimeout(0);
-        taskDefinition.setDelayTime(0);
-        taskDefinition.setTimeoutNotifyStrategy(TaskTimeoutStrategy.WARN);
-        taskDefinition.setVersion(0);
-        taskDefinition.setResourceIds("");
-        return taskDefinition;
-    }
-
-    /**
-     * check and import
-     */
-    protected boolean checkAndImport(User loginUser,
-                                     long projectCode,
-                                     Map<String, Object> result,
-                                     DagDataSchedule dagDataSchedule) {
-        if (!checkImportanceParams(dagDataSchedule, result)) {
-            return false;
-        }
-        WorkflowDefinition workflowDefinition = dagDataSchedule.getWorkflowDefinition();
-
-        // generate import workflowDefinitionName
-        String workflowDefinitionName = recursionWorkflowDefinitionName(projectCode, workflowDefinition.getName(), 1);
-        String importWorkflowDefinitionName = getNewName(workflowDefinitionName, IMPORT_SUFFIX);
-        // unique check
-        Map<String, Object> checkResult =
-                verifyWorkflowDefinitionName(loginUser, projectCode, importWorkflowDefinitionName, 0);
-        if (Status.SUCCESS.equals(checkResult.get(Constants.STATUS))) {
-            putMsg(result, Status.SUCCESS);
-        } else {
-            result.putAll(checkResult);
-            return false;
-        }
-        workflowDefinition.setName(importWorkflowDefinitionName);
-        workflowDefinition.setId(null);
-        workflowDefinition.setProjectCode(projectCode);
-        workflowDefinition.setUserId(loginUser.getId());
-        workflowDefinition.setCode(CodeGenerateUtils.genCode());
-
-        List<TaskDefinition> taskDefinitionList = dagDataSchedule.getTaskDefinitionList();
-        Map<Long, Long> taskCodeMap = new HashMap<>();
-        Date now = new Date();
-        List<TaskDefinitionLog> taskDefinitionLogList = new ArrayList<>();
-        for (TaskDefinition taskDefinition : taskDefinitionList) {
-            TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
-            taskDefinitionLog.setName(taskDefinitionLog.getName());
-            taskDefinitionLog.setProjectCode(projectCode);
-            taskDefinitionLog.setUserId(loginUser.getId());
-            taskDefinitionLog.setVersion(Constants.VERSION_FIRST);
-            taskDefinitionLog.setCreateTime(now);
-            taskDefinitionLog.setUpdateTime(now);
-            taskDefinitionLog.setOperator(loginUser.getId());
-            taskDefinitionLog.setOperateTime(now);
-            long code = CodeGenerateUtils.genCode();
-            taskCodeMap.put(taskDefinitionLog.getCode(), code);
-            taskDefinitionLog.setCode(code);
-
-            taskDefinitionLogList.add(taskDefinitionLog);
-        }
-        int insert = taskDefinitionMapper.batchInsert(taskDefinitionLogList);
-        int logInsert = taskDefinitionLogMapper.batchInsert(taskDefinitionLogList);
-        if ((logInsert & insert) == 0) {
-            log.error("Save task definition error, projectCode:{}, workflowDefinitionCode:{}", projectCode,
-                    workflowDefinition.getCode());
-            putMsg(result, Status.CREATE_TASK_DEFINITION_ERROR);
-            throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
-        }
-
-        List<WorkflowTaskRelation> taskRelationList = dagDataSchedule.getWorkflowTaskRelationList();
-        List<WorkflowTaskRelationLog> taskRelationLogList = new ArrayList<>();
-        for (WorkflowTaskRelation workflowTaskRelation : taskRelationList) {
-            WorkflowTaskRelationLog workflowTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
-            if (taskCodeMap.containsKey(workflowTaskRelationLog.getPreTaskCode())) {
-                workflowTaskRelationLog.setPreTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPreTaskCode()));
-            }
-            if (taskCodeMap.containsKey(workflowTaskRelationLog.getPostTaskCode())) {
-                workflowTaskRelationLog.setPostTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPostTaskCode()));
-            }
-            workflowTaskRelationLog.setPreTaskVersion(Constants.VERSION_FIRST);
-            workflowTaskRelationLog.setPostTaskVersion(Constants.VERSION_FIRST);
-            taskRelationLogList.add(workflowTaskRelationLog);
-        }
-        if (StringUtils.isNotEmpty(workflowDefinition.getLocations())
-                && JSONUtils.checkJsonValid(workflowDefinition.getLocations())) {
-            ArrayNode arrayNode = JSONUtils.parseArray(workflowDefinition.getLocations());
-            ArrayNode newArrayNode = JSONUtils.createArrayNode();
-            for (int i = 0; i < arrayNode.size(); i++) {
-                ObjectNode newObjectNode = newArrayNode.addObject();
-                JsonNode jsonNode = arrayNode.get(i);
-                Long taskCode = taskCodeMap.get(jsonNode.get("taskCode").asLong());
-                if (Objects.nonNull(taskCode)) {
-                    newObjectNode.put("taskCode", taskCode);
-                    newObjectNode.set("x", jsonNode.get("x"));
-                    newObjectNode.set("y", jsonNode.get("y"));
-                }
-            }
-            workflowDefinition.setLocations(newArrayNode.toString());
-        }
-        workflowDefinition.setCreateTime(new Date());
-        workflowDefinition.setUpdateTime(new Date());
-        Map<String, Object> createDagResult =
-                createDagDefine(loginUser, taskRelationLogList, workflowDefinition, Lists.newArrayList());
-        if (Status.SUCCESS.equals(createDagResult.get(Constants.STATUS))) {
-            putMsg(createDagResult, Status.SUCCESS);
-        } else {
-            result.putAll(createDagResult);
-            log.error("Import workflow definition error, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
-                    workflowDefinition.getCode());
-            throw new ServiceException(Status.IMPORT_WORKFLOW_DEFINE_ERROR);
-        }
-
-        Schedule schedule = dagDataSchedule.getSchedule();
-        if (null != schedule) {
-            WorkflowDefinition newWorkflowDefinition =
-                    workflowDefinitionMapper.queryByCode(workflowDefinition.getCode());
-            schedule.setWorkflowDefinitionCode(newWorkflowDefinition.getCode());
-            schedule.setId(null);
-            schedule.setUserId(loginUser.getId());
-            schedule.setCreateTime(now);
-            schedule.setUpdateTime(now);
-            // not allow to import an online schedule
-            schedule.setReleaseState(ReleaseState.OFFLINE);
-            int scheduleInsert = scheduleMapper.insert(schedule);
-            if (0 == scheduleInsert) {
-                log.error(
-                        "Import workflow definition error due to save schedule fail, projectCode:{}, workflowDefinitionCode:{}.",
-                        projectCode, workflowDefinition.getCode());
-                putMsg(result, Status.IMPORT_WORKFLOW_DEFINE_ERROR);
-                throw new ServiceException(Status.IMPORT_WORKFLOW_DEFINE_ERROR);
-            }
-        }
-
-        result.put(Constants.DATA_LIST, workflowDefinition);
-        log.info("Import workflow definition complete, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
-                workflowDefinition.getCode());
-        return true;
-    }
-
-    /**
-     * check importance params
-     */
-    private boolean checkImportanceParams(DagDataSchedule dagDataSchedule, Map<String, Object> result) {
-        if (dagDataSchedule.getWorkflowDefinition() == null) {
-            log.warn("workflow definition is null.");
-            putMsg(result, Status.DATA_IS_NULL, "WorkflowDefinition");
-            return false;
-        }
-        if (CollectionUtils.isEmpty(dagDataSchedule.getTaskDefinitionList())) {
-            log.warn("Task definition list is null.");
-            putMsg(result, Status.DATA_IS_NULL, "TaskDefinitionList");
-            return false;
-        }
-        if (CollectionUtils.isEmpty(dagDataSchedule.getWorkflowTaskRelationList())) {
-            log.warn("workflow task relation list is null.");
-            putMsg(result, Status.DATA_IS_NULL, "WorkflowTaskRelationList");
-            return false;
-        }
-        return true;
-    }
-
-    private String recursionWorkflowDefinitionName(long projectCode, String workflowDefinitionName, int num) {
-        WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByDefineName(projectCode, workflowDefinitionName);
-        if (workflowDefinition != null) {
-            if (num > 1) {
-                String str = workflowDefinitionName.substring(0, workflowDefinitionName.length() - 3);
-                workflowDefinitionName = str + "(" + num + ")";
-            } else {
-                workflowDefinitionName = workflowDefinition.getName() + "(" + num + ")";
-            }
-        } else {
-            return workflowDefinitionName;
-        }
-        return recursionWorkflowDefinitionName(projectCode, workflowDefinitionName, num + 1);
     }
 
     /**
@@ -2115,25 +1508,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     taskDefinitionLog.setProjectCode(targetProjectCode);
                     taskDefinitionLog.setVersion(0);
                     taskDefinitionLog.setName(taskDefinitionLog.getName());
+
                     if (TaskTypeUtils.isSwitchTask(taskDefinitionLog.getTaskType())) {
-                        final String taskParams = taskDefinitionLog.getTaskParams();
-                        final SwitchParameters switchParameters =
-                                JSONUtils.parseObject(taskParams, SwitchParameters.class);
-                        if (switchParameters == null) {
-                            throw new IllegalArgumentException(
-                                    "Switch task params: " + taskParams + " is invalid.");
-                        }
-                        SwitchParameters.SwitchResult switchResult = switchParameters.getSwitchResult();
-                        switchResult.getDependTaskList().forEach(switchResultVo -> {
-                            switchResultVo.setNextNode(taskCodeMap.get(switchResultVo.getNextNode()));
-                        });
-                        if (switchResult.getNextNode() != null) {
-                            switchResult.setNextNode(
-                                    taskCodeMap.get(switchResult.getNextNode()));
-                        }
-                        taskDefinitionLog.setTaskParams(JSONUtils.toJsonString(switchParameters));
+                        replaceTaskCodeForSwitchTaskParams(taskDefinitionLog, taskCodeMap);
+                    }
+
+                    if (TaskTypeUtils.isConditionTask(taskDefinitionLog.getTaskType())) {
+                        replaceTaskCodeForConditionTaskParams(taskDefinitionLog, taskCodeMap);
                     }
                 }
+
                 for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
                     if (workflowTaskRelationLog.getPreTaskCode() > 0) {
                         workflowTaskRelationLog
@@ -2203,6 +1587,109 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 failedWorkflowList.add(workflowDefinition.getCode() + "[" + workflowDefinition.getName() + "]");
             }
         }
+    }
+
+    /**
+     * Replaces old task codes with new ones in the parameters of a Switch task.
+     * Used during workflow duplication or import to preserve correct task dependencies.
+     */
+    private void replaceTaskCodeForSwitchTaskParams(TaskDefinitionLog taskDefLog, Map<Long, Long> taskCodeMap) {
+        String taskParams = taskDefLog.getTaskParams();
+        SwitchParameters params;
+
+        try {
+            params = JSONUtils.parseObject(taskParams, SwitchParameters.class);
+        } catch (Exception e) {
+            log.warn("Invalid Switch task params: {}", taskParams, e);
+            throw new IllegalArgumentException("Failed to parse Switch task params: " + taskParams, e);
+        }
+
+        if (params == null) {
+            log.warn("Parsed Switch task params is null: {}", taskParams);
+            throw new IllegalArgumentException("Failed to parse Switch task params: " + taskParams);
+        }
+
+        // Update nextBranch if mapped
+        Long nextBranch = params.getNextBranch();
+        if (nextBranch != null && taskCodeMap.containsKey(nextBranch)) {
+            params.setNextBranch(taskCodeMap.get(nextBranch));
+        }
+
+        // Update switch result nodes
+        SwitchParameters.SwitchResult result = params.getSwitchResult();
+        if (result != null) {
+            Long nextNode = result.getNextNode();
+            if (nextNode != null && taskCodeMap.containsKey(nextNode)) {
+                result.setNextNode(taskCodeMap.get(nextNode));
+            }
+
+            // Update depend task list in result
+            for (SwitchResultVo vo : result.getDependTaskList()) {
+                Long original = vo.getNextNode();
+                if (original != null && taskCodeMap.containsKey(original)) {
+                    vo.setNextNode(taskCodeMap.get(original));
+                }
+            }
+        }
+
+        taskDefLog.setTaskParams(JSONUtils.toJsonString(params));
+    }
+
+    /**
+     * Replaces old task codes with new ones in the parameters of a Condition task.
+     * Used during workflow duplication or import to preserve correct task dependencies.
+     */
+    private void replaceTaskCodeForConditionTaskParams(TaskDefinitionLog taskDefLog, Map<Long, Long> taskCodeMap) {
+        String taskParams = taskDefLog.getTaskParams();
+        ConditionsParameters params;
+
+        try {
+            params = JSONUtils.parseObject(taskParams, ConditionsParameters.class);
+        } catch (Exception e) {
+            log.warn("Invalid Condition task params: {}", taskParams, e);
+            throw new IllegalArgumentException("Failed to parse Condition task params: " + taskParams, e);
+        }
+
+        if (params == null) {
+            log.warn("Parsed Condition task params is null: {}", taskParams);
+            throw new IllegalArgumentException("Failed to parse Condition task params: " + taskParams);
+        }
+
+        // Update dependency task codes
+        ConditionsParameters.ConditionDependency dep = params.getDependence();
+        if (dep != null) {
+            for (ConditionDependentTaskModel taskModel : dep.getDependTaskList()) {
+                for (ConditionDependentItem item : taskModel.getDependItemList()) {
+                    Long oldCode = item.getDepTaskCode();
+                    if (taskCodeMap.containsKey(oldCode)) {
+                        item.setDepTaskCode(taskCodeMap.get(oldCode));
+                    }
+                }
+            }
+        }
+
+        // Update success/failed node lists
+        ConditionsParameters.ConditionResult result = params.getConditionResult();
+        if (result != null) {
+            replaceInNodeList(result::getSuccessNode, result::setSuccessNode, taskCodeMap);
+            replaceInNodeList(result::getFailedNode, result::setFailedNode, taskCodeMap);
+        }
+
+        taskDefLog.setTaskParams(JSONUtils.toJsonString(params));
+    }
+
+    // Helper to avoid duplication for success/failed node lists
+    private void replaceInNodeList(Supplier<List<Long>> getter, Consumer<List<Long>> setter,
+                                   Map<Long, Long> taskCodeMap) {
+        List<Long> original = getter.get();
+        if (CollectionUtils.isEmpty(original))
+            return;
+
+        List<Long> updated = original.stream()
+                .map(code -> code != null && taskCodeMap.containsKey(code) ? taskCodeMap.get(code) : code)
+                .collect(Collectors.toList());
+
+        setter.accept(updated);
     }
 
     /**
@@ -2451,51 +1938,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, newWorkflowDefinition.getName());
             }
         }
-    }
-
-    /**
-     * update single resource workflow
-     *
-     * @param loginUser             login user
-     * @param workflowCode          workflow resource code want to update
-     * @param workflowUpdateRequest workflow update resource object
-     * @return workflow definition
-     */
-    @Override
-    @Transactional
-    public WorkflowDefinition updateSingleWorkflowDefinition(User loginUser,
-                                                             long workflowCode,
-                                                             WorkflowUpdateRequest workflowUpdateRequest) {
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowCode);
-        // check workflow definition exists
-        if (workflowDefinition == null) {
-            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowCode);
-        }
-
-        WorkflowDefinition workflowDefinitionUpdate =
-                workflowUpdateRequest.mergeIntoWorkflowDefinition(workflowDefinition);
-        this.updateWorkflowValid(loginUser, workflowDefinition, workflowDefinitionUpdate);
-
-        int insertVersion = this.saveWorkflowDefine(loginUser, workflowDefinitionUpdate);
-        if (insertVersion == 0) {
-            log.error("Update workflow definition error, projectCode:{}, workflowDefinitionName:{}.",
-                    workflowDefinitionUpdate.getCode(),
-                    workflowDefinitionUpdate.getName());
-            throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
-        }
-
-        int insertRelationVersion = this.saveTaskRelation(loginUser, workflowDefinitionUpdate, insertVersion);
-        if (insertRelationVersion != Constants.EXIT_CODE_SUCCESS) {
-            log.error(
-                    "Save workflow task relations error, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
-                    workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
-            throw new ServiceException(Status.CREATE_WORKFLOW_TASK_RELATION_ERROR);
-        }
-        log.info(
-                "Save workflow task relations complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
-                workflowDefinition.getProjectCode(), workflowDefinition.getCode(), insertVersion);
-        workflowDefinitionUpdate.setVersion(insertVersion);
-        return workflowDefinitionUpdate;
     }
 
     public int saveWorkflowDefine(User loginUser, WorkflowDefinition workflowDefinition) {

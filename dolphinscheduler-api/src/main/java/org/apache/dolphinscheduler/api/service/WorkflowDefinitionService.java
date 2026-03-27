@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowCreateRequest;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowFilterRequest;
-import org.apache.dolphinscheduler.api.dto.workflow.WorkflowUpdateRequest;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
@@ -30,10 +27,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.multipart.MultipartFile;
 
 public interface WorkflowDefinitionService {
 
@@ -63,15 +56,6 @@ public interface WorkflowDefinitionService {
                                                  String taskDefinitionJson,
                                                  String otherParamsJson,
                                                  WorkflowExecutionTypeEnum executionType);
-
-    /**
-     * create workflow definition V2
-     *
-     * @param loginUser             login user
-     * @param workflowCreateRequest the new workflow object will be created
-     * @return New WorkflowDefinition object created just now
-     */
-    WorkflowDefinition createSingleWorkflowDefinition(User loginUser, WorkflowCreateRequest workflowCreateRequest);
 
     /**
      * query workflow definition list
@@ -114,16 +98,6 @@ public interface WorkflowDefinitionService {
                                                                    Integer pageSize);
 
     /**
-     * Filter resource workflow definitions
-     *
-     * @param loginUser             login user
-     * @param workflowFilterRequest workflow filter requests
-     * @return List workflow definition
-     */
-    PageInfo<WorkflowDefinition> filterWorkflowDefinition(User loginUser,
-                                                          WorkflowFilterRequest workflowFilterRequest);
-
-    /**
      * query detail of workflow definition
      *
      * @param loginUser   login user
@@ -135,16 +109,6 @@ public interface WorkflowDefinitionService {
     Map<String, Object> queryWorkflowDefinitionByCode(User loginUser,
                                                       long projectCode,
                                                       long code);
-
-    /**
-     * Get resource workflow
-     *
-     * @param loginUser login user
-     * @param code      workflow definition code
-     * @return workflow definition Object
-     */
-    WorkflowDefinition getWorkflowDefinition(User loginUser,
-                                             long code);
 
     Optional<WorkflowDefinition> queryWorkflowDefinition(long workflowDefinitionCode, int workflowDefinitionVersion);
 
@@ -244,43 +208,6 @@ public interface WorkflowDefinitionService {
                                                              String codes);
 
     void deleteWorkflowDefinitionByCode(User loginUser, long workflowDefinitionCode);
-
-    /**
-     * batch export workflow definition by codes
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param codes       workflow definition codes
-     * @param response    http servlet response
-     */
-    void batchExportWorkflowDefinitionByCodes(User loginUser,
-                                              long projectCode,
-                                              String codes,
-                                              HttpServletResponse response);
-
-    /**
-     * import workflow definition
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param file        workflow metadata json file
-     * @return import workflow
-     */
-    Map<String, Object> importWorkflowDefinition(User loginUser,
-                                                 long projectCode,
-                                                 MultipartFile file);
-
-    /**
-     * import sql workflow definition
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param file        sql file, zip
-     * @return import workflow
-     */
-    Map<String, Object> importSqlWorkflowDefinition(User loginUser,
-                                                    long projectCode,
-                                                    MultipartFile file);
 
     /**
      * check the workflow task relation json
@@ -392,18 +319,6 @@ public interface WorkflowDefinitionService {
                                          long projectCode,
                                          long workflowDefinitionCode,
                                          int workflowDefinitionVersion);
-
-    /**
-     * update workflow definition basic info, not including task definition, task relation and location.
-     *
-     * @param loginUser             login user
-     * @param workflowCode          workflow resource code you want to update
-     * @param workflowUpdateRequest workflow update requests
-     * @return WorkflowDefinition instance
-     */
-    WorkflowDefinition updateSingleWorkflowDefinition(User loginUser,
-                                                      long workflowCode,
-                                                      WorkflowUpdateRequest workflowUpdateRequest);
 
     /**
      * Online the workflow definition, it will check all sub workflow is online.

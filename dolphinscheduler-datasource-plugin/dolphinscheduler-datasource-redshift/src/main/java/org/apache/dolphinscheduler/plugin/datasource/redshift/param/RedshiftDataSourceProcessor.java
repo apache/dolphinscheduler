@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceCon
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -32,7 +33,6 @@ import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,17 +129,20 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
+    public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
         RedshiftConnectionParam redshiftConnectionParam = (RedshiftConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
         if (redshiftConnectionParam.getMode().equals(RedshiftAuthMode.PASSWORD)) {
-            return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                    redshiftConnectionParam.getUser(),
-                    PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()));
+            return JdbcDriverConnectionProvider.builder()
+                    .jdbcDriverClassName(getDatasourceDriver())
+                    .jdbcUrl(getJdbcUrl(redshiftConnectionParam))
+                    .username(redshiftConnectionParam.getUser())
+                    .password(PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()))
+                    .build()
+                    .getConnection();
         } else if (redshiftConnectionParam.getMode().equals(RedshiftAuthMode.IAM_ACCESS_KEY)) {
             return getConnectionByIAM(redshiftConnectionParam);
         }
-        return null;
+        throw new SQLException("Unsupported authentication mode: " + redshiftConnectionParam.getMode());
     }
 
     @Override
@@ -179,7 +182,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
         return null;
     }
 
-    private static String transformOther(Map<String, String> otherMap) {
+    private String transformOther(Map<String, String> otherMap) {
         if (MapUtils.isNotEmpty(otherMap)) {
             List<String> list = new ArrayList<>(otherMap.size());
             otherMap.forEach((key, value) -> list.add(String.format("%s=%s", key, value)));
@@ -198,7 +201,7 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
      * @param redshiftConnectionParam
      * @return
      */
-    public static Connection getConnectionByIAM(RedshiftConnectionParam redshiftConnectionParam) {
+    private Connection getConnectionByIAM(RedshiftConnectionParam redshiftConnectionParam) throws SQLException {
         String basic;
         String authParams = String.format("AccessKeyID=%s&SecretAccessKey=%s&DbUser=%s",
                 redshiftConnectionParam.getUser(), PasswordUtils.decodePassword(redshiftConnectionParam.getPassword()),
@@ -217,13 +220,10 @@ public class RedshiftDataSourceProcessor extends AbstractDataSourceProcessor {
             // append AccessKeyID &SecretAccessKey &DbUser
             connectionUrl = String.format("%s?%s", basic, authParams);
         }
-        try {
-            Class.forName(DataSourceConstants.COM_REDSHIFT_JDBC_DRIVER);
-            return DriverManager.getConnection(connectionUrl);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(connectionUrl)
+                .build()
+                .getConnection();
     }
 }

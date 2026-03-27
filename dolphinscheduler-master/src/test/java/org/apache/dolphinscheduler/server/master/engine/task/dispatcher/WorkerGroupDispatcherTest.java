@@ -34,7 +34,6 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.config.TaskDispatchPolicy;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
@@ -49,6 +48,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -61,9 +61,14 @@ class WorkerGroupDispatcherTest {
     @BeforeEach
     void setUp() {
         taskExecutorClient = mock(ITaskExecutorClient.class);
-        final MasterConfig masterConfig = new MasterConfig();
         dispatcher =
-                new WorkerGroupDispatcher("TestGroup", taskExecutorClient, masterConfig.getTaskDispatchPolicy());
+                new WorkerGroupDispatcher("TestGroup", taskExecutorClient, new TaskDispatchPolicy());
+    }
+
+    @AfterEach
+    void tearDown() {
+        dispatcher.close();
+        dispatcher.interrupt();
     }
 
     @Test

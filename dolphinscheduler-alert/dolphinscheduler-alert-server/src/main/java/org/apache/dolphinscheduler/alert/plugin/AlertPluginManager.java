@@ -64,10 +64,6 @@ public final class AlertPluginManager {
         return Optional.ofNullable(alertPluginMap.get(id));
     }
 
-    public int size() {
-        return alertPluginMap.size();
-    }
-
     private void checkAlertPluginExist() {
         if (!pluginDao.checkPluginDefineTableExist()) {
             log.error("Plugin Define Table t_ds_plugin_define Not Exist. Please Create it First!");

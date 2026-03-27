@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
@@ -134,7 +135,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                 property.setValue(val);
             }
         }
-        return JSONUtils.toJsonString(globalParamList);
+        return GlobalParameterUtils.serializeGlobalParameter(globalParamList);
     }
 
     @Override
@@ -198,7 +199,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         String timeZone = commandParam.getTimeZone();
 
         // 1. Built-in parameters (lowest precedence)
-        Map<String, String> builtInParams = setBuiltInParamsMap(
+        Map<String, String> builtInParams = parseBuiltInParamsMap(
                 taskInstance, workflowInstance, timeZone, projectName, workflowDefinitionName);
         safePutAll(prepareParamsMap, ParameterUtils.getUserDefParamsMap(builtInParams));
 
@@ -211,7 +212,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         safePutAll(prepareParamsMap, globalParams);
 
         // 4. Task-local parameters
-        Map<String, Property> localParams = parameters.getInputLocalParametersMap();
+        Map<String, Property> localParams = parseLocalParamsMap(parameters);
         safePutAll(prepareParamsMap, localParams);
 
         // 5. Command-line / complement parameters
@@ -293,11 +294,11 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      * @param projectName
      * @param workflowDefinitionName
      */
-    private Map<String, String> setBuiltInParamsMap(@NonNull TaskInstance taskInstance,
-                                                    WorkflowInstance workflowInstance,
-                                                    String timeZone,
-                                                    String projectName,
-                                                    String workflowDefinitionName) {
+    private Map<String, String> parseBuiltInParamsMap(@NonNull TaskInstance taskInstance,
+                                                      WorkflowInstance workflowInstance,
+                                                      String timeZone,
+                                                      String projectName,
+                                                      String workflowDefinitionName) {
         CommandType commandType = workflowInstance.getCmdTypeIfComplement();
         Date scheduleTime = workflowInstance.getScheduleTime();
 
@@ -317,10 +318,19 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         return params;
     }
 
+    private Map<String, Property> parseLocalParamsMap(AbstractParameters parameters) {
+        Map<String, Property> localParametersMaps = new LinkedHashMap<>();
+        if (CollectionUtils.isNotEmpty(parameters.getLocalParams())) {
+            parameters.getLocalParams()
+                    .forEach(localParam -> localParametersMaps.put(localParam.getProp(), localParam));
+        }
+        return localParametersMaps;
+    }
+
     private Map<String, Property> parseGlobalParamsMap(WorkflowInstance workflowInstance) {
         final Map<String, Property> globalParametersMaps = new LinkedHashMap<>();
         if (StringUtils.isNotEmpty(workflowInstance.getGlobalParams())) {
-            JSONUtils.toList(workflowInstance.getGlobalParams(), Property.class)
+            GlobalParameterUtils.deserializeGlobalParameter(workflowInstance.getGlobalParams())
                     .forEach(property -> globalParametersMaps.put(property.getProp(), property));
         }
         return globalParametersMaps;
