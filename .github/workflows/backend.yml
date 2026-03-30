@@ -121,7 +121,7 @@ jobs:
           submodules: true
       - name: Collect Workflow Metrics
         uses: ./.github/actions/actions-workflow-metrics
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         name: Download Binary Package
         with:
           # Only run cluster test on jdk8
@@ -151,7 +151,7 @@ jobs:
       - name: Collect Workflow Metrics
         uses: ./.github/actions/actions-workflow-metrics
       - name: Download Binary Package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: binary-package-8
           path: ds_schema_check_test/dev
