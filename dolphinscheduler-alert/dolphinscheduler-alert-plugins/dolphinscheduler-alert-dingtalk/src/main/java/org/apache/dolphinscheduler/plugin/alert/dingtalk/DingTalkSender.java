@@ -48,8 +48,7 @@ import java.util.Objects;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -156,7 +155,7 @@ public final class DingTalkSender {
      * @param content content
      * @return
      */
-    public AlertResult sendDingTalkMsg(String title, String content) {
+    AlertResult sendDingTalkMsg(String title, String content) {
         AlertResult alertResult;
         try {
             String resp = sendMsg(title, content);
@@ -328,53 +327,10 @@ public final class DingTalkSender {
         return url + "&timestamp=" + timestamp + "&sign=" + sign;
     }
 
-    @Getter
-    @Setter
+    @Data
     static final class DingTalkSendMsgResponse {
 
         private Integer errcode;
         private String errmsg;
-
-        public DingTalkSendMsgResponse() {
-        }
-
-        @Override
-        public boolean equals(final Object o) {
-            if (o == this) {
-                return true;
-            }
-            if (!(o instanceof DingTalkSendMsgResponse)) {
-                return false;
-            }
-            final DingTalkSendMsgResponse other = (DingTalkSendMsgResponse) o;
-            final Object this$errcode = this.getErrcode();
-            final Object other$errcode = other.getErrcode();
-            if (this$errcode == null ? other$errcode != null : !this$errcode.equals(other$errcode)) {
-                return false;
-            }
-            final Object this$errmsg = this.getErrmsg();
-            final Object other$errmsg = other.getErrmsg();
-            if (this$errmsg == null ? other$errmsg != null : !this$errmsg.equals(other$errmsg)) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public int hashCode() {
-            final int PRIME = 59;
-            int result = 1;
-            final Object $errcode = this.getErrcode();
-            result = result * PRIME + ($errcode == null ? 43 : $errcode.hashCode());
-            final Object $errmsg = this.getErrmsg();
-            result = result * PRIME + ($errmsg == null ? 43 : $errmsg.hashCode());
-            return result;
-        }
-
-        @Override
-        public String toString() {
-            return "DingTalkSender.DingTalkSendMsgResponse(errcode=" + this.getErrcode() + ", errmsg="
-                    + this.getErrmsg() + ")";
-        }
     }
 }

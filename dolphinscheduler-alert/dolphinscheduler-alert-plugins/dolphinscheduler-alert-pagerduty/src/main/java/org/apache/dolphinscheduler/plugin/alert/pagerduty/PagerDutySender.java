@@ -46,12 +46,12 @@ public final class PagerDutySender {
 
     private final String integrationKey;
 
-    public PagerDutySender(Map<String, String> config) {
+    PagerDutySender(Map<String, String> config) {
         integrationKey = config.get(PagerDutyParamsConstants.NAME_PAGER_DUTY_INTEGRATION_KEY_NAME);
         Preconditions.checkArgument(!Objects.isNull(integrationKey), "PagerDuty integration key can not be null");
     }
 
-    public AlertResult sendPagerDutyAlter(String title, String content) {
+    AlertResult sendPagerDutyAlter(String title, String content) {
         AlertResult alertResult = new AlertResult();
         alertResult.setSuccess(false);
         alertResult.setMessage("send pager duty alert fail.");
@@ -124,7 +124,7 @@ public final class PagerDutySender {
         return post;
     }
 
-    public static String formatContent(String content) {
+    private static String formatContent(String content) {
         List<Map> list = JSONUtils.toList(content, Map.class);
         if (list.isEmpty()) {
             return content;

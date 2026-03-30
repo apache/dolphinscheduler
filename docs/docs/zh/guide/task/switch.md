@@ -11,9 +11,6 @@ Switch 是一个条件判断节点，依据[全局变量](../parameter/global.md
 
 ## 任务参数
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
-
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
 | **任务参数** |                                 **描述**                                  |
@@ -36,6 +33,7 @@ switch 任务需要和下游任务连线配置关系后，才可以进行下游�
 
 配置条件和默认分支，满足条件会走指定分支，都不满足则走默认分支。
 图中如果变量的值为 "A" 则执行分支 taskA，如果变量的值为 "B" 则执行分支 taskB ，都不满足则执行 default。
+由于switch任务类型不支持配置自定义参数，因此无需配置IN类型的局部变量X，即可直接使用上游节点的OUT类型输出X，请参考[参数传递](../parameter/context.md)。
 
 ![switch_02](../../../../img/tasks/demo/switch_02.png)
 

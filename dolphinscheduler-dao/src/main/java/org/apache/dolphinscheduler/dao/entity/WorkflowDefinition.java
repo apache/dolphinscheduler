@@ -20,8 +20,8 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -134,7 +134,7 @@ public class WorkflowDefinition {
     }
 
     public void setGlobalParams(String globalParams) {
-        this.globalParamList = JSONUtils.toList(globalParams, Property.class);
+        this.globalParamList = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
         if (this.globalParamList == null) {
             this.globalParamList = new ArrayList<>();
         }
@@ -143,7 +143,7 @@ public class WorkflowDefinition {
 
     public Map<String, String> getGlobalParamMap() {
         if (globalParamMap == null && !Strings.isNullOrEmpty(globalParams)) {
-            List<Property> propList = JSONUtils.toList(globalParams, Property.class);
+            List<Property> propList = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
             globalParamMap = propList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         }
 

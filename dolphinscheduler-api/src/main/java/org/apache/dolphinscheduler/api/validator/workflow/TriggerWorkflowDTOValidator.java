@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.validator.workflow;
 
 import org.apache.dolphinscheduler.api.validator.IValidator;
+import org.apache.dolphinscheduler.api.validator.StartParamListValidator;
 import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -32,8 +33,12 @@ public class TriggerWorkflowDTOValidator implements IValidator<TriggerWorkflowDT
 
     private final TenantExistValidator tenantExistValidator;
 
-    public TriggerWorkflowDTOValidator(TenantExistValidator tenantExistValidator) {
+    private final StartParamListValidator startParamListValidator;
+
+    public TriggerWorkflowDTOValidator(TenantExistValidator tenantExistValidator,
+                                       StartParamListValidator startParamListValidator) {
         this.tenantExistValidator = tenantExistValidator;
+        this.startParamListValidator = startParamListValidator;
     }
 
     @Override
@@ -47,6 +52,9 @@ public class TriggerWorkflowDTOValidator implements IValidator<TriggerWorkflowDT
         if (triggerWorkflowDTO.getWorkflowDefinition().getReleaseState() != ReleaseState.ONLINE) {
             throw new IllegalStateException("The workflowDefinition should be online");
         }
+
         tenantExistValidator.validate(triggerWorkflowDTO.getTenantCode());
+
+        startParamListValidator.validate(triggerWorkflowDTO.getStartParamList());
     }
 }

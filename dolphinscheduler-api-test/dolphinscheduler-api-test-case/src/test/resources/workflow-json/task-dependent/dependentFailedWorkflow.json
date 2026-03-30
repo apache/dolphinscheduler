@@ -1,0 +1,64 @@
+{
+  "taskDefinitionJson": [
+    {
+      "code": 264597693773601,
+      "delayTime": "0",
+      "description": "",
+      "environmentCode": -1,
+      "failRetryInterval": "1",
+      "failRetryTimes": "0",
+      "flag": "YES",
+      "name": "dependent_failed_test",
+      "taskParams": {
+        "localParams": [],
+        "resourceList": [],
+        "dependence": {
+          "relation": "AND",
+          "dependTaskList": [
+            {
+              "relation": "AND",
+              "dependItemList": [
+                {
+                  "projectCode": ${projectCode},
+                  "definitionCode": 999999999999,
+                  "depTaskCode": 0,
+                  "cycle": "day",
+                  "dateValue": "today",
+                  "dependentType": "DEPENDENT_ON_WORKFLOW"
+                }
+              ]
+            }
+          ],
+          "checkInterval": 10,
+          "failurePolicy": "DEPENDENT_FAILURE_FAILURE",
+          "failureWaitingTime": 1
+        }
+      },
+      "taskPriority": "MEDIUM",
+      "taskType": "DEPENDENT",
+      "timeout": 0,
+      "timeoutFlag": "CLOSE",
+      "timeoutNotifyStrategy": "",
+      "workerGroup": "default",
+      "cpuQuota": -1,
+      "memoryMax": -1,
+      "taskExecuteType": "BATCH"
+    }
+  ],
+  "taskRelationJson": [
+    {
+      "name": "",
+      "preTaskCode": 0,
+      "preTaskVersion": 0,
+      "postTaskCode": 264597693773601,
+      "postTaskVersion": 0,
+      "conditionType": "NONE",
+      "conditionParams": {}
+    }
+  ],
+  "name": "dependentFailedWorkflow",
+  "executionType": "PARALLEL",
+  "description": "",
+  "globalParams": [],
+  "timeout": 0
+}

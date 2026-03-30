@@ -28,9 +28,7 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.text.MessageFormat;
 
 import lombok.extern.slf4j.Slf4j;
@@ -101,7 +99,7 @@ public class K8sDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException, IOException {
+    public Connection getConnection(ConnectionParam connectionParam) {
         return null;
     }
 

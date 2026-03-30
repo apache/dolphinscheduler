@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -36,7 +38,16 @@ import io.micrometer.core.instrument.Timer;
 public class WorkflowInstanceMetrics {
 
     private final Set<String> workflowInstanceStates = ImmutableSet.of(
-            "submit", "timeout", "finish", "failover", "success", "fail", "stop");
+            WorkflowExecutionStatus.SUBMITTED_SUCCESS.name(),
+            WorkflowExecutionStatus.RUNNING_EXECUTION.name(),
+            WorkflowExecutionStatus.READY_PAUSE.name(),
+            WorkflowExecutionStatus.PAUSE.name(),
+            WorkflowExecutionStatus.READY_STOP.name(),
+            WorkflowExecutionStatus.FAILOVER.name(),
+            WorkflowExecutionStatus.SUCCESS.name(),
+            WorkflowExecutionStatus.FAILURE.name(),
+            WorkflowExecutionStatus.STOP.name(),
+            WorkflowExecutionStatus.SERIAL_WAIT.name());
 
     static {
         for (final String state : workflowInstanceStates) {
@@ -78,16 +89,37 @@ public class WorkflowInstanceMetrics {
                 .register(Metrics.globalRegistry);
     }
 
-    public void incWorkflowInstanceByStateAndWorkflowDefinitionCode(final String state,
+    public void incWorkflowInstanceByStateAndWorkflowDefinitionCode(final WorkflowExecutionStatus state,
                                                                     final String workflowDefinitionCode) {
         // When tags need to be determined from local context,
         // you have no choice but to construct or lookup the Meter inside your method body.
         // The lookup cost is just a single hash lookup, so it is acceptable for most use cases.
         Metrics.globalRegistry.counter(
                 "ds.workflow.instance.count",
-                "state", state,
+                "state", state.name(),
                 "workflow.definition.code", workflowDefinitionCode)
                 .increment();
+    }
+
+    public void recordWorkflowInstanceSubmit(final Long workflowDefinitionCode) {
+        incWorkflowInstanceByStateAndWorkflowDefinitionCode(
+                WorkflowExecutionStatus.SUBMITTED_SUCCESS,
+                String.valueOf(workflowDefinitionCode));
+    }
+
+    public void recordWorkflowInstanceFailover(final Long workflowDefinitionCode) {
+        incWorkflowInstanceByStateAndWorkflowDefinitionCode(
+                WorkflowExecutionStatus.FAILOVER,
+                String.valueOf(workflowDefinitionCode));
+    }
+
+    public void recordWorkflowInstanceFinish(final WorkflowExecutionStatus workflowExecutionStatus,
+                                             final Long workflowDefinitionCode) {
+        if (workflowExecutionStatus == null || !workflowExecutionStatus.isFinalState()) {
+            return;
+        }
+        incWorkflowInstanceByStateAndWorkflowDefinitionCode(workflowExecutionStatus,
+                String.valueOf(workflowDefinitionCode));
     }
 
     public void cleanUpWorkflowInstanceCountMetricsByDefinitionCode(final Long workflowDefinitionCode) {
