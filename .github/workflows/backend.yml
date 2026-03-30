@@ -136,7 +136,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     strategy:
-      fail-fast: false
       matrix:
         version: ["3.1.9", "3.2.0", "3.3.1"]
         case:
