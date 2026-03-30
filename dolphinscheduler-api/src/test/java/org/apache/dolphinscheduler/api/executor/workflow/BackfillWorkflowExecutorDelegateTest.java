@@ -115,7 +115,8 @@ public class BackfillWorkflowExecutorDelegateTest {
         // upstream + downstream
         Assertions.assertEquals(2, requests.size());
         WorkflowBackfillTriggerRequest downstreamReq =
-                requests.stream().filter(r -> r.getWorkflowCode() == downstreamCode).findFirst().orElseThrow();
+                requests.stream().filter(r -> r.getWorkflowCode() == downstreamCode).findFirst()
+                        .orElseThrow(java.util.NoSuchElementException::new);
         Assertions.assertNull(downstreamReq.getStartNodes());
         Assertions.assertEquals("upstreamGroup", downstreamReq.getWorkerGroup());
     }
@@ -161,7 +162,8 @@ public class BackfillWorkflowExecutorDelegateTest {
         }).when(backfillWorkflowExecutorDelegate).triggerBackfillWorkflow(any(), any());
         backfillWorkflowExecutorDelegate.executeWithVisitedCodes(dto, new HashSet<>());
         WorkflowBackfillTriggerRequest downstreamReq =
-                requests.stream().filter(r -> r.getWorkflowCode() == downstreamCode).findFirst().orElseThrow();
+                requests.stream().filter(r -> r.getWorkflowCode() == downstreamCode).findFirst()
+                        .orElseThrow(java.util.NoSuchElementException::new);
         Assertions.assertEquals("upstreamGroup", downstreamReq.getWorkerGroup());
     }
 
