@@ -138,7 +138,7 @@ jobs:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-api-test
           restore-keys: ${{ runner.os }}-maven-
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         name: Download Docker Images
         with:
           name: standalone-image-api-test
