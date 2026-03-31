@@ -224,6 +224,16 @@ public final class Constants {
     public static final Duration SERVER_CLOSE_WAIT_TIME = Duration.ofSeconds(3);
 
     /**
+     * exit code success
+     */
+    public static final int EXIT_CODE_SUCCESS = 0;
+
+    /**
+     * exit code failure
+     */
+    public static final int EXIT_CODE_FAILURE = -1;
+
+    /**
      * workflow or task definition failure
      */
     public static final int DEFINITION_FAILURE = -1;
