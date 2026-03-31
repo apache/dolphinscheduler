@@ -73,20 +73,53 @@ jobs:
         id: set-matrix
         run: |
           MODULES=$(python3 - <<'EOF'
-          import xml.etree.ElementTree as ET, json, re
+          import json
+          import re
+          import xml.etree.ElementTree as ET
+          from pathlib import Path
 
-          tree = ET.parse('pom.xml')
           ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
+
+          def module_names(pom_path: Path):
+              tree = ET.parse(pom_path)
+              root = tree.getroot()
+              found = root.findall('.//m:modules/m:module', ns)
+              if not found:
+                  found = root.findall('.//modules/module')
+              return [m.text.strip() for m in found if m.text and m.text.strip()]
+
+          repo = Path('.')
+          tree = ET.parse('pom.xml')
           root = tree.getroot()
 
-          # Support both namespaced and non-namespaced pom.xml
           modules = root.findall('.//m:modules/m:module', ns)
           if not modules:
               modules = root.findall('.//modules/module')
 
           # Exclude aggregator-only or non-testable modules
-          exclude = re.compile(r'dolphinscheduler-bom|dolphinscheduler-dist|dolphinscheduler-microbench|dolphinscheduler-ui')
-          result = [m.text.strip() for m in modules if m.text and not exclude.search(m.text)]
+          exclude = re.compile(
+              r'dolphinscheduler-bom|dolphinscheduler-dist|dolphinscheduler-microbench|dolphinscheduler-ui'
+          )
+
+          result = []
+          for m in modules:
+              if not m.text:
+                  continue
+              text = m.text.strip()
+              if exclude.search(text):
+                  continue
+
+              # Parent POM dolphinscheduler-task-plugin has no sources/tests; -pl on it alone
+              # never runs child module unit tests, so JaCoCo/Sonar see 0% on task plugin code.
+              if text == 'dolphinscheduler-task-plugin':
+                  tp = repo / 'dolphinscheduler-task-plugin'
+                  for child in module_names(tp / 'pom.xml'):
+                      if (tp / child / 'src' / 'test' / 'java').is_dir():
+                          result.append(f'dolphinscheduler-task-plugin/{child}')
+                  continue
+
+              result.append(text)
+
           print(json.dumps(result))
           EOF
           )
