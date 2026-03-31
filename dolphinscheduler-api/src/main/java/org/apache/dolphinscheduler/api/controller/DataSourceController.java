@@ -225,7 +225,7 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param id data source id
-     * @return connect result code
+     * @return A Result wrapping {@code true} if the connection is successful; otherwise, throws an exception.
      */
     @Operation(summary = "connectionTest", description = "CONNECT_DATA_SOURCE_TEST_NOTES")
     @Parameters({
@@ -236,7 +236,7 @@ public class DataSourceController extends BaseController {
     @ApiException(CONNECTION_TEST_FAILURE)
     public Result<Boolean> connectionTest(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @PathVariable("id") int id) {
-        dataSourceService.connectionTest(id);
+        dataSourceService.connectionTest(loginUser, id);
         return Result.success(true);
     }
 
@@ -337,6 +337,14 @@ public class DataSourceController extends BaseController {
         return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
     }
 
+    /**
+     * Retrieves the list of tables within a specific database of a data source.
+     *
+     * @param loginUser the current logged-in user (injected from session)
+     * @param datasourceId the unique identifier of the data source
+     * @param database the name of the database to query
+     * @return a list of table names/options accessible to the user
+     */
     @Operation(summary = "tables", description = "GET_DATASOURCE_TABLES_NOTES")
     @Parameters({
             @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1")),
@@ -345,28 +353,46 @@ public class DataSourceController extends BaseController {
     @GetMapping(value = "/tables")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_DATASOURCE_TABLES_ERROR)
-    public Result<Object> getTables(@RequestParam("datasourceId") Integer datasourceId,
-                                    @RequestParam(value = "database") String database) {
-        List<ParamsOptions> options = dataSourceService.getTables(datasourceId, database);
+    public Result<Object> getTables(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                    @RequestParam("datasourceId") Integer datasourceId,
+                                    @RequestParam("database") String database) {
+        List<ParamsOptions> options = dataSourceService.getTables(loginUser, datasourceId, database);
         return Result.success(options);
     }
 
+    /**
+     * Retrieves the column details (schema) for a specific table.
+     *
+     * @param loginUser the current logged-in user (injected from session)
+     * @param datasourceId the unique identifier of the data source
+     * @param database the name of the database containing the table
+     * @param tableName the name of the table to query columns for
+     * @return a list of column definitions (name, type, etc.) for the specified table
+     */
     @Operation(summary = "tableColumns", description = "GET_DATASOURCE_TABLE_COLUMNS_NOTES")
     @Parameters({
             @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1")),
-            @Parameter(name = "tableName", description = "TABLE_NAME", required = true, schema = @Schema(implementation = String.class, example = "test")),
-            @Parameter(name = "database", description = "DATABASE", required = true, schema = @Schema(implementation = String.class, example = "test"))
+            @Parameter(name = "database", description = "DATABASE", required = true, schema = @Schema(implementation = String.class, example = "test")),
+            @Parameter(name = "tableName", description = "TABLE_NAME", required = true, schema = @Schema(implementation = String.class, example = "test"))
     })
     @GetMapping(value = "/tableColumns")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_DATASOURCE_TABLE_COLUMNS_ERROR)
-    public Result<Object> getTableColumns(@RequestParam("datasourceId") Integer datasourceId,
-                                          @RequestParam("tableName") String tableName,
-                                          @RequestParam(value = "database") String database) {
-        List<ParamsOptions> options = dataSourceService.getTableColumns(datasourceId, database, tableName);
+    public Result<Object> getTableColumns(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @RequestParam("datasourceId") Integer datasourceId,
+                                          @RequestParam("database") String database,
+                                          @RequestParam("tableName") String tableName) {
+        List<ParamsOptions> options = dataSourceService.getTableColumns(loginUser, datasourceId, database, tableName);
         return Result.success(options);
     }
 
+    /**
+     * Retrieves the list of databases available in a specific data source.
+     *
+     * @param loginUser the current logged-in user (injected from session)
+     * @param datasourceId the unique identifier of the data source
+     * @return a list of database names/options accessible to the user
+     */
     @Operation(summary = "databases", description = "GET_DATASOURCE_DATABASE_NOTES")
     @Parameters({
             @Parameter(name = "datasourceId", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class, example = "1"))
@@ -374,8 +400,9 @@ public class DataSourceController extends BaseController {
     @GetMapping(value = "/databases")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_DATASOURCE_DATABASES_ERROR)
-    public Result<Object> getDatabases(@RequestParam("datasourceId") Integer datasourceId) {
-        List<ParamsOptions> options = dataSourceService.getDatabases(datasourceId);
+    public Result<Object> getDatabases(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                       @RequestParam("datasourceId") Integer datasourceId) {
+        List<ParamsOptions> options = dataSourceService.getDatabases(loginUser, datasourceId);
         return Result.success(options);
     }
 }
