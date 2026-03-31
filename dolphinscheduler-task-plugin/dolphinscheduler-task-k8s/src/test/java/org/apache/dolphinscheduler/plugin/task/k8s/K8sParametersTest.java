@@ -17,9 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.k8s;
 
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.K8sTaskParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import java.util.Arrays;
 import java.util.List;
@@ -78,6 +82,23 @@ public class K8sParametersTest {
         Assertions.assertEquals(args, k8sTaskParameters.getArgs());
         Assertions.assertEquals(labels, k8sTaskParameters.getCustomizedLabels());
         Assertions.assertEquals(nodeSelectorExpressions, k8sTaskParameters.getNodeSelectors());
+    }
+
+    @Test
+    public void testGenerateK8sTaskExecutionContextShouldContainDatasourceNamespace() {
+        String connectionParams = "{\"kubeConfig\":\"{}\",\"namespace\":\"namespace\"}";
+        DataSourceParameters dataSourceParameters = new DataSourceParameters();
+        dataSourceParameters.setConnectionParams(connectionParams);
+
+        ResourceParametersHelper resourceParametersHelper = new ResourceParametersHelper();
+        resourceParametersHelper.put(ResourceType.DATASOURCE, 1, dataSourceParameters);
+
+        K8sTaskExecutionContext executionContext =
+                k8sTaskParameters.generateK8sTaskExecutionContext(resourceParametersHelper, 1);
+
+        Assertions.assertEquals(connectionParams, executionContext.getConnectionParams());
+        Assertions.assertEquals("{}", executionContext.getConfigYaml());
+        Assertions.assertEquals(namespace, executionContext.getNamespace());
     }
 
 }

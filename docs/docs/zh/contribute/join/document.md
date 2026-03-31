@@ -6,7 +6,7 @@
 
 DolphinScheduler 项目的文档维护在独立的 [git 仓库](https://github.com/apache/dolphinscheduler-website)中。
 
-首先你需要先将文档项目 fork 到自己的 github 仓库中，然后将 fork 的文档克隆到本地计算机中。
+首先你需要先将文档项目 fork 到自己的 GitHub 仓库中，然后将 fork 的项目克隆到本地计算机中。
 
 ```
 git clone https://github.com/<your-github-user-name>/dolphinscheduler-website
@@ -16,11 +16,12 @@ git clone https://github.com/<your-github-user-name>/dolphinscheduler-website
 
 1. 在根目录中运行 `yarn` 以安装依赖项。
 
-2. 运行命令收集资源：2.1.运行 `export PROTOCOL_MODE=ssh` 告诉Git克隆资源，通过SSH协议而不是HTTPS协议。 2.2.运行 `./scripts/prepare_docs.sh` 准备所有相关资源，关更多信息，您可以查看[how prepare script work](https://github.com/apache/dolphinscheduler-website/blob/master/HOW_PREPARE_WORK.md)。
+2. 运行命令收集资源：
 
+   - 运行 `export PROTOCOL_MODE=ssh` 告诉 Git 通过 SSH 协议而不是 HTTPS 协议克隆资源
+   - 运行 `./scripts/prepare_docs.sh` 准备所有相关资源
 3. 在根目录下运行 `yarn generate` 来格式化和准备数据。
-
-4. 在根目录下运行 `yarn dev` 启动本地服务器，其将允许在 http://localhost:3000 。
+4. 在根目录下运行 `yarn dev` 启动本地服务器，你可以在 http://localhost:3000 查看网站。
 
 ```
 注意：如果您在 Windows 而非 Mac 或 Linux 中克隆代码。请阅读下面的详细信息。
@@ -30,11 +31,11 @@ git clone https://github.com/<your-github-user-name>/dolphinscheduler-website
 遇到这个问题时。你可以以管理员身份运行 cmd.exe 中的两个步骤。
 ```
 
-5. 运行 `yarn build` 来构建源代码，此时会自动生成一个名为 `build` 目录，等待执行完成之后进入 `build` 目录。
+5. 运行 `yarn build` 来构建源代码，此时会自动生成一个名为 `build` 的目录，等待执行完成后进入 `build` 目录。
 
-6. 在本地验证你的更改：`python -m SimpleHTTPServer 8000`，当 python 版本为 3 时，请使用：`python3 -m http.server 8000`。
+6. 在本地验证你的更改：`python -m SimpleHTTPServer 8000`，当 Python 版本为 3 时，请使用：`python3 -m http.server 8000`。
 
-如果本地安装了更高版本的 node，可以考虑使用 `nvm` 来允许不同版本的 `node` 在你的计算机上运行。
+如果本地安装了更高版本的 Node，可以考虑使用 `nvm` 来允许不同版本的 Node 在你的计算机上运行。
 
 1. 参考[说明](http://nvm.sh)安装 nvm
 

@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.policy.IWorkflowFailureStrategy;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
 import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 
@@ -146,6 +147,9 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
             final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
             workflowInstance.setEndTime(new Date());
             transformWorkflowInstanceState(workflowExecutionRunnable, workflowExecutionStatus);
+            WorkflowInstanceMetrics.recordWorkflowInstanceFinish(
+                    workflowExecutionStatus,
+                    workflowInstance.getWorkflowDefinitionCode());
             if (workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowDefinition().getExecutionType()
                     .isSerial()) {
                 if (serialCommandDao.deleteByWorkflowInstanceId(workflowInstance.getId()) > 0) {
