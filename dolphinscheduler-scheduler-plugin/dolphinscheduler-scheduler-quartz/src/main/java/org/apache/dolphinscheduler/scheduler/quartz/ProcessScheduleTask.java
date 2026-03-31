@@ -117,6 +117,10 @@ public class ProcessScheduleTask extends QuartzJobBean {
                 .workerGroup(WorkerGroupUtils.getWorkerGroupOrDefault(schedule.getWorkerGroup()))
                 .tenantCode(schedule.getTenantCode())
                 .environmentCode(schedule.getEnvironmentCode())
+                .calendarId(schedule.getCalendarId())
+                .businessDateOffset(schedule.getBusinessDateOffset())
+                .cutoverTime(schedule.getCutoverTime())
+                .earliestExecTime(schedule.getEarliestExecTime())
                 .dryRun(Flag.NO)
                 .build();
         workflowInstanceController.scheduleTriggerWorkflow(scheduleTriggerRequest);

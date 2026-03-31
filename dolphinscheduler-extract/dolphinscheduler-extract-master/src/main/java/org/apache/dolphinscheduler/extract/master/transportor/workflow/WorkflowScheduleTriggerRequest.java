@@ -69,4 +69,12 @@ public class WorkflowScheduleTriggerRequest {
     @Builder.Default
     private Flag dryRun = Flag.NO;
 
+    private Long calendarId;
+
+    private Integer businessDateOffset;
+
+    private String cutoverTime;
+
+    private String earliestExecTime;
+
 }

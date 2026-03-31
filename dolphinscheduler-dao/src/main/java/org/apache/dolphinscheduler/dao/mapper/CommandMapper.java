@@ -59,6 +59,8 @@ public interface CommandMapper extends BaseMapper<Command> {
                                        @Param("idStep") int idStep,
                                        @Param("fetchNumber") int fetchNum);
 
+    List<Command> queryPendingCommands(@Param("fetchNumber") int fetchNumber);
+
     void deleteByWorkflowInstanceIds(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds);
 
     IPage<Command> queryCommandPageByIds(Page<Command> page,

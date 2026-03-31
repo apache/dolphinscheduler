@@ -35,14 +35,22 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowS
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
-import java.util.Date;
+import org.apache.dolphinscheduler.service.calendar.BusinessCalendarService;
 
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 
 @Component
 public class WorkflowScheduleTrigger
         extends
             AbstractWorkflowTrigger<WorkflowScheduleTriggerRequest, WorkflowScheduleTriggerResponse> {
+
+    @Autowired
+    private BusinessCalendarService businessCalendarService;
 
     @Override
     protected ImmutablePair<WorkflowDefinition, WorkflowInstance> constructWorkflowInstance(WorkflowScheduleTriggerRequest scheduleTriggerRequest) {
@@ -89,6 +97,23 @@ public class WorkflowScheduleTrigger
         final ScheduleWorkflowCommandParam scheduleWorkflowCommandParam = ScheduleWorkflowCommandParam.builder()
                 .timeZone(scheduleTriggerRequest.getTimezoneId())
                 .build();
+        Date businessDate = businessCalendarService.resolveBusinessDate(
+                scheduleTriggerRequest.getCalendarId(),
+                scheduleTriggerRequest.getScheduleTIme(),
+                scheduleTriggerRequest.getBusinessDateOffset(),
+                scheduleTriggerRequest.getCutoverTime()
+        );
+
+        Date earliestTimeoutTime = null;
+        if (scheduleTriggerRequest.getEarliestExecTime() != null && !scheduleTriggerRequest.getEarliestExecTime().trim().isEmpty()) {
+            ZonedDateTime base = scheduleTriggerRequest.getScheduleTIme().toInstant().atZone(ZoneId.systemDefault());
+            LocalTime elt = LocalTime.parse(scheduleTriggerRequest.getEarliestExecTime());
+            earliestTimeoutTime = Date.from(base.with(elt).toInstant());
+            if (earliestTimeoutTime.before(scheduleTriggerRequest.getScheduleTIme())) {
+                earliestTimeoutTime = Date.from(base.plusDays(1).with(elt).toInstant());
+            }
+        }
+
         return Command.builder()
                 .commandType(CommandType.SCHEDULER)
                 .workflowDefinitionCode(scheduleTriggerRequest.getWorkflowCode())
@@ -96,6 +121,10 @@ public class WorkflowScheduleTrigger
                 .workflowInstanceId(workflowInstance.getId())
                 .workflowInstancePriority(workflowInstance.getWorkflowInstancePriority())
                 .commandParam(JSONUtils.toJsonString(scheduleWorkflowCommandParam))
+                .businessDate(businessDate)
+                .earliestTimeoutTime(earliestTimeoutTime)
+                .commandState(1) // 1: CHECK_PENDING
+                .waitReason(0)   // 0: Initial evaluation
                 .build();
     }
 

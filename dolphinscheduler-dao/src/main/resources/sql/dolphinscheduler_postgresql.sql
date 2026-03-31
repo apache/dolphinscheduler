@@ -269,6 +269,10 @@ CREATE TABLE t_ds_command (
   dry_run                   int DEFAULT '0' ,
   workflow_instance_id       int DEFAULT 0,
   workflow_definition_version int DEFAULT 0,
+  wait_reason               int DEFAULT 0 ,
+  business_date             timestamp DEFAULT NULL ,
+  earliest_timeout_time     timestamp DEFAULT NULL ,
+  command_state             int DEFAULT 0 ,
   PRIMARY KEY (id)
 ) ;
 
@@ -793,6 +797,10 @@ CREATE TABLE t_ds_schedules (
   worker_group varchar(255),
   tenant_code               varchar(64) DEFAULT 'default',
   environment_code bigint DEFAULT '-1',
+  calendar_id bigint DEFAULT NULL,
+  business_date_offset int DEFAULT 0,
+  cutover_time varchar(20) DEFAULT NULL,
+  earliest_exec_time varchar(20) DEFAULT NULL,
   create_time timestamp NOT NULL ,
   update_time timestamp NOT NULL ,
   PRIMARY KEY (id)
@@ -1409,3 +1417,33 @@ create table t_ds_jdbc_registry_data_change_event
     create_time        timestamp not null default current_timestamp,
     primary key (id)
 );
+
+--
+-- Table structure for table t_ds_calendar
+-- 
+DROP TABLE IF EXISTS t_ds_calendar;
+CREATE TABLE t_ds_calendar (
+  id bigint NOT NULL,
+  calendar_code varchar(100) NOT NULL,
+  calendar_name varchar(255) NOT NULL,
+  calendar_type int DEFAULT 0,
+  description text,
+  create_time timestamp DEFAULT NULL,
+  update_time timestamp DEFAULT NULL,
+  PRIMARY KEY (id)
+);
+
+--
+-- Table structure for table t_ds_calendar_date
+--
+DROP TABLE IF EXISTS t_ds_calendar_date;
+CREATE TABLE t_ds_calendar_date (
+  id bigint NOT NULL,
+  calendar_id bigint NOT NULL,
+  date_value date NOT NULL,
+  is_working_day int DEFAULT 1,
+  is_trading_day int DEFAULT 1,
+  day_type int DEFAULT 0,
+  PRIMARY KEY (id)
+);
+CREATE INDEX idx_calendar_date_ref ON t_ds_calendar_date(calendar_id, date_value);

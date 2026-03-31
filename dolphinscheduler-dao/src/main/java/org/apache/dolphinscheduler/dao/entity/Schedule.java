@@ -92,6 +92,15 @@ public class Schedule {
 
     private Long environmentCode;
 
+    private Long calendarId;
+
+    private Integer businessDateOffset;
+
+    private String cutoverTime;
+
+    private String earliestExecTime;
+
+
     @TableField(exist = false)
     private String environmentName;
 }

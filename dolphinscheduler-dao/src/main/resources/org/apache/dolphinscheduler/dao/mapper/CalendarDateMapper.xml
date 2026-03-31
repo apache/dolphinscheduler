@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.apache.dolphinscheduler.dao.mapper.CalendarDateMapper">
+    <select id="calculateBusinessDate" resultType="java.util.Date">
+        <choose>
+            <when test="offsetDays > 0">
+                select date_value 
+                from t_ds_calendar_date 
+                where calendar_id = #{calendarId}
+                and date_value > #{baseDate}
+                <if test="checkTrading">
+                    and is_trading_day = 1
+                </if>
+                order by date_value asc 
+                offset #{offsetDays} - 1 limit 1
+            </when>
+            <when test="offsetDays &lt; 0">
+                select date_value 
+                from t_ds_calendar_date 
+                where calendar_id = #{calendarId}
+                and date_value &lt; #{baseDate}
+                <if test="checkTrading">
+                    and is_trading_day = 1
+                </if>
+                order by date_value desc
+                offset abs(#{offsetDays}) - 1 limit 1
+            </when>
+            <otherwise>
+                <!-- For offset = 0, find current day, if not valid, fall back to previous valid day -->
+                select max(date_value) 
+                from t_ds_calendar_date 
+                where calendar_id = #{calendarId}
+                and date_value &lt;= #{baseDate}
+                <if test="checkTrading">
+                    and is_trading_day = 1
+                </if>
+            </otherwise>
+        </choose>
+    </select>
+</mapper>

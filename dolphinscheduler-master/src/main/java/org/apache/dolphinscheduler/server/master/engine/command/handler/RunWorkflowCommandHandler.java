@@ -77,6 +77,11 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
         workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstance.setCommandParam(command.getCommandParam());
         workflowInstance.setGlobalParams(mergeCommandParamsWithWorkflowParams(command, workflowDefinition));
+        
+        if (command.getBusinessDate() != null) {
+            workflowInstance.setScheduleTime(command.getBusinessDate());
+        }
+        
         workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
     }

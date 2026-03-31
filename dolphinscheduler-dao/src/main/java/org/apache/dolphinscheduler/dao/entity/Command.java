@@ -119,6 +119,19 @@ public class Command {
     @TableField("dry_run")
     private int dryRun;
 
+    @TableField("business_date")
+    private Date businessDate;
+
+    @TableField("earliest_timeout_time")
+    private Date earliestTimeoutTime;
+
+    @TableField("wait_reason")
+    private Integer waitReason;
+
+    @TableField("command_state")
+    private Integer commandState;
+
+
     public Command(
                    CommandType commandType,
                    TaskDependType taskDependType,

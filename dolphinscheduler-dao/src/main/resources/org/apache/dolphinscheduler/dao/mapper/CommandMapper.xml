@@ -41,7 +41,7 @@
         select
         *
         from t_ds_command
-        where 1 = 1
+        where (command_state is null or command_state = 0)
         order by workflow_instance_priority, id asc
     </select>
 
@@ -49,7 +49,8 @@
         select
         *
         from t_ds_command
-        where workflow_definition_code in
+        where (command_state is null or command_state = 0)
+        and workflow_definition_code in
             <foreach item="id" index="index" collection="workflowDefinitionCodes" open="(" separator="," close=")">
                 #{id}
             </foreach>
@@ -59,9 +60,18 @@
     <select id="queryCommandByIdSlot" resultType="org.apache.dolphinscheduler.dao.entity.Command">
         select *
         from t_ds_command
-        where (id / #{idStep}) % #{totalSlot} = #{currentSlotIndex}
+        where (command_state is null or command_state = 0)
+        and (id / #{idStep}) % #{totalSlot} = #{currentSlotIndex}
         order by workflow_instance_priority, id asc
             limit #{fetchNumber}
+    </select>
+
+    <select id="queryPendingCommands" resultType="org.apache.dolphinscheduler.dao.entity.Command">
+        select *
+        from t_ds_command
+        where command_state = 1
+        order by update_time asc
+        limit #{fetchNumber}
     </select>
     <delete id="deleteByWorkflowInstanceIds" >
         delete from t_ds_command
