@@ -34,7 +34,7 @@ import java.util.List;
 public interface DataSourceService {
 
     /**
-     * create a new datasource.
+     * create a new datasource
      *
      * @param loginUser login user
      * @param datasourceParam datasource configuration DTO
@@ -83,7 +83,7 @@ public interface DataSourceService {
     List<DataSource> queryDataSourceList(User loginUser, Integer type);
 
     /**
-     * verify whether a datasource name already exists.
+     * verify whether a datasource name already exists
      * <p>
      * If the name already exists, a {@link ServiceException} is thrown.
      * If the name is available (does not exist), the method completes successfully without returning a value.
@@ -94,7 +94,7 @@ public interface DataSourceService {
     void verifyDataSourceName(String name);
 
     /**
-     * Checks the connectivity of a datasource based on the provided type and parameters.
+     * check the connectivity of a datasource based on the provided type and parameters
      * <p>
      * This method attempts to establish a connection.
      * - If the connection is successful, the method returns normally (void).
@@ -107,7 +107,7 @@ public interface DataSourceService {
     void checkConnection(DbType type, ConnectionParam connectionParam);
 
     /**
-     * Tests the connectivity of a specific data source.
+     * test the connectivity of a specific data source
      *
      * @param loginUser the current logged-in user (required for permission check)
      * @param id        the unique identifier of the data source to test
@@ -116,7 +116,7 @@ public interface DataSourceService {
     void connectionTest(User loginUser, int id);
 
     /**
-     * delete a datasource by ID.
+     * delete a datasource by ID
      *
      * @param loginUser    the current logged-in user
      * @param datasourceId the unique identifier of the datasource to delete
@@ -125,7 +125,7 @@ public interface DataSourceService {
     void delete(User loginUser, int datasourceId);
 
     /**
-     * unauthorized datasource
+     * query the list of unauthorized data sources for a specific user
      *
      * @param loginUser login user
      * @param userId    user id
@@ -134,7 +134,7 @@ public interface DataSourceService {
     List<DataSource> unAuthDatasource(User loginUser, Integer userId);
 
     /**
-     * authorized datasource
+     * query the list of data sources authorized for a specific user
      *
      * @param loginUser login user
      * @param userId    user id
@@ -143,7 +143,7 @@ public interface DataSourceService {
     List<DataSource> authedDatasource(User loginUser, Integer userId);
 
     /**
-     * Retrieves the list of tables from a specific database within a data source.
+     * query the list of tables from a specific database within a data source
      *
      * @param loginUser    the current logged-in user (required for permission check)
      * @param datasourceId the unique identifier of the data source
@@ -154,7 +154,7 @@ public interface DataSourceService {
     List<ParamsOptions> getTables(User loginUser, Integer datasourceId, String database);
 
     /**
-     * Retrieves the list of columns for a specific table in a data source.
+     * query the list of columns for a specific table in a data source
      *
      * @param loginUser    current logged-in user
      * @param datasourceId ID of the data source
@@ -166,7 +166,7 @@ public interface DataSourceService {
     List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database, String tableName);
 
     /**
-     * Retrieves the list of databases (or schemas) available in a specific data source.
+     * query the list of databases (or schemas) available in a specific data source
      *
      * @param loginUser    current logged-in user
      * @param datasourceId ID of the data source
