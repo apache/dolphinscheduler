@@ -31,8 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.Date;
 import java.util.UUID;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,6 +40,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class PasswordAuthenticatorTest extends AbstractControllerTest {
 

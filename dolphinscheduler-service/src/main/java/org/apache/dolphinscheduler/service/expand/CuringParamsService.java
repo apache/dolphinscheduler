@@ -27,9 +27,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 import lombok.NonNull;
+import jakarta.annotation.Nullable;
 
 public interface CuringParamsService {
 

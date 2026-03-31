@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.loop;
 
-import javax.annotation.Nullable;
+import jakarta.annotation.Nullable;
 
 public interface LoopTaskCancelMethodDefinition extends LoopTaskMethodDefinition {
 

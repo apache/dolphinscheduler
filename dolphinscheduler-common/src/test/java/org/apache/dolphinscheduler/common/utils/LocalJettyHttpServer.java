@@ -18,20 +18,18 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import junit.extensions.TestSetup;
 import junit.framework.Test;
 
-import org.mortbay.jetty.HttpConnection;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.AbstractHandler;
-import org.mortbay.jetty.handler.ContextHandler;
-import org.mortbay.util.ByteArrayISO8859Writer;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,28 +49,27 @@ public class LocalJettyHttpServer extends TestSetup {
 
     protected void setUp() throws Exception {
         server = new Server(serverPort);
-        ContextHandler context = new ContextHandler("/test.json");
-        context.setHandler(new AbstractHandler() {
-
+        server.setHandler(new AbstractHandler() {
             @Override
-            public void handle(String s, HttpServletRequest request, HttpServletResponse response,
-                               int i) throws IOException {
-                ByteArrayISO8859Writer writer = new ByteArrayISO8859Writer();
-                writer.write("{\"name\":\"Github\"}");
-                writer.flush();
-                response.setContentLength(writer.size());
-                OutputStream out = response.getOutputStream();
-                writer.writeTo(out);
-                out.flush();
-                Request baseRequest = request instanceof Request ? (Request) request
-                        : HttpConnection.getCurrentConnection().getRequest();
-                baseRequest.setHandled(true);
+            public void handle(String target, Request baseRequest, HttpServletRequest request,
+                               HttpServletResponse response) throws IOException {
+                if ("/test.json".equals(target)) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding(StandardCharsets.ISO_8859_1.name());
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    try (PrintWriter writer = response.getWriter()) {
+                        writer.write("{\"name\":\"Github\"}");
+                        writer.flush();
+                    }
+                    baseRequest.setHandled(true);
+                } else {
+                    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    baseRequest.setHandled(true);
+                }
             }
         });
-        server.setHandler(context);
-        logger.info("server for " + context.getBaseResource());
         server.start();
-        serverPort = server.getConnectors()[0].getLocalPort();
+        serverPort = server.getURI().getPort();
         logger.info("server is starting in port: " + serverPort);
     }
 

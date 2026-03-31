@@ -40,8 +40,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import javax.annotation.Nullable;
-
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -64,6 +62,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.base.Strings;
+import jakarta.annotation.Nullable;
 
 /**
  * json utils

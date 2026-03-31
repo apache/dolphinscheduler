@@ -26,15 +26,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.concurrent.NotThreadSafe;
-
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Used to parse ${setValue()} and #{setValue()} from given lines.
+ * Not Thread-Safe: This class should not be shared between threads.
  */
 @Slf4j
-@NotThreadSafe
 public class TaskOutputParameterParser {
 
     // Used to avoid '${setValue(' which loss the end of ')}'

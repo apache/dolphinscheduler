@@ -38,7 +38,7 @@ import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface ResourcesService {
 

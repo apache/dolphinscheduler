@@ -27,10 +27,9 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.RetryUtils;
 
 import java.time.Duration;
 
-import javax.annotation.Nullable;
-
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.Nullable;
 
 /**
  * This class is the base class for all loop task type.

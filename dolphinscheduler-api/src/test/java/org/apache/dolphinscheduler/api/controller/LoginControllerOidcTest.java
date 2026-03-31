@@ -298,7 +298,7 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
                 .andExpect(status().isFound())
                 .andExpect(redirectedUrl(authUrl))
                 .andExpect(result -> {
-                    javax.servlet.http.HttpSession session = result.getRequest().getSession(false);
+                    jakarta.servlet.http.HttpSession session = result.getRequest().getSession(false);
                     Assertions.assertNotNull(session, "Session should exist");
                     Object storedState = session.getAttribute(Constants.SSO_LOGIN_USER_STATE);
                     Assertions.assertNotNull(storedState, "State should be stored in session");

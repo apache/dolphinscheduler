@@ -70,7 +70,7 @@ public class ActuatorAuthenticationAutoConfiguration {
                 "Initialize ActuatorSecurityConfiguration, management.security.enabled: {}, management.security.exclude: {}",
                 properties.isEnabled(), properties.getExclude());
         // Restrict this security configuration to requests starting with actuator paths
-        http.requestMatcher(request -> request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_1) ||
+        http.securityMatcher(request -> request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_1) ||
                 request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_2));
 
         if (properties.isEnabled()) {

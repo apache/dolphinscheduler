@@ -29,7 +29,7 @@
 
     <properties>
         <netty.version>4.1.53.Final</netty.version>
-        <spring-boot.version>2.7.11</spring-boot.version>
+        <spring-boot.version>3.2.0</spring-boot.version>
         <spring-ldap.version>2.4.1</spring-ldap.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <quartz.version>2.3.2</quartz.version>
@@ -46,7 +46,7 @@
         <commons-httpclient>3.0.1</commons-httpclient>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-configuration.version>1.10</commons-configuration.version>
-        <commons-email.version>1.5</commons-email.version>
+        <commons-email.version>2.0.0-M2</commons-email.version>
         <commons-collections4.version>4.5.0</commons-collections4.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.15</httpcore.version>
@@ -96,7 +96,7 @@
         <dropwizard.metrics-version>4.2.11</dropwizard.metrics-version>
         <snappy.version>1.1.10.1</snappy.version>
         <janino.version>3.0.16</janino.version>
-        <snakeyaml.version>1.33</snakeyaml.version>
+        <snakeyaml.version>2.2</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
         <datasync.version>2.17.282</datasync.version>
         <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
@@ -700,12 +700,6 @@
             </dependency>
 
             <dependency>
-                <groupId>javax.servlet</groupId>
-                <artifactId>javax.servlet-api</artifactId>
-                <version>${javax.servlet-api.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.github.rholder</groupId>
                 <artifactId>guava-retrying</artifactId>
                 <version>${guava-retry.version}</version>
@@ -1010,6 +1004,19 @@
                 <groupId>com.dolphindb</groupId>
                 <artifactId>jdbc</artifactId>
                 <version>${dolphindb-jdbc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>jakarta.servlet</groupId>
+                <artifactId>jakarta.servlet-api</artifactId>
+                <version>6.0.0</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <scope>provided</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

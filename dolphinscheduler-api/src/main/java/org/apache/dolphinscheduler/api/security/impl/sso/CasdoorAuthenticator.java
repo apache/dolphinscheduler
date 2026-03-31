@@ -25,8 +25,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.security.MessageDigest;
 
-import javax.servlet.http.HttpServletRequest;
-
 import lombok.NonNull;
 
 import org.casbin.casdoor.entity.CasdoorUser;
@@ -35,6 +33,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 public class CasdoorAuthenticator extends AbstractSsoAuthenticator {
 

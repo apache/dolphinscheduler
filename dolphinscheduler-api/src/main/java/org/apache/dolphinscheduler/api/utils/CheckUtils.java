@@ -28,12 +28,16 @@ import org.apache.commons.lang3.StringUtils;
 import java.time.ZoneId;
 import java.util.regex.Pattern;
 
-import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * check utils
  */
+@Slf4j
 public class CheckUtils {
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     private CheckUtils() {
         throw new IllegalStateException("CheckUtils class");
@@ -59,8 +63,7 @@ public class CheckUtils {
         if (StringUtils.isBlank(email)) {
             return false;
         }
-        EmailValidator emailValidator = new EmailValidator();
-        if (!emailValidator.isValid(email, null)) {
+        if (!EMAIL_PATTERN.matcher(email).matches()) {
             return false;
         }
         // Email is at least a second-level domain name

@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
-
 import lombok.NonNull;
 import okhttp3.HttpUrl;
 import okhttp3.MediaType;
@@ -37,6 +35,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import jakarta.annotation.Nullable;
 
 public class OkHttpUtils {
 

@@ -22,9 +22,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import lombok.NonNull;
+import jakarta.servlet.http.HttpServletRequest;
 
 public interface Authenticator {
 

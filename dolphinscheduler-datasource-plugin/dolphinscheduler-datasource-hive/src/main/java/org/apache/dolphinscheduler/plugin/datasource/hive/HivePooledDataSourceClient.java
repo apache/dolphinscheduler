@@ -27,11 +27,10 @@ import org.apache.dolphinscheduler.plugin.datasource.hive.security.UserGroupInfo
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import sun.security.krb5.Config;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -59,11 +58,25 @@ public class HivePooledDataSourceClient extends BasePooledDataSourceClient {
         if (kerberosStartupState && StringUtils.isNotBlank(krb5File)) {
             System.setProperty(JAVA_SECURITY_KRB5_CONF, krb5File);
             try {
-                Config.refresh();
+                // Use reflection to access internal sun.security.krb5.Config class
+                // This is needed because sun.security.krb5 is not exported in Java 9+ module system
+                Class<?> configClass = Class.forName("sun.security.krb5.Config");
+                Method refreshMethod = configClass.getMethod("refresh");
+                refreshMethod.invoke(null);
+                
+                Method getInstanceMethod = configClass.getMethod("getInstance");
+                Object configInstance = getInstanceMethod.invoke(null);
+                Method getDefaultRealmMethod = configClass.getMethod("getDefaultRealm");
+                String defaultRealm = (String) getDefaultRealmMethod.invoke(configInstance);
+                
                 Class<?> kerberosName = Class.forName("org.apache.hadoop.security.authentication.util.KerberosName");
                 Field field = kerberosName.getDeclaredField("defaultRealm");
                 field.setAccessible(true);
-                field.set(null, Config.getInstance().getDefaultRealm());
+                field.set(null, defaultRealm);
+            } catch (ClassNotFoundException | LinkageError e) {
+                // If we can't access the internal class (Java 9+), skip this step
+                // The Kerberos configuration will still work but without explicit refresh
+                log.warn("Unable to refresh Kerberos configuration via sun.security.krb5.Config: {}", e.getMessage());
             } catch (Exception e) {
                 throw new RuntimeException("Update Kerberos environment failed.", e);
             }

@@ -32,15 +32,15 @@ import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.registry.api.ha.AbstractServerStatusChangeListener;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
+
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 
 @Slf4j
 @Import({CommonConfiguration.class,

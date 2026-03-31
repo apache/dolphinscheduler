@@ -23,12 +23,12 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import java.util.Date;
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import jakarta.annotation.Resource;
 
 public class WorkerGroupMapperTest extends BaseDaoTest {
 

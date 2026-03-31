@@ -24,13 +24,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.PostConstruct;
-
 import lombok.NonNull;
 
 import org.springframework.stereotype.Component;
 
 import com.google.common.collect.ImmutableList;
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class WorkflowCacheRepository implements IWorkflowRepository {

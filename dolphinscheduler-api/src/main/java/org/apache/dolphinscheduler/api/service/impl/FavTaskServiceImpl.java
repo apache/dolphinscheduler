@@ -28,9 +28,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.Resource;
-
 import org.springframework.stereotype.Service;
+
+import jakarta.annotation.Resource;
 
 @Service
 public class FavTaskServiceImpl extends BaseServiceImpl implements FavTaskService {

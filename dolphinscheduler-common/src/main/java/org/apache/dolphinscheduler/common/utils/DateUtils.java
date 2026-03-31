@@ -32,10 +32,9 @@ import java.util.Date;
 import java.util.Objects;
 import java.util.TimeZone;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
 import lombok.extern.slf4j.Slf4j;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 @Slf4j
 public final class DateUtils {
