@@ -83,7 +83,7 @@ build {
       "sudo yum install -y java-1.8.0-amazon-corretto.x86_64",
       "echo 'export JAVA_HOME=/etc/alternatives/jre' | sudo tee /etc/profile.d/java_home.sh",
       "sudo mkdir -p /opt/dolphinscheduler",
-      "curl -Ls http://archive.apache.org/dist/dolphinscheduler/${var.ds_version}/apache-dolphinscheduler-${var.ds_version}-bin.tar.gz | sudo tar zxvf - --strip-components 1 -C /opt/dolphinscheduler",
+      "curl -Ls https://archive.apache.org/dist/dolphinscheduler/${var.ds_version}/apache-dolphinscheduler-${var.ds_version}-bin.tar.gz | sudo tar zxvf - --strip-components 1 -C /opt/dolphinscheduler",
       "sudo find /opt/dolphinscheduler/ -name start.sh | xargs -I{} sudo chmod +x {}",
     ]
   }

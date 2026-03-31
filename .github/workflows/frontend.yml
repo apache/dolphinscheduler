@@ -42,8 +42,10 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+      - uses: ./.github/actions/paths-filter
         id: filter
         with:
           filters: |
@@ -59,14 +61,14 @@ jobs:
       matrix:
         os: [ ubuntu-latest, macos-latest ]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - if: matrix.os == 'ubuntu-latest'
         name: Sanity Check
         uses: ./.github/actions/sanity-check
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
           node-version: 16
       - name: Code Format Check
@@ -90,7 +92,7 @@ jobs:
     needs: [ build, paths-filter ]
     if: always()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Status
         run: |
           if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then

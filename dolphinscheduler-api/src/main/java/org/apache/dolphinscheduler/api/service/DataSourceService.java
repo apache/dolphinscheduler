@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -96,12 +97,13 @@ public interface DataSourceService {
     void checkConnection(DbType type, ConnectionParam parameter);
 
     /**
-     * test connection
+     * Tests the connectivity of a specific data source.
      *
-     * @param id datasource id
-     * @return connect result code
+     * @param loginUser the current logged-in user (required for permission check)
+     * @param id        the unique identifier of the data source to test
+     * @throws ServiceException if the resource doesn't exist, permission is denied, or connection fails
      */
-    void connectionTest(int id);
+    void connectionTest(User loginUser, int id);
 
     /**
      * delete datasource
@@ -131,26 +133,36 @@ public interface DataSourceService {
     List<DataSource> authedDatasource(User loginUser, Integer userId);
 
     /**
-     * get tables
-     * @param datasourceId
-     * @param database
-     * @return
+     * Retrieves the list of tables from a specific database within a data source.
+     *
+     * @param loginUser    the current logged-in user (required for permission check)
+     * @param datasourceId the unique identifier of the data source
+     * @param database     the specific database/schema name to query (nullable for some DB types like SQLite)
+     * @return a list of {@link ParamsOptions} containing table names and optional metadata (e.g., comments)
+     * @throws ServiceException if permission denied, resource not found, or connection fails
      */
-    List<ParamsOptions> getTables(Integer datasourceId, String database);
+    List<ParamsOptions> getTables(User loginUser, Integer datasourceId, String database);
 
     /**
-     * get table columns
-     * @param datasourceId
-     * @param database
-     * @param tableName
-     * @return
+     * Retrieves the list of columns for a specific table in a data source.
+     *
+     * @param loginUser    current logged-in user
+     * @param datasourceId ID of the data source
+     * @param database     database/schema name
+     * @param tableName    table name to query
+     * @return list of {@link ParamsOptions} representing column names and types
+     * @throws ServiceException if permission denied, resource not found, or connection fails
      */
-    List<ParamsOptions> getTableColumns(Integer datasourceId, String database, String tableName);
+    List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database, String tableName);
 
     /**
-     * get databases
-     * @param datasourceId
-     * @return
+     * Retrieves the list of databases (or schemas) available in a specific data source.
+     *
+     * @param loginUser    current logged-in user
+     * @param datasourceId ID of the data source
+     * @return list of {@link ParamsOptions} representing database/schema names
+     * @throws ServiceException if permission denied, resource not found, or connection fails
      */
-    List<ParamsOptions> getDatabases(Integer datasourceId);
+    List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId);
+
 }

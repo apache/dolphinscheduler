@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowInstanceStopRequest;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -86,6 +87,9 @@ public abstract class AbstractSerialCommandHandler implements ISerialCommandHand
                 workflowInstance.setEndTime(DateUtils.getCurrentDate());
                 workflowInstance.setState(WorkflowExecutionStatus.STOP);
                 workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
+                WorkflowInstanceMetrics.recordWorkflowInstanceFinish(
+                        WorkflowExecutionStatus.STOP,
+                        workflowInstance.getWorkflowDefinitionCode());
                 return null;
             }
         });
