@@ -14,17 +14,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { queryResourceList } from '@/service/modules/resources'
+import { useTaskNodeStore } from '@/store/project/task-node'
+import utils from '@/utils'
 import { useCustomParams } from '.'
-import type { IJsonItem } from '../types'
+import type { IJsonItem, IResource } from '../types'
 
 export function useSql(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const hiveSpan = computed(() => (model.type === 'HIVE' ? 24 : 0))
-  const showScriptEditor = computed(
+  const taskStore = useTaskNodeStore()
+  const sqlResourceOptions = ref<IResource[]>([])
+
+  const sqlEditorSpan = computed(() => (model.sqlSource === 'FILE' ? 0 : 24))
+  const sqlResourceSpan = computed(() => (model.sqlSource === 'FILE' ? 24 : 0))
+  const isScriptSource = computed(
     () => model.sqlSource === 'SCRIPT' || !model.sqlSource
   )
+
+  const loadSqlResourceTree = async () => {
+    if (taskStore.resources.length) {
+      sqlResourceOptions.value = taskStore.resources
+      return
+    }
+    const res = await queryResourceList({ type: 'FILE', fullName: '' })
+    utils.removeUselessChildren(res)
+    sqlResourceOptions.value = res || []
+    taskStore.updateResource(res)
+  }
+
+  onMounted(() => {
+    void loadSqlResourceTree()
+  })
 
   return [
     {
@@ -57,10 +80,10 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
       type: 'editor',
       field: 'sql',
       name: t('project.node.sql_statement'),
-      if: showScriptEditor,
+      span: sqlEditorSpan,
       validate: {
-        trigger: ['input', 'trigger'],
-        required: true,
+        trigger: ['input', 'blur'],
+        required: isScriptSource,
         message: t('project.node.sql_empty_tips')
       },
       props: {
@@ -71,15 +94,21 @@ export function useSql(model: { [field: string]: any }): IJsonItem[] {
       type: 'tree-select',
       field: 'sqlResource',
       name: t('project.node.sql_resource_file'),
-      span: 24,
-      if: () => model.sqlSource === 'FILE',
+      span: sqlResourceSpan,
+      options: sqlResourceOptions,
       props: {
         placeholder: t('project.node.resources_tips'),
         keyField: 'fullName',
         labelField: 'name',
-        disabledField: 'disable'
+        disabledField: 'disable',
+        filterable: true,
+        showPath: true
       },
-      slots: {}
+      validate: {
+        trigger: ['input', 'blur'],
+        required: computed(() => model.sqlSource === 'FILE'),
+        message: t('project.node.resources_tips')
+      }
     },
     ...useCustomParams({
       model,
