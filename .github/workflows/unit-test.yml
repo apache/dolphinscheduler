@@ -49,6 +49,18 @@ jobs:
             not-ignore:
               - '!(docs/**)'
 
+  sanity-check:
+    name: Sanity Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+      - name: Sanity Check
+        uses: ./.github/actions/sanity-check
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
   generate-matrix:
     name: Generate Module Matrix
     runs-on: ubuntu-latest
@@ -84,11 +96,10 @@ jobs:
 
   unit-test:
     name: Unit-Test (${{ matrix.module }} | Java ${{ matrix.java }})
-    needs: [ paths-filter, generate-matrix ]
+    needs: [ paths-filter, generate-matrix, sanity-check ]
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: false
       matrix:
         java: [ '8', '11' ]
         module: ${{ fromJSON(needs.generate-matrix.outputs.matrix).module }}
@@ -100,11 +111,6 @@ jobs:
 
       - name: Collect Workflow Metrics
         uses: ./.github/actions/actions-workflow-metrics
-
-      - name: Sanity Check
-        uses: ./.github/actions/sanity-check
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@v5
@@ -264,7 +270,7 @@ jobs:
     name: Unit Test
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [ unit-test, paths-filter, sonar ]
+    needs: [ unit-test, paths-filter, sonar, sanity-check ]
     if: always()
     steps:
       - name: Status
@@ -272,6 +278,10 @@ jobs:
           if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
             echo "Skip Unit Test!"
             exit 0
+          fi
+          if [[ ${{ needs.sanity-check.result }} != 'success' ]]; then
+            echo "Sanity Check Failed!"
+            exit -1
           fi
           if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
             echo "Unit Test Failed!"

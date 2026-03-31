@@ -156,24 +156,6 @@ public final class WeChatSender {
         }
     }
 
-    private static String mkString(Iterable<String> list) {
-        if (null == list || StringUtils.isEmpty("|")) {
-            return null;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (String item : list) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append("|");
-            }
-            sb.append(item);
-        }
-        return sb.toString();
-    }
-
     private static AlertResult checkWeChatSendMsgResult(String result) {
         AlertResult alertResult = new AlertResult();
         alertResult.setSuccess(false);
