@@ -64,7 +64,7 @@ public final class ProcessUtils {
     /**
      * executeScript with timeout
      *
-     * @param timeoutSeconds timeout in seconds, if <= 0 waits indefinitely
+    * @param timeoutSeconds timeout in seconds, must be greater than 0
      * @param cmd cmd params
      * @return execution result
      */
