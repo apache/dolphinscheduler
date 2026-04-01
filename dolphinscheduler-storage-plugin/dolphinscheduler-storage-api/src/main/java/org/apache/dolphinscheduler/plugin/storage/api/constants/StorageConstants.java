@@ -22,8 +22,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class StorageConstants {
 
-    public static final String RESOURCE_TYPE_FILE = "resources";
-
     /**
      * resource.hdfs.fs.defaultFS
      */

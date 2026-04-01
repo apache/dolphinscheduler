@@ -171,7 +171,7 @@ jobs:
     name: SonarCloud Analysis
     runs-on: ubuntu-latest
     needs: [ paths-filter, unit-test ]
-    if: ${{ always() && (needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push') }}
+    if: ${{ needs.unit-test.result == 'success' }}
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
@@ -250,8 +250,8 @@ jobs:
   publish-test-results:
     name: Publish Test Results
     runs-on: ubuntu-latest
-    needs: unit-test
-    if: always()
+    needs: [ paths-filter, unit-test ]
+    if: ${{ needs.unit-test.result == 'success' }}
     steps:
       - name: Download all surefire reports
         uses: actions/download-artifact@v8
