@@ -10,16 +10,16 @@
     },
     "jsonBody": {
       "jobRun": {
-        "applicationId": "test-app-id-123",
-        "jobRunId": "test-job-run-id-001",
-        "name": "test name",
-        "arn": "arn:aws:emr-serverless:us-east-1:123456789012:/applications/test-app-id-123/jobruns/test-job-run-id-001",
+        "applicationId": "test-app-id-456",
+        "jobRunId": "test-job-run-id-002",
+        "name": "test name failed",
+        "arn": "arn:aws:emr-serverless:us-east-1:123456789012:/applications/test-app-id-456/jobruns/test-job-run-id-002",
         "createdBy": "arn:aws:iam::123456789012:role/EMRServerlessExecutionRole",
         "createdAt": "2024-01-01T00:00:00Z",
         "updatedAt": "2024-01-01T00:01:00Z",
         "executionRole": "arn:aws:iam::123456789012:role/EMRServerlessExecutionRole",
-        "state": "SUCCESS",
-        "stateDetails": "Job run completed successfully",
+        "state": "FAILED",
+        "stateDetails": "Job run failed",
         "releaseLabel": "emr-7.12.0"
       }
     }
