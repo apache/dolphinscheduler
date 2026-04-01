@@ -105,7 +105,8 @@ public class EmrServerlessTaskAPITest {
 
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource("workflow-json/task-emr-serverless/emrServerlessSuccessWorkflow.json").getFile());
+            File file = new File(classLoader
+                    .getResource("workflow-json/task-emr-serverless/emrServerlessSuccessWorkflow.json").getFile());
             HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
                     .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
             Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
@@ -149,7 +150,8 @@ public class EmrServerlessTaskAPITest {
 
             // upload failed workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader.getResource("workflow-json/task-emr-serverless/emrServerlessFailedWorkflow.json").getFile());
+            File file = new File(classLoader
+                    .getResource("workflow-json/task-emr-serverless/emrServerlessFailedWorkflow.json").getFile());
             HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
                     .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
             Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
