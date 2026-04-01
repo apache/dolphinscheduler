@@ -75,7 +75,7 @@ public final class ScriptAlertChannelFactory implements AlertChannelFactory {
                         .addValidate(Validate.newBuilder()
                                 .setType(DataType.NUMBER.getDataType())
                                 .setRequired(false)
-                                .setMin(0D)
+                                .setMin(1D)
                                 .build())
                         .build();
 

@@ -32,8 +32,9 @@ public class ProcessUtilsTest {
         String javaBin = getJavaBin();
         String[] cmd = {javaBin, "-cp", System.getProperty("java.class.path"),
                 ProcessUtilsTest.class.getName() + "$SimpleMain"};
-        int code = ProcessUtils.executeScript(60, cmd);
-        Assertions.assertNotEquals(ProcessUtils.EXECUTE_ERROR_EXIT_CODE, code);
+        ProcessUtils.ProcessExecutionResult executionResult = ProcessUtils.executeScript(60, cmd);
+        Assertions.assertFalse(executionResult.isTimedOut());
+        Assertions.assertEquals(0, executionResult.getExitCode());
     }
 
     @Test
@@ -41,8 +42,9 @@ public class ProcessUtilsTest {
         String javaBin = getJavaBin();
         String[] sleepCmd = {javaBin, "-cp", System.getProperty("java.class.path"),
                 ProcessUtilsTest.class.getName() + "$SleepMain"};
-        int code = ProcessUtils.executeScript(2, sleepCmd);
-        Assertions.assertEquals(ProcessUtils.EXECUTE_TIMEOUT_EXIT_CODE, code);
+        ProcessUtils.ProcessExecutionResult executionResult = ProcessUtils.executeScript(2, sleepCmd);
+        Assertions.assertTrue(executionResult.isTimedOut());
+        Assertions.assertNull(executionResult.getExitCode());
     }
 
     private static String getJavaBin() {

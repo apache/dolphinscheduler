@@ -31,9 +31,13 @@ done
 # Set the exit code according to your execution result, and alert needs to use it to judge the status of this alarm result
 
 
-if  [ "$t" = "error msg title" ]
-   then
-     exit 12
+if [ "$t" = "error msg title" ]; then
+    exit 12
 fi
-exit 0
+
+if [ "$t" = "timeout msg title" ]; then
+    sleep 30
+    exit 0
+fi
+
 exit 0

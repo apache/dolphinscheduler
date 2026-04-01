@@ -115,17 +115,24 @@ public final class ScriptSender {
 
         String[] cmd = {"/bin/sh", "-c", scriptPath + ALERT_TITLE_OPTION + "'" + title + "'" + ALERT_CONTENT_OPTION
                 + "'" + content + "'" + ALERT_USER_PARAMS_OPTION + "'" + userParams + "'"};
-        int exitCode = ProcessUtils.executeScript(timeout, cmd);
+        ProcessUtils.ProcessExecutionResult executionResult = ProcessUtils.executeScript(timeout, cmd);
 
-        if (exitCode == 0) {
+        if (executionResult.isTimedOut()) {
+            alertResult.setMessage("send script alert msg error, script execution timed out after " + timeout
+                    + " seconds");
+            log.error("send script alert msg error, script execution timed out after {} seconds", timeout);
+            return alertResult;
+        }
+
+        Integer exitCode = executionResult.getExitCode();
+        if (exitCode != null && exitCode == 0) {
             alertResult.setSuccess(true);
             alertResult.setMessage("send script alert msg success");
             return alertResult;
         }
-        if (exitCode == ProcessUtils.EXECUTE_TIMEOUT_EXIT_CODE) {
-            alertResult.setMessage("send script alert msg error, script execution timed out after " + timeout
-                    + " seconds");
-            log.error("send script alert msg error, script execution timed out after {} seconds", timeout);
+        if (exitCode == null) {
+            alertResult.setMessage("send script alert msg error");
+            log.info("send script alert msg error, execute alert script failed");
             return alertResult;
         }
         alertResult.setMessage("send script alert msg error,exitCode is " + exitCode);
@@ -134,9 +141,15 @@ public final class ScriptSender {
     }
 
     private Long parseTimeout(AlertResult alertResult) {
-        if (StringUtils.isNotEmpty(timeoutConfig)) {
+        if (StringUtils.isNotBlank(timeoutConfig)) {
             try {
-                return Long.parseLong(timeoutConfig);
+                long parsedTimeout = Long.parseLong(timeoutConfig.trim());
+                if (parsedTimeout <= 0) {
+                    log.warn("Invalid script timeout config value: '{}'", timeoutConfig);
+                    alertResult.setMessage("script timeout config must be greater than 0");
+                    return null;
+                }
+                return parsedTimeout;
             } catch (NumberFormatException ex) {
                 log.warn("Invalid script timeout config value: '{}'", timeoutConfig, ex);
                 alertResult.setMessage("script timeout config is invalid, should be a number");

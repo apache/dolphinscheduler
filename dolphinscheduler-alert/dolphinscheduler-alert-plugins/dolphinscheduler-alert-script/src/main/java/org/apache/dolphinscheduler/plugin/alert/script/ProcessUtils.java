@@ -18,12 +18,44 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public final class ProcessUtils {
+
+    public static final class ProcessExecutionResult {
+
+        private final Integer exitCode;
+        private final boolean timedOut;
+
+        private ProcessExecutionResult(Integer exitCode, boolean timedOut) {
+            this.exitCode = exitCode;
+            this.timedOut = timedOut;
+        }
+
+        public Integer getExitCode() {
+            return exitCode;
+        }
+
+        public boolean isTimedOut() {
+            return timedOut;
+        }
+
+        static ProcessExecutionResult success(int exitCode) {
+            return new ProcessExecutionResult(exitCode, false);
+        }
+
+        static ProcessExecutionResult timeout() {
+            return new ProcessExecutionResult(null, true);
+        }
+
+        static ProcessExecutionResult error() {
+            return new ProcessExecutionResult(null, false);
+        }
+    }
 
     static final int EXECUTE_ERROR_EXIT_CODE = 125;
     static final int EXECUTE_TIMEOUT_EXIT_CODE = 124;
@@ -37,18 +69,21 @@ public final class ProcessUtils {
      *
      * @param timeoutSeconds timeout in seconds, if <= 0 waits indefinitely
      * @param cmd cmd params
-    * @return exit code, 125 if internal error, 124 if timeout
+     * @return execution result
      */
-    static Integer executeScript(long timeoutSeconds, String... cmd) {
-
-        int exitCode = EXECUTE_ERROR_EXIT_CODE;
+    static ProcessExecutionResult executeScript(long timeoutSeconds, String... cmd) {
 
         ProcessBuilder processBuilder = new ProcessBuilder(cmd);
+        Process process = null;
+        StreamGobbler inputStreamGobbler = null;
+        StreamGobbler errorStreamGobbler = null;
         try {
-            Process process = processBuilder.start();
-            StreamGobbler inputStreamGobbler = new StreamGobbler(process.getInputStream());
-            StreamGobbler errorStreamGobbler = new StreamGobbler(process.getErrorStream());
+            process = processBuilder.start();
+            inputStreamGobbler = new StreamGobbler(process.getInputStream());
+            errorStreamGobbler = new StreamGobbler(process.getErrorStream());
 
+            inputStreamGobbler.setDaemon(true);
+            errorStreamGobbler.setDaemon(true);
             inputStreamGobbler.start();
             errorStreamGobbler.start();
 
@@ -57,29 +92,27 @@ public final class ProcessUtils {
                 if (!finished) {
                     log.error("script execution timed out after {} seconds, destroying process", timeoutSeconds);
                     process.destroyForcibly();
-                    closeProcessStreams(process);
-                    joinGobbler(inputStreamGobbler);
-                    joinGobbler(errorStreamGobbler);
-                    return EXECUTE_TIMEOUT_EXIT_CODE;
+                    return ProcessExecutionResult.timeout();
                 }
             } else {
                 process.waitFor();
             }
-            int processExitCode = process.exitValue();
+            return ProcessExecutionResult.success(process.exitValue());
+        } catch (IOException | InterruptedException e) {
+            log.error("execute alert script error {}", e.getMessage());
+            Thread.currentThread().interrupt();
+            return ProcessExecutionResult.error();
+        } finally {
+            closeProcessStreams(process);
             joinGobbler(inputStreamGobbler);
             joinGobbler(errorStreamGobbler);
-            return processExitCode;
-        } catch (InterruptedException e) {
-            log.error("execute alert script interrupted {}", e.getMessage());
-            Thread.currentThread().interrupt();
-        } catch (IOException e) {
-            log.error("execute alert script error {}", e.getMessage());
         }
-
-        return exitCode;
     }
 
     private static void closeProcessStreams(Process process) {
+        if (Objects.isNull(process)) {
+            return;
+        }
         try {
             process.getInputStream().close();
         } catch (IOException e) {
@@ -93,9 +126,11 @@ public final class ProcessUtils {
     }
 
     private static void joinGobbler(StreamGobbler gobbler) {
+        if (gobbler == null) {
+            return;
+        }
         try {
-            gobbler.interrupt();
-            gobbler.join(TimeUnit.SECONDS.toMillis(1));
+            gobbler.join();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
