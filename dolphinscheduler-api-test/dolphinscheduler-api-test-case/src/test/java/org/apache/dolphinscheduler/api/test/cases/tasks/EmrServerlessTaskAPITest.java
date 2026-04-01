@@ -140,4 +140,45 @@ public class EmrServerlessTaskAPITest {
             Assertions.fail();
         }
     }
+
+    @Test
+    @Order(2)
+    public void testEmrServerlessFailedWorkflowInstance() {
+        try {
+            String workflowDefinitionName = "test_emr_serverless_failed_" + System.currentTimeMillis();
+
+            // upload failed workflow definition json
+            ClassLoader classLoader = getClass().getClassLoader();
+            File file = new File(classLoader
+                    .getResource("workflow-json/task-emr-serverless/emrServerlessFailedWorkflow.json").getFile());
+            HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
+                    .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+            Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
+
+            // get workflow definition code
+            HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
+                    workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+            Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
+            long failedWorkflowDefinitionCode =
+                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
+                            .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
+
+            // release
+            HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(
+                    loginUser, projectCode, failedWorkflowDefinitionCode, ReleaseState.ONLINE);
+            Assertions.assertTrue(releaseWorkflowDefinitionResponse.getBody().getSuccess());
+
+            // trigger
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date date = new Date();
+            String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
+            HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
+                    failedWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+            Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
+
+        } catch (Exception e) {
+            log.error("failed", e);
+            Assertions.fail();
+        }
+    }
 }

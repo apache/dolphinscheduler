@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPattern": "/applications/.*/jobruns/.*"
+    "urlPattern": "/applications/.*/jobruns/test-job-run-id-success"
   },
   "response": {
     "status": 200,
@@ -11,9 +11,9 @@
     "jsonBody": {
       "jobRun": {
         "applicationId": "test-app-id-123",
-        "jobRunId": "test-job-run-id-001",
+        "jobRunId": "test-job-run-id-success",
         "name": "test name",
-        "arn": "arn:aws:emr-serverless:us-east-1:123456789012:/applications/test-app-id-123/jobruns/test-job-run-id-001",
+        "arn": "arn:aws:emr-serverless:us-east-1:123456789012:/applications/test-app-id-123/jobruns/test-job-run-id-success",
         "createdBy": "arn:aws:iam::123456789012:role/EMRServerlessExecutionRole",
         "createdAt": "2024-01-01T00:00:00Z",
         "updatedAt": "2024-01-01T00:01:00Z",
