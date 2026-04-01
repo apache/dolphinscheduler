@@ -57,9 +57,6 @@ public final class ProcessUtils {
         }
     }
 
-    static final int EXECUTE_ERROR_EXIT_CODE = 125;
-    static final int EXECUTE_TIMEOUT_EXIT_CODE = 124;
-
     private ProcessUtils() {
         throw new UnsupportedOperationException("This is a utility class and cannot be instantiated");
     }
