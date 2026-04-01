@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, ref, toRefs } from 'vue'
-import { NGrid, NGi, NCard, NSpace, NTag } from 'naive-ui'
+import { defineComponent, h, onMounted, ref, toRefs } from 'vue'
+import { NButton, NGrid, NGi, NCard, NIcon, NModal, NSpace, NTag } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useWorker } from './use-worker'
 import styles from './index.module.scss'
@@ -28,11 +28,19 @@ import type { Ref } from 'vue'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import type { WorkerNode } from '@/service/modules/monitor/types'
 import { capitalize } from 'lodash'
+import {
+  DashboardOutlined,
+  HddOutlined,
+  DatabaseOutlined,
+  BarsOutlined
+} from '@vicons/antd'
 
 const worker = defineComponent({
   name: 'worker',
   setup() {
     const showModalRef = ref(false)
+    const showDiskDetailModalRef = ref(false)
+    const diskDetailListRef: Ref<Array<any>> = ref([])
     const { t } = useI18n()
     const { variables, getTableWorker } = useWorker()
     const zkDirectoryRef: Ref<Array<RowData>> = ref([])
@@ -50,18 +58,42 @@ const worker = defineComponent({
       getTableWorker()
     })
 
+    const openDiskDetails = (details: any[]) => {
+      diskDetailListRef.value = details || []
+      showDiskDetailModalRef.value = true
+    }
+
+    const setDiskDetailModalShow = (v: boolean) => {
+      showDiskDetailModalRef.value = v
+      if (!v) {
+        diskDetailListRef.value = []
+      }
+    }
+
     return {
       t,
       ...toRefs(variables),
       clickDetails,
       onConfirmModal,
       showModalRef,
-      zkDirectoryRef
+      zkDirectoryRef,
+      showDiskDetailModalRef,
+      diskDetailListRef,
+      openDiskDetails,
+      setDiskDetailModalShow
     }
   },
   render() {
-    const { t, clickDetails, onConfirmModal, showModalRef, zkDirectoryRef } =
-      this
+    const {
+      t,
+      clickDetails,
+      onConfirmModal,
+      showModalRef,
+      zkDirectoryRef,
+      showDiskDetailModalRef,
+      diskDetailListRef,
+      openDiskDetails
+    } = this
 
     const renderNodeServerStatusTag = (item: WorkerNode) => {
       const serverStatus = JSON.parse(item.heartBeatInfo)?.serverStatus
@@ -86,6 +118,11 @@ const worker = defineComponent({
       <>
         <NSpace vertical size={25}>
           {this.data.map((item: WorkerNode) => {
+            const heartBeatInfo = item?.heartBeatInfo
+              ? JSON.parse(item.heartBeatInfo)
+              : {}
+            const diskUsageDetails = heartBeatInfo?.diskUsageDetails || []
+
             return (
               <NSpace vertical>
                 <NCard>
@@ -120,12 +157,21 @@ const worker = defineComponent({
                 </NCard>
                 <NGrid x-gap='12' cols='4'>
                   <NGi>
-                    <Card title={t('monitor.worker.cpu_usage')}>
-                      <div class={styles.card}>
+                    <Card
+                      title={
+                        <span class={styles.metricTitle}>
+                          <NIcon size={16}>
+                            <DashboardOutlined />
+                          </NIcon>
+                          {t('monitor.worker.cpu_usage')}
+                        </span>
+                      }
+                    >
+                      <div class={styles.metricCard}>
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.heartBeatInfo).cpuUsage * 100
+                              heartBeatInfo.cpuUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -133,12 +179,21 @@ const worker = defineComponent({
                     </Card>
                   </NGi>
                   <NGi>
-                    <Card title={t('monitor.worker.memory_usage')}>
-                      <div class={styles.card}>
+                    <Card
+                      title={
+                        <span class={styles.metricTitle}>
+                          <NIcon size={16}>
+                            <DatabaseOutlined />
+                          </NIcon>
+                          {t('monitor.worker.memory_usage')}
+                        </span>
+                      }
+                    >
+                      <div class={styles.metricCard}>
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.heartBeatInfo).memoryUsage * 100
+                              heartBeatInfo.memoryUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -146,26 +201,58 @@ const worker = defineComponent({
                     </Card>
                   </NGi>
                   <NGi>
-                    <Card title={t('monitor.worker.disk_usage')}>
-                      <div class={[styles.card]}>
+                    <Card
+                      title={
+                        <span class={styles.metricTitle}>
+                          <NIcon size={16}>
+                            <HddOutlined />
+                          </NIcon>
+                          {t('monitor.worker.disk_usage')}
+                        </span>
+                      }
+                    >
+                      <div class={styles.metricCard}>
                         {item && (
-                          <Gauge
-                            data={(
-                              JSON.parse(item.heartBeatInfo).diskUsage * 100
-                            ).toFixed(2)}
-                          />
+                          <div class={styles.metricCardInner}>
+                            <Gauge
+                              data={(
+                                heartBeatInfo.diskUsage * 100
+                              ).toFixed(2)}
+                            />
+                            {diskUsageDetails.length > 0 && (
+                              <div class={styles.metricAction}>
+                                <NButton
+                                  size='small'
+                                  tertiary
+                                  onClick={() => {
+                                    openDiskDetails(diskUsageDetails)
+                                  }}
+                                >
+                                  {t('monitor.worker.disk_usage_detail')}
+                                </NButton>
+                              </div>
+                            )}
+                          </div>
                         )}
                       </div>
                     </Card>
                   </NGi>
                   <NGi>
-                    <Card title={t('monitor.worker.thread_pool_usage')}>
-                      <div class={[styles.card]}>
+                    <Card
+                      title={
+                        <span class={styles.metricTitle}>
+                          <NIcon size={16}>
+                            <BarsOutlined />
+                          </NIcon>
+                          {t('monitor.worker.thread_pool_usage')}
+                        </span>
+                      }
+                    >
+                      <div class={styles.metricCard}>
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.heartBeatInfo).threadPoolUsage *
-                              100
+                              heartBeatInfo.threadPoolUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -182,6 +269,38 @@ const worker = defineComponent({
           data={zkDirectoryRef}
           onConfirmModal={onConfirmModal}
         />
+        <NModal
+          show={showDiskDetailModalRef}
+          maskClosable
+          preset='card'
+          style={{ width: '520px' }}
+          title={t('monitor.worker.data_disk_usage')}
+          onUpdateShow={this.setDiskDetailModalShow}
+        >
+          <NSpace vertical size={8}>
+            {diskDetailListRef.length === 0 &&
+              t('monitor.worker.data_disk_usage_empty')}
+            {diskDetailListRef.map((d: any) =>
+              h(
+                NSpace,
+                { justify: 'space-between' },
+                {
+                  default: () => [
+                    h('span', d.diskPath || '-'),
+                    h(
+                      NTag,
+                      { type: 'info', size: 'small' },
+                      {
+                        default: () =>
+                          `${((d.usedPercentage || 0) * 100).toFixed(2)}%`
+                      }
+                    )
+                  ]
+                }
+              )
+            )}
+          </NSpace>
+        </NModal>
       </>
     )
   }

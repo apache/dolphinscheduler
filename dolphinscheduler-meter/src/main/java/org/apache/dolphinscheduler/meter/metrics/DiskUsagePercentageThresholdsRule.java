@@ -15,44 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.model;
-
-import org.apache.dolphinscheduler.common.enums.ServerStatus;
-
-import java.util.List;
+package org.apache.dolphinscheduler.meter.metrics;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 @Data
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BaseHeartBeat implements HeartBeat {
+public class DiskUsagePercentageThresholdsRule {
 
-    protected int processId;
-    protected long startupTime;
-    protected long reportTime;
-    protected double jvmCpuUsage;
-    protected double cpuUsage;
-    protected double jvmMemoryUsage;
-    private double jvmHeapUsed;
-    private double jvmNonHeapUsed;
-    private double jvmHeapMax;
-    private double jvmNonHeapMax;
-    protected double memoryUsage;
-    protected double diskUsage;
     /**
-     * Fine-grained disk usage details for specific paths (optional).
-     *
-     * <p>For backward compatibility, this field may be absent in older heartbeat payloads.</p>
+     * The disk path to monitor.
      */
-    protected List<DiskUsageDetail> diskUsageDetails;
-    protected ServerStatus serverStatus;
+    private String diskPath;
 
-    protected String host;
-    protected int port;
-
+    /**
+     * Overload threshold in range [0,1], e.g. 0.9 means 90% used.
+     */
+    private double usagePercentageThresholds;
 }

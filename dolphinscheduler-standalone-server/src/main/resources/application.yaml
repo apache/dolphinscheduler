@@ -236,7 +236,16 @@ worker:
     # Worker max System memory usage , when the worker's system memory usage is smaller then this value, worker server can be dispatched tasks.
     max-system-memory-usage-percentage-thresholds: 0.8
     # Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
+    # Deprecated: Use max-disk-usage-percentage-thresholds-rules instead
     max-disk-usage-percentage-thresholds: 0.8
+    # Worker disk usage threshold rules for monitoring multiple paths
+    # Example:
+    # max-disk-usage-percentage-thresholds-rules:
+    #   - disk-path: /data1
+    #     usage-percentage-thresholds: 0.9
+    #   - disk-path: /data2
+    #     usage-percentage-thresholds: 0.8
+    max-disk-usage-percentage-thresholds-rules: []
   physical-task-config:
     # The number of threads in the Physical task engine that used to execute tasks
     task-executor-thread-size: 100

@@ -738,6 +738,12 @@ worker:
     WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.7
     # -- Worker max disk usage , when the worker's disk usage is smaller then this value, worker server can be dispatched tasks.
     WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.7
+    # -- Worker disk usage threshold rules for monitoring multiple paths (Deprecated: use global disk thresholds if rules are not set)
+    # -- Example:
+    # WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS_RULES_0_DISK_PATH: "/data1"
+    # WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS_RULES_0_USAGE_PERCENTAGE_THRESHOLDS: 0.9
+    # WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS_RULES_1_DISK_PATH: "/data2"
+    # WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS_RULES_1_USAGE_PERCENTAGE_THRESHOLDS: 0.8
     # -- Worker execute thread number to limit task instances
     WORKER_EXEC_THREADS: "100"
     # -- Worker heartbeat interval

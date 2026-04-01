@@ -30,7 +30,8 @@ const headerExtraStyle = {}
 
 const props = {
   title: {
-    type: String as PropType<string>
+    // Naive UI supports string/vnode title, keep backward compatible.
+    type: [String, Object] as PropType<any>
   },
   headerStyle: {
     type: String as PropType<string | CSSProperties>

@@ -386,3 +386,16 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | zookeeper.persistence.size | string | `"20Gi"` | PersistentVolumeClaim size |
 | zookeeper.persistence.storageClass | string | `"-"` | ZooKeeper data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
 | zookeeper.service.port | int | `2181` | The port of zookeeper |
+
+## Worker disk usage threshold rules
+
+You can configure fine-grained disk usage overload protection rules by using indexed environment variables.
+
+Example:
+
+```bash
+WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS_RULES_0_DISK_PATH=/data1
+WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS_RULES_0_USAGE_PERCENTAGE_THRESHOLDS=0.9
+WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS_RULES_1_DISK_PATH=/data2
+WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS_RULES_1_USAGE_PERCENTAGE_THRESHOLDS=0.8
+```
