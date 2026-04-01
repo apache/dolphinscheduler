@@ -28,7 +28,6 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETE
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_DEFINITION_NAME;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.PARAMETER_WORKFLOW_INSTANCE_ID;
 
-import org.apache.dolphinscheduler.common.constants.CommandKeyConstants;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.DateConstants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -47,7 +46,6 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 
@@ -63,8 +61,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -136,30 +132,6 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             }
         }
         return GlobalParameterUtils.serializeGlobalParameter(globalParamList);
-    }
-
-    @Override
-    public Map<String, Property> parseWorkflowStartParam(@Nullable Map<String, String> cmdParam) {
-        if (cmdParam == null || !cmdParam.containsKey(CommandKeyConstants.CMD_PARAM_START_PARAMS)) {
-            return new HashMap<>();
-        }
-        String startParamJson = cmdParam.get(CommandKeyConstants.CMD_PARAM_START_PARAMS);
-        List<Property> propertyList = PropertyUtils.startParamsTransformPropertyList(startParamJson);
-        if (CollectionUtils.isEmpty(propertyList)) {
-            return new HashMap<>();
-        }
-        return propertyList.stream().collect(Collectors.toMap(Property::getProp, Function.identity()));
-    }
-
-    @Override
-    public Map<String, Property> parseWorkflowFatherParam(@Nullable Map<String, String> cmdParam) {
-        if (cmdParam == null || !cmdParam.containsKey(CommandKeyConstants.CMD_PARAM_FATHER_PARAMS)) {
-            return new HashMap<>();
-        }
-        String startParamJson = cmdParam.get(CommandKeyConstants.CMD_PARAM_FATHER_PARAMS);
-        Map<String, String> startParamMap = JSONUtils.toMap(startParamJson);
-        return startParamMap.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-                entry -> new Property(entry.getKey(), Direct.IN, DataType.VARCHAR, entry.getValue())));
     }
 
     /**
