@@ -62,17 +62,9 @@ import com.aliyun.oss.model.PutObjectRequest;
 @Slf4j
 public class OssStorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
 
-    private String accessKeyId;
-
-    private String accessKeySecret;
-
     private String region;
 
     private String bucketName;
-
-    private String endPoint;
-
-    private OssConnection ossConnection;
 
     private OSS ossClient;
 
@@ -82,25 +74,12 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
     }
 
     private void init() {
-        this.accessKeyId = readOssAccessKeyID();
-        this.accessKeySecret = readOssAccessKeySecret();
-        this.endPoint = readOssEndPoint();
+        final String accessKeyId = readOssAccessKeyID();
+        final String accessKeySecret = readOssAccessKeySecret();
+        final String endPoint = readOssEndPoint();
         this.region = readOssRegion();
         this.bucketName = readOssBucketName();
-        this.ossConnection = buildOssConnection();
-        this.ossClient = buildOssClient();
-        ensureBucketSuccessfullyCreated(bucketName);
-    }
-
-    // TODO: change to use the following init method after DS supports Configuration / Connection Center
-    public void init(OssConnection ossConnection) {
-        this.accessKeyId = readOssAccessKeyID();
-        this.accessKeySecret = readOssAccessKeySecret();
-        this.endPoint = readOssEndPoint();
-        this.region = readOssRegion();
-        this.bucketName = readOssBucketName();
-        this.ossConnection = ossConnection;
-        this.ossClient = buildOssClient();
+        this.ossClient = OssClientFactory.buildOssClient(new OssConnection(accessKeyId, accessKeySecret, endPoint));
         ensureBucketSuccessfullyCreated(bucketName);
     }
 
@@ -122,10 +101,6 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
 
     protected String readOssEndPoint() {
         return PropertyUtils.getString(StorageConstants.ALIBABA_CLOUD_OSS_END_POINT);
-    }
-
-    protected OssConnection buildOssConnection() {
-        return new OssConnection(accessKeyId, accessKeySecret, endPoint);
     }
 
     @Override
@@ -311,7 +286,7 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
         return transformOSSObjectToStorageEntity(object);
     }
 
-    public void ensureBucketSuccessfullyCreated(String bucketName) {
+    private void ensureBucketSuccessfullyCreated(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
             throw new IllegalArgumentException("resource.alibaba.cloud.oss.bucket.name is empty");
         }
@@ -324,11 +299,6 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
 
         log.info("bucketName: {} has been found, the current regionName is {}", bucketName, region);
     }
-
-    protected OSS buildOssClient() {
-        return OssClientFactory.buildOssClient(ossConnection);
-    }
-
     protected StorageEntity transformOSSObjectToStorageEntity(OSSObject ossObject) {
         ResourceMetadata resourceMetaData = getResourceMetaData(ossObject.getKey());
 
