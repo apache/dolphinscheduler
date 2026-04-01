@@ -137,68 +137,6 @@ public class WorkflowAlertManager {
     }
 
     /**
-     * getting worker fault tolerant content
-     *
-     * @param workflowInstance workflow instance
-     * @param toleranceTaskList tolerance task list
-     * @return worker tolerance content
-     */
-    private String getWorkerToleranceContent(WorkflowInstance workflowInstance, List<TaskInstance> toleranceTaskList) {
-
-        List<WorkflowAlertContent> toleranceTaskInstanceList = new ArrayList<>();
-
-        WorkflowDefinitionLog workflowDefinitionLog = workflowDefinitionLogDao
-                .queryByDefinitionCodeAndVersion(workflowInstance.getWorkflowDefinitionCode(),
-                        workflowInstance.getWorkflowDefinitionVersion());
-        String modifyBy = "";
-        if (workflowDefinitionLog != null) {
-            User operator = userDao.queryById(workflowDefinitionLog.getOperator());
-            modifyBy = operator == null ? "" : operator.getUserName();
-        }
-
-        for (TaskInstance taskInstance : toleranceTaskList) {
-            WorkflowAlertContent workflowAlertContent = WorkflowAlertContent.builder()
-                    .workflowInstanceId(workflowInstance.getId())
-                    .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
-                    .workflowInstanceName(workflowInstance.getName())
-                    .modifyBy(modifyBy)
-                    .taskCode(taskInstance.getTaskCode())
-                    .taskName(taskInstance.getName())
-                    .taskHost(taskInstance.getHost())
-                    .taskPriority(taskInstance.getTaskInstancePriority().getDescp())
-                    .retryTimes(taskInstance.getRetryTimes())
-                    .build();
-            toleranceTaskInstanceList.add(workflowAlertContent);
-        }
-        return JSONUtils.toJsonString(toleranceTaskInstanceList);
-    }
-
-    /**
-     * send worker alert fault tolerance
-     *
-     * @param workflowInstance workflow instance
-     * @param toleranceTaskList tolerance task list
-     */
-    public void sendAlertWorkerToleranceFault(WorkflowInstance workflowInstance, List<TaskInstance> toleranceTaskList) {
-        try {
-            Alert alert = new Alert();
-            alert.setTitle("worker fault tolerance");
-            String content = getWorkerToleranceContent(workflowInstance, toleranceTaskList);
-            alert.setContent(content);
-            alert.setWarningType(WarningType.FAILURE);
-            alert.setCreateTime(new Date());
-            alert.setAlertGroupId(
-                    workflowInstance.getWarningGroupId() == null ? 1 : workflowInstance.getWarningGroupId());
-            alert.setAlertType(AlertType.FAULT_TOLERANCE_WARNING);
-            alertDao.addAlert(alert);
-
-        } catch (Exception e) {
-            log.error("send alert failed:{} ", e.getMessage());
-        }
-
-    }
-
-    /**
      * send workflow instance alert
      *
      * @param workflowInstance workflow instance
