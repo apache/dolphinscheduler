@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopol
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -77,6 +78,12 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
         workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstance.setCommandParam(command.getCommandParam());
         workflowInstance.setGlobalParams(mergeCommandParamsWithWorkflowParams(command, workflowDefinition));
+        workflowInstance.setLogPath(WorkflowLogUtils.getWorkflowInstanceLogFullPath(
+                workflowInstance.getStartTime(),
+                workflowInstance.getWorkflowDefinitionCode(),
+                workflowInstance.getWorkflowDefinitionVersion(),
+                workflowInstance.getId()));
+
         workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
     }

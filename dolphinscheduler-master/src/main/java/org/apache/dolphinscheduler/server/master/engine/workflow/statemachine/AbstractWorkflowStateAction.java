@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.policy.IWorkflo
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -108,12 +109,15 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
     protected void pauseActiveTask(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
         try {
             LogUtils.setWorkflowInstanceIdMDC(workflowExecutionRunnable.getId());
+            WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(
+                    workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance().getLogPath());
             workflowExecutionRunnable
                     .getWorkflowExecutionGraph()
                     .getActiveTaskExecutionRunnable()
                     .forEach(ITaskExecutionRunnable::pause);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
+            WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
         }
     }
 

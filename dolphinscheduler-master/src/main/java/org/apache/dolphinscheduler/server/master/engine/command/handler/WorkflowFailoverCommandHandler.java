@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopol
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -89,6 +90,12 @@ public class WorkflowFailoverCommandHandler extends AbstractCommandHandler {
         workflowInstance.setRestartTime(new Date());
         workflowInstance.setState(workflowFailoverCommandParam.getWorkflowExecutionStatus());
         workflowInstance.setHost(masterConfig.getMasterAddress());
+        workflowInstance.setLogPath(WorkflowLogUtils.getWorkflowInstanceLogFullPath(
+                workflowInstance.getRestartTime(),
+                workflowInstance.getWorkflowDefinitionCode(),
+                workflowInstance.getWorkflowDefinitionVersion(),
+                workflowInstance.getId()));
+
         workflowInstanceDao.updateById(workflowInstance);
 
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);

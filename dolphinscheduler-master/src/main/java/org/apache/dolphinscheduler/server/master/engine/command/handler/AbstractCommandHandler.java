@@ -81,6 +81,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         assembleWorkflowInstanceLifecycleListeners(workflowExecuteContextBuilder);
         assembleWorkflowEventBus(workflowExecuteContextBuilder);
         assembleWorkflowExecutionGraph(workflowExecuteContextBuilder);
+        assembleLogPath(workflowExecuteContextBuilder);
 
         final WorkflowExecutionRunnableBuilder workflowExecutionRunnableBuilder = WorkflowExecutionRunnableBuilder
                 .builder()
@@ -157,6 +158,10 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         final Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
         checkArgument(project != null, "Cannot find the project code: " + workflowDefinition.getProjectCode());
         workflowExecuteContextBuilder.setProject(project);
+    }
+
+    protected void assembleLogPath(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
+        workflowExecuteContextBuilder.setLogPath(workflowExecuteContextBuilder.getWorkflowInstance().getLogPath());
     }
 
 }

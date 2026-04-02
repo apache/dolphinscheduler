@@ -636,6 +636,7 @@ CREATE TABLE t_ds_workflow_instance
     var_pool                   longtext,
     dry_run                    int NULL DEFAULT 0,
     restart_time               datetime     DEFAULT NULL,
+    log_path                   longtext     DEFAULT NULL,
     PRIMARY KEY (id)
 );
 

@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecuto
 import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
 import java.util.Date;
@@ -93,9 +94,12 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
                     TaskExecutorMDCUtils.MDCAutoClosable ignore =
                             TaskExecutorMDCUtils.logWithMDC(taskExecutionRunnable.getId())) {
                 LogUtils.setWorkflowInstanceIdMDC(taskExecutionRunnable.getTaskInstance().getWorkflowInstanceId());
+                WorkflowLogUtils
+                        .setWorkflowInstanceLogFullPathMDC(taskExecutionRunnable.getWorkflowInstance().getLogPath());
                 doDispatchTask(taskExecutionRunnable);
             } finally {
                 LogUtils.removeWorkflowInstanceIdMDC();
+                WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
             }
         }
     }

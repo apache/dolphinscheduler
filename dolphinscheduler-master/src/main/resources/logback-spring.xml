@@ -51,6 +51,27 @@
             </appender>
         </sift>
     </appender>
+
+    <appender name="WORKFLOWLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <filter class="org.apache.dolphinscheduler.server.master.log.WorkflowLogFilter"/>
+        <Discriminator class="org.apache.dolphinscheduler.server.master.log.WorkflowLogDiscriminator">
+            <key>workflowInstanceLogFullPath</key>
+            <logBase>${log.base}/workflows</logBase>
+        </Discriminator>
+        <sift>
+            <appender name="FILE-${workflowInstanceLogFullPath}" class="ch.qos.logback.core.FileAppender">
+                <file>${workflowInstanceLogFullPath}</file>
+                <encoder>
+                    <pattern>
+                        %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{10}:[%line] - %message%n
+                    </pattern>
+                    <charset>UTF-8</charset>
+                </encoder>
+                <append>true</append>
+            </appender>
+        </sift>
+    </appender>
+
     <appender name="MASTERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${log.base}/dolphinscheduler-master.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
@@ -75,6 +96,7 @@
             </then>
         </if>
         <appender-ref ref="TASKLOGFILE"/>
+        <appender-ref ref="WORKFLOWLOGFILE"/>
         <appender-ref ref="MASTERLOGFILE"/>
     </root>
 </configuration>

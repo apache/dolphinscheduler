@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.rpc;
 
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.ITaskInstanceController;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskGroupSlotAcquireSuccessNotifyRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.TaskGroupSlotAcquireSuccessNotifyResponse;
@@ -25,6 +26,7 @@ import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,6 +48,9 @@ public class TaskInstanceControllerImpl implements ITaskInstanceController {
             final int workflowInstanceId = taskGroupSlotAcquireSuccessNotifyRequest.getWorkflowInstanceId();
             final int taskInstanceId = taskGroupSlotAcquireSuccessNotifyRequest.getTaskInstanceId();
             LogUtils.setWorkflowAndTaskInstanceIDMDC(workflowInstanceId, taskInstanceId);
+            WorkflowInstance workflowInstance =
+                    workflowExecutionRunnableMemoryRepository.get(workflowInstanceId).getWorkflowInstance();
+            WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(workflowInstance.getLogPath());
             final IWorkflowExecutionRunnable workflowExecutionRunnable =
                     workflowExecutionRunnableMemoryRepository.get(workflowInstanceId);
             if (workflowExecutionRunnable == null) {
@@ -68,6 +73,7 @@ public class TaskInstanceControllerImpl implements ITaskInstanceController {
             return TaskGroupSlotAcquireSuccessNotifyResponse.success();
         } finally {
             LogUtils.removeWorkflowAndTaskInstanceIdMDC();
+            WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
         }
     }
 }

@@ -584,6 +584,7 @@ CREATE TABLE t_ds_workflow_instance (
   dry_run int DEFAULT '0' ,
   next_workflow_instance_id int DEFAULT '0',
   restart_time timestamp DEFAULT NULL ,
+  log_path text DEFAULT NULL ,
   PRIMARY KEY (id)
 ) ;
 
