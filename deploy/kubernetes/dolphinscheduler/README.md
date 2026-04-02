@@ -12,6 +12,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| global.security.allowInsecureImages | bool | `true` | Allow using non-standard container images (required for bitnamilegacy images). |
 | alert.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | alert.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
 | alert.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-alert/dolphinscheduler-alert-server/src/main/resources/application.yaml |
@@ -272,18 +273,18 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | mysql.primary.persistence.enabled | bool | `false` | Set mysql.primary.persistence.enabled to true to mount a new volume for internal MySQL |
 | mysql.primary.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
 | mysql.primary.persistence.storageClass | string | `"-"` | MySQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
+| postgresql.auth.database | string | `"dolphinscheduler"` | The database for internal PostgreSQL |
+| postgresql.auth.password | string | `"root"` | The password for internal PostgreSQL |
+| postgresql.auth.username | string | `"root"` | The username for internal PostgreSQL |
 | postgresql.driverClassName | string | `"org.postgresql.Driver"` | The driverClassName for internal PostgreSQL |
 | postgresql.enabled | bool | `true` | If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL |
 | postgresql.image.registry | string | `"docker.io"` |  |
 | postgresql.image.repository | string | `"bitnamilegacy/postgresql"` |  |
-| postgresql.image.tag | string | `"11.11.0"` |  |
+| postgresql.image.tag | string | `"15.1.0-debian-11-r12"` |  |
 | postgresql.params | string | `"characterEncoding=utf8"` | The params for internal PostgreSQL |
-| postgresql.persistence.enabled | bool | `false` | Set postgresql.persistence.enabled to true to mount a new volume for internal PostgreSQL |
-| postgresql.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
-| postgresql.persistence.storageClass | string | `"-"` | PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
-| postgresql.postgresqlDatabase | string | `"dolphinscheduler"` | The database for internal PostgreSQL |
-| postgresql.postgresqlPassword | string | `"root"` | The password for internal PostgreSQL |
-| postgresql.postgresqlUsername | string | `"root"` | The username for internal PostgreSQL |
+| postgresql.primary.persistence.enabled | bool | `false` | Set postgresql.primary.persistence.enabled to true to mount a new volume for internal PostgreSQL |
+| postgresql.primary.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
+| postgresql.primary.persistence.storageClass | string | `"-"` | PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
 | registryEtcd.authority | string | `""` | Etcd authority |
 | registryEtcd.enabled | bool | `false` | If you want to use Etcd for your registry center, change this value to true. And set zookeeper.enabled to false |
 | registryEtcd.endpoints | string | `""` | Etcd endpoints |

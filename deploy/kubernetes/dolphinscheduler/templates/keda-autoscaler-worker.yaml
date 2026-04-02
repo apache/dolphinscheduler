@@ -46,8 +46,8 @@ spec:
       metadata:
         host: {{ template "dolphinscheduler.postgresql.fullname" . }}.{{ .Release.Namespace }}.svc.cluster.local
         port: "5432"
-        dbName: {{ .Values.postgresql.postgresqlDatabase }}
-        userName: {{ .Values.postgresql.postgresqlUsername }}
+        dbName: {{ .Values.postgresql.auth.database }}
+        userName: {{ .Values.postgresql.auth.username }}
         passwordFromEnv: SPRING_DATASOURCE_PASSWORD
         sslmode: "disable"
         targetQueryValue: "1"

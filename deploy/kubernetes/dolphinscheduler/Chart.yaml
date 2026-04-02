@@ -43,13 +43,8 @@ appVersion: 3.1.0
 
 dependencies:
 - name: postgresql
-  version: 10.3.18
-  # Due to a change in the Bitnami repo, https://charts.bitnami.com/bitnami was truncated only
-  # containing entries for the latest 6 months (from January 2022 on).
-  # This URL: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
-  # contains the full 'index.yaml'.
-  # See detail here: https://github.com/bitnami/charts/issues/10833
-  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  version: 12.1.5
+  repository: https://charts.bitnami.com/bitnami
   condition: postgresql.enabled
 - name: zookeeper
   version: 11.4.11
