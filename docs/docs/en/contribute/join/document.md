@@ -20,15 +20,6 @@ git clone https://github.com/<your-github-user-name>/dolphinscheduler-website
    2.2. Run `./scripts/prepare_docs.sh` prepare all related resources, for more information you could see [how prepare script work](https://github.com/apache/dolphinscheduler-website/blob/master/HOW_PREPARE_WORK.md)
 3. Run `yarn generate` in the root directory to format and prepare the data.
 4. Run `yarn dev` in the root directory to start a local server, you will see the website in 'http://localhost:3000'.
-
-```
-Note: if you clone the code in Windows, not Mac or Linux. Please read the details below.
-If you execute the commands like the two steps above, you will get the exception "UnhandledPromiseRejectionWarning: Error: EPERM: operation not permitted, symlink '2.0.3' -> 'latest'".
-If you get the exception "Can't resolve 'antd' in xxx",you can run `yarn add antd` and `yarn install`.
-Because the `./scripts/prepare_docs.sh` command requires a Linux environment, if you are on a Windows system, you can use WSL to complete this step.
-When you encounter this problem. You can run the two steps in cmd.exe as an administrator on your Windows system.
-```
-
 5. Run `yarn build` to build source code, this will automatically generate a directory called `build`, wait for the execution to complete and into `build` directory.
 6. Verify your change locally: `python -m SimpleHTTPServer 8000`, when your python version is 3 use :`python3 -m http.server 8000` instead.
 
