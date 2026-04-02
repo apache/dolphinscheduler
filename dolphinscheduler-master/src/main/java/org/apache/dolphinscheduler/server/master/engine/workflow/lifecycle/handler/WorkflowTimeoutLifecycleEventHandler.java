@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.hand
 
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTimeoutLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
@@ -46,12 +45,6 @@ public class WorkflowTimeoutLifecycleEventHandler
     public void handle(final IWorkflowStateAction workflowStateAction,
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final WorkflowTimeoutLifecycleEvent workflowTimeoutLifecycleEvent) {
-        final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecutionRunnable.getWorkflowExecutionGraph();
-        if (workflowExecutionGraph.isAllTaskExecutionRunnableChainFinish()) {
-            // all the TaskExecutionRunnable chain in the graph is finish, means the workflow is already finished.
-            return;
-        }
-
         final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
         final boolean shouldSendAlert = workflowInstance.getWarningGroupId() != null;
 
