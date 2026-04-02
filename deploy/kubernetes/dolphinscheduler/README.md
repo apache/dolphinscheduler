@@ -12,6 +12,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| global.security.allowInsecureImages | bool | `true` | Allow using non-standard container images (required for bitnamilegacy images). This is required because the new Bitnami charts verify image signatures. |
 | alert.affinity | object | `{}` | Affinity is a group of affinity scheduling rules. If specified, the pod's scheduling constraints. More info: [node-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#node-affinity) |
 | alert.annotations | object | `{}` | You can use annotations to attach arbitrary non-identifying metadata to objects. Clients such as tools and libraries can retrieve this metadata. |
 | alert.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-alert/dolphinscheduler-alert-server/src/main/resources/application.yaml |
@@ -381,7 +382,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | zookeeper.fourlwCommandsWhitelist | string | `"srvr,ruok,wchs,cons"` | A list of comma separated Four Letter Words commands to use |
 | zookeeper.image.registry | string | `"docker.io"` |  |
 | zookeeper.image.repository | string | `"bitnamilegacy/zookeeper"` |  |
-| zookeeper.image.tag | string | `"3.8.4"` |  |
+| zookeeper.image.tag | string | `"3.9.3-debian-12-r21"` |  |
 | zookeeper.persistence.enabled | bool | `false` | Set `zookeeper.persistence.enabled` to true to mount a new volume for internal ZooKeeper |
 | zookeeper.persistence.size | string | `"20Gi"` | PersistentVolumeClaim size |
 | zookeeper.persistence.storageClass | string | `"-"` | ZooKeeper data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |

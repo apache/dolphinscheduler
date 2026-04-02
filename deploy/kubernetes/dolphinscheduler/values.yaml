@@ -19,6 +19,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Global settings for Bitnami subcharts
+global:
+  security:
+    # -- Allow using non-standard container images (required for bitnamilegacy images)
+    allowInsecureImages: true
+
 # -- World time and date for cities in all time zones
 timezone: "Asia/Shanghai"
 
@@ -163,7 +169,7 @@ zookeeper:
   image:
     registry: docker.io
     repository: bitnamilegacy/zookeeper
-    tag: 3.8.4
+    tag: 3.9.3-debian-12-r21
 
 registryEtcd:
   # -- If you want to use Etcd for your registry center, change this value to true. And set zookeeper.enabled to false
