@@ -330,6 +330,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.info("Save workflow definition complete, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                     workflowDefinition.getCode(), insertVersion);
         }
+        workflowDefinition.setVersion(insertVersion);
         int insertResult = processService.saveTaskRelation(loginUser, workflowDefinition.getProjectCode(),
                 workflowDefinition.getCode(),
                 insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
@@ -822,6 +823,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                         "Update workflow definition complete, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                         workflowDefinition.getCode(), insertVersion);
             }
+            workflowDefinition.setVersion(insertVersion);
 
             taskUsedInOtherTaskValid(workflowDefinition, taskRelationList);
             int insertResult = processService.saveTaskRelation(loginUser, workflowDefinition.getProjectCode(),
