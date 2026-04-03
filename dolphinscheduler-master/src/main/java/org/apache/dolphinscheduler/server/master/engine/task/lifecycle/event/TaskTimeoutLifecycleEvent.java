@@ -51,7 +51,7 @@ public class TaskTimeoutLifecycleEvent extends AbstractTaskLifecycleEvent {
         final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
 
         checkState(timeoutStrategy != null, "The task timeoutStrategy must not be null");
-        checkState(timeoutInMinutes >= 0, "The task timeout: %s must >=0 minutes", timeoutInMinutes);
+        checkState(timeoutInMinutes > 0, "The task timeout: %s must > 0 minutes", timeoutInMinutes);
 
         long delayTime = System.currentTimeMillis() - taskInstance.getSubmitTime().getTime()
                 + TimeUnit.MINUTES.toMillis(timeoutInMinutes);

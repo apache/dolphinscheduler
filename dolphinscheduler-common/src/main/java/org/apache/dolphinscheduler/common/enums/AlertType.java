@@ -29,7 +29,7 @@ public enum AlertType {
 
     /**
      * 0 workflow instance failure, 1 workflow instance success, 2 workflow instance blocked, 3 workflow instance timeout, 4 fault tolerance warning,
-     * 5 task failure, 6 task success, 7 task timeout, 8 close alert
+     * 5 task failure, 6 task success, 7 task timeout
       */
     WORKFLOW_INSTANCE_FAILURE(0, "workflow instance failure"),
     WORKFLOW_INSTANCE_SUCCESS(1, "workflow instance success"),
