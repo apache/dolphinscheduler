@@ -67,6 +67,10 @@ public class NetUtils {
      * @return addr
      */
     public static String getAddr(String host, int port) {
+        String normalizedHost = unwrapIpv6Literal(host);
+        if (isIpv6Literal(normalizedHost)) {
+            return String.format("[%s]:%d", normalizedHost, port);
+        }
         return String.format("%s:%d", host, port);
     }
 
@@ -91,6 +95,9 @@ public class NetUtils {
                     return String.format("%s.%s", items[0], items[1]);
                 }
                 return canonicalHost;
+            }
+            if (inetAddress instanceof Inet6Address) {
+                return normalizeV6Address((Inet6Address) inetAddress).getHostAddress();
             }
             return inetAddress.getHostAddress();
         }
@@ -134,10 +141,10 @@ public class NetUtils {
 
     private static InetAddress normalizeV6Address(Inet6Address address) {
         String addr = address.getHostAddress();
-        int i = addr.lastIndexOf('%');
-        if (i > 0) {
+        String normalizedAddr = stripIpv6Scope(addr);
+        if (!StringUtils.equals(addr, normalizedAddr)) {
             try {
-                return InetAddress.getByName(addr.substring(0, i) + '%' + address.getScopeId());
+                return InetAddress.getByName(normalizedAddr);
             } catch (UnknownHostException e) {
                 log.debug("Unknown IPV6 address: ", e);
             }
@@ -160,11 +167,12 @@ public class NetUtils {
         if (!(address instanceof Inet6Address)) {
             return false;
         }
-        String name = address.getHostAddress();
+        String name = stripIpv6Scope(address.getHostAddress());
         return (name != null
                 && InetAddressUtils.isIPv6Address(name)
                 && !address.isAnyLocalAddress()
-                && !address.isLoopbackAddress());
+                && !address.isLoopbackAddress()
+                && !address.isLinkLocalAddress());
     }
 
     /**
@@ -311,6 +319,31 @@ public class NetUtils {
         }
         log.info("Get all NetworkInterfaces: {}", validNetworkInterfaces);
         return validNetworkInterfaces;
+    }
+
+    private static boolean isIpv6Literal(String host) {
+        return StringUtils.isNotEmpty(host) && InetAddressUtils.isIPv6Address(stripIpv6Scope(host));
+    }
+
+    private static String stripIpv6Scope(String host) {
+        if (StringUtils.isEmpty(host)) {
+            return host;
+        }
+        int index = host.lastIndexOf('%');
+        if (index > 0) {
+            return host.substring(0, index);
+        }
+        return host;
+    }
+
+    private static String unwrapIpv6Literal(String host) {
+        if (StringUtils.isEmpty(host)) {
+            return host;
+        }
+        if (host.startsWith("[") && host.endsWith("]")) {
+            return host.substring(1, host.length() - 1);
+        }
+        return host;
     }
 
     private static String specifyNetworkInterfaceName() {

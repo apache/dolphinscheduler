@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -83,12 +84,13 @@ public class DataSourceController extends BaseController {
     private DataSourceService dataSourceService;
 
     /**
-     * create data source
+     * create a new data source
      *
      * @param loginUser login user
      * @param jsonStr   datasource param
      *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
-     * @return create result code
+     * @return the created DataSource object
+     * @throws ServiceException if the data source name already exists or parameters are invalid
      */
     @Operation(summary = "createDataSource", description = "CREATE_DATA_SOURCE_NOTES")
     @PostMapping()
@@ -103,18 +105,19 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * updateWorkflowInstance data source
+     * update an existing data source
      *
      * @param loginUser login user
      * @param id        datasource id
      * @param jsonStr   datasource param
      *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
-     * @return update result code
+     * @return the updated DataSource object
+     * @throws ServiceException if the data source does not exist or parameters are invalid
      */
     @Operation(summary = "updateDataSource", description = "UPDATE_DATA_SOURCE_NOTES")
     @Parameters({
             @Parameter(name = "id", description = "DATA_SOURCE_ID", required = true, schema = @Schema(implementation = int.class)),
-            @Parameter(name = "dataSourceParam", description = "DATA_SOURCE_PARAM", required = true, schema = @Schema(implementation = BaseDataSourceParamDTO.class))
+            @Parameter(name = "jsonStr", description = "DATA_SOURCE_PARAM", required = true, schema = @Schema(implementation = BaseDataSourceParamDTO.class))
     })
     @PutMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.OK)
@@ -200,19 +203,18 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * connect datasource
+     * test the connection to a data source
      *
-     * @param loginUser login user
      * @param jsonStr   datasource param
      *                  example: {"type":"MYSQL","name":"txx","note":"","host":"localhost","port":3306,"principal":"","javaSecurityKrb5Conf":"","loginUserKeytabUsername":"","loginUserKeytabPath":"","userName":"root","password":"xxx","database":"ds","connectType":"","other":{"serverTimezone":"GMT-8"},"id":2}
-     * @return connect result code
+     * @return {@code true} if the connection test was successful
+     * @throws ServiceException if the connection fails or parameters are invalid
      */
     @Operation(summary = "connectDataSource", description = "CONNECT_DATA_SOURCE_NOTES")
     @PostMapping(value = "/connect")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(CONNECT_DATASOURCE_FAILURE)
-    public Result<Boolean> connectDataSource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                             @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "dataSourceParam") @RequestBody String jsonStr) {
+    public Result<Boolean> connectDataSource(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "dataSourceParam") @RequestBody String jsonStr) {
         BaseDataSourceParamDTO dataSourceParam = DataSourceUtils.buildDatasourceParam(jsonStr);
         DataSourceUtils.checkDatasourceParam(dataSourceParam);
         ConnectionParam connectionParams = DataSourceUtils.buildConnectionParams(dataSourceParam);
@@ -221,11 +223,12 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * connection test
+     * test the connection to an existing data source
      *
      * @param loginUser login user
      * @param id data source id
-     * @return A Result wrapping {@code true} if the connection is successful; otherwise, throws an exception.
+     * @return {@code true} if the connection test was successful
+     * @throws ServiceException if the connection fails or the data source does not exist
      */
     @Operation(summary = "connectionTest", description = "CONNECT_DATA_SOURCE_TEST_NOTES")
     @Parameters({
@@ -245,7 +248,8 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param id datasource id
-     * @return delete result
+     * @return {@code true} if the deletion was successful
+     * @throws ServiceException if the data source does not exist or if the user lacks permission
      */
     @Operation(summary = "deleteDataSource", description = "DELETE_DATA_SOURCE_NOTES")
     @Parameters({
@@ -262,11 +266,11 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * verify datasource name
+     * verify if a data source name is available
      *
-     * @param loginUser login user
      * @param name data source name
-     * @return true if data source name not exists, otherwise return false
+     * @return {@code true} if the name is available (does not exist)
+     * @throws ServiceException if the name already exists
      */
     @Operation(summary = "verifyDataSourceName", description = "VERIFY_DATA_SOURCE_NOTES")
     @Parameters({
@@ -275,18 +279,17 @@ public class DataSourceController extends BaseController {
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_DATASOURCE_NAME_FAILURE)
-    public Result<Boolean> verifyDataSourceName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                @RequestParam(value = "name") String name) {
+    public Result<Boolean> verifyDataSourceName(@RequestParam(value = "name") String name) {
         dataSourceService.verifyDataSourceName(name);
         return Result.success(true);
     }
 
     /**
-     * unauthorized datasource
+     * query the list of unauthorized data sources for a specific user
      *
      * @param loginUser login user
      * @param userId user id
-     * @return unauthorized data source result code
+     * @return a list of unauthorized DataSource objects
      */
     @Operation(summary = "unauthorizedDatasource", description = "UNAUTHORIZED_DATA_SOURCE_NOTES")
     @Parameters({
@@ -295,19 +298,19 @@ public class DataSourceController extends BaseController {
     @GetMapping(value = "/unauth-datasource")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UNAUTHORIZED_DATASOURCE)
-    public Result<Object> unAuthDatasource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @RequestParam("userId") Integer userId) {
+    public Result<Object> getUnauthorizedDatasourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                        @RequestParam("userId") Integer userId) {
 
         List<DataSource> unAuthDatasourceList = dataSourceService.unAuthDatasource(loginUser, userId);
         return Result.success(unAuthDatasourceList);
     }
 
     /**
-     * authorized datasource
+     * query the list of data sources authorized for a specific user
      *
      * @param loginUser login user
      * @param userId user id
-     * @return authorized result code
+     * @return a list of authorized DataSource objects
      */
     @Operation(summary = "authedDatasource", description = "AUTHORIZED_DATA_SOURCE_NOTES")
     @Parameters({
@@ -316,29 +319,28 @@ public class DataSourceController extends BaseController {
     @GetMapping(value = "/authed-datasource")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(AUTHORIZED_DATA_SOURCE)
-    public Result<Object> authedDatasource(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @RequestParam("userId") Integer userId) {
+    public Result<Object> getAuthorizedDatasourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                      @RequestParam("userId") Integer userId) {
         List<DataSource> authedDatasourceList = dataSourceService.authedDatasource(loginUser, userId);
         return Result.success(authedDatasourceList);
     }
 
     /**
-     * get user info
+     * check the active status of Kerberos authentication
      *
-     * @param loginUser login user
-     * @return user info data
+     * @return {@code true} if Kerberos is active and configured for HDFS; {@code false} otherwise
      */
-    @Operation(summary = "getKerberosStartupState", description = "GET_USER_INFO_NOTES")
+    @Operation(summary = "getKerberosStartupState", description = "GET_KERBEROS_STARTUP_STATE")
     @GetMapping(value = "/kerberos-startup-state")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(KERBEROS_STARTUP_STATE)
-    public Result<Object> getKerberosStartupState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result<Object> getKerberosStartupState() {
         // if upload resource is HDFS and kerberos startup is true , else false
         return success(Status.SUCCESS.getMsg(), CommonUtils.getKerberosStartupState());
     }
 
     /**
-     * Retrieves the list of tables within a specific database of a data source.
+     * query the list of tables within a specific database of a data source
      *
      * @param loginUser the current logged-in user (injected from session)
      * @param datasourceId the unique identifier of the data source
@@ -361,7 +363,7 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * Retrieves the column details (schema) for a specific table.
+     * query the column details (schema) for a specific table
      *
      * @param loginUser the current logged-in user (injected from session)
      * @param datasourceId the unique identifier of the data source
@@ -387,7 +389,7 @@ public class DataSourceController extends BaseController {
     }
 
     /**
-     * Retrieves the list of databases available in a specific data source.
+     * query the list of databases available in a specific data source
      *
      * @param loginUser the current logged-in user (injected from session)
      * @param datasourceId the unique identifier of the data source

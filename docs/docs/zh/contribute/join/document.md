@@ -22,17 +22,7 @@ git clone https://github.com/<your-github-user-name>/dolphinscheduler-website
    - 运行 `./scripts/prepare_docs.sh` 准备所有相关资源
 3. 在根目录下运行 `yarn generate` 来格式化和准备数据。
 4. 在根目录下运行 `yarn dev` 启动本地服务器，你可以在 http://localhost:3000 查看网站。
-
-```
-注意：如果您在 Windows 而非 Mac 或 Linux 中克隆代码。请阅读下面的详细信息。
-如果执行上述两个步骤中的命令，将出现异常 “UnhandledPromiseRejectionWarning.Error:”： Error： EPERM: operation not permitted, symlink ‘2.0.3’ -> ‘latest’".
-如果出现异常 “Can't resolve ‘antd’ in xxx”，你可以运行 `yarn add antd` 和 `yarn install`。
-因为这两个步骤运行的命令`./scripts/prepare_docs.sh`应该是 Linux 环境，所以如果你是 Windows 系统，可以使用 WSL 来完成。
-遇到这个问题时。你可以以管理员身份运行 cmd.exe 中的两个步骤。
-```
-
 5. 运行 `yarn build` 来构建源代码，此时会自动生成一个名为 `build` 的目录，等待执行完成后进入 `build` 目录。
-
 6. 在本地验证你的更改：`python -m SimpleHTTPServer 8000`，当 Python 版本为 3 时，请使用：`python3 -m http.server 8000`。
 
 如果本地安装了更高版本的 Node，可以考虑使用 `nvm` 来允许不同版本的 Node 在你的计算机上运行。

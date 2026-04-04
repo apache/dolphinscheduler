@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -78,6 +79,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskM
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -882,6 +884,55 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testCreateWorkflowDefinitionShouldSyncVersionToResponse() {
+        Project project = getProject(projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.hasProjectAndWritePerm(eq(user), eq(project), any(Map.class))).thenReturn(true);
+        when(workflowDefinitionMapper.verifyByDefineName(projectCode, name)).thenReturn(null);
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        when(processService.saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE))).thenReturn(1);
+        when(processService.saveWorkflowDefine(any(User.class), any(WorkflowDefinition.class), eq(Boolean.TRUE),
+                eq(Boolean.TRUE))).thenReturn(1);
+        when(processService.saveTaskRelation(eq(user), eq(projectCode), anyLong(), eq(1), anyList(), anyList(),
+                eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        Map<String, Object> result = workflowDefinitionService.createWorkflowDefinition(
+                user, projectCode, name, description, "[]", "[]", timeout,
+                taskRelationJson, taskDefinitionJson, null, WorkflowExecutionTypeEnum.PARALLEL);
+
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        WorkflowDefinition workflowDefinition = (WorkflowDefinition) result.get(Constants.DATA_LIST);
+        Assertions.assertEquals(1, workflowDefinition.getVersion());
+    }
+
+    @Test
+    public void testUpdateWorkflowDefinitionShouldSyncVersionToResponse() {
+        Project project = getProject(projectCode);
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        workflowDefinition.setName("origin-name");
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.hasProjectAndWritePerm(eq(user), eq(project), any(Map.class))).thenReturn(true);
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
+        when(workflowDefinitionMapper.verifyByDefineName(projectCode, name)).thenReturn(null);
+        when(processService.saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE))).thenReturn(1);
+        when(processService.saveWorkflowDefine(any(User.class), any(WorkflowDefinition.class), eq(Boolean.TRUE),
+                eq(Boolean.TRUE))).thenReturn(2);
+        when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(Collections.emptyList());
+        when(processService.saveTaskRelation(eq(user), eq(projectCode), eq(processDefinitionCode), eq(2), anyList(),
+                anyList(), eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        Map<String, Object> result = workflowDefinitionService.updateWorkflowDefinition(
+                user, projectCode, name, processDefinitionCode, description, "[]", "[]", timeout,
+                taskRelationJson, taskDefinitionJson, WorkflowExecutionTypeEnum.PARALLEL);
+
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        WorkflowDefinition resultDefinition = (WorkflowDefinition) result.get(Constants.DATA_LIST);
+        Assertions.assertEquals(2, resultDefinition.getVersion());
+    }
+
+    @Test
     public void testGetNewProcessName() {
         String processName1 = "test_copy_" + DateUtils.getCurrentTimeStamp();
         final String newName1 = workflowDefinitionService.getNewName(processName1, Constants.COPY_SUFFIX);
@@ -974,6 +1025,18 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         workflowTaskRelation.setPostTaskCode(postTaskCode);
         workflowTaskRelation.setPostTaskVersion(postTaskVersion);
         return workflowTaskRelation;
+    }
+
+    private List<TaskNode> getTaskNodeList() {
+        TaskNode firstTaskNode = new TaskNode();
+        firstTaskNode.setCode(123456789L);
+        firstTaskNode.setPreTasks(JSONUtils.toJsonString(Collections.emptyList()));
+
+        TaskNode secondTaskNode = new TaskNode();
+        secondTaskNode.setCode(123451234L);
+        secondTaskNode.setPreTasks(JSONUtils.toJsonString(Collections.singletonList(123456789L)));
+
+        return Arrays.asList(firstTaskNode, secondTaskNode);
     }
 
     /**

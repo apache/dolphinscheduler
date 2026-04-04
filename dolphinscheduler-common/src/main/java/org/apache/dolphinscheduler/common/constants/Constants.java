@@ -46,12 +46,6 @@ public final class Constants {
     public static final String FS_DEFAULT_FS = "resource.hdfs.fs.defaultFS";
 
     /**
-     * hdfs/s3 configuration
-     * resource.storage.upload.base.path
-     */
-    public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
-
-    /**
      * data basedir path
      */
     public static final String DATA_BASEDIR_PATH = "data.basedir.path";
@@ -128,9 +122,6 @@ public final class Constants {
 
     public static final String ADDRESS = "address";
     public static final String DATABASE = "database";
-    public static final String OTHER = "other";
-    public static final String USER = "user";
-    public static final String JDBC_URL = "jdbcUrl";
 
     public static final String IMPORT_SUFFIX = "_import_";
 
@@ -219,7 +210,6 @@ public final class Constants {
     public static final String THREAD_NAME_ALERT_SERVER = "Alert-Server";
 
     // suffix of crc file
-    public static final String CRC_SUFFIX = ".crc";
 
     /**
      * complement date default cron string
@@ -232,21 +222,6 @@ public final class Constants {
     public static final long SLEEP_TIME_MILLIS = 1_000L;
 
     public static final Duration SERVER_CLOSE_WAIT_TIME = Duration.ofSeconds(3);
-
-    /**
-     * jar
-     */
-    public static final String JAR = "jar";
-
-    /**
-     * hadoop
-     */
-    public static final String HADOOP = "hadoop";
-
-    /**
-     * -D <property>=<value>
-     */
-    public static final String D = "-D";
 
     /**
      * exit code success
@@ -263,27 +238,16 @@ public final class Constants {
      */
     public static final int DEFINITION_FAILURE = -1;
 
-    public static final int OPPOSITE_VALUE = -1;
-
     /**
      * workflow or task definition first version
      */
     public static final int VERSION_FIRST = 1;
 
     /**
-     * FAILED
-     */
-    public static final String FAILED = "FAILED";
-    /**
-     * RUNNING
-     */
-    public static final String RUNNING = "RUNNING";
-    /**
      * underline  "_"
      */
     public static final String UNDERLINE = "_";
 
-    public static final String STAR = "*";
     public static final String GLOBAL_PARAMS = "globalParams";
     public static final String LOCAL_PARAMS = "localParams";
     public static final String SUBWORKFLOW_INSTANCE_ID = "subWorkflowInstanceId";
@@ -345,8 +309,6 @@ public final class Constants {
      */
     public static final String SSO_LOGIN_USER_STATE = "sso.login.user.state";
 
-    public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
-
     /**
      * status
      */
@@ -400,8 +362,6 @@ public final class Constants {
      * session timeout
      */
     public static final int SESSION_TIME_OUT = 7200;
-
-    public static final String CLASS = "class";
 
     /**
      * authorize writable perm
@@ -499,11 +459,6 @@ public final class Constants {
     public static final String STRING_YES = "YES";
     /** string no */
     public static final String STRING_NO = "NO";
-
-    public static final Integer QUERY_ALL_ON_SYSTEM = 0;
-    public static final Integer QUERY_ALL_ON_PROJECT = 1;
-    public static final Integer QUERY_ALL_ON_WORKFLOW = 2;
-    public static final Integer QUERY_ALL_ON_TASK = 3;
 
     public static final String REMOTE_LOGGING_ENABLE = "remote.logging.enable";
 

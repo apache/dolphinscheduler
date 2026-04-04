@@ -44,7 +44,7 @@ public class MailUtilsTest {
 
     @BeforeAll
     public static void initEmailConfig() {
-        emailConfig.put(MailParamsConstants.NAME_MAIL_PROTOCOL, "smtp");
+        emailConfig.put("mail.protocol", "smtp");
         emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_HOST, "xxx.xxx.com");
         emailConfig.put(MailParamsConstants.NAME_MAIL_SMTP_PORT, "25");
         emailConfig.put(MailParamsConstants.NAME_MAIL_SENDER, "xxx1.xxx.com");

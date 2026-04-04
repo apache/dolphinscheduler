@@ -21,42 +21,20 @@ import java.util.Optional;
 
 public enum StorageType {
 
-    LOCAL(0, "LOCAL"),
-    HDFS(1, "HDFS"),
-    OSS(2, "OSS"),
-    S3(3, "S3"),
-    GCS(4, "GCS"),
-
-    ABS(5, "ABS"),
-
-    OBS(6, "OBS"),
-
-    COS(7, "COS"),
-
-    ;
-
-    private final int code;
-    private final String name;
-
-    StorageType(int code, String name) {
-        this.code = code;
-        this.name = name;
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getName() {
-        return name;
-    }
+    LOCAL,
+    HDFS,
+    OSS,
+    S3,
+    GCS,
+    ABS,
+    OBS,
+    COS;
 
     public static Optional<StorageType> getStorageType(String name) {
-        for (StorageType storageType : StorageType.values()) {
-            if (storageType.getName().equals(name)) {
-                return Optional.of(storageType);
-            }
+        try {
+            return Optional.of(StorageType.valueOf(name));
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            return Optional.empty();
         }
-        return Optional.empty();
     }
 }
