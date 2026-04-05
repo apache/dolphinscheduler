@@ -32,9 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,19 +65,7 @@ public class TaskGroupServiceTest {
     private TaskGroupServiceImpl taskGroupService;
 
     @Mock
-    private TaskGroupQueueService taskGroupQueueService;
-
-    @Mock
-    private ProcessService processService;
-
-    @Mock
     private TaskGroupMapper taskGroupMapper;
-
-    @Mock
-    private TaskGroupQueueMapper taskGroupQueueMapper;
-
-    @Mock
-    private UserMapper userMapper;
 
     @Mock
     private ProjectMapper projectMapper;

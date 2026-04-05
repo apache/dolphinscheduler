@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
@@ -96,9 +95,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
     @Autowired
     private SchedulerApi schedulerApi;
-
-    @Autowired
-    private EnvironmentMapper environmentMapper;
 
     @Autowired
     private TenantExistValidator tenantExistValidator;
@@ -224,22 +220,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
         // check project auth
         this.projectService.checkProjectAndAuthThrowException(loginUser, project, null);
-    }
-
-    private void scheduleParamCheck(String scheduleParamStr) {
-        ScheduleParam scheduleParam = JSONUtils.parseObject(scheduleParamStr, ScheduleParam.class);
-        if (scheduleParam == null) {
-            throw new ServiceException(Status.PARSE_SCHEDULE_PARAM_ERROR, scheduleParamStr);
-        }
-        if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
-            throw new ServiceException(Status.SCHEDULE_START_TIME_END_TIME_SAME);
-        }
-        if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
-            throw new ServiceException(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
-        }
-        if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
-            throw new ServiceException(Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
-        }
     }
 
     /**

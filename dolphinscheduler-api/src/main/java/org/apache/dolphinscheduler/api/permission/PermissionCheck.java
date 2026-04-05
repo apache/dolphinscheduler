@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.permission;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -28,14 +27,17 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import org.slf4j.Logger;
 
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PermissionCheck<T> {
 
-    /**
-     * logger
-     */
-    private Logger logger;
     /**
      * Authorization Type
      */
@@ -52,47 +54,14 @@ public class PermissionCheck<T> {
     private T[] needChecks;
 
     /**
-     * resoruce info
-     */
-    private List<ResourceInfo> resourceList;
-
-    /**
      * user id
      */
     private int userId;
 
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
-                           int userId, Logger logger) {
-        this.authorizationType = authorizationType;
-        this.processService = processService;
-        this.needChecks = needChecks;
-        this.userId = userId;
-        this.logger = logger;
-    }
-
-    public ProcessService getProcessService() {
-        return processService;
-    }
-
-    public void setProcessService(ProcessService processService) {
-        this.processService = processService;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public List<ResourceInfo> getResourceList() {
-        return resourceList;
-    }
-
-    public void setResourceList(List<ResourceInfo> resourceList) {
-        this.resourceList = resourceList;
-    }
+    /**
+     * logger
+     */
+    private Logger logger;
 
     /**
      * check permission
