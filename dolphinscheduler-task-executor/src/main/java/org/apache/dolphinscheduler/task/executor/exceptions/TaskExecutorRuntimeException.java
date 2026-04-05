@@ -23,8 +23,4 @@ public class TaskExecutorRuntimeException extends RuntimeException {
         super(message);
     }
 
-    public TaskExecutorRuntimeException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
 }
