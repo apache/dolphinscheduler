@@ -183,7 +183,7 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
         return null;
     }
 
-    public void checkContainerNameExists(String containerName) {
+    private void checkContainerNameExists(String containerName) {
         if (StringUtils.isBlank(containerName)) {
             throw new IllegalArgumentException(containerName + " is blank");
         }

@@ -138,7 +138,6 @@ master:
 
 worker:
   listen-port: 1234
-  exec-threads: 10
   max-heartbeat-interval: 10s
   host-weight: 100
   group: default
@@ -148,10 +147,8 @@ worker:
     max-jvm-cpu-usage-percentage-thresholds: 0.9
     max-system-memory-usage-percentage-thresholds: 0.9
     max-disk-usage-percentage-thresholds: 0.9
-  task-execute-threads-full-policy: REJECT
   tenant-config:
     auto-create-tenant-enabled: true
-    distributed-tenant: false
     default-tenant-enabled: true
 
 alert:
