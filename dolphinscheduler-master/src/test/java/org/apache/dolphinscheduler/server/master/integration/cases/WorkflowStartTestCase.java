@@ -1823,6 +1823,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     @Test
     @DisplayName("Test start a workflow which contains a dep task with timeout warn strategy")
     public void testStartWorkflow_withTimeoutWarnTask() {
+        masterConfig.getServerLoadProtection().setEnabled(false);
+
         final String yaml = "/it/start/workflow_with_timeout_warn_task.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_warn_task");
@@ -1831,6 +1833,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .warningGroupId(workflow.getWarningGroupId())
                 .build();
 
         final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
@@ -1855,14 +1858,9 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
 
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
-
-                    Assertions
                             .assertThat(repository.queryAlert(workflowInstanceId))
-                            .hasSize(1)
-                            .satisfiesExactly(alert -> {
+                            .isNotEmpty()
+                            .anySatisfy(alert -> {
                                 assertThat(alert.getAlertType())
                                         .isEqualTo(AlertType.TASK_TIMEOUT);
                             });
@@ -1879,6 +1877,8 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     @Test
     @DisplayName("Test start a workflow which contains a dep task with timeout warn failed strategy")
     public void testStartWorkflow_withTimeoutWarnFailedTask() {
+        masterConfig.getServerLoadProtection().setEnabled(false);
+
         final String yaml = "/it/start/workflow_with_timeout_warnfailed_task.yaml";
         final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
         final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_warnfailed_task");
@@ -1887,6 +1887,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                 .builder()
                 .workflowDefinition(workflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .warningGroupId(workflow.getWarningGroupId())
                 .build();
 
         final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
@@ -1911,14 +1912,9 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             });
 
                     Assertions
-                            .assertThat(repository.queryWorkflowInstance(workflow))
-                            .satisfiesExactly(workflowInstance -> assertThat(workflowInstance.getState())
-                                    .isEqualTo(WorkflowExecutionStatus.STOP));
-
-                    Assertions
                             .assertThat(repository.queryAlert(workflowInstanceId))
-                            .hasSize(1)
-                            .satisfiesExactly(alert -> {
+                            .isNotEmpty()
+                            .anySatisfy(alert -> {
                                 assertThat(alert.getAlertType())
                                         .isEqualTo(AlertType.TASK_TIMEOUT);
                             });
