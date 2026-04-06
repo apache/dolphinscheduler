@@ -1780,6 +1780,47 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
     }
 
     @Test
+    @DisplayName("Test start a workflow when timeout should trigger alert when warningGroupId is set")
+    public void testWorkflowTimeout_WithAlertGroup_ShouldSendAlert() {
+        final String yaml = "/it/start/workflow_with_workflow_timeout_alert.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .warningGroupId(workflow.getWarningGroupId())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await().atMost(Duration.ofMinutes(2))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("long_running_task");
+                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("default");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+                    Assertions
+                            .assertThat(repository.queryAlert(workflowInstanceId))
+                            .hasSize(1)
+                            .anySatisfy(alert -> {
+                                assertThat(alert.getTitle()).isEqualTo("Workflow Timeout Warn");
+                                assertThat(alert.getProjectCode()).isEqualTo(1);
+                                assertThat(alert.getWorkflowDefinitionCode()).isEqualTo(1);
+                                assertThat(alert.getAlertType()).isEqualTo(AlertType.WORKFLOW_INSTANCE_TIMEOUT);
+                            });
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+    @Test
     @DisplayName("Test start a workflow which contains a dep task with timeout warn strategy")
     public void testStartWorkflow_withTimeoutWarnTask() {
         final String yaml = "/it/start/workflow_with_timeout_warn_task.yaml";

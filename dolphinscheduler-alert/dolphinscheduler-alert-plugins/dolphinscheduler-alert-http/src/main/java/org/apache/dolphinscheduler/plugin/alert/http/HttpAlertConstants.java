@@ -38,10 +38,6 @@ public final class HttpAlertConstants {
 
     public static final String NAME_BODY_PARAMS = "bodyParams";
 
-    public static final String CONTENT_FIELD = "$t('contentField')";
-
-    public static final String NAME_CONTENT_FIELD = "contentField";
-
     public static final String REQUEST_TYPE = "$t('requestType')";
 
     public static final String NAME_REQUEST_TYPE = "requestType";

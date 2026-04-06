@@ -93,10 +93,12 @@ public class Repository {
     }
 
     /**
-     * Return the alerts associated with this workflow instance
+     * Return the list of alert for a given workflow instance in ascending order of their IDs.
      */
     public List<Alert> queryAlert(final Integer workflowInstanceId) {
-        return alertMapper.selectByWorkflowInstanceId(workflowInstanceId);
+        return alertMapper.selectByWorkflowInstanceId(workflowInstanceId)
+                .stream()
+                .sorted(Comparator.comparingInt(Alert::getId))
+                .collect(Collectors.toList());
     }
-
 }

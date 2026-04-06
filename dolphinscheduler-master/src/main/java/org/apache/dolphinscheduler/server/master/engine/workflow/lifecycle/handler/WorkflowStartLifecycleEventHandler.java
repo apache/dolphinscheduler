@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.handler;
 
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStartLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTimeoutLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.statemachine.IWorkflowStateAction;
 
@@ -38,11 +40,24 @@ public class WorkflowStartLifecycleEventHandler
                        final IWorkflowExecutionRunnable workflowExecutionRunnable,
                        final WorkflowStartLifecycleEvent workflowStartEvent) {
 
+        workflowTimeoutMonitor(workflowExecutionRunnable);
         workflowStateAction.onStartEvent(workflowExecutionRunnable, workflowStartEvent);
     }
 
     @Override
     public ILifecycleEventType matchEventType() {
         return WorkflowLifecycleEventType.START;
+    }
+
+    private void workflowTimeoutMonitor(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
+        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        if (workflowInstance.getTimeout() <= 0) {
+            log.debug("The workflow {} timeout {} is not configured or invalid, skip timeout monitor.",
+                    workflowInstance.getName(),
+                    workflowInstance.getTimeout());
+            return;
+        }
+        workflowExecutionRunnable.getWorkflowEventBus()
+                .publish(WorkflowTimeoutLifecycleEvent.of(workflowExecutionRunnable));
     }
 }

@@ -374,7 +374,7 @@ docker build -t apache/dolphinscheduler-worker:python3 .
 
 3. 部署 dolphinscheduler (详见**安装 dolphinscheduler**)
 
-4. 复制 Spark 3.1.1 二进制包到 Docker 容器中
+4. 复制 Spark 2.4.7 二进制包到 Docker 容器中
 
 ```bash
 kubectl cp spark-2.4.7-bin-hadoop2.7.tgz dolphinscheduler-worker-0:/opt/soft

@@ -30,11 +30,6 @@ public class DateConstants {
     public static final String YYYYMMDD = "yyyyMMdd";
 
     /**
-     * date format of yyyyMMddHHmmss
-     */
-    public static final String YYYYMMDDHHMMSS = "yyyyMMddHHmmss";
-
-    /**
      * date format of yyyyMMddHHmmssSSS
      */
     public static final String YYYYMMDDHHMMSSSSS = "yyyyMMddHHmmssSSS";
@@ -63,29 +58,4 @@ public class DateConstants {
      * system date(yyyymmdd) yesterday
      */
     public static final String PARAMETER_BUSINESS_DATE = "system.biz.date";
-
-    /**
-     * month_begin
-     */
-    public static final String MONTH_BEGIN = "month_begin";
-    /**
-     * add_months
-     */
-    public static final String ADD_MONTHS = "add_months";
-    /**
-     * month_end
-     */
-    public static final String MONTH_END = "month_end";
-    /**
-     * week_begin
-     */
-    public static final String WEEK_BEGIN = "week_begin";
-    /**
-     * week_end
-     */
-    public static final String WEEK_END = "week_end";
-    /**
-     * timestamp
-     */
-    public static final String TIMESTAMP = "timestamp";
 }
