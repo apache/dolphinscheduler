@@ -15,35 +15,17 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import type { ServerNodeType } from './types'
+package org.apache.dolphinscheduler.extract.master;
 
-export function queryDatabaseState(): any {
-  return axios({
-    url: '/monitor/databases',
-    method: 'get'
-  })
-}
+import org.apache.dolphinscheduler.extract.base.RpcMethod;
+import org.apache.dolphinscheduler.extract.base.RpcService;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowExecutorQueryRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowExecutorQueryResponse;
 
-export function listMonitorServerNode(nodeType: ServerNodeType): any {
-  return axios({
-    url: `/monitor/${nodeType}`,
-    method: 'get'
-  })
-}
+@RpcService
+public interface IWorkflowExecutorQueryClient {
 
-export function queryWorkflowExecutors(masterAddress: string): any {
-  return axios({
-    url: '/monitor/masters/workflow-executors',
-    method: 'get',
-    params: { masterAddress }
-  })
-}
+    @RpcMethod
+    WorkflowExecutorQueryResponse queryWorkflowExecutors(WorkflowExecutorQueryRequest request);
 
-export function queryTaskExecutors(serverAddress: string): any {
-  return axios({
-    url: '/monitor/workers/task-executors',
-    method: 'get',
-    params: { serverAddress }
-  })
 }

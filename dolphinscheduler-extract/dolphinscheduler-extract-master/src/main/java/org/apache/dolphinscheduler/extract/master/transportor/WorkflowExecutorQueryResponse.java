@@ -15,35 +15,33 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import type { ServerNodeType } from './types'
+package org.apache.dolphinscheduler.extract.master.transportor;
 
-export function queryDatabaseState(): any {
-  return axios({
-    url: '/monitor/databases',
-    method: 'get'
-  })
-}
+import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecutorDTO;
 
-export function listMonitorServerNode(nodeType: ServerNodeType): any {
-  return axios({
-    url: `/monitor/${nodeType}`,
-    method: 'get'
-  })
-}
+import java.util.List;
 
-export function queryWorkflowExecutors(masterAddress: string): any {
-  return axios({
-    url: '/monitor/masters/workflow-executors',
-    method: 'get',
-    params: { masterAddress }
-  })
-}
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-export function queryTaskExecutors(serverAddress: string): any {
-  return axios({
-    url: '/monitor/workers/task-executors',
-    method: 'get',
-    params: { serverAddress }
-  })
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkflowExecutorQueryResponse {
+
+    private boolean success;
+
+    private String message;
+
+    private List<WorkflowExecutorDTO> workflowExecutors;
+
+    public static WorkflowExecutorQueryResponse success(List<WorkflowExecutorDTO> workflowExecutors) {
+        return new WorkflowExecutorQueryResponse(true, null, workflowExecutors);
+    }
+
+    public static WorkflowExecutorQueryResponse fail(String message) {
+        return new WorkflowExecutorQueryResponse(false, message, null);
+    }
+
 }

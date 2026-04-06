@@ -15,35 +15,33 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import type { ServerNodeType } from './types'
+package org.apache.dolphinscheduler.task.executor.dto;
 
-export function queryDatabaseState(): any {
-  return axios({
-    url: '/monitor/databases',
-    method: 'get'
-  })
-}
+import java.util.Date;
 
-export function listMonitorServerNode(nodeType: ServerNodeType): any {
-  return axios({
-    url: `/monitor/${nodeType}`,
-    method: 'get'
-  })
-}
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-export function queryWorkflowExecutors(masterAddress: string): any {
-  return axios({
-    url: '/monitor/masters/workflow-executors',
-    method: 'get',
-    params: { masterAddress }
-  })
-}
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class TaskExecutorDTO {
 
-export function queryTaskExecutors(serverAddress: string): any {
-  return axios({
-    url: '/monitor/workers/task-executors',
-    method: 'get',
-    params: { serverAddress }
-  })
+    private int id;
+
+    private String name;
+
+    private String taskType;
+
+    private long projectCode;
+
+    private int workflowInstanceId;
+
+    private String workflowInstanceName;
+
+    private Date startTime;
+
 }

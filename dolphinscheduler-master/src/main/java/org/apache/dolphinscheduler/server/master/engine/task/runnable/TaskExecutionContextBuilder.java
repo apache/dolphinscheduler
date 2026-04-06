@@ -93,6 +93,8 @@ public class TaskExecutionContextBuilder {
      */
     public TaskExecutionContextBuilder buildProcessInstanceRelatedInfo(final WorkflowInstance workflowInstance) {
         taskExecutionContext.setWorkflowInstanceId(workflowInstance.getId());
+        taskExecutionContext.setWorkflowInstanceName(workflowInstance.getName());
+        taskExecutionContext.setProjectCode(workflowInstance.getProjectCode());
         taskExecutionContext.setScheduleTime(DateUtils.dateToTimeStamp(workflowInstance.getScheduleTime()));
         taskExecutionContext.setGlobalParams(workflowInstance.getGlobalParams());
         taskExecutionContext.setExecutorId(workflowInstance.getExecutorId());

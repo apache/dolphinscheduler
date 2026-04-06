@@ -15,35 +15,8 @@
  * limitations under the License.
  */
 
-import { axios } from '@/service/service'
-import type { ServerNodeType } from './types'
+package org.apache.dolphinscheduler.extract.master.transportor;
 
-export function queryDatabaseState(): any {
-  return axios({
-    url: '/monitor/databases',
-    method: 'get'
-  })
-}
+public class WorkflowExecutorQueryRequest {
 
-export function listMonitorServerNode(nodeType: ServerNodeType): any {
-  return axios({
-    url: `/monitor/${nodeType}`,
-    method: 'get'
-  })
-}
-
-export function queryWorkflowExecutors(masterAddress: string): any {
-  return axios({
-    url: '/monitor/masters/workflow-executors',
-    method: 'get',
-    params: { masterAddress }
-  })
-}
-
-export function queryTaskExecutors(serverAddress: string): any {
-  return axios({
-    url: '/monitor/workers/task-executors',
-    method: 'get',
-    params: { serverAddress }
-  })
 }
