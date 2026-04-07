@@ -171,7 +171,7 @@ zookeeper:
   image:
     registry: docker.io
     repository: bitnamilegacy/zookeeper
-    tag: 3.8.4
+    tag: 3.9.3-debian-12-r21
 
 registryEtcd:
   # -- If you want to use Etcd for your registry center, change this value to true. And set zookeeper.enabled to false
