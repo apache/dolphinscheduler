@@ -18,20 +18,15 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_VERSION_VIEW;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
-import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
-import org.apache.dolphinscheduler.api.dto.taskRelation.TaskRelationUpdateUpstreamRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.PermissionCheck;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
-import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -48,7 +43,6 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
@@ -128,42 +122,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private ProcessService processService;
 
     @Autowired
-    private WorkflowDefinitionService workflowDefinitionService;
-
-    @Autowired
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
-
-    private TaskDefinitionLog persist2TaskDefinitionLog(User user, TaskDefinition taskDefinition) {
-        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
-        taskDefinitionLog.setOperator(user.getId());
-        taskDefinitionLog.setOperateTime(new Date());
-        int result = taskDefinitionLogMapper.insert(taskDefinitionLog);
-        if (result <= 0) {
-            throw new ServiceException(Status.CREATE_TASK_DEFINITION_LOG_ERROR, taskDefinitionLog.getName());
-        }
-        return taskDefinitionLog;
-    }
-
-    private void checkTaskDefinitionValid(User user, TaskDefinition taskDefinition, String permissions) {
-        // check user access for project
-        Project project = projectMapper.queryByCode(taskDefinition.getProjectCode());
-        projectService.checkProjectAndAuthThrowException(user, project, permissions);
-
-        if (!checkTaskParameters(taskDefinition.getTaskType(), taskDefinition.getTaskParams())) {
-            throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinition.getName());
-        }
-    }
-
-    private List<WorkflowTaskRelation> updateTaskUpstreams(User user, long workflowCode, long taskCode,
-                                                           String upstreamCodes) {
-        TaskRelationUpdateUpstreamRequest taskRelationUpdateUpstreamRequest = new TaskRelationUpdateUpstreamRequest();
-        taskRelationUpdateUpstreamRequest.setWorkflowCode(workflowCode);
-        if (upstreamCodes != null) {
-            taskRelationUpdateUpstreamRequest.setUpstreams(upstreamCodes);
-        }
-        return workflowTaskRelationService.updateUpstreamTaskDefinitionWithSyncDag(user, taskCode, Boolean.FALSE,
-                taskRelationUpdateUpstreamRequest);
-    }
 
     /**
      * query task definition
@@ -194,38 +153,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.SUCCESS);
         }
         return result;
-    }
-
-    /**
-     * Whether task definition can be deleted or not
-     */
-    private void taskCanDeleteValid(User user, TaskDefinition taskDefinition, User loginUser) {
-        // check user access for project
-        Project project = projectMapper.queryByCode(taskDefinition.getProjectCode());
-        projectService.checkProjectAndAuthThrowException(user, project, TASK_DEFINITION_DELETE);
-        // check if user have write perm for project
-        Map<String, Object> result = new HashMap<>();
-        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            throw new ServiceException(Status.TASK_DEFINITION_STATE_ONLINE, taskDefinition.getCode());
-        }
-
-        // Whether task relation workflow is online
-        if (processService.isTaskOnline(taskDefinition.getCode()) && taskDefinition.getFlag() == Flag.YES) {
-            throw new ServiceException(Status.TASK_DEFINITION_STATE_ONLINE, taskDefinition.getCode());
-        }
-
-        // Whether task have downstream tasks
-        List<WorkflowTaskRelation> workflowTaskRelationList =
-                workflowTaskRelationMapper.queryDownstreamByTaskCode(taskDefinition.getCode());
-        if (CollectionUtils.isNotEmpty(workflowTaskRelationList)) {
-            Set<Long> postTaskCodes = workflowTaskRelationList
-                    .stream()
-                    .map(WorkflowTaskRelation::getPostTaskCode)
-                    .collect(Collectors.toSet());
-            String postTaskCodesStr = StringUtils.join(postTaskCodes, Constants.COMMA);
-            throw new ServiceException(Status.TASK_HAS_DOWNSTREAM, postTaskCodesStr);
-        }
     }
 
     public void updateDag(User loginUser, long workflowDefinitionCode,
@@ -262,28 +189,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
     }
 
-    private void TaskDefinitionUpdateValid(TaskDefinition taskDefinitionOriginal, TaskDefinition taskDefinitionUpdate) {
-        // Task already online
-        if (processService.isTaskOnline(taskDefinitionOriginal.getCode())
-                && taskDefinitionOriginal.getFlag() == Flag.YES) {
-            // if stream, can update task definition without online check
-            if (taskDefinitionOriginal.getTaskExecuteType() != TaskExecuteType.STREAM) {
-                throw new ServiceException(Status.NOT_SUPPORT_UPDATE_TASK_DEFINITION);
-            }
-        }
-
-        // not update anything
-        if (taskDefinitionOriginal.equals(taskDefinitionUpdate)) {
-            throw new ServiceException(Status.TASK_DEFINITION_NOT_CHANGE, taskDefinitionOriginal.getCode());
-        }
-
-        // check version invalid
-        Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskDefinitionOriginal.getCode());
-        if (version == null || version == 0) {
-            throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionOriginal.getCode());
-        }
-    }
-
     /**
      * Get resource task definition by code
      *
@@ -301,36 +206,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Project project = projectMapper.queryByCode(taskDefinition.getProjectCode());
         projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
         return taskDefinition;
-    }
-
-    /**
-     * Get resource task definition according to query parameter
-     *
-     * @param loginUser         login user
-     * @param taskFilterRequest taskFilterRequest object you want to filter the resource task definitions
-     * @return TaskDefinitions of page
-     */
-    @Override
-    public PageInfo<TaskDefinition> filterTaskDefinition(User loginUser,
-                                                         TaskFilterRequest taskFilterRequest) {
-        TaskDefinition taskDefinition = taskFilterRequest.convert2TaskDefinition();
-        if (taskDefinition.getProjectName() != null) {
-            Project project = projectMapper.queryByName(taskDefinition.getProjectName());
-            // check user access for project
-            projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
-            taskDefinition.setProjectCode(project.getCode());
-        }
-
-        Page<TaskDefinition> page =
-                new Page<>(taskFilterRequest.getPageNo(), taskFilterRequest.getPageSize());
-        IPage<TaskDefinition> taskDefinitionIPage =
-                taskDefinitionMapper.filterTaskDefinition(page, taskDefinition);
-
-        PageInfo<TaskDefinition> pageInfo =
-                new PageInfo<>(taskFilterRequest.getPageNo(), taskFilterRequest.getPageSize());
-        pageInfo.setTotal((int) taskDefinitionIPage.getTotal());
-        pageInfo.setTotalList(taskDefinitionIPage.getRecords());
-        return pageInfo;
     }
 
     private TaskDefinitionLog updateTask(User loginUser, long projectCode, long taskCode, String taskDefinitionJsonObj,
@@ -796,51 +671,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             putMsg(result, Status.SUCCESS);
         }
         return result;
-    }
-
-    private void fillRecords(long projectCode, IPage<TaskMainInfo> taskMainInfoIPage) {
-        List<TaskMainInfo> records = Collections.emptyList();
-        if (CollectionUtils.isNotEmpty(taskMainInfoIPage.getRecords())) {
-            // query task relevant info by task code
-            records = taskDefinitionMapper.queryDefineListByCodeList(projectCode,
-                    taskMainInfoIPage.getRecords().stream().map(TaskMainInfo::getTaskCode)
-                            .collect(Collectors.toList()));
-        }
-        // because first step, so need init records
-        taskMainInfoIPage.setRecords(Collections.emptyList());
-        if (CollectionUtils.isNotEmpty(records)) {
-            // task code and task info map
-            Map<Long, TaskMainInfo> taskMainInfoMap = new HashMap<>();
-            // construct task code and relevant upstream task list map
-            for (TaskMainInfo info : records) {
-                taskMainInfoMap.compute(info.getTaskCode(), (k, v) -> {
-                    if (v == null) {
-                        Map<Long, String> upstreamTaskMap = new HashMap<>();
-                        if (info.getUpstreamTaskCode() != 0) {
-                            upstreamTaskMap.put(info.getUpstreamTaskCode(), info.getUpstreamTaskName());
-                            info.setUpstreamTaskCode(0L);
-                            info.setUpstreamTaskName(StringUtils.EMPTY);
-                        }
-                        info.setUpstreamTaskMap(upstreamTaskMap);
-                        v = info;
-                    }
-                    if (info.getUpstreamTaskCode() != 0) {
-                        v.getUpstreamTaskMap().put(info.getUpstreamTaskCode(), info.getUpstreamTaskName());
-                    }
-                    return v;
-                });
-            }
-
-            // because taskMainInfoMap's value is TaskMainInfo,
-            // TaskMainInfo have task code info, so only need gain taskMainInfoMap's values
-            List<TaskMainInfo> resultRecords = Lists.newArrayList(taskMainInfoMap.values());
-            resultRecords.sort((o1, o2) -> o2.getTaskUpdateTime().compareTo(o1.getTaskUpdateTime()));
-            taskMainInfoIPage.setRecords(resultRecords);
-        }
-    }
-
-    private void fillWorkflowInfo(long projectCode, IPage<TaskMainInfo> taskMainInfoIPage) {
-
     }
 
     @Override

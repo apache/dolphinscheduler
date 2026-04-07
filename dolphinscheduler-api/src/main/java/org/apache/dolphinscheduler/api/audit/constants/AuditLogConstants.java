@@ -41,6 +41,5 @@ public final class AuditLogConstants {
     public static final String ALIAS = "alias";
     public static final String FILE_NAME = "fileName";
     public static final String FULL_NAME = "fullName";
-    public static final String FUNC_NAME = "funcName";
 
 }

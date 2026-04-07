@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.dto.task.TaskFilterRequest;
-import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -53,16 +51,6 @@ public interface TaskDefinitionService {
      */
     TaskDefinition getTaskDefinition(User loginUser,
                                      long taskCode);
-
-    /**
-     * Get resource task definition according to query parameter
-     *
-     * @param loginUser         login user
-     * @param taskFilterRequest taskFilterRequest
-     * @return PageResourceResponse from condition
-     */
-    PageInfo<TaskDefinition> filterTaskDefinition(User loginUser,
-                                                  TaskFilterRequest taskFilterRequest);
 
     /**
      * update task definition and upstream

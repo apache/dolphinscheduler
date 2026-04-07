@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
@@ -63,9 +62,6 @@ public class WorkflowTaskLineageServiceTest {
 
     @Mock
     private ProjectMapper projectMapper;
-
-    @Mock
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
