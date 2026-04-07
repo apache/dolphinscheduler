@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -94,9 +93,6 @@ public class TenantServiceTest {
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
-
-    @Mock
-    private StorageOperator storageOperator;
 
     private static final String tenantCode = "hayden";
     private static final String tenantDesc = "This is the tenant desc";
