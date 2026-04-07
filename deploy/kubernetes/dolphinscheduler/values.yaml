@@ -19,6 +19,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Global settings for Bitnami subcharts
+global:
+  security:
+    # -- Allow using non-standard container images (required for bitnamilegacy images)
+    allowInsecureImages: true
+
 # -- World time and date for cities in all time zones
 timezone: "Asia/Shanghai"
 
@@ -56,27 +62,29 @@ datasource:
 postgresql:
   # -- If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL
   enabled: true
-  # -- The username for internal PostgreSQL
-  postgresqlUsername: "root"
-  # -- The password for internal PostgreSQL
-  postgresqlPassword: "root"
-  # -- The database for internal PostgreSQL
-  postgresqlDatabase: "dolphinscheduler"
   # -- The driverClassName for internal PostgreSQL
   driverClassName: "org.postgresql.Driver"
   # -- The params for internal PostgreSQL
   params: "characterEncoding=utf8"
-  persistence:
-    # -- Set postgresql.persistence.enabled to true to mount a new volume for internal PostgreSQL
-    enabled: false
-    # -- `PersistentVolumeClaim` size
-    size: "20Gi"
-    # -- PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning
-    storageClass: "-"
+  auth:
+    # -- The username for internal PostgreSQL
+    username: "root"
+    # -- The password for internal PostgreSQL
+    password: "root"
+    # -- The database for internal PostgreSQL
+    database: "dolphinscheduler"
+  primary:
+    persistence:
+      # -- Set postgresql.primary.persistence.enabled to true to mount a new volume for internal PostgreSQL
+      enabled: false
+      # -- `PersistentVolumeClaim` size
+      size: "20Gi"
+      # -- PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning
+      storageClass: "-"
   image:
     registry: docker.io
     repository: bitnamilegacy/postgresql
-    tag: 11.11.0
+    tag: 15.1.0-debian-11-r12
 
 mysql:
   # -- If not exists external MySQL, by default, the DolphinScheduler will use a internal MySQL
