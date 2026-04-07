@@ -84,14 +84,6 @@ public class PropertyUtils {
         return propertyDelegate.getLong(key, defaultValue);
     }
 
-    public static Double getDouble(String key) {
-        return propertyDelegate.getDouble(key);
-    }
-
-    public static Double getDouble(String key, Double defaultValue) {
-        return propertyDelegate.getDouble(key, defaultValue);
-    }
-
     /**
      * get all properties with specified prefix, like: fs.
      *
