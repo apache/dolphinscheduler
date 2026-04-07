@@ -11,6 +11,25 @@ There are three ways to start DolphinScheduler with Docker
 Need to install [Docker](https://docs.docker.com/engine/install/) 1.13.1+ and [Docker Compose](https://docs.docker.com/compose/) 1.28.0+
 before starting DolphinScheduler with Docker
 
+## Download Plugins Dependencies
+
+Starting from version 3.3.0, the binary package no longer provides plugin dependencies, and users need to download them by themselves. The plugin dependency package download address: [Plugin Dependency Package](https://repo.maven.apache.org/maven2/org/apache/dolphinscheduler)
+You can also execute the following command to install plugin dependencies:
+
+```shell
+bash ./bin/install-plugins.sh 3.3.0
+```
+
+Usually, you do not need all connector plugins, you can specify the plugins you need by configuring `conf/plugins_config`. For example, if you only need the `dolphinscheduler-task-shell` plugin, you can modify the configuration file as follows:
+
+```
+--task-plugins--
+dolphinscheduler-task-shell
+--end--
+```
+
+> **_Note:_** The plugin dependency package is usually not included in the binary package. If you encounter a `ClassNotFoundException` error when starting the service, please refer to the documentation of the relevant plugin type to check if the plugin dependency package is missing. For example, `dolphinscheduler-datasource-mysql` does not include `mysql-connector-java.jar`.
+
 ## Start Server
 
 ### Using standalone-server Docker Image
