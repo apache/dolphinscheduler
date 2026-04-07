@@ -31,7 +31,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
@@ -61,13 +60,11 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
     private ProjectMapper projectMapper;
 
     @Autowired
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
-
-    @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
     private WorkflowTaskLineageDao workflowTaskLineageDao;
+
     @Autowired
     private WorkflowDefinitionMapper workflowDefinitionMapper;
 
@@ -320,11 +317,6 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
             dependentLineageTaskList.add(dependentLineageTask);
         }
         return dependentLineageTaskList;
-    }
-
-    @Override
-    public int createWorkflowLineage(List<WorkflowTaskLineage> workflowTaskLineages) {
-        return workflowTaskLineageDao.batchInsert(workflowTaskLineages);
     }
 
     @Override

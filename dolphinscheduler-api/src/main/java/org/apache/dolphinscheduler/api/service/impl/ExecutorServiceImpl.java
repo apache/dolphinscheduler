@@ -18,13 +18,9 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_END_DATE;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_START_DATE;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_RECOVER_WORKFLOW_ID_STRING;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE;
-import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowBackFillRequest;
@@ -36,8 +32,6 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.workflow.ExecutorClient;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.service.WorkerGroupService;
-import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowRequestTransformer;
@@ -46,21 +40,13 @@ import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTOVali
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowRequestTransformer;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
-import org.apache.dolphinscheduler.common.enums.CycleEnum;
-import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -68,29 +54,18 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
-import org.apache.dolphinscheduler.service.cron.CronUtils;
-import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -100,8 +75,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.base.Splitter;
 
 @Service
 @Slf4j
@@ -134,15 +107,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
     @Autowired
     private TaskGroupQueueMapper taskGroupQueueMapper;
-
-    @Autowired
-    private WorkerGroupService workerGroupService;
-
-    @Autowired
-    private TenantMapper tenantMapper;
-
-    @Autowired
-    private WorkflowLineageService workflowLineageService;
 
     @Autowired
     private TriggerWorkflowRequestTransformer triggerWorkflowRequestTransformer;
@@ -236,20 +200,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 .filter(definition -> definition.getReleaseState().equals(ReleaseState.OFFLINE))
                 .collect(Collectors.toSet())
                 .isEmpty();
-    }
-
-    /**
-     * check valid tenant
-     *
-     * @param tenantCode
-     */
-    private void checkValidTenant(String tenantCode) {
-        if (!Constants.DEFAULT.equals(tenantCode)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-            if (tenant == null) {
-                throw new ServiceException(Status.TENANT_NOT_EXIST, tenantCode);
-            }
-        }
     }
 
     @Override
@@ -425,287 +375,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         result.put(Constants.STATUS, Status.SUCCESS);
         return result;
-    }
-
-    private int createComplementCommand(Long triggerCode, Command command, Map<String, String> cmdParam,
-                                        List<ZonedDateTime> dateTimeList, List<Schedule> schedules,
-                                        ComplementDependentMode complementDependentMode, boolean allLevelDependent) {
-
-        String dateTimeListStr = dateTimeList.stream()
-                .map(item -> DateUtils.dateToString(item))
-                .collect(Collectors.joining(COMMA));
-
-        cmdParam.put(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST, dateTimeListStr);
-        command.setCommandParam(JSONUtils.toJsonString(cmdParam));
-
-        log.info("Creating command, commandInfo:{}.", command);
-        int createCount = commandService.createCommand(command);
-
-        if (createCount > 0) {
-            log.info("Create {} command complete, workflowDefinitionCode:{}",
-                    command.getCommandType().getDescp(), command.getWorkflowDefinitionCode());
-        } else {
-            log.error("Create {} command error, workflowDefinitionCode:{}",
-                    command.getCommandType().getDescp(), command.getWorkflowDefinitionCode());
-        }
-
-        if (schedules.isEmpty() || complementDependentMode == ComplementDependentMode.OFF_MODE) {
-            log.info(
-                    "Complement dependent mode is off mode or Scheduler is empty, so skip create complement dependent command, workflowDefinitionCode:{}.",
-                    command.getWorkflowDefinitionCode());
-        } else {
-            log.info(
-                    "Complement dependent mode is all dependent and Scheduler is not empty, need create complement dependent command, workflowDefinitionCode:{}.",
-                    command.getWorkflowDefinitionCode());
-            createComplementDependentCommand(schedules, command, allLevelDependent);
-        }
-
-        return createCount;
-    }
-
-    protected int createComplementCommandList(Long triggerCode, String scheduleTimeParam, RunMode runMode,
-                                              Command command,
-                                              Integer expectedParallelismNumber,
-                                              ComplementDependentMode complementDependentMode,
-                                              boolean allLevelDependent,
-                                              ExecutionOrder executionOrder) throws CronParseException {
-        int createCount = 0;
-        int dependentWorkflowDefinitionCreateCount = 0;
-        runMode = (runMode == null) ? RunMode.RUN_MODE_SERIAL : runMode;
-        Map<String, String> cmdParam = JSONUtils.toMap(command.getCommandParam());
-        Map<String, String> scheduleParam = JSONUtils.toMap(scheduleTimeParam);
-
-        if (Objects.isNull(executionOrder)) {
-            executionOrder = ExecutionOrder.DESC_ORDER;
-        }
-
-        List<Schedule> schedules = processService.queryReleaseSchedulerListByWorkflowDefinitionCode(
-                command.getWorkflowDefinitionCode());
-
-        List<ZonedDateTime> listDate = new ArrayList<>();
-        if (scheduleParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE) && scheduleParam.containsKey(
-                CMD_PARAM_COMPLEMENT_DATA_END_DATE)) {
-            String startDate = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE);
-            String endDate = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE);
-            if (startDate != null && endDate != null) {
-                listDate = CronUtils.getSelfFireDateList(
-                        DateUtils.stringToZoneDateTime(startDate),
-                        DateUtils.stringToZoneDateTime(endDate),
-                        schedules);
-            }
-        }
-
-        if (scheduleParam.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
-            String dateList = scheduleParam.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
-
-            if (StringUtils.isNotBlank(dateList)) {
-                listDate = Splitter.on(COMMA).splitToStream(dateList)
-                        .map(item -> DateUtils.stringToZoneDateTime(item.trim()))
-                        .distinct()
-                        .collect(Collectors.toList());
-            }
-        }
-
-        if (CollectionUtils.isEmpty(listDate)) {
-            throw new ServiceException(Status.TASK_COMPLEMENT_DATA_DATE_ERROR);
-        }
-
-        if (executionOrder.equals(ExecutionOrder.DESC_ORDER)) {
-            Collections.sort(listDate, Collections.reverseOrder());
-        } else {
-            Collections.sort(listDate);
-        }
-
-        switch (runMode) {
-            case RUN_MODE_SERIAL: {
-                log.info("RunMode of {} command is serial run, workflowDefinitionCode:{}.",
-                        command.getCommandType().getDescp(), command.getWorkflowDefinitionCode());
-                createCount = createComplementCommand(triggerCode, command, cmdParam, listDate, schedules,
-                        complementDependentMode, allLevelDependent);
-                break;
-            }
-            case RUN_MODE_PARALLEL: {
-                log.info("RunMode of {} command is parallel run, workflowDefinitionCode:{}.",
-                        command.getCommandType().getDescp(), command.getWorkflowDefinitionCode());
-
-                int queueNum = 0;
-                if (CollectionUtils.isNotEmpty(listDate)) {
-                    queueNum = listDate.size();
-                    if (expectedParallelismNumber != null && expectedParallelismNumber != 0) {
-                        queueNum = Math.min(queueNum, expectedParallelismNumber);
-                    }
-                    log.info("Complement command run in parallel mode, current expectedParallelismNumber:{}.",
-                            queueNum);
-                    List[] queues = new List[queueNum];
-
-                    for (int i = 0; i < listDate.size(); i++) {
-                        if (Objects.isNull(queues[i % queueNum])) {
-                            queues[i % queueNum] = new ArrayList();
-                        }
-                        queues[i % queueNum].add(listDate.get(i));
-                    }
-                    for (List queue : queues) {
-                        createCount = createComplementCommand(triggerCode, command, cmdParam, queue, schedules,
-                                complementDependentMode, allLevelDependent);
-                    }
-                }
-                break;
-            }
-            default:
-                break;
-        }
-        log.info("Create complement command count:{}, Create dependent complement command count:{}", createCount,
-                dependentWorkflowDefinitionCreateCount);
-        return createCount;
-    }
-
-    /**
-     * create complement dependent command
-     */
-    public int createComplementDependentCommand(List<Schedule> schedules, Command command, boolean allLevelDependent) {
-        int dependentWorkflowDefinitionCreateCount = 0;
-        Command dependentCommand;
-
-        try {
-            dependentCommand = (Command) BeanUtils.cloneBean(command);
-        } catch (Exception e) {
-            log.error("Copy dependent command error.", e);
-            return dependentWorkflowDefinitionCreateCount;
-        }
-
-        List<DependentWorkflowDefinition> dependentWorkflowDefinitionList =
-                getComplementDependentDefinitionList(dependentCommand.getWorkflowDefinitionCode(),
-                        CronUtils.getMaxCycle(schedules.get(0).getCrontab()), dependentCommand.getWorkerGroup(),
-                        allLevelDependent);
-        dependentCommand.setTaskDependType(TaskDependType.TASK_POST);
-        for (DependentWorkflowDefinition dependentWorkflowDefinition : dependentWorkflowDefinitionList) {
-            // If the id is Integer, the auto-increment id will be obtained by mybatis-plus
-            // and causing duplicate when clone it.
-            dependentCommand.setId(null);
-            dependentCommand.setWorkflowDefinitionCode(dependentWorkflowDefinition.getWorkflowDefinitionCode());
-            dependentCommand.setWorkflowDefinitionVersion(dependentWorkflowDefinition.getWorkflowDefinitionVersion());
-            dependentCommand.setWorkerGroup(dependentWorkflowDefinition.getWorkerGroup());
-            Map<String, String> cmdParam = JSONUtils.toMap(dependentCommand.getCommandParam());
-            cmdParam.put(CMD_PARAM_START_NODES, String.valueOf(dependentWorkflowDefinition.getTaskDefinitionCode()));
-            dependentCommand.setCommandParam(JSONUtils.toJsonString(cmdParam));
-            log.info("Creating complement dependent command, commandInfo:{}.", command);
-            dependentWorkflowDefinitionCreateCount += commandService.createCommand(dependentCommand);
-        }
-
-        return dependentWorkflowDefinitionCreateCount;
-    }
-
-    /**
-     * get complement dependent online workflow definition list
-     */
-    private List<DependentWorkflowDefinition> getComplementDependentDefinitionList(long workflowDefinitionCode,
-                                                                                   CycleEnum workflowDefinitionCycle,
-                                                                                   String workerGroup,
-                                                                                   boolean allLevelDependent) {
-        List<DependentWorkflowDefinition> dependentWorkflowDefinitionList =
-                checkDependentWorkflowDefinitionValid(
-                        workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowDefinitionCode),
-                        workflowDefinitionCycle, workerGroup,
-                        workflowDefinitionCode);
-
-        if (dependentWorkflowDefinitionList.isEmpty()) {
-            return dependentWorkflowDefinitionList;
-        }
-
-        if (allLevelDependent) {
-            List<DependentWorkflowDefinition> childList = new ArrayList<>(dependentWorkflowDefinitionList);
-            while (true) {
-                List<DependentWorkflowDefinition> childDependentList = childList
-                        .stream()
-                        .flatMap(dependentWorkflowDefinition -> checkDependentWorkflowDefinitionValid(
-                                workflowLineageService.queryDownstreamDependentWorkflowDefinitions(
-                                        dependentWorkflowDefinition.getWorkflowDefinitionCode()),
-                                workflowDefinitionCycle,
-                                workerGroup,
-                                dependentWorkflowDefinition.getWorkflowDefinitionCode()).stream())
-                        .collect(Collectors.toList());
-                if (childDependentList.isEmpty()) {
-                    break;
-                }
-                dependentWorkflowDefinitionList.addAll(childDependentList);
-                childList = new ArrayList<>(childDependentList);
-            }
-        }
-        return dependentWorkflowDefinitionList;
-    }
-
-    /**
-     * Check whether the dependency cycle of the dependent node is consistent with the schedule cycle of
-     * the dependent workflow definition and if there is no worker group in the schedule, use the complement selection's
-     * worker group
-     */
-    private List<DependentWorkflowDefinition> checkDependentWorkflowDefinitionValid(
-                                                                                    List<DependentWorkflowDefinition> dependentWorkflowDefinitionList,
-                                                                                    CycleEnum workflowDefinitionCycle,
-                                                                                    String workerGroup,
-                                                                                    long upstreamWorkflowDefinitionCode) {
-        List<DependentWorkflowDefinition> validDependentWorkflowDefinitionList = new ArrayList<>();
-
-        List<Long> workflowDefinitionCodeList =
-                dependentWorkflowDefinitionList.stream().map(DependentWorkflowDefinition::getWorkflowDefinitionCode)
-                        .collect(Collectors.toList());
-
-        Map<Long, String> workflowDefinitionWorkerGroupMap =
-                workerGroupService.queryWorkerGroupByWorkflowDefinitionCodes(workflowDefinitionCodeList);
-
-        for (DependentWorkflowDefinition dependentWorkflowDefinition : dependentWorkflowDefinitionList) {
-            if (dependentWorkflowDefinition
-                    .getDependentCycle(upstreamWorkflowDefinitionCode) == workflowDefinitionCycle) {
-                if (workflowDefinitionWorkerGroupMap
-                        .get(dependentWorkflowDefinition.getWorkflowDefinitionCode()) == null) {
-                    dependentWorkflowDefinition.setWorkerGroup(workerGroup);
-                }
-
-                validDependentWorkflowDefinitionList.add(dependentWorkflowDefinition);
-            }
-        }
-
-        return validDependentWorkflowDefinitionList;
-    }
-
-    /**
-     * @param schedule
-     * @return check error return 0, otherwise 1
-     */
-    private boolean isValidateScheduleTime(String schedule) {
-        Map<String, String> scheduleResult = JSONUtils.toMap(schedule);
-        if (scheduleResult == null) {
-            return false;
-        }
-        if (scheduleResult.containsKey(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST)) {
-            if (scheduleResult.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST) == null) {
-                return false;
-            }
-        }
-        if (scheduleResult.containsKey(CMD_PARAM_COMPLEMENT_DATA_START_DATE)) {
-            String startDate = scheduleResult.get(CMD_PARAM_COMPLEMENT_DATA_START_DATE);
-            String endDate = scheduleResult.get(CMD_PARAM_COMPLEMENT_DATA_END_DATE);
-            if (startDate == null || endDate == null) {
-                return false;
-            }
-            try {
-                ZonedDateTime start = DateUtils.stringToZoneDateTime(startDate);
-                ZonedDateTime end = DateUtils.stringToZoneDateTime(endDate);
-                if (start == null || end == null) {
-                    return false;
-                }
-                if (start.isAfter(end)) {
-                    log.error(
-                            "Complement data parameter error, start time should be before end time, startDate:{}, endDate:{}.",
-                            start, end);
-                    return false;
-                }
-            } catch (Exception ex) {
-                log.warn("Parse schedule time error, startDate:{}, endDate:{}.", startDate, endDate);
-                return false;
-            }
-        }
-        return true;
     }
 
     @Override
