@@ -31,20 +31,19 @@ Review Issues 是指在 GitHub 中参与 [Issues][all-issues] 的讨论，并在
 
 除了个 issue 建议之外，给 Issue 分类也是非常重要的一个工作。分类后的 Issue 可以更好的被检索，为以后进一步处理提供便利。一个 Issue 可以被打上多个标签，常见的 Issue 分类有
 
-|                    标签                    |        标签代表的情况        |
-|------------------------------------------|-----------------------|
-| [UI][label-ui]                           | UI 以及前端相关的 Issue      |
-| [security][label-security]               | 安全相关的 Issue           |
-| [user experience][label-user-experience] | 用户体验相关的 Issue         |
-| [development][label-development]         | 开发者相关的 Issue          |
-| [Python][label-python]                   | Python 相关的 Issue      |
-| [plug-in][label-plug-in]                 | 插件相关的 Issue           |
-| [document][label-document]               | 文档相关的 Issue           |
-| [docker][label-docker]                   | docker 相关的 Issue      |
-| [need verify][label-need-verify]         | Issue 需要被验证           |
-| [e2e][label-e2e]                         | e2e 相关的 Issue         |
-| [win-os][label-win-os]                   | windows 操作系统相关的 Issue |
-| [suggestion][label-suggestion]           | Issue 为项目提出了建议        |
+|                    标签                    |     标签代表的情况      |
+|------------------------------------------|------------------|
+| [UI][label-ui]                           | UI 以及前端相关的 Issue |
+| [security][label-security]               | 安全相关的 Issue      |
+| [user experience][label-user-experience] | 用户体验相关的 Issue    |
+| [development][label-development]         | 开发者相关的 Issue     |
+| [Python][label-python]                   | Python 相关的 Issue |
+| [plug-in][label-plug-in]                 | 插件相关的 Issue      |
+| [document][label-document]               | 文档相关的 Issue      |
+| [docker][label-docker]                   | docker 相关的 Issue |
+| [need verify][label-need-verify]         | Issue 需要被验证      |
+| [e2e][label-e2e]                         | e2e 相关的 Issue    |
+| [suggestion][label-suggestion]           | Issue 为项目提出了建议   |
 
 标签除了分类之外，还能区分 Issue 的优先级，优先级越高的标签越重要，越容易被重视，并会尽快被修复或者实现，优先级的标签如下
 

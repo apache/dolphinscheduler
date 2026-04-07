@@ -31,7 +31,7 @@ $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:2
 
 使用 docker-compose 启动服务相比 standalone-server 的优点是 DolphinScheduler 的各个是独立的容器和进程，相互影响降到最小，且能够在
 服务重启的时候保留元数据（如需要挂载到本地路径需要做指定）。他更健壮，能保证用户体验更加完整的 DolphinScheduler 服务。这种方式需要先安装
-[docker-compose](https://docs.docker.com/compose/install/)，链接适用于 Mac，Linux，Windows。
+[docker-compose](https://docs.docker.com/compose/install/)，链接适用于 Mac，Linux。
 
 确保 docker-compose 顺利安装后，需要获取 `docker-compose.yaml` 文件，通过[下载页面](https://dolphinscheduler.apache.org/en-us/download/<version>)
 下载对应版本源码包可能是最快的方法，当下载完源码后就可以运行命令进行部署了。
@@ -41,7 +41,6 @@ $ DOLPHINSCHEDULER_VERSION=<version>
 $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 # Mac Linux 用户
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
-# Windows 用户, `cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker`
 
 # 如果需要初始化或者升级数据库结构，需要指定profile为schema
 $ docker-compose --profile schema up -d
