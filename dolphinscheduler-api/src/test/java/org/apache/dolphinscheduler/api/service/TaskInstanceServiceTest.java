@@ -41,7 +41,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -94,10 +93,8 @@ public class TaskInstanceServiceTest {
     UsersService usersService;
 
     @Mock
-    TaskDefinitionMapper taskDefinitionMapper;
-
-    @Mock
     TaskInstanceDao taskInstanceDao;
+
     @Mock
     WorkflowInstanceDao workflowInstanceDao;
 

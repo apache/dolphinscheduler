@@ -10,6 +10,25 @@
 
 需要安装 [Docker](https://docs.docker.com/engine/install/) 1.13.1 以上版本，以及 [Docker Compose](https://docs.docker.com/compose/) 1.28.0 以上版本。
 
+## 下载插件依赖
+
+从 3.3.0 版本开始，二进制包不再提供插件依赖，需要用户自行下载。插件依赖包下载地址：[插件依赖包](https://repo.maven.apache.org/maven2/org/apache/dolphinscheduler)
+你也可以执行以下命令来安装插件依赖:
+
+```shell
+bash ./bin/install-plugins.sh 3.3.0
+```
+
+通常你并不需要所有的连接器插件，可以通过配置 `conf/plugins_config` 来指定你所需要的插件，例如，你只需要 `dolphinscheduler-task-shell` 插件，那么您可以修改配置文件如下：
+
+```
+--task-plugins--
+dolphinscheduler-task-shell
+--end--
+```
+
+> **_注意:_** 插件依赖包通常不包含在二进制包中，如果你在启动服务时遇到 `ClassNotFoundException` 错误，请参考相关插件类型的文档检查是否缺少插件依赖包，例如 `dolphinscheduler-datasource-mysql` 中不包含 `mysql-connector-java.jar`
+
 ## 启动服务
 
 ### 使用 standalone-server 镜像
