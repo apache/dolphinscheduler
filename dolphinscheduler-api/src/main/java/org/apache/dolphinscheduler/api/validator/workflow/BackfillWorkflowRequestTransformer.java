@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -48,9 +47,6 @@ public class BackfillWorkflowRequestTransformer implements ITransformer<Workflow
 
     @Autowired
     private ProcessService processService;
-
-    @Autowired
-    private ProjectDao projectDao;
 
     @Autowired
     private WorkflowDefinitionDao workflowDefinitionDao;

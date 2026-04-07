@@ -25,11 +25,9 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
-import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -64,15 +62,6 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     @Mock
     private ProjectService projectService;
 
-    @Mock
-    private SchedulerApi schedulerApi;
-
-    @Mock
-    private ExecutorService executorService;
-
-    @Mock
-    private EnvironmentMapper environmentMapper;
-
     protected static User user;
     protected Exception exception;
     private static final String userName = "userName";
@@ -84,9 +73,6 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private static final int processDefinitionVersion = 3;
     private static final int scheduleId = 3;
     private static final long environmentCode = 4L;
-    private static final String startTime = "2020-01-01 12:13:14";
-    private static final String endTime = "2020-02-01 12:13:14";
-    private static final String crontab = "0 0 * * * ? *";
 
     @BeforeEach
     public void setUp() {

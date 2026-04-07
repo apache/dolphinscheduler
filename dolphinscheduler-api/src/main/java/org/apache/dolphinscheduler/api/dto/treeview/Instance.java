@@ -68,9 +68,6 @@ public class Instance {
 
     private long subflowCode;
 
-    public Instance() {
-    }
-
     public Instance(int id, String name, long code, String type) {
         this.id = id;
         this.name = name;

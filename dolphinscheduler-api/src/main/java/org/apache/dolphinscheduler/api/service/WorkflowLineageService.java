@@ -55,8 +55,6 @@ public interface WorkflowLineageService {
     List<DependentLineageTask> queryDependentWorkflowDefinitions(long projectCode, long workflowDefinitionCode,
                                                                  Long taskCode);
 
-    int createWorkflowLineage(List<WorkflowTaskLineage> workflowTaskLineages);
-
     /**
      * Replace the lineage of given workflow definition by new lineage list.
      * When the list is empty, existing lineage data will be deleted.

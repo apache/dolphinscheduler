@@ -22,8 +22,6 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionLogServiceImpl;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
 
 import java.util.Arrays;
@@ -47,11 +45,6 @@ public class TaskDefinitionLogServiceTest {
 
     @Mock
     private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;
-
-    @Mock
-    private TaskDefinitionLogDao taskDefinitionLogDao;
-    @Mock
-    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     private List<WorkflowTaskRelationLog> getProcessTaskRelationList() {
         WorkflowTaskRelationLog processTaskRelationLog1 = new WorkflowTaskRelationLog();

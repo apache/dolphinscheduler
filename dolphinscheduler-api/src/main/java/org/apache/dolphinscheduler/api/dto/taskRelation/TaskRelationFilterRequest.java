@@ -44,12 +44,6 @@ public class TaskRelationFilterRequest extends PageQueryDto {
     @Schema(example = "1234567890123")
     private long postTaskCode;
 
-    public TaskRelationFilterRequest(long workflowCode, long preTaskCode, long postTaskCode) {
-        this.workflowCode = workflowCode;
-        this.preTaskCode = preTaskCode;
-        this.postTaskCode = postTaskCode;
-    }
-
     public TaskRelationFilterRequest(long preTaskCode, long postTaskCode) {
         this.preTaskCode = preTaskCode;
         this.postTaskCode = postTaskCode;

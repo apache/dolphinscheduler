@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.permission;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -36,6 +35,7 @@ public class PermissionCheck<T> {
      * logger
      */
     private Logger logger;
+
     /**
      * Authorization Type
      */
@@ -50,11 +50,6 @@ public class PermissionCheck<T> {
      * need check array
      */
     private T[] needChecks;
-
-    /**
-     * resoruce info
-     */
-    private List<ResourceInfo> resourceList;
 
     /**
      * user id
@@ -84,14 +79,6 @@ public class PermissionCheck<T> {
 
     public void setUserId(int userId) {
         this.userId = userId;
-    }
-
-    public List<ResourceInfo> getResourceList() {
-        return resourceList;
-    }
-
-    public void setResourceList(List<ResourceInfo> resourceList) {
-        this.resourceList = resourceList;
     }
 
     /**

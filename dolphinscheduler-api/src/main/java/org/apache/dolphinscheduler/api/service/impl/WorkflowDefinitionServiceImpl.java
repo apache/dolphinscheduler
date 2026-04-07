@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static java.util.stream.Collectors.toSet;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_MOVE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VERSION_LIST;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_BATCH_COPY;
@@ -27,7 +26,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_ONLINE_OFFLINE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_UPDATE;
 import static org.apache.dolphinscheduler.api.enums.Status.WORKFLOW_DEFINITION_NOT_EXIST;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE;
 import static org.apache.dolphinscheduler.common.constants.Constants.COPY_SUFFIX;
@@ -170,6 +168,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
     @Autowired
     private WorkflowDefinitionLogDao workflowDefinitionLogDao;
+
     @Lazy
     @Autowired
     private WorkflowInstanceService workflowInstanceService;
@@ -275,36 +274,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         result = createDagDefine(loginUser, taskRelationList, workflowDefinition, taskDefinitionLogs);
         return result;
-    }
-
-    private void createWorkflowValid(User user, WorkflowDefinition workflowDefinition) {
-        Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
-        if (project == null) {
-            throw new ServiceException(Status.PROJECT_NOT_FOUND, workflowDefinition.getProjectCode());
-        }
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
-
-        if (checkDescriptionLength(workflowDefinition.getDescription())) {
-            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
-        }
-
-        // check whether the new workflow definition name exist
-        WorkflowDefinition definition =
-                workflowDefinitionMapper.verifyByDefineName(project.getCode(), workflowDefinition.getName());
-        if (definition != null) {
-            throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, workflowDefinition.getName());
-        }
-
-    }
-
-    private void syncObj2Log(User user, WorkflowDefinition workflowDefinition) {
-        WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
-        workflowDefinitionLog.setOperator(user.getId());
-        int result = workflowDefinitionLogMapper.insert(workflowDefinitionLog);
-        if (result <= 0) {
-            throw new ServiceException(Status.CREATE_WORKFLOW_DEFINITION_LOG_ERROR);
-        }
     }
 
     protected Map<String, Object> createDagDefine(User loginUser,
@@ -1915,117 +1884,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         log.info("Delete version: {} of workflow: {}, projectCode: {}", version, code, projectCode);
 
-    }
-
-    private void updateWorkflowValid(User user, WorkflowDefinition oldWorkflowDefinition,
-                                     WorkflowDefinition newWorkflowDefinition) {
-        // online can not permit edit
-        if (oldWorkflowDefinition.getReleaseState() == ReleaseState.ONLINE) {
-            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_ALLOWED_EDIT, oldWorkflowDefinition.getName());
-        }
-
-        Project project = projectMapper.queryByCode(oldWorkflowDefinition.getProjectCode());
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(user, project, WORKFLOW_UPDATE);
-
-        if (checkDescriptionLength(newWorkflowDefinition.getDescription())) {
-            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
-        }
-
-        // check whether the new workflow define name exist
-        if (!oldWorkflowDefinition.getName().equals(newWorkflowDefinition.getName())) {
-            WorkflowDefinition definition = workflowDefinitionMapper
-                    .verifyByDefineName(newWorkflowDefinition.getProjectCode(), newWorkflowDefinition.getName());
-            if (definition != null) {
-                throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, newWorkflowDefinition.getName());
-            }
-        }
-    }
-
-    public int saveWorkflowDefine(User loginUser, WorkflowDefinition workflowDefinition) {
-        WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
-        Integer version = workflowDefinitionLogMapper.queryMaxVersionForDefinition(workflowDefinition.getCode());
-        int insertVersion = version == null || version == 0 ? Constants.VERSION_FIRST : version + 1;
-        workflowDefinitionLog.setVersion(insertVersion);
-        workflowDefinition.setVersion(insertVersion);
-
-        workflowDefinitionLog.setOperator(loginUser.getId());
-        workflowDefinition.setUserId(loginUser.getId());
-        workflowDefinitionLog.setOperateTime(workflowDefinition.getUpdateTime());
-        workflowDefinition.setUpdateTime(workflowDefinition.getUpdateTime());
-        workflowDefinitionLog.setId(null);
-        int result = workflowDefinitionMapper.updateById(workflowDefinition);
-
-        int insertLog = workflowDefinitionLogMapper.insert(workflowDefinitionLog);
-        workflowDefinitionLog.setId(workflowDefinition.getId());
-        return (insertLog & result) > 0 ? insertVersion : 0;
-    }
-
-    public int saveTaskRelation(User loginUser, WorkflowDefinition workflowDefinition,
-                                int workflowDefinitionVersion) {
-        long projectCode = workflowDefinition.getProjectCode();
-        long workflowDefinitionCode = workflowDefinition.getCode();
-        List<WorkflowTaskRelation> taskRelations =
-                workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
-        List<WorkflowTaskRelationLog> taskRelationList =
-                taskRelations.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
-
-        List<Long> taskCodeList =
-                taskRelations.stream().map(WorkflowTaskRelation::getPostTaskCode).collect(Collectors.toList());
-        List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(taskCodeList);
-        List<TaskDefinitionLog> taskDefinitionLogs =
-                taskDefinitions.stream().map(TaskDefinitionLog::new).collect(Collectors.toList());
-
-        if (taskRelationList.isEmpty()) {
-            return Constants.EXIT_CODE_SUCCESS;
-        }
-        Map<Long, TaskDefinitionLog> taskDefinitionLogMap = null;
-        if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
-            taskDefinitionLogMap = taskDefinitionLogs
-                    .stream()
-                    .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinitionLog -> taskDefinitionLog));
-        }
-        Date now = new Date();
-        for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
-            workflowTaskRelationLog.setProjectCode(projectCode);
-            workflowTaskRelationLog.setWorkflowDefinitionCode(workflowDefinitionCode);
-            workflowTaskRelationLog.setWorkflowDefinitionVersion(workflowDefinitionVersion);
-            if (taskDefinitionLogMap != null) {
-                TaskDefinitionLog preTaskDefinitionLog =
-                        taskDefinitionLogMap.get(workflowTaskRelationLog.getPreTaskCode());
-                if (preTaskDefinitionLog != null) {
-                    workflowTaskRelationLog.setPreTaskVersion(preTaskDefinitionLog.getVersion());
-                }
-                TaskDefinitionLog postTaskDefinitionLog =
-                        taskDefinitionLogMap.get(workflowTaskRelationLog.getPostTaskCode());
-                if (postTaskDefinitionLog != null) {
-                    workflowTaskRelationLog.setPostTaskVersion(postTaskDefinitionLog.getVersion());
-                }
-            }
-            workflowTaskRelationLog.setCreateTime(now);
-            workflowTaskRelationLog.setUpdateTime(now);
-            workflowTaskRelationLog.setOperator(loginUser.getId());
-            workflowTaskRelationLog.setOperateTime(now);
-        }
-        if (!taskRelations.isEmpty()) {
-            Set<Integer> workflowTaskRelationSet =
-                    taskRelations.stream().map(WorkflowTaskRelation::hashCode).collect(toSet());
-            Set<Integer> taskRelationSet =
-                    taskRelationList.stream().map(WorkflowTaskRelationLog::hashCode).collect(toSet());
-            boolean isSame = CollectionUtils.isEqualCollection(workflowTaskRelationSet,
-                    taskRelationSet);
-            if (isSame) {
-                log.info("workflow task relations is non-existent, projectCode:{}, workflowDefinitionCode:{}.",
-                        workflowDefinition.getProjectCode(), workflowDefinition.getCode());
-                return Constants.EXIT_CODE_SUCCESS;
-            }
-            workflowTaskRelationMapper.deleteByWorkflowDefinitionCode(projectCode, workflowDefinitionCode);
-        }
-        List<WorkflowTaskRelation> workflowTaskRelations =
-                taskRelationList.stream().map(WorkflowTaskRelation::new).collect(Collectors.toList());
-        int insert = workflowTaskRelationMapper.batchInsert(workflowTaskRelations);
-        int resultLog = workflowTaskRelationLogMapper.batchInsert(taskRelationList);
-        return (insert & resultLog) > 0 ? Constants.EXIT_CODE_SUCCESS : Constants.EXIT_CODE_FAILURE;
     }
 
     @Transactional
