@@ -26,22 +26,26 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 /**
  * resource tree visitor
  */
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class ResourceTreeVisitor implements Visitor {
 
     /**
      * resource list
      */
     private List<StorageEntity> resourceList;
+
+    public ResourceTreeVisitor() {
+    }
+
+    /**
+     * constructor
+     * @param resourceList resource list
+     */
+    public ResourceTreeVisitor(List<StorageEntity> resourceList) {
+        this.resourceList = resourceList;
+    }
 
     /**
      * visit

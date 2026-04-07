@@ -27,16 +27,14 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import org.slf4j.Logger;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class PermissionCheck<T> {
+
+    /**
+     * logger
+     */
+    private Logger logger;
 
     /**
      * Authorization Type
@@ -58,10 +56,30 @@ public class PermissionCheck<T> {
      */
     private int userId;
 
-    /**
-     * logger
-     */
-    private Logger logger;
+    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
+                           int userId, Logger logger) {
+        this.authorizationType = authorizationType;
+        this.processService = processService;
+        this.needChecks = needChecks;
+        this.userId = userId;
+        this.logger = logger;
+    }
+
+    public ProcessService getProcessService() {
+        return processService;
+    }
+
+    public void setProcessService(ProcessService processService) {
+        this.processService = processService;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 
     /**
      * check permission

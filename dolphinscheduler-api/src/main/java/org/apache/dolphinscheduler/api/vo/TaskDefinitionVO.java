@@ -23,20 +23,23 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import java.util.List;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import org.springframework.beans.BeanUtils;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
 public class TaskDefinitionVO extends TaskDefinition {
 
     private List<WorkflowTaskRelation> workflowTaskRelationList;
+
+    public TaskDefinitionVO() {
+    }
+
+    public TaskDefinitionVO(List<WorkflowTaskRelation> workflowTaskRelationList) {
+        this.workflowTaskRelationList = workflowTaskRelationList;
+    }
 
     public static TaskDefinitionVO fromTaskDefinition(TaskDefinition taskDefinition) {
         TaskDefinitionVO taskDefinitionVo = new TaskDefinitionVO();
