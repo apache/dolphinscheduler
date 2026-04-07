@@ -59,7 +59,7 @@ import com.amazonaws.services.emrserverless.model.StartJobRunRequest;
 import com.amazonaws.services.emrserverless.model.StartJobRunResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.google.common.collect.Sets;
 
@@ -70,7 +70,6 @@ import com.google.common.collect.Sets;
  * Supports Spark and Hive job types.
  * </p>
  *
- * @since dev-SNAPSHOT
  */
 @Slf4j
 public class EmrServerlessTask extends AbstractRemoteTask {
@@ -90,7 +89,7 @@ public class EmrServerlessTask extends AbstractRemoteTask {
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .defaultTimeZone(SystemConstants.DEFAULT_TIME_ZONE)
-            .propertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy())
+            .propertyNamingStrategy(PropertyNamingStrategies.UPPER_CAMEL_CASE)
             .build();
 
     private final TaskExecutionContext taskExecutionContext;
@@ -98,11 +97,6 @@ public class EmrServerlessTask extends AbstractRemoteTask {
     private EmrServerlessParameters emrServerlessParameters;
 
     private AWSEMRServerless emrServerlessClient;
-
-    /**
-     * applicationId from parameters
-     */
-    private String applicationId;
 
     /**
      * jobRunId returned by StartJobRun or recovered from appIds
@@ -124,7 +118,6 @@ public class EmrServerlessTask extends AbstractRemoteTask {
             throw new EmrServerlessTaskException("EMR Serverless task params are not valid");
         }
 
-        applicationId = emrServerlessParameters.getApplicationId();
         emrServerlessClient = createEmrServerlessClient();
     }
 
@@ -133,12 +126,13 @@ public class EmrServerlessTask extends AbstractRemoteTask {
         try {
             StartJobRunRequest request = buildStartJobRunRequest();
 
-            log.info("Submitting EMR Serverless job run to application: {}", applicationId);
+            log.info("Submitting EMR Serverless job run to application: {}",
+                    emrServerlessParameters.getApplicationId());
             StartJobRunResult result = emrServerlessClient.startJobRun(request);
 
             jobRunId = result.getJobRunId();
-            // Store applicationId:jobRunId for failover recovery
-            setAppIds(applicationId + ":" + jobRunId);
+            // Store jobRunId for failover recovery; applicationId is always available from parameters
+            setAppIds(jobRunId);
             log.info("Successfully submitted EMR Serverless job run, jobRunId: {}", jobRunId);
 
         } catch (EmrServerlessTaskException | SdkBaseException e) {
@@ -150,15 +144,10 @@ public class EmrServerlessTask extends AbstractRemoteTask {
     @Override
     public void trackApplicationStatus() throws TaskException {
         try {
-            // Recover applicationId and jobRunId from appIds if needed (failover case)
+            // Recover jobRunId from appIds if needed (failover case)
             if (StringUtils.isEmpty(jobRunId) && StringUtils.isNotEmpty(getAppIds())) {
-                String[] parts = getAppIds().split(":");
-                if (parts.length == 2) {
-                    applicationId = parts[0];
-                    jobRunId = parts[1];
-                    log.info("Recovered EMR Serverless job from appIds - applicationId: {}, jobRunId: {}",
-                            applicationId, jobRunId);
-                }
+                jobRunId = getAppIds();
+                log.info("Recovered EMR Serverless jobRunId from appIds: {}", jobRunId);
             }
 
             if (StringUtils.isEmpty(jobRunId)) {
@@ -191,10 +180,11 @@ public class EmrServerlessTask extends AbstractRemoteTask {
             log.warn("jobRunId is empty, skip cancel");
             return;
         }
-        log.info("Cancelling EMR Serverless job run, applicationId: {}, jobRunId: {}", applicationId, jobRunId);
+        log.info("Cancelling EMR Serverless job run, applicationId: {}, jobRunId: {}",
+                emrServerlessParameters.getApplicationId(), jobRunId);
         try {
             CancelJobRunRequest request = new CancelJobRunRequest()
-                    .withApplicationId(applicationId)
+                    .withApplicationId(emrServerlessParameters.getApplicationId())
                     .withJobRunId(jobRunId);
             CancelJobRunResult result = emrServerlessClient.cancelJobRun(request);
             log.info("Cancel job run result: {}", result);
@@ -235,7 +225,7 @@ public class EmrServerlessTask extends AbstractRemoteTask {
         }
 
         // Override applicationId and executionRoleArn from top-level parameters
-        request.setApplicationId(applicationId);
+        request.setApplicationId(emrServerlessParameters.getApplicationId());
         request.setExecutionRoleArn(emrServerlessParameters.getExecutionRoleArn());
 
         // Set job name if provided
@@ -256,7 +246,7 @@ public class EmrServerlessTask extends AbstractRemoteTask {
      */
     private String getJobRunState() {
         GetJobRunRequest request = new GetJobRunRequest()
-                .withApplicationId(applicationId)
+                .withApplicationId(emrServerlessParameters.getApplicationId())
                 .withJobRunId(jobRunId);
         GetJobRunResult result = emrServerlessClient.getJobRun(request);
 
@@ -266,7 +256,8 @@ public class EmrServerlessTask extends AbstractRemoteTask {
 
         JobRun jobRun = result.getJobRun();
         String state = jobRun.getState();
-        log.info("EMR Serverless job run [applicationId:{}, jobRunId:{}] state: {}", applicationId, jobRunId, state);
+        log.info("EMR Serverless job run [applicationId:{}, jobRunId:{}] state: {}",
+                emrServerlessParameters.getApplicationId(), jobRunId, state);
         return state;
     }
 

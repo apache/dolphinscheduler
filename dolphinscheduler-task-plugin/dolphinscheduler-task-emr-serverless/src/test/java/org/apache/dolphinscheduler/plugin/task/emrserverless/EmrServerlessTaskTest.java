@@ -189,7 +189,7 @@ public class EmrServerlessTaskTest {
         Mockito.lenient().when(failoverContext.getTaskName()).thenReturn("test-emr-serverless-failover");
         Mockito.lenient().when(failoverContext.getTaskInstanceId()).thenReturn(2);
         // Simulate that appIds was persisted from previous run
-        Mockito.when(failoverContext.getAppIds()).thenReturn(APPLICATION_ID + ":" + JOB_RUN_ID);
+        Mockito.when(failoverContext.getAppIds()).thenReturn(JOB_RUN_ID);
 
         EmrServerlessTask failoverTask = Mockito.spy(new EmrServerlessTask(failoverContext));
         Mockito.doReturn(emrServerlessClient).when(failoverTask).createEmrServerlessClient();
