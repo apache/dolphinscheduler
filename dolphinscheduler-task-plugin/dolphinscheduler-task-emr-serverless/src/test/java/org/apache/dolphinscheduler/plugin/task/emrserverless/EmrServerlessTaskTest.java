@@ -47,6 +47,7 @@ import com.amazonaws.services.emrserverless.model.AWSEMRServerlessException;
 import com.amazonaws.services.emrserverless.model.CancelJobRunResult;
 import com.amazonaws.services.emrserverless.model.GetJobRunResult;
 import com.amazonaws.services.emrserverless.model.JobRun;
+import com.amazonaws.services.emrserverless.model.JobRunState;
 import com.amazonaws.services.emrserverless.model.StartJobRunResult;
 
 @ExtendWith(MockitoExtension.class)
@@ -98,7 +99,8 @@ public class EmrServerlessTaskTest {
     @Test
     public void testHandleSuccess() throws Exception {
         // Job goes: SUBMITTED -> RUNNING -> SUCCESS
-        mockJobRunStates("SUBMITTED", "RUNNING", "SUCCESS");
+        mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.RUNNING.toString(),
+                JobRunState.SUCCESS.toString());
 
         emrServerlessTask.handle(taskCallBack);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, emrServerlessTask.getExitStatusCode());
@@ -107,7 +109,8 @@ public class EmrServerlessTaskTest {
     @Test
     public void testHandleFailed() throws Exception {
         // Job goes: SUBMITTED -> RUNNING -> FAILED
-        mockJobRunStates("SUBMITTED", "RUNNING", "FAILED");
+        mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.RUNNING.toString(),
+                JobRunState.FAILED.toString());
 
         emrServerlessTask.handle(taskCallBack);
         Assertions.assertEquals(EXIT_CODE_FAILURE, emrServerlessTask.getExitStatusCode());
@@ -116,7 +119,8 @@ public class EmrServerlessTaskTest {
     @Test
     public void testHandleCancelled() throws Exception {
         // Job goes: SUBMITTED -> RUNNING -> CANCELLED
-        mockJobRunStates("SUBMITTED", "RUNNING", "CANCELLED");
+        mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.RUNNING.toString(),
+                JobRunState.CANCELLED.toString());
 
         emrServerlessTask.handle(taskCallBack);
         Assertions.assertEquals(EXIT_CODE_KILL, emrServerlessTask.getExitStatusCode());
@@ -125,7 +129,8 @@ public class EmrServerlessTaskTest {
     @Test
     public void testHandleFullLifecycle() throws Exception {
         // Job goes through all intermediate states: SUBMITTED -> PENDING -> SCHEDULED -> RUNNING -> SUCCESS
-        mockJobRunStates("SUBMITTED", "PENDING", "SCHEDULED", "RUNNING", "SUCCESS");
+        mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.PENDING.toString(),
+                JobRunState.SCHEDULED.toString(), JobRunState.RUNNING.toString(), JobRunState.SUCCESS.toString());
 
         emrServerlessTask.handle(taskCallBack);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, emrServerlessTask.getExitStatusCode());
@@ -158,7 +163,8 @@ public class EmrServerlessTaskTest {
     @Test
     public void testCancelApplication() throws Exception {
         // Submit first so we have a jobRunId
-        mockJobRunStates("SUBMITTED", "RUNNING", "SUCCESS");
+        mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.RUNNING.toString(),
+                JobRunState.SUCCESS.toString());
         emrServerlessTask.handle(taskCallBack);
 
         // Now test cancel
@@ -179,7 +185,8 @@ public class EmrServerlessTaskTest {
     @Test
     public void testFailoverRecovery() throws Exception {
         // Simulate failover: submit the job first
-        mockJobRunStates("SUBMITTED", "RUNNING", "SUCCESS");
+        mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.RUNNING.toString(),
+                JobRunState.SUCCESS.toString());
         emrServerlessTask.handle(taskCallBack);
 
         // Now create a new task instance simulating failover
@@ -195,7 +202,7 @@ public class EmrServerlessTaskTest {
         Mockito.doReturn(emrServerlessClient).when(failoverTask).createEmrServerlessClient();
 
         // Reset getJobRun mock for the recovery path — job already completed
-        mockJobRunStates("SUCCESS");
+        mockJobRunStates(JobRunState.SUCCESS.toString());
 
         failoverTask.init();
         failoverTask.handle(taskCallBack);
@@ -280,7 +287,7 @@ public class EmrServerlessTaskTest {
         GetJobRunResult runningResult = Mockito.mock(GetJobRunResult.class);
         JobRun runningJobRun = Mockito.mock(JobRun.class);
         Mockito.when(runningResult.getJobRun()).thenReturn(runningJobRun);
-        Mockito.when(runningJobRun.getState()).thenReturn("RUNNING");
+        Mockito.when(runningJobRun.getState()).thenReturn(JobRunState.RUNNING.toString());
 
         Mockito.when(emrServerlessClient.getJobRun(any()))
                 .thenReturn(runningResult)
@@ -294,19 +301,19 @@ public class EmrServerlessTaskTest {
     @Test
     public void testMapStateToExitCode() throws Exception {
         // Test SUCCESS state
-        mockJobRunStates("SUCCESS");
+        mockJobRunStates(JobRunState.SUCCESS.toString());
         emrServerlessTask.handle(taskCallBack);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, emrServerlessTask.getExitStatusCode());
 
         // Re-init for next test
         before();
-        mockJobRunStates("FAILED");
+        mockJobRunStates(JobRunState.FAILED.toString());
         emrServerlessTask.handle(taskCallBack);
         Assertions.assertEquals(EXIT_CODE_FAILURE, emrServerlessTask.getExitStatusCode());
 
         // Re-init for next test
         before();
-        mockJobRunStates("CANCELLED");
+        mockJobRunStates(JobRunState.CANCELLED.toString());
         emrServerlessTask.handle(taskCallBack);
         Assertions.assertEquals(EXIT_CODE_KILL, emrServerlessTask.getExitStatusCode());
 

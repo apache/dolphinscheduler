@@ -55,6 +55,7 @@ import com.amazonaws.services.emrserverless.model.CancelJobRunResult;
 import com.amazonaws.services.emrserverless.model.GetJobRunRequest;
 import com.amazonaws.services.emrserverless.model.GetJobRunResult;
 import com.amazonaws.services.emrserverless.model.JobRun;
+import com.amazonaws.services.emrserverless.model.JobRunState;
 import com.amazonaws.services.emrserverless.model.StartJobRunRequest;
 import com.amazonaws.services.emrserverless.model.StartJobRunResult;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -78,7 +79,10 @@ public class EmrServerlessTask extends AbstractRemoteTask {
      * EMR Serverless job run states that indicate the job is still in progress.
      */
     private static final HashSet<String> WAITING_STATES = Sets.newHashSet(
-            "SUBMITTED", "PENDING", "SCHEDULED", "RUNNING");
+            JobRunState.SUBMITTED.toString(),
+            JobRunState.PENDING.toString(),
+            JobRunState.SCHEDULED.toString(),
+            JobRunState.RUNNING.toString());
 
     /**
      * ObjectMapper configured for AWS SDK request/response deserialization.
@@ -268,14 +272,12 @@ public class EmrServerlessTask extends AbstractRemoteTask {
         if (state == null) {
             return TaskConstants.EXIT_CODE_FAILURE;
         }
-        switch (state) {
-            case "SUCCESS":
-                return TaskConstants.EXIT_CODE_SUCCESS;
-            case "CANCELLED":
-                return TaskConstants.EXIT_CODE_KILL;
-            case "FAILED":
-            default:
-                return TaskConstants.EXIT_CODE_FAILURE;
+        if (JobRunState.SUCCESS.toString().equals(state)) {
+            return TaskConstants.EXIT_CODE_SUCCESS;
+        } else if (JobRunState.CANCELLED.toString().equals(state)) {
+            return TaskConstants.EXIT_CODE_KILL;
+        } else {
+            return TaskConstants.EXIT_CODE_FAILURE;
         }
     }
 
