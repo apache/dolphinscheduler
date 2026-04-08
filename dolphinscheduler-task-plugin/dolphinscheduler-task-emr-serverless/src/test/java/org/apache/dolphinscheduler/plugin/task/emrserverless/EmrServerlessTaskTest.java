@@ -65,15 +65,17 @@ public class EmrServerlessTaskTest {
 
         @Override
         public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo) {
+            // No-op: not needed for unit tests
         }
 
         @Override
         public void updateTaskInstanceInfo(int taskInstanceId) {
+            // No-op: not needed for unit tests
         }
     };
 
     @BeforeEach
-    public void before() throws Exception {
+    void before() throws Exception {
         String taskParams = buildEmrServerlessTaskParameters();
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(taskParams);
@@ -97,7 +99,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testHandleSuccess() throws Exception {
+    void testHandleSuccess() {
         // Job goes: SUBMITTED -> RUNNING -> SUCCESS
         mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.RUNNING.toString(),
                 JobRunState.SUCCESS.toString());
@@ -107,7 +109,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testHandleFailed() throws Exception {
+    void testHandleFailed() {
         // Job goes: SUBMITTED -> RUNNING -> FAILED
         mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.RUNNING.toString(),
                 JobRunState.FAILED.toString());
@@ -117,7 +119,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testHandleCancelled() throws Exception {
+    void testHandleCancelled() {
         // Job goes: SUBMITTED -> RUNNING -> CANCELLED
         mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.RUNNING.toString(),
                 JobRunState.CANCELLED.toString());
@@ -127,7 +129,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testHandleFullLifecycle() throws Exception {
+    void testHandleFullLifecycle() {
         // Job goes through all intermediate states: SUBMITTED -> PENDING -> SCHEDULED -> RUNNING -> SUCCESS
         mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.PENDING.toString(),
                 JobRunState.SCHEDULED.toString(), JobRunState.RUNNING.toString(), JobRunState.SUCCESS.toString());
@@ -137,7 +139,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testSubmitError() throws Exception {
+    void testSubmitError() {
         Mockito.when(emrServerlessClient.startJobRun(any()))
                 .thenThrow(new AWSEMRServerlessException("Access denied"));
 
@@ -147,7 +149,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testGetJobRunReturnsNull() throws Exception {
+    void testGetJobRunReturnsNull() {
         // First call for submit (need a valid startJobRun response)
         StartJobRunResult startResult = Mockito.mock(StartJobRunResult.class);
         Mockito.when(emrServerlessClient.startJobRun(any())).thenReturn(startResult);
@@ -161,7 +163,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testCancelApplication() throws Exception {
+    void testCancelApplication() {
         // Submit first so we have a jobRunId
         mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.RUNNING.toString(),
                 JobRunState.SUCCESS.toString());
@@ -176,14 +178,14 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testCancelWithEmptyJobRunId() throws Exception {
+    void testCancelWithEmptyJobRunId() {
         // Don't submit, so jobRunId is empty — cancel should be a no-op
         emrServerlessTask.cancelApplication();
         Mockito.verify(emrServerlessClient, Mockito.never()).cancelJobRun(any());
     }
 
     @Test
-    public void testFailoverRecovery() throws Exception {
+    void testFailoverRecovery() {
         // Simulate failover: submit the job first
         mockJobRunStates(JobRunState.SUBMITTED.toString(), JobRunState.RUNNING.toString(),
                 JobRunState.SUCCESS.toString());
@@ -212,7 +214,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testInit() throws Exception {
+    void testInit() {
         String taskParams = buildEmrServerlessTaskParameters();
         TaskExecutionContext ctx = Mockito.mock(TaskExecutionContext.class);
         Mockito.when(ctx.getTaskParams()).thenReturn(taskParams);
@@ -235,7 +237,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testParametersCheck() {
+    void testParametersCheck() {
         EmrServerlessParameters params = new EmrServerlessParameters();
 
         // All empty — should fail
@@ -255,7 +257,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testInvalidJson() throws Exception {
+    void testInvalidJson() {
         // Build params with invalid JSON
         EmrServerlessParameters params = new EmrServerlessParameters();
         params.setApplicationId(APPLICATION_ID);
@@ -277,7 +279,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testHandle_PollingFailure() throws Exception {
+    void testHandle_PollingFailure() {
         // Submit succeeds
         StartJobRunResult startResult = Mockito.mock(StartJobRunResult.class);
         Mockito.when(emrServerlessClient.startJobRun(any())).thenReturn(startResult);
@@ -299,7 +301,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testMapStateToExitCode() throws Exception {
+    void testMapStateToExitCode() throws Exception {
         // Test SUCCESS state
         mockJobRunStates(JobRunState.SUCCESS.toString());
         emrServerlessTask.handle(taskCallBack);
@@ -325,7 +327,7 @@ public class EmrServerlessTaskTest {
     }
 
     @Test
-    public void testGetApplicationIds() throws Exception {
+    void testGetApplicationIds() {
         Assertions.assertTrue(emrServerlessTask.getApplicationIds().isEmpty());
     }
 
