@@ -80,16 +80,20 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
      * Try to trigger the tasks if the trigger condition is met.
      * <p> If all the given tasks trigger condition is not met then will try to emit workflow finish event.
      */
-    protected void triggerTasks(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                final List<ITaskExecutionRunnable> triggerCandidateTasks) {
+    protected boolean triggerTasks(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                   final List<ITaskExecutionRunnable> triggerCandidateTasks) {
         final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecutionRunnable.getWorkflowExecutionGraph();
+        final IWorkflowFailureStrategy workflowFailureStrategy = workflowExecutionRunnable.getWorkflowFailureStrategy();
         final List<ITaskExecutionRunnable> readyToTriggerTasks = triggerCandidateTasks
                 .stream()
-                .filter(workflowExecutionGraph::isTriggerConditionMet)
+                .filter(taskExecutionRunnable -> workflowExecutionGraph.isTriggerConditionMet(
+                        taskExecutionRunnable,
+                        predecessor -> workflowFailureStrategy.canTriggerSuccessor(workflowExecutionRunnable,
+                                predecessor)))
                 .sorted(Comparator.comparing(ITaskExecutionRunnable::getName))
                 .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(readyToTriggerTasks)) {
-            return;
+            return false;
         }
         final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
         for (ITaskExecutionRunnable readyToTriggerTask : readyToTriggerTasks) {
@@ -101,8 +105,10 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
                                 workflowExecutionRunnable, readyToTriggerTask));
                 continue;
             }
+            workflowExecutionGraph.markTaskExecutionRunnableChainContinue(readyToTriggerTask);
             workflowEventBus.publish(TaskStartLifecycleEvent.of(readyToTriggerTask));
         }
+        return true;
     }
 
     protected void pauseActiveTask(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
@@ -137,7 +143,11 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
             return;
         }
 
-        triggerTasks(workflowExecutionRunnable, workflowExecutionGraph.getSuccessors(taskExecutionRunnable));
+        final boolean hasTriggeredTask =
+                triggerTasks(workflowExecutionRunnable, workflowExecutionGraph.getSuccessors(taskExecutionRunnable));
+        if (!hasTriggeredTask) {
+            emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
+        }
     }
 
     protected void workflowFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,

@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
@@ -204,6 +205,12 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
 
     @Override
     public boolean isTriggerConditionMet(final ITaskExecutionRunnable taskExecutionRunnable) {
+        return isTriggerConditionMet(taskExecutionRunnable, predecessor -> false);
+    }
+
+    @Override
+    public boolean isTriggerConditionMet(final ITaskExecutionRunnable taskExecutionRunnable,
+                                         final Predicate<ITaskExecutionRunnable> failedPredecessorAllowed) {
         if (isTaskExecutionRunnableActive(taskExecutionRunnable)
                 || isTaskExecutionRunnableInActive(taskExecutionRunnable)) {
             return false;
@@ -211,9 +218,10 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
         return getPredecessors(taskExecutionRunnable.getName())
                 .stream()
                 .allMatch(predecessor -> isTaskExecutionRunnableInActive(predecessor)
-                        && !isTaskExecutionRunnableFailed(predecessor)
                         && !isTaskExecutionRunnablePaused(predecessor)
-                        && !isTaskExecutionRunnableKilled(predecessor));
+                        && !isTaskExecutionRunnableKilled(predecessor)
+                        && (!isTaskExecutionRunnableFailed(predecessor)
+                                || failedPredecessorAllowed.test(predecessor)));
     }
 
     @Override
@@ -264,6 +272,14 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
     }
 
     @Override
+    public void markTaskExecutionRunnableChainContinue(final ITaskExecutionRunnable taskExecutionRunnable) {
+        getPredecessors(taskExecutionRunnable.getName())
+                .stream()
+                .filter(this::isTaskExecutionRunnableFailed)
+                .forEach(predecessor -> failureTaskChains.remove(predecessor.getName()));
+    }
+
+    @Override
     public void markTaskExecutionRunnableChainPause(final ITaskExecutionRunnable taskExecutionRunnable) {
         assertTaskExecutionRunnableState(taskExecutionRunnable, TaskExecutionStatus.PAUSE);
         pausedTaskChains.add(taskExecutionRunnable.getName());
@@ -289,9 +305,7 @@ public class WorkflowExecutionGraph implements IWorkflowExecutionGraph {
     public boolean isEndOfTaskChain(final ITaskExecutionRunnable taskExecutionRunnable) {
         return successors.get(taskExecutionRunnable.getName()).isEmpty()
                 || isTaskExecutionRunnableKilled(taskExecutionRunnable)
-                || isTaskExecutionRunnablePaused(taskExecutionRunnable)
-                || (isTaskExecutionRunnableFailed(taskExecutionRunnable)
-                        && !isAllSuccessorsAreConditionTask(taskExecutionRunnable));
+                || isTaskExecutionRunnablePaused(taskExecutionRunnable);
     }
 
     @Override

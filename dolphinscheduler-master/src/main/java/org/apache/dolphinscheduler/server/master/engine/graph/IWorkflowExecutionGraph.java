@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecu
 
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * The workflow execution graph represent the real DAG in runtime, it might be a sub DAG of the workflow DAG.
@@ -126,6 +127,15 @@ public interface IWorkflowExecutionGraph {
     boolean isTriggerConditionMet(final ITaskExecutionRunnable taskExecutionRunnable);
 
     /**
+     * Check whether the given task can be trigger now.
+     * <p> The task can be trigger only all the predecessors are finished and all predecessors are not
+     * pause/kill. Failed predecessors can still satisfy the condition if the given predicate allows them.
+     * <p> Once the task has been triggered, then will also return false.
+     */
+    boolean isTriggerConditionMet(final ITaskExecutionRunnable taskExecutionRunnable,
+                                  final Predicate<ITaskExecutionRunnable> failedPredecessorAllowed);
+
+    /**
      * Mark the TaskExecutionRunnable is active.
      * <p> If the TaskExecutionRunnable is active means the task is handling by the workflow.
      * <p> Once we begin to handle a task, we should mark the TaskExecutionRunnable active.
@@ -156,6 +166,13 @@ public interface IWorkflowExecutionGraph {
      * <p> Once the TaskExecutionRunnable chain is failure, then the successors will not be trigger, and the workflow execution graph might be failure.
      */
     void markTaskExecutionRunnableChainFailure(final ITaskExecutionRunnable taskExecutionRunnable);
+
+    /**
+     * Mark the TaskExecutionRunnable chain is continued.
+     * <p> Once the TaskExecutionRunnable is continued, then the direct failed predecessors are no longer the
+     * terminal failure chain and the successor result will determine the final chain status.
+     */
+    void markTaskExecutionRunnableChainContinue(final ITaskExecutionRunnable taskExecutionRunnable);
 
     /**
      * Mark the TaskExecutionRunnable chain is pause.
@@ -198,7 +215,8 @@ public interface IWorkflowExecutionGraph {
      * Check whether the given task is the end of the task chain.
      * <p> If the given task has no successor, then it is the end of the task chain.
      * <p> If the given task is killed or paused, then it is the end of the task chain.
-     * <p> If the given task is failure, and all its successors are condition task then it is not end of a task chain.
+     * <p> Failed tasks are not treated as chain terminals if the current workflow failure strategy
+     * allows their successors to continue.
      */
     boolean isEndOfTaskChain(final ITaskExecutionRunnable taskExecutionRunnable);
 
