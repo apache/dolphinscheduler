@@ -45,6 +45,8 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -231,8 +233,6 @@ public class BackfillWorkflowExecutorDelegateTest {
                 .thenReturn(Collections.singletonList(depBtoA));
         when(workflowDefinitionDao.queryByCodes(Collections.singleton(codeB)))
                 .thenReturn(Collections.singletonList(workflowB));
-        when(workflowDefinitionDao.queryByCodes(Collections.singleton(codeA)))
-                .thenReturn(Collections.singletonList(workflowA));
         User loginUser = new User();
         loginUser.setId(1);
         BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
@@ -261,6 +261,140 @@ public class BackfillWorkflowExecutorDelegateTest {
         backfillWorkflowExecutorDelegate.executeWithVisitedCodes(dto, new HashSet<>());
         // Only A and B will be triggered once each
         Assertions.assertEquals(2, requests.size());
+    }
+
+    @Test
+    public void testAllLevelDependent_resolveTransitiveDownstreamThenTrigger() {
+        long codeA = 1L, codeB = 2L, codeC = 3L;
+        WorkflowDefinition workflowA =
+                WorkflowDefinition.builder().code(codeA).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition workflowB =
+                WorkflowDefinition.builder().code(codeB).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition workflowC =
+                WorkflowDefinition.builder().code(codeC).releaseState(ReleaseState.ONLINE).build();
+
+        DependentWorkflowDefinition depAtoB = new DependentWorkflowDefinition();
+        depAtoB.setWorkflowDefinitionCode(codeB);
+        DependentWorkflowDefinition depBtoC = new DependentWorkflowDefinition();
+        depBtoC.setWorkflowDefinitionCode(codeC);
+
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(codeA))
+                .thenReturn(Collections.singletonList(depAtoB));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(codeB))
+                .thenReturn(Collections.singletonList(depBtoC));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(codeC))
+                .thenReturn(Collections.emptyList());
+        when(workflowDefinitionDao.queryByCodes(new LinkedHashSet<>(Arrays.asList(codeB, codeC))))
+                .thenReturn(Arrays.asList(workflowB, workflowC));
+
+        User loginUser = new User();
+        loginUser.setId(1);
+        BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                .runMode(RunMode.RUN_MODE_SERIAL)
+                .backfillDateList(Collections.singletonList(ZonedDateTime.parse("2026-02-01T00:00:00Z")))
+                .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                .allLevelDependent(true)
+                .executionOrder(ExecutionOrder.ASC_ORDER)
+                .build();
+        BackfillWorkflowDTO dto = BackfillWorkflowDTO.builder()
+                .loginUser(loginUser)
+                .workflowDefinition(workflowA)
+                .workerGroup("a")
+                .backfillParams(params)
+                .build();
+
+        Server masterServer = new Server();
+        masterServer.setHost("127.0.0.1");
+        masterServer.setPort(1234);
+        when(registryClient.getRandomServer(RegistryNodeType.MASTER)).thenReturn(Optional.of(masterServer));
+
+        List<WorkflowBackfillTriggerRequest> requests = new ArrayList<>();
+        doAnswer(invocation -> {
+            WorkflowBackfillTriggerRequest req = invocation.getArgument(0);
+            requests.add(req);
+            return WorkflowBackfillTriggerResponse.success(1);
+        }).when(backfillWorkflowExecutorDelegate).triggerBackfillWorkflow(any(), any());
+
+        backfillWorkflowExecutorDelegate.executeWithVisitedCodes(dto, new HashSet<>());
+
+        Assertions.assertEquals(3, requests.size());
+        Assertions.assertEquals(1, requests.stream().filter(r -> r.getWorkflowCode() == codeA).count());
+        Assertions.assertEquals(1, requests.stream().filter(r -> r.getWorkflowCode() == codeB).count());
+        Assertions.assertEquals(1, requests.stream().filter(r -> r.getWorkflowCode() == codeC).count());
+    }
+
+    @Test
+    public void testParallelBackfill_allLevelDependent_shouldTriggerDownstreamForAllDates() {
+        long codeA = 1L, codeB = 2L, codeC = 3L;
+        WorkflowDefinition workflowA =
+                WorkflowDefinition.builder().code(codeA).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition workflowB =
+                WorkflowDefinition.builder().code(codeB).releaseState(ReleaseState.ONLINE).build();
+        WorkflowDefinition workflowC =
+                WorkflowDefinition.builder().code(codeC).releaseState(ReleaseState.ONLINE).build();
+
+        DependentWorkflowDefinition depAtoB = new DependentWorkflowDefinition();
+        depAtoB.setWorkflowDefinitionCode(codeB);
+        DependentWorkflowDefinition depBtoC = new DependentWorkflowDefinition();
+        depBtoC.setWorkflowDefinitionCode(codeC);
+
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(codeA))
+                .thenReturn(Collections.singletonList(depAtoB));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(codeB))
+                .thenReturn(Collections.singletonList(depBtoC));
+        when(workflowLineageService.queryDownstreamDependentWorkflowDefinitions(codeC))
+                .thenReturn(Collections.emptyList());
+
+        when(workflowDefinitionDao.queryByCodes(new LinkedHashSet<>(Arrays.asList(codeB, codeC))))
+                .thenReturn(Arrays.asList(workflowB, workflowC));
+
+        User loginUser = new User();
+        loginUser.setId(1);
+        BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                .runMode(RunMode.RUN_MODE_PARALLEL)
+                .expectedParallelismNumber(2)
+                .backfillDateList(Arrays.asList(
+                        ZonedDateTime.parse("2026-04-01T00:00:00Z"),
+                        ZonedDateTime.parse("2026-04-02T00:00:00Z"),
+                        ZonedDateTime.parse("2026-04-03T00:00:00Z")))
+                .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                .allLevelDependent(true)
+                .executionOrder(ExecutionOrder.ASC_ORDER)
+                .build();
+        BackfillWorkflowDTO dto = BackfillWorkflowDTO.builder()
+                .loginUser(loginUser)
+                .workflowDefinition(workflowA)
+                .workerGroup("a")
+                .backfillParams(params)
+                .build();
+
+        Server masterServer = new Server();
+        masterServer.setHost("127.0.0.1");
+        masterServer.setPort(1234);
+        when(registryClient.getRandomServer(RegistryNodeType.MASTER)).thenReturn(Optional.of(masterServer));
+
+        List<WorkflowBackfillTriggerRequest> requests = new ArrayList<>();
+        doAnswer(invocation -> {
+            WorkflowBackfillTriggerRequest req = invocation.getArgument(0);
+            requests.add(req);
+            return WorkflowBackfillTriggerResponse.success(1);
+        }).when(backfillWorkflowExecutorDelegate).triggerBackfillWorkflow(any(), any());
+
+        backfillWorkflowExecutorDelegate.executeWithVisitedCodes(dto, new HashSet<>());
+
+        long countA = requests.stream().filter(r -> r.getWorkflowCode() == codeA).count();
+        Set<String> bBackfillDates = requests.stream()
+                .filter(r -> r.getWorkflowCode() == codeB)
+                .flatMap(r -> r.getBackfillTimeList().stream())
+                .collect(Collectors.toSet());
+        Set<String> cBackfillDates = requests.stream()
+                .filter(r -> r.getWorkflowCode() == codeC)
+                .flatMap(r -> r.getBackfillTimeList().stream())
+                .collect(Collectors.toSet());
+
+        Assertions.assertEquals(2, countA);
+        Assertions.assertEquals(3, bBackfillDates.size());
+        Assertions.assertEquals(3, cBackfillDates.size());
     }
 
     @Test
