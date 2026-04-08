@@ -7,11 +7,11 @@ The following shows the `Script` configuration example:
 
 ## Parameter Configuration
 
-| **Parameter** |                       **Description**                       |
-|---------------|-------------------------------------------------------------|
-| User Params   | User defined parameters will pass to the script.            |
-| Script Path   | The file location path in the server, only support .sh file |
-| Type          | Support `Shell` script.                                     |
+| **Parameter** |                                   **Description**                                   |
+|---------------|-------------------------------------------------------------------------------------|
+| User Params   | User defined parameters will pass to the script.                                    |
+| Script Path   | The file location path in the server, only support .sh file                         |
+| Type          | Support `Shell` script.                                                             |
 | Timeout       | Script execution timeout in seconds, default is `60`, and must be greater than `0`. |
 
 ### Note
