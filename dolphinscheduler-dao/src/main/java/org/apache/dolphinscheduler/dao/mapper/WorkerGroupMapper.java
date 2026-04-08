@@ -49,9 +49,5 @@ public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
      */
     List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
 
-    int updateAddrListByWorkerGroupName(@Param("name") String name,
-                                        @Param("addrList") String addrList,
-                                        @Param("source") WorkerGroupSource source);
-
     int deleteByWorkerGroupName(@Param("name") String name);
 }
