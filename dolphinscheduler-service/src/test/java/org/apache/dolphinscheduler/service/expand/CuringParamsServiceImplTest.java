@@ -233,48 +233,6 @@ public class CuringParamsServiceImplTest {
     }
 
     @Test
-    public void testParseWorkflowStartParam() {
-        Map<String, Property> result;
-        // empty cmd param
-        Map<String, String> startParamMap = new HashMap<>();
-        result = curingParamsServiceImpl.parseWorkflowStartParam(startParamMap);
-        Assertions.assertTrue(MapUtils.isEmpty(result));
-
-        // without key
-        startParamMap.put("testStartParam", "$[yyyyMMdd]");
-        result = curingParamsServiceImpl.parseWorkflowStartParam(startParamMap);
-        Assertions.assertTrue(MapUtils.isEmpty(result));
-
-        startParamMap.put("StartParams", "{\"param1\":\"11111\", \"param2\":\"22222\"}");
-        result = curingParamsServiceImpl.parseWorkflowStartParam(startParamMap);
-        Assertions.assertTrue(MapUtils.isNotEmpty(result));
-        Assertions.assertEquals(2, result.keySet().size());
-        Assertions.assertEquals("11111", result.get("param1").getValue());
-        Assertions.assertEquals("22222", result.get("param2").getValue());
-    }
-
-    @Test
-    public void testParseWorkflowFatherParam() {
-        Map<String, Property> result;
-        // empty cmd param
-        Map<String, String> startParamMap = new HashMap<>();
-        result = curingParamsServiceImpl.parseWorkflowFatherParam(startParamMap);
-        Assertions.assertTrue(MapUtils.isEmpty(result));
-
-        // without key
-        startParamMap.put("testfatherParams", "$[yyyyMMdd]");
-        result = curingParamsServiceImpl.parseWorkflowFatherParam(startParamMap);
-        Assertions.assertTrue(MapUtils.isEmpty(result));
-
-        startParamMap.put("fatherParams", "{\"param1\":\"11111\", \"param2\":\"22222\"}");
-        result = curingParamsServiceImpl.parseWorkflowFatherParam(startParamMap);
-        Assertions.assertTrue(MapUtils.isNotEmpty(result));
-        Assertions.assertEquals(2, result.keySet().size());
-        Assertions.assertEquals("11111", result.get("param1").getValue());
-        Assertions.assertEquals("22222", result.get("param2").getValue());
-    }
-
-    @Test
     public void testParseGlobalParamsMap() throws Exception {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setGlobalParams(

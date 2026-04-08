@@ -75,6 +75,7 @@ spring:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
     static-path-pattern: /static/**
+    dispatch-trace-request: false
   cloud.discovery.client.composite-indicator.enabled: false
 
 springdoc:

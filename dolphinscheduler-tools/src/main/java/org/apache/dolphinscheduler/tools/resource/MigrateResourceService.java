@@ -72,7 +72,6 @@ public class MigrateResourceService {
         for (Map<String, Object> item : resources) {
             String oriFullName = (String) item.get("full_name");
             int type = (int) item.get("type");
-            int id = (int) item.get("id");
             try {
                 oriFullName = oriFullName.startsWith("/") ? oriFullName.substring(1) : oriFullName;
                 if (ResourceType.FILE.getCode() == type) {

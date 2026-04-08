@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.storage.hdfs.HdfsStorageOperator;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,10 +31,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * base service test
@@ -43,12 +39,7 @@ import org.slf4j.LoggerFactory;
 @ExtendWith(MockitoExtension.class)
 public class BaseServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(BaseServiceTest.class);
-
     private BaseServiceImpl baseService;
-
-    @Mock
-    private HdfsStorageOperator hdfsStorageOperator;
 
     @BeforeEach
     public void setUp() {

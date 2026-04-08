@@ -30,6 +30,10 @@ public enum WorkflowLifecycleEventType implements ILifecycleEventType {
      */
     TOPOLOGY_LOGICAL_TRANSACTION_WITH_TASK_FINISH,
     /**
+     * Do Timeout strategy of the workflow instance.
+     */
+    TIMEOUT,
+    /**
      * Pause the workflow instance
      */
     PAUSE,

@@ -195,6 +195,13 @@ public class AlertDao {
      * @param projectUser     projectUser
      */
     public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance, ProjectUser projectUser) {
+        if (projectUser == null) {
+            throw new IllegalArgumentException("projectUser must not be null");
+        }
+        if (workflowInstance.getWarningGroupId() == null) {
+            throw new IllegalArgumentException("warningGroupId of the workflow instance must not be null");
+        }
+
         int alertGroupId = workflowInstance.getWarningGroupId();
         Alert alert = new Alert();
         List<WorkflowAlertContent> workflowAlertContentList = new ArrayList<>(1);
@@ -220,10 +227,11 @@ public class AlertDao {
         alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
         alert.setWorkflowInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.WORKFLOW_INSTANCE_TIMEOUT);
-        saveTaskTimeoutAlert(alert, content, alertGroupId);
+
+        saveTimeoutAlert(alert, content, alertGroupId);
     }
 
-    private void saveTaskTimeoutAlert(Alert alert, String content, int alertGroupId) {
+    private void saveTimeoutAlert(Alert alert, String content, int alertGroupId) {
         alert.setAlertGroupId(alertGroupId);
         alert.setWarningType(WarningType.FAILURE);
         alert.setContent(content);
@@ -275,7 +283,8 @@ public class AlertDao {
         alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
         alert.setWorkflowInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.TASK_TIMEOUT);
-        saveTaskTimeoutAlert(alert, content, workflowInstance.getWarningGroupId());
+
+        saveTimeoutAlert(alert, content, workflowInstance.getWarningGroupId());
     }
 
     /**

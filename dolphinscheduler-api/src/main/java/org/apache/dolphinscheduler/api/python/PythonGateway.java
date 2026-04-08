@@ -34,13 +34,10 @@ import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
-import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
-import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -49,7 +46,6 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
-import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -94,11 +90,6 @@ public class PythonGateway {
     private static final Priority DEFAULT_PRIORITY = Priority.MEDIUM;
     private static final Long DEFAULT_ENVIRONMENT_CODE = -1L;
 
-    private static final TaskDependType DEFAULT_TASK_DEPEND_TYPE = TaskDependType.TASK_POST;
-    private static final RunMode DEFAULT_RUN_MODE = RunMode.RUN_MODE_SERIAL;
-    private static final ExecutionOrder DEFAULT_EXECUTION_ORDER = ExecutionOrder.DESC_ORDER;
-    private static final int DEFAULT_DRY_RUN = 0;
-    private static final ComplementDependentMode COMPLEMENT_DEPENDENT_MODE = ComplementDependentMode.OFF_MODE;
     // We use admin user's user_id to skip some permission issue from python gateway service
     private static final int ADMIN_USER_ID = 1;
 
@@ -157,14 +148,6 @@ public class PythonGateway {
             setId(ADMIN_USER_ID);
             setUserName("dummyUser");
             setUserType(UserType.ADMIN_USER);
-        }
-    };
-
-    private final Queue queuePythonGateway = new Queue() {
-
-        {
-            setId(Integer.MAX_VALUE);
-            setQueueName("queuePythonGateway");
         }
     };
 

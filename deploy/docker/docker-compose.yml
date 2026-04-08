@@ -18,7 +18,8 @@ version: "3.8"
 
 services:
   dolphinscheduler-postgresql:
-    image: bitnami/postgresql:15.2.0
+    image: bitnamilegacy/postgresql:15.2.0-debian-11-r9
+
     ports:
       - "5432:5432"
     profiles: ["all", "schema"]
@@ -37,7 +38,7 @@ services:
       - dolphinscheduler
 
   dolphinscheduler-zookeeper:
-    image: bitnami/zookeeper:3.7.1
+    image: bitnamilegacy/zookeeper:3.7.1-debian-11-r99
     profiles: ["all"]
     environment:
       ALLOW_ANONYMOUS_LOGIN: "yes"
