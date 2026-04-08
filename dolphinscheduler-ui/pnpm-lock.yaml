@@ -20,7 +20,7 @@ specifiers:
   '@antv/layout': 0.1.31
   '@antv/x6': ^1.34.1
   '@types/js-cookie': ^3.0.2
-  '@types/lodash': ^4.14.185
+  '@types/lodash': ^4.18.0
   '@types/node': ^18.7.18
   '@types/nprogress': ^0.2.0
   '@types/qs': ^6.9.7
@@ -41,7 +41,7 @@ specifiers:
   eslint-plugin-prettier: ^4.2.1
   eslint-plugin-vue: ^9.5.1
   js-cookie: ^3.0.1
-  lodash: ^4.17.21
+  lodash: ^4.18.0
   monaco-editor: ^0.50.0
   naive-ui: 2.33.5
   nprogress: ^0.2.0
