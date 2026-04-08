@@ -95,9 +95,12 @@ public final class ProcessUtils {
                 process.waitFor();
             }
             return ProcessExecutionResult.success(process.exitValue());
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
             log.error("execute alert script error {}", e.getMessage());
+            return ProcessExecutionResult.error();
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            log.error("execute alert script interrupted", e);
             return ProcessExecutionResult.error();
         } finally {
             closeProcessStreams(process);
@@ -109,6 +112,11 @@ public final class ProcessUtils {
     private static void closeProcessStreams(Process process) {
         if (Objects.isNull(process)) {
             return;
+        }
+        try {
+            process.getOutputStream().close();
+        } catch (IOException e) {
+            log.warn("Failed to close process output stream", e);
         }
         try {
             process.getInputStream().close();
@@ -130,6 +138,7 @@ public final class ProcessUtils {
             gobbler.join();
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            log.warn("Interrupted while waiting for stream gobbler to finish", e);
         }
     }
 }
