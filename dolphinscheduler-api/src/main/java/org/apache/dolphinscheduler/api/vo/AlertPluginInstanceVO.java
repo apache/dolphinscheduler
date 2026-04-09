@@ -24,14 +24,8 @@ import lombok.Data;
 @Data
 public class AlertPluginInstanceVO {
 
-    /**
-     * id
-     */
     private int id;
 
-    /**
-     * plugin_define_id
-     */
     private int pluginDefineId;
 
     /**
@@ -49,23 +43,11 @@ public class AlertPluginInstanceVO {
      */
     private String warningType;
 
-    /**
-     * plugin_instance_params
-     */
     private String pluginInstanceParams;
 
-    /**
-     * create_time
-     */
     private Date createTime;
 
-    /**
-     * update_time
-     */
     private Date updateTime;
 
-    /**
-     * alert plugin name
-     */
     private String alertPluginName;
 }

@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-/**
- * flink stream parameters
- */
 public class FlinkStreamParameters extends FlinkParameters {
 
 }

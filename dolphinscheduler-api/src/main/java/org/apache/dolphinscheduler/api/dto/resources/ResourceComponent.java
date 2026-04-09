@@ -25,41 +25,20 @@ import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * resource component
- */
 @Data
 @NoArgsConstructor
 public abstract class ResourceComponent {
 
-    /**
-     * name
-     */
     protected String name;
-    /**
-     * current directory
-     */
     protected String currentDir;
-    /**
-     * full name
-     */
     protected String fullName;
-    /**
-     * description
-     */
     protected String description;
-    /**
-     * is directory
-     */
     protected boolean isDirctory;
 
     /**
      * resoruce type
      */
     protected ResourceType type;
-    /**
-     * children
-     */
     protected List<ResourceComponent> children = new ArrayList<>();
 
     /**

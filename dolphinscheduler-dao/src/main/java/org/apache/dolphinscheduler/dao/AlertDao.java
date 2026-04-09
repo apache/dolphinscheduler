@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,15 +70,20 @@ public class AlertDao {
     private static final int ADMIN_ALERT_GROUP_ID = 1;
 
     @Value("${alert.alarm-suppression.crash:60}")
+    @Setter
     private Integer crashAlarmSuppression;
 
     @Autowired
     private AlertMapper alertMapper;
 
     @Autowired
+    @Getter
+    @Setter
     private AlertPluginInstanceMapper alertPluginInstanceMapper;
 
     @Autowired
+    @Getter
+    @Setter
     private AlertGroupMapper alertGroupMapper;
 
     @Autowired
@@ -317,26 +324,6 @@ public class AlertDao {
             return alertPluginInstanceMapper.queryByIds(ids);
         }
         return null;
-    }
-
-    public AlertPluginInstanceMapper getAlertPluginInstanceMapper() {
-        return alertPluginInstanceMapper;
-    }
-
-    public void setAlertPluginInstanceMapper(AlertPluginInstanceMapper alertPluginInstanceMapper) {
-        this.alertPluginInstanceMapper = alertPluginInstanceMapper;
-    }
-
-    public AlertGroupMapper getAlertGroupMapper() {
-        return alertGroupMapper;
-    }
-
-    public void setAlertGroupMapper(AlertGroupMapper alertGroupMapper) {
-        this.alertGroupMapper = alertGroupMapper;
-    }
-
-    public void setCrashAlarmSuppression(Integer crashAlarmSuppression) {
-        this.crashAlarmSuppression = crashAlarmSuppression;
     }
 
     public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {

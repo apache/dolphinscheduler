@@ -52,9 +52,6 @@ public class SparkConstants {
      */
     public static final String DRIVER_MEMORY = "--conf spark.driver.memory=%s";
 
-    /**
-     * master
-     */
     public static final String MASTER = "--master";
 
     public static final String SPARK_ON_YARN = "yarn";
@@ -66,9 +63,6 @@ public class SparkConstants {
      */
     public static final String DRIVER_LABEL_CONF = "--conf spark.kubernetes.driver.label.%s=%s";
 
-    /**
-     * spark kubernetes namespace
-     */
     public static final String SPARK_KUBERNETES_NAMESPACE = "--conf spark.kubernetes.namespace=%s";
 
     /**
@@ -96,9 +90,6 @@ public class SparkConstants {
      */
     public static final String SPARK_SQL_COMMAND = "${SPARK_HOME}/bin/spark-sql";
 
-    /**
-     * spark submit command
-     */
     public static final String SPARK_SUBMIT_COMMAND = "${SPARK_HOME}/bin/spark-submit";
 
     public static final String TYPE_SCRIPT = "SCRIPT";

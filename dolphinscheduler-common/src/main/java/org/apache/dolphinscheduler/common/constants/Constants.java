@@ -25,9 +25,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public final class Constants {
 
-    /**
-     * common properties path
-     */
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
 
     public static final String REMOTE_LOGGING_YAML_PATH = "/remote-logging.yaml";
@@ -45,9 +42,6 @@ public final class Constants {
      */
     public static final String FS_DEFAULT_FS = "resource.hdfs.fs.defaultFS";
 
-    /**
-     * data basedir path
-     */
     public static final String DATA_BASEDIR_PATH = "data.basedir.path";
 
     /**
@@ -58,9 +52,6 @@ public final class Constants {
     public static final String RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE =
             "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js";
 
-    /**
-     * development.state
-     */
     public static final String DEVELOPMENT_STATE = "development.state";
 
     /**
@@ -68,64 +59,31 @@ public final class Constants {
      */
     public static final String SHELL_KILL_WAIT_TIMEOUT = "shell.kill.wait.timeout";
 
-    /**
-     * sudo enable
-     */
     public static final String SUDO_ENABLE = "sudo.enable";
 
-    /**
-     * resource storage type
-     */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
     public static final String AWS_S3_BUCKET_NAME = "aws.s3.bucket.name";
 
-    /**
-     * comma ,
-     */
     public static final String COMMA = ",";
 
-    /**
-     * COLON :
-     */
     public static final String COLON = ":";
 
-    /**
-     * SPACE " "
-     */
     public static final String SPACE = " ";
 
-    /**
-     * SINGLE_SLASH /
-     */
     public static final String SINGLE_SLASH = "/";
 
-    /**
-     * DOUBLE_SLASH //
-     */
     public static final String DOUBLE_SLASH = "//";
 
-    /**
-     * AT SIGN
-     */
     public static final String AT_SIGN = "@";
 
-    /**
-     * SLASH /
-     */
     public static final String SLASH = "/";
 
-    /**
-     * SEMICOLON ;
-     */
     public static final String SEMICOLON = ";";
 
     public static final String IMPORT_SUFFIX = "_import_";
 
     public static final String COPY_SUFFIX = "_copy_";
-    /**
-     * http connect time out
-     */
     public static final int HTTP_CONNECT_TIMEOUT = 60 * 1000;
 
     /**
@@ -143,14 +101,8 @@ public final class Constants {
      */
     public static final String HTTP_HEADER_UNKNOWN = "unKnown";
 
-    /**
-     * http X-Forwarded-For
-     */
     public static final String HTTP_X_FORWARDED_FOR = "X-Forwarded-For";
 
-    /**
-     * http X-Real-IP
-     */
     public static final String HTTP_X_REAL_IP = "X-Real-IP";
 
     /**
@@ -158,34 +110,16 @@ public final class Constants {
      */
     public static final Pattern REGEX_USER_NAME = Pattern.compile("^[a-zA-Z0-9._-]{3,39}$");
 
-    /**
-     * read permission
-     */
     public static final int READ_PERMISSION = 2;
 
-    /**
-     * write permission
-     */
     public static final int WRITE_PERMISSION = 2 * 2;
 
-    /**
-     * execute permission
-     */
     public static final int EXECUTE_PERMISSION = 1;
 
-    /**
-     * default admin permission
-     */
     public static final int DEFAULT_ADMIN_PERMISSION = 7;
 
-    /**
-     * default hash map size
-     */
     public static final int DEFAULT_HASH_MAP_SIZE = 16;
 
-    /**
-     * all permissions
-     */
     public static final int ALL_PERMISSIONS = READ_PERMISSION | WRITE_PERMISSION | EXECUTE_PERMISSION;
 
     /**
@@ -218,14 +152,8 @@ public final class Constants {
 
     public static final Duration SERVER_CLOSE_WAIT_TIME = Duration.ofSeconds(3);
 
-    /**
-     * exit code success
-     */
     public static final int EXIT_CODE_SUCCESS = 0;
 
-    /**
-     * exit code failure
-     */
     public static final int EXIT_CODE_FAILURE = -1;
 
     /**
@@ -238,9 +166,6 @@ public final class Constants {
      */
     public static final int VERSION_FIRST = 1;
 
-    /**
-     * underline  "_"
-     */
     public static final String UNDERLINE = "_";
 
     public static final String GLOBAL_PARAMS = "globalParams";
@@ -258,29 +183,14 @@ public final class Constants {
     public static final long DEPENDENT_ALL_TASK_CODE = -1;
     public static final long DEPENDENT_WORKFLOW_CODE = 0;
 
-    /**
-     * preview schedule execute count
-     */
     public static final int PREVIEW_SCHEDULE_EXECUTE_COUNT = 5;
 
-    /**
-     * kerberos
-     */
     public static final String KERBEROS = "kerberos";
 
-    /**
-     * java.security.krb5.conf
-     */
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
 
-    /**
-     * java.security.krb5.conf.path
-     */
     public static final String JAVA_SECURITY_KRB5_CONF_PATH = "java.security.krb5.conf.path";
 
-    /**
-     * hadoop.security.authentication
-     */
     public static final String HADOOP_SECURITY_AUTHENTICATION = "hadoop.security.authentication";
 
     /**
@@ -299,24 +209,12 @@ public final class Constants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
-    /**
-     * sso.login.user.state
-     */
     public static final String SSO_LOGIN_USER_STATE = "sso.login.user.state";
 
-    /**
-     * status
-     */
     public static final String STATUS = "status";
 
-    /**
-     * message
-     */
     public static final String MSG = "msg";
 
-    /**
-     * page size
-     */
     public static final String PAGE_SIZE = "pageSize";
 
     /**
@@ -341,9 +239,6 @@ public final class Constants {
 
     public static final long DEPENDENT_ALL_TASK = 0;
 
-    /**
-     * session user
-     */
     public static final String SESSION_USER = "session.user";
 
     public static final String SESSION_ID = "sessionId";
@@ -353,23 +248,14 @@ public final class Constants {
      */
     public static final String LOCALE_LANGUAGE = "language";
 
-    /**
-     * session timeout
-     */
     public static final int SESSION_TIME_OUT = 7200;
 
-    /**
-     * authorize writable perm
-     */
     public static final int AUTHORIZE_WRITABLE_PERM = 7;
 
     public static final String START_TIME = "start time";
     public static final String END_TIME = "end time";
     public static final String START_END_DATE = "startDate,endDate";
 
-    /**
-     * system line separator
-     */
     public static final String SYSTEM_LINE_SEPARATOR = System.getProperty("line.separator");
 
     /**
@@ -384,9 +270,6 @@ public final class Constants {
     public static final String CLUSTER = "cluster";
     public static final Long K8S_LOCAL_TEST_CLUSTER_CODE = 0L;
 
-    /**
-     * schedule timezone
-     */
     public static final String SCHEDULE_TIMEZONE = "schedule_timezone";
 
     /**

@@ -29,9 +29,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.List;
 import java.util.Map;
 
-/**
- * data analysis service
- */
 public interface DataAnalysisService {
 
     TaskInstanceCountVO getTaskInstanceStateCountByProject(User loginUser,

@@ -35,9 +35,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-/**
- * base controller
- */
 public class BaseController {
 
     /**

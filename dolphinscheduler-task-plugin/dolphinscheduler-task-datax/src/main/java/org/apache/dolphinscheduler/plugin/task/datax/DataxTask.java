@@ -91,17 +91,11 @@ public class DataxTask extends AbstractTask {
      */
     private static final String SELECT_ALL_CHARACTER = "*";
 
-    /**
-     * post jdbc info regex
-     */
     private static final String POST_JDBC_INFO_REGEX = "(?<=(post jdbc info:)).*(?=)";
     /**
      * datax path
      */
     private static final String DATAX_LAUNCHER = "${DATAX_LAUNCHER}";
-    /**
-     * datax channel count
-     */
     private static final int DATAX_CHANNEL_COUNT = 1;
 
     private DataxParameters dataXParameters;

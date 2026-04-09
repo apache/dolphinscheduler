@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.api.security;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- * ldap user not exist action type
- */
 public enum LdapUserNotExistActionType {
 
     CREATE(0, "automatically create user when user not exist"),

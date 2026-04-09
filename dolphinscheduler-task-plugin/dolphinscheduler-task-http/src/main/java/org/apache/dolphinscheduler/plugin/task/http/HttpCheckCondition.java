@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-/**
- * http check condition
- */
 public enum HttpCheckCondition {
     /**
      * 0 status_code_default:200

@@ -20,17 +20,14 @@ package org.apache.dolphinscheduler.plugin.datasource.oracle.param;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class OracleConnectionParam extends BaseConnectionParam {
 
     protected DbConnectType connectType;
-
-    public DbConnectType getConnectType() {
-        return connectType;
-    }
-
-    public void setConnectType(DbConnectType connectType) {
-        this.connectType = connectType;
-    }
 
     @Override
     public String toString() {

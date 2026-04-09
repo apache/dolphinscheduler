@@ -28,9 +28,6 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
-/**
- * project mapper interface
- */
 public interface ProjectMapper extends BaseMapper<Project> {
 
     /**

@@ -34,9 +34,6 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
 
-/**
- * monitor service impl
- */
 @Service
 @Slf4j
 public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService {

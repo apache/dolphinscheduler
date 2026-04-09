@@ -36,29 +36,14 @@ public class AccessToken {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    /**
-     * user_id
-     */
     @TableField(value = "user_id")
     private int userId;
-    /**
-     * token
-     */
     @TableField(value = "token")
     private String token;
-    /**
-     * expire_time
-     */
     @TableField(value = "expire_time")
     private Date expireTime;
-    /**
-     * create_time
-     */
     @TableField(value = "create_time")
     private Date createTime;
-    /**
-     * update_time
-     */
     @TableField(value = "update_time")
     private Date updateTime;
     @TableField(exist = false)

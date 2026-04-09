@@ -23,9 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-/**
- * environment service
- */
 public interface EnvironmentService {
 
     /**

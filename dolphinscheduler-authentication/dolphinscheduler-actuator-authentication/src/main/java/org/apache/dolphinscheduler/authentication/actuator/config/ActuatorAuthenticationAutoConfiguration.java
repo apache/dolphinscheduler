@@ -22,8 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
@@ -129,8 +128,7 @@ public class ActuatorAuthenticationAutoConfiguration {
      * Properties for Actuator security settings.
      * Maps: management.security.*
      */
-    @Getter
-    @Setter
+    @Data
     @ToString(exclude = "password")
     @ConfigurationProperties("management.security")
     public static class ActuatorSecurityProperties {

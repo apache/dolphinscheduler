@@ -55,9 +55,6 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * task Group Service
- */
 @Service
 @Slf4j
 public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupService {

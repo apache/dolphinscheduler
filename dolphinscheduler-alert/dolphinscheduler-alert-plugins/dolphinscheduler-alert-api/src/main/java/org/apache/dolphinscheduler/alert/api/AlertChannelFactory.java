@@ -23,9 +23,6 @@ import org.apache.dolphinscheduler.spi.plugin.SPIIdentify;
 
 import java.util.List;
 
-/**
- * alert channel factory
- */
 public interface AlertChannelFactory extends PrioritySPI {
 
     /**
