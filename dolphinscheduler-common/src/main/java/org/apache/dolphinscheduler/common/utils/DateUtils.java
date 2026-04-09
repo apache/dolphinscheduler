@@ -210,7 +210,7 @@ public final class DateUtils {
             }
             return localDateTime2Date(ldt, ZoneId.of(timezone));
         } catch (Exception e) {
-            log.error("error while parse date:" + date, e);
+            log.error("error while parse date: {}, error: ", date, e);
         }
         return null;
     }
