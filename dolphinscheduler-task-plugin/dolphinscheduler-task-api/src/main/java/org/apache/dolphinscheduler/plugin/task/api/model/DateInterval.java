@@ -21,9 +21,6 @@ import java.util.Date;
 
 import lombok.Data;
 
-/**
- * date interval class
- */
 @Data
 public class DateInterval {
 

@@ -57,14 +57,8 @@ public class SqlParameters extends AbstractParameters {
      */
     private int datasource;
 
-    /**
-     * sql
-     */
     private String sql;
 
-    /**
-     * sql source
-     */
     private SqlSourceType sqlSource;
 
     /**
@@ -79,14 +73,8 @@ public class SqlParameters extends AbstractParameters {
      */
     private int sqlType;
 
-    /**
-     * send email
-     */
     private Boolean sendEmail;
 
-    /**
-     * display rows
-     */
     private int displayRows;
 
     /**
@@ -101,22 +89,10 @@ public class SqlParameters extends AbstractParameters {
      * SQL connection parameters
      */
     private String connParams;
-    /**
-     * Pre Statements
-     */
     private List<String> preStatements;
-    /**
-     * Post Statements
-     */
     private List<String> postStatements;
 
-    /**
-     * groupId
-     */
     private int groupId;
-    /**
-     * title
-     */
     private String title;
 
     private int limit;

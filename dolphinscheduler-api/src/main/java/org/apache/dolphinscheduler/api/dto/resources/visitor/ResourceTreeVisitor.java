@@ -26,14 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * resource tree visitor
- */
 public class ResourceTreeVisitor implements Visitor {
 
-    /**
-     * resource list
-     */
     private List<StorageEntity> resourceList;
 
     public ResourceTreeVisitor() {

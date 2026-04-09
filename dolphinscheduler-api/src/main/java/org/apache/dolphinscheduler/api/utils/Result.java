@@ -36,14 +36,8 @@ public class Result<T> {
      */
     private Integer code;
 
-    /**
-     * message
-     */
     private String msg;
 
-    /**
-     * data
-     */
     private T data;
 
     public Result() {

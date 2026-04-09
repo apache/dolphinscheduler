@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.service.command;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
 
-/**
- * Command Service
- */
 public interface CommandService {
 
     /**

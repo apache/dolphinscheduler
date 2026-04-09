@@ -50,15 +50,9 @@ public class NettyServerConfig {
     @Builder.Default
     private boolean soKeepalive = true;
 
-    /**
-     * send buffer size
-     */
     @Builder.Default
     private int sendBufferSize = 65535;
 
-    /**
-     * receive buffer size
-     */
     @Builder.Default
     private int receiveBufferSize = 65535;
 
@@ -74,9 +68,6 @@ public class NettyServerConfig {
     @Builder.Default
     private long connectionIdleTime = Duration.ofSeconds(60).toMillis();
 
-    /**
-     * listen port
-     */
     private int listenPort;
 
 }

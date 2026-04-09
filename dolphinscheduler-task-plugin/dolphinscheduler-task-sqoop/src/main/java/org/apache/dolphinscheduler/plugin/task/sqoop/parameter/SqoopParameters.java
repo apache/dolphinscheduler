@@ -52,9 +52,6 @@ import java.util.Objects;
 
 import lombok.Data;
 
-/**
- * sqoop parameters
- */
 @Data
 public class SqoopParameters extends AbstractParameters {
 
@@ -75,33 +72,12 @@ public class SqoopParameters extends AbstractParameters {
      */
     private String jobName;
 
-    /**
-     * model type
-     */
     private String modelType;
-    /**
-     * concurrency
-     */
     private int concurrency;
-    /**
-     * split by
-     */
     private String splitBy;
-    /**
-     * source type
-     */
     private String sourceType;
-    /**
-     * target type
-     */
     private String targetType;
-    /**
-     * source params
-     */
     private String sourceParams;
-    /**
-     * target params
-     */
     private String targetParams;
 
     /**

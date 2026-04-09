@@ -34,14 +34,8 @@ import org.slf4j.Logger;
 
 public class PermissionCheck<T> {
 
-    /**
-     * logger
-     */
     private Logger logger;
 
-    /**
-     * Authorization Type
-     */
     private AuthorizationType authorizationType;
 
     /**
@@ -56,9 +50,6 @@ public class PermissionCheck<T> {
      */
     private T[] needChecks;
 
-    /**
-     * user id
-     */
     @Getter
     @Setter
     private int userId;

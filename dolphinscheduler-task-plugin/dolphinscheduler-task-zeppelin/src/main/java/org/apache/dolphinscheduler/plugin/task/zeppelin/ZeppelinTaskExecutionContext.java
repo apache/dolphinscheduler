@@ -27,9 +27,6 @@ import lombok.Data;
 @Data
 public class ZeppelinTaskExecutionContext implements Serializable {
 
-    /**
-     * connectionParams
-     */
     private String connectionParams;
 
     @Override

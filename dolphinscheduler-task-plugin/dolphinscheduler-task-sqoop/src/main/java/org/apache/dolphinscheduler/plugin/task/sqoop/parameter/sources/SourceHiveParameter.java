@@ -21,27 +21,12 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SourceCommonParam
 
 import lombok.Data;
 
-/**
- * source hive parameter
- */
 @Data
 public class SourceHiveParameter extends SourceCommonParameter {
 
-    /**
-     * hive database
-     */
     private String hiveDatabase;
-    /**
-     * hive table
-     */
     private String hiveTable;
-    /**
-     * hive partition key
-     */
     private String hivePartitionKey;
-    /**
-     * hive partition value
-     */
     private String hivePartitionValue;
 
 }

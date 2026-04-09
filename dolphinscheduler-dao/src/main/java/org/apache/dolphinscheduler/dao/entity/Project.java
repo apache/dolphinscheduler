@@ -36,21 +36,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_project")
 public class Project {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * user id
-     */
     @TableField("user_id")
     private Integer userId;
 
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
 
@@ -69,14 +60,8 @@ public class Project {
      */
     private String description;
 
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 
     /**

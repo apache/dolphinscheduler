@@ -25,9 +25,6 @@ import java.util.List;
 
 import lombok.Data;
 
-/**
- * flink parameters
- */
 @Data
 public class FlinkParameters extends AbstractParameters {
 
@@ -56,9 +53,6 @@ public class FlinkParameters extends AbstractParameters {
      */
     private int slot;
 
-    /**
-     * parallelism
-     */
     private int parallelism;
 
     /**
@@ -71,19 +65,10 @@ public class FlinkParameters extends AbstractParameters {
      */
     private int taskManager;
 
-    /**
-     * job manager memory
-     */
     private String jobManagerMemory;
 
-    /**
-     * task manager memory
-     */
     private String taskManagerMemory;
 
-    /**
-     * resource list
-     */
     private List<ResourceInfo> resourceList = new ArrayList<>();
 
     /**
@@ -96,9 +81,6 @@ public class FlinkParameters extends AbstractParameters {
      */
     private String others;
 
-    /**
-     * flink version
-     */
     private String flinkVersion;
 
     /**

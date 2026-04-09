@@ -31,9 +31,6 @@ import java.util.List;
 import lombok.Data;
 import lombok.ToString;
 
-/**
- * chunjun parameters
- */
 @Data
 @ToString
 public class ChunJunParameters extends AbstractParameters {
@@ -88,14 +85,8 @@ public class ChunJunParameters extends AbstractParameters {
      */
     private String targetTable;
 
-    /**
-     * pre statements
-     */
     private List<String> preStatements;
 
-    /**
-     * post statements
-     */
     private List<String> postStatements;
 
     /**

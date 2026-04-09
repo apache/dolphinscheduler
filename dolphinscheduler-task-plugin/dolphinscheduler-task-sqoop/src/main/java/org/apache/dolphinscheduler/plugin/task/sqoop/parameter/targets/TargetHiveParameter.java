@@ -21,47 +21,17 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.TargetCommonParam
 
 import lombok.Data;
 
-/**
- * target hive parameter
- */
 @Data
 public class TargetHiveParameter extends TargetCommonParameter {
 
-    /**
-     * hive database
-     */
     private String hiveDatabase;
-    /**
-     * hive table
-     */
     private String hiveTable;
-    /**
-     * create hive table
-     */
     private boolean createHiveTable;
-    /**
-     * drop delimiter
-     */
     private boolean dropDelimiter;
-    /**
-     * hive overwrite
-     */
     private boolean hiveOverWrite;
-    /**
-     * replace delimiter
-     */
     private String replaceDelimiter;
-    /**
-     * hive partition key
-     */
     private String hivePartitionKey;
-    /**
-     * hive partition value
-     */
     private String hivePartitionValue;
-    /**
-     * hive target dir
-     */
     private String hiveTargetDir;
 
 }

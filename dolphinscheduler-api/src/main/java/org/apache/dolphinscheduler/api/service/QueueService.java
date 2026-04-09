@@ -23,9 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
 
-/**
- * queue service
- */
 public interface QueueService {
 
     /**

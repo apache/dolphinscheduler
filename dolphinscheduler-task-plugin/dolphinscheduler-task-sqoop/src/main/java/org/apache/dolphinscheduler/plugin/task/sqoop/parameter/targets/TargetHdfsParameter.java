@@ -21,9 +21,6 @@ import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.TargetCommonParam
 
 import lombok.Data;
 
-/**
- * target hdfs parameter
- */
 @Data
 public class TargetHdfsParameter extends TargetCommonParameter {
 
@@ -31,25 +28,10 @@ public class TargetHdfsParameter extends TargetCommonParameter {
      * target dir
      */
     private String targetPath;
-    /**
-     * delete target dir
-     */
     private boolean deleteTargetDir;
-    /**
-     * file type
-     */
     private String fileType;
-    /**
-     * compression codec
-     */
     private String compressionCodec;
-    /**
-     * fields terminated
-     */
     private String fieldsTerminated;
-    /**
-     * lines terminated
-     */
     private String linesTerminated;
 
 }

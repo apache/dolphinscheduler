@@ -65,9 +65,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
-/**
- * data analysis service impl
- */
 @Service
 @Slf4j
 public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {

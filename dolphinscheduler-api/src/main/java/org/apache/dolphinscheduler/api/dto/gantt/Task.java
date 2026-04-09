@@ -23,15 +23,9 @@ import java.util.List;
 
 import lombok.Data;
 
-/**
- * Task
- */
 @Data
 public class Task {
 
-    /**
-     * task name
-     */
     private String taskName;
 
     /**

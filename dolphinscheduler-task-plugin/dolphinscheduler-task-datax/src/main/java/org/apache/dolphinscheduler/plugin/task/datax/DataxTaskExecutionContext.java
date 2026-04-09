@@ -29,34 +29,16 @@ import lombok.Data;
 @Data
 public class DataxTaskExecutionContext implements Serializable {
 
-    /**
-     * dataSourceId
-     */
     private int dataSourceId;
 
-    /**
-     * sourcetype
-     */
     private DbType sourcetype;
 
-    /**
-     * sourceConnectionParams
-     */
     private String sourceConnectionParams;
 
-    /**
-     * dataTargetId
-     */
     private int dataTargetId;
 
-    /**
-     * targetType
-     */
     private DbType targetType;
 
-    /**
-     * targetConnectionParams
-     */
     private String targetConnectionParams;
 
     @Override

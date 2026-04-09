@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.plugin.alert.script;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * ProcessUtilsTest
- */
 public class ProcessUtilsTest {
 
     private static final String rootPath = System.getProperty("user.dir");

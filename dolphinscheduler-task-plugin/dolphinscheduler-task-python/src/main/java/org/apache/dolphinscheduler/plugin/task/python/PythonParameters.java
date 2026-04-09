@@ -32,9 +32,6 @@ public class PythonParameters extends AbstractParameters {
      */
     private String rawScript;
 
-    /**
-     * resource list
-     */
     private List<ResourceInfo> resourceList;
 
     @Override

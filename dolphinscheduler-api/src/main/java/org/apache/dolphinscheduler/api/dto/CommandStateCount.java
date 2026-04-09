@@ -21,9 +21,6 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 
 import lombok.Data;
 
-/**
- * command state count
- */
 @Data
 public class CommandStateCount {
 

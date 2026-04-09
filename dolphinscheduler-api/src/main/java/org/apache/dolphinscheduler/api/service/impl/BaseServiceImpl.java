@@ -39,9 +39,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * base service impl
- */
 @Slf4j
 public class BaseServiceImpl implements BaseService {
 

@@ -23,9 +23,6 @@ import java.util.List;
 
 import lombok.Getter;
 
-/**
- * Audit Operation type
- */
 @Getter
 public enum AuditOperationType {
 

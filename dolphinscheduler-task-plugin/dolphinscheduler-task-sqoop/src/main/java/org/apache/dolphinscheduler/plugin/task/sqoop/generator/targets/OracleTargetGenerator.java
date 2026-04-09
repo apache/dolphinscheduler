@@ -45,9 +45,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * oracle target generator
- */
 public class OracleTargetGenerator implements ITargetGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(OracleTargetGenerator.class);

@@ -42,9 +42,6 @@ public class SeatunnelParameters extends AbstractParameters {
 
     private String rawScript;
 
-    /**
-     * resource list
-     */
     private List<ResourceInfo> resourceList;
 
     @Override

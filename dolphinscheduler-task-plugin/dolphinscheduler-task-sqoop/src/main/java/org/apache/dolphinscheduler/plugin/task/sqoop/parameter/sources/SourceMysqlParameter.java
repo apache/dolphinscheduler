@@ -24,43 +24,16 @@ import java.util.List;
 
 import lombok.Data;
 
-/**
- * source mysql parameter
- */
 @Data
 public class SourceMysqlParameter extends SourceCommonParameter {
 
-    /**
-     * src table
-     */
     private String srcTable;
-    /**
-     * src query type
-     */
     private int srcQueryType;
-    /**
-     * src query sql
-     */
     private String srcQuerySql;
-    /**
-     * src column type
-     */
     private int srcColumnType;
-    /**
-     * src columns
-     */
     private String srcColumns;
-    /**
-     * src condition list
-     */
     private List<Property> srcConditionList;
-    /**
-     * map column hive
-     */
     private List<Property> mapColumnHive;
-    /**
-     * map column java
-     */
     private List<Property> mapColumnJava;
 
 }

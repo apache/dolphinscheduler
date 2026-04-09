@@ -25,9 +25,6 @@ import java.util.List;
 
 import lombok.Data;
 
-/**
- * mapreduce parameters
- */
 @Data
 public class MapReduceParameters extends AbstractParameters {
 
@@ -51,9 +48,6 @@ public class MapReduceParameters extends AbstractParameters {
      */
     private String others;
 
-    /**
-     * app name
-     */
     private String appName;
 
     /**
@@ -61,9 +55,6 @@ public class MapReduceParameters extends AbstractParameters {
      */
     private String yarnQueue;
 
-    /**
-     * resource list
-     */
     private List<ResourceInfo> resourceList = new ArrayList<>();
 
     /**

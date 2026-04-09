@@ -32,35 +32,17 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_audit_log")
 public class AuditLog {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * user id
-     */
     private Integer userId;
 
-    /**
-     * model type
-     */
     private String modelType;
 
-    /**
-     * operation type
-     */
     private String operationType;
 
-    /**
-     * model id
-     */
     private Long modelId;
 
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
 

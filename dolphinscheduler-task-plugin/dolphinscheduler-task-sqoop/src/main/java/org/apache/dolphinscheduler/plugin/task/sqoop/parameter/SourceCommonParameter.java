@@ -19,15 +19,9 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.parameter;
 
 import lombok.Data;
 
-/**
- * source common parameter
- */
 @Data
 public class SourceCommonParameter {
 
-    /**
-     * src datasource
-     */
     protected int srcDatasource;
 
 }

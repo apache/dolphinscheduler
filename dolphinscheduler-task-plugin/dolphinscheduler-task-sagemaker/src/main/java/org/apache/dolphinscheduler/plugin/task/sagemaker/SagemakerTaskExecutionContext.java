@@ -28,9 +28,6 @@ import lombok.Data;
 @Data
 public class SagemakerTaskExecutionContext implements Serializable {
 
-    /**
-     * connectionParams
-     */
     private String connectionParams;
 
     @Override

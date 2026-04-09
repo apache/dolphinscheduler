@@ -56,9 +56,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * tenant controller
- */
 @Tag(name = "TENANT_TAG")
 @RestController
 @RequestMapping("/tenants")

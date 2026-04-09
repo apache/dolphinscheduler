@@ -72,9 +72,6 @@ public class WorkflowExecuteDto {
      */
     private FailureStrategy failureStrategy;
 
-    /**
-     * warning type
-     */
     private WarningType warningType;
 
     private Integer warningGroupId;
@@ -88,24 +85,12 @@ public class WorkflowExecuteDto {
      */
     private String globalParams;
 
-    /**
-     * executor id
-     */
     private int executorId;
 
-    /**
-     * executor name
-     */
     private String executorName;
 
-    /**
-     * tenant code
-     */
     private String tenantCode;
 
-    /**
-     * queue
-     */
     private String queue;
 
     /**

@@ -68,24 +68,12 @@ public class DataxParameters extends AbstractParameters {
      */
     private int dataTarget;
 
-    /**
-     * sql
-     */
     private String sql;
 
-    /**
-     * target table
-     */
     private String targetTable;
 
-    /**
-     * Pre Statements
-     */
     private List<String> preStatements;
 
-    /**
-     * Post Statements
-     */
     private List<String> postStatements;
 
     /**
@@ -113,9 +101,6 @@ public class DataxParameters extends AbstractParameters {
      */
     private int xmx;
 
-    /**
-     * resource list
-     */
     private List<ResourceInfo> resourceList;
 
     @Override

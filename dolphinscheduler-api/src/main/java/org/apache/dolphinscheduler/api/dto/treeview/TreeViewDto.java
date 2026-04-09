@@ -22,36 +22,17 @@ import java.util.List;
 
 import lombok.Data;
 
-/**
- * TreeView
- */
 @Data
 public class TreeViewDto {
 
-    /**
-     * name
-     */
     private String name;
 
-    /**
-     * type
-     */
     private String type;
 
-    /**
-     * code
-     */
     private long code;
-
-    /**
-     * instances list
-     */
 
     private List<Instance> instances = new ArrayList<>();
 
-    /**
-     * children
-     */
     private List<TreeViewDto> children = new ArrayList<>();
 
 }

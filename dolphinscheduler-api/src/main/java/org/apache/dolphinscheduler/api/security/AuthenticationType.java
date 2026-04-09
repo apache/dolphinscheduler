@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.api.security;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- * authentication type
- */
 public enum AuthenticationType {
 
     PASSWORD(0, "verify via user name and password"),

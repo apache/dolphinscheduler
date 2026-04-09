@@ -27,9 +27,6 @@ import lombok.Data;
 @Data
 public class ProcedureTaskExecutionContext implements Serializable {
 
-    /**
-     * connectionParams
-     */
     private String connectionParams;
 
     @Override
