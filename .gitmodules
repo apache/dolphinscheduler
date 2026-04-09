@@ -34,7 +34,7 @@
 	branch = main
 [submodule ".github/actions/login-action"]
 	path = .github/actions/login-action
-	url = https://github.com/docker/login-action.git
+	url = https://github.com/docker/login-action
 	branch = master
 [submodule ".github/actions/setup-qemu-action"]
 	path = .github/actions/setup-qemu-action
