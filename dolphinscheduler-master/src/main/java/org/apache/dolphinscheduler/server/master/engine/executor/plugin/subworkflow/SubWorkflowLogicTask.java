@@ -250,6 +250,8 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
                 .workerGroup(workflowInstance.getWorkerGroup())
                 .tenantCode(workflowInstance.getTenantCode())
                 .environmentCode(workflowInstance.getEnvironmentCode())
+                .scheduleTime(workflowInstance.getScheduleTime())
+                .timeZone(commandParam.getTimeZone())
                 .startParamList(paramList)
                 .dryRun(Flag.of(workflowInstance.getDryRun()))
                 .build();
