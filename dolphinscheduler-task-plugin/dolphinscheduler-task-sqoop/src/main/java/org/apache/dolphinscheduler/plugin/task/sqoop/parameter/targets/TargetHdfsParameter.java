@@ -19,9 +19,12 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets;
 
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.TargetCommonParameter;
 
+import lombok.Data;
+
 /**
  * target hdfs parameter
  */
+@Data
 public class TargetHdfsParameter extends TargetCommonParameter {
 
     /**
@@ -48,53 +51,5 @@ public class TargetHdfsParameter extends TargetCommonParameter {
      * lines terminated
      */
     private String linesTerminated;
-
-    public String getTargetPath() {
-        return targetPath;
-    }
-
-    public void setTargetPath(String targetPath) {
-        this.targetPath = targetPath;
-    }
-
-    public boolean isDeleteTargetDir() {
-        return deleteTargetDir;
-    }
-
-    public void setDeleteTargetDir(boolean deleteTargetDir) {
-        this.deleteTargetDir = deleteTargetDir;
-    }
-
-    public String getFileType() {
-        return fileType;
-    }
-
-    public void setFileType(String fileType) {
-        this.fileType = fileType;
-    }
-
-    public String getCompressionCodec() {
-        return compressionCodec;
-    }
-
-    public void setCompressionCodec(String compressionCodec) {
-        this.compressionCodec = compressionCodec;
-    }
-
-    public String getFieldsTerminated() {
-        return fieldsTerminated;
-    }
-
-    public void setFieldsTerminated(String fieldsTerminated) {
-        this.fieldsTerminated = fieldsTerminated;
-    }
-
-    public String getLinesTerminated() {
-        return linesTerminated;
-    }
-
-    public void setLinesTerminated(String linesTerminated) {
-        this.linesTerminated = linesTerminated;
-    }
 
 }
