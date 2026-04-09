@@ -19,13 +19,11 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -63,17 +61,6 @@ public class LogUtils {
         return getFileContentBytesFromLocal(filePath);
     }
 
-    public static byte[] getFileContentBytes(String filePath) {
-        File file = new File(filePath);
-        if (file.exists()) {
-            return getFileContentBytesFromLocal(filePath);
-        }
-        if (RemoteLogUtils.isRemoteLoggingEnable()) {
-            return getFileContentBytesFromRemote(filePath);
-        }
-        return getFileContentBytesFromLocal(filePath);
-    }
-
     public static List<String> readPartFileContentFromLocal(String filePath,
                                                             int skipLine,
                                                             int limit) {
@@ -95,49 +82,6 @@ public class LogUtils {
                                                              int limit) {
         RemoteLogUtils.getRemoteLog(filePath);
         return readPartFileContentFromLocal(filePath, skipLine, limit);
-    }
-
-    public static List<String> readPartFileContent(String filePath,
-                                                   int skipLine,
-                                                   int limit) {
-        File file = new File(filePath);
-        if (file.exists()) {
-            return readPartFileContentFromLocal(filePath, skipLine, limit);
-        }
-        if (RemoteLogUtils.isRemoteLoggingEnable()) {
-            return readPartFileContentFromRemote(filePath, skipLine, limit);
-        }
-        return readPartFileContentFromLocal(filePath, skipLine, limit);
-    }
-
-    public static String readWholeFileContentFromRemote(String filePath) {
-        RemoteLogUtils.getRemoteLog(filePath);
-        return LogUtils.readWholeFileContentFromLocal(filePath);
-    }
-
-    public static String readWholeFileContentFromLocal(String filePath) {
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)))) {
-            while ((line = br.readLine()) != null) {
-                sb.append(line + "\r\n");
-            }
-            return sb.toString();
-        } catch (IOException e) {
-            log.error("read file error", e);
-        }
-        return "";
-    }
-
-    public static String readWholeFileContent(String filePath) {
-        File file = new File(filePath);
-        if (file.exists()) {
-            return readWholeFileContentFromLocal(filePath);
-        }
-        if (RemoteLogUtils.isRemoteLoggingEnable()) {
-            return readWholeFileContentFromRemote(filePath);
-        }
-        return readWholeFileContentFromLocal(filePath);
     }
 
     public static String rollViewLogLines(List<String> lines) {
@@ -164,6 +108,7 @@ public class LogUtils {
 
         return builder.toString();
     }
+
     public static String getLocalLogBaseDir() {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         return loggerContext.getProperty("log.base.ctx");

@@ -120,9 +120,6 @@ public final class Constants {
      */
     public static final String SEMICOLON = ";";
 
-    public static final String ADDRESS = "address";
-    public static final String DATABASE = "database";
-
     public static final String IMPORT_SUFFIX = "_import_";
 
     public static final String COPY_SUFFIX = "_copy_";
@@ -208,8 +205,6 @@ public final class Constants {
     public static final String THREAD_NAME_MASTER_SERVER = "Master-Server";
     public static final String THREAD_NAME_WORKER_SERVER = "Worker-Server";
     public static final String THREAD_NAME_ALERT_SERVER = "Alert-Server";
-
-    // suffix of crc file
 
     /**
      * complement date default cron string
@@ -465,8 +460,6 @@ public final class Constants {
     public static final String REMOTE_LOGGING_TARGET = "remote.logging.target";
 
     public static final String REMOTE_LOGGING_BASE_DIR = "remote.logging.base.dir";
-
-    public static final String REMOTE_LOGGING_THREAD_POOL_SIZE = "remote.logging.thread.pool.size";
 
     /**
      * remote logging for OSS

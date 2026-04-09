@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaderContentType;
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 import org.apache.dolphinscheduler.common.model.OkHttpResponse;
 
@@ -150,35 +148,6 @@ public class OkHttpUtils {
         } catch (Exception e) {
             throw new RuntimeException(String.format("Delete request execute failed, url: %s", url), e);
         }
-    }
-
-    public static @NonNull String demoPost(@NonNull String url,
-                                           @Nullable String token,
-                                           @Nullable Map<String, Object> requestBodyMap) throws IOException {
-
-        StringBuilder stringBuffer = new StringBuilder();
-        if (requestBodyMap != null) {
-            for (String key : requestBodyMap.keySet()) {
-                stringBuffer.append(key).append("=").append(requestBodyMap.get(key)).append("&");
-            }
-        }
-
-        RequestBody body =
-                RequestBody.create(stringBuffer.toString(),
-                        MediaType.parse(OkHttpRequestHeaderContentType.APPLICATION_FORM_URLENCODED.getValue()));
-
-        Request request = new Request.Builder()
-                .url(url)
-                .header("token", token)
-                .addHeader("accpect", "application/json")
-                .post(body)
-                .build();
-        OkHttpClient client = getHttpClient(Constants.HTTP_CONNECT_TIMEOUT, Constants.HTTP_CONNECT_TIMEOUT,
-                Constants.HTTP_CONNECT_TIMEOUT);
-        try (Response response = client.newCall(request).execute()) {
-            return response.body().string();
-        }
-
     }
 
     private static String addUrlParams(@Nullable Map<String, Object> requestParams, @NonNull String url) {
