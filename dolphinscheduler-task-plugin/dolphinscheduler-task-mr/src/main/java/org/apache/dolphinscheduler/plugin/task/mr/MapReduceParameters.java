@@ -23,9 +23,12 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import java.util.ArrayList;
 import java.util.List;
 
+import lombok.Data;
+
 /**
  * mapreduce parameters
  */
+@Data
 public class MapReduceParameters extends AbstractParameters {
 
     /**
@@ -68,70 +71,6 @@ public class MapReduceParameters extends AbstractParameters {
      * 0 JAVA,1 SCALA,2 PYTHON
      */
     private ProgramType programType;
-
-    public String getMainClass() {
-        return mainClass;
-    }
-
-    public void setMainClass(String mainClass) {
-        this.mainClass = mainClass;
-    }
-
-    public String getMainArgs() {
-        return mainArgs;
-    }
-
-    public void setMainArgs(String mainArgs) {
-        this.mainArgs = mainArgs;
-    }
-
-    public String getOthers() {
-        return others;
-    }
-
-    public void setOthers(String others) {
-        this.others = others;
-    }
-
-    public String getAppName() {
-        return appName;
-    }
-
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-
-    public String getYarnQueue() {
-        return yarnQueue;
-    }
-
-    public void setYarnQueue(String yarnQueue) {
-        this.yarnQueue = yarnQueue;
-    }
-
-    public List<ResourceInfo> getResourceList() {
-        return this.resourceList;
-    }
-
-    public void setResourceList(List<ResourceInfo> resourceList) {
-        this.resourceList = resourceList;
-    }
-
-    public void setMainJar(ResourceInfo mainJar) {
-        this.mainJar = mainJar;
-    }
-
-    public ResourceInfo getMainJar() {
-        return mainJar;
-    }
-
-    public ProgramType getProgramType() {
-        return programType;
-    }
-
-    public void setProgramType(ProgramType programType) {
-        this.programType = programType;
-    }
 
     @Override
     public boolean checkParameters() {

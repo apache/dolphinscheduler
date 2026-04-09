@@ -28,11 +28,9 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import java.util.Collection;
 import java.util.Date;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
+@Data
 public class WorkflowExecuteDto {
 
     private int id;

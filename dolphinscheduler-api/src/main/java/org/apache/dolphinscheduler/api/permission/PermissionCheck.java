@@ -27,6 +27,9 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.slf4j.Logger;
 
 public class PermissionCheck<T> {
@@ -44,6 +47,8 @@ public class PermissionCheck<T> {
     /**
      * Authorization Type
      */
+    @Getter
+    @Setter
     private ProcessService processService;
 
     /**
@@ -54,6 +59,8 @@ public class PermissionCheck<T> {
     /**
      * user id
      */
+    @Getter
+    @Setter
     private int userId;
 
     public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
@@ -63,22 +70,6 @@ public class PermissionCheck<T> {
         this.needChecks = needChecks;
         this.userId = userId;
         this.logger = logger;
-    }
-
-    public ProcessService getProcessService() {
-        return processService;
-    }
-
-    public void setProcessService(ProcessService processService) {
-        this.processService = processService;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 
     /**

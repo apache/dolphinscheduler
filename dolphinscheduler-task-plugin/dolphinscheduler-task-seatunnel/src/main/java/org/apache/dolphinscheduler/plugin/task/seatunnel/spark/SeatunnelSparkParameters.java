@@ -24,12 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class SeatunnelSparkParameters extends SeatunnelParameters {
 

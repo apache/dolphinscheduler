@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.grpc.protobufjs.mapping;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -32,8 +30,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 })
 public class Field extends ReflectionObject {
 
-    @Getter
-    @Setter
     private JsonNode rule;
 
     private String type;

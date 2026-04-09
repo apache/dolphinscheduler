@@ -21,11 +21,14 @@ import org.apache.dolphinscheduler.api.enums.Status;
 
 import java.text.MessageFormat;
 
+import lombok.Data;
+
 /**
  * result
  *
  * @param <T> T
  */
+@Data
 public class Result<T> {
 
     /**
@@ -110,30 +113,6 @@ public class Result<T> {
      */
     public static <T> Result<T> errorWithArgs(Status status, Object... args) {
         return new Result<>(status.getCode(), MessageFormat.format(status.getMsg(), args));
-    }
-
-    public Integer getCode() {
-        return code;
-    }
-
-    public void setCode(Integer code) {
-        this.code = code;
-    }
-
-    public String getMsg() {
-        return msg;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
-    }
-
-    public T getData() {
-        return data;
-    }
-
-    public void setData(T data) {
-        this.data = data;
     }
 
     @Override

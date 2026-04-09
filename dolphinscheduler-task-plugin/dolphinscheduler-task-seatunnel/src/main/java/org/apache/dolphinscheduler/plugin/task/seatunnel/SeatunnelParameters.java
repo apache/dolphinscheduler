@@ -27,12 +27,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class SeatunnelParameters extends AbstractParameters {
 

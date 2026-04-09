@@ -28,15 +28,13 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.ToString;
 
 /**
  * chunjun parameters
  */
-@Setter
-@Getter
+@Data
 @ToString
 public class ChunJunParameters extends AbstractParameters {
 
