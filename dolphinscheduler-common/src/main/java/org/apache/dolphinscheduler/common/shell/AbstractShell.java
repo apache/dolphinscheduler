@@ -22,7 +22,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,6 +43,7 @@ public abstract class AbstractShell {
      * Time after which the executing script would be timedout
      */
     protected long timeOutInterval = 0L;
+
     /**
      * If or not script timed out
      */
@@ -63,12 +63,14 @@ public abstract class AbstractShell {
      * env for the command execution
      */
     private Map<String, String> environment;
+
     private File dir;
 
     /**
      * sub process used to execute the command
      */
     private Process process;
+
     private int exitCode;
 
     /**
@@ -251,13 +253,6 @@ public abstract class AbstractShell {
         return process;
     }
 
-    /** get the exit code
-     * @return the exit code of the process
-     */
-    public int getExitCode() {
-        return exitCode;
-    }
-
     /**
      * Set if the command has timed out.
      *
@@ -306,9 +301,6 @@ public abstract class AbstractShell {
             this.exitCode = exitCode;
         }
 
-        public int getExitCode() {
-            return exitCode;
-        }
     }
 
     /**
@@ -331,25 +323,9 @@ public abstract class AbstractShell {
             getInstance().put(process.hashCode(), process);
         }
 
-        public static int processSize() {
-            return getInstance().size();
-        }
-
         public static void removeProcess(Process process) {
             getInstance().remove(process.hashCode());
         }
 
-        public static void destroyAllProcess() {
-            Set<Entry<Integer, Process>> set = getInstance().entrySet();
-            for (Entry<Integer, Process> entry : set) {
-                try {
-                    entry.getValue().destroy();
-                } catch (Exception e) {
-                    log.error("Destroy All Processes error", e);
-                }
-            }
-
-            log.info("close " + set.size() + " executing process tasks");
-        }
     }
 }

@@ -47,6 +47,8 @@ export function useSql({
     type: 'MYSQL',
     displayRows: 10,
     sql: '',
+    sqlSource: 'SCRIPT',
+    sqlResource: '',
     sqlType: '0',
     preStatements: [],
     postStatements: [],

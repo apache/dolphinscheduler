@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.apache.dolphinscheduler.common.constants.Constants.DATA_BASEDIR_PATH;
 import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPARATOR;
 import static org.apache.dolphinscheduler.common.constants.Constants.FORMAT_S_S;
@@ -34,7 +33,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -42,7 +40,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Optional;
 import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
@@ -316,13 +313,6 @@ public class FileUtils {
             finalPath.append(path);
         }
         return finalPath.toString();
-    }
-
-    public static String getClassPathAbsolutePath(Class clazz) {
-        checkNotNull(clazz, "class is null");
-        return Optional.ofNullable(clazz.getResource("/"))
-                .map(URL::getPath)
-                .orElseThrow(() -> new IllegalArgumentException("class path: " + clazz + " is null"));
     }
 
     /**
