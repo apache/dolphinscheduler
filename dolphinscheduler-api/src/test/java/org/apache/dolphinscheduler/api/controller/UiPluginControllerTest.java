@@ -44,9 +44,6 @@ import org.springframework.util.MultiValueMap;
 
 import com.google.common.collect.ImmutableMap;
 
-/**
- * ui plugin controller test
- */
 public class UiPluginControllerTest extends AbstractControllerTest {
 
     private static final PluginType pluginType = PluginType.ALERT;

@@ -24,11 +24,23 @@
 [submodule ".github/actions/auto-assign-action"]
 	path = .github/actions/auto-assign-action
 	url = https://github.com/kentaro-m/auto-assign-action.git
-	branch = 288f36f
+	branch = master
 [submodule ".github/actions/paths-filter"]
 	path = .github/actions/paths-filter
 	url = https://github.com/dorny/paths-filter.git
 [submodule ".github/actions/actions-workflow-metrics"]
 	path = .github/actions/actions-workflow-metrics
 	url = https://github.com/dev-hato/actions-workflow-metrics.git
-	branch = 5b65761569ce13fb81a422c8a6df680ef4dc05d4
+	branch = main
+[submodule ".github/actions/login-action"]
+	path = .github/actions/login-action
+	url = https://github.com/docker/login-action
+	branch = master
+[submodule ".github/actions/setup-qemu-action"]
+	path = .github/actions/setup-qemu-action
+	url = https://github.com/docker/setup-qemu-action
+	branch = master
+[submodule ".github/actions/setup-buildx-action"]
+	path = .github/actions/setup-buildx-action
+	url = https://github.com/docker/setup-buildx-action
+	branch = master

@@ -22,9 +22,6 @@ import java.util.Map;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- * condition type
- */
 public enum ConditionType {
 
     /**

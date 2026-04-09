@@ -28,11 +28,9 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import java.util.Collection;
 import java.util.Date;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
+@Data
 public class WorkflowExecuteDto {
 
     private int id;
@@ -74,9 +72,6 @@ public class WorkflowExecuteDto {
      */
     private FailureStrategy failureStrategy;
 
-    /**
-     * warning type
-     */
     private WarningType warningType;
 
     private Integer warningGroupId;
@@ -90,24 +85,12 @@ public class WorkflowExecuteDto {
      */
     private String globalParams;
 
-    /**
-     * executor id
-     */
     private int executorId;
 
-    /**
-     * executor name
-     */
     private String executorName;
 
-    /**
-     * tenant code
-     */
     private String tenantCode;
 
-    /**
-     * queue
-     */
     private String queue;
 
     /**

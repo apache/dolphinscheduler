@@ -26,9 +26,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import java.util.Date;
 import java.util.Map;
 
-/**
- * base service
- */
 public interface BaseService {
 
     /**

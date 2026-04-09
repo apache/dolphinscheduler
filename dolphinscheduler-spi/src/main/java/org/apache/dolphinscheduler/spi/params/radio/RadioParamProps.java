@@ -19,9 +19,12 @@ package org.apache.dolphinscheduler.spi.params.radio;
 
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 
+import lombok.Data;
+
 /**
  * front-end radio component props attributes
  */
+@Data
 public class RadioParamProps extends ParamsProps {
 
     /**
@@ -34,19 +37,4 @@ public class RadioParamProps extends ParamsProps {
      */
     private String fill;
 
-    public String getTextColor() {
-        return textColor;
-    }
-
-    public void setTextColor(String textColor) {
-        this.textColor = textColor;
-    }
-
-    public String getFill() {
-        return fill;
-    }
-
-    public void setFill(String fill) {
-        this.fill = fill;
-    }
 }

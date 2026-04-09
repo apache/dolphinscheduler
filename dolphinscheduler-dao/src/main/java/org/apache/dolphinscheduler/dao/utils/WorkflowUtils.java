@@ -22,9 +22,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
 import java.util.Date;
 
-/**
- * workflow utils
- */
 public class WorkflowUtils {
 
     /**

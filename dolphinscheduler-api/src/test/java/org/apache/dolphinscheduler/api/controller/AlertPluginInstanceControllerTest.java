@@ -46,9 +46,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-/**
- * alert plugin instance controller test
- */
 public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
 
     private static AlertPluginInstance alertPluginInstance = new AlertPluginInstance();

@@ -75,9 +75,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-/**
- * login controller test
- */
 public class LoginControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginControllerTest.class);

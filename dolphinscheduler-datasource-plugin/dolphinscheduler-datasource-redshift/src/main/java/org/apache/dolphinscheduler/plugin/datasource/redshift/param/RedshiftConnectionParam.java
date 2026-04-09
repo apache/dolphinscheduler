@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class RedshiftConnectionParam extends BaseConnectionParam {
 
     protected RedshiftAuthMode mode;

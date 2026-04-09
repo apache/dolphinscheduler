@@ -36,9 +36,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-/**
- * k8s namespace controller test
- */
 public class K8sNamespaceControllerTest extends AbstractControllerTest {
 
     private static final String NAMESPACE_CREATE_STRING = "namespace1";

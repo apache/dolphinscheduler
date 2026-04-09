@@ -51,9 +51,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * task group controller
- */
 @Tag(name = "TASK_GROUP_TAG")
 @RestController
 @RequestMapping("/task-group")

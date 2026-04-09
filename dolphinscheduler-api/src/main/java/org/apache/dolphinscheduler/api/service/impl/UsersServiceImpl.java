@@ -73,9 +73,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * users service impl
- */
 @Service
 @Slf4j
 public class UsersServiceImpl extends BaseServiceImpl implements UsersService {

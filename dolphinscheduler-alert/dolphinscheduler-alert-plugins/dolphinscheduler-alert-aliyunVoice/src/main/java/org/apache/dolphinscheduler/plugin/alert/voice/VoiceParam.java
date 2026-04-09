@@ -22,53 +22,24 @@ import lombok.Data;
 @Data
 public class VoiceParam {
 
-    /**
-     * called Number
-     */
     private String calledNumber;
-    /**
-     * called Show Number
-     */
+
     private String calledShowNumber;
-    /**
-     * tts code
-     */
+
     private String ttsCode;
-    /**
-     * tts param
-     */
+
     private String ttsParam;
 
-    /**
-     * connection info
-     */
     private Connection connection;
 
-    /**
-     * outId
-     */
     private String outId;
 
     @Data
     public static class Connection {
 
-        /**
-         * address
-         */
         private String address;
-
-        /**
-         * accessKeyId
-         */
         private String accessKeyId;
-        /**
-         * accessKeySecret
-         */
         private String accessKeySecret;
-
-        /**
-         * tts Code
-         */
         private String ttsCode;
     }
 }

@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- * Flink deploy mode
- */
 public enum FlinkDeployMode {
     @JsonProperty("local")
     LOCAL,

@@ -33,9 +33,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * base service test
- */
 @ExtendWith(MockitoExtension.class)
 public class BaseServiceTest {
 

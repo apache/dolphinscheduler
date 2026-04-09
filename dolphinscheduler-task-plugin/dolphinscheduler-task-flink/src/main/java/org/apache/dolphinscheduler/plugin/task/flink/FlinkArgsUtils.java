@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * flink args utils
- */
 public class FlinkArgsUtils {
 
     private FlinkArgsUtils() {

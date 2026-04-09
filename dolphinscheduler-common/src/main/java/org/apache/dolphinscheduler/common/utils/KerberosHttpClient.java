@@ -42,9 +42,6 @@ import javax.security.auth.login.LoginException;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * kerberos http client
- */
 @Slf4j
 public class KerberosHttpClient {
 

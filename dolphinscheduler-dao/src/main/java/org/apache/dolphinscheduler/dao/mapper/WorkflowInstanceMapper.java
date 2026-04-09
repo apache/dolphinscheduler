@@ -33,9 +33,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * workflow instance mapper interface
- */
 public interface WorkflowInstanceMapper extends BaseMapper<WorkflowInstance> {
 
     /**

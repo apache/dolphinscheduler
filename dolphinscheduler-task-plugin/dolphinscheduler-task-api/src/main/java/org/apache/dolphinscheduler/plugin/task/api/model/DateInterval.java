@@ -18,11 +18,10 @@
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
 import java.util.Date;
-import java.util.Objects;
 
-/**
- * date interval class
- */
+import lombok.Data;
+
+@Data
 public class DateInterval {
 
     private Date startTime;
@@ -31,39 +30,5 @@ public class DateInterval {
     public DateInterval(Date beginTime, Date endTime) {
         this.startTime = beginTime;
         this.endTime = endTime;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj == null || getClass() != obj.getClass()) {
-            return false;
-        } else if (this == obj) {
-            return true;
-        } else {
-            DateInterval that = (DateInterval) obj;
-            return startTime.equals(that.startTime)
-                    && endTime.equals(that.endTime);
-        }
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(startTime, endTime);
     }
 }

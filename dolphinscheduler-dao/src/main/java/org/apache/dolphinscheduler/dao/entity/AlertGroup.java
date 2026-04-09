@@ -36,34 +36,19 @@ public class AlertGroup {
      */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    /**
-     * group_name
-     */
     @TableField(value = "group_name")
     private String groupName;
 
     @TableField(value = "alert_instance_ids")
     private String alertInstanceIds;
 
-    /**
-     * description
-     */
     @TableField(value = "description")
     private String description;
-    /**
-     * create_time
-     */
     @TableField(value = "create_time")
     private Date createTime;
-    /**
-     * update_time
-     */
     @TableField(value = "update_time")
     private Date updateTime;
 
-    /**
-     * create_user_id
-     */
     @TableField(value = "create_user_id")
     private int createUserId;
 
