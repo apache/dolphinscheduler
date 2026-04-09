@@ -35,8 +35,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
-import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -312,10 +312,7 @@ public class SqlTask extends AbstractTask {
         if (resultSet != null) {
             ResultSetMetaData metaData = resultSet.getMetaData();
             int columnsNum = metaData.getColumnCount();
-<<<<<<< HEAD
             log.info("sql query results is empty");
-=======
->>>>>>> d2ad3dce8 ([DSIP-99] Save task output to a separate file)
             for (int i = 1; i <= columnsNum; i++) {
                 emptyOfColValues.set(metaData.getColumnLabel(i), JSONUtils.toJsonNode(""));
             }
