@@ -24,9 +24,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Task Instance DAO
- */
 public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     /**

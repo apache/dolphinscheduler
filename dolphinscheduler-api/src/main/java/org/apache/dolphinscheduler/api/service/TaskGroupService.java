@@ -21,9 +21,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-/**
- * task group service
- */
 public interface TaskGroupService {
 
     /**

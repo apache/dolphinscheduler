@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.api.service;
 
 import java.util.Map;
 
-/**
- * environment worker group relation service
- */
 public interface EnvironmentWorkerGroupRelationService {
 
     /**

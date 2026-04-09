@@ -24,9 +24,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
 
-/**
- * alert plugin instance service
- */
 public interface AlertPluginInstanceService {
 
     /**

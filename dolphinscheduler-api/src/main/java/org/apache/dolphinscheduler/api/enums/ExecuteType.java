@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.api.enums;
 
-/**
- * execute type
- */
 public enum ExecuteType {
 
     /**

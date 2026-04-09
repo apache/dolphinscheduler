@@ -56,9 +56,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
-/**
- * json utils
- */
 public class JSONUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JSONUtils.class);
@@ -364,9 +361,6 @@ public class JSONUtils {
 
     }
 
-    /**
-     * json data deserializer
-     */
     public static class JsonDataDeserializer extends JsonDeserializer<String> {
 
         @Override

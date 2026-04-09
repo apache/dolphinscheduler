@@ -53,9 +53,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * hana source generator
- */
 public class HanaSourceGenerator implements ISourceGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(HanaSourceGenerator.class);

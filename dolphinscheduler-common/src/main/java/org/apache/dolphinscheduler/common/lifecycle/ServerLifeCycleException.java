@@ -23,7 +23,4 @@ public class ServerLifeCycleException extends Exception {
         super(message);
     }
 
-    public ServerLifeCycleException(String message, Throwable throwable) {
-        super(message, throwable);
-    }
 }

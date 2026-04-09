@@ -22,9 +22,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/**
- * connector type
- */
 public enum ConnectorType {
 
     /**

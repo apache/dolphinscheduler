@@ -25,8 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class LinkisParameters extends AbstractParameters {
@@ -37,8 +35,7 @@ public class LinkisParameters extends AbstractParameters {
 
     private String rawScript;
 
-    @Getter
-    @Setter
+    @Data
     public static class Param {
 
         private String props;

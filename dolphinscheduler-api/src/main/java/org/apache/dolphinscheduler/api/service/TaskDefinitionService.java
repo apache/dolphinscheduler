@@ -24,9 +24,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
 
-/**
- * task definition service
- */
 public interface TaskDefinitionService {
 
     /**

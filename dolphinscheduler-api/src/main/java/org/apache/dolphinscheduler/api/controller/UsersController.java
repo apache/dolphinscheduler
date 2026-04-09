@@ -64,9 +64,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * users controller
- */
 @Tag(name = "USERS_TAG")
 @RestController
 @RequestMapping("/users")

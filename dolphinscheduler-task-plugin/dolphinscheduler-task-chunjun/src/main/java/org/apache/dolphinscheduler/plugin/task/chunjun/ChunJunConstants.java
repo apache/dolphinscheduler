@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.chunjun;
 
-/**
- * ChunJun constants
- */
 public class ChunJunConstants {
 
     public static final String FLINK_CONF_DIR = "${FLINK_HOME}/conf";

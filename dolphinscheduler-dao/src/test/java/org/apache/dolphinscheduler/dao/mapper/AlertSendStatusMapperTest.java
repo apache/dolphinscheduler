@@ -26,9 +26,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * AlertSendStatus mapper test
- */
 public class AlertSendStatusMapperTest extends BaseDaoTest {
 
     @Autowired

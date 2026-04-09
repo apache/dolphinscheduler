@@ -22,9 +22,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 
 import com.google.auto.service.AutoService;
 
-/**
- * chunjun task channelFactory
- */
 @AutoService(TaskChannelFactory.class)
 public class ChunJunTaskChannelFactory implements TaskChannelFactory {
 

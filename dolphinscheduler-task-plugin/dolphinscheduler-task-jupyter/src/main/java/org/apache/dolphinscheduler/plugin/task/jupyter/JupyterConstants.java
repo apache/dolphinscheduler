@@ -28,19 +28,10 @@ public class JupyterConstants {
      */
     public static final String EXECUTION_FLAG = "set +e";
 
-    /**
-     * new line symbol
-     */
     public static final String NEW_LINE_SYMBOL = "\n";
 
-    /**
-     * conda init
-     */
     public static final String CONDA_INIT = "source";
 
-    /**
-     * conda activate
-     */
     public static final String CONDA_ACTIVATE = "conda activate";
 
     /**
@@ -77,9 +68,6 @@ public class JupyterConstants {
      */
     public static final String JOINTER = "&&";
 
-    /**
-     * papermill
-     */
     public static final String PAPERMILL = "papermill";
 
     /**

@@ -19,42 +19,15 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets;
 
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.TargetCommonParameter;
 
-/**
- * target sqlServer parameter
- */
 public class TargetSqlServerParameter extends TargetCommonParameter {
 
-    /**
-     * target table
-     */
     private String targetTable;
-    /**
-     * target columns
-     */
     private String targetColumns;
-    /**
-     * fields terminated
-     */
     private String fieldsTerminated;
-    /**
-     * lines terminated
-     */
     private String linesTerminated;
-    /**
-     * pre query
-     */
     private String preQuery;
-    /**
-     * is update
-     */
     private boolean isUpdate;
-    /**
-     * target update key
-     */
     private String targetUpdateKey;
-    /**
-     * target update mode
-     */
     private String targetUpdateMode;
 
     public String getTargetTable() {

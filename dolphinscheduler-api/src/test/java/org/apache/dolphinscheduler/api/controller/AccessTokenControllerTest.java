@@ -37,9 +37,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-/**
- * access token controller test
- */
 public class AccessTokenControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AccessTokenControllerTest.class);

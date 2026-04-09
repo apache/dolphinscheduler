@@ -19,9 +19,14 @@ package org.apache.dolphinscheduler.spi.params.select;
 
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 /**
  * front-end select component props attributes
  */
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class SelectParamProps extends ParamsProps {
 
     /**
@@ -109,131 +114,4 @@ public class SelectParamProps extends ParamsProps {
      */
     private Boolean automaticDropdown;
 
-    public Boolean getMultiple() {
-        return multiple;
-    }
-
-    public void setMultiple(Boolean multiple) {
-        this.multiple = multiple;
-    }
-
-    public String getValueKey() {
-        return valueKey;
-    }
-
-    public void setValueKey(String valueKey) {
-        this.valueKey = valueKey;
-    }
-
-    public Boolean getClearable() {
-        return clearable;
-    }
-
-    public void setClearable(Boolean clearable) {
-        this.clearable = clearable;
-    }
-
-    public Boolean getCollapseTags() {
-        return collapseTags;
-    }
-
-    public void setCollapseTags(Boolean collapseTags) {
-        this.collapseTags = collapseTags;
-    }
-
-    public Integer getMultipleLimit() {
-        return multipleLimit;
-    }
-
-    public void setMultipleLimit(Integer multipleLimit) {
-        this.multipleLimit = multipleLimit;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getAutocomplete() {
-        return autocomplete;
-    }
-
-    public void setAutocomplete(String autocomplete) {
-        this.autocomplete = autocomplete;
-    }
-
-    public Boolean getFilterable() {
-        return filterable;
-    }
-
-    public void setFilterable(Boolean filterable) {
-        this.filterable = filterable;
-    }
-
-    public Boolean getAllowCreate() {
-        return allowCreate;
-    }
-
-    public void setAllowCreate(Boolean allowCreate) {
-        this.allowCreate = allowCreate;
-    }
-
-    public String getNoMatchText() {
-        return noMatchText;
-    }
-
-    public void setNoMatchText(String noMatchText) {
-        this.noMatchText = noMatchText;
-    }
-
-    public String getNoDataText() {
-        return noDataText;
-    }
-
-    public void setNoDataText(String noDataText) {
-        this.noDataText = noDataText;
-    }
-
-    public String getPopperClass() {
-        return popperClass;
-    }
-
-    public void setPopperClass(String popperClass) {
-        this.popperClass = popperClass;
-    }
-
-    public Boolean getReserveKeyword() {
-        return reserveKeyword;
-    }
-
-    public void setReserveKeyword(Boolean reserveKeyword) {
-        this.reserveKeyword = reserveKeyword;
-    }
-
-    public Boolean getDefaultFirstOption() {
-        return defaultFirstOption;
-    }
-
-    public void setDefaultFirstOption(Boolean defaultFirstOption) {
-        this.defaultFirstOption = defaultFirstOption;
-    }
-
-    public Boolean getPopperAppendToBody() {
-        return popperAppendToBody;
-    }
-
-    public void setPopperAppendToBody(Boolean popperAppendToBody) {
-        this.popperAppendToBody = popperAppendToBody;
-    }
-
-    public Boolean getAutomaticDropdown() {
-        return automaticDropdown;
-    }
-
-    public void setAutomaticDropdown(Boolean automaticDropdown) {
-        this.automaticDropdown = automaticDropdown;
-    }
 }

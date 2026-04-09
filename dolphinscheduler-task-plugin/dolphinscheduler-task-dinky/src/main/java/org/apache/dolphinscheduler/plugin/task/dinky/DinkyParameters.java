@@ -25,6 +25,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Collections;
 import java.util.List;
 
+import lombok.Data;
+
+@Data
 public class DinkyParameters extends AbstractParameters {
 
     /**
@@ -44,30 +47,6 @@ public class DinkyParameters extends AbstractParameters {
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         return Collections.emptyList();
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getTaskId() {
-        return taskId;
-    }
-
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
-    }
-
-    public boolean isOnline() {
-        return online;
-    }
-
-    public void setOnline(boolean online) {
-        this.online = online;
     }
 
     @Override

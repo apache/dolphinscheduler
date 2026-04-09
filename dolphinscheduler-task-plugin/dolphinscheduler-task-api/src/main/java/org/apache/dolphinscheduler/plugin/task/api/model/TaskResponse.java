@@ -44,14 +44,8 @@ public class TaskResponse {
      */
     private String appIds;
 
-    /**
-     * process
-     */
     private Process process;
 
-    /**
-     * cancel
-     */
     private volatile boolean cancel = false;
 
     /**

@@ -24,9 +24,6 @@ import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.util.List;
 
-/**
- * monitor service
- */
 public interface MonitorService {
 
     /**

@@ -27,9 +27,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * entity test utils
- */
 public class EntityTestUtils {
 
     private static final Map<String, Object> OBJECT_MAP = new HashMap<>();
