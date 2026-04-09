@@ -38,14 +38,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FlinkTask extends AbstractYarnTask {
 
-    /**
-     * flink parameters
-     */
     private FlinkParameters flinkParameters;
 
-    /**
-     * taskExecutionContext
-     */
     private TaskExecutionContext taskExecutionContext;
 
     /**

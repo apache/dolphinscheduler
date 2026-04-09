@@ -28,8 +28,7 @@ import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import org.aspectj.lang.JoinPoint;
@@ -107,8 +106,7 @@ public class OperatorLogAspect {
         auditThreadLocal.remove();
     }
 
-    @Getter
-    @Setter
+    @Data
     @AllArgsConstructor
     public static class AuditContext {
 

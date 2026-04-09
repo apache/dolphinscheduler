@@ -72,9 +72,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * workflow definition controller
- */
 @Tag(name = "WORKFLOW_DEFINITION_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/workflow-definition")

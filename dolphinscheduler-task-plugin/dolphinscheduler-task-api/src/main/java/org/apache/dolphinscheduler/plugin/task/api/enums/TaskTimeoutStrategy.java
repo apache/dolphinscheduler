@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.api.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- * task timeout strategy
- */
 public enum TaskTimeoutStrategy {
 
     /**

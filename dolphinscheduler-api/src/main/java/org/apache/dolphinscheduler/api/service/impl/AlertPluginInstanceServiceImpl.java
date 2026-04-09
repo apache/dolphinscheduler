@@ -66,9 +66,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * alert plugin instance service impl
- */
 @Service
 @Lazy
 @Slf4j

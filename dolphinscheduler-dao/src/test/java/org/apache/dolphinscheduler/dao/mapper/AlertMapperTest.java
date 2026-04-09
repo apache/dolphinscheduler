@@ -32,9 +32,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * alert mapper test
- */
 public class AlertMapperTest extends BaseDaoTest {
 
     @Autowired

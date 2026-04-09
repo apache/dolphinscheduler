@@ -27,9 +27,6 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-/**
- * alert mapper interface
- */
 @Mapper
 public interface AlertMapper extends BaseMapper<Alert> {
 

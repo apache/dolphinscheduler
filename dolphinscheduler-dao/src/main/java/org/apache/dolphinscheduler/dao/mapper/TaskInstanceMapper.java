@@ -34,9 +34,6 @@ import java.util.Set;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
-/**
- * task instance mapper interface
- */
 public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
 
     List<TaskInstance> findValidTaskListByWorkflowInstanceId(@Param("workflowInstanceId") Integer workflowInstanceId,

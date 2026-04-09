@@ -28,14 +28,8 @@ import lombok.ToString;
 @AllArgsConstructor
 public class YarnApplicationManagerContext implements ApplicationManagerContext {
 
-    /**
-     * execute path
-     */
     private final String executePath;
 
-    /**
-     * tenant code
-     */
     private final String tenantCode;
 
     /**

@@ -54,9 +54,6 @@ public class RemoteShellTask extends AbstractTask {
      */
     private RemoteShellParameters remoteShellParameters;
 
-    /**
-     * taskExecutionContext
-     */
     private TaskExecutionContext taskExecutionContext;
 
     private RemoteExecutor remoteExecutor;

@@ -22,9 +22,6 @@ import org.apache.dolphinscheduler.common.enums.PluginType;
 
 import java.util.Map;
 
-/**
- * ui plugin service
- */
 public interface UiPluginService {
 
     Map<String, Object> queryUiPluginsByType(PluginType pluginType);

@@ -54,9 +54,6 @@ import org.slf4j.LoggerFactory;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 
-/**
- * monitor service test
- */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class MonitorServiceTest {

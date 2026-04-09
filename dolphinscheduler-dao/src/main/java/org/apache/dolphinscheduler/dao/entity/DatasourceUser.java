@@ -29,33 +29,18 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_relation_datasource_user")
 public class DatasourceUser {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * user id
-     */
     private int userId;
 
-    /**
-     * data source id
-     */
     private int datasourceId;
 
     /**
      * permission
      */
     private int perm;
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 }

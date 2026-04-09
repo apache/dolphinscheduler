@@ -52,9 +52,6 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * mysql source generator
- */
 @Slf4j
 public class MySQLSourceGenerator implements ISourceGenerator {
 

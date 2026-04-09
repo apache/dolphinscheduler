@@ -47,9 +47,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
-/**
- * command mapper test
- */
 public class CommandMapperTest extends BaseDaoTest {
 
     @Autowired
