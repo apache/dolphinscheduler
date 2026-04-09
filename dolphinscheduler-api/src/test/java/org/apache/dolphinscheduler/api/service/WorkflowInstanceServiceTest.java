@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -56,6 +57,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
@@ -63,6 +65,7 @@ import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -70,6 +73,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -145,6 +149,21 @@ public class WorkflowInstanceServiceTest {
 
     @Mock
     private TaskInstanceContextDao taskInstanceContextDao;
+
+    @Mock
+    TaskInstanceMapper taskInstanceMapper;
+
+    @Mock
+    CuringParamsService curingGlobalParamsService;
+
+    @Mock
+    TaskInstanceService taskInstanceService;
+
+    @Mock
+    WorkflowInstanceMapDao workflowInstanceMapDao;
+
+    @Mock
+    AlertDao alertDao;
 
     private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
             + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
