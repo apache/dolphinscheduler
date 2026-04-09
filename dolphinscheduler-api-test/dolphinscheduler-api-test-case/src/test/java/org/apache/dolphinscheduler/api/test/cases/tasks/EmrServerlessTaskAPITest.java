@@ -97,142 +97,129 @@ public class EmrServerlessTaskAPITest {
 
     @Test
     @Order(1)
-    public void testEmrServerlessSuccessWorkflowInstance() {
-        try {
-            String workflowDefinitionName = "test_emr_serverless_success_" + System.currentTimeMillis();
-            // create test project
-            HttpResponse createProjectResponse = projectPage.createProject(loginUser, "project-test-emr-serverless");
-            HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
-            Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
-            projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
-                    .getBody().getData()).get(0)).get("code");
+    public void testEmrServerlessSuccessWorkflowInstance() throws Exception {
+        String workflowDefinitionName = "test_emr_serverless_success_" + System.currentTimeMillis();
+        // create test project
+        projectPage.createProject(loginUser, "project-test-emr-serverless");
+        HttpResponse queryAllProjectListResponse = projectPage.queryAllProjectList(loginUser);
+        Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
+        projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
+                .getBody().getData()).get(0)).get("code");
 
-            // upload test workflow definition json
-            ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader
-                    .getResource("workflow-json/task-emr-serverless/emrServerlessSuccessWorkflow.json").getFile());
-            HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
-                    .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
-            Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
+        // upload test workflow definition json
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader
+                .getResource("workflow-json/task-emr-serverless/emrServerlessSuccessWorkflow.json").getFile());
+        HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
+                .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+        Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
 
-            // get workflow definition code
-            HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
-                    workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
-            Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
-            Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getData().toString()
-                    .contains("test name"));
-            workflowDefinitionCode =
-                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
-                            .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
+        // get workflow definition code
+        HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
+                workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+        Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
+        Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getData().toString()
+                .contains("test name"));
+        workflowDefinitionCode =
+                (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
+                        .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
 
-            // release test workflow
-            HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(loginUser,
-                    projectCode, workflowDefinitionCode, ReleaseState.ONLINE);
-            Assertions.assertTrue(releaseWorkflowDefinitionResponse.getBody().getSuccess());
+        // release test workflow
+        HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(loginUser,
+                projectCode, workflowDefinitionCode, ReleaseState.ONLINE);
+        Assertions.assertTrue(releaseWorkflowDefinitionResponse.getBody().getSuccess());
 
-            // trigger workflow instance
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date date = new Date();
-            String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
-            log.info("use current time {} as scheduleTime", scheduleTime);
-            HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
-                    workflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
-            Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
+        // trigger workflow instance
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
+        log.info("use current time {} as scheduleTime", scheduleTime);
+        HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
+                workflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+        Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
 
-            workflowInstanceIds = (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
-            Assertions.assertFalse(workflowInstanceIds.isEmpty(), "No workflow instances were created");
+        workflowInstanceIds = (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
+        Assertions.assertFalse(workflowInstanceIds.isEmpty(), "No workflow instances were created");
 
-            // Wait for workflow instance to finish with timeout
-            int workflowInstanceId = workflowInstanceIds.get(0);
-            log.info("Waiting for EMR Serverless success workflow instance: {}", workflowInstanceId);
-            long timeout = 120_000; // 120 seconds
-            long startTime = System.currentTimeMillis();
-            String finalState = null;
-            while (System.currentTimeMillis() - startTime < timeout) {
-                Thread.sleep(2000);
-                HttpResponse queryResponse = workflowInstancePage.queryWorkflowInstanceById(
-                        loginUser, projectCode, workflowInstanceId);
-                LinkedHashMap<String, Object> instanceData =
-                        (LinkedHashMap<String, Object>) queryResponse.getBody().getData();
-                String state = (String) instanceData.get("state");
-                log.info("EMR Serverless success workflow instance state: {}", state);
-                if ("SUCCESS".equals(state) || "FAILURE".equals(state) || "STOP".equals(state)) {
-                    finalState = state;
-                    break;
-                }
+        // Wait for workflow instance to complete (up to 120 seconds, polling every 2 seconds)
+        int workflowInstanceId = workflowInstanceIds.get(0);
+        log.info("Waiting for EMR Serverless success workflow instance: {}", workflowInstanceId);
+        boolean completed = false;
+        for (int i = 0; i < 60; i++) {
+            Thread.sleep(2000);
+            HttpResponse queryResponse = workflowInstancePage.queryWorkflowInstanceById(
+                    loginUser, projectCode, workflowInstanceId);
+            LinkedHashMap<String, Object> instanceData =
+                    (LinkedHashMap<String, Object>) queryResponse.getBody().getData();
+            String state = (String) instanceData.get("state");
+            log.info("EMR Serverless success workflow instance state: {}", state);
+            if ("SUCCESS".equals(state)) {
+                completed = true;
+                break;
+            } else if ("FAILURE".equals(state) || "STOP".equals(state)) {
+                Assertions.fail("EMR Serverless workflow instance expected SUCCESS but got: " + state);
             }
-            Assertions.assertNotNull(finalState, "Workflow instance did not reach a final state within timeout");
-            Assertions.assertEquals("SUCCESS", finalState, "Expected workflow instance to succeed");
-        } catch (Exception e) {
-            log.error("failed", e);
-            Assertions.fail();
         }
+        Assertions.assertTrue(completed, "EMR Serverless workflow instance did not complete within 120 seconds");
     }
 
     @Test
     @Order(2)
-    public void testEmrServerlessFailedWorkflowInstance() {
-        try {
-            String workflowDefinitionName = "test_emr_serverless_failed_" + System.currentTimeMillis();
+    public void testEmrServerlessFailedWorkflowInstance() throws Exception {
+        String workflowDefinitionName = "test_emr_serverless_failed_" + System.currentTimeMillis();
 
-            // upload failed workflow definition json
-            ClassLoader classLoader = getClass().getClassLoader();
-            File file = new File(classLoader
-                    .getResource("workflow-json/task-emr-serverless/emrServerlessFailedWorkflow.json").getFile());
-            HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
-                    .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
-            Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
+        // upload failed workflow definition json
+        ClassLoader classLoader = getClass().getClassLoader();
+        File file = new File(classLoader
+                .getResource("workflow-json/task-emr-serverless/emrServerlessFailedWorkflow.json").getFile());
+        HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
+                .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+        Assertions.assertTrue(createWorkflowDefinitionResponse.getBody().getSuccess());
 
-            // get workflow definition code
-            HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
-                    workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
-            Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
-            long failedWorkflowDefinitionCode =
-                    (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
-                            .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
+        // get workflow definition code
+        HttpResponse queryAllWorkflowDefinitionByProjectCodeResponse =
+                workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+        Assertions.assertTrue(queryAllWorkflowDefinitionByProjectCodeResponse.getBody().getSuccess());
+        long failedWorkflowDefinitionCode =
+                (long) ((LinkedHashMap<String, Object>) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllWorkflowDefinitionByProjectCodeResponse
+                        .getBody().getData()).get(0)).get("workflowDefinition")).get("code");
 
-            // release
-            HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(
-                    loginUser, projectCode, failedWorkflowDefinitionCode, ReleaseState.ONLINE);
-            Assertions.assertTrue(releaseWorkflowDefinitionResponse.getBody().getSuccess());
+        // release
+        HttpResponse releaseWorkflowDefinitionResponse = workflowDefinitionPage.releaseWorkflowDefinition(
+                loginUser, projectCode, failedWorkflowDefinitionCode, ReleaseState.ONLINE);
+        Assertions.assertTrue(releaseWorkflowDefinitionResponse.getBody().getSuccess());
 
-            // trigger
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            Date date = new Date();
-            String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
-            HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
-                    failedWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
-            Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
+        // trigger
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = new Date();
+        String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
+        HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
+                failedWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+        Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
 
-            List<Integer> failedWorkflowInstanceIds =
-                    (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
-            Assertions.assertFalse(failedWorkflowInstanceIds.isEmpty(), "No workflow instances were created");
+        List<Integer> failedWorkflowInstanceIds =
+                (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
+        Assertions.assertFalse(failedWorkflowInstanceIds.isEmpty(), "No workflow instances were created");
 
-            // Wait for workflow instance to finish with timeout
-            int failedWorkflowInstanceId = failedWorkflowInstanceIds.get(0);
-            log.info("Waiting for EMR Serverless failed workflow instance: {}", failedWorkflowInstanceId);
-            long timeout = 120_000; // 120 seconds
-            long startTime = System.currentTimeMillis();
-            String finalState = null;
-            while (System.currentTimeMillis() - startTime < timeout) {
-                Thread.sleep(2000);
-                HttpResponse queryResponse = workflowInstancePage.queryWorkflowInstanceById(
-                        loginUser, projectCode, failedWorkflowInstanceId);
-                LinkedHashMap<String, Object> instanceData =
-                        (LinkedHashMap<String, Object>) queryResponse.getBody().getData();
-                String state = (String) instanceData.get("state");
-                log.info("EMR Serverless failed workflow instance state: {}", state);
-                if ("SUCCESS".equals(state) || "FAILURE".equals(state) || "STOP".equals(state)) {
-                    finalState = state;
-                    break;
-                }
+        // Wait for workflow instance to complete (up to 120 seconds, polling every 2 seconds)
+        int failedWorkflowInstanceId = failedWorkflowInstanceIds.get(0);
+        log.info("Waiting for EMR Serverless failed workflow instance: {}", failedWorkflowInstanceId);
+        boolean completed = false;
+        for (int i = 0; i < 60; i++) {
+            Thread.sleep(2000);
+            HttpResponse queryResponse = workflowInstancePage.queryWorkflowInstanceById(
+                    loginUser, projectCode, failedWorkflowInstanceId);
+            LinkedHashMap<String, Object> instanceData =
+                    (LinkedHashMap<String, Object>) queryResponse.getBody().getData();
+            String state = (String) instanceData.get("state");
+            log.info("EMR Serverless failed workflow instance state: {}", state);
+            if ("FAILURE".equals(state) || "STOP".equals(state)) {
+                completed = true;
+                break;
+            } else if ("SUCCESS".equals(state)) {
+                Assertions.fail("EMR Serverless workflow instance expected FAILURE but got SUCCESS");
             }
-            Assertions.assertNotNull(finalState, "Workflow instance did not reach a final state within timeout");
-            Assertions.assertTrue("FAILURE".equals(finalState) || "STOP".equals(finalState),
-                    "Expected workflow instance to fail, but got: " + finalState);
-        } catch (Exception e) {
-            log.error("failed", e);
-            Assertions.fail();
         }
+        Assertions.assertTrue(completed, "EMR Serverless workflow instance did not complete within 120 seconds");
     }
 }
