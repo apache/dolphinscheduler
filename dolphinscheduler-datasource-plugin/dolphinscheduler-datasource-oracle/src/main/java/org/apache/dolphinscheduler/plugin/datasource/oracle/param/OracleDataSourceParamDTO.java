@@ -22,7 +22,9 @@ import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class OracleDataSourceParamDTO extends BaseDataSourceParamDTO {
 

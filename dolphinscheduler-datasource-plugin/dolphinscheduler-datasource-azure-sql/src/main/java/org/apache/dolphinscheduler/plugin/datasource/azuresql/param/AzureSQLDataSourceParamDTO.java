@@ -21,8 +21,10 @@ import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSour
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+@EqualsAndHashCode(callSuper = true)
 @ToString
 @Data
 public class AzureSQLDataSourceParamDTO extends BaseDataSourceParamDTO {

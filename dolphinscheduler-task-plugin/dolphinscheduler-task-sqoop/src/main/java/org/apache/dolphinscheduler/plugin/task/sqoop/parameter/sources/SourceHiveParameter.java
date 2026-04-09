@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SourceCommonParameter;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class SourceHiveParameter extends SourceCommonParameter {
 

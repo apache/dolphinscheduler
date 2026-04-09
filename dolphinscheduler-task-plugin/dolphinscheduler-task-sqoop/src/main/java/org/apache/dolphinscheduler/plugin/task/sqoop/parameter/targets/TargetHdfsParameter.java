@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.TargetCommonParameter;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class TargetHdfsParameter extends TargetCommonParameter {
 

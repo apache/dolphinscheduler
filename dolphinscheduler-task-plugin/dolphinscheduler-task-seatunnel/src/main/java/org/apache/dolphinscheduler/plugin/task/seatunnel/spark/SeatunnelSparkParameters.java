@@ -25,9 +25,11 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Objects;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @NoArgsConstructor
 public class SeatunnelSparkParameters extends SeatunnelParameters {

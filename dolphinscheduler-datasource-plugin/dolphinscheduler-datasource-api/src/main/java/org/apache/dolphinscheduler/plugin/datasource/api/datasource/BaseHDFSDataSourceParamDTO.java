@@ -18,7 +18,9 @@
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public abstract class BaseHDFSDataSourceParamDTO extends BaseDataSourceParamDTO {
 

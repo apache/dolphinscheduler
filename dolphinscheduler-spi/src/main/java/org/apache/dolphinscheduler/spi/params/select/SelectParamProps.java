@@ -20,10 +20,12 @@ package org.apache.dolphinscheduler.spi.params.select;
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * front-end select component props attributes
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class SelectParamProps extends ParamsProps {
 

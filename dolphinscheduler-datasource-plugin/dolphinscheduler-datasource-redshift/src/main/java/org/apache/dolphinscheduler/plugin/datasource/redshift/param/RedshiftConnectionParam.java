@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class RedshiftConnectionParam extends BaseConnectionParam {
 

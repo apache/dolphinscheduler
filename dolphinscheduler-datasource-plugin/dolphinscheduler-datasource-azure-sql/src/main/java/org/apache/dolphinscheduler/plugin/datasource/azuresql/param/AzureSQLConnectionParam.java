@@ -20,8 +20,10 @@ package org.apache.dolphinscheduler.plugin.datasource.azuresql.param;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+@EqualsAndHashCode(callSuper = true)
 @ToString
 @Data
 public class AzureSQLConnectionParam extends BaseConnectionParam {
