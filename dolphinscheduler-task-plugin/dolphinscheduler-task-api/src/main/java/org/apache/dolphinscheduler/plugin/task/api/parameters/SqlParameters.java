@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.SqlSourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
@@ -57,6 +58,16 @@ public class SqlParameters extends AbstractParameters {
      * sql
      */
     private String sql;
+
+    /**
+     * sql source
+     */
+    private SqlSourceType sqlSource;
+
+    /**
+     * sql resource file path in resource center
+     */
+    private String sqlResource;
 
     /**
      * sql type
@@ -139,6 +150,22 @@ public class SqlParameters extends AbstractParameters {
         this.sql = sql;
     }
 
+    public SqlSourceType getSqlSource() {
+        return sqlSource;
+    }
+
+    public void setSqlSource(SqlSourceType sqlSource) {
+        this.sqlSource = sqlSource;
+    }
+
+    public String getSqlResource() {
+        return sqlResource;
+    }
+
+    public void setSqlResource(String sqlResource) {
+        this.sqlResource = sqlResource;
+    }
+
     public int getSqlType() {
         return sqlType;
     }
@@ -213,12 +240,24 @@ public class SqlParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return datasource != 0 && StringUtils.isNotEmpty(type) && StringUtils.isNotEmpty(sql);
+        if (datasource == 0 || StringUtils.isEmpty(type)) {
+            return false;
+        }
+        if (StringUtils.isNotEmpty(sql)) {
+            return true;
+        }
+        return StringUtils.isNotEmpty(sqlResource);
     }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
-        return new ArrayList<>();
+        List<ResourceInfo> resourceFiles = new ArrayList<>();
+        if (StringUtils.isNotEmpty(sqlResource)) {
+            ResourceInfo resourceInfo = new ResourceInfo();
+            resourceInfo.setResourceName(sqlResource);
+            resourceFiles.add(resourceInfo);
+        }
+        return resourceFiles;
     }
 
     public void dealOutParam(String result) {
@@ -272,6 +311,8 @@ public class SqlParameters extends AbstractParameters {
                 + "type='" + type + '\''
                 + ", datasource=" + datasource
                 + ", sql='" + sql + '\''
+                + ", sqlSource='" + sqlSource + '\''
+                + ", sqlResource='" + sqlResource + '\''
                 + ", sqlType=" + sqlType
                 + ", sendEmail=" + sendEmail
                 + ", displayRows=" + displayRows

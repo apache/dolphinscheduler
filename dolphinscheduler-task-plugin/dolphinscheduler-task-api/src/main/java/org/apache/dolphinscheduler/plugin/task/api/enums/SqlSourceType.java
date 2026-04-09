@@ -15,31 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.common.enums;
+package org.apache.dolphinscheduler.plugin.task.api.enums;
 
-import com.baomidou.mybatisplus.annotation.EnumValue;
-
-public enum DbConnectType {
-
-    ORACLE_SERVICE_NAME(0, "Oracle Service Name"),
-    ORACLE_SID(1, "Oracle SID");
-
-    DbConnectType(int code, String descp) {
-        this.code = code;
-        this.descp = descp;
-    }
-
-    @EnumValue
-    private final int code;
-
-    private final String descp;
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
-
+public enum SqlSourceType {
+    /**
+     * SCRIPT: inline sql text
+     * FILE: sql from resource center file
+     */
+    SCRIPT, FILE
 }

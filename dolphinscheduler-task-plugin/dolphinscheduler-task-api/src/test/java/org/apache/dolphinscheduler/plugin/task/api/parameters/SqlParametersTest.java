@@ -17,9 +17,14 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -87,5 +92,57 @@ public class SqlParametersTest {
         sqlParameters.setLocalParams(properties);
         sqlParameters.dealOutParam(sqlResult);
         Assertions.assertNotNull(sqlParameters.getVarPool().get(0));
+
+        // resource files list should contain sqlResource when it is set
+        sqlParameters.setSql(null);
+        sqlParameters.setSqlResource("/sql/demo.sql");
+        Assertions.assertFalse(CollectionUtils.isEmpty(sqlParameters.getResourceFilesList()));
+    }
+
+    @Test
+    public void testCheckParameters_variants() {
+        SqlParameters p = new SqlParameters();
+
+        // datasource/type invalid
+        p.setDatasource(0);
+        p.setType("");
+        p.setSql("select 1");
+        p.setSqlResource(null);
+        Assertions.assertFalse(p.checkParameters());
+
+        // sql present -> true
+        p.setDatasource(1);
+        p.setType("MYSQL");
+        p.setSql("select 1");
+        p.setSqlResource(null);
+        Assertions.assertTrue(p.checkParameters());
+
+        // sql absent, sqlResource present -> true
+        p.setSql(null);
+        p.setSqlResource("/sql/demo.sql");
+        Assertions.assertTrue(p.checkParameters());
+
+        // both absent -> false
+        p.setSql(null);
+        p.setSqlResource(null);
+        Assertions.assertFalse(p.checkParameters());
+    }
+
+    @Test
+    public void testGenerateExtendedContext_setsConnectionParams() {
+        SqlParameters p = new SqlParameters();
+        p.setDatasource(1);
+
+        DataSourceParameters dataSourceParameters = new DataSourceParameters();
+        dataSourceParameters.setType(DbType.MYSQL);
+        dataSourceParameters.setResourceType(ResourceType.DATASOURCE.name());
+        dataSourceParameters.setConnectionParams("conn_params");
+
+        ResourceParametersHelper helper = new ResourceParametersHelper();
+        helper.put(ResourceType.DATASOURCE, 1, dataSourceParameters);
+
+        SQLTaskExecutionContext ctx = p.generateExtendedContext(helper);
+        Assertions.assertNotNull(ctx);
+        Assertions.assertEquals("conn_params", ctx.getConnectionParams());
     }
 }
