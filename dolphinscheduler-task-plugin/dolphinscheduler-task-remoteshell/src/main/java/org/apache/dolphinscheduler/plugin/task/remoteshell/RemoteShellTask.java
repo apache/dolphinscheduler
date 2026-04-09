@@ -176,6 +176,7 @@ public class RemoteShellTask extends AbstractTask {
         SSHConnectionParam sshConnectionParam = (SSHConnectionParam) DataSourceUtils.buildConnectionParams(
                 DbType.valueOf(remoteShellParameters.getType()),
                 dbSource.getConnectionParams());
-        remoteExecutor = new RemoteExecutor(sshConnectionParam);
+        remoteExecutor = new RemoteExecutor(sshConnectionParam, taskExecutionContext.getLogPath(),
+                taskExecutionContext.getTaskOutputLogPath());
     }
 }

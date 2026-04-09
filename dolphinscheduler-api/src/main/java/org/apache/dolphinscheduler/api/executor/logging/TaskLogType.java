@@ -32,7 +32,7 @@ public enum TaskLogType {
 
         @Override
         public String getLogPath(TaskInstance taskInstance) {
-            return taskInstance.getTaskOutPutLogPath();
+            return taskInstance.getTaskOutputLogPath();
         }
     };
 

@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -41,11 +42,16 @@ import java.util.stream.Collectors;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 
 @Slf4j
 public class HttpTask extends AbstractTask {
+
+    private static final Logger TASK_OUTPUT_LOGGER = LoggerFactory.getLogger(LogUtils.TASK_OUTPUT_LOGGER_NAME);
 
     private HttpParameters httpParameters;
 
@@ -89,32 +95,32 @@ public class HttpTask extends AbstractTask {
         switch (httpParameters.getHttpCheckCondition()) {
             case BODY_CONTAINS:
                 if (StringUtils.isEmpty(body) || !body.contains(httpParameters.getCondition())) {
-                    log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
-                            httpParameters.getUrl(), statusCode, HttpCheckCondition.BODY_CONTAINS.name(), body);
+                    logHttpResponse("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
+                            statusCode, HttpCheckCondition.BODY_CONTAINS.name(), body);
                     exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
                 break;
             case BODY_NOT_CONTAINS:
                 if (StringUtils.isEmpty(body) || body.contains(httpParameters.getCondition())) {
-                    log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
-                            httpParameters.getUrl(), statusCode, HttpCheckCondition.BODY_NOT_CONTAINS.name(), body);
+                    logHttpResponse("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
+                            statusCode, HttpCheckCondition.BODY_NOT_CONTAINS.name(), body);
                     exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
                 break;
             case STATUS_CODE_CUSTOM:
                 if (statusCode != Integer.parseInt(httpParameters.getCondition())) {
-                    log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
-                            httpParameters.getUrl(), statusCode, HttpCheckCondition.STATUS_CODE_CUSTOM.name(), body);
+                    logHttpResponse("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
+                            statusCode, HttpCheckCondition.STATUS_CODE_CUSTOM.name(), body);
                     exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
                 break;
             case STATUS_CODE_DEFAULT:
                 if (HttpConstants.RESPONSE_CODE_SUCCESS != statusCode) {
-                    log.error("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
-                            httpParameters.getUrl(), statusCode, HttpCheckCondition.STATUS_CODE_DEFAULT.name(), body);
+                    logHttpResponse("http request failed, url: {}, statusCode: {}, checkCondition: {}, body: {}",
+                            statusCode, HttpCheckCondition.STATUS_CODE_DEFAULT.name(), body);
                     exitStatusCode = TaskConstants.EXIT_CODE_FAILURE;
                     return;
                 }
@@ -125,8 +131,31 @@ public class HttpTask extends AbstractTask {
         }
 
         // default success log
-        log.info("http request success, url: {}, statusCode: {}, body: {}", httpParameters.getUrl(), statusCode, body);
+        logHttpResponse("http request success, url: {}, statusCode: {}, body: {}", statusCode, null, body);
         exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
+    }
+
+    private void logHttpResponse(String message, int statusCode, String checkCondition, String body) {
+        if (StringUtils.isBlank(taskExecutionContext.getTaskOutputLogPath())) {
+            if (checkCondition == null) {
+                log.info(message, httpParameters.getUrl(), statusCode, body);
+            } else {
+                log.error(message, httpParameters.getUrl(), statusCode, checkCondition, body);
+            }
+            return;
+        }
+        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
+        try (
+                LogUtils.MDCAutoClosableContext ignored =
+                        LogUtils.withTaskOutputLogPathMDC(taskExecutionContext.getTaskOutputLogPath())) {
+            if (checkCondition == null) {
+                TASK_OUTPUT_LOGGER.info(message, httpParameters.getUrl(), statusCode, body);
+            } else {
+                TASK_OUTPUT_LOGGER.info(message, httpParameters.getUrl(), statusCode, checkCondition, body);
+            }
+        } finally {
+            LogUtils.removeTaskInstanceLogFullPathMDC();
+        }
     }
 
     private OkHttpResponse sendRequest() {

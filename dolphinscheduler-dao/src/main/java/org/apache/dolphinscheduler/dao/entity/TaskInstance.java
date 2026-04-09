@@ -80,7 +80,8 @@ public class TaskInstance implements Serializable {
     private String executePath;
 
     private String logPath;
-    private String taskOutPutLogPath;
+    @TableField("task_output_log_path")
+    private String taskOutputLogPath;
 
     private int retryTimes;
 

@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -51,8 +52,13 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Slf4j
 public class ProcedureTask extends AbstractTask {
+
+    private static final Logger TASK_OUTPUT_LOGGER = LoggerFactory.getLogger(LogUtils.TASK_OUTPUT_LOGGER_NAME);
 
     private final ProcedureParameters procedureParameters;
 
@@ -234,45 +240,53 @@ public class ProcedureTask extends AbstractTask {
         Object value = null;
         switch (dataType) {
             case VARCHAR:
-                log.info("out parameter varchar key : {} , value : {}", prop, stmt.getString(index));
                 value = stmt.getString(index);
                 break;
             case INTEGER:
-                log.info("out parameter integer key : {} , value : {}", prop, stmt.getInt(index));
                 value = stmt.getInt(index);
                 break;
             case LONG:
-                log.info("out parameter long key : {} , value : {}", prop, stmt.getLong(index));
                 value = stmt.getLong(index);
                 break;
             case FLOAT:
-                log.info("out parameter float key : {} , value : {}", prop, stmt.getFloat(index));
                 value = stmt.getFloat(index);
                 break;
             case DOUBLE:
-                log.info("out parameter double key : {} , value : {}", prop, stmt.getDouble(index));
                 value = stmt.getDouble(index);
                 break;
             case DATE:
-                log.info("out parameter date key : {} , value : {}", prop, stmt.getDate(index));
                 value = stmt.getDate(index);
                 break;
             case TIME:
-                log.info("out parameter time key : {} , value : {}", prop, stmt.getTime(index));
                 value = stmt.getTime(index);
                 break;
             case TIMESTAMP:
-                log.info("out parameter timestamp key : {} , value : {}", prop, stmt.getTimestamp(index));
                 value = stmt.getTimestamp(index);
                 break;
             case BOOLEAN:
-                log.info("out parameter boolean key : {} , value : {}", prop, stmt.getBoolean(index));
                 value = stmt.getBoolean(index);
                 break;
             default:
                 break;
         }
+        logOutputParameter(prop, dataType, value);
         return value;
+    }
+
+    private void logOutputParameter(String prop, DataType dataType, Object value) {
+        String message = String.format("out parameter %s key : {} , value : {}", dataType.name().toLowerCase());
+        if (StringUtils.isBlank(taskExecutionContext.getTaskOutputLogPath())) {
+            log.info(message, prop, value);
+            return;
+        }
+        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
+        try (
+                LogUtils.MDCAutoClosableContext ignored =
+                        LogUtils.withTaskOutputLogPathMDC(taskExecutionContext.getTaskOutputLogPath())) {
+            TASK_OUTPUT_LOGGER.info(message, prop, value);
+        } finally {
+            LogUtils.removeTaskInstanceLogFullPathMDC();
+        }
     }
 
     @Override

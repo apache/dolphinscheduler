@@ -199,7 +199,10 @@ public abstract class AbstractCommandExecutor {
         final CompletableFuture<Void> collectPodLogFuture = CompletableFuture.runAsync(() -> {
             // wait for launching (driver) pod
             ThreadUtils.sleep(SLEEP_TIME_MILLIS * 5L);
+            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
             try (
+                    LogUtils.MDCAutoClosableContext ignored =
+                            LogUtils.withTaskOutputLogPathMDC(taskRequest.getTaskOutputLogPath());
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
                             taskRequest.getTaskAppId(), "")) {
                 if (watcher == null) {
@@ -208,13 +211,19 @@ public abstract class AbstractCommandExecutor {
                     String line;
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                         while ((line = reader.readLine()) != null) {
-                            log.info("[K8S-pod-log-{}]: {}", taskRequest.getTaskName(), line);
+                            if (StringUtils.isBlank(taskRequest.getTaskOutputLogPath())) {
+                                log.info("[K8S-pod-log-{}]: {}", taskRequest.getTaskName(), line);
+                            } else {
+                                TASK_OUTPUT_LOGGER.info(line);
+                            }
                         }
                     }
                 }
             } catch (Exception e) {
                 log.error("Collect pod log error", e);
                 throw new RuntimeException(e);
+            } finally {
+                LogUtils.removeTaskInstanceLogFullPathMDC();
             }
         }, collectPodLogExecutorService);
 

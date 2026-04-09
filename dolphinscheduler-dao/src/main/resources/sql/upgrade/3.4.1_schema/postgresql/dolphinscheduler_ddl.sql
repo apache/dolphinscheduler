@@ -18,3 +18,6 @@
 CREATE SEQUENCE IF NOT EXISTS t_ds_task_instance_context_id_seq;
 ALTER TABLE t_ds_task_instance_context
 ALTER COLUMN id SET DEFAULT nextval('t_ds_task_instance_context_id_seq'::regclass);
+
+ALTER TABLE t_ds_task_instance
+ADD COLUMN IF NOT EXISTS task_output_log_path text DEFAULT NULL;

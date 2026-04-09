@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.plugin.datasource.ssh.SSHUtils;
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
+import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,8 +52,13 @@ import java.util.function.Consumer;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 @Slf4j
 public class RemoteExecutor implements AutoCloseable {
+
+    private static final Logger TASK_OUTPUT_LOGGER = LoggerFactory.getLogger(LogUtils.TASK_OUTPUT_LOGGER_NAME);
 
     static final String REMOTE_SHELL_HOME = "/tmp/dolphinscheduler-remote-shell-%s/";
     static final String STATUS_TAG_MESSAGE = "DOLPHINSCHEDULER-REMOTE-SHELL-TASK-STATUS-";
@@ -61,14 +67,21 @@ public class RemoteExecutor implements AutoCloseable {
     protected Map<String, String> taskOutputParams = new HashMap<>();
     private SshClient sshClient;
     private ClientSession session;
-    private SSHConnectionParam sshConnectionParam;
+    private final SSHConnectionParam sshConnectionParam;
+    private final String taskLogPath;
+    private final String taskOutputLogPath;
 
     public RemoteExecutor(SSHConnectionParam sshConnectionParam) {
-
-        this.sshConnectionParam = sshConnectionParam;
-        initClient();
+        this(sshConnectionParam, null, null);
     }
 
+    public RemoteExecutor(SSHConnectionParam sshConnectionParam, String taskLogPath, String taskOutputLogPath) {
+
+        this.sshConnectionParam = sshConnectionParam;
+        this.taskLogPath = taskLogPath;
+        this.taskOutputLogPath = taskOutputLogPath;
+        initClient();
+    }
     private void initClient() {
         sshClient = SshClient.setUpDefaultClient();
         sshClient.start();
@@ -111,20 +124,44 @@ public class RemoteExecutor implements AutoCloseable {
         String pid;
         log.info("Remote shell task log:");
         TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
-        do {
-            pid = getTaskPid(taskId);
-            String trackCommand = String.format(COMMAND.TRACK_COMMAND, logN + 1, getRemoteShellHome(), taskId);
-            int readLines = runRemoteAndProcessLines(trackCommand, line -> {
-                log.info(line);
-                taskOutputParameterParser.appendParseLog(line);
-            });
-            if (readLines > 0) {
-                logN += readLines;
+        if (StringUtils.isBlank(taskOutputLogPath)) {
+            do {
+                pid = getTaskPid(taskId);
+                String trackCommand = String.format(COMMAND.TRACK_COMMAND, logN + 1, getRemoteShellHome(), taskId);
+                int readLines = runRemoteAndProcessLines(trackCommand, line -> {
+                    log.info(line);
+                    taskOutputParameterParser.appendParseLog(line);
+                });
+                if (readLines > 0) {
+                    logN += readLines;
 
-            } else {
-                Thread.sleep(TRACK_INTERVAL);
-            }
-        } while (StringUtils.isNotEmpty(pid));
+                } else {
+                    Thread.sleep(TRACK_INTERVAL);
+                }
+            } while (StringUtils.isNotEmpty(pid));
+            taskOutputParams.putAll(taskOutputParameterParser.getTaskOutputParams());
+            return;
+        }
+
+        LogUtils.setTaskInstanceLogFullPathMDC(taskLogPath);
+        try (LogUtils.MDCAutoClosableContext ignored = LogUtils.withTaskOutputLogPathMDC(taskOutputLogPath)) {
+            do {
+                pid = getTaskPid(taskId);
+                String trackCommand = String.format(COMMAND.TRACK_COMMAND, logN + 1, getRemoteShellHome(), taskId);
+                int readLines = runRemoteAndProcessLines(trackCommand, line -> {
+                    TASK_OUTPUT_LOGGER.info(line);
+                    taskOutputParameterParser.appendParseLog(line);
+                });
+                if (readLines > 0) {
+                    logN += readLines;
+
+                } else {
+                    Thread.sleep(TRACK_INTERVAL);
+                }
+            } while (StringUtils.isNotEmpty(pid));
+        } finally {
+            LogUtils.removeTaskInstanceLogFullPathMDC();
+        }
         taskOutputParams.putAll(taskOutputParameterParser.getTaskOutputParams());
     }
 

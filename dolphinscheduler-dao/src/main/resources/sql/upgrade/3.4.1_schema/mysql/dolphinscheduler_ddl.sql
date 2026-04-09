@@ -17,3 +17,21 @@
 
 ALTER TABLE `t_ds_serial_command`
 MODIFY COLUMN `workflow_definition_code` BIGINT(20) NOT NULL COMMENT 'workflow definition code';
+
+drop PROCEDURE if EXISTS add_task_output_log_path_to_t_ds_task_instance;
+delimiter d//
+CREATE PROCEDURE add_task_output_log_path_to_t_ds_task_instance()
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_NAME='t_ds_task_instance'
+          AND TABLE_SCHEMA=(SELECT DATABASE())
+          AND COLUMN_NAME='task_output_log_path')
+    THEN
+        ALTER TABLE `t_ds_task_instance`
+            ADD COLUMN `task_output_log_path` longtext DEFAULT NULL COMMENT 'task output log path' AFTER `log_path`;
+    END IF;
+END;
+d//
+delimiter ;
+call add_task_output_log_path_to_t_ds_task_instance();
+drop PROCEDURE if EXISTS add_task_output_log_path_to_t_ds_task_instance;

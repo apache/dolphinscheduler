@@ -834,6 +834,7 @@ CREATE TABLE t_ds_task_instance (
   host varchar(135) DEFAULT NULL ,
   execute_path varchar(200) DEFAULT NULL ,
   log_path text DEFAULT NULL ,
+  task_output_log_path text DEFAULT NULL ,
   alert_flag int DEFAULT NULL ,
   retry_times int DEFAULT '0' ,
   pid int DEFAULT NULL ,

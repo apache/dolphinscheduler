@@ -187,7 +187,7 @@ public class LoggerServiceTest {
         taskInstance.setId(1);
         taskInstance.setExecutorId(loginUser.getId() + 1);
         taskInstance.setHost("127.0.0.1:" + nettyServerPort);
-        taskInstance.setTaskOutPutLogPath("/temp/output.log");
+        taskInstance.setTaskOutputLogPath("/temp/output.log");
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
 
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(),
