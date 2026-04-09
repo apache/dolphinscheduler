@@ -78,4 +78,4 @@ jobs:
           -Dspotless.skip=true \
           -Ddocker.tag=${{ env.DOCKER_TAG }} \
           -Ddocker.hub=${{ env.HUB }} \
-          -Pdocker,release
+          -Pdocker,staging
