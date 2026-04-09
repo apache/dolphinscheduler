@@ -34,8 +34,6 @@ import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -153,13 +151,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     WorkflowDefinitionService workflowDefinitionService;
 
     @Autowired
-    ExecutorService execService;
-
-    @Autowired
     TaskInstanceMapper taskInstanceMapper;
-
-    @Autowired
-    LoggerService loggerService;
 
     @Autowired
     WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
@@ -266,31 +258,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         }
 
         return result;
-    }
-
-    @Override
-    public WorkflowInstance queryByWorkflowInstanceIdThrowExceptionIfNotFound(Integer workflowInstanceId) {
-        WorkflowInstance workflowInstance = workflowInstanceDao.queryById(workflowInstanceId);
-        if (workflowInstance == null) {
-            throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
-        }
-        return workflowInstance;
-    }
-
-    /**
-     * query workflow instance by id
-     *
-     * @param loginUser          login user
-     * @param workflowInstanceId workflow instance id
-     * @return workflow instance detail
-     */
-    @Override
-    public Map<String, Object> queryWorkflowInstanceById(User loginUser, Integer workflowInstanceId) {
-        WorkflowInstance workflowInstance = workflowInstanceMapper.selectById(workflowInstanceId);
-        WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(workflowInstance.getWorkflowDefinitionCode());
-
-        return queryWorkflowInstanceById(loginUser, workflowDefinition.getProjectCode(), workflowInstanceId);
     }
 
     /**

@@ -146,7 +146,4 @@ public class Result<T> {
                 + '}';
     }
 
-    public Boolean checkResult() {
-        return this.code == Status.SUCCESS.getCode();
-    }
 }

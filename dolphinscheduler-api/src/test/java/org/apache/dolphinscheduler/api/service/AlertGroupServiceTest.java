@@ -67,7 +67,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class AlertGroupServiceTest {
 
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
-    private static final Logger logger = LoggerFactory.getLogger(AlertGroupServiceTest.class);
     private static final Logger alertGroupServiceLogger = LoggerFactory.getLogger(AlertGroupServiceImpl.class);
     private String tooLongDescription =
             "this is a toooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo"

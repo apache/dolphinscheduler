@@ -109,13 +109,7 @@ public class TaskDefinitionServiceImplTest {
     private WorkflowTaskRelationMapper workflowTaskRelationMapper;
 
     @Mock
-    private WorkflowTaskRelationService workflowTaskRelationService;
-
-    @Mock
     private WorkflowDefinitionMapper workflowDefinitionMapper;
-
-    @Mock
-    private WorkflowDefinitionService workflowDefinitionService;
 
     @Mock
     private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;

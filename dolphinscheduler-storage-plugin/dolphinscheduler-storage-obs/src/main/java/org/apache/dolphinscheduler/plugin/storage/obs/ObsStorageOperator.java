@@ -233,7 +233,7 @@ public class ObsStorageOperator extends AbstractStorageOperator implements Close
         return transformObsObjectToStorageEntity(object);
     }
 
-    public void ensureBucketSuccessfullyCreated(String bucketName) {
+    private void ensureBucketSuccessfullyCreated(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
             throw new IllegalArgumentException("resource.alibaba.cloud.obs.bucket.name is empty");
         }

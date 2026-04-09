@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 
@@ -75,14 +74,12 @@ public class ProjectServiceTest {
     private static final Logger logger = LoggerFactory.getLogger(ProjectServiceTest.class);
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger projectLogger = LoggerFactory.getLogger(ProjectServiceImpl.class);
+
     @InjectMocks
     private ProjectServiceImpl projectService;
 
     @Mock
     private ProjectMapper projectMapper;
-
-    @Mock
-    private ProjectUserMapper projectUserMapper;
 
     @Mock
     private WorkflowDefinitionMapper workflowDefinitionMapper;
@@ -92,9 +89,6 @@ public class ProjectServiceTest {
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
-
-    @Mock
-    private TaskGroupService taskGroupService;
 
     private String projectName = "ProjectServiceTest";
 

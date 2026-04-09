@@ -307,7 +307,7 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
         return transformCOSObjectToStorageEntity(object);
     }
 
-    public void ensureBucketSuccessfullyCreated(String bucketName) {
+    private void ensureBucketSuccessfullyCreated(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
             throw new IllegalArgumentException(CosStorageConstants.TENCENT_CLOUD_COS_BUCKET_NAME + " is empty");
         }

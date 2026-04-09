@@ -33,11 +33,7 @@ public final class WeChatAlertConstants {
 
     static final String WE_CHAT_CONTENT_KEY = "content";
 
-    static final String WE_CHAT_MESSAGE_TYPE_TEXT = "text";
-
     static final Integer WE_CHAT_MESSAGE_SAFE_PUBLICITY = 0;
-
-    static final Integer WE_CHAT_MESSAGE_SAFE_PRIVACY = 1;
 
     static final Integer WE_CHAT_ENABLE_ID_TRANS = 0;
 

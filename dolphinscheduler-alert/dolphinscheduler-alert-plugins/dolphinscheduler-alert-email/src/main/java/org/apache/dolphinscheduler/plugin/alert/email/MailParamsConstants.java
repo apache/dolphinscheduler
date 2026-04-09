@@ -25,8 +25,6 @@ public final class MailParamsConstants {
     public static final String PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "$t('receiverCcs')";
     public static final String NAME_PLUGIN_DEFAULT_EMAIL_RECEIVERCCS = "receiverCcs";
 
-    public static final String NAME_MAIL_PROTOCOL = "mail.protocol";
-
     public static final String MAIL_SMTP_HOST = "mail.smtp.host";
     public static final String NAME_MAIL_SMTP_HOST = "serverHost";
 

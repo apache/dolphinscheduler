@@ -51,18 +51,6 @@ public interface WorkflowInstanceService {
                                                   long projectCode,
                                                   Integer workflowInstanceId);
 
-    WorkflowInstance queryByWorkflowInstanceIdThrowExceptionIfNotFound(Integer workflowInstanceId);
-
-    /**
-     * query workflow instance by id
-     *
-     * @param loginUser login user
-     * @param workflowInstanceId workflow instance id
-     * @return workflow instance detail
-     */
-    Map<String, Object> queryWorkflowInstanceById(User loginUser,
-                                                  Integer workflowInstanceId);
-
     /**
      * paging query workflow instance list, filtering according to project, workflow definition, time range, keyword, workflow status
      *

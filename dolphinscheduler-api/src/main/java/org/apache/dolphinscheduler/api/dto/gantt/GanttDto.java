@@ -28,11 +28,6 @@ import lombok.Data;
 public class GanttDto {
 
     /**
-     * height
-     */
-    private int height;
-
-    /**
      * tasks list
      */
     private List<Task> tasks = new ArrayList<>();
@@ -50,20 +45,6 @@ public class GanttDto {
     public GanttDto() {
         this.taskStatus = new HashMap<>();
         taskStatus.put("success", "success");
-    }
-
-    public GanttDto(int height, List<Task> tasks, List<Long> taskNames) {
-        this();
-        this.height = height;
-        this.tasks = tasks;
-        this.taskNames = taskNames;
-    }
-
-    public GanttDto(int height, List<Task> tasks, List<Long> taskNames, Map<String, String> taskStatus) {
-        this.height = height;
-        this.tasks = tasks;
-        this.taskNames = taskNames;
-        this.taskStatus = taskStatus;
     }
 
 }

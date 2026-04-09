@@ -27,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -39,7 +40,6 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -59,25 +59,21 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
+import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.lang3.StringUtils;
@@ -142,12 +138,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Mock
-    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
-
-    @Mock
     private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
@@ -172,31 +162,10 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Mock
-    private WorkflowInstanceService workflowInstanceService;
-
-    @Mock
-    private DataSourceMapper dataSourceMapper;
-
-    @Mock
     private WorkflowLineageService workflowLineageService;
 
     @Mock
-    private TaskDefinitionService taskDefinitionService;
-
-    @Mock
-    private TaskDefinitionLogService taskDefinitionLogService;
-
-    @Mock
-    private WorkflowDefinitionLogDao workflowDefinitionLogDao;
-
-    @Mock
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
-
-    @Mock
     private UserMapper userMapper;
-
-    @Mock
-    private GlobalParamsValidator globalParamsValidator;
 
     protected User user;
     protected Exception exception;
@@ -205,10 +174,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     protected final static long processDefinitionCode = 11L;
     protected final static String name = "testProcessDefinitionName";
     protected final static String description = "this is a description";
-    protected final static String releaseState = "ONLINE";
-    protected final static int warningGroupId = 1;
     protected final static int timeout = 60;
-    protected final static String executionType = "PARALLEL";
 
     @BeforeEach
     public void before() {
@@ -882,6 +848,55 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testCreateWorkflowDefinitionShouldSyncVersionToResponse() {
+        Project project = getProject(projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.hasProjectAndWritePerm(eq(user), eq(project), any(Map.class))).thenReturn(true);
+        when(workflowDefinitionMapper.verifyByDefineName(projectCode, name)).thenReturn(null);
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        when(processService.saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE))).thenReturn(1);
+        when(processService.saveWorkflowDefine(any(User.class), any(WorkflowDefinition.class), eq(Boolean.TRUE),
+                eq(Boolean.TRUE))).thenReturn(1);
+        when(processService.saveTaskRelation(eq(user), eq(projectCode), anyLong(), eq(1), anyList(), anyList(),
+                eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        Map<String, Object> result = workflowDefinitionService.createWorkflowDefinition(
+                user, projectCode, name, description, "[]", "[]", timeout,
+                taskRelationJson, taskDefinitionJson, null, WorkflowExecutionTypeEnum.PARALLEL);
+
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        WorkflowDefinition workflowDefinition = (WorkflowDefinition) result.get(Constants.DATA_LIST);
+        Assertions.assertEquals(1, workflowDefinition.getVersion());
+    }
+
+    @Test
+    public void testUpdateWorkflowDefinitionShouldSyncVersionToResponse() {
+        Project project = getProject(projectCode);
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        workflowDefinition.setName("origin-name");
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectService.hasProjectAndWritePerm(eq(user), eq(project), any(Map.class))).thenReturn(true);
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
+        when(workflowDefinitionMapper.verifyByDefineName(projectCode, name)).thenReturn(null);
+        when(processService.saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE))).thenReturn(1);
+        when(processService.saveWorkflowDefine(any(User.class), any(WorkflowDefinition.class), eq(Boolean.TRUE),
+                eq(Boolean.TRUE))).thenReturn(2);
+        when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(Collections.emptyList());
+        when(processService.saveTaskRelation(eq(user), eq(projectCode), eq(processDefinitionCode), eq(2), anyList(),
+                anyList(), eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        Map<String, Object> result = workflowDefinitionService.updateWorkflowDefinition(
+                user, projectCode, name, processDefinitionCode, description, "[]", "[]", timeout,
+                taskRelationJson, taskDefinitionJson, WorkflowExecutionTypeEnum.PARALLEL);
+
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        WorkflowDefinition resultDefinition = (WorkflowDefinition) result.get(Constants.DATA_LIST);
+        Assertions.assertEquals(2, resultDefinition.getVersion());
+    }
+
+    @Test
     public void testGetNewProcessName() {
         String processName1 = "test_copy_" + DateUtils.getCurrentTimeStamp();
         final String newName1 = workflowDefinitionService.getNewName(processName1, Constants.COPY_SUFFIX);
@@ -974,6 +989,18 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         workflowTaskRelation.setPostTaskCode(postTaskCode);
         workflowTaskRelation.setPostTaskVersion(postTaskVersion);
         return workflowTaskRelation;
+    }
+
+    private List<TaskNode> getTaskNodeList() {
+        TaskNode firstTaskNode = new TaskNode();
+        firstTaskNode.setCode(123456789L);
+        firstTaskNode.setPreTasks(JSONUtils.toJsonString(Collections.emptyList()));
+
+        TaskNode secondTaskNode = new TaskNode();
+        secondTaskNode.setCode(123451234L);
+        secondTaskNode.setPreTasks(JSONUtils.toJsonString(Collections.singletonList(123456789L)));
+
+        return Arrays.asList(firstTaskNode, secondTaskNode);
     }
 
     /**

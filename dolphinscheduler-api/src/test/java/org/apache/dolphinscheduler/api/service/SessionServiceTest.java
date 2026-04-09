@@ -38,16 +38,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * session service test
  */
 @ExtendWith(MockitoExtension.class)
 public class SessionServiceTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(SessionServiceTest.class);
 
     @InjectMocks
     private SessionServiceImpl sessionService;

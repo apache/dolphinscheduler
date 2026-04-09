@@ -36,20 +36,19 @@ Review Issues means discuss [Issues][all-issues] in GitHub and give suggestions 
 In addition give suggestion, add label for issue is also important during review. The labeled issues can be retrieved
 better, which convenient for further processing. An issue can with more than one label. Common issue categories are:
 
-|                  Label                   |            Meaning             |
-|------------------------------------------|--------------------------------|
-| [UI][label-ui]                           | UI and front-end related       |
-| [security][label-security]               | Security Issue                 |
-| [user experience][label-user-experience] | User experience Issue          |
-| [development][label-development]         | Development Issue              |
-| [Python][label-python]                   | Python Issue                   |
-| [plug-in][label-plug-in]                 | Plug-in Issue                  |
-| [document][label-document]               | Document Issue                 |
-| [docker][label-docker]                   | Docker Issue                   |
-| [need verify][label-need-verify]         | Need verify Issue              |
-| [e2e][label-e2e]                         | E2E Issue                      |
-| [win-os][label-win-os]                   | windows operating system Issue |
-| [suggestion][label-suggestion]           | Give suggestion to us          |
+|                  Label                   |         Meaning          |
+|------------------------------------------|--------------------------|
+| [UI][label-ui]                           | UI and front-end related |
+| [security][label-security]               | Security Issue           |
+| [user experience][label-user-experience] | User experience Issue    |
+| [development][label-development]         | Development Issue        |
+| [Python][label-python]                   | Python Issue             |
+| [plug-in][label-plug-in]                 | Plug-in Issue            |
+| [document][label-document]               | Document Issue           |
+| [docker][label-docker]                   | Docker Issue             |
+| [need verify][label-need-verify]         | Need verify Issue        |
+| [e2e][label-e2e]                         | E2E Issue                |
+| [suggestion][label-suggestion]           | Give suggestion to us    |
 
 Beside classification, label could also set the priority of Issues. The higher the priority, the more attention pay
 in the community, the easier it is to be fixed or implemented. The priority label are as follows
