@@ -34,6 +34,8 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v6
+        with:
+          submodules: true
       - name: Set environment variables
         run: |
           if [[ ${{ github.event_name }} == "release" ]]; then
@@ -48,7 +50,7 @@ jobs:
             echo "DOCKER_PASSWORD=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
           fi
       - name: Log in to the Container registry
-        uses: docker/login-action@v2
+        uses: ./.github/actions/login-action
         with:
           registry: ${{ env.DOCKER_REGISTRY }}
           username: ${{ env.DOCKER_USERNAME }}

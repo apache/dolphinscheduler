@@ -17,10 +17,6 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
-import java.util.List;
-
-import com.google.common.collect.Lists;
-
 public enum ProfileType {
     ;
 
@@ -30,5 +26,4 @@ public enum ProfileType {
 
     public static final String POSTGRESQL = "postgresql";
 
-    public static final List<String> DATASOURCE_PROFILE = Lists.newArrayList(H2, MYSQL, POSTGRESQL);
 }

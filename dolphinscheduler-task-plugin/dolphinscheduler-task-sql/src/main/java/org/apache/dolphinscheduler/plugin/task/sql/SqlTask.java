@@ -35,12 +35,17 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -48,6 +53,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -127,6 +133,8 @@ public class SqlTask extends AbstractTask {
                 sqlParameters.getVarPool(),
                 sqlParameters.getLimit());
         try {
+
+            ensureSqlContent();
 
             // get datasource
             baseConnectionParam = (BaseConnectionParam) DataSourceUtils.buildConnectionParams(dbType,
@@ -405,6 +413,32 @@ public class SqlTask extends AbstractTask {
         log.info("Sql Params are {}", logPrint);
     }
 
+    private void ensureSqlContent() {
+        if (StringUtils.isNotEmpty(sqlParameters.getSql())) {
+            return;
+        }
+        if (StringUtils.isEmpty(sqlParameters.getSqlResource())) {
+            return;
+        }
+        String resourcePathInStorage = sqlParameters.getSqlResource();
+        try {
+            ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+            ResourceContext.ResourceItem resourceItem =
+                    resourceContext.getResourceItem(resourcePathInStorage);
+            String localPath = resourceItem.getResourceAbsolutePathInLocal();
+            log.info("Load sql content from resource file: {}", resourcePathInStorage);
+            String sqlContent = new String(
+                    Files.readAllBytes(Paths.get(localPath)),
+                    StandardCharsets.UTF_8);
+            sqlParameters.setSql(sqlContent);
+        } catch (IOException e) {
+            log.error("Read sql content from resource file {} error", resourcePathInStorage, e);
+            throw new TaskException(
+                    String.format("Read sql content from resource file %s error", resourcePathInStorage),
+                    e);
+        }
+    }
+
     /**
      * ready to execute SQL and parameter entity Map
      *
@@ -420,17 +454,20 @@ public class SqlTask extends AbstractTask {
 
         Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
 
+        Map<String, String> placeholderParamsMap = paramsMap == null
+                ? Collections.emptyMap()
+                : ParameterUtils.convert(paramsMap);
+
+        if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
+            String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(), placeholderParamsMap);
+            log.info("SQL title : {}", title);
+            sqlParameters.setTitle(title);
+        }
+
         // spell SQL according to the final user-defined variable
         if (paramsMap == null) {
             sqlBuilder.append(sql);
             return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
-        }
-
-        if (StringUtils.isNotEmpty(sqlParameters.getTitle())) {
-            String title = ParameterUtils.convertParameterPlaceholders(sqlParameters.getTitle(),
-                    ParameterUtils.convert(paramsMap));
-            log.info("SQL title : {}", title);
-            sqlParameters.setTitle(title);
         }
 
         // special characters need to be escaped, ${} needs to be escaped
