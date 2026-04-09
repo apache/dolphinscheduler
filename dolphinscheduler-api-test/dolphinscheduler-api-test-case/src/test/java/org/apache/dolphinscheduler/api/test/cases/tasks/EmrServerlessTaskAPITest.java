@@ -142,23 +142,27 @@ public class EmrServerlessTaskAPITest {
             workflowInstanceIds = (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
             Assertions.assertFalse(workflowInstanceIds.isEmpty(), "No workflow instances were created");
 
-            // Wait for workflow instance to finish and assert SUCCESS
+            // Wait for workflow instance to finish with timeout
             int workflowInstanceId = workflowInstanceIds.get(0);
             log.info("Waiting for EMR Serverless success workflow instance: {}", workflowInstanceId);
-            while (true) {
-                Thread.sleep(5000);
+            long timeout = 120_000; // 120 seconds
+            long startTime = System.currentTimeMillis();
+            String finalState = null;
+            while (System.currentTimeMillis() - startTime < timeout) {
+                Thread.sleep(2000);
                 HttpResponse queryResponse = workflowInstancePage.queryWorkflowInstanceById(
                         loginUser, projectCode, workflowInstanceId);
                 LinkedHashMap<String, Object> instanceData =
                         (LinkedHashMap<String, Object>) queryResponse.getBody().getData();
                 String state = (String) instanceData.get("state");
                 log.info("EMR Serverless success workflow instance state: {}", state);
-                if ("SUCCESS".equals(state)) {
+                if ("SUCCESS".equals(state) || "FAILURE".equals(state) || "STOP".equals(state)) {
+                    finalState = state;
                     break;
-                } else if ("FAILURE".equals(state) || "STOP".equals(state)) {
-                    Assertions.fail("EMR Serverless workflow instance expected SUCCESS but got: " + state);
                 }
             }
+            Assertions.assertNotNull(finalState, "Workflow instance did not reach a final state within timeout");
+            Assertions.assertEquals("SUCCESS", finalState, "Expected workflow instance to succeed");
         } catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
@@ -204,23 +208,28 @@ public class EmrServerlessTaskAPITest {
                     (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
             Assertions.assertFalse(failedWorkflowInstanceIds.isEmpty(), "No workflow instances were created");
 
-            // Wait for workflow instance to finish and assert FAILURE
+            // Wait for workflow instance to finish with timeout
             int failedWorkflowInstanceId = failedWorkflowInstanceIds.get(0);
             log.info("Waiting for EMR Serverless failed workflow instance: {}", failedWorkflowInstanceId);
-            while (true) {
-                Thread.sleep(5000);
+            long timeout = 120_000; // 120 seconds
+            long startTime = System.currentTimeMillis();
+            String finalState = null;
+            while (System.currentTimeMillis() - startTime < timeout) {
+                Thread.sleep(2000);
                 HttpResponse queryResponse = workflowInstancePage.queryWorkflowInstanceById(
                         loginUser, projectCode, failedWorkflowInstanceId);
                 LinkedHashMap<String, Object> instanceData =
                         (LinkedHashMap<String, Object>) queryResponse.getBody().getData();
                 String state = (String) instanceData.get("state");
                 log.info("EMR Serverless failed workflow instance state: {}", state);
-                if ("FAILURE".equals(state) || "STOP".equals(state)) {
+                if ("SUCCESS".equals(state) || "FAILURE".equals(state) || "STOP".equals(state)) {
+                    finalState = state;
                     break;
-                } else if ("SUCCESS".equals(state)) {
-                    Assertions.fail("EMR Serverless workflow instance expected FAILURE but got SUCCESS");
                 }
             }
+            Assertions.assertNotNull(finalState, "Workflow instance did not reach a final state within timeout");
+            Assertions.assertTrue("FAILURE".equals(finalState) || "STOP".equals(finalState),
+                    "Expected workflow instance to fail, but got: " + finalState);
         } catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();

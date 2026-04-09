@@ -70,7 +70,6 @@ import com.google.common.collect.Sets;
  * Submits a job run to an EMR Serverless application and tracks it until completion.
  * Supports Spark and Hive job types.
  * </p>
- *
  */
 @Slf4j
 public class EmrServerlessTask extends AbstractRemoteTask {
@@ -93,7 +92,7 @@ public class EmrServerlessTask extends AbstractRemoteTask {
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .defaultTimeZone(SystemConstants.DEFAULT_TIME_ZONE)
-            .propertyNamingStrategy(PropertyNamingStrategies.UPPER_CAMEL_CASE)
+            .propertyNamingStrategy(new PropertyNamingStrategies.UpperCamelCaseStrategy())
             .build();
 
     private final TaskExecutionContext taskExecutionContext;
