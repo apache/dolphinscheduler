@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.pages.workflow.ExecutorPage;
 import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowDefinitionPage;
+import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowInstancePage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -63,6 +64,8 @@ public class EmrServerlessTaskAPITest {
 
     private static WorkflowDefinitionPage workflowDefinitionPage;
 
+    private static WorkflowInstancePage workflowInstancePage;
+
     private static ProjectPage projectPage;
 
     private static long projectCode;
@@ -79,6 +82,7 @@ public class EmrServerlessTaskAPITest {
                 JSONUtils.convertValue(loginHttpResponse.getBody().getData(), LoginResponseData.class).getSessionId();
         executorPage = new ExecutorPage(sessionId);
         workflowDefinitionPage = new WorkflowDefinitionPage(sessionId);
+        workflowInstancePage = new WorkflowInstancePage(sessionId);
         projectPage = new ProjectPage(sessionId);
         loginUser = new User();
         loginUser.setUserName("admin");
@@ -136,6 +140,25 @@ public class EmrServerlessTaskAPITest {
             Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
 
             workflowInstanceIds = (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
+            Assertions.assertFalse(workflowInstanceIds.isEmpty(), "No workflow instances were created");
+
+            // Wait for workflow instance to finish and assert SUCCESS
+            int workflowInstanceId = workflowInstanceIds.get(0);
+            log.info("Waiting for EMR Serverless success workflow instance: {}", workflowInstanceId);
+            while (true) {
+                Thread.sleep(5000);
+                HttpResponse queryResponse = workflowInstancePage.queryWorkflowInstanceById(
+                        loginUser, projectCode, workflowInstanceId);
+                LinkedHashMap<String, Object> instanceData =
+                        (LinkedHashMap<String, Object>) queryResponse.getBody().getData();
+                String state = (String) instanceData.get("state");
+                log.info("EMR Serverless success workflow instance state: {}", state);
+                if ("SUCCESS".equals(state)) {
+                    break;
+                } else if ("FAILURE".equals(state) || "STOP".equals(state)) {
+                    Assertions.fail("EMR Serverless workflow instance expected SUCCESS but got: " + state);
+                }
+            }
         } catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
@@ -177,6 +200,27 @@ public class EmrServerlessTaskAPITest {
                     failedWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
             Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
 
+            List<Integer> failedWorkflowInstanceIds =
+                    (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
+            Assertions.assertFalse(failedWorkflowInstanceIds.isEmpty(), "No workflow instances were created");
+
+            // Wait for workflow instance to finish and assert FAILURE
+            int failedWorkflowInstanceId = failedWorkflowInstanceIds.get(0);
+            log.info("Waiting for EMR Serverless failed workflow instance: {}", failedWorkflowInstanceId);
+            while (true) {
+                Thread.sleep(5000);
+                HttpResponse queryResponse = workflowInstancePage.queryWorkflowInstanceById(
+                        loginUser, projectCode, failedWorkflowInstanceId);
+                LinkedHashMap<String, Object> instanceData =
+                        (LinkedHashMap<String, Object>) queryResponse.getBody().getData();
+                String state = (String) instanceData.get("state");
+                log.info("EMR Serverless failed workflow instance state: {}", state);
+                if ("FAILURE".equals(state) || "STOP".equals(state)) {
+                    break;
+                } else if ("SUCCESS".equals(state)) {
+                    Assertions.fail("EMR Serverless workflow instance expected FAILURE but got SUCCESS");
+                }
+            }
         } catch (Exception e) {
             log.error("failed", e);
             Assertions.fail();
