@@ -89,6 +89,14 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
                 .sorted(Comparator.comparing(ITaskExecutionRunnable::getName))
                 .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(readyToTriggerTasks)) {
+            final boolean isAllCandidateTaskPredecessorsInActive = triggerCandidateTasks.stream()
+                    .flatMap(taskExecutionRunnable -> workflowExecutionGraph
+                            .getPredecessors(taskExecutionRunnable.getName())
+                            .stream())
+                    .allMatch(workflowExecutionGraph::isTaskExecutionRunnableInActive);
+            if (isAllCandidateTaskPredecessorsInActive) {
+                emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
+            }
             return;
         }
         final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
