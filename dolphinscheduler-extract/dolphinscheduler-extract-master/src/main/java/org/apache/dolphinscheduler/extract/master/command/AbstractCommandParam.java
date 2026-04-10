@@ -30,8 +30,6 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 public abstract class AbstractCommandParam implements ICommandParam {
 
-    protected boolean subWorkflowInstance;
-
     protected List<Long> startNodes;
 
     protected List<Property> commandParams;

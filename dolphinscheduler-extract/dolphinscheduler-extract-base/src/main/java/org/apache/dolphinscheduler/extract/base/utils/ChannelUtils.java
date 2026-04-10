@@ -32,16 +32,6 @@ public class ChannelUtils {
     }
 
     /**
-     * get local address
-     *
-     * @param channel channel
-     * @return local address
-     */
-    public static String getLocalAddress(Channel channel) {
-        return NetUtils.getHost(((InetSocketAddress) channel.localAddress()).getAddress());
-    }
-
-    /**
      * get remote address
      *
      * @param channel channel

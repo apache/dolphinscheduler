@@ -53,11 +53,6 @@ public interface ICommandParam {
     String getTimeZone();
 
     /**
-     * Whether the command is used to trigger a sub workflow instance.
-     */
-    boolean isSubWorkflowInstance();
-
-    /**
      * Get the command type.
      */
     CommandType getCommandType();

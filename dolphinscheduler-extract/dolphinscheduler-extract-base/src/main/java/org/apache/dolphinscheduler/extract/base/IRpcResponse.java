@@ -25,6 +25,4 @@ public interface IRpcResponse {
 
     byte[] getBody();
 
-    byte[] toBytes();
-
 }

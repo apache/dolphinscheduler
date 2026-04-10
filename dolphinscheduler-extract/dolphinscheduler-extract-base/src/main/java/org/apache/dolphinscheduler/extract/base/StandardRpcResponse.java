@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.extract.base;
 
-import org.apache.dolphinscheduler.extract.base.serialize.JsonSerializer;
-
 import lombok.Data;
 
 @Data
@@ -47,8 +45,4 @@ public class StandardRpcResponse implements IRpcResponse {
         return rpcResponse;
     }
 
-    @Override
-    public byte[] toBytes() {
-        return JsonSerializer.serialize(this);
-    }
 }
