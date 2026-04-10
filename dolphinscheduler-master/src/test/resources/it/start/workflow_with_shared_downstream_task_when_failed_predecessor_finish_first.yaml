@@ -15,8 +15,8 @@
 # limitations under the License.
 #
 
-# A(failed) -> C(success)
-# B(success) -> C(success)
+# A(failed) -> C(not triggered)
+# B(success) -> C(not triggered)
 # A finishes before B.
 project:
   name: MasterIntegrationTest
@@ -28,11 +28,11 @@ project:
   updateTime: 2021-08-12 00:00:00
 
 workflows:
-  - name: workflow_with_shared_downstream_success_task_when_failed_predecessor_finish_first
+  - name: workflow_with_shared_downstream_task_when_failed_predecessor_finish_first
     code: 1
     version: 1
     projectCode: 1
-    description: This is a fake workflow with a shared downstream success task
+    description: This is a fake workflow with a shared downstream task
     releaseState: ONLINE
     createTime: 2024-08-12 00:00:00
     updateTime: 2021-08-12 00:00:00
