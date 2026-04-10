@@ -23,6 +23,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -142,5 +143,92 @@ class WorkflowLineageServiceImplTest {
         assertThat(workflowDependent.getWorkflowDefinitionVersion()).isEqualTo(4);
 
         verify(taskDefinitionMapper).queryByCodeList(Collections.singletonList(300L));
+    }
+
+    @Test
+    void resolveDownstream_oneHop_order() {
+        long root = 10L;
+        long child = 20L;
+
+        WorkflowTaskLineage edge = new WorkflowTaskLineage();
+        edge.setWorkflowDefinitionCode(child);
+        edge.setDeptWorkflowDefinitionCode(root);
+        edge.setTaskDefinitionCode(0L);
+
+        when(workflowTaskLineageDao
+                .queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, root, Constants.DEPENDENT_ALL_TASK))
+                        .thenReturn(Collections.singletonList(edge));
+        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(child)))
+                .thenReturn(Collections.singletonList(WorkflowDefinition.builder().code(child).version(1).build()));
+
+        List<WorkflowDefinition> result =
+                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(root, false);
+
+        assertThat(result).extracting(WorkflowDefinition::getCode).containsExactly(child);
+    }
+
+    @Test
+    void resolveDownstream_transitive_bfsOrder() {
+        long codeA = 1L;
+        long codeB = 2L;
+        long codeC = 3L;
+
+        WorkflowTaskLineage aToB = new WorkflowTaskLineage();
+        aToB.setWorkflowDefinitionCode(codeB);
+        aToB.setDeptWorkflowDefinitionCode(codeA);
+        aToB.setTaskDefinitionCode(0L);
+
+        WorkflowTaskLineage bToC = new WorkflowTaskLineage();
+        bToC.setWorkflowDefinitionCode(codeC);
+        bToC.setDeptWorkflowDefinitionCode(codeB);
+        bToC.setTaskDefinitionCode(0L);
+
+        when(workflowTaskLineageDao
+                .queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, codeA, Constants.DEPENDENT_ALL_TASK))
+                        .thenReturn(Collections.singletonList(aToB));
+        when(workflowTaskLineageDao
+                .queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, codeB, Constants.DEPENDENT_ALL_TASK))
+                        .thenReturn(Collections.singletonList(bToC));
+        when(workflowTaskLineageDao
+                .queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, codeC, Constants.DEPENDENT_ALL_TASK))
+                        .thenReturn(Collections.emptyList());
+
+        WorkflowDefinition workflowB = WorkflowDefinition.builder().code(codeB).version(1).build();
+        WorkflowDefinition workflowC = WorkflowDefinition.builder().code(codeC).version(1).build();
+        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(codeB)))
+                .thenReturn(Collections.singletonList(workflowB));
+        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(codeC)))
+                .thenReturn(Collections.singletonList(workflowC));
+
+        List<WorkflowDefinition> result =
+                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(codeA, true);
+
+        assertThat(result).extracting(WorkflowDefinition::getCode).containsExactly(codeB, codeC);
+    }
+
+    @Test
+    void resolveDownstream_transitive_filterOffline_shouldSkipAndNotExpandOffline() {
+        long codeA = 11L;
+        long codeB = 12L;
+
+        WorkflowTaskLineage aToB = new WorkflowTaskLineage();
+        aToB.setWorkflowDefinitionCode(codeB);
+        aToB.setDeptWorkflowDefinitionCode(codeA);
+        aToB.setTaskDefinitionCode(0L);
+
+        when(workflowTaskLineageDao
+                .queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, codeA, Constants.DEPENDENT_ALL_TASK))
+                        .thenReturn(Collections.singletonList(aToB));
+
+        WorkflowDefinition workflowB = new WorkflowDefinition();
+        workflowB.setCode(codeB);
+        workflowB.setReleaseState(ReleaseState.OFFLINE);
+        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(codeB)))
+                .thenReturn(Collections.singletonList(workflowB));
+
+        List<WorkflowDefinition> result =
+                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(codeA, true, true);
+
+        assertThat(result).isEmpty();
     }
 }

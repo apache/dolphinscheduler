@@ -26,9 +26,7 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerRequest;
@@ -37,15 +35,9 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -63,28 +55,56 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
     private WorkflowLineageService workflowLineageService;
 
     @Autowired
-    private WorkflowDefinitionDao workflowDefinitionDao;
-
-    @Autowired
     private RegistryClient registryClient;
 
     @Override
     public List<Integer> execute(final BackfillWorkflowDTO backfillWorkflowDTO) {
-        return executeWithVisitedCodes(backfillWorkflowDTO, new HashSet<>());
+        return executeWithDependentExpansion(backfillWorkflowDTO);
     }
 
-    List<Integer> executeWithVisitedCodes(final BackfillWorkflowDTO backfillWorkflowDTO,
-                                          final Set<Long> visitedCodes) {
+    /**
+     * Expands optional downstream workflows, then submits root and each downstream in list order.
+     * <p>
+     * {@link RunMode} (serial vs parallel date sharding) is taken only from the <strong>root</strong>
+     * {@code backfillWorkflowDTO}'s {@link BackfillWorkflowDTO.BackfillParamsDTO#getRunMode()}; downstream DTOs
+     * mirror the same mode in their params for consistency.
+     */
+    List<Integer> executeWithDependentExpansion(final BackfillWorkflowDTO backfillWorkflowDTO) {
         // todo: directly call the master api to do backfill
-        if (backfillWorkflowDTO.getBackfillParams().getRunMode() == RunMode.RUN_MODE_SERIAL) {
-            return doSerialBackfillWorkflow(backfillWorkflowDTO, visitedCodes);
-        } else {
-            return doParallelBackfillWorkflow(backfillWorkflowDTO, visitedCodes);
+        List<BackfillWorkflowDTO> dependentBackfillDtos = new ArrayList<>();
+        dependentBackfillDtos.add(backfillWorkflowDTO);
+        if (backfillWorkflowDTO.getBackfillParams()
+                .getBackfillDependentMode() == ComplementDependentMode.ALL_DEPENDENT) {
+
+            List<WorkflowDefinition> downstreamWorkflowList =
+                    workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(
+                            backfillWorkflowDTO.getWorkflowDefinition().getCode(),
+                            backfillWorkflowDTO.getBackfillParams().isAllLevelDependent(),
+                            true);
+            if (downstreamWorkflowList.isEmpty()) {
+                log.info("No downstream dependent workflows found for workflow code {}",
+                        backfillWorkflowDTO.getWorkflowDefinition().getCode());
+            } else {
+                dependentBackfillDtos.addAll(buildResolvedDownstreamBackfillDtos(backfillWorkflowDTO,
+                        backfillWorkflowDTO.getBackfillParams().getBackfillDateList(),
+                        downstreamWorkflowList));
+            }
         }
+        List<Integer> workflowInstanceIdList = new ArrayList<>();
+        // RunMode is defined by the root request only (not per downstream DTO).
+        if (backfillWorkflowDTO.getBackfillParams().getRunMode() == RunMode.RUN_MODE_SERIAL) {
+            for (BackfillWorkflowDTO dependentDto : dependentBackfillDtos) {
+                workflowInstanceIdList.addAll(doSerialBackfillWorkflow(dependentDto));
+            }
+        } else {
+            for (BackfillWorkflowDTO dependentDto : dependentBackfillDtos) {
+                workflowInstanceIdList.addAll(doParallelBackfillWorkflow(dependentDto));
+            }
+        }
+        return workflowInstanceIdList;
     }
 
-    private List<Integer> doSerialBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
-                                                   final Set<Long> visitedCodes) {
+    private List<Integer> doSerialBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO) {
         final BackfillWorkflowDTO.BackfillParamsDTO backfillParams = backfillWorkflowDTO.getBackfillParams();
         final List<ZonedDateTime> backfillTimeList = backfillParams.getBackfillDateList();
         if (backfillParams.getExecutionOrder() == ExecutionOrder.DESC_ORDER) {
@@ -93,12 +113,11 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
             Collections.sort(backfillTimeList);
         }
 
-        final Integer workflowInstanceId = doBackfillWorkflow(backfillWorkflowDTO, backfillTimeList, visitedCodes);
+        final Integer workflowInstanceId = doBackfillWorkflow(backfillWorkflowDTO, backfillTimeList);
         return Lists.newArrayList(workflowInstanceId);
     }
 
-    private List<Integer> doParallelBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
-                                                     final Set<Long> visitedCodes) {
+    private List<Integer> doParallelBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO) {
         final BackfillWorkflowDTO.BackfillParamsDTO backfillParams = backfillWorkflowDTO.getBackfillParams();
         Integer expectedParallelismNumber = backfillParams.getExpectedParallelismNumber();
 
@@ -113,7 +132,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         final List<Integer> workflowInstanceIdList = Lists.newArrayList();
         for (List<ZonedDateTime> stringDate : splitDateTime(listDate, expectedParallelismNumber)) {
             final Integer workflowInstanceId = doBackfillWorkflow(
-                    backfillWorkflowDTO, stringDate, visitedCodes);
+                    backfillWorkflowDTO, stringDate);
             workflowInstanceIdList.add(workflowInstanceId);
         }
         return workflowInstanceIdList;
@@ -144,8 +163,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
     }
 
     private Integer doBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
-                                       final List<ZonedDateTime> backfillDateTimes,
-                                       final Set<Long> visitedCodes) {
+                                       final List<ZonedDateTime> backfillDateTimes) {
         final Server masterServer = registryClient.getRandomServer(RegistryNodeType.MASTER).orElse(null);
         if (masterServer == null) {
             throw new ServiceException("no master server available");
@@ -178,13 +196,6 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         if (!backfillTriggerResponse.isSuccess()) {
             throw new ServiceException("Backfill workflow failed: " + backfillTriggerResponse.getMessage());
         }
-        final BackfillWorkflowDTO.BackfillParamsDTO backfillParams = backfillWorkflowDTO.getBackfillParams();
-        if (backfillParams.getBackfillDependentMode() == ComplementDependentMode.ALL_DEPENDENT) {
-            final Set<Long> effectiveVisitedCodes =
-                    visitedCodes == null ? new HashSet<>() : new HashSet<>(visitedCodes);
-            effectiveVisitedCodes.add(backfillWorkflowDTO.getWorkflowDefinition().getCode());
-            doBackfillDependentWorkflow(backfillWorkflowDTO, backfillDateTimes, effectiveVisitedCodes);
-        }
         return backfillTriggerResponse.getWorkflowInstanceId();
     }
 
@@ -196,110 +207,27 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 .backfillTriggerWorkflow(request);
     }
 
-    private void doBackfillDependentWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
-                                             final List<ZonedDateTime> backfillDateTimes,
-                                             final Set<Long> visitedCodes) {
-        final WorkflowDefinition upstreamWorkflow = backfillWorkflowDTO.getWorkflowDefinition();
-        final long upstreamWorkflowCode = upstreamWorkflow.getCode();
-        final BackfillWorkflowDTO.BackfillParamsDTO originalParams = backfillWorkflowDTO.getBackfillParams();
-
-        final List<WorkflowDefinition> downstreamWorkflowList = resolveDownstreamWorkflows(
-                upstreamWorkflowCode, visitedCodes, originalParams.isAllLevelDependent());
-        if (downstreamWorkflowList.isEmpty()) {
-            log.info("No downstream dependent workflows found for workflow code {}", upstreamWorkflowCode);
-            return;
-        }
-        triggerResolvedDownstreamWorkflows(
-                backfillWorkflowDTO, backfillDateTimes, visitedCodes, downstreamWorkflowList);
-    }
-
-    private List<WorkflowDefinition> resolveDownstreamWorkflows(final long upstreamWorkflowCode,
-                                                                final Set<Long> visitedCodes,
-                                                                final boolean allLevelDependent) {
-        final Set<Long> downstreamCodes = new LinkedHashSet<>();
-        if (allLevelDependent) {
-            final Deque<Long> pendingWorkflows = new ArrayDeque<>();
-            pendingWorkflows.add(upstreamWorkflowCode);
-            while (!pendingWorkflows.isEmpty()) {
-                final Long currentWorkflowCode = pendingWorkflows.removeFirst();
-                for (Long directDownstreamCode : queryDirectDownstreamWorkflowCodes(currentWorkflowCode)) {
-                    if (directDownstreamCode == upstreamWorkflowCode) {
-                        continue;
-                    }
-                    if (visitedCodes.contains(directDownstreamCode)) {
-                        continue;
-                    }
-                    if (downstreamCodes.add(directDownstreamCode)) {
-                        pendingWorkflows.addLast(directDownstreamCode);
-                    }
-                }
-            }
-        } else {
-            for (Long directDownstreamCode : queryDirectDownstreamWorkflowCodes(upstreamWorkflowCode)) {
-                if (directDownstreamCode == upstreamWorkflowCode || visitedCodes.contains(directDownstreamCode)) {
-                    continue;
-                }
-                downstreamCodes.add(directDownstreamCode);
-            }
-        }
-
-        if (downstreamCodes.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-        final Map<Long, WorkflowDefinition> downstreamWorkflowMapByCode = workflowDefinitionDao
-                .queryByCodes(downstreamCodes)
-                .stream()
-                .collect(Collectors.toMap(WorkflowDefinition::getCode, workflowDefinition -> workflowDefinition,
-                        (left, right) -> left));
-
-        final List<WorkflowDefinition> downstreamWorkflows = new ArrayList<>();
-        for (Long downstreamCode : downstreamCodes) {
-            final WorkflowDefinition downstreamWorkflow = downstreamWorkflowMapByCode.get(downstreamCode);
-            if (downstreamWorkflow == null) {
-                log.warn("Skip dependent workflow {}, workflow definition not found", downstreamCode);
-                continue;
-            }
-            if (downstreamWorkflow.getReleaseState() != ReleaseState.ONLINE) {
-                log.warn("Skip dependent workflow {}, release state is not ONLINE", downstreamCode);
-                continue;
-            }
-            downstreamWorkflows.add(downstreamWorkflow);
-        }
-        return downstreamWorkflows;
-    }
-
-    private Set<Long> queryDirectDownstreamWorkflowCodes(final long workflowCode) {
-        final List<DependentWorkflowDefinition> downstreamDefinitions =
-                workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowCode);
-        if (downstreamDefinitions == null || downstreamDefinitions.isEmpty()) {
-            return Collections.emptySet();
-        }
-        return downstreamDefinitions.stream()
-                .map(DependentWorkflowDefinition::getWorkflowDefinitionCode)
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
-    private void triggerResolvedDownstreamWorkflows(final BackfillWorkflowDTO backfillWorkflowDTO,
-                                                    final List<ZonedDateTime> backfillDateTimes,
-                                                    final Set<Long> visitedCodes,
-                                                    final List<WorkflowDefinition> downstreamWorkflows) {
+    /**
+     * Builds {@link BackfillWorkflowDTO} list for resolved downstream workflows.
+     * {@link RunMode} in each downstream {@link BackfillWorkflowDTO.BackfillParamsDTO} matches the root (see
+     * {@link #executeWithDependentExpansion(BackfillWorkflowDTO)}).
+     */
+    private List<BackfillWorkflowDTO> buildResolvedDownstreamBackfillDtos(final BackfillWorkflowDTO backfillWorkflowDTO,
+                                                                          final List<ZonedDateTime> backfillDateTimes,
+                                                                          final List<WorkflowDefinition> downstreamWorkflows) {
         final long upstreamWorkflowCode = backfillWorkflowDTO.getWorkflowDefinition().getCode();
         final List<ZonedDateTime> upstreamBackfillDates = new ArrayList<>(backfillDateTimes);
         final BackfillWorkflowDTO.BackfillParamsDTO originalParams = backfillWorkflowDTO.getBackfillParams();
         final boolean allLevelDependent = originalParams.isAllLevelDependent();
 
+        final List<BackfillWorkflowDTO> result = new ArrayList<>();
         for (WorkflowDefinition downstreamWorkflow : downstreamWorkflows) {
             final long downstreamCode = downstreamWorkflow.getCode();
-            if (visitedCodes.contains(downstreamCode)) {
-                log.warn("Skip already visited dependent workflow {}", downstreamCode);
-                continue;
-            }
 
             final BackfillWorkflowDTO.BackfillParamsDTO dependentParams =
                     BackfillWorkflowDTO.BackfillParamsDTO.builder()
-                            .runMode(originalParams.getRunMode() == RunMode.RUN_MODE_PARALLEL ? RunMode.RUN_MODE_SERIAL
-                                    : originalParams.getRunMode())
+                            // Same as root; executor also branches on root RunMode only.
+                            .runMode(originalParams.getRunMode())
                             .backfillDateList(upstreamBackfillDates)
                             .expectedParallelismNumber(originalParams.getExpectedParallelismNumber())
                             // Downstream expansion has already been decided in resolution stage.
@@ -327,12 +255,12 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                     .backfillParams(dependentParams)
                     .build();
 
-            log.info("Trigger dependent workflow {} for upstream workflow {} with backfill dates {}",
+            log.info("Built dependent backfill DTO for workflow {} (upstream {}) with backfill dates {}",
                     downstreamCode, upstreamWorkflowCode,
                     backfillDateTimes.stream().map(DateUtils::dateToString).collect(Collectors.toList()));
 
-            visitedCodes.add(downstreamCode);
-            executeWithVisitedCodes(dependentBackfillDTO, visitedCodes);
+            result.add(dependentBackfillDTO);
         }
+        return result;
     }
 }
