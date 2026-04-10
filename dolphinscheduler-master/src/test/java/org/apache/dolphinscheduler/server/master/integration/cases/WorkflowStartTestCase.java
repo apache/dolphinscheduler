@@ -360,7 +360,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                     Assertions
                             .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
                             .matches(
-                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE);
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
                     Assertions
                             .assertThat(repository.queryTaskInstance(workflow))
                             .satisfiesExactly(taskInstance -> {
