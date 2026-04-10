@@ -47,6 +47,7 @@ tasks:
     taskType: LogicFakeTask
     taskParams: '{"localParams":null,"varPool":[],"shellScript":"echo success"}'
     workerGroup: default
+    environmentCode: 144873539254368
     createTime: 2024-08-12 00:00:00
     updateTime: 2024-08-12 00:00:00
     taskExecuteType: BATCH
