@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowPauseLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStopLifecycleEvent;
@@ -66,12 +64,6 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
     @Override
     public List<IWorkflowLifecycleListener> getWorkflowLifecycleListeners() {
         return workflowInstanceLifecycleListeners;
-    }
-
-    @Override
-    public void registerWorkflowInstanceLifecycleListener(IWorkflowLifecycleListener listener) {
-        checkArgument(listener != null, "listener cannot be null");
-        workflowInstanceLifecycleListeners.add(listener);
     }
 
     @Override
