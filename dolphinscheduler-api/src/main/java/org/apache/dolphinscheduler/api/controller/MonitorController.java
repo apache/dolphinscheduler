@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.apache.dolphinscheduler.api.enums.Status.INTERNAL_SERVER_ERROR_ARGS;
 import static org.apache.dolphinscheduler.api.enums.Status.LIST_MASTERS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DATABASE_STATE_ERROR;
 
@@ -27,7 +28,9 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
+import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecutorDTO;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 
 import java.util.List;
 
@@ -37,6 +40,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -79,6 +83,36 @@ public class MonitorController extends BaseController {
     public Result<List<DatabaseMetrics>> queryDatabaseState(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
         List<DatabaseMetrics> databaseMetrics = monitorService.queryDatabaseState(loginUser);
         return Result.success(databaseMetrics);
+    }
+
+    /**
+     * query running workflow instances on a specific master
+     *
+     * @param masterAddress master address in host:port format
+     * @return running workflow instance list
+     */
+    @GetMapping(value = "/masters/workflow-executors")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(INTERNAL_SERVER_ERROR_ARGS)
+    public Result<List<WorkflowExecutorDTO>> queryWorkflowExecutors(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                    @RequestParam("masterAddress") String masterAddress) {
+        List<WorkflowExecutorDTO> workflows = monitorService.queryWorkflowExecutors(loginUser, masterAddress);
+        return Result.success(workflows);
+    }
+
+    /**
+     * query running task instances on a specific worker
+     *
+     * @param serverAddress worker address in host:port format
+     * @return running task instance list
+     */
+    @GetMapping(value = "/workers/task-executors")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(INTERNAL_SERVER_ERROR_ARGS)
+    public Result<List<TaskExecutorDTO>> queryTaskExecutors(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                            @RequestParam("serverAddress") String serverAddress) {
+        List<TaskExecutorDTO> tasks = monitorService.queryTaskExecutors(loginUser, serverAddress);
+        return Result.success(tasks);
     }
 
 }
