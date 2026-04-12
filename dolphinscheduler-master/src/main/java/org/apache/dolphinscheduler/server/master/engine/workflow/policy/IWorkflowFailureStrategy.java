@@ -28,7 +28,4 @@ public interface IWorkflowFailureStrategy {
     void onTaskFailure(IWorkflowExecutionRunnable workflowExecutionRunnable,
                        ITaskExecutionRunnable taskExecutionRunnable);
 
-    boolean canTriggerSuccessor(IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                ITaskExecutionRunnable taskExecutionRunnable);
-
 }

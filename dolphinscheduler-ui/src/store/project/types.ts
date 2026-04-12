@@ -38,6 +38,7 @@ type TaskType =
   | 'SWITCH'
   | 'SEATUNNEL'
   | 'EMR'
+  | 'EMR_SERVERLESS'
   | 'ZEPPELIN'
   | 'K8S'
   | 'JUPYTER'

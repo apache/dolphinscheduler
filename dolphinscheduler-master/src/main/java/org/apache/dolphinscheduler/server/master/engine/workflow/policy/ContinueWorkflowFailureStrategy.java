@@ -32,10 +32,4 @@ public class ContinueWorkflowFailureStrategy implements IWorkflowFailureStrategy
         // do nothing, just continue workflow execution
     }
 
-    @Override
-    public boolean canTriggerSuccessor(IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                       ITaskExecutionRunnable taskExecutionRunnable) {
-        return true;
-    }
-
 }

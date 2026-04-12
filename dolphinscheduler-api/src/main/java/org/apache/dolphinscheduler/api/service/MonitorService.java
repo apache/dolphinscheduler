@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
+import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecutorDTO;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 
 import java.util.List;
 
@@ -41,4 +43,8 @@ public interface MonitorService {
      * @return server information list
      */
     List<Server> listServer(RegistryNodeType nodeType);
+
+    List<WorkflowExecutorDTO> queryWorkflowExecutors(User loginUser, String masterAddress);
+
+    List<TaskExecutorDTO> queryTaskExecutors(User loginUser, String serverAddress);
 }
