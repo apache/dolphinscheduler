@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
  * Todo: this interface is used to listen to the lifecycle of the task execution runnable.
  * We should use this to listen the state and trigger alert
  */
-public interface ITaskExecutionRunnableLifecycleListener {
+public interface ITaskExecutionLifecycleListener {
 
     void onDispatched(TaskDispatchedLifecycleEvent taskDispatchedEvent);
 

@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.extract.master.ILogicTaskExecutorOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskKillException;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchRequest;
@@ -50,12 +50,12 @@ public class LogicTaskExecutorClientDelegator implements ITaskExecutorClientDele
     private MasterConfig masterConfig;
 
     @Override
-    public void dispatch(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskDispatchException {
+    public void dispatch(final ITaskExecution taskExecution) throws TaskDispatchException {
         final String logicTaskExecutorAddress = masterConfig.getMasterAddress();
-        final TaskExecutionContext taskExecutionContext = taskExecutionRunnable.getTaskExecutionContext();
+        final TaskExecutionContext taskExecutionContext = taskExecution.getTaskExecutionContext();
 
         taskExecutionContext.setHost(logicTaskExecutorAddress);
-        taskExecutionRunnable.getTaskInstance().setHost(logicTaskExecutorAddress);
+        taskExecution.getTaskInstance().setHost(logicTaskExecutorAddress);
 
         final TaskExecutorDispatchResponse logicTaskDispatchResponse = Clients
                 .withService(ILogicTaskExecutorOperator.class)
@@ -69,14 +69,14 @@ public class LogicTaskExecutorClientDelegator implements ITaskExecutorClientDele
     }
 
     @Override
-    public boolean reassignMasterHost(final ITaskExecutionRunnable taskExecutionRunnable) {
+    public boolean reassignMasterHost(final ITaskExecution taskExecution) {
         // The Logic Task doesn't support take-over, since the logic task is not executed on the worker.
         return false;
     }
 
     @Override
-    public void pause(final ITaskExecutionRunnable taskExecutionRunnable) {
-        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+    public void pause(final ITaskExecution taskExecution) {
+        final TaskInstance taskInstance = taskExecution.getTaskInstance();
         final String executorHost = taskInstance.getHost();
         final String taskName = taskInstance.getName();
         checkArgument(StringUtils.isNotEmpty(executorHost), "Executor host is empty");
@@ -93,8 +93,8 @@ public class LogicTaskExecutorClientDelegator implements ITaskExecutorClientDele
     }
 
     @Override
-    public void kill(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskKillException {
-        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+    public void kill(final ITaskExecution taskExecution) throws TaskKillException {
+        final TaskInstance taskInstance = taskExecution.getTaskInstance();
         final String executorHost = taskInstance.getHost();
         final String taskName = taskInstance.getName();
         checkArgument(StringUtils.isNotEmpty(executorHost), "Executor host is empty");
@@ -112,9 +112,9 @@ public class LogicTaskExecutorClientDelegator implements ITaskExecutorClientDele
 
     @Override
     public void ackTaskExecutorLifecycleEvent(
-                                              final ITaskExecutionRunnable taskExecutionRunnable,
+                                              final ITaskExecution taskExecution,
                                               final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
-        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+        final TaskInstance taskInstance = taskExecution.getTaskInstance();
         final String executorHost = taskInstance.getHost();
         checkArgument(StringUtils.isNotEmpty(executorHost), "Executor host is empty");
 

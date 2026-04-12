@@ -31,8 +31,8 @@ import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
 import org.apache.dolphinscheduler.server.master.engine.system.event.MasterFailoverEvent;
 import org.apache.dolphinscheduler.server.master.engine.system.event.WorkerFailoverEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -244,7 +244,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
         final StopWatch failoverTimeCost = StopWatch.createStarted();
         // we don't check the workerFailoverNodePath exist, since the worker may be failovered multiple master
 
-        final List<ITaskExecutionRunnable> needFailoverTasks =
+        final List<ITaskExecution> needFailoverTasks =
                 getFailoverTaskForWorker(workerAddress, new Date(taskFailoverDeadline));
         needFailoverTasks.forEach(taskFailover::failoverTask);
 
@@ -258,23 +258,23 @@ public class FailoverCoordinator implements IFailoverCoordinator {
                 failoverTimeCost.getTime());
     }
 
-    private List<ITaskExecutionRunnable> getFailoverTaskForWorker(final String workerAddress,
-                                                                  final Date taskFailoverDeadline) {
+    private List<ITaskExecution> getFailoverTaskForWorker(final String workerAddress,
+                                                          final Date taskFailoverDeadline) {
         return workflowRepository.getAll()
                 .stream()
-                .map(IWorkflowExecutionRunnable::getWorkflowExecutionGraph)
-                .flatMap(workflowExecutionGraph -> workflowExecutionGraph.getActiveTaskExecutionRunnable().stream())
-                .filter(ITaskExecutionRunnable::isTaskInstanceInitialized)
-                .filter(taskExecutionRunnable -> workerAddress
-                        .equals(taskExecutionRunnable.getTaskInstance().getHost()))
-                .filter(taskExecutionRunnable -> {
-                    final TaskExecutionStatus state = taskExecutionRunnable.getTaskInstance().getState();
+                .map(IWorkflowExecution::getWorkflowExecutionGraph)
+                .flatMap(workflowExecutionGraph -> workflowExecutionGraph.getActiveTaskExecution().stream())
+                .filter(ITaskExecution::isTaskInstanceInitialized)
+                .filter(taskExecution -> workerAddress
+                        .equals(taskExecution.getTaskInstance().getHost()))
+                .filter(taskExecution -> {
+                    final TaskExecutionStatus state = taskExecution.getTaskInstance().getState();
                     return state == TaskExecutionStatus.DISPATCH || state == TaskExecutionStatus.RUNNING_EXECUTION;
                 })
-                .filter(taskExecutionRunnable -> {
+                .filter(taskExecution -> {
                     // The submitTime should not be null.
                     // This is a bad case unless someone manually set the submitTime to null.
-                    final Date submitTime = taskExecutionRunnable.getTaskInstance().getSubmitTime();
+                    final Date submitTime = taskExecution.getTaskInstance().getSubmitTime();
                     return submitTime != null && submitTime.before(taskFailoverDeadline);
                 })
                 .collect(Collectors.toList());

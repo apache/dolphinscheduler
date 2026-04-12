@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.policy;
 
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 /**
  * The strategy used to deal with {@link org.apache.dolphinscheduler.common.enums.FailureStrategy#CONTINUE} when task failure occurs.
@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkf
 public class ContinueWorkflowFailureStrategy implements IWorkflowFailureStrategy {
 
     @Override
-    public void onTaskFailure(IWorkflowExecutionRunnable workflowExecutionRunnable,
-                              ITaskExecutionRunnable taskExecutionRunnable) {
+    public void onTaskFailure(IWorkflowExecution workflowExecution,
+                              ITaskExecution taskExecution) {
         // do nothing, just continue workflow execution
     }
 

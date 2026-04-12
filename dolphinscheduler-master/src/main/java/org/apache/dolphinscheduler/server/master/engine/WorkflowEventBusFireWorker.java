@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.WorkflowEventFireException;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.utils.ExceptionUtils;
 
@@ -47,7 +47,7 @@ import lombok.extern.slf4j.Slf4j;
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class WorkflowEventBusFireWorker {
 
-    private final Map<Integer, IWorkflowExecutionRunnable> registeredWorkflowExecuteRunnableMap =
+    private final Map<Integer, IWorkflowExecution> registeredWorkflowExecuteRunnableMap =
             new ConcurrentHashMap<>();
 
     private final Map<ILifecycleEventType, ILifecycleEventHandler> eventHandlerMap = new ConcurrentHashMap<>();
@@ -58,35 +58,35 @@ public class WorkflowEventBusFireWorker {
         eventHandlerMap.put(eventHandler.matchEventType(), eventHandler);
     }
 
-    public void registerWorkflowEventBus(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
+    public void registerWorkflowEventBus(IWorkflowExecution workflowExecution) {
+        final IWorkflowExecuteContext workflowExecuteContext = workflowExecution.getWorkflowExecuteContext();
         final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         final Integer workflowInstanceId = workflowInstance.getId();
         final String workflowInstanceName = workflowInstance.getName();
         checkState(!registeredWorkflowExecuteRunnableMap.containsKey(workflowInstanceId),
                 "WorkflowExecuteRunnable(%s/%s already registered at WorkflowEventBusFireWorker", workflowInstanceId,
                 workflowInstanceName);
-        registeredWorkflowExecuteRunnableMap.put(workflowInstanceId, workflowExecutionRunnable);
+        registeredWorkflowExecuteRunnableMap.put(workflowInstanceId, workflowExecution);
     }
 
-    public void unRegisterWorkflowEventBus(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
+    public void unRegisterWorkflowEventBus(IWorkflowExecution workflowExecution) {
+        final IWorkflowExecuteContext workflowExecuteContext = workflowExecution.getWorkflowExecuteContext();
         final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         final Integer workflowInstanceId = workflowInstance.getId();
-        registeredWorkflowExecuteRunnableMap.remove(workflowInstanceId, workflowExecutionRunnable);
+        registeredWorkflowExecuteRunnableMap.remove(workflowInstanceId, workflowExecution);
     }
 
     public void fireAllRegisteredEvent() {
-        final List<IWorkflowExecutionRunnable> workflowExecutionRunnables = getWaitingFireWorkflowExecutionRunnables();
-        if (CollectionUtils.isEmpty(workflowExecutionRunnables)) {
+        final List<IWorkflowExecution> workflowExecutions = getWaitingFireWorkflowExecutions();
+        if (CollectionUtils.isEmpty(workflowExecutions)) {
             return;
         }
-        for (final IWorkflowExecutionRunnable workflowExecutionRunnable : workflowExecutionRunnables) {
-            final Integer workflowInstanceId = workflowExecutionRunnable.getId();
-            final String workflowInstanceName = workflowExecutionRunnable.getName();
+        for (final IWorkflowExecution workflowExecution : workflowExecutions) {
+            final Integer workflowInstanceId = workflowExecution.getId();
+            final String workflowInstanceName = workflowExecution.getName();
             try {
                 LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
-                doFireSingleWorkflowEventBus(workflowExecutionRunnable);
+                doFireSingleWorkflowEventBus(workflowExecution);
             } catch (Exception ex) {
                 log.error("Fire event failed for WorkflowExecuteRunnable: {}", workflowInstanceName, ex);
             } finally {
@@ -99,7 +99,7 @@ public class WorkflowEventBusFireWorker {
         return registeredWorkflowExecuteRunnableMap.size();
     }
 
-    private List<IWorkflowExecutionRunnable> getWaitingFireWorkflowExecutionRunnables() {
+    private List<IWorkflowExecution> getWaitingFireWorkflowExecutions() {
         if (MapUtils.isEmpty(registeredWorkflowExecuteRunnableMap)) {
             return Collections.emptyList();
         }
@@ -109,8 +109,8 @@ public class WorkflowEventBusFireWorker {
                 .collect(Collectors.toList());
     }
 
-    private void doFireSingleWorkflowEventBus(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
+    private void doFireSingleWorkflowEventBus(final IWorkflowExecution workflowExecution) {
+        final WorkflowEventBus workflowEventBus = workflowExecution.getWorkflowEventBus();
         while (!workflowEventBus.isEmpty()) {
             Optional<AbstractLifecycleEvent> eventOptional = workflowEventBus.poll();
             if (!eventOptional.isPresent()) {
@@ -122,7 +122,7 @@ public class WorkflowEventBusFireWorker {
                 // So we increase the event count before the event fired then we can get the correct event count
                 // And if the event handle failed we will decrease the success event count
                 workflowEventBus.getWorkflowEventBusSummary().increaseFireSuccessEventCount();
-                doFireSingleEvent(workflowExecutionRunnable, lifecycleEvent);
+                doFireSingleEvent(workflowExecution, lifecycleEvent);
             } catch (Exception ex) {
                 // If the database connection is failed, do not remove the event from the event bus
                 // so that the event can be fired again when the database connection is recovered
@@ -136,7 +136,7 @@ public class WorkflowEventBusFireWorker {
                 if (ExceptionUtils.isTaskExecutionContextCreateException(ex)) {
                     AbstractTaskLifecycleEvent taskLifecycleEvent = (AbstractTaskLifecycleEvent) lifecycleEvent;
                     final TaskFatalLifecycleEvent taskFatalEvent = TaskFatalLifecycleEvent.builder()
-                            .taskExecutionRunnable(taskLifecycleEvent.getTaskExecutionRunnable())
+                            .taskExecution(taskLifecycleEvent.getTaskExecution())
                             .endTime(new Date())
                             .build();
                     workflowEventBus.publish(taskFatalEvent);
@@ -149,13 +149,13 @@ public class WorkflowEventBusFireWorker {
         }
     }
 
-    private void doFireSingleEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    private void doFireSingleEvent(final IWorkflowExecution workflowExecution,
                                    final AbstractLifecycleEvent event) {
         final ILifecycleEventHandler lifecycleEventHandler = eventHandlerMap.get(event.getEventType());
         if (lifecycleEventHandler == null) {
             throw new RuntimeException("No EventHandler found for event: " + event.getEventType());
         }
-        lifecycleEventHandler.handle(workflowExecutionRunnable, event);
+        lifecycleEventHandler.handle(workflowExecution, event);
     }
 
 }
