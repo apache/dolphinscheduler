@@ -16,6 +16,8 @@
 #
 
 spring:
+  application:
+    name: standalone-server
   profiles:
     active: h2
   jackson:
