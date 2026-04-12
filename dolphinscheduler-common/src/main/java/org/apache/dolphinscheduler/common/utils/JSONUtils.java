@@ -65,9 +65,6 @@ import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.base.Strings;
 
-/**
- * json utils
- */
 @Slf4j
 public final class JSONUtils {
 
@@ -369,9 +366,6 @@ public final class JSONUtils {
 
     }
 
-    /**
-     * json data deserializer
-     */
     public static class JsonDataDeserializer extends JsonDeserializer<String> {
 
         @Override

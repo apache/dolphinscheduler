@@ -26,9 +26,6 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
-/**
- * tenant mapper interface
- */
 public interface TenantMapper extends BaseMapper<Tenant> {
 
     /**

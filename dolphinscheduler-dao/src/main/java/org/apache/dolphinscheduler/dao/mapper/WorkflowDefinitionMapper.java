@@ -30,9 +30,6 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
-/**
- * workflow definition mapper interface
- */
 public interface WorkflowDefinitionMapper extends BaseMapper<WorkflowDefinition> {
 
     /**

@@ -44,9 +44,6 @@ public final class StorageConstants {
      */
     public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
 
-    /**
-     * resource storage type
-     */
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
 
     public static final String AWS_S3_BUCKET_NAME = "aws.s3.bucket.name";

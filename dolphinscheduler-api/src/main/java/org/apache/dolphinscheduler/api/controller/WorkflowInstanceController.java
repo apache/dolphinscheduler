@@ -62,9 +62,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * workflow instance controller
- */
 @Tag(name = "WORKFLOW_INSTANCE_TAG")
 @RestController
 @RequestMapping("/projects/{projectCode}/workflow-instances")

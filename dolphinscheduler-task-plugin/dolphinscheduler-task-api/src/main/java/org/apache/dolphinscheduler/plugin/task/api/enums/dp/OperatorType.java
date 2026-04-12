@@ -22,9 +22,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 
-/**
- * operator type
- */
 public enum OperatorType {
 
     /**

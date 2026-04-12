@@ -22,9 +22,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Task Instance DAO
- */
 public interface TaskInstanceDao extends IDao<TaskInstance> {
 
     /**

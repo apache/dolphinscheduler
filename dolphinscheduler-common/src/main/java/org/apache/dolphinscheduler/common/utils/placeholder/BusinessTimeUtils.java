@@ -29,9 +29,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * business time utils
- */
 public class BusinessTimeUtils {
 
     private BusinessTimeUtils() {

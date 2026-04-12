@@ -21,9 +21,6 @@ import lombok.Getter;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- * resource type
- */
 @Getter
 public enum ResourceType {
 

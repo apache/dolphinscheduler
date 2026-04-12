@@ -49,9 +49,6 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
 
-/**
- * abstract command executor
- */
 @Slf4j
 public abstract class AbstractCommandExecutor {
 

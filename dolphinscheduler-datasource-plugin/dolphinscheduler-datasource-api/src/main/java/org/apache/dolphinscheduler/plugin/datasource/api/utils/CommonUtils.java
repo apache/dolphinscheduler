@@ -38,9 +38,6 @@ import java.io.IOException;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * common utils
- */
 @Slf4j
 public class CommonUtils {
 

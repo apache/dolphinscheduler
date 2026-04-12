@@ -28,9 +28,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * ScriptSenderTest
- */
 public class ScriptSenderTest {
 
     private static final String rootPath = System.getProperty("user.dir");

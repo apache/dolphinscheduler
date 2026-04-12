@@ -34,9 +34,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
-/**
- * plugin params
- */
 @JsonDeserialize(builder = PluginParams.Builder.class)
 public class PluginParams {
 

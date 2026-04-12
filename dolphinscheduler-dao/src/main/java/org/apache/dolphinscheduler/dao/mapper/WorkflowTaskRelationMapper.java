@@ -25,9 +25,6 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-/**
- * workflow task relation mapper interface
- */
 public interface WorkflowTaskRelationMapper extends BaseMapper<WorkflowTaskRelation> {
 
     /**
