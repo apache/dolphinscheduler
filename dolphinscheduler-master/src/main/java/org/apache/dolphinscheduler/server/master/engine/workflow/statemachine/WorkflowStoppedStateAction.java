@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.statemachine;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFailedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFinalizeLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowPauseLifecycleEvent;
@@ -27,7 +28,6 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStoppedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowSucceedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,67 +38,67 @@ import org.springframework.stereotype.Component;
 public class WorkflowStoppedStateAction extends AbstractWorkflowStateAction {
 
     @Override
-    public void onStartEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public void onStartEvent(final IWorkflowExecution workflowExecution,
                              final WorkflowStartLifecycleEvent workflowStartEvent) {
-        throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        logWarningIfCannotDoAction(workflowExecutionRunnable, workflowStartEvent);
+        throwExceptionIfStateIsNotMatch(workflowExecution);
+        logWarningIfCannotDoAction(workflowExecution, workflowStartEvent);
     }
 
     @Override
     public void onTopologyLogicalTransitionEvent(
-                                                 final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                                 final IWorkflowExecution workflowExecution,
                                                  final WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent workflowTopologyLogicalTransitionWithTaskFinishEvent) {
-        throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        logWarningIfCannotDoAction(workflowExecutionRunnable, workflowTopologyLogicalTransitionWithTaskFinishEvent);
+        throwExceptionIfStateIsNotMatch(workflowExecution);
+        logWarningIfCannotDoAction(workflowExecution, workflowTopologyLogicalTransitionWithTaskFinishEvent);
     }
 
     @Override
-    public void onPauseEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public void onPauseEvent(final IWorkflowExecution workflowExecution,
                              final WorkflowPauseLifecycleEvent workflowPauseEvent) {
-        throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        logWarningIfCannotDoAction(workflowExecutionRunnable, workflowPauseEvent);
+        throwExceptionIfStateIsNotMatch(workflowExecution);
+        logWarningIfCannotDoAction(workflowExecution, workflowPauseEvent);
     }
 
     @Override
-    public void onPausedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public void onPausedEvent(final IWorkflowExecution workflowExecution,
                               final WorkflowPausedLifecycleEvent workflowPausedEvent) {
-        throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        logWarningIfCannotDoAction(workflowExecutionRunnable, workflowPausedEvent);
+        throwExceptionIfStateIsNotMatch(workflowExecution);
+        logWarningIfCannotDoAction(workflowExecution, workflowPausedEvent);
     }
 
     @Override
-    public void onStopEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public void onStopEvent(final IWorkflowExecution workflowExecution,
                             final WorkflowStopLifecycleEvent workflowStopEvent) {
-        throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        logWarningIfCannotDoAction(workflowExecutionRunnable, workflowStopEvent);
+        throwExceptionIfStateIsNotMatch(workflowExecution);
+        logWarningIfCannotDoAction(workflowExecution, workflowStopEvent);
     }
 
     @Override
-    public void onStoppedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public void onStoppedEvent(final IWorkflowExecution workflowExecution,
                                final WorkflowStoppedLifecycleEvent workflowStoppedEvent) {
-        throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        logWarningIfCannotDoAction(workflowExecutionRunnable, workflowStoppedEvent);
+        throwExceptionIfStateIsNotMatch(workflowExecution);
+        logWarningIfCannotDoAction(workflowExecution, workflowStoppedEvent);
     }
 
     @Override
-    public void onSucceedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public void onSucceedEvent(final IWorkflowExecution workflowExecution,
                                final WorkflowSucceedLifecycleEvent workflowSucceedEvent) {
-        throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        logWarningIfCannotDoAction(workflowExecutionRunnable, workflowSucceedEvent);
+        throwExceptionIfStateIsNotMatch(workflowExecution);
+        logWarningIfCannotDoAction(workflowExecution, workflowSucceedEvent);
     }
 
     @Override
-    public void onFailedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public void onFailedEvent(final IWorkflowExecution workflowExecution,
                               final WorkflowFailedLifecycleEvent workflowFailedEvent) {
-        throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        logWarningIfCannotDoAction(workflowExecutionRunnable, workflowFailedEvent);
+        throwExceptionIfStateIsNotMatch(workflowExecution);
+        logWarningIfCannotDoAction(workflowExecution, workflowFailedEvent);
     }
 
     @Override
-    public void onFinalizeEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public void onFinalizeEvent(final IWorkflowExecution workflowExecution,
                                 final WorkflowFinalizeLifecycleEvent workflowFinalizeEvent) {
-        throwExceptionIfStateIsNotMatch(workflowExecutionRunnable);
-        super.finalizeEventAction(workflowExecutionRunnable);
+        throwExceptionIfStateIsNotMatch(workflowExecution);
+        super.finalizeEventAction(workflowExecution);
     }
 
     @Override
@@ -110,9 +110,9 @@ public class WorkflowStoppedStateAction extends AbstractWorkflowStateAction {
      * The running state can only finish with success/failure.
      */
     @Override
-    protected void emitWorkflowFinishedEventIfApplicable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
+    protected void emitWorkflowFinishedEventIfApplicable(IWorkflowExecution workflowExecution) {
         throw new IllegalStateException(
-                "The workflow " + workflowExecutionRunnable.getName() +
+                "The workflow " + workflowExecution.getName() +
                         "is stopped, shouldn't emit workflow finished event");
     }
 }

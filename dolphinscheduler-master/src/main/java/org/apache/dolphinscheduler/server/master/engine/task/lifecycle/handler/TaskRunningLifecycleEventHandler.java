@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRunningLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
 
@@ -43,14 +43,14 @@ public class TaskRunningLifecycleEventHandler extends AbstractTaskLifecycleEvent
 
     @Override
     public void handle(final ITaskStateAction taskStateAction,
-                       final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                       final ITaskExecutionRunnable taskExecutionRunnable,
+                       final IWorkflowExecution workflowExecution,
+                       final ITaskExecution taskExecution,
                        final TaskRunningLifecycleEvent taskRunningEvent) {
-        taskStateAction.onStartedEvent(workflowExecutionRunnable, taskExecutionRunnable, taskRunningEvent);
+        taskStateAction.onStartedEvent(workflowExecution, taskExecution, taskRunningEvent);
         taskExecutorClient.ackTaskExecutorLifecycleEvent(
-                taskExecutionRunnable,
+                taskExecution,
                 new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(
-                        taskExecutionRunnable.getId(),
+                        taskExecution.getId(),
                         TaskExecutorLifecycleEventType.RUNNING));
     }
 

@@ -43,9 +43,9 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionContextBuilder;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionContextCreateRequest;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionContextBuilder;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionContextCreateRequest;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -207,8 +207,8 @@ public class TaskExecutionContextFactory {
 
         List<String> varPoolsFromPredecessors = workflowExecutionGraph.getPredecessors(taskDefinition.getName())
                 .stream()
-                .filter(ITaskExecutionRunnable::isTaskInstanceInitialized)
-                .map(ITaskExecutionRunnable::getTaskInstance)
+                .filter(ITaskExecution::isTaskInstanceInitialized)
+                .map(ITaskExecution::getTaskInstance)
                 .sorted(Comparator.comparing(TaskInstance::getEndTime, Comparator.nullsLast(Comparator.naturalOrder())))
                 .map(TaskInstance::getVarPool)
                 .filter(StringUtils::isNotBlank)

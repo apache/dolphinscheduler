@@ -35,7 +35,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowM
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowScheduleTriggerRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowScheduleTriggerResponse;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowCacheRepository;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowBackfillTrigger;
 import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowInstanceRecoverFailureTaskTrigger;
 import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowInstanceRecoverSuspendTaskTrigger;
@@ -148,7 +148,7 @@ public class WorkflowControlClient implements IWorkflowControlClient {
     public WorkflowInstancePauseResponse pauseWorkflowInstance(final WorkflowInstancePauseRequest workflowInstancePauseRequest) {
         try {
             final Integer workflowInstanceId = workflowInstancePauseRequest.getWorkflowInstanceId();
-            final IWorkflowExecutionRunnable workflow = workflowRepository.get(workflowInstanceId);
+            final IWorkflowExecution workflow = workflowRepository.get(workflowInstanceId);
             if (workflow == null) {
                 return WorkflowInstancePauseResponse.fail(
                         "Cannot find the WorkflowExecuteRunnable: " + workflowInstanceId);
@@ -166,7 +166,7 @@ public class WorkflowControlClient implements IWorkflowControlClient {
     public WorkflowInstanceStopResponse stopWorkflowInstance(final WorkflowInstanceStopRequest workflowInstanceStopRequest) {
         try {
             final Integer workflowInstanceId = workflowInstanceStopRequest.getWorkflowInstanceId();
-            final IWorkflowExecutionRunnable workflow = workflowRepository.get(workflowInstanceId);
+            final IWorkflowExecution workflow = workflowRepository.get(workflowInstanceId);
             if (workflow == null) {
                 return WorkflowInstanceStopResponse
                         .fail("Cannot find the WorkflowExecuteRunnable: " + workflowInstanceId);

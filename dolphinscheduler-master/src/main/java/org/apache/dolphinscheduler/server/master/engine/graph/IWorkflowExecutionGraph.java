@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.graph;
 
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 
 import java.util.List;
 import java.util.Set;
@@ -32,7 +32,7 @@ public interface IWorkflowExecutionGraph {
     /**
      * Add a new task to the graph.
      */
-    void addNode(final ITaskExecutionRunnable taskExecutionRunnable);
+    void addNode(final ITaskExecution taskExecution);
 
     /**
      * Add a new edge to the graph.
@@ -48,102 +48,102 @@ public interface IWorkflowExecutionGraph {
     /**
      * Return the start tasks, the start tasks in the workflow execution graph is the tasks which predecessors is empty.
      */
-    List<ITaskExecutionRunnable> getStartNodes();
+    List<ITaskExecution> getStartNodes();
 
     /**
      * Get the predecessor tasks of the given task.
      */
-    List<ITaskExecutionRunnable> getPredecessors(final String taskName);
+    List<ITaskExecution> getPredecessors(final String taskName);
 
     /**
      * Return the successor tasks of the given task.
      */
-    List<ITaskExecutionRunnable> getSuccessors(final String taskName);
+    List<ITaskExecution> getSuccessors(final String taskName);
 
     /**
      * Return the successor tasks of the given task.
      */
-    List<ITaskExecutionRunnable> getSuccessors(final ITaskExecutionRunnable taskExecutionRunnable);
+    List<ITaskExecution> getSuccessors(final ITaskExecution taskExecution);
 
     /**
-     * Get the ITaskExecutionRunnable by task code.
+     * Get the ITaskExecution by task code.
      */
-    ITaskExecutionRunnable getTaskExecutionRunnableByName(final String taskName);
+    ITaskExecution getTaskExecutionByName(final String taskName);
 
     /**
-     * Get the ITaskExecutionRunnable by task instance id.
+     * Get the ITaskExecution by task instance id.
      */
-    ITaskExecutionRunnable getTaskExecutionRunnableById(final Integer taskInstanceId);
+    ITaskExecution getTaskExecutionById(final Integer taskInstanceId);
 
     /**
-     * Get the ITaskExecutionRunnable by task code.
+     * Get the ITaskExecution by task code.
      */
-    ITaskExecutionRunnable getTaskExecutionRunnableByTaskCode(final Long taskCode);
+    ITaskExecution getTaskExecutionByTaskCode(final Long taskCode);
 
     /**
      * Whether the given task is active.
      */
-    boolean isTaskExecutionRunnableActive(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isTaskExecutionActive(final ITaskExecution taskExecution);
 
     /**
      * Whether the given task is inactive.
      * <p> A task is inactive means the task has been `executed`.
      */
-    boolean isTaskExecutionRunnableInActive(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isTaskExecutionInActive(final ITaskExecution taskExecution);
 
     /**
      * Whether the given task is killed.
      */
-    boolean isTaskExecutionRunnableKilled(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isTaskExecutionKilled(final ITaskExecution taskExecution);
 
     /**
      * Whether the given task is failure.
      */
-    boolean isTaskExecutionRunnableFailed(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isTaskExecutionFailed(final ITaskExecution taskExecution);
 
     /**
      * Whether the given task is paused.
      */
-    boolean isTaskExecutionRunnablePaused(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isTaskExecutionPaused(final ITaskExecution taskExecution);
 
     /**
-     * Get the active TaskExecutionRunnable list.
-     * <p> The active TaskExecutionRunnable means the task is handling in the workflow execution graph.
+     * Get the active TaskExecution list.
+     * <p> The active TaskExecution means the task is handling in the workflow execution graph.
      */
-    List<ITaskExecutionRunnable> getActiveTaskExecutionRunnable();
+    List<ITaskExecution> getActiveTaskExecution();
 
     /**
-     * Get all the TaskExecutionRunnable in the graph, this method will return all the TaskExecutionRunnable in the graph,
-     * include active and inactive TaskExecutionRunnable.
+     * Get all the TaskExecution in the graph, this method will return all the TaskExecution in the graph,
+     * include active and inactive TaskExecution.
      */
-    List<ITaskExecutionRunnable> getAllTaskExecutionRunnable();
+    List<ITaskExecution> getAllTaskExecution();
 
     /**
      * Check whether the given task can be trigger now.
      * <p> The task can be trigger only all the predecessors are finished and all predecessors are not failure/pause/kill.
      * <p> Once the task has been triggered, then will also return false.
      */
-    boolean isTriggerConditionMet(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isTriggerConditionMet(final ITaskExecution taskExecution);
 
     /**
-     * Mark the TaskExecutionRunnable is active.
-     * <p> If the TaskExecutionRunnable is active means the task is handling by the workflow.
-     * <p> Once we begin to handle a task, we should mark the TaskExecutionRunnable active.
+     * Mark the TaskExecution is active.
+     * <p> If the TaskExecution is active means the task is handling by the workflow.
+     * <p> Once we begin to handle a task, we should mark the TaskExecution active.
      */
-    void markTaskExecutionRunnableActive(final ITaskExecutionRunnable taskExecutionRunnable);
+    void markTaskExecutionActive(final ITaskExecution taskExecution);
 
     /**
-     * Mark the TaskExecutionRunnable is inactive.
-     * <p> If the TaskExecutionRunnable is inactive means the task has not been handled by the workflow.
-     * <p> Once we finish to handle a task, we should mark the TaskExecutionRunnable inactive.
+     * Mark the TaskExecution is inactive.
+     * <p> If the TaskExecution is inactive means the task has not been handled by the workflow.
+     * <p> Once we finish to handle a task, we should mark the TaskExecution inactive.
      */
-    void markTaskExecutionRunnableInActive(final ITaskExecutionRunnable taskExecutionRunnable);
+    void markTaskExecutionInActive(final ITaskExecution taskExecution);
 
     /**
-     * Mark the TaskExecutionRunnable is skipped.
-     * <p> Once the TaskExecutionRunnable is marked as skipped, this means the task will not be trigger.
+     * Mark the TaskExecution is skipped.
+     * <p> Once the TaskExecution is marked as skipped, this means the task will not be trigger.
      */
-    void markTaskSkipped(final ITaskExecutionRunnable taskExecutionRunnable);
+    void markTaskSkipped(final ITaskExecution taskExecution);
 
     /**
      * Mark the Task is skipped.
@@ -152,47 +152,47 @@ public interface IWorkflowExecutionGraph {
     void markTaskSkipped(final String taskName);
 
     /**
-     * Mark the TaskExecutionRunnable chain is failure.
-     * <p> Once the TaskExecutionRunnable chain is failure, then the successors will not be trigger, and the workflow execution graph might be failure.
+     * Mark the TaskExecution chain is failure.
+     * <p> Once the TaskExecution chain is failure, then the successors will not be trigger, and the workflow execution graph might be failure.
      */
-    void markTaskExecutionRunnableChainFailure(final ITaskExecutionRunnable taskExecutionRunnable);
+    void markTaskExecutionChainFailure(final ITaskExecution taskExecution);
 
     /**
-     * Mark the TaskExecutionRunnable chain is pause.
-     * <p> Once the TaskExecutionRunnable chain is pause, then the successors will not be trigger, and the workflow execution graph might be paused.
+     * Mark the TaskExecution chain is pause.
+     * <p> Once the TaskExecution chain is pause, then the successors will not be trigger, and the workflow execution graph might be paused.
      */
-    void markTaskExecutionRunnableChainPause(final ITaskExecutionRunnable taskExecutionRunnable);
+    void markTaskExecutionChainPause(final ITaskExecution taskExecution);
 
     /**
-     * Mark the TaskExecutionRunnable chain is kill.
-     * <p> Once the TaskExecutionRunnable chain is kill, then the successors will not be trigger, and the workflow execution graph might be stop.
+     * Mark the TaskExecution chain is kill.
+     * <p> Once the TaskExecution chain is kill, then the successors will not be trigger, and the workflow execution graph might be stop.
      */
-    void markTaskExecutionRunnableChainKill(final ITaskExecutionRunnable taskExecutionRunnable);
+    void markTaskExecutionChainKill(final ITaskExecution taskExecution);
 
     /**
-     * Whether all the TaskExecutionRunnable chain in the graph is finish.
+     * Whether all the TaskExecution chain in the graph is finish.
      */
-    boolean isAllTaskExecutionRunnableChainFinish();
+    boolean isAllTaskExecutionChainFinish();
 
     /**
-     * Whether all the TaskExecutionRunnable chain in the graph is finish with success.
+     * Whether all the TaskExecution chain in the graph is finish with success.
      */
-    boolean isAllTaskExecutionRunnableChainSuccess();
+    boolean isAllTaskExecutionChainSuccess();
 
     /**
-     * Whether there exist the TaskExecutionRunnable chain in the graph is finish with failure.
+     * Whether there exist the TaskExecution chain in the graph is finish with failure.
      */
-    boolean isExistFailureTaskExecutionRunnableChain();
+    boolean isExistFailureTaskExecutionChain();
 
     /**
-     * Whether there exist the TaskExecutionRunnable chain in the graph is finish with paused.
+     * Whether there exist the TaskExecution chain in the graph is finish with paused.
      */
-    boolean isExistPausedTaskExecutionRunnableChain();
+    boolean isExistPausedTaskExecutionChain();
 
     /**
-     * Whether there exist the TaskExecutionRunnable chain in the graph is finish with kill.
+     * Whether there exist the TaskExecution chain in the graph is finish with kill.
      */
-    boolean isExistKilledTaskExecutionRunnableChain();
+    boolean isExistKilledTaskExecutionChain();
 
     /**
      * Check whether the given task is the end of the task chain.
@@ -200,33 +200,33 @@ public interface IWorkflowExecutionGraph {
      * <p> If the given task is killed or paused, then it is the end of the task chain.
      * <p> If the given task is failure, and all its successors are condition task then it is not end of a task chain.
      */
-    boolean isEndOfTaskChain(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isEndOfTaskChain(final ITaskExecution taskExecution);
 
     /**
      * Whether the given task is skipped.
      * <p> Once we mark the task is skipped, then the task will not be trigger, and will trigger its successors.
      */
-    boolean isTaskExecutionRunnableSkipped(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isTaskExecutionSkipped(final ITaskExecution taskExecution);
 
     /**
      * Whether the given task is forbidden.
      * <p> Once the task is forbidden then it will be passed, and will trigger its successors.
      */
-    boolean isTaskExecutionRunnableForbidden(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isTaskExecutionForbidden(final ITaskExecution taskExecution);
 
     /**
      * Whether the given task's execution is failure and waiting for retry.
      */
-    boolean isTaskExecutionRunnableRetrying(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isTaskExecutionRetrying(final ITaskExecution taskExecution);
 
     /**
      * Whether all predecessors task is skipped.
      * <p> Once all predecessors are marked as skipped, then the task will be marked as skipped, and will trigger its successors.
      */
-    boolean isAllPredecessorsSkipped(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isAllPredecessorsSkipped(final ITaskExecution taskExecution);
 
     /**
      * Whether all predecessors task are condition task.
      */
-    boolean isAllSuccessorsAreConditionTask(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean isAllSuccessorsAreConditionTask(final ITaskExecution taskExecution);
 }

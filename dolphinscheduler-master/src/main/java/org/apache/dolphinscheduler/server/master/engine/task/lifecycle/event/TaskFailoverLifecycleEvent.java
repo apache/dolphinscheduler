@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,9 +29,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TaskFailoverLifecycleEvent extends AbstractTaskLifecycleEvent {
 
-    private final ITaskExecutionRunnable taskExecutionRunnable;
+    private final ITaskExecution taskExecution;
 
-    public static TaskFailoverLifecycleEvent of(final ITaskExecutionRunnable taskExecuteRunnable) {
+    public static TaskFailoverLifecycleEvent of(final ITaskExecution taskExecuteRunnable) {
         return new TaskFailoverLifecycleEvent(taskExecuteRunnable);
     }
 
@@ -42,7 +42,7 @@ public class TaskFailoverLifecycleEvent extends AbstractTaskLifecycleEvent {
 
     public String toString() {
         return "TaskFailoverLifecycleEvent{" +
-                "task=" + taskExecutionRunnable.getName() +
+                "task=" + taskExecution.getName() +
                 '}';
     }
 }
