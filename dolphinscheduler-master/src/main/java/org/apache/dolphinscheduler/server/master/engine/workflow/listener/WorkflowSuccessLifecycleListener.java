@@ -27,9 +27,9 @@ import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowComman
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.trigger.WorkflowBackfillTrigger;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -51,9 +51,9 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
     @Autowired
     private CommandDao commandDao;
 
-    public void notifyWorkflowLifecycleEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public void notifyWorkflowLifecycleEvent(final IWorkflowExecution workflowExecution,
                                              final AbstractWorkflowLifecycleLifecycleEvent lifecycleEvent) {
-        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
         if (Flag.YES == workflowInstance.getIsSubWorkflow()) {
             // The sub workflow does not need to generate the backfill command
             // Since the parent workflow will trigger the task to generate the sub workflow instance.

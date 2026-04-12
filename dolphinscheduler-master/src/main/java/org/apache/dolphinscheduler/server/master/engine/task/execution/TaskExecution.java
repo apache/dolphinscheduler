@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.task.runnable;
+package org.apache.dolphinscheduler.server.master.engine.task.execution;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 
 @Slf4j
-public class TaskExecutionRunnable implements ITaskExecutionRunnable {
+public class TaskExecution implements ITaskExecution {
 
     private final ApplicationContext applicationContext;
 
@@ -63,15 +63,15 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
     @Getter
     private TaskExecutionContext taskExecutionContext;
 
-    public TaskExecutionRunnable(TaskExecutionRunnableBuilder taskExecutionRunnableBuilder) {
-        this.applicationContext = taskExecutionRunnableBuilder.getApplicationContext();
-        this.workflowExecutionGraph = checkNotNull(taskExecutionRunnableBuilder.getWorkflowExecutionGraph());
-        this.workflowEventBus = checkNotNull(taskExecutionRunnableBuilder.getWorkflowEventBus());
-        this.workflowDefinition = checkNotNull(taskExecutionRunnableBuilder.getWorkflowDefinition());
-        this.project = checkNotNull(taskExecutionRunnableBuilder.getProject());
-        this.workflowInstance = checkNotNull(taskExecutionRunnableBuilder.getWorkflowInstance());
-        this.taskDefinition = checkNotNull(taskExecutionRunnableBuilder.getTaskDefinition());
-        this.taskInstance = taskExecutionRunnableBuilder.getTaskInstance();
+    public TaskExecution(TaskExecutionBuilder taskExecutionBuilder) {
+        this.applicationContext = taskExecutionBuilder.getApplicationContext();
+        this.workflowExecutionGraph = checkNotNull(taskExecutionBuilder.getWorkflowExecutionGraph());
+        this.workflowEventBus = checkNotNull(taskExecutionBuilder.getWorkflowEventBus());
+        this.workflowDefinition = checkNotNull(taskExecutionBuilder.getWorkflowDefinition());
+        this.project = checkNotNull(taskExecutionBuilder.getProject());
+        this.workflowInstance = checkNotNull(taskExecutionBuilder.getWorkflowInstance());
+        this.taskDefinition = checkNotNull(taskExecutionBuilder.getTaskDefinition());
+        this.taskInstance = taskExecutionBuilder.getTaskInstance();
     }
 
     @Override
@@ -164,7 +164,7 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
     }
 
     @Override
-    public int compareTo(ITaskExecutionRunnable other) {
+    public int compareTo(ITaskExecution other) {
         if (other == null) {
             return 1;
         }
@@ -194,8 +194,8 @@ public class TaskExecutionRunnable implements ITaskExecutionRunnable {
     @Override
     public String toString() {
         if (taskInstance != null) {
-            return "TaskExecutionRunnable{" + "name=" + getName() + ", state=" + taskInstance.getState() + '}';
+            return "TaskExecution{" + "name=" + getName() + ", state=" + taskInstance.getState() + '}';
         }
-        return "TaskExecutionRunnable{" + "name=" + getName() + '}';
+        return "TaskExecution{" + "name=" + getName() + '}';
     }
 }

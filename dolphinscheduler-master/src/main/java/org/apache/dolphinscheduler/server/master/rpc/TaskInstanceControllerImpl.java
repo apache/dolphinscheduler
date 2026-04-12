@@ -22,9 +22,9 @@ import org.apache.dolphinscheduler.extract.master.transportor.TaskGroupSlotAcqui
 import org.apache.dolphinscheduler.extract.master.transportor.TaskGroupSlotAcquireSuccessNotifyResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 public class TaskInstanceControllerImpl implements ITaskInstanceController {
 
     @Autowired
-    private IWorkflowRepository workflowExecutionRunnableMemoryRepository;
+    private IWorkflowRepository workflowExecutionMemoryRepository;
 
     @Override
     public TaskGroupSlotAcquireSuccessNotifyResponse notifyTaskGroupSlotAcquireSuccess(
@@ -46,24 +46,24 @@ public class TaskInstanceControllerImpl implements ITaskInstanceController {
             final int workflowInstanceId = taskGroupSlotAcquireSuccessNotifyRequest.getWorkflowInstanceId();
             final int taskInstanceId = taskGroupSlotAcquireSuccessNotifyRequest.getTaskInstanceId();
             LogUtils.setWorkflowAndTaskInstanceIDMDC(workflowInstanceId, taskInstanceId);
-            final IWorkflowExecutionRunnable workflowExecutionRunnable =
-                    workflowExecutionRunnableMemoryRepository.get(workflowInstanceId);
-            if (workflowExecutionRunnable == null) {
+            final IWorkflowExecution workflowExecution =
+                    workflowExecutionMemoryRepository.get(workflowInstanceId);
+            if (workflowExecution == null) {
                 log.warn("cannot find WorkflowExecuteRunnable: {}, no need to Wakeup task", workflowInstanceId);
                 return TaskGroupSlotAcquireSuccessNotifyResponse
                         .failed("cannot find WorkflowExecuteRunnable: " + workflowInstanceId);
             }
-            final ITaskExecutionRunnable taskExecutionRunnable = workflowExecutionRunnable
+            final ITaskExecution taskExecution = workflowExecution
                     .getWorkflowExecuteContext()
                     .getWorkflowExecutionGraph()
-                    .getTaskExecutionRunnableById(taskInstanceId);
-            if (taskExecutionRunnable == null) {
-                log.warn("Cannot find TaskExecutionRunnable: {}, no need to Wakeup task", taskInstanceId);
+                    .getTaskExecutionById(taskInstanceId);
+            if (taskExecution == null) {
+                log.warn("Cannot find TaskExecution: {}, no need to Wakeup task", taskInstanceId);
                 return TaskGroupSlotAcquireSuccessNotifyResponse
-                        .failed("Cannot find TaskExecutionRunnable: " + taskInstanceId);
+                        .failed("Cannot find TaskExecution: " + taskInstanceId);
             }
-            workflowExecutionRunnable.getWorkflowEventBus()
-                    .publish(TaskDispatchLifecycleEvent.of(taskExecutionRunnable));
+            workflowExecution.getWorkflowEventBus()
+                    .publish(TaskDispatchLifecycleEvent.of(taskExecution));
             log.info("Success Wakeup TaskInstance: {}", taskInstanceId);
             return TaskGroupSlotAcquireSuccessNotifyResponse.success();
         } finally {

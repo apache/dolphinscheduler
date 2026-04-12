@@ -15,13 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.task.runnable;
+package org.apache.dolphinscheduler.server.master.engine.task.execution;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.RetryTaskInstanceFactory.RetryTaskInstanceBuilder;
 
 import java.util.Date;
 
@@ -30,57 +29,55 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-public class RetryTaskInstanceFactory extends AbstractTaskInstanceFactory<RetryTaskInstanceBuilder> {
+public class FailedRecoverTaskInstanceFactory
+        extends
+            AbstractTaskInstanceFactory<FailedRecoverTaskInstanceFactory.FailedRecoverTaskInstanceBuilder> {
 
     @Autowired
     private TaskInstanceDao taskInstanceDao;
 
     @Override
-    public RetryTaskInstanceBuilder builder() {
-        return new RetryTaskInstanceBuilder(this);
+    public FailedRecoverTaskInstanceFactory.FailedRecoverTaskInstanceBuilder builder() {
+        return new FailedRecoverTaskInstanceBuilder(this);
     }
 
     @Transactional
     @Override
-    public TaskInstance createTaskInstance(RetryTaskInstanceBuilder builder) {
-        final TaskInstance needRetryTaskInstance = builder.taskInstance;
-        final TaskInstance taskInstance = cloneTaskInstance(needRetryTaskInstance);
+    public TaskInstance createTaskInstance(FailedRecoverTaskInstanceBuilder builder) {
+        final TaskInstance needRecoverTaskInstance = builder.needRecoverTaskInstance;
+        final TaskInstance taskInstance = cloneTaskInstance(needRecoverTaskInstance);
         taskInstance.setId(null);
         taskInstance.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
-        taskInstance.setPid(0);
         taskInstance.setHost(null);
-        taskInstance.setExecutePath(null);
-        taskInstance.setLogPath(null);
-        taskInstance.setStartTime(null);
-        taskInstance.setEndTime(null);
+        taskInstance.setVarPool(null);
         taskInstance.setSubmitTime(new Date());
-        taskInstance.setRetryTimes(taskInstance.getRetryTimes() + 1);
+        taskInstance.setLogPath(null);
+        taskInstance.setExecutePath(null);
         taskInstanceDao.insert(taskInstance);
 
-        needRetryTaskInstance.setFlag(Flag.NO);
-        taskInstanceDao.updateById(needRetryTaskInstance);
+        needRecoverTaskInstance.setFlag(Flag.NO);
+        taskInstanceDao.updateById(needRecoverTaskInstance);
         return taskInstance;
     }
 
-    public static class RetryTaskInstanceBuilder implements ITaskInstanceFactory.ITaskInstanceBuilder {
+    public static class FailedRecoverTaskInstanceBuilder implements ITaskInstanceFactory.ITaskInstanceBuilder {
 
-        private final RetryTaskInstanceFactory retryTaskInstanceFactory;
+        private final FailedRecoverTaskInstanceFactory failedRecoverTaskInstanceFactory;
 
-        private TaskInstance taskInstance;
+        private TaskInstance needRecoverTaskInstance;
 
-        public RetryTaskInstanceBuilder(RetryTaskInstanceFactory retryTaskInstanceFactory) {
-            this.retryTaskInstanceFactory = retryTaskInstanceFactory;
+        public FailedRecoverTaskInstanceBuilder(FailedRecoverTaskInstanceFactory failedRecoverTaskInstanceFactory) {
+            this.failedRecoverTaskInstanceFactory = failedRecoverTaskInstanceFactory;
         }
 
-        public RetryTaskInstanceBuilder withTaskInstance(TaskInstance taskInstance) {
-            this.taskInstance = taskInstance;
+        public FailedRecoverTaskInstanceBuilder withTaskInstance(TaskInstance needRecoverTaskInstance) {
+            this.needRecoverTaskInstance = needRecoverTaskInstance;
             return this;
         }
 
         @Override
         public TaskInstance build() {
-            return retryTaskInstanceFactory.createTaskInstance(this);
+            return failedRecoverTaskInstanceFactory.createTaskInstance(this);
         }
-
     }
 }

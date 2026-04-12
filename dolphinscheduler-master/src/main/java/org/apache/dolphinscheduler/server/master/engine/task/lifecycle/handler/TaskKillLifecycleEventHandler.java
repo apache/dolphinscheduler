@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskKillLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -34,10 +34,10 @@ public class TaskKillLifecycleEventHandler extends AbstractTaskLifecycleEventHan
 
     @Override
     public void handle(final ITaskStateAction taskStateAction,
-                       final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                       final ITaskExecutionRunnable taskExecutionRunnable,
+                       final IWorkflowExecution workflowExecution,
+                       final ITaskExecution taskExecution,
                        final TaskKillLifecycleEvent taskKillEvent) {
-        taskStateAction.onKillEvent(workflowExecutionRunnable, taskExecutionRunnable, taskKillEvent);
+        taskStateAction.onKillEvent(workflowExecution, taskExecution, taskKillEvent);
     }
 
     @Override

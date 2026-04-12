@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
+package org.apache.dolphinscheduler.server.master.engine.workflow.execution;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -34,7 +34,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
+public class WorkflowExecution implements IWorkflowExecution {
 
     @Getter
     private final IWorkflowExecuteContext workflowExecuteContext;
@@ -45,8 +45,8 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
     @Getter
     private final IWorkflowFailureStrategy workflowFailureStrategy;
 
-    public WorkflowExecutionRunnable(WorkflowExecutionRunnableBuilder workflowExecutionRunnableBuilder) {
-        this.workflowExecuteContext = workflowExecutionRunnableBuilder.getWorkflowExecuteContextBuilder().build();
+    public WorkflowExecution(WorkflowExecutionBuilder workflowExecutionBuilder) {
+        this.workflowExecuteContext = workflowExecutionBuilder.getWorkflowExecuteContextBuilder().build();
         this.workflowInstanceLifecycleListeners =
                 new ArrayList<>(workflowExecuteContext.getWorkflowInstanceLifecycleListeners());
         this.workflowFailureStrategy = WorkflowFailureStrategyFactory
@@ -77,7 +77,7 @@ public class WorkflowExecutionRunnable implements IWorkflowExecutionRunnable {
     @Override
     public String toString() {
         final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
-        return "WorkflowExecutionRunnable{" +
+        return "WorkflowExecution{" +
                 "name=" + workflowInstance.getName() +
                 ", state=" + workflowInstance.getState().name() +
                 '}';

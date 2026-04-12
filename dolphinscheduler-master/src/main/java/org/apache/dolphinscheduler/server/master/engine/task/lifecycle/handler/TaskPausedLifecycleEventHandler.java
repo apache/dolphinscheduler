@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.client.TaskExecutorClient;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskPausedLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
 
@@ -40,14 +40,14 @@ public class TaskPausedLifecycleEventHandler extends AbstractTaskLifecycleEventH
 
     @Override
     public void handle(final ITaskStateAction taskStateAction,
-                       final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                       final ITaskExecutionRunnable taskExecutionRunnable,
+                       final IWorkflowExecution workflowExecution,
+                       final ITaskExecution taskExecution,
                        final TaskPausedLifecycleEvent event) {
-        taskStateAction.onPausedEvent(workflowExecutionRunnable, taskExecutionRunnable, event);
+        taskStateAction.onPausedEvent(workflowExecution, taskExecution, event);
         taskExecutorClient.ackTaskExecutorLifecycleEvent(
-                taskExecutionRunnable,
+                taskExecution,
                 new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(
-                        taskExecutionRunnable.getId(),
+                        taskExecution.getId(),
                         TaskExecutorLifecycleEventType.PAUSED));
     }
 

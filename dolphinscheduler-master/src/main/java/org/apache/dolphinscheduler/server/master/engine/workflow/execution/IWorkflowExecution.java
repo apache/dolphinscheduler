@@ -15,37 +15,37 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
+package org.apache.dolphinscheduler.server.master.engine.workflow.execution;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 import org.apache.dolphinscheduler.server.master.engine.workflow.policy.IWorkflowFailureStrategy;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 
 import java.util.List;
 
-public interface IWorkflowExecutionRunnable {
+public interface IWorkflowExecution {
 
     /**
-     * Get the id of the WorkflowExecutionRunnable.
+     * Get the id of the WorkflowExecution.
      */
     default int getId() {
         return getWorkflowInstance().getId();
     }
 
     /**
-     * Get the name of the WorkflowExecutionRunnable.
+     * Get the name of the WorkflowExecution.
      */
     default String getName() {
         return getWorkflowInstance().getName();
     }
 
     /**
-     * Pause the WorkflowExecutionRunnable.
+     * Pause the WorkflowExecution.
      */
     void pause();
 
@@ -58,7 +58,7 @@ public interface IWorkflowExecutionRunnable {
     }
 
     /**
-     * Stop the WorkflowExecutionRunnable.
+     * Stop the WorkflowExecution.
      */
     void stop();
 
@@ -71,26 +71,26 @@ public interface IWorkflowExecutionRunnable {
     }
 
     /**
-     * Kill the active tasks of the WorkflowExecutionRunnable.
+     * Kill the active tasks of the WorkflowExecution.
      */
     default void killActiveTasks() {
-        getWorkflowExecutionGraph().getActiveTaskExecutionRunnable().forEach(ITaskExecutionRunnable::kill);
+        getWorkflowExecutionGraph().getActiveTaskExecution().forEach(ITaskExecution::kill);
     }
 
     /**
-     * Get the WorkflowExecuteContext belongs to the WorkflowExecutionRunnable.
+     * Get the WorkflowExecuteContext belongs to the WorkflowExecution.
      */
     IWorkflowExecuteContext getWorkflowExecuteContext();
 
     /**
-     * Get the WorkflowInstance belongs to the WorkflowExecutionRunnable.
+     * Get the WorkflowInstance belongs to the WorkflowExecution.
      */
     default WorkflowInstance getWorkflowInstance() {
         return getWorkflowExecuteContext().getWorkflowInstance();
     }
 
     /**
-     * Get the state of the WorkflowExecutionRunnable.
+     * Get the state of the WorkflowExecution.
      */
     default WorkflowExecutionStatus getState() {
         return getWorkflowInstance().getState();
