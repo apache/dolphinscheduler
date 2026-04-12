@@ -140,11 +140,6 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
             return;
         }
 
-        if (!workflowFailureStrategy.canTriggerSuccessor(workflowExecutionRunnable, taskExecutionRunnable)) {
-            emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
-            return;
-        }
-
         triggerTasks(workflowExecutionRunnable, workflowExecutionGraph.getSuccessors(taskExecutionRunnable));
     }
 

@@ -37,10 +37,4 @@ public class EndWorkflowFailureStrategy implements IWorkflowFailureStrategy {
         workflowExecutionRunnable.killActiveTasks();
     }
 
-    @Override
-    public boolean canTriggerSuccessor(IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                       ITaskExecutionRunnable taskExecutionRunnable) {
-        return !workflowExecutionRunnable.getWorkflowExecutionGraph().isExistFailureTaskExecutionRunnableChain();
-    }
-
 }
