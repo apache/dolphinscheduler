@@ -20,7 +20,10 @@ package org.apache.dolphinscheduler.server.master.engine.executor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.TaskEngine;
+import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
+
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,6 +64,10 @@ public class LogicTaskEngineDelegator implements AutoCloseable {
 
     public void pauseLogicTask(final int taskInstanceId) {
         taskEngine.pauseTask(taskInstanceId);
+    }
+
+    public List<TaskExecutorDTO> queryTaskExecutors() {
+        return taskEngine.queryTaskExecutors();
     }
 
     public void ackLogicTaskExecutionEvent(final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
