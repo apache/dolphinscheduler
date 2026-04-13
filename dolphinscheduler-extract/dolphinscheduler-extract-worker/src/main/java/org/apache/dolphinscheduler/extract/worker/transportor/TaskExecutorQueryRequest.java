@@ -15,21 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.workflow.policy;
+package org.apache.dolphinscheduler.extract.worker.transportor;
 
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
-
-/**
- * The strategy used to deal with {@link org.apache.dolphinscheduler.common.enums.FailureStrategy#CONTINUE} when task failure occurs.
- * <p> Will wait the active the tasks finished.
- */
-public class ContinueWorkflowFailureStrategy implements IWorkflowFailureStrategy {
-
-    @Override
-    public void onTaskFailure(IWorkflowExecutionRunnable workflowExecutionRunnable,
-                              ITaskExecutionRunnable taskExecutionRunnable) {
-        // do nothing, just continue workflow execution
-    }
+public class TaskExecutorQueryRequest {
 
 }

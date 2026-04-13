@@ -17,13 +17,25 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.MonitorService;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IWorkflowExecutorQueryClient;
+import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecutorDTO;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowExecutorQueryRequest;
+import org.apache.dolphinscheduler.extract.master.transportor.WorkflowExecutorQueryResponse;
+import org.apache.dolphinscheduler.extract.worker.ITaskExecutorQueryClient;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutorQueryRequest;
+import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutorQueryResponse;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 
 import java.util.List;
 
@@ -59,4 +71,36 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     public List<Server> listServer(RegistryNodeType nodeType) {
         return registryClient.getServerList(nodeType);
     }
+
+    @Override
+    public List<WorkflowExecutorDTO> queryWorkflowExecutors(User loginUser, String masterAddress) {
+        if (!loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION);
+        }
+
+        WorkflowExecutorQueryResponse response = Clients
+                .withService(IWorkflowExecutorQueryClient.class)
+                .withHost(masterAddress)
+                .queryWorkflowExecutors(new WorkflowExecutorQueryRequest());
+        if (!response.isSuccess()) {
+            throw new ServiceException(response.getMessage());
+        }
+        return response.getWorkflowExecutors();
+    }
+
+    @Override
+    public List<TaskExecutorDTO> queryTaskExecutors(User loginUser, String serverAddress) {
+        if (!loginUser.getUserType().equals(UserType.ADMIN_USER)) {
+            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION);
+        }
+        TaskExecutorQueryResponse response = Clients
+                .withService(ITaskExecutorQueryClient.class)
+                .withHost(serverAddress)
+                .queryTaskInstances(new TaskExecutorQueryRequest());
+        if (!response.isSuccess()) {
+            throw new ServiceException(response.getMessage());
+        }
+        return response.getTaskExecutors();
+    }
+
 }
