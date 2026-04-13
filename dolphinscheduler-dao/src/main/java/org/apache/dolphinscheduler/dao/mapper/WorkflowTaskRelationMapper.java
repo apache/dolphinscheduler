@@ -18,14 +18,12 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.baomidou.mybatisplus.core.metadata.IPage;
 
 public interface WorkflowTaskRelationMapper extends BaseMapper<WorkflowTaskRelation> {
 
@@ -77,14 +75,6 @@ public interface WorkflowTaskRelationMapper extends BaseMapper<WorkflowTaskRelat
     int batchInsert(@Param("taskRelationList") List<WorkflowTaskRelation> taskRelationList);
 
     /**
-     * query downstream workflow task relation by taskCode
-     *
-     * @param taskCode taskCode
-     * @return ProcessTaskRelation
-     */
-    List<WorkflowTaskRelation> queryDownstreamByTaskCode(@Param("taskCode") long taskCode);
-
-    /**
      * query upstream workflow task relation by taskCode
      *
      * @param projectCode projectCode
@@ -93,28 +83,6 @@ public interface WorkflowTaskRelationMapper extends BaseMapper<WorkflowTaskRelat
      */
     List<WorkflowTaskRelation> queryUpstreamByCode(@Param("projectCode") long projectCode,
                                                    @Param("taskCode") long taskCode);
-
-    /**
-     * query downstream workflow task relation by taskCode
-     *
-     * @param projectCode projectCode
-     * @param taskCode taskCode
-     * @return ProcessTaskRelation
-     */
-    List<WorkflowTaskRelation> queryDownstreamByCode(@Param("projectCode") long projectCode,
-                                                     @Param("taskCode") long taskCode);
-
-    /**
-     * query task relation by codes
-     *
-     * @param projectCode projectCode
-     * @param taskCode taskCode
-     * @param preTaskCodes preTaskCode list
-     * @return ProcessTaskRelation
-     */
-    List<WorkflowTaskRelation> queryUpstreamByCodes(@Param("projectCode") long projectCode,
-                                                    @Param("taskCode") long taskCode,
-                                                    @Param("preTaskCodes") Long[] preTaskCodes);
 
     /**
      * query workflow task relation by process definition code
@@ -141,29 +109,11 @@ public interface WorkflowTaskRelationMapper extends BaseMapper<WorkflowTaskRelat
                                            @Param("postTaskCode") long postTaskCode);
 
     /**
-     * delete workflow task relation
-     *
-     * @param workflowTaskRelationLog workflowTaskRelationLog
-     * @return int
-     */
-    int deleteRelation(@Param("workflowTaskRelationLog") WorkflowTaskRelationLog workflowTaskRelationLog);
-
-    /**
      * query downstream workflow task relation by workflowDefinitionCode
      * @param workflowDefinitionCode
      * @return ProcessTaskRelation
      */
     List<WorkflowTaskRelation> queryDownstreamByWorkflowDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
-
-    /**
-     * Filter workflow task relation
-     *
-     * @param page page
-     * @param workflowTaskRelation process definition object
-     * @return workflow task relation IPage
-     */
-    IPage<WorkflowTaskRelation> filterWorkflowTaskRelation(IPage<WorkflowTaskRelation> page,
-                                                           @Param("relation") WorkflowTaskRelation workflowTaskRelation);
 
     /**
      * batch update workflow task relation version
@@ -172,9 +122,6 @@ public interface WorkflowTaskRelationMapper extends BaseMapper<WorkflowTaskRelat
      * @return update num
      */
     int updateWorkflowTaskRelationTaskVersion(@Param("workflowTaskRelation") WorkflowTaskRelation workflowTaskRelation);
-
-    Long queryTaskCodeByTaskName(@Param("workflowCode") Long workflowCode,
-                                 @Param("taskName") String taskName);
 
     void deleteByWorkflowDefinitionCodeAndVersion(@Param("workflowDefinitionCode") long workflowDefinitionCode,
                                                   @Param("workflowDefinitionVersion") int workflowDefinitionVersion);

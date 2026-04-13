@@ -77,7 +77,6 @@ public class ProjectWorkerGroupMapperTest extends BaseDaoTest {
      */
     @Test
     public void testQuery() {
-        ProjectWorkerGroup projectWorkerGroup = insertOne();
         // query
         List<ProjectWorkerGroup> projectUsers = projectWorkerGroupMapper.selectList(null);
         Assertions.assertNotEquals(0, projectUsers.size());
