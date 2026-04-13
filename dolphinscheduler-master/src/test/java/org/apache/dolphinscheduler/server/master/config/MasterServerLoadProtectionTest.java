@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 import java.util.Collections;
 
@@ -110,7 +110,7 @@ class MasterServerLoadProtectionTest {
     @Test
     void isOverloadWithMaxConcurrentWorkflowInstances() {
         Mockito.when(mockRepository.getAll())
-                .thenReturn(Collections.nCopies(5, Mockito.mock(IWorkflowExecutionRunnable.class)));
+                .thenReturn(Collections.nCopies(5, Mockito.mock(IWorkflowExecution.class)));
 
         // With a workflow count below the threshold, the system should not be overloaded.
         MasterConfig masterConfig = new MasterConfig();

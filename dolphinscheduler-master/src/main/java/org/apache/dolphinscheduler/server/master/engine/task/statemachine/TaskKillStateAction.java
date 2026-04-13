@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.task.statemachine;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
@@ -30,8 +31,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRunningLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskStartLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,100 +42,100 @@ import org.springframework.stereotype.Component;
 public class TaskKillStateAction extends AbstractTaskStateAction {
 
     @Override
-    public void onStartEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                             final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onStartEvent(final IWorkflowExecution workflowExecution,
+                             final ITaskExecution taskExecution,
                              final TaskStartLifecycleEvent taskStartEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        taskExecutionRunnable.getWorkflowExecutionGraph().markTaskExecutionRunnableChainKill(taskExecutionRunnable);
-        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecutionRunnable, taskExecutionRunnable);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        taskExecution.getWorkflowExecutionGraph().markTaskExecutionChainKill(taskExecution);
+        publishWorkflowInstanceTopologyLogicalTransitionEvent(workflowExecution, taskExecution);
     }
 
     @Override
-    public void onStartedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                               final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onStartedEvent(final IWorkflowExecution workflowExecution,
+                               final ITaskExecution taskExecution,
                                final TaskRunningLifecycleEvent taskRunningEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskRunningEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskRunningEvent);
     }
 
     @Override
-    public void onRetryEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                             final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onRetryEvent(final IWorkflowExecution workflowExecution,
+                             final ITaskExecution taskExecution,
                              final TaskRetryLifecycleEvent taskRetryEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskRetryEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskRetryEvent);
     }
 
     @Override
-    public void onDispatchEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onDispatchEvent(final IWorkflowExecution workflowExecution,
+                                final ITaskExecution taskExecution,
                                 final TaskDispatchLifecycleEvent taskDispatchEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskDispatchEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskDispatchEvent);
     }
 
     @Override
-    public void onDispatchedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                  final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onDispatchedEvent(final IWorkflowExecution workflowExecution,
+                                  final ITaskExecution taskExecution,
                                   final TaskDispatchedLifecycleEvent taskDispatchedEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskDispatchedEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskDispatchedEvent);
     }
 
     @Override
-    public void onPauseEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                             final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onPauseEvent(final IWorkflowExecution workflowExecution,
+                             final ITaskExecution taskExecution,
                              final TaskPauseLifecycleEvent taskPauseEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskPauseEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskPauseEvent);
     }
 
     @Override
-    public void onPausedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                              final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onPausedEvent(final IWorkflowExecution workflowExecution,
+                              final ITaskExecution taskExecution,
                               final TaskPausedLifecycleEvent taskPausedEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskPausedEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskPausedEvent);
     }
 
     @Override
-    public void onKillEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                            final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onKillEvent(final IWorkflowExecution workflowExecution,
+                            final ITaskExecution taskExecution,
                             final TaskKillLifecycleEvent taskKillEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskKillEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskKillEvent);
     }
 
     @Override
-    public void onKilledEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                              final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onKilledEvent(final IWorkflowExecution workflowExecution,
+                              final ITaskExecution taskExecution,
                               final TaskKilledLifecycleEvent taskKilledEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskKilledEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskKilledEvent);
     }
 
     @Override
-    public void onFailedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                              final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onFailedEvent(final IWorkflowExecution workflowExecution,
+                              final ITaskExecution taskExecution,
                               final TaskFailedLifecycleEvent taskFailedEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskFailedEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskFailedEvent);
     }
 
     @Override
-    public void onSucceedEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                               final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onSucceedEvent(final IWorkflowExecution workflowExecution,
+                               final ITaskExecution taskExecution,
                                final TaskSuccessLifecycleEvent taskSuccessEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskSuccessEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskSuccessEvent);
     }
 
     @Override
-    public void onFailoverEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                final ITaskExecutionRunnable taskExecutionRunnable,
+    public void onFailoverEvent(final IWorkflowExecution workflowExecution,
+                                final ITaskExecution taskExecution,
                                 final TaskFailoverLifecycleEvent taskFailoverEvent) {
-        throwExceptionIfStateIsNotMatch(taskExecutionRunnable);
-        logWarningIfCannotDoAction(taskExecutionRunnable, taskFailoverEvent);
+        throwExceptionIfStateIsNotMatch(taskExecution);
+        logWarningIfCannotDoAction(taskExecution, taskFailoverEvent);
     }
 
     @Override

@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.AbstractLogicTask;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ public class DependentLogicTask extends AbstractLogicTask<DependentParameters> {
                               TaskDefinitionDao taskDefinitionDao,
                               TaskInstanceDao taskInstanceDao,
                               WorkflowInstanceDao workflowInstanceDao,
-                              IWorkflowExecutionRunnable workflowExecutionRunnable,
+                              IWorkflowExecution workflowExecution,
                               TaskInstanceContextDao taskInstanceContextDao) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;

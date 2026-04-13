@@ -24,9 +24,6 @@ import java.util.List;
 
 public interface TaskInstanceContextDao extends IDao<TaskInstanceContext> {
 
-    List<TaskInstanceContext> queryListByTaskInstanceIdAndContextType(Integer taskInstanceId,
-                                                                      ContextType contextType);
-
     int deleteByTaskInstanceIdAndContextType(Integer taskInstanceId,
                                              ContextType contextType);
 

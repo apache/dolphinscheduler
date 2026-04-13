@@ -34,9 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -129,8 +127,6 @@ public class CommandMapperTest extends BaseDaoTest {
     @Test
     public void testGetAll() {
         Integer count = 10;
-
-        Map<Integer, Command> commandMap = createCommandMap(count);
 
         List<Command> actualCommands = commandMapper.selectList(null);
 
@@ -253,22 +249,6 @@ public class CommandMapperTest extends BaseDaoTest {
         workflowDefinitionMapper.insert(workflowDefinition);
 
         return workflowDefinition;
-    }
-
-    /**
-     * create command map
-     *
-     * @param count map count
-     * @return command map
-     */
-    private Map<Integer, Command> createCommandMap(Integer count) {
-        Map<Integer, Command> commandMap = new HashMap<>();
-
-        for (int i = 0; i < count; i++) {
-            Command command = createCommand();
-            commandMap.put(command.getId(), command);
-        }
-        return commandMap;
     }
 
     /**

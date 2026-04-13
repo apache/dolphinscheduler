@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.policy;
 
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 /**
  * Used to deal with {@link org.apache.dolphinscheduler.common.enums.FailureStrategy} when task failure occurs
  */
 public interface IWorkflowFailureStrategy {
 
-    void onTaskFailure(IWorkflowExecutionRunnable workflowExecutionRunnable,
-                       ITaskExecutionRunnable taskExecutionRunnable);
+    void onTaskFailure(IWorkflowExecution workflowExecution,
+                       ITaskExecution taskExecution);
 
 }

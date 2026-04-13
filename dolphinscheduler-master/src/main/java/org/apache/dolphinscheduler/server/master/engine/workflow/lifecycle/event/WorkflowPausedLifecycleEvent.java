@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,11 +32,11 @@ import com.google.common.base.Preconditions;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorkflowPausedLifecycleEvent extends AbstractWorkflowLifecycleLifecycleEvent {
 
-    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
+    private final IWorkflowExecution workflowExecution;
 
-    public static WorkflowPausedLifecycleEvent of(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        Preconditions.checkNotNull(workflowExecutionRunnable, "workflowExecutionRunnable is null");
-        return new WorkflowPausedLifecycleEvent(workflowExecutionRunnable);
+    public static WorkflowPausedLifecycleEvent of(final IWorkflowExecution workflowExecution) {
+        Preconditions.checkNotNull(workflowExecution, "workflowExecution is null");
+        return new WorkflowPausedLifecycleEvent(workflowExecution);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class WorkflowPausedLifecycleEvent extends AbstractWorkflowLifecycleLifec
     @Override
     public String toString() {
         return "WorkflowPausedLifecycleEvent{" +
-                "workflow=" + workflowExecutionRunnable.getName() +
+                "workflow=" + workflowExecution.getName() +
                 '}';
     }
 }
