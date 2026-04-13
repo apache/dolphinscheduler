@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.api.dto;
 
 import lombok.Data;
 
-/**
- * ProductInfoDto
- */
 @Data
 public class ProductInfoDto {
 

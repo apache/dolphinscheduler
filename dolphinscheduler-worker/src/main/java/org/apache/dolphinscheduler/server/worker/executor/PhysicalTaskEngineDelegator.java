@@ -20,9 +20,11 @@ package org.apache.dolphinscheduler.server.worker.executor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.TaskEngine;
+import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorReassignMasterRequest;
 
+import java.util.List;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +70,10 @@ public class PhysicalTaskEngineDelegator implements AutoCloseable {
 
     public void pauseLogicTask(final int taskInstanceId) {
         taskEngine.pauseTask(taskInstanceId);
+    }
+
+    public List<TaskExecutorDTO> queryTaskExecutors() {
+        return taskEngine.queryTaskExecutors();
     }
 
     public void ackPhysicalTaskExecutorLifecycleEventACK(final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {

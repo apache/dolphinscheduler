@@ -25,6 +25,12 @@ export default {
     directory_detail: 'Directory Detail',
     host: 'Host',
     directory: 'Directory',
+    running_workflows: 'Running Workflows',
+    workflow_name: 'Workflow Instance',
+    workflow_state: 'State',
+    workflow_start_time: 'Start Time',
+    workflow_run_times: 'Run Times',
+    running_tasks: 'Running Tasks',
     master_no_data_result_title: 'No Master Nodes Exist',
     master_no_data_result_desc:
       'Currently, there are no master nodes exist, please create a master node and refresh this page'
@@ -39,6 +45,11 @@ export default {
     directory_detail: 'Directory Detail',
     host: 'Host',
     directory: 'Directory',
+    running_tasks: 'Running Tasks',
+    task_name: 'Task Name',
+    task_type: 'Task Type',
+    task_workflow_instance: 'Workflow Instance',
+    task_start_time: 'Start Time',
     worker_no_data_result_title: 'No Worker Nodes Exist',
     worker_no_data_result_desc:
       'Currently, there are no worker nodes exist, please create a worker node and refresh this page'

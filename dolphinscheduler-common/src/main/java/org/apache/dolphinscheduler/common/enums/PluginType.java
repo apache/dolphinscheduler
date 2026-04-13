@@ -21,9 +21,6 @@ import java.util.HashMap;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- * PluginType
- */
 public enum PluginType {
 
     ALERT(1, "alert", true),

@@ -24,9 +24,12 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
+import lombok.Data;
+
 /**
  * Basic datasource params submitted to api, each datasource plugin should have implementation.
  */
+@Data
 public abstract class BaseDataSourceParamDTO implements Serializable {
 
     protected Integer id;
@@ -46,46 +49,6 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
     protected String password;
 
     protected Map<String, String> other;
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public Integer getPort() {
-        return port;
-    }
-
-    public void setPort(Integer port) {
-        this.port = port;
-    }
 
     /**
      * extract the host and port from the address,
@@ -118,38 +81,6 @@ public abstract class BaseDataSourceParamDTO implements Serializable {
 
         this.host = String.join(Constants.COMMA, hosts);
         this.port = Integer.parseInt(portString);
-    }
-
-    public String getDatabase() {
-        return database;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Map<String, String> getOther() {
-        return other;
-    }
-
-    public void setOther(Map<String, String> other) {
-        this.other = other;
     }
 
     /**

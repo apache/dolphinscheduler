@@ -46,9 +46,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * access token service impl
- */
 @Service
 @Slf4j
 public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTokenService {

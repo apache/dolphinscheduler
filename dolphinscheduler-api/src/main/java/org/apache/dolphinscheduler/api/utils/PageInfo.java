@@ -32,30 +32,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 @AllArgsConstructor
 public class PageInfo<T> {
 
-    /**
-     * totalList
-     */
     private List<T> totalList = Collections.emptyList();
-    /**
-     * total
-     */
     private Integer total = 0;
-    /**
-     * total Page
-     */
     @Setter
     private Integer totalPage;
-    /**
-     * page size
-     */
     private Integer pageSize = 20;
-    /**
-     * current page
-     */
     private Integer currentPage = 0;
-    /**
-     * pageNo
-     */
     private Integer pageNo;
 
     public PageInfo() {

@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -65,6 +66,10 @@ public class WorkflowManualTriggerRequest {
     private String tenantCode;
 
     private Long environmentCode;
+
+    private Date scheduleTime;
+
+    private String timeZone;
 
     @Builder.Default
     private List<Property> startParamList = new ArrayList<>();

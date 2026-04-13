@@ -28,9 +28,6 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 
 import java.util.List;
 
-/**
- * datasource service
- */
 public interface DataSourceService {
 
     /**

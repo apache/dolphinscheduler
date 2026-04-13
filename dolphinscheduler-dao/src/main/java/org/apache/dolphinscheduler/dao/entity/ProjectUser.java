@@ -30,9 +30,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_relation_project_user")
 public class ProjectUser {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
@@ -42,21 +39,12 @@ public class ProjectUser {
     @TableField("project_id")
     private int projectId;
 
-    /**
-     * project code
-     */
     @TableField(exist = false)
     private long projectCode;
 
-    /**
-     * project name
-     */
     @TableField(exist = false)
     private String projectName;
 
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
 

@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.http;
 
-/**
- * http parameters type
- */
 public enum HttpParametersType {
     PARAMETER, HEADERS
 }

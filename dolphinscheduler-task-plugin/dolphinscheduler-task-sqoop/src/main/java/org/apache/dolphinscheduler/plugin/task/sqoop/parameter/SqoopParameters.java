@@ -50,9 +50,9 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 import java.util.Objects;
 
-/**
- * sqoop parameters
- */
+import lombok.Data;
+
+@Data
 public class SqoopParameters extends AbstractParameters {
 
     /**
@@ -72,33 +72,12 @@ public class SqoopParameters extends AbstractParameters {
      */
     private String jobName;
 
-    /**
-     * model type
-     */
     private String modelType;
-    /**
-     * concurrency
-     */
     private int concurrency;
-    /**
-     * split by
-     */
     private String splitBy;
-    /**
-     * source type
-     */
     private String sourceType;
-    /**
-     * target type
-     */
     private String targetType;
-    /**
-     * source params
-     */
     private String sourceParams;
-    /**
-     * target params
-     */
     private String targetParams;
 
     /**
@@ -110,102 +89,6 @@ public class SqoopParameters extends AbstractParameters {
      * sqoop advanced param
      */
     private List<Property> sqoopAdvancedParams;
-
-    public String getModelType() {
-        return modelType;
-    }
-
-    public void setModelType(String modelType) {
-        this.modelType = modelType;
-    }
-
-    public int getConcurrency() {
-        return concurrency;
-    }
-
-    public void setConcurrency(int concurrency) {
-        this.concurrency = concurrency;
-    }
-
-    public String getSplitBy() {
-        return splitBy;
-    }
-
-    public void setSplitBy(String splitBy) {
-        this.splitBy = splitBy;
-    }
-
-    public String getSourceType() {
-        return sourceType;
-    }
-
-    public void setSourceType(String sourceType) {
-        this.sourceType = sourceType;
-    }
-
-    public String getTargetType() {
-        return targetType;
-    }
-
-    public void setTargetType(String targetType) {
-        this.targetType = targetType;
-    }
-
-    public String getSourceParams() {
-        return sourceParams;
-    }
-
-    public void setSourceParams(String sourceParams) {
-        this.sourceParams = sourceParams;
-    }
-
-    public String getTargetParams() {
-        return targetParams;
-    }
-
-    public void setTargetParams(String targetParams) {
-        this.targetParams = targetParams;
-    }
-
-    public String getJobType() {
-        return jobType;
-    }
-
-    public void setJobType(String jobType) {
-        this.jobType = jobType;
-    }
-
-    public String getJobName() {
-        return jobName;
-    }
-
-    public void setJobName(String jobName) {
-        this.jobName = jobName;
-    }
-
-    public String getCustomShell() {
-        return customShell;
-    }
-
-    public void setCustomShell(String customShell) {
-        this.customShell = customShell;
-    }
-
-    public List<Property> getHadoopCustomParams() {
-        return hadoopCustomParams;
-    }
-
-    public void setHadoopCustomParams(List<Property> hadoopCustomParams) {
-        this.hadoopCustomParams = hadoopCustomParams;
-    }
-
-    public List<Property> getSqoopAdvancedParams() {
-        return sqoopAdvancedParams;
-    }
-
-    public void setSqoopAdvancedParams(List<Property> sqoopAdvancedParams) {
-        this.sqoopAdvancedParams = sqoopAdvancedParams;
-    }
 
     @Override
     public boolean checkParameters() {

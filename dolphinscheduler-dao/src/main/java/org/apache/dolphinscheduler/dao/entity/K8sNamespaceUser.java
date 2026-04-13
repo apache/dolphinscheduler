@@ -30,21 +30,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_relation_namespace_user")
 public class K8sNamespaceUser {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * user id
-     */
     @TableField("user_id")
     private int userId;
 
-    /**
-     * namespace id
-     */
     @TableField("namespace_id")
     private int namespaceId;
 
@@ -54,15 +45,9 @@ public class K8sNamespaceUser {
     @TableField(exist = false)
     private String k8s;
 
-    /**
-     * namespace name
-     */
     @TableField(exist = false)
     private String namespaceName;
 
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
 

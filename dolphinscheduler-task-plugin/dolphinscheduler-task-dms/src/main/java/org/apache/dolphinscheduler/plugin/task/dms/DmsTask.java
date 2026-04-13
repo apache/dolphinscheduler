@@ -54,9 +54,6 @@ public class DmsTask extends AbstractRemoteTask {
                     .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
                     .propertyNamingStrategy(new PropertyNamingStrategy.UpperCamelCaseStrategy())
                     .build();
-    /**
-     * taskExecutionContext
-     */
     private final TaskExecutionContext taskExecutionContext;
     public DmsHook dmsHook;
     /**

@@ -19,13 +19,13 @@ package org.apache.dolphinscheduler.plugin.datasource.azuresql.param;
 
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+@EqualsAndHashCode(callSuper = true)
 @ToString
-@Getter
-@Setter
+@Data
 public class AzureSQLConnectionParam extends BaseConnectionParam {
 
     protected AzureSQLAuthMode mode;

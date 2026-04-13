@@ -32,9 +32,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 
-/**
- * monitor controller test
- */
 public class MonitorControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(MonitorControllerTest.class);

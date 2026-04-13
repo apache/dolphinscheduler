@@ -20,28 +20,28 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.even
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.WorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnable;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * The workflow instance finalize event, used to remove the {@link WorkflowExecutionRunnable} from the master, will
+ * The workflow instance finalize event, used to remove the {@link WorkflowExecution} from the master, will
  * clear the workflow instance related resources in memory.
  */
 @Getter
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorkflowFinalizeLifecycleEvent extends AbstractWorkflowLifecycleLifecycleEvent {
 
-    private IWorkflowExecutionRunnable workflowExecutionRunnable;
+    private IWorkflowExecution workflowExecution;
 
-    public static WorkflowFinalizeLifecycleEvent of(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        checkNotNull(workflowExecutionRunnable, "workflowExecutionRunnable is null");
-        return new WorkflowFinalizeLifecycleEvent(workflowExecutionRunnable);
+    public static WorkflowFinalizeLifecycleEvent of(IWorkflowExecution workflowExecution) {
+        checkNotNull(workflowExecution, "workflowExecution is null");
+        return new WorkflowFinalizeLifecycleEvent(workflowExecution);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class WorkflowFinalizeLifecycleEvent extends AbstractWorkflowLifecycleLif
     @Override
     public String toString() {
         return "WorkflowFinalizeLifecycleEvent{" +
-                "workflow=" + workflowExecutionRunnable.getName() +
+                "workflow=" + workflowExecution.getName() +
                 '}';
     }
 }

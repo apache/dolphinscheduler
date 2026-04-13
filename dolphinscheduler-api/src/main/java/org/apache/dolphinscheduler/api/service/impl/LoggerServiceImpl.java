@@ -47,9 +47,6 @@ import org.springframework.stereotype.Service;
 
 import com.google.common.primitives.Bytes;
 
-/**
- * logger service impl
- */
 @Service
 @Slf4j
 public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService {

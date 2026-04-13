@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -59,11 +59,11 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
     /**
      * Dispatch task to the worker group with the specified remaining time.
      */
-    public void dispatchTask(final ITaskExecutionRunnable taskExecutionRunnable,
+    public void dispatchTask(final ITaskExecution taskExecution,
                              final long delayTimeMills) {
-        final String workerGroup = taskExecutionRunnable.getTaskInstance().getWorkerGroup();
-        getOrCreateWorkerGroupDispatcher(workerGroup).dispatchTask(taskExecutionRunnable, delayTimeMills);
-        log.info("Success add Task[id={}] to WorkerGroupDispatcher[name={}]", taskExecutionRunnable.getId(),
+        final String workerGroup = taskExecution.getTaskInstance().getWorkerGroup();
+        getOrCreateWorkerGroupDispatcher(workerGroup).dispatchTask(taskExecution, delayTimeMills);
+        log.info("Success add Task[id={}] to WorkerGroupDispatcher[name={}]", taskExecution.getId(),
                 workerGroup);
     }
 
@@ -71,15 +71,15 @@ public class WorkerGroupDispatcherCoordinator implements AutoCloseable {
      * Remove task from the dispatcher.
      * <p> If the task doesn't exist in the dispatcher, it will return false, this means the task might already be dispatched.
      */
-    public boolean removeTask(ITaskExecutionRunnable taskExecutionRunnable) {
-        final String workerGroup = taskExecutionRunnable.getTaskInstance().getWorkerGroup();
-        boolean removed = getOrCreateWorkerGroupDispatcher(workerGroup).removeTask(taskExecutionRunnable);
+    public boolean removeTask(ITaskExecution taskExecution) {
+        final String workerGroup = taskExecution.getTaskInstance().getWorkerGroup();
+        boolean removed = getOrCreateWorkerGroupDispatcher(workerGroup).removeTask(taskExecution);
         if (removed) {
             log.info("Success removed Task[id={}] from WorkerGroupDispatcher[name={}]",
-                    taskExecutionRunnable.getId(), workerGroup);
+                    taskExecution.getId(), workerGroup);
         } else {
             log.info("Failed to remove Task[id={}] from WorkerGroupDispatcher[name={}], this task has been dispatched",
-                    taskExecutionRunnable.getId(), workerGroup);
+                    taskExecution.getId(), workerGroup);
         }
         return removed;
     }

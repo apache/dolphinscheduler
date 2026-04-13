@@ -81,6 +81,10 @@ export const TASK_TYPES_MAP = {
     alias: 'AmazonEMR',
     helperLinkDisable: true
   },
+  EMR_SERVERLESS: {
+    alias: 'AmazonEMRServerless',
+    helperLinkDisable: true
+  },
   ZEPPELIN: {
     alias: 'ZEPPELIN',
     helperLinkDisable: true

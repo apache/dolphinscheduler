@@ -55,35 +55,17 @@ import com.google.common.base.Strings;
 @TableName("t_ds_task_definition")
 public class TaskDefinition {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * code
-     */
     private long code;
 
-    /**
-     * name
-     */
     private String name;
 
-    /**
-     * version
-     */
     private int version;
 
-    /**
-     * description
-     */
     private String description;
 
-    /**
-     * project code
-     */
     private long projectCode;
 
     /**
@@ -91,9 +73,6 @@ public class TaskDefinition {
      */
     private int userId;
 
-    /**
-     * task type
-     */
     private String taskType;
 
     /**
@@ -121,51 +100,24 @@ public class TaskDefinition {
      */
     private Flag flag;
 
-    /**
-     * task priority
-     */
     private Priority taskPriority;
 
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
 
-    /**
-     * project name
-     */
     @TableField(exist = false)
     private String projectName;
 
-    /**
-     * worker group
-     */
     private String workerGroup;
 
-    /**
-     * environment code
-     */
     private long environmentCode;
 
-    /**
-     * fail retry times
-     */
     private int failRetryTimes;
 
-    /**
-     * fail retry interval
-     */
     private int failRetryInterval;
 
-    /**
-     * timeout flag
-     */
     private TimeoutFlag timeoutFlag;
 
-    /**
-     * timeout notify strategy
-     */
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private TaskTimeoutStrategy timeoutNotifyStrategy;
 
@@ -185,14 +137,8 @@ public class TaskDefinition {
     @Deprecated
     private String resourceIds;
 
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 
     /**
@@ -201,18 +147,12 @@ public class TaskDefinition {
     @TableField(exist = false)
     private String modifyBy;
 
-    /**
-     * task group id
-     */
     private int taskGroupId;
     /**
      * task group priority, todo: we should add this field to task instance when create task instance
      */
     private int taskGroupPriority;
 
-    /**
-     * cpu quota
-     */
     private Integer cpuQuota;
 
     /**
@@ -220,9 +160,6 @@ public class TaskDefinition {
      */
     private Integer memoryMax;
 
-    /**
-     * task execute type
-     */
     private TaskExecuteType taskExecuteType;
 
     public TaskDefinition(long code, int version) {

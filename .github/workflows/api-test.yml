@@ -121,6 +121,8 @@ jobs:
             class: org.apache.dolphinscheduler.api.test.cases.OidcLoginAPITest
           - name: DependentTaskAPITest
             class: org.apache.dolphinscheduler.api.test.cases.tasks.DependentTaskAPITest
+          - name: EmrServerlessTaskAPITest
+            class: org.apache.dolphinscheduler.api.test.cases.tasks.EmrServerlessTaskAPITest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:

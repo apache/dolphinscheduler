@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,10 +29,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class WorkflowSucceedLifecycleEvent extends AbstractWorkflowLifecycleLifecycleEvent {
 
-    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
+    private final IWorkflowExecution workflowExecution;
 
-    public static WorkflowSucceedLifecycleEvent of(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        return new WorkflowSucceedLifecycleEvent(workflowExecutionRunnable);
+    public static WorkflowSucceedLifecycleEvent of(final IWorkflowExecution workflowExecution) {
+        return new WorkflowSucceedLifecycleEvent(workflowExecution);
     }
 
     @Override
@@ -42,7 +42,7 @@ public class WorkflowSucceedLifecycleEvent extends AbstractWorkflowLifecycleLife
 
     public String toString() {
         return "WorkflowSucceedLifecycleEvent{" +
-                "workflow=" + workflowExecutionRunnable.getName() +
+                "workflow=" + workflowExecution.getName() +
                 '}';
     }
 }

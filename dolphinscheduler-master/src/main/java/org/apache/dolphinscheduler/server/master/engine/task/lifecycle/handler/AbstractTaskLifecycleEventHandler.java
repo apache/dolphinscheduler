@@ -19,11 +19,11 @@ package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventHandler;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.TaskStateActionFactory;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,21 +38,21 @@ public abstract class AbstractTaskLifecycleEventHandler<T extends AbstractTaskLi
     protected TaskStateActionFactory taskStateActionFactory;
 
     @Override
-    public void handle(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public void handle(final IWorkflowExecution workflowExecution,
                        final T event) {
-        final ITaskExecutionRunnable taskExecutionRunnable = event.getTaskExecutionRunnable();
-        final TaskExecutionStatus state = taskExecutionRunnable.getTaskInstance().getState();
+        final ITaskExecution taskExecution = event.getTaskExecution();
+        final TaskExecutionStatus state = taskExecution.getTaskInstance().getState();
         final ITaskStateAction taskStateAction = taskStateActionFactory.getTaskStateAction(state);
-        handle(taskStateAction, workflowExecutionRunnable, taskExecutionRunnable, event);
+        handle(taskStateAction, workflowExecution, taskExecution, event);
         log.info("Fired task {} {} with state {}",
-                taskExecutionRunnable.getName(),
+                taskExecution.getName(),
                 event,
                 state.name());
     }
 
     public abstract void handle(final ITaskStateAction taskStateAction,
-                                final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                final ITaskExecutionRunnable taskExecutionRunnable,
+                                final IWorkflowExecution workflowExecution,
+                                final ITaskExecution taskExecution,
                                 final T event);
 
 }

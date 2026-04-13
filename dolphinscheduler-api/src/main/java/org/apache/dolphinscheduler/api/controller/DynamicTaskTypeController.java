@@ -43,9 +43,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * dynamic task type controller
- */
 @Tag(name = "DYNAMIC_TASK_TYPE")
 @RestController
 @RequestMapping("/dynamic")

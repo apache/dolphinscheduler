@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.task.executor;
 
+import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorNotFoundException;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorRuntimeException;
+
+import java.util.List;
 
 /**
  * The TaskEngine interface used to responsible for task runtime.
@@ -29,6 +32,13 @@ public interface ITaskEngine extends AutoCloseable {
      * Start the task engine.
      */
     void start();
+
+    /**
+     * Query all task executors info.
+     *
+     * @return list of task executor DTOs
+     */
+    List<TaskExecutorDTO> queryTaskExecutors();
 
     /**
      * Submit the task to the task engine.

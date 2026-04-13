@@ -381,6 +381,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .failureStrategy(FailureStrategy.CONTINUE)
                 .build();
         final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
@@ -610,6 +611,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .failureStrategy(FailureStrategy.CONTINUE)
                 .build();
         final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
@@ -634,6 +636,45 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+                });
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with shared downstream task when failed predecessor finishes first using continue failure strategy")
+    void testStartWorkflow_with_sharedDownstreamTask_whenFailedPredecessorFinishFirst_usingFailureStrategyContinue() {
+        final String yaml =
+                "/it/start/workflow_with_shared_downstream_task_when_failed_predecessor_finish_first.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(parentWorkflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .failureStrategy(FailureStrategy.CONTINUE)
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE)
+                            .matches(workflowInstance -> workflowInstance.getEndTime() != null);
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .hasSize(2)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("B");
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });

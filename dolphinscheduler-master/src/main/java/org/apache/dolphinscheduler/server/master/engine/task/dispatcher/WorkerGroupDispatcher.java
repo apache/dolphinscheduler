@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.config.TaskDispatchPolicy;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
 import java.util.Date;
@@ -48,7 +48,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
 
     private final ITaskExecutorClient taskExecutorClient;
 
-    private final TaskDispatchableEventBus<TaskDispatchableEvent<ITaskExecutionRunnable>, ITaskExecutionRunnable> workerGroupEventBus;
+    private final TaskDispatchableEventBus<TaskDispatchableEvent<ITaskExecution>, ITaskExecution> workerGroupEventBus;
 
     private final Set<Integer> waitingDispatchTaskIds;
 
@@ -87,22 +87,22 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     @Override
     public void run() {
         while (runningFlag.get()) {
-            TaskDispatchableEvent<ITaskExecutionRunnable> taskEntry = workerGroupEventBus.take();
-            ITaskExecutionRunnable taskExecutionRunnable = taskEntry.getData();
+            TaskDispatchableEvent<ITaskExecution> taskEntry = workerGroupEventBus.take();
+            ITaskExecution taskExecution = taskEntry.getData();
             try (
                     TaskExecutorMDCUtils.MDCAutoClosable ignore =
-                            TaskExecutorMDCUtils.logWithMDC(taskExecutionRunnable.getId())) {
-                LogUtils.setWorkflowInstanceIdMDC(taskExecutionRunnable.getTaskInstance().getWorkflowInstanceId());
-                doDispatchTask(taskExecutionRunnable);
+                            TaskExecutorMDCUtils.logWithMDC(taskExecution.getId())) {
+                LogUtils.setWorkflowInstanceIdMDC(taskExecution.getTaskInstance().getWorkflowInstanceId());
+                doDispatchTask(taskExecution);
             } finally {
                 LogUtils.removeWorkflowInstanceIdMDC();
             }
         }
     }
 
-    private void doDispatchTask(ITaskExecutionRunnable taskExecutionRunnable) {
-        final int taskInstanceId = taskExecutionRunnable.getId();
-        final TaskExecutionContext taskExecutionContext = taskExecutionRunnable.getTaskExecutionContext();
+    private void doDispatchTask(ITaskExecution taskExecution) {
+        final int taskInstanceId = taskExecution.getId();
+        final TaskExecutionContext taskExecutionContext = taskExecution.getTaskExecutionContext();
         try {
             if (!waitingDispatchTaskIds.remove(taskInstanceId)) {
                 log.info(
@@ -110,13 +110,13 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
                         taskInstanceId);
                 return;
             }
-            taskExecutorClient.dispatch(taskExecutionRunnable);
+            taskExecutorClient.dispatch(taskExecution);
         } catch (Exception ex) {
             if (taskDispatchPolicy.isDispatchTimeoutEnabled()) {
                 // If a dispatch timeout occurs, the task will not be put back into the queue.
                 long elapsed = System.currentTimeMillis() - taskExecutionContext.getFirstDispatchTime();
                 if (elapsed > maxTaskDispatchMillis) {
-                    onDispatchTimeout(taskExecutionRunnable, ex, elapsed, maxTaskDispatchMillis);
+                    onDispatchTimeout(taskExecution, ex, elapsed, maxTaskDispatchMillis);
                     return;
                 }
             }
@@ -125,8 +125,8 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
             // The task will be dispatched after waiting time.
             // the waiting time will increase multiple of times, but will not exceed 60 seconds
             long waitingTimeMillis = Math.min(
-                    taskExecutionRunnable.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
-            dispatchTask(taskExecutionRunnable, waitingTimeMillis);
+                    taskExecution.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
+            dispatchTask(taskExecution, waitingTimeMillis);
             log.warn("Dispatch Task: {} failed will retry after: {}/ms", taskInstanceId,
                     waitingTimeMillis, ex);
         }
@@ -136,17 +136,17 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
      * Marks a task as permanently failed due to dispatch timeout.
      * Once called, the task is considered permanently failed and will not be retried.
      */
-    private void onDispatchTimeout(ITaskExecutionRunnable taskExecutionRunnable, Exception ex,
+    private void onDispatchTimeout(ITaskExecution taskExecution, Exception ex,
                                    long elapsed, long timeout) {
-        String taskName = taskExecutionRunnable.getName();
+        String taskName = taskExecution.getName();
         log.error("Task: {} dispatch timeout after {}ms (limit: {}ms)",
                 taskName, elapsed, timeout, ex);
 
         final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
-                .taskExecutionRunnable(taskExecutionRunnable)
+                .taskExecution(taskExecution)
                 .endTime(new Date())
                 .build();
-        taskExecutionRunnable.getWorkflowEventBus().publish(taskFailedEvent);
+        taskExecution.getWorkflowEventBus().publish(taskFailedEvent);
     }
 
     /**
@@ -155,21 +155,21 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
      * The task is only added if the current dispatcher status is either STARTED or INIT. If the dispatcher is in any other state,
      * the task addition will fail, and a warning message will be logged.
      *
-     * @param taskExecutionRunnable The task execution object to add to the queue, which implements the {@link ITaskExecutionRunnable} interface.
+     * @param taskExecution The task execution object to add to the queue, which implements the {@link ITaskExecution} interface.
      * @param delayTimeMills        The delay time in milliseconds before the task should be executed.
      */
-    public void dispatchTask(final ITaskExecutionRunnable taskExecutionRunnable, final long delayTimeMills) {
-        waitingDispatchTaskIds.add(taskExecutionRunnable.getId());
-        workerGroupEventBus.add(new TaskDispatchableEvent<>(delayTimeMills, taskExecutionRunnable,
-                taskExecutionRunnable.getTaskExecutionContext().getDispatchFailTimes()));
+    public void dispatchTask(final ITaskExecution taskExecution, final long delayTimeMills) {
+        waitingDispatchTaskIds.add(taskExecution.getId());
+        workerGroupEventBus.add(new TaskDispatchableEvent<>(delayTimeMills, taskExecution,
+                taskExecution.getTaskExecutionContext().getDispatchFailTimes()));
     }
 
-    public boolean removeTask(ITaskExecutionRunnable taskExecutionRunnable) {
-        return waitingDispatchTaskIds.remove(taskExecutionRunnable.getId());
+    public boolean removeTask(ITaskExecution taskExecution) {
+        return waitingDispatchTaskIds.remove(taskExecution.getId());
     }
 
-    public boolean existTask(ITaskExecutionRunnable taskExecutionRunnable) {
-        return waitingDispatchTaskIds.contains(taskExecutionRunnable.getId());
+    public boolean existTask(ITaskExecution taskExecution) {
+        return waitingDispatchTaskIds.contains(taskExecution.getId());
     }
 
     public synchronized void close() {

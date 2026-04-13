@@ -26,8 +26,4 @@ public class H2Dialect implements DatabaseDialect {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean columnExists(String tableName, String columnName) {
-        throw new UnsupportedOperationException();
-    }
 }
