@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,9 +46,6 @@ class MessageServiceImplTest {
 
     @Mock
     private CommandMapper commandMapper;
-
-    @Mock
-    private WorkflowDefinitionMapper processDefineMapper;
 
     @Mock
     private ScheduleMapper scheduleMapper;
