@@ -255,7 +255,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
         log.info("Worker[{}] failover {} tasks finished, cost: {}/ms",
                 workerAddress,
                 needFailoverTasks.size(),
-                failoverTimeCost.getTime());
+                failoverTimeCost.getDuration());
     }
 
     private List<ITaskExecution> getFailoverTaskForWorker(final String workerAddress,

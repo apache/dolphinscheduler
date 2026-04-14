@@ -40,6 +40,7 @@ public class TaskFailoverLifecycleEvent extends AbstractTaskLifecycleEvent {
         return TaskLifecycleEventType.FAILOVER;
     }
 
+    @Override
     public String toString() {
         return "TaskFailoverLifecycleEvent{" +
                 "task=" + taskExecution.getName() +
