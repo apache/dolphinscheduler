@@ -58,10 +58,6 @@ public enum TaskExecutionStatus {
         return taskExecutionStatus;
     }
 
-    public boolean isRunning() {
-        return this == RUNNING_EXECUTION;
-    }
-
     public boolean isSuccess() {
         return this == TaskExecutionStatus.SUCCESS;
     }
@@ -84,17 +80,6 @@ public enum TaskExecutionStatus {
 
     public boolean isFinished() {
         return isSuccess() || isKill() || isFailure() || isPause() || isForceSuccess();
-    }
-
-    public boolean isNeedFaultTolerance() {
-        return this == NEED_FAULT_TOLERANCE;
-    }
-
-    public boolean shouldFailover() {
-        return SUBMITTED_SUCCESS == this
-                || DISPATCH == this
-                || RUNNING_EXECUTION == this
-                || DELAY_EXECUTION == this;
     }
 
     @EnumValue

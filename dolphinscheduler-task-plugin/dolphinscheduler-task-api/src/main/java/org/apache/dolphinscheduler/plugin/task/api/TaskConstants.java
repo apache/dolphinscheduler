@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.common.constants.DateConstants;
 
-import java.time.Duration;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -42,30 +41,16 @@ public class TaskConstants {
     public static final int EXIT_CODE_HARD_KILL = 143;
     public static final String PID = "pid";
 
-    public static final String QUESTION = "?";
-
     public static final String COMMA = ",";
 
     public static final String HYPHEN = "-";
 
-    public static final String SLASH = "/";
-
-    public static final String COLON = ":";
-
     public static final String SPACE = " ";
-
-    public static final String SINGLE_SLASH = "/";
-
-    public static final String DOUBLE_SLASH = "//";
 
     public static final String SINGLE_QUOTES = "'";
     public static final String DOUBLE_QUOTES = "\"";
 
-    public static final String SEMICOLON = ";";
-
     public static final String EQUAL_SIGN = "=";
-
-    public static final String UNDERLINE = "_";
 
     /**
      * sleep time
@@ -76,13 +61,6 @@ public class TaskConstants {
 
     public static final int EXIT_CODE_SUCCESS = 0;
     public static final int RUNNING_CODE = 1;
-
-    public static final String SH = "sh";
-
-    /**
-     * log flush interval?output when reach the interval
-     */
-    public static final int DEFAULT_LOG_FLUSH_INTERVAL = 1000;
 
     /**
      * pstree, get pud and sub pid
@@ -106,16 +84,6 @@ public class TaskConstants {
      * system date(yyyyMMddHHmmss)
      */
     public static final String PARAMETER_DATETIME = DateConstants.PARAMETER_DATETIME;
-
-    /**
-     * system date(yyyymmdd) today
-     */
-    public static final String PARAMETER_CURRENT_DATE = DateConstants.PARAMETER_CURRENT_DATE;
-
-    /**
-     * system date(yyyymmdd) yesterday
-     */
-    public static final String PARAMETER_BUSINESS_DATE = DateConstants.PARAMETER_BUSINESS_DATE;
 
     /**
      * the absolute path of current executing task
@@ -194,7 +162,6 @@ public class TaskConstants {
     public static final String SUBTRACT_STRING = "-";
     public static final String LOCAL_PARAMS_LIST = "localParamsList";
     public static final String TASK_TYPE = "taskType";
-    public static final String QUEUE = "queue";
     public static final int DEFAULT_DISPLAY_ROWS = 10;
 
     public static final String JAR = "jar";
@@ -215,8 +182,6 @@ public class TaskConstants {
      */
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
             "hadoop.security.authentication.startup.state";
-
-    public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
 
     public static final Set<String> TASK_TYPE_SET_K8S = Sets.newHashSet("K8S", "KUBEFLOW");
 
@@ -242,7 +207,6 @@ public class TaskConstants {
     public static final String TASK_INSTANCE_ID = "taskInstanceId";
     public static final String MI = "Mi";
     public static final int JOB_TTL_SECONDS = 300;
-    public static final int LOG_LINES = 500;
     public static final String NAMESPACE_NAME = "name";
     public static final String CLUSTER = "cluster";
 
@@ -255,9 +219,6 @@ public class TaskConstants {
      * conda config used by jupyter task plugin
      */
     public static final String CONDA_PATH = "conda.path";
-
-    // Loop task constants
-    public static final Duration DEFAULT_LOOP_STATUS_INTERVAL = Duration.ofSeconds(5L);
 
     /**
      * sql params regex
@@ -281,6 +242,6 @@ public class TaskConstants {
     public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
     public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
 
-    public static final String STAR = "*";
     public static final String SENSITIVE_DATA_MASK = "******";
+
 }

@@ -19,10 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.aliyunserverlessspark;
 
 public class AliyunServerlessSparkTaskException extends RuntimeException {
 
-    public AliyunServerlessSparkTaskException() {
-        super();
-    }
-
     public AliyunServerlessSparkTaskException(String message) {
         super(message);
     }

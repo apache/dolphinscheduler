@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -29,8 +28,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -41,11 +38,6 @@ public class FlinkTask extends AbstractYarnTask {
     private FlinkParameters flinkParameters;
 
     private TaskExecutionContext taskExecutionContext;
-
-    /**
-     * rules for flink application ID
-     */
-    protected static final Pattern FLINK_APPLICATION_REGEX = Pattern.compile(TaskConstants.FLINK_APPLICATION_REGEX);
 
     public FlinkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -103,18 +95,4 @@ public class FlinkTask extends AbstractYarnTask {
         return flinkParameters;
     }
 
-    /**
-     * find app id
-     *
-     * @param line line
-     * @return appid
-     */
-    protected String findAppId(String line) {
-        Matcher matcher = FLINK_APPLICATION_REGEX.matcher(line);
-        if (matcher.find()) {
-            String str = matcher.group();
-            return str.substring(6);
-        }
-        return null;
-    }
 }

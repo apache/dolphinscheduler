@@ -22,10 +22,6 @@ package org.apache.dolphinscheduler.plugin.task.sagemaker;
  */
 public class SagemakerTaskException extends RuntimeException {
 
-    public SagemakerTaskException() {
-        super();
-    }
-
     public SagemakerTaskException(String message) {
         super(message);
     }
@@ -33,4 +29,5 @@ public class SagemakerTaskException extends RuntimeException {
     public SagemakerTaskException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

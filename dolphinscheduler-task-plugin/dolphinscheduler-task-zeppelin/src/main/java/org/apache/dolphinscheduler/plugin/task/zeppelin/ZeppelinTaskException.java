@@ -22,15 +22,8 @@ package org.apache.dolphinscheduler.plugin.task.zeppelin;
  */
 public class ZeppelinTaskException extends RuntimeException {
 
-    public ZeppelinTaskException() {
-        super();
-    }
-
     public ZeppelinTaskException(String message) {
         super(message);
     }
 
-    public ZeppelinTaskException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

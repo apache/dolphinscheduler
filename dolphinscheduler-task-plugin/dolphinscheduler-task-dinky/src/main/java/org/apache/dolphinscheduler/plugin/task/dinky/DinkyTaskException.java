@@ -22,15 +22,8 @@ package org.apache.dolphinscheduler.plugin.task.dinky;
  */
 public class DinkyTaskException extends RuntimeException {
 
-    public DinkyTaskException() {
-        super();
-    }
-
     public DinkyTaskException(String message) {
         super(message);
     }
 
-    public DinkyTaskException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

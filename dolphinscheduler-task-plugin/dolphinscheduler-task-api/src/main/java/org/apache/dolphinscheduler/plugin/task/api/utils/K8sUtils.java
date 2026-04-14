@@ -17,14 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.LOG_LINES;
-
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
-import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
@@ -81,27 +76,6 @@ public class K8sUtils {
         } catch (Exception e) {
             throw new TaskException("fail to register batch job watcher", e);
         }
-    }
-
-    public String getPodLog(String jobName, String namespace) {
-        try {
-            List<Pod> podList = client.pods().inNamespace(namespace).list().getItems();
-            String podName = null;
-            for (Pod pod : podList) {
-                podName = pod.getMetadata().getName();
-                if (podName.contains("-") && jobName.equals(podName.substring(0, podName.lastIndexOf("-")))) {
-                    break;
-                }
-            }
-            return client.pods().inNamespace(namespace)
-                    .withName(podName)
-                    .tailingLines(LOG_LINES)
-                    .getLog(Boolean.TRUE);
-        } catch (Exception e) {
-            log.error("fail to getPodLog", e);
-            log.error("response bodies : {}", e.getMessage());
-        }
-        return null;
     }
 
     public void buildClient(String configYaml) {

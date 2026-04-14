@@ -58,16 +58,6 @@ public class PropertyPlaceholderHelper {
 
     /**
      * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
-     * Unresolvable placeholders are ignored.
-     * @param placeholderPrefix the prefix that denotes the start of a placeholder
-     * @param placeholderSuffix the suffix that denotes the end of a placeholder
-     */
-    public PropertyPlaceholderHelper(String placeholderPrefix, String placeholderSuffix) {
-        this(placeholderPrefix, placeholderSuffix, null, true);
-    }
-
-    /**
-     * Creates a new {@code PropertyPlaceholderHelper} that uses the supplied prefix and suffix.
      * @param placeholderPrefix the prefix that denotes the start of a placeholder
      * @param placeholderSuffix the suffix that denotes the end of a placeholder
      * @param valueSeparator the separating character between the placeholder variable
@@ -90,24 +80,6 @@ public class PropertyPlaceholderHelper {
         }
         this.valueSeparator = valueSeparator;
         this.ignoreUnresolvablePlaceholders = ignoreUnresolvablePlaceholders;
-    }
-
-    /**
-     * Replaces all placeholders of format {@code ${name}} with the corresponding
-     * property from the supplied {@link Properties}.
-     * @param value the value containing the placeholders to be replaced
-     * @param properties the {@code Properties} to use for replacement
-     * @return the supplied value with placeholders replaced inline
-     */
-    public String replacePlaceholders(String value, final Properties properties) {
-        notNull(properties, "'properties' must not be null");
-        return replacePlaceholders(value, new PlaceholderResolver() {
-
-            @Override
-            public String resolvePlaceholder(String placeholderName) {
-                return properties.getProperty(placeholderName);
-            }
-        });
     }
 
     /**

@@ -55,13 +55,6 @@ public class TaskTimeoutParameter {
         this.interval = interval;
     }
 
-    public TaskTimeoutParameter() {
-    }
-
-    public TaskTimeoutParameter(boolean enable) {
-        this.enable = enable;
-    }
-
     public TaskTimeoutParameter(boolean enable, TaskTimeoutStrategy strategy, int interval) {
         this.enable = enable;
         this.strategy = strategy;

@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.SINGLE_QUOTES;
-
 public class ArgsUtils {
 
     private ArgsUtils() throws IllegalStateException {
@@ -27,10 +25,6 @@ public class ArgsUtils {
 
     public static String escape(String arg) {
         return arg.replace(" ", "\\ ").replace("\"", "\\\"").replace("'", "\\'");
-    }
-
-    public static String wrapperSingleQuotes(String value) {
-        return SINGLE_QUOTES + value + SINGLE_QUOTES;
     }
 
 }

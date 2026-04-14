@@ -92,8 +92,6 @@ public class SparkConstants {
 
     public static final String SPARK_SUBMIT_COMMAND = "${SPARK_HOME}/bin/spark-submit";
 
-    public static final String TYPE_SCRIPT = "SCRIPT";
-
     public static final String TYPE_FILE = "FILE";
 
 }

@@ -79,13 +79,6 @@ public class SqlTask extends AbstractTask {
     private BaseConnectionParam baseConnectionParam;
 
     /**
-     * create function format
-     * include replace here which can be compatible with more cases, for example a long-running Spark session in Kyuubi will keep its own temp functions instead of destroying them right away
-     */
-    private static final String CREATE_OR_REPLACE_FUNCTION_FORMAT =
-            "create or replace temporary function {0} as ''{1}''";
-
-    /**
      * default query sql limit
      */
     private static final int QUERY_LIMIT = 10000;
@@ -393,12 +386,10 @@ public class SqlTask extends AbstractTask {
     /**
      * print replace sql
      *
-     * @param content      content
      * @param formatSql    format sql
-     * @param rgex         rgex
      * @param sqlParamsMap sql params map
      */
-    private void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
+    private void printReplacedSql(String formatSql, Map<Integer, Property> sqlParamsMap) {
         // parameter print style
         log.info("after replace sql , preparing : {}", formatSql);
         StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
@@ -480,7 +471,7 @@ public class SqlTask extends AbstractTask {
         String formatSql = ParameterUtils.expandListParameter(sqlParamsMap, sql);
         sqlBuilder.append(formatSql);
         // print replace sql
-        printReplacedSql(sql, formatSql, TaskConstants.SQL_PARAMS_REGEX, sqlParamsMap);
+        printReplacedSql(formatSql, sqlParamsMap);
         return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
     }
 

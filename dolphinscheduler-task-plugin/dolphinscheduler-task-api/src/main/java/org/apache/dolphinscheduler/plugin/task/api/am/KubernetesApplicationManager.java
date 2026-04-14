@@ -51,7 +51,6 @@ import io.fabric8.kubernetes.client.dsl.PodResource;
 public class KubernetesApplicationManager implements ApplicationManager<KubernetesApplicationManagerContext> {
 
     private static final String PENDING = "Pending";
-    private static final String RUNNING = "Running";
     private static final String FINISH = "Succeeded";
     private static final String FAILED = "Failed";
     private static final String UNKNOWN = "Unknown";

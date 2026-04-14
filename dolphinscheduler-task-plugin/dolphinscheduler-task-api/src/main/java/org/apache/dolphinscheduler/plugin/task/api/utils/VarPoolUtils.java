@@ -101,15 +101,6 @@ public class VarPoolUtils {
         return new ArrayList<>(result.values());
     }
 
-    public String subtractVarPoolJson(String varPool, List<String> subtractVarPool) {
-        List<Property> varPoolList = deserializeVarPool(varPool);
-        List<List<Property>> subtractVarPoolList = subtractVarPool.stream()
-                .map(VarPoolUtils::deserializeVarPool)
-                .collect(Collectors.toList());
-        List<Property> finalVarPool = subtractVarPool(varPoolList, subtractVarPoolList);
-        return JSONUtils.toJsonString(finalVarPool);
-    }
-
     /**
      * Return the subtracted varpool, which key is in varPool but not in subtractVarPool.
      */
