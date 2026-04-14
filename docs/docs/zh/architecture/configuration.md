@@ -26,7 +26,6 @@ DolphinScheduler的目录结构如下：
 │   │   └── jvm_args_env.sh                     DolphinScheduler alert-server jvm参数配置脚本
 │   ├── conf
 │   │   ├── application.yaml                    alert-server配置文件
-│   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
 │   │   ├── common.properties                   公共服务（存储等信息）配置文件
 │   │   ├── dolphinscheduler_env.sh             alert-server环境变量配置加载脚本
 │   │   └── logback-spring.xml                  alert-service日志配置文件
@@ -38,7 +37,6 @@ DolphinScheduler的目录结构如下：
 │   │   └── jvm_args_env.sh                     DolphinScheduler api-server jvm参数配置脚本
 │   ├── conf
 │   │   ├── application.yaml                    api-server配置文件
-│   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
 │   │   ├── common.properties                   公共服务（存储等信息）配置文件
 │   │   ├── dolphinscheduler_env.sh             api-server环境变量配置加载脚本
 │   │   └── logback-spring.xml                  api-service日志配置文件
@@ -51,7 +49,6 @@ DolphinScheduler的目录结构如下：
 │   │   └── jvm_args_env.sh                     DolphinScheduler master-server jvm参数配置脚本
 │   ├── conf
 │   │   ├── application.yaml                    master-server配置文件
-│   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
 │   │   ├── common.properties                   公共服务（存储等信息）配置文件
 │   │   ├── dolphinscheduler_env.sh             master-server环境变量配置加载脚本
 │   │   └── logback-spring.xml                  master-service日志配置文件
@@ -63,7 +60,6 @@ DolphinScheduler的目录结构如下：
 │   │   └── jvm_args_env.sh                     DolphinScheduler standalone-server jvm参数配置脚本
 │   ├── conf
 │   │   ├── application.yaml                    standalone-server配置文件
-│   │   ├── bootstrap.yaml                      Spring Cloud 启动阶段配置文件, 通常不需要修改
 │   │   ├── common.properties                   公共服务（存储等信息）配置文件
 │   │   ├── dolphinscheduler_env.sh             standalone-server环境变量配置加载脚本
 │   │   ├── logback-spring.xml                  standalone-service日志配置文件
@@ -88,7 +84,6 @@ DolphinScheduler的目录结构如下：
 │   │   └── jvm_args_env.sh                 DolphinScheduler worker-server jvm参数配置脚本
 │   ├── conf
 │   │   ├── application.yaml                worker-server配置文件
-│   │   ├── bootstrap.yaml                  Spring Cloud 启动阶段配置文件, 通常不需要修改
 │   │   ├── common.properties               公共服务（存储等信息）配置文件
 │   │   ├── dolphinscheduler_env.sh         worker-server环境变量配置加载脚本
 │   │   └── logback-spring.xml              worker-service日志配置文件
