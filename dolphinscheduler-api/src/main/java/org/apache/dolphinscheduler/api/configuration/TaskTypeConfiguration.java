@@ -26,8 +26,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -39,8 +38,7 @@ import org.springframework.stereotype.Component;
 @EnableConfigurationProperties
 @PropertySource(value = {"classpath:task-type-config.yaml"}, factory = YamlPropertySourceFactory.class)
 @ConfigurationProperties(prefix = "task")
-@Getter
-@Setter
+@Data
 @Slf4j
 public class TaskTypeConfiguration {
 

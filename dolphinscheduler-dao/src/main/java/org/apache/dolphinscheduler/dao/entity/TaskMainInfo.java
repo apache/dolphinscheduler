@@ -24,32 +24,17 @@ import java.util.Map;
 
 import lombok.Data;
 
-/**
- * task main info
- */
 @Data
 public class TaskMainInfo {
 
     private long id;
 
-    /**
-     * task name
-     */
     private String taskName;
 
-    /**
-     * task code
-     */
     private long taskCode;
 
-    /**
-     * task version
-     */
     private int taskVersion;
 
-    /**
-     * task type
-     */
     private String taskType;
 
     /**
@@ -62,29 +47,14 @@ public class TaskMainInfo {
      */
     private Date taskUpdateTime;
 
-    /**
-     * projectCode
-     */
     private long projectCode;
 
-    /**
-     * processDefinitionCode
-     */
     private long processDefinitionCode;
 
-    /**
-     * processDefinitionVersion
-     */
     private int processDefinitionVersion;
 
-    /**
-     * processDefinitionName
-     */
     private String processDefinitionName;
 
-    /**
-     * processReleaseState
-     */
     private ReleaseState processReleaseState;
 
     /**
@@ -92,13 +62,7 @@ public class TaskMainInfo {
      */
     private Map<Long, String> upstreamTaskMap;
 
-    /**
-     * upstreamTaskCode
-     */
     private long upstreamTaskCode;
 
-    /**
-     * upstreamTaskName
-     */
     private String upstreamTaskName;
 }

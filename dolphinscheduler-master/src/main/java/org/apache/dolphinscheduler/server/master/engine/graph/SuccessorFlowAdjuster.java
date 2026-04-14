@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.condition.ConditionLogicTask;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.switchtask.SwitchLogicTask;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -52,12 +52,12 @@ public class SuccessorFlowAdjuster {
      * <p> If the task {@link ConditionLogicTask}, then will adjust the flow according to the condition result.
      * <p> If the task {@link SwitchLogicTask}, then will adjust the flow according to the switch result.
      */
-    public void adjustSuccessorFlow(final ITaskExecutionRunnable taskExecutionRunnable) {
-        final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
+    public void adjustSuccessorFlow(final ITaskExecution taskExecution) {
+        final IWorkflowExecutionGraph workflowExecutionGraph = taskExecution.getWorkflowExecutionGraph();
 
-        if (workflowExecutionGraph.isTaskExecutionRunnableSkipped(taskExecutionRunnable)) {
+        if (workflowExecutionGraph.isTaskExecutionSkipped(taskExecution)) {
             // If the successor flow's all parent is skipped, then mark the successor skipped.
-            for (ITaskExecutionRunnable successor : workflowExecutionGraph.getSuccessors(taskExecutionRunnable)) {
+            for (ITaskExecution successor : workflowExecutionGraph.getSuccessors(taskExecution)) {
                 if (workflowExecutionGraph.isAllPredecessorsSkipped(successor)) {
                     workflowExecutionGraph.markTaskSkipped(successor);
                 }
@@ -65,24 +65,24 @@ public class SuccessorFlowAdjuster {
             return;
         }
 
-        if (workflowExecutionGraph.isTaskExecutionRunnableForbidden(taskExecutionRunnable)) {
+        if (workflowExecutionGraph.isTaskExecutionForbidden(taskExecution)) {
             return;
         }
 
-        final String taskType = taskExecutionRunnable.getTaskInstance().getTaskType();
+        final String taskType = taskExecution.getTaskInstance().getTaskType();
         if (TaskTypeUtils.isConditionTask(taskType)) {
-            adjustConditionTaskSuccessorFlow(taskExecutionRunnable);
+            adjustConditionTaskSuccessorFlow(taskExecution);
             return;
         }
 
         if (TaskTypeUtils.isSwitchTask(taskType)) {
-            adjustSwitchTaskSuccessorFlow(taskExecutionRunnable);
+            adjustSwitchTaskSuccessorFlow(taskExecution);
             return;
         }
     }
 
-    private void adjustConditionTaskSuccessorFlow(final ITaskExecutionRunnable taskExecutionRunnable) {
-        final String taskParams = taskExecutionRunnable.getTaskInstance().getTaskParams();
+    private void adjustConditionTaskSuccessorFlow(final ITaskExecution taskExecution) {
+        final String taskParams = taskExecution.getTaskInstance().getTaskParams();
         final ConditionsParameters conditionsParameters = JSONUtils.parseObject(taskParams, ConditionsParameters.class);
         if (conditionsParameters == null) {
             throw new IllegalArgumentException("Condition task params: " + taskParams + " is invalid.");
@@ -97,11 +97,11 @@ public class SuccessorFlowAdjuster {
         } else {
             needSkippedBranch = conditionResult.getSuccessNode();
         }
-        markTaskSkipped(taskExecutionRunnable, needSkippedBranch);
+        markTaskSkipped(taskExecution, needSkippedBranch);
     }
 
-    private void adjustSwitchTaskSuccessorFlow(final ITaskExecutionRunnable taskExecutionRunnable) {
-        final String taskParams = taskExecutionRunnable.getTaskInstance().getTaskParams();
+    private void adjustSwitchTaskSuccessorFlow(final ITaskExecution taskExecution) {
+        final String taskParams = taskExecution.getTaskInstance().getTaskParams();
         final SwitchParameters switchParameters = JSONUtils.parseObject(taskParams, SwitchParameters.class);
         if (switchParameters == null) {
             throw new IllegalArgumentException("Switch task params: " + taskParams + " is invalid.");
@@ -120,20 +120,20 @@ public class SuccessorFlowAdjuster {
             }
         }
         needSkippedBranch.remove(switchParameters.getNextBranch());
-        markTaskSkipped(taskExecutionRunnable, needSkippedBranch);
+        markTaskSkipped(taskExecution, needSkippedBranch);
     }
 
-    private void markTaskSkipped(final ITaskExecutionRunnable taskExecutionRunnable,
+    private void markTaskSkipped(final ITaskExecution taskExecution,
                                  final Collection<Long> needSkippedTaskCodes) {
         if (CollectionUtils.isEmpty(needSkippedTaskCodes)) {
             return;
         }
-        final IWorkflowExecutionGraph workflowExecutionGraph = taskExecutionRunnable.getWorkflowExecutionGraph();
+        final IWorkflowExecutionGraph workflowExecutionGraph = taskExecution.getWorkflowExecutionGraph();
         for (Long taskCode : needSkippedTaskCodes) {
-            final ITaskExecutionRunnable branch = workflowExecutionGraph.getTaskExecutionRunnableByTaskCode(taskCode);
+            final ITaskExecution branch = workflowExecutionGraph.getTaskExecutionByTaskCode(taskCode);
             if (branch == null) {
                 log.info("Branch(taskCode={}) is not found in the workflow: {}.", taskCode,
-                        taskExecutionRunnable.getWorkflowInstance().getName());
+                        taskExecution.getWorkflowInstance().getName());
                 continue;
             }
             workflowExecutionGraph.markTaskSkipped(branch);

@@ -21,13 +21,11 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
 @ToString
 public class DatafactoryParameters extends AbstractParameters {

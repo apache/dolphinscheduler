@@ -68,9 +68,6 @@ public class DependentExecute {
 
     private final TaskInstanceDao taskInstanceDao = SpringApplicationContext.getBean(TaskInstanceDao.class);
 
-    /**
-     * depend item list
-     */
     private List<DependentItem> dependItemList;
 
     /**
@@ -82,26 +79,14 @@ public class DependentExecute {
 
     private TaskInstance taskInstance;
 
-    /**
-     * depend result map
-     */
     @Getter
     private Map<String, DependResult> dependResultMap = new HashMap<>();
 
-    /**
-     * process service
-     */
     private final ProcessService processService = SpringApplicationContext.getBean(ProcessService.class);
 
-    /**
-     * task definition log dao
-     */
     private final TaskDefinitionLogDao taskDefinitionLogDao =
             SpringApplicationContext.getBean(TaskDefinitionLogDao.class);
 
-    /**
-     * task definition dao
-     */
     private final TaskDefinitionDao taskDefinitionDao = SpringApplicationContext.getBean(TaskDefinitionDao.class);
 
     @Getter

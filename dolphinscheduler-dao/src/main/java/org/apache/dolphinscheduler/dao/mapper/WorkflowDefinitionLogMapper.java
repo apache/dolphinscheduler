@@ -30,7 +30,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 /**
  * workflow definition log mapper interface
  */
-
 public interface WorkflowDefinitionLogMapper extends BaseMapper<WorkflowDefinitionLog> {
 
     /**
@@ -40,7 +39,6 @@ public interface WorkflowDefinitionLogMapper extends BaseMapper<WorkflowDefiniti
      * @param version version number
      * @return the workflow definition version info
      */
-
     WorkflowDefinitionLog queryByDefinitionCodeAndVersion(@Param("code") long code, @Param("version") int version);
 
     /**

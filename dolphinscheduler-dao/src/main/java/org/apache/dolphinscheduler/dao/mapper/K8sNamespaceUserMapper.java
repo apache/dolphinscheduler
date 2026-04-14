@@ -38,13 +38,4 @@ public interface K8sNamespaceUserMapper extends BaseMapper<K8sNamespaceUser> {
     int deleteNamespaceRelation(@Param("namespaceId") int namespaceId,
                                 @Param("userId") int userId);
 
-    /**
-     * query namespace relation
-     *
-     * @param namespaceId namespaceId
-     * @param userId      userId
-     * @return namespace user relation
-     */
-    K8sNamespaceUser queryNamespaceRelation(@Param("namespaceId") int namespaceId,
-                                            @Param("userId") int userId);
 }

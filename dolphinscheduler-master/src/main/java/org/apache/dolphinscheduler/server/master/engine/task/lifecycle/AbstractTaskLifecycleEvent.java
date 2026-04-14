@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle;
 
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 
 public abstract class AbstractTaskLifecycleEvent extends AbstractLifecycleEvent {
 
@@ -30,6 +30,6 @@ public abstract class AbstractTaskLifecycleEvent extends AbstractLifecycleEvent 
         super(delayTime);
     }
 
-    public abstract ITaskExecutionRunnable getTaskExecutionRunnable();
+    public abstract ITaskExecution getTaskExecution();
 
 }

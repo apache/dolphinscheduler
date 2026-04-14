@@ -17,9 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import lombok.Data;
+
 /**
  * dependent node simplify definition
  */
+@Data
 public class DependentSimplifyDefinition {
 
     /**
@@ -36,28 +39,4 @@ public class DependentSimplifyDefinition {
      * definition version
      */
     private Integer version;
-
-    public Long getCode() {
-        return this.code;
-    }
-
-    public void setCode(Long code) {
-        this.code = code;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getVersion() {
-        return this.version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
 }

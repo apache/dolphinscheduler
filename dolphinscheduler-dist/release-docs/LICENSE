@@ -285,12 +285,7 @@ The text of each license is also included at licenses/LICENSE-[project].txt.
     oshi-core 6.1.1: https://mvnrepository.com/artifact/com.github.oshi/oshi-core/6.1.1, MIT
     classgraph 4.8.147: https://mvnrepository.com/artifact/io.github.classgraph/classgraph/4.8.147, MIT
     bcpkix-jdk15on 1.67: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on/1.67, MIT
-    bcpkix-jdk15on 1.69: https://mvnrepository.com/artifact/org.bouncycastle/bcpkix-jdk15on/1.69, MIT
     bcprov-jdk15on 1.67: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on/1.67, MIT
-    bcprov-jdk15on 1.69: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-jdk15on/1.69, MIT
-    bcprov-ext-jdk15on 1.69: https://mvnrepository.com/artifact/org.bouncycastle/bcprov-ext-jdk15on, MIT
-    bcutil-jdk15on 1.69: https://mvnrepository.com/artifact/org.bouncycastle/bcutil-jdk15on, MIT
-    gson-fire 1.8.5: https://mvnrepository.com/artifact/io.gsonfire/gson-fire/1.8.5, MIT
     reactive-streams 1.0.4: https://mvnrepository.com/artifact/org.reactivestreams/reactive-streams/1.0.4, MIT
     webjars-locator-core 0.50: https://mvnrepository.com/artifact/org.webjars/webjars-locator-core/0.50, MIT
     azure-core 1.36.0: https://mvnrepository.com/artifact/com.azure/azure-core/1.36.0, MIT

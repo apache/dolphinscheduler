@@ -20,15 +20,13 @@ package org.apache.dolphinscheduler.api.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-@Getter
-@Setter
+@Data
 @Configuration
 @ConditionalOnProperty(prefix = "security.authentication.oauth2", name = "enable", havingValue = "true")
 @ConfigurationProperties(prefix = "security.authentication.oauth2")
@@ -36,8 +34,7 @@ public class OAuth2Configuration {
 
     private Map<String, OAuth2ClientProperties> provider = new HashMap<>();
 
-    @Getter
-    @Setter
+    @Data
     public static class OAuth2ClientProperties {
 
         private String authorizationUri;

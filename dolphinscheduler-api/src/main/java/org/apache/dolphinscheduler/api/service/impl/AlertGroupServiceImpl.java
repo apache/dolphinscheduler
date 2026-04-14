@@ -52,9 +52,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * alert group service impl
- */
 @Service
 @Slf4j
 public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroupService {

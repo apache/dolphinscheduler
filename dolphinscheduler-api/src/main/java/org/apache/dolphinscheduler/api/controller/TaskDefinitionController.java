@@ -55,9 +55,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * task definition controller
- */
 @Tag(name = "TASK_DEFINITION_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/task-definition")

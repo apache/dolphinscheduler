@@ -26,9 +26,6 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
-/**
- * queue mapper interface
- */
 public interface QueueMapper extends BaseMapper<Queue> {
 
     /**

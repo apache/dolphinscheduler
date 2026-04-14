@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -66,9 +67,15 @@ public class WorkflowTestCaseContext {
         if (CollectionUtils.isEmpty(workflows)) {
             throw new IllegalStateException("workflows is empty");
         }
-        return workflows.stream()
+        List<WorkflowDefinition> collect = workflows.stream()
                 .filter(workflow -> workflow.getName().equals(name))
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("Workflow with name " + name + " not found"));
+                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(collect)) {
+            throw new IllegalStateException("Workflow with name " + name + " not found");
+        }
+        if (collect.size() > 1) {
+            throw new IllegalStateException("Multiple workflows with name " + name + " found");
+        }
+        return collect.get(0);
     }
 }

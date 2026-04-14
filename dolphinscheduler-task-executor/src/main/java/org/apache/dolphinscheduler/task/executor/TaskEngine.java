@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.task.executor;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainer;
 import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainerProvider;
+import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorEventBusCoordinator;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKillLifecycleEvent;
@@ -26,6 +29,9 @@ import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPauseLifecyc
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorNotFoundException;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorRuntimeException;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,6 +84,24 @@ public class TaskEngine implements ITaskEngine {
         try (final TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskExecutor)) {
             taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorKillLifecycleEvent.of(taskExecutor));
         }
+    }
+
+    @Override
+    public List<TaskExecutorDTO> queryTaskExecutors() {
+        return taskExecutorRepository.getAll().stream()
+                .map(executor -> {
+                    TaskExecutionContext ctx = executor.getTaskExecutionContext();
+                    return TaskExecutorDTO.builder()
+                            .id(ctx.getTaskInstanceId())
+                            .name(ctx.getTaskName())
+                            .taskType(ctx.getTaskType())
+                            .projectCode(ctx.getProjectCode())
+                            .workflowInstanceId(ctx.getWorkflowInstanceId())
+                            .workflowInstanceName(ctx.getWorkflowInstanceName())
+                            .startTime(DateUtils.timeStampToDate(ctx.getStartTime()))
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

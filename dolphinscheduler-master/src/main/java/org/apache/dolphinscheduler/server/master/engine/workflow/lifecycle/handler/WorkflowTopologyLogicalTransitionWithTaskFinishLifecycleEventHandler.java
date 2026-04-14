@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.handler;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.statemachine.IWorkflowStateAction;
 
 import org.springframework.stereotype.Component;
@@ -32,11 +32,11 @@ public class WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEventHandle
 
     @Override
     public void handle(final IWorkflowStateAction workflowStateAction,
-                       final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                       final IWorkflowExecution workflowExecution,
                        final WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent workflowTopologyLogicalTransitionWithTaskFinishEvent) {
 
         workflowStateAction.onTopologyLogicalTransitionEvent(
-                workflowExecutionRunnable,
+                workflowExecution,
                 workflowTopologyLogicalTransitionWithTaskFinishEvent);
     }
 

@@ -59,9 +59,6 @@ public class JavaParameters extends AbstractParameters {
      **/
     private String mainClass;
 
-    /**
-     * resource list
-     */
     private List<ResourceInfo> resourceList;
 
     /**

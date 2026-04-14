@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,18 +56,18 @@ class WorkerGroupDispatcherCoordinatorTest {
         String workerGroup = "newGroup";
         long delayTimeMills = 1000;
 
-        ITaskExecutionRunnable taskExecutionRunnable = Mockito.mock(ITaskExecutionRunnable.class);
+        ITaskExecution taskExecution = Mockito.mock(ITaskExecution.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
         TaskExecutionContext taskExecutionContext = mock(TaskExecutionContext.class);
 
-        when(taskExecutionRunnable.getTaskInstance()).thenReturn(taskInstance);
+        when(taskExecution.getTaskInstance()).thenReturn(taskInstance);
         when(taskInstance.getWorkerGroup()).thenReturn(workerGroup);
-        when(taskExecutionRunnable.getTaskExecutionContext()).thenReturn(taskExecutionContext);
+        when(taskExecution.getTaskExecutionContext()).thenReturn(taskExecutionContext);
         when(taskExecutionContext.getDispatchFailTimes()).thenReturn(1);
 
         assertFalse(workerGroupDispatcherCoordinator.existWorkerGroup(workerGroup));
 
-        workerGroupDispatcherCoordinator.dispatchTask(taskExecutionRunnable, delayTimeMills);
+        workerGroupDispatcherCoordinator.dispatchTask(taskExecution, delayTimeMills);
 
         assertTrue(workerGroupDispatcherCoordinator.existWorkerGroup(workerGroup));
     }

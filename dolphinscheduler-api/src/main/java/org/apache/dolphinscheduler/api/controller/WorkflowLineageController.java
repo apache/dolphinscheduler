@@ -57,9 +57,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * work flow lineage controller
- */
 @Tag(name = "WORK_FLOW_LINEAGE_TAG")
 @RestController
 @RequestMapping("projects/{projectCode}/lineages")

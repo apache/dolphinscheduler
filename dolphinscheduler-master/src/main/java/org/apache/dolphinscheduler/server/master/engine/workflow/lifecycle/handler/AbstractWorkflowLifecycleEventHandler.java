@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.handler;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventHandler;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.statemachine.IWorkflowStateAction;
 import org.apache.dolphinscheduler.server.master.engine.workflow.statemachine.WorkflowStateActionFactory;
 
@@ -41,37 +41,37 @@ public abstract class AbstractWorkflowLifecycleEventHandler<T extends AbstractWo
     private WorkflowStateActionFactory workflowStateActionFactory;
 
     @Override
-    public void handle(final IWorkflowExecutionRunnable workflowExecutionRunnable, final T event) {
-        final IWorkflowStateAction action = workflowStateActionFactory.getAction(workflowExecutionRunnable.getState());
+    public void handle(final IWorkflowExecution workflowExecution, final T event) {
+        final IWorkflowStateAction action = workflowStateActionFactory.getAction(workflowExecution.getState());
 
         log.info("Begin fire workflow {} LifecycleEvent[{}] with state: {}",
-                workflowExecutionRunnable.getName(),
+                workflowExecution.getName(),
                 event,
-                workflowExecutionRunnable.getState().name());
-        handle(action, workflowExecutionRunnable, event);
+                workflowExecution.getState().name());
+        handle(action, workflowExecution, event);
         log.info("Fired workflow {} LifecycleEvent[{}] with state: {}",
-                workflowExecutionRunnable.getName(),
+                workflowExecution.getName(),
                 event,
-                workflowExecutionRunnable.getState().name());
-        doTriggerWorkflowLifecycleListener(workflowExecutionRunnable, event);
+                workflowExecution.getState().name());
+        doTriggerWorkflowLifecycleListener(workflowExecution, event);
     }
 
     public abstract void handle(
                                 final IWorkflowStateAction workflowStateAction,
-                                final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                final IWorkflowExecution workflowExecution,
                                 final T event);
 
     private void doTriggerWorkflowLifecycleListener(
-                                                    final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                                    final IWorkflowExecution workflowExecution,
                                                     final T event) {
-        final List<IWorkflowLifecycleListener> listeners = workflowExecutionRunnable.getWorkflowLifecycleListeners();
+        final List<IWorkflowLifecycleListener> listeners = workflowExecution.getWorkflowLifecycleListeners();
         if (CollectionUtils.isEmpty(listeners)) {
             return;
         }
         for (final IWorkflowLifecycleListener listener : listeners) {
             try {
                 if (listener.match(event)) {
-                    listener.notifyWorkflowLifecycleEvent(workflowExecutionRunnable, event);
+                    listener.notifyWorkflowLifecycleEvent(workflowExecution, event);
                 }
             } catch (Exception e) {
                 log.warn("Trigger WorkflowLifecycleListener on event: {} failed", event, e);

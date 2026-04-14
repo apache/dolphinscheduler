@@ -19,23 +19,15 @@ package org.apache.dolphinscheduler.plugin.task.zeppelin;
 
 import java.io.Serializable;
 
+import lombok.Data;
+
 /**
  *  master/worker task transport
  */
+@Data
 public class ZeppelinTaskExecutionContext implements Serializable {
 
-    /**
-     * connectionParams
-     */
     private String connectionParams;
-
-    public String getConnectionParams() {
-        return connectionParams;
-    }
-
-    public void setConnectionParams(String connectionParams) {
-        this.connectionParams = connectionParams;
-    }
 
     @Override
     public String toString() {

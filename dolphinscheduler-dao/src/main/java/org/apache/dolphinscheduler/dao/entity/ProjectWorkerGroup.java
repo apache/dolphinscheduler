@@ -29,29 +29,14 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_relation_project_worker_group")
 public class ProjectWorkerGroup {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * project code
-     */
     private Long projectCode;
 
-    /**
-     * worker group
-     */
     private String workerGroup;
 
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 }

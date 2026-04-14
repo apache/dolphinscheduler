@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.task.SubWorkflowLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ILogicTaskPluginFactory;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -47,10 +47,10 @@ public class SubWorkflowLogicTaskPluginFactory implements ILogicTaskPluginFactor
     public SubWorkflowLogicTask createLogicTask(final ITaskExecutor taskExecutor) {
         final TaskExecutionContext taskExecutionContext = taskExecutor.getTaskExecutionContext();
         final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
-        final IWorkflowExecutionRunnable workflowExecutionRunnable = workflowRepository.get(workflowInstanceId);
+        final IWorkflowExecution workflowExecution = workflowRepository.get(workflowInstanceId);
         return new SubWorkflowLogicTask(
                 taskExecutionContext,
-                workflowExecutionRunnable,
+                workflowExecution,
                 taskExecutor,
                 applicationContext);
     }

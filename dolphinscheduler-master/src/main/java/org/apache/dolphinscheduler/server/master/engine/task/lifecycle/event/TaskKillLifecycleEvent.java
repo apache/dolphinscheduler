@@ -18,28 +18,28 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import lombok.Getter;
 
 @Getter
 public class TaskKillLifecycleEvent extends AbstractTaskLifecycleEvent {
 
-    private final ITaskExecutionRunnable taskExecutionRunnable;
+    private final ITaskExecution taskExecution;
 
-    private TaskKillLifecycleEvent(ITaskExecutionRunnable taskExecutionRunnable, long delayTime) {
+    private TaskKillLifecycleEvent(ITaskExecution taskExecution, long delayTime) {
         super(delayTime);
-        this.taskExecutionRunnable = taskExecutionRunnable;
+        this.taskExecution = taskExecution;
     }
 
-    public static TaskKillLifecycleEvent of(final ITaskExecutionRunnable taskExecutionRunnable) {
-        return of(taskExecutionRunnable, 0);
+    public static TaskKillLifecycleEvent of(final ITaskExecution taskExecution) {
+        return of(taskExecution, 0);
     }
 
-    public static TaskKillLifecycleEvent of(final ITaskExecutionRunnable taskExecutionRunnable, long delayTime) {
-        return new TaskKillLifecycleEvent(taskExecutionRunnable, delayTime);
+    public static TaskKillLifecycleEvent of(final ITaskExecution taskExecution, long delayTime) {
+        return new TaskKillLifecycleEvent(taskExecution, delayTime);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class TaskKillLifecycleEvent extends AbstractTaskLifecycleEvent {
     @Override
     public String toString() {
         return "TaskKillLifecycleEvent{" +
-                "task=" + taskExecutionRunnable.getName() + ", " +
+                "task=" + taskExecution.getName() + ", " +
                 "delayTime=" + delayTime +
                 '}';
     }
