@@ -40,6 +40,7 @@ public class WorkflowSucceedLifecycleEvent extends AbstractWorkflowLifecycleLife
         return WorkflowLifecycleEventType.SUCCEED;
     }
 
+    @Override
     public String toString() {
         return "WorkflowSucceedLifecycleEvent{" +
                 "workflow=" + workflowExecution.getName() +

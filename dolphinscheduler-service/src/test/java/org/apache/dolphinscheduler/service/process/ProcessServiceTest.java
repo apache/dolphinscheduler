@@ -31,15 +31,11 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 
 import java.util.ArrayList;
@@ -71,12 +67,6 @@ public class ProcessServiceTest {
     private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Mock
-    private WorkflowInstanceMapper workflowInstanceMapper;
-
-    @Mock
-    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
-
-    @Mock
     private TaskDefinitionDao taskDefinitionDao;
 
     @Mock
@@ -90,12 +80,6 @@ public class ProcessServiceTest {
 
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Mock
-    private TaskGroupQueueMapper taskGroupQueueMapper;
-
-    @Mock
-    CuringParamsService curingGlobalParamsService;
 
     @Test
     public void testGetUserById() {
