@@ -115,5 +115,10 @@ public interface IWorkflowExecution {
      */
     List<IWorkflowLifecycleListener> getWorkflowLifecycleListeners();
 
+    /**
+     * Register a WorkflowInstanceLifecycleListener to the Workflow instance.
+     */
+    void registerWorkflowInstanceLifecycleListener(IWorkflowLifecycleListener listener);
+
     IWorkflowFailureStrategy getWorkflowFailureStrategy();
 }

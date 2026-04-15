@@ -23,4 +23,8 @@ public class LogicTaskInitializeException extends MasterException {
         super(message);
     }
 
+    public LogicTaskInitializeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
 }
