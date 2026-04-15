@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.DatavinesTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.PythonTaskForm;
@@ -90,6 +91,8 @@ public final class WorkflowForm {
                 return (T) new JavaTaskForm(this);
             case PYTHON:
                 return (T) new PythonTaskForm(this);
+            case DATAVINES:
+                return (T) new DatavinesTaskForm(this);
         }
         throw new UnsupportedOperationException("Unknown task type");
     }
@@ -129,6 +132,7 @@ public final class WorkflowForm {
         SWITCH,
         HTTP,
         JAVA,
-        PYTHON
+        PYTHON,
+        DATAVINES
     }
 }
