@@ -84,10 +84,6 @@ public class TenantUtils {
         return TenantConstants.BOOTSTRAP_SYSTEM_USER;
     }
 
-    public static boolean isBootstrapTenant(String tenantCode) {
-        return TenantConstants.BOOTSTRAP_SYSTEM_USER.equals(tenantCode);
-    }
-
     public static boolean tenantExists(String tenantCode) {
         return OSUtils.getUserList().contains(tenantCode);
     }

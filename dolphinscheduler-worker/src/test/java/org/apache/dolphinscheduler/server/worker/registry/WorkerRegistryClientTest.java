@@ -54,16 +54,22 @@ public class WorkerRegistryClientTest {
 
     @InjectMocks
     private WorkerRegistryClient workerRegistryClient;
+
     @Mock
     private RegistryClient registryClient;
+
     @Mock
     private WorkerServerLoadProtection workerServerLoadProtection;
+
     @Mock
     private WorkerConfig workerConfig;
+
     @Mock
     private MetricsProvider metricsProvider;
+
     @Mock
     private PhysicalTaskExecutorContainerProvider physicalTaskExecutorContainerDelegator;
+
     @Mock
     private IStoppable stoppable;
 
