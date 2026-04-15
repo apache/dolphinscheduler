@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.task.runnable;
+package org.apache.dolphinscheduler.server.master.engine.task.execution;
 
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -36,7 +36,7 @@ import org.springframework.context.ApplicationContext;
 @Getter
 @Builder
 @AllArgsConstructor
-public class TaskExecutionRunnableBuilder {
+public class TaskExecutionBuilder {
 
     private final IWorkflowExecutionGraph workflowExecutionGraph;
     private final WorkflowDefinition workflowDefinition;

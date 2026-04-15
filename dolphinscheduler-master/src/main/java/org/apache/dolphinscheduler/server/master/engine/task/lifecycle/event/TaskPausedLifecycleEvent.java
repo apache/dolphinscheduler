@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -29,10 +29,10 @@ import lombok.Getter;
 @AllArgsConstructor
 public class TaskPausedLifecycleEvent extends AbstractTaskLifecycleEvent {
 
-    private final ITaskExecutionRunnable taskExecutionRunnable;
+    private final ITaskExecution taskExecution;
 
-    public static TaskPausedLifecycleEvent of(final ITaskExecutionRunnable taskExecutionRunnable) {
-        return new TaskPausedLifecycleEvent(taskExecutionRunnable);
+    public static TaskPausedLifecycleEvent of(final ITaskExecution taskExecution) {
+        return new TaskPausedLifecycleEvent(taskExecution);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class TaskPausedLifecycleEvent extends AbstractTaskLifecycleEvent {
     @Override
     public String toString() {
         return "TaskPausedLifecycleEvent{" +
-                "task=" + taskExecutionRunnable.getName() +
+                "task=" + taskExecution.getName() +
                 '}';
     }
 }

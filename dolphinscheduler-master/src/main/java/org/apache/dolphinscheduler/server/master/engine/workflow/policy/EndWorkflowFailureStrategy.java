@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.policy;
 
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,11 +30,11 @@ import lombok.extern.slf4j.Slf4j;
 public class EndWorkflowFailureStrategy implements IWorkflowFailureStrategy {
 
     @Override
-    public void onTaskFailure(IWorkflowExecutionRunnable workflowExecutionRunnable,
-                              ITaskExecutionRunnable taskExecutionRunnable) {
+    public void onTaskFailure(IWorkflowExecution workflowExecution,
+                              ITaskExecution taskExecution) {
         log.info("The workflow instance: [{}] using END failure strategy, will kill the active tasks.",
-                workflowExecutionRunnable.getName());
-        workflowExecutionRunnable.killActiveTasks();
+                workflowExecution.getName());
+        workflowExecution.killActiveTasks();
     }
 
 }

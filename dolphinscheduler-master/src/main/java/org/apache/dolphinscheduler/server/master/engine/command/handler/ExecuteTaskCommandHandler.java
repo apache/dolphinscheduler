@@ -33,8 +33,8 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopologyLogicalVisitor;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.TaskExecutionRunnableBuilder;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecution;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -119,9 +119,9 @@ public class ExecuteTaskCommandHandler extends AbstractCommandHandler {
         }
 
         final WorkflowExecutionGraph workflowExecutionGraph = new WorkflowExecutionGraph();
-        final BiConsumer<String, Set<String>> taskExecutionRunnableCreator = (task, successors) -> {
-            final TaskExecutionRunnableBuilder taskExecutionRunnableBuilder =
-                    TaskExecutionRunnableBuilder
+        final BiConsumer<String, Set<String>> taskExecutionCreator = (task, successors) -> {
+            final TaskExecutionBuilder taskExecutionBuilder =
+                    TaskExecutionBuilder
                             .builder()
                             .workflowExecutionGraph(workflowExecutionGraph)
                             .workflowDefinition(workflowExecuteContextBuilder.getWorkflowDefinition())
@@ -132,7 +132,7 @@ public class ExecuteTaskCommandHandler extends AbstractCommandHandler {
                             .workflowEventBus(workflowExecuteContextBuilder.getWorkflowEventBus())
                             .applicationContext(applicationContext)
                             .build();
-            workflowExecutionGraph.addNode(new TaskExecutionRunnable(taskExecutionRunnableBuilder));
+            workflowExecutionGraph.addNode(new TaskExecution(taskExecutionBuilder));
             workflowExecutionGraph.addEdge(task, successors);
         };
 
@@ -141,7 +141,7 @@ public class ExecuteTaskCommandHandler extends AbstractCommandHandler {
                         .taskDependType(workflowExecuteContextBuilder.getWorkflowInstance().getTaskDependType())
                         .onWorkflowGraph(workflowGraph)
                         .fromTask(startNodes)
-                        .doVisitFunction(taskExecutionRunnableCreator)
+                        .doVisitFunction(taskExecutionCreator)
                         .build();
         workflowGraphTopologyLogicalVisitor.visit();
         workflowExecutionGraph.removeUnReachableEdge();

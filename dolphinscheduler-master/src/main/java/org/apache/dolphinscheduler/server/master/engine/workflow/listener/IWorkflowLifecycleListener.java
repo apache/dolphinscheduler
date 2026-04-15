@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.listener;
 
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 public interface IWorkflowLifecycleListener {
 
-    void notifyWorkflowLifecycleEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    void notifyWorkflowLifecycleEvent(final IWorkflowExecution workflowExecution,
                                       final AbstractWorkflowLifecycleLifecycleEvent workflowLifecycleLifecycleEvent);
 
     boolean match(AbstractWorkflowLifecycleLifecycleEvent event);

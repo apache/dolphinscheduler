@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskKillException;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskPauseException;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskReassignMasterHostException;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 
@@ -49,67 +49,67 @@ public class TaskExecutorClient implements ITaskExecutorClient {
     private PhysicalTaskExecutorClientDelegator physicalTaskExecutorClientDelegator;
 
     @Override
-    public void dispatch(ITaskExecutionRunnable taskExecutionRunnable) throws TaskDispatchException {
+    public void dispatch(ITaskExecution taskExecution) throws TaskDispatchException {
         try {
-            getTaskExecutorClientDelegator(taskExecutionRunnable).dispatch(taskExecutionRunnable);
+            getTaskExecutorClientDelegator(taskExecution).dispatch(taskExecution);
         } catch (TaskDispatchException taskDispatchException) {
             throw taskDispatchException;
         } catch (Exception ex) {
-            throw new TaskDispatchException("Dispatch task: " + taskExecutionRunnable.getName() + " to executor failed",
+            throw new TaskDispatchException("Dispatch task: " + taskExecution.getName() + " to executor failed",
                     ex);
         }
     }
 
     @Override
-    public boolean reassignWorkflowInstanceHost(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskReassignMasterHostException {
+    public boolean reassignWorkflowInstanceHost(final ITaskExecution taskExecution) throws TaskReassignMasterHostException {
         try {
-            return getTaskExecutorClientDelegator(taskExecutionRunnable)
-                    .reassignMasterHost(taskExecutionRunnable);
+            return getTaskExecutorClientDelegator(taskExecution)
+                    .reassignMasterHost(taskExecution);
         } catch (Exception ex) {
             throw new TaskReassignMasterHostException(
-                    "Take over task: " + taskExecutionRunnable.getName() + " from executor failed",
+                    "Take over task: " + taskExecution.getName() + " from executor failed",
                     ex);
         }
     }
 
     @Override
-    public void pause(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskPauseException {
+    public void pause(final ITaskExecution taskExecution) throws TaskPauseException {
         try {
-            getTaskExecutorClientDelegator(taskExecutionRunnable).pause(taskExecutionRunnable);
+            getTaskExecutorClientDelegator(taskExecution).pause(taskExecution);
         } catch (Exception ex) {
-            throw new TaskPauseException("Pause task: " + taskExecutionRunnable.getName() + " from executor failed",
+            throw new TaskPauseException("Pause task: " + taskExecution.getName() + " from executor failed",
                     ex);
         }
     }
 
     @Override
-    public void kill(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskKillException {
+    public void kill(final ITaskExecution taskExecution) throws TaskKillException {
         try {
-            getTaskExecutorClientDelegator(taskExecutionRunnable).kill(taskExecutionRunnable);
+            getTaskExecutorClientDelegator(taskExecution).kill(taskExecution);
         } catch (Exception ex) {
-            throw new TaskKillException("Kill task: " + taskExecutionRunnable.getName() + " from executor failed", ex);
+            throw new TaskKillException("Kill task: " + taskExecution.getName() + " from executor failed", ex);
         }
     }
 
     @Override
     public void ackTaskExecutorLifecycleEvent(
-                                              final ITaskExecutionRunnable taskExecutionRunnable,
+                                              final ITaskExecution taskExecution,
                                               final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
         try {
-            if (StringUtils.isEmpty(taskExecutionRunnable.getTaskInstance().getHost())) {
+            if (StringUtils.isEmpty(taskExecution.getTaskInstance().getHost())) {
                 log.info("The task: {} is didn't dispatched to executor, skip ack taskExecutorLifecycleEventAck: {}",
-                        taskExecutionRunnable.getName(), taskExecutorLifecycleEventAck);
+                        taskExecution.getName(), taskExecutorLifecycleEventAck);
                 return;
             }
-            getTaskExecutorClientDelegator(taskExecutionRunnable)
-                    .ackTaskExecutorLifecycleEvent(taskExecutionRunnable, taskExecutorLifecycleEventAck);
+            getTaskExecutorClientDelegator(taskExecution)
+                    .ackTaskExecutorLifecycleEvent(taskExecution, taskExecutorLifecycleEventAck);
         } catch (Exception ex) {
             log.error("Send taskExecutorLifecycleEventAck: {} failed", taskExecutorLifecycleEventAck, ex);
         }
     }
 
-    private ITaskExecutorClientDelegator getTaskExecutorClientDelegator(final ITaskExecutionRunnable taskExecutionRunnable) {
-        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+    private ITaskExecutorClientDelegator getTaskExecutorClientDelegator(final ITaskExecution taskExecution) {
+        final TaskInstance taskInstance = taskExecution.getTaskInstance();
         checkArgument(taskInstance != null, "taskType cannot be empty");
         if (TaskTypeUtils.isLogicTask(taskInstance.getTaskType())) {
             return logicTaskExecutorClientDelegator;

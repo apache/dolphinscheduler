@@ -21,10 +21,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 import java.util.Optional;
 
@@ -41,18 +41,18 @@ public class WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent
         extends
             AbstractWorkflowLifecycleLifecycleEvent {
 
-    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
+    private final IWorkflowExecution workflowExecution;
 
-    private final ITaskExecutionRunnable taskExecutionRunnable;
+    private final ITaskExecution taskExecution;
 
     public static WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent of(
-                                                                                   final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                                                                   final ITaskExecutionRunnable taskExecutionRunnable) {
-        checkNotNull(workflowExecutionRunnable, "workflowExecutionRunnable is null");
-        checkNotNull(taskExecutionRunnable, "taskExecutionRunnable is null");
+                                                                                   final IWorkflowExecution workflowExecution,
+                                                                                   final ITaskExecution taskExecution) {
+        checkNotNull(workflowExecution, "workflowExecution is null");
+        checkNotNull(taskExecution, "taskExecution is null");
         return new WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent(
-                workflowExecutionRunnable,
-                taskExecutionRunnable);
+                workflowExecution,
+                taskExecution);
     }
 
     @Override
@@ -63,9 +63,9 @@ public class WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent
     @Override
     public String toString() {
         return "WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent{"
-                + "task=" + taskExecutionRunnable.getName()
+                + "task=" + taskExecution.getName()
                 + "taskState="
-                + Optional.ofNullable(taskExecutionRunnable.getTaskInstance()).map(TaskInstance::getState)
+                + Optional.ofNullable(taskExecution.getTaskInstance()).map(TaskInstance::getState)
                         .map(Enum::name).orElse(null)
                 + '}';
     }

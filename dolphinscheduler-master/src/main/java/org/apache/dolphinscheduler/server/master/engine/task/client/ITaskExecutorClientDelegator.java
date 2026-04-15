@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.client;
 
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 
@@ -34,27 +34,27 @@ public interface ITaskExecutorClientDelegator {
      *
      * @throws TaskDispatchException If dispatch failed
      */
-    void dispatch(final ITaskExecutionRunnable taskExecutionRunnable) throws TaskDispatchException;
+    void dispatch(final ITaskExecution taskExecution) throws TaskDispatchException;
 
     /**
      * Take over the task from task executor.
      */
-    boolean reassignMasterHost(final ITaskExecutionRunnable taskExecutionRunnable);
+    boolean reassignMasterHost(final ITaskExecution taskExecution);
 
     /**
      * Pause the task, this method doesn't guarantee the task is paused success.
      */
-    void pause(final ITaskExecutionRunnable taskExecutionRunnable);
+    void pause(final ITaskExecution taskExecution);
 
     /**
      * Kill the task, this method doesn't guarantee the task is killed success.
      */
-    void kill(final ITaskExecutionRunnable taskExecutionRunnable);
+    void kill(final ITaskExecution taskExecution);
 
     /**
      * Ack the task executor lifecycle event.
      */
     void ackTaskExecutorLifecycleEvent(
-                                       final ITaskExecutionRunnable taskExecutionRunnable,
+                                       final ITaskExecution taskExecution,
                                        final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck);
 }

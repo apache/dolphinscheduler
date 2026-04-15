@@ -15,25 +15,29 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
+package org.apache.dolphinscheduler.server.master.engine.task.execution;
 
-import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext;
+import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
-import org.springframework.context.ApplicationContext;
-
-@Data
+@Getter
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor
-public class WorkflowExecutionRunnableBuilder {
+public class TaskExecutionContextCreateRequest {
 
-    private WorkflowExecuteContext.WorkflowExecuteContextBuilder workflowExecuteContextBuilder;
-
-    private ApplicationContext applicationContext;
+    private IWorkflowExecutionGraph workflowExecutionGraph;
+    private WorkflowDefinition workflowDefinition;
+    private WorkflowInstance workflowInstance;
+    private TaskDefinition taskDefinition;
+    private TaskInstance taskInstance;
+    private Project project;
 
 }
