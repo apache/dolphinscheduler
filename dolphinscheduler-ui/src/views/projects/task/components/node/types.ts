@@ -476,6 +476,9 @@ interface ITaskParams {
   yarnQueue?: string
   awsRegion?: string
   kubeConfig?: string
+  jobId?: string
+  token?: string
+  failureBlock?:string
 }
 
 interface INodeData

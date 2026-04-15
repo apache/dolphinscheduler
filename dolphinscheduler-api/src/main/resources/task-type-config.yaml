@@ -47,12 +47,15 @@ task:
     - 'SEATUNNEL'
     - 'DATAX'
     - 'SQOOP'
+  dataQuality:
+    - 'DATAVINES'
   machineLearning:
     - 'JUPYTER'
     - 'MLFLOW'
     - 'OPENMLDB'
     - 'DVC'
     - 'SAGEMAKER'
+    - 'PYTORCH'
     - 'KUBEFLOW'
   other:
     - 'ZEPPELIN'
