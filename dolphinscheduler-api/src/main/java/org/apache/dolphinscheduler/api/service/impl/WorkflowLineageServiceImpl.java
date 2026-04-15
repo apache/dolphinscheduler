@@ -332,7 +332,7 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
                                                                              boolean filterOfflineWorkflow) {
 
         Set<Long> resultCodes = new LinkedHashSet<>();
-        Set<Long> expandedCodes = new HashSet<>();
+        Set<Long> visitedWorkflowCodes = new HashSet<>();
         List<Long> frontier = Collections.singletonList(rootWorkflowDefinitionCode);
         Map<Long, WorkflowDefinition> workflowDefinitionCache = new HashMap<>();
 
