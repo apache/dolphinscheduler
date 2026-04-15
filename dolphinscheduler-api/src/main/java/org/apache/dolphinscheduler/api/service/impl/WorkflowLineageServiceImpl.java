@@ -341,7 +341,7 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
             frontier = new ArrayList<>();
 
             for (Long upstreamCode : currentLevel) {
-                if (!expandedCodes.add(upstreamCode)) {
+                if (!visitedWorkflowCodes.add(upstreamCode)) {
                     continue;
                 }
                 List<Long> directDownstreamCodes = queryDirectDownstreamWorkflowCodes(upstreamCode);
