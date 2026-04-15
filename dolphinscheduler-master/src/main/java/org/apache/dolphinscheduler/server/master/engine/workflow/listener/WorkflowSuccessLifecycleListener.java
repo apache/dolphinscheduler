@@ -51,6 +51,7 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
     @Autowired
     private CommandDao commandDao;
 
+    @Override
     public void notifyWorkflowLifecycleEvent(final IWorkflowExecution workflowExecution,
                                              final AbstractWorkflowLifecycleLifecycleEvent lifecycleEvent) {
         final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
