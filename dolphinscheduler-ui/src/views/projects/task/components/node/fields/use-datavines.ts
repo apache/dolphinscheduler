@@ -25,6 +25,7 @@ export function useDatavines(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'input',
       field: 'address',
+      class: 'input-datavines-address',
       name: t('project.node.datavines_address'),
       props: {
         placeholder: t('project.node.datavines_address_tips')
@@ -42,6 +43,7 @@ export function useDatavines(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'input',
       field: 'jobId',
+      class: 'input-datavines-job-id',
       name: t('project.node.datavines_job_id'),
       props: {
         placeholder: t('project.node.datavines_job_id_tips')
@@ -59,6 +61,7 @@ export function useDatavines(model: { [field: string]: any }): IJsonItem[] {
     {
       type: 'input',
       field: 'token',
+      class: 'input-datavines-token',
       name: t('project.node.datavines_token'),
       props: {
         placeholder: t('project.node.datavines_token_tips')
