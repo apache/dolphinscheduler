@@ -47,9 +47,10 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
     @Autowired
     private WorkflowBackfillTrigger workflowBackfillTrigger;
 
-    public void notifyWorkflowLifecycleEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    @Override
+    public void notifyWorkflowLifecycleEvent(final IWorkflowExecution workflowExecution,
                                              final AbstractWorkflowLifecycleLifecycleEvent lifecycleEvent) {
-        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
         if (Flag.YES == workflowInstance.getIsSubWorkflow()) {
             // The sub workflow does not need to generate the backfill command
             // Since the parent workflow will trigger the task to generate the sub workflow instance.
