@@ -88,7 +88,7 @@ public class WorkflowEventBusFireWorker {
             try {
                 LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
                 WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(
-                        workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance().getLogPath());
+                        workflowExecution.getWorkflowExecuteContext().getWorkflowInstance().getLogPath());
                 doFireSingleWorkflowEventBus(workflowExecution);
             } catch (Exception ex) {
                 log.error("Fire event failed for WorkflowExecuteRunnable: {}", workflowInstanceName, ex);

@@ -49,7 +49,7 @@ public class TaskInstanceControllerImpl implements ITaskInstanceController {
             final int taskInstanceId = taskGroupSlotAcquireSuccessNotifyRequest.getTaskInstanceId();
             LogUtils.setWorkflowAndTaskInstanceIDMDC(workflowInstanceId, taskInstanceId);
             WorkflowInstance workflowInstance =
-                    workflowExecutionRunnableMemoryRepository.get(workflowInstanceId).getWorkflowInstance();
+                    workflowExecutionMemoryRepository.get(workflowInstanceId).getWorkflowInstance();
             WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(workflowInstance.getLogPath());
             final IWorkflowExecution workflowExecution =
                     workflowExecutionMemoryRepository.get(workflowInstanceId);

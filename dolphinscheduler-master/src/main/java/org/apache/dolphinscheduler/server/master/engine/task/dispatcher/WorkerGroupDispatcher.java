@@ -95,7 +95,7 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
                             TaskExecutorMDCUtils.logWithMDC(taskExecution.getId())) {
                 LogUtils.setWorkflowInstanceIdMDC(taskExecution.getTaskInstance().getWorkflowInstanceId());
                 WorkflowLogUtils
-                        .setWorkflowInstanceLogFullPathMDC(taskExecutionRunnable.getWorkflowInstance().getLogPath());
+                        .setWorkflowInstanceLogFullPathMDC(taskExecution.getWorkflowInstance().getLogPath());
                 doDispatchTask(taskExecution);
             } finally {
                 LogUtils.removeWorkflowInstanceIdMDC();
