@@ -30,10 +30,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Getter
+@Setter
 public abstract class AbstractTask {
 
-    @Getter
-    @Setter
     protected Map<String, String> taskOutputParams;
 
     /**
@@ -79,51 +79,6 @@ public abstract class AbstractTask {
     public abstract void handle(TaskCallBack taskCallBack) throws TaskException;
 
     public abstract void cancel() throws TaskException;
-
-    /**
-     * get exit status code
-     *
-     * @return exit status code
-     */
-    public int getExitStatusCode() {
-        return exitStatusCode;
-    }
-
-    public void setExitStatusCode(int exitStatusCode) {
-        this.exitStatusCode = exitStatusCode;
-    }
-
-    public int getProcessId() {
-        return processId;
-    }
-
-    public void setProcessId(int processId) {
-        this.processId = processId;
-    }
-
-    public String getAppIds() {
-        return appIds;
-    }
-
-    public void setAppIds(String appIds) {
-        this.appIds = appIds;
-    }
-
-    public boolean getNeedAlert() {
-        return needAlert;
-    }
-
-    public void setNeedAlert(boolean needAlert) {
-        this.needAlert = needAlert;
-    }
-
-    public TaskAlertInfo getTaskAlertInfo() {
-        return taskAlertInfo;
-    }
-
-    public void setTaskAlertInfo(TaskAlertInfo taskAlertInfo) {
-        this.taskAlertInfo = taskAlertInfo;
-    }
 
     /**
      * get task parameters
@@ -186,4 +141,5 @@ public abstract class AbstractTask {
 
         }
     }
+
 }

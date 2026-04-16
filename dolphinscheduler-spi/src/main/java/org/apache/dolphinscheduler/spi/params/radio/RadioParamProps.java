@@ -20,10 +20,12 @@ package org.apache.dolphinscheduler.spi.params.radio;
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * front-end radio component props attributes
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class RadioParamProps extends ParamsProps {
 

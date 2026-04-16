@@ -19,6 +19,11 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.targets;
 
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.TargetCommonParameter;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class TargetHanaParameter extends TargetCommonParameter {
 
     private String targetTable;
@@ -30,67 +35,4 @@ public class TargetHanaParameter extends TargetCommonParameter {
     private String targetUpdateKey;
     private String targetUpdateMode;
 
-    public String getTargetTable() {
-        return targetTable;
-    }
-
-    public void setTargetTable(String targetTable) {
-        this.targetTable = targetTable;
-    }
-
-    public String getTargetColumns() {
-        return targetColumns;
-    }
-
-    public void setTargetColumns(String targetColumns) {
-        this.targetColumns = targetColumns;
-    }
-
-    public String getFieldsTerminated() {
-        return fieldsTerminated;
-    }
-
-    public void setFieldsTerminated(String fieldsTerminated) {
-        this.fieldsTerminated = fieldsTerminated;
-    }
-
-    public String getLinesTerminated() {
-        return linesTerminated;
-    }
-
-    public void setLinesTerminated(String linesTerminated) {
-        this.linesTerminated = linesTerminated;
-    }
-
-    public String getPreQuery() {
-        return preQuery;
-    }
-
-    public void setPreQuery(String preQuery) {
-        this.preQuery = preQuery;
-    }
-
-    public boolean getIsUpdate() {
-        return isUpdate;
-    }
-
-    public void setUpdate(boolean update) {
-        isUpdate = update;
-    }
-
-    public String getTargetUpdateKey() {
-        return targetUpdateKey;
-    }
-
-    public void setTargetUpdateKey(String targetUpdateKey) {
-        this.targetUpdateKey = targetUpdateKey;
-    }
-
-    public String getTargetUpdateMode() {
-        return targetUpdateMode;
-    }
-
-    public void setTargetUpdateMode(String targetUpdateMode) {
-        this.targetUpdateMode = targetUpdateMode;
-    }
 }

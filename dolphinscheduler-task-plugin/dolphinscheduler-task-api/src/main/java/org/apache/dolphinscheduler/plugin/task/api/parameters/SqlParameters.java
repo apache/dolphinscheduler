@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import com.google.common.collect.Lists;
 
@@ -45,6 +46,7 @@ import com.google.common.collect.Lists;
  * Sql/Hql parameter
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class SqlParameters extends AbstractParameters {
 
     /**

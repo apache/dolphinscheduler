@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -58,6 +59,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
 
     private static final String SEATUNNEL_BIN_DIR = "${SEATUNNEL_HOME}/bin/";
 
+    @Setter
     private SeatunnelParameters seatunnelParameters;
 
     private final ShellCommandExecutor shellCommandExecutor;
@@ -231,7 +233,4 @@ public class SeatunnelTask extends AbstractRemoteTask {
         return ParameterUtils.convertParameterPlaceholders(script, ParameterUtils.convert(paramsMap));
     }
 
-    public void setSeatunnelParameters(SeatunnelParameters seatunnelParameters) {
-        this.seatunnelParameters = seatunnelParameters;
-    }
 }

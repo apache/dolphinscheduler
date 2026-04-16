@@ -107,7 +107,7 @@ public class HanaTargetGenerator implements ITargetGenerator {
                 }
             }
 
-            if (targetHanaParameter.getIsUpdate()
+            if (targetHanaParameter.isUpdate()
                     && StringUtils.isNotEmpty(targetHanaParameter.getTargetUpdateKey())
                     && StringUtils.isNotEmpty(targetHanaParameter.getTargetUpdateMode())) {
                 hanaTargetSb.append(SPACE).append(UPDATE_KEY)

@@ -40,11 +40,6 @@ public class SelectParamProps extends ParamsProps {
     private String valueKey;
 
     /**
-     * input box size, optional value medium/small/mini
-     */
-    private String size;
-
-    /**
      * whether the option can be cleared, the default value is false
      */
     private Boolean clearable;

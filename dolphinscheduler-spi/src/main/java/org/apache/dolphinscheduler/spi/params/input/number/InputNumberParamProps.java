@@ -20,10 +20,12 @@ package org.apache.dolphinscheduler.spi.params.input.number;
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * front-end input number component props attributes
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class InputNumberParamProps extends ParamsProps {
 

@@ -41,6 +41,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
@@ -50,6 +52,9 @@ import org.springframework.stereotype.Component;
 public class RegistryClient {
 
     private static final String EMPTY = "";
+
+    @Setter
+    @Getter
     private IStoppable stoppable;
 
     private final Registry registry;
@@ -199,14 +204,6 @@ public class RegistryClient {
 
     public boolean releaseLock(String key) {
         return registry.releaseLock(key);
-    }
-
-    public void setStoppable(IStoppable stoppable) {
-        this.stoppable = stoppable;
-    }
-
-    public IStoppable getStoppable() {
-        return stoppable;
     }
 
     public Collection<String> getChildrenKeys(final String key) {

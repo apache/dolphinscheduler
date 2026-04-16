@@ -23,6 +23,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import lombok.Data;
+
+@Data
 public class ResourceParametersHelper {
 
     private Map<ResourceType, Map<Integer, AbstractResourceParameters>> resourceMap = new HashMap<>();
@@ -38,14 +41,6 @@ public class ResourceParametersHelper {
             resourceMap.put(resourceType, resourceParametersMap);
         }
         resourceParametersMap.put(id, parameters);
-    }
-
-    public void setResourceMap(Map<ResourceType, Map<Integer, AbstractResourceParameters>> resourceMap) {
-        this.resourceMap = resourceMap;
-    }
-
-    public Map<ResourceType, Map<Integer, AbstractResourceParameters>> getResourceMap() {
-        return resourceMap;
     }
 
     public Map<Integer, AbstractResourceParameters> getResourceMap(ResourceType resourceType) {
