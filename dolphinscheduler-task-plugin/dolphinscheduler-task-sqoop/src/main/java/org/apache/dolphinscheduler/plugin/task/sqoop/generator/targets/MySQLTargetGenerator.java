@@ -102,7 +102,7 @@ public class MySQLTargetGenerator implements ITargetGenerator {
                         }
                     }
 
-                    if (targetMysqlParameter.getIsUpdate()
+                    if (targetMysqlParameter.isUpdate()
                             && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateKey())
                             && StringUtils.isNotEmpty(targetMysqlParameter.getTargetUpdateMode())) {
                         mysqlTargetSb.append(SPACE).append(UPDATE_KEY)

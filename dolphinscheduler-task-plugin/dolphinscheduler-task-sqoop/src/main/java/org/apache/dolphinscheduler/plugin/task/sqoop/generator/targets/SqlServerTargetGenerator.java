@@ -109,7 +109,7 @@ public class SqlServerTargetGenerator implements ITargetGenerator {
                 }
             }
 
-            if (targetSqlServerParameter.getIsUpdate()
+            if (targetSqlServerParameter.isUpdate()
                     && StringUtils.isNotEmpty(targetSqlServerParameter.getTargetUpdateKey())
                     && StringUtils.isNotEmpty(targetSqlServerParameter.getTargetUpdateMode())) {
                 oracleTargetSb.append(SPACE).append(UPDATE_KEY)

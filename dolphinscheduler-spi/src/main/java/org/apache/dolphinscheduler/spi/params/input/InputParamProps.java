@@ -21,10 +21,12 @@ import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 import org.apache.dolphinscheduler.spi.params.base.ResizeType;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * front-end input component props attributes
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class InputParamProps extends ParamsProps {
 

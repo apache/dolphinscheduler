@@ -107,7 +107,7 @@ public class OracleTargetGenerator implements ITargetGenerator {
                 }
             }
 
-            if (targetOracleParameter.getIsUpdate()
+            if (targetOracleParameter.isUpdate()
                     && StringUtils.isNotEmpty(targetOracleParameter.getTargetUpdateKey())
                     && StringUtils.isNotEmpty(targetOracleParameter.getTargetUpdateMode())) {
                 oracleTargetSb.append(SPACE).append(UPDATE_KEY)

@@ -20,20 +20,18 @@ package org.apache.dolphinscheduler.plugin.datasource.oceanbase.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class OceanBaseDataSourceParamDTO extends BaseDataSourceParamDTO {
 
     protected String compatibleMode;
-
-    public String getCompatibleMode() {
-        return compatibleMode;
-    }
-
-    public void setCompatibleMode(String compatibleMode) {
-        this.compatibleMode = compatibleMode;
-    }
 
     @Override
     public DbType getType() {
         return DbType.OCEANBASE;
     }
+
 }

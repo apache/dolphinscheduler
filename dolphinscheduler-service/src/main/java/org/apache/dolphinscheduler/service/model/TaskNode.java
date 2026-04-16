@@ -17,20 +17,21 @@
 
 package org.apache.dolphinscheduler.service.model;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
 
+import lombok.Data;
+
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+@Data
 public class TaskNode {
 
     /**
@@ -142,96 +143,9 @@ public class TaskNode {
 
     private TaskExecuteType taskExecuteType;
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getParams() {
-        return params;
-    }
-
-    public void setParams(String params) {
-        this.params = params;
-    }
-
-    public String getPreTasks() {
-        return preTasks;
-    }
-
     public void setPreTasks(String preTasks) {
         this.preTasks = preTasks;
         this.depList = JSONUtils.toList(preTasks, Long.class);
-    }
-
-    public String getExtras() {
-        return extras;
-    }
-
-    public void setExtras(String extras) {
-        this.extras = extras;
-    }
-
-    public List<Long> getDepList() {
-        return depList;
-    }
-
-    public void setDepList(List<Long> depList) {
-        if (depList != null) {
-            this.depList = depList;
-            this.preTasks = JSONUtils.toJsonString(depList);
-        }
-    }
-
-    public String getLoc() {
-        return loc;
-    }
-
-    public void setLoc(String loc) {
-        this.loc = loc;
-    }
-
-    public String getRunFlag() {
-        return runFlag;
-    }
-
-    public void setRunFlag(String runFlag) {
-        this.runFlag = runFlag;
-    }
-
-    public boolean isForbidden() {
-        // skip stream task when run DAG
-        if (taskExecuteType == TaskExecuteType.STREAM) {
-            return true;
-        }
-        return StringUtils.isNotEmpty(this.runFlag) && this.runFlag.equals(Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
     }
 
     @Override
@@ -261,70 +175,6 @@ public class TaskNode {
         return Objects.hash(name, desc, type, params, preTasks, extras, depList, runFlag);
     }
 
-    public int getMaxRetryTimes() {
-        return maxRetryTimes;
-    }
-
-    public void setMaxRetryTimes(int maxRetryTimes) {
-        this.maxRetryTimes = maxRetryTimes;
-    }
-
-    public int getRetryInterval() {
-        return retryInterval;
-    }
-
-    public void setRetryInterval(int retryInterval) {
-        this.retryInterval = retryInterval;
-    }
-
-    public Priority getTaskInstancePriority() {
-        return taskInstancePriority;
-    }
-
-    public void setTaskInstancePriority(Priority taskInstancePriority) {
-        this.taskInstancePriority = taskInstancePriority;
-    }
-
-    public String getTimeout() {
-        return timeout;
-    }
-
-    public void setTimeout(String timeout) {
-        this.timeout = timeout;
-    }
-
-    public String getWorkerGroup() {
-        return workerGroup;
-    }
-
-    public void setWorkerGroup(String workerGroup) {
-        this.workerGroup = workerGroup;
-    }
-
-    public int getDelayTime() {
-        return delayTime;
-    }
-
-    public void setDelayTime(int delayTime) {
-        this.delayTime = delayTime;
-    }
-
-    public long getCode() {
-        return code;
-    }
-
-    public void setCode(long code) {
-        this.code = code;
-    }
-
-    public int getVersion() {
-        return version;
-    }
-
-    public void setVersion(int version) {
-        this.version = version;
-    }
-
     @Override
     public String toString() {
         return "TaskNode{"
@@ -351,51 +201,4 @@ public class TaskNode {
                 + '}';
     }
 
-    public void setEnvironmentCode(Long environmentCode) {
-        this.environmentCode = environmentCode;
-    }
-
-    public Long getEnvironmentCode() {
-        return this.environmentCode;
-    }
-
-    public int getTaskGroupId() {
-        return taskGroupId;
-    }
-
-    public void setTaskGroupId(int taskGroupId) {
-        this.taskGroupId = taskGroupId;
-    }
-
-    public int getTaskGroupPriority() {
-        return taskGroupPriority;
-    }
-
-    public void setTaskGroupPriority(int taskGroupPriority) {
-        this.taskGroupPriority = taskGroupPriority;
-    }
-
-    public Integer getCpuQuota() {
-        return cpuQuota == null ? -1 : cpuQuota;
-    }
-
-    public void setCpuQuota(Integer cpuQuota) {
-        this.cpuQuota = cpuQuota;
-    }
-
-    public Integer getMemoryMax() {
-        return memoryMax == null ? -1 : memoryMax;
-    }
-
-    public void setMemoryMax(Integer memoryMax) {
-        this.memoryMax = memoryMax;
-    }
-
-    public TaskExecuteType getTaskExecuteType() {
-        return taskExecuteType;
-    }
-
-    public void setTaskExecuteType(TaskExecuteType taskExecuteType) {
-        this.taskExecuteType = taskExecuteType;
-    }
 }

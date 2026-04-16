@@ -62,6 +62,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.api.model.Affinity;
 import io.fabric8.kubernetes.api.model.AffinityBuilder;
@@ -84,6 +86,8 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 @Slf4j
 public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
+    @Setter
+    @Getter
     private Job job;
     protected boolean podLogOutputIsFinished = false;
     protected Future<?> podLogOutputFuture;
@@ -219,7 +223,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                         if (jobStatus == TaskConstants.RUNNING_CODE) {
                             return;
                         }
-                        setTaskStatus(jobStatus, taskInstanceId, taskResponse);
+                        setTaskStatus(jobStatus, taskResponse);
                         countDownLatch.countDown();
                     }
                 } finally {
@@ -378,7 +382,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         }
     }
 
-    public void setTaskStatus(int jobStatus, String taskInstanceId, TaskResponse taskResponse) {
+    public void setTaskStatus(int jobStatus, TaskResponse taskResponse) {
         if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {
             if (jobStatus == EXIT_CODE_SUCCESS) {
                 log.info("[K8sJobExecutor-{}] succeed in k8s", job.getMetadata().getName());
@@ -390,11 +394,4 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         }
     }
 
-    public Job getJob() {
-        return job;
-    }
-
-    public void setJob(Job job) {
-        this.job = job;
-    }
 }

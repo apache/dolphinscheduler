@@ -19,54 +19,24 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
 public class TaskTimeoutParameter {
 
     private boolean enable;
+
     /**
      * task timeout strategy
      */
     private TaskTimeoutStrategy strategy;
+
     /**
      * task timeout interval
      */
     private int interval;
-
-    public boolean getEnable() {
-        return enable;
-    }
-
-    public void setEnable(boolean enable) {
-        this.enable = enable;
-    }
-
-    public TaskTimeoutStrategy getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(TaskTimeoutStrategy strategy) {
-        this.strategy = strategy;
-    }
-
-    public int getInterval() {
-        return interval;
-    }
-
-    public void setInterval(int interval) {
-        this.interval = interval;
-    }
-
-    public TaskTimeoutParameter() {
-    }
-
-    public TaskTimeoutParameter(boolean enable) {
-        this.enable = enable;
-    }
-
-    public TaskTimeoutParameter(boolean enable, TaskTimeoutStrategy strategy, int interval) {
-        this.enable = enable;
-        this.strategy = strategy;
-        this.interval = interval;
-    }
 
     @Override
     public String toString() {
