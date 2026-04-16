@@ -17,14 +17,15 @@
 
 package org.apache.dolphinscheduler.plugin.task.datavines.utils;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.datavines.DatavinesTaskConstants;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
@@ -32,12 +33,12 @@ import java.net.URI;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Slf4j
 public class RequestUtils {
+
+    private static final CloseableHttpClient HTTP_CLIENT = HttpClientBuilder.create().build();
 
     private RequestUtils() {
         throw new IllegalStateException("Utility class");
@@ -60,19 +61,15 @@ public class RequestUtils {
     }
 
     public static JsonNode parse(String res) {
-        ObjectMapper mapper = new ObjectMapper();
-        JsonNode result = null;
         try {
-            result = mapper.readTree(res);
-        } catch (JsonProcessingException e) {
-            log.error("datavines task submit failed with error", e);
+            return JSONUtils.parseObject(res, JsonNode.class);
+        } catch (Exception e) {
+            return null;
         }
-        return result;
     }
 
     public static String doGet(String url, String token) {
         String result = "";
-        HttpClient httpClient = HttpClientBuilder.create().build();
         HttpGet httpGet = null;
         try {
             URIBuilder uriBuilder = new URIBuilder(url);
@@ -80,12 +77,13 @@ public class RequestUtils {
             httpGet = new HttpGet(uri);
             httpGet.setHeader("Authorization", "Bearer " + token);
             log.info("access url: {}", uri);
-            HttpResponse response = httpClient.execute(httpGet);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                result = EntityUtils.toString(response.getEntity());
-                log.info("datavines task succeed with results: {}", result);
-            } else {
-                log.error("datavines task terminated,response: {}", response);
+            try (CloseableHttpResponse response = HTTP_CLIENT.execute(httpGet)) {
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    result = EntityUtils.toString(response.getEntity());
+                    log.info("datavines task succeed with results: {}", result);
+                } else {
+                    log.error("datavines task terminated,response: {}", response);
+                }
             }
         } catch (IllegalArgumentException ie) {
             log.error("datavines task terminated: {}", ie.getMessage());
@@ -101,17 +99,17 @@ public class RequestUtils {
 
     public static String doPost(String url, String token) {
         String result = "";
-        HttpClient httpClient = HttpClientBuilder.create().build();
         HttpPost httpPost = new HttpPost(url);
         try {
             httpPost.setHeader("Authorization", "Bearer " + token);
-            HttpResponse response = httpClient.execute(httpPost);
             log.info("access url: {}", url);
-            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                result = EntityUtils.toString(response.getEntity());
-                log.info("datavines task succeed with results: {}", result);
-            } else {
-                log.error("datavines task terminated, response: {}", response);
+            try (CloseableHttpResponse response = HTTP_CLIENT.execute(httpPost)) {
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    result = EntityUtils.toString(response.getEntity());
+                    log.info("datavines task succeed with results: {}", result);
+                } else {
+                    log.error("datavines task terminated, response: {}", response);
+                }
             }
         } catch (IllegalArgumentException ie) {
             log.error("datavines task terminated: {}", ie.getMessage());

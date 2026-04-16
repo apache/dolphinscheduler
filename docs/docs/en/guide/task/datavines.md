@@ -18,7 +18,7 @@ it will call `Datavines API` to trigger datavines job. Click [here](https://data
 |-------------------|-------------------------------------------------------------------------------------------------------|
 | Datavines Address | The URL for the Datavines service, e.g., http://localhost:5600.                                       |
 | Datavines Job ID  | The unique job id for a datavines job.                                                                |
-| Datavines token   | The Datawines service access token can be obtained through token management on the Datavines service. |
+| Datavines token   | The Datavines service access token can be obtained through token management on the Datavines service. |
 | Block on Failure  | When turned on, if the data quality check result is failed, the task result will be set as failed.    |
 
 ## Task Example

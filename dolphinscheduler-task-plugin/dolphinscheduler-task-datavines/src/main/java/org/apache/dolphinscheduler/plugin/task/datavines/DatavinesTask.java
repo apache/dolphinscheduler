@@ -168,12 +168,18 @@ public class DatavinesTask extends AbstractRemoteTask {
 
     private boolean checkResult(JsonNode result) {
         boolean isCorrect = true;
-        if (result instanceof MissingNode || result instanceof NullNode) {
+        if (result == null
+                || result instanceof MissingNode
+                || result instanceof NullNode
+                || !result.hasNonNull(DatavinesTaskConstants.API_RESULT_CODE)) {
             errorHandle(DatavinesTaskConstants.API_ERROR_MSG);
             isCorrect = false;
         } else if (result.get(DatavinesTaskConstants.API_RESULT_CODE)
                 .asInt() != DatavinesTaskConstants.API_RESULT_CODE_SUCCESS) {
-            errorHandle(result.get(DatavinesTaskConstants.API_RESULT_MSG));
+            JsonNode errorMsg = result.get(DatavinesTaskConstants.API_RESULT_MSG);
+            errorHandle(errorMsg == null || errorMsg instanceof NullNode
+                    ? DatavinesTaskConstants.API_ERROR_MSG
+                    : errorMsg);
             isCorrect = false;
         }
         return isCorrect;

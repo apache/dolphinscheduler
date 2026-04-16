@@ -42,7 +42,9 @@ public class DatavinesParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return StringUtils.isNotEmpty(this.address) && StringUtils.isNotEmpty(this.jobId);
+        return StringUtils.isNotEmpty(this.address)
+                && StringUtils.isNotEmpty(this.jobId)
+                && StringUtils.isNotEmpty(this.token);
     }
 
     @Override

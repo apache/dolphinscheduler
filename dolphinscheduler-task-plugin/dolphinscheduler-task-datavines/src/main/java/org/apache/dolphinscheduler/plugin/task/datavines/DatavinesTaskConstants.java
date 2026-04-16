@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.datavines;
 
 /**
- * Custom DinkyTaskConstants
+ * Constants for Datavines tasks.
  */
 public class DatavinesTaskConstants {
 

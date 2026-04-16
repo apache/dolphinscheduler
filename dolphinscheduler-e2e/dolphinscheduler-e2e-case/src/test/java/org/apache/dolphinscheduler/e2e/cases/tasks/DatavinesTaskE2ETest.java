@@ -146,4 +146,39 @@ public class DatavinesTaskE2ETest extends BaseWorkflowE2ETest {
         TaskInstanceTab.Row taskInstance = untilTaskInstanceSuccess(workflowName, taskName);
         assertThat(taskInstance.retryTimes()).isEqualTo(0);
     }
+
+    @Test
+    @Order(30)
+    void testRunDatavinesTasks_FailureCase() {
+        WorkflowDefinitionTab workflowDefinitionPage =
+                new ProjectPage(browser)
+                        .goToNav(ProjectPage.class)
+                        .goTo(projectName)
+                        .goToTab(WorkflowDefinitionTab.class);
+
+        String workflowName = "DatavinesFailureCase";
+        String taskName = "DatavinesFailureTask";
+        // Job ID "2" is configured in MockServer to return execution status FAILURE
+        workflowDefinitionPage
+                .createWorkflow()
+                .<DatavinesTaskForm>addTask(WorkflowForm.TaskType.DATAVINES)
+                .address(mockServerAddress)
+                .jobId("2")
+                .token(token)
+                .name(taskName)
+                .submit()
+
+                .submit()
+                .name(workflowName)
+                .submit();
+
+        untilWorkflowDefinitionExist(workflowName);
+
+        workflowDefinitionPage.publish(workflowName);
+
+        runWorkflow(workflowName);
+        untilWorkflowInstanceExist(workflowName);
+        WorkflowInstanceTab.Row workflowInstance = untilWorkflowInstanceFailed(workflowName);
+        assertThat(workflowInstance.executionTime()).isEqualTo(1);
+    }
 }

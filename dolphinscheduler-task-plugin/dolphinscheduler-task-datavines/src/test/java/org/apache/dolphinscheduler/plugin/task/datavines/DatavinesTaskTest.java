@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.task.datavines;
 
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
-import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -78,10 +78,15 @@ class DatavinesTaskTest {
 
     @Test
     void submitApplicationExecutesJobSuccessfully() {
-        when(taskExecutionContext.getTaskParams())
-                .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
-        datavinesTask.init();
-        assertDoesNotThrow(() -> datavinesTask.submitApplication());
+        JsonNode executeJobResult = RequestUtils.parse("{\"code\":200,\"data\":\"1\"}");
+        try (MockedStatic<RequestUtils> requestUtilsStatic = Mockito.mockStatic(RequestUtils.class)) {
+            when(taskExecutionContext.getTaskParams())
+                    .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
+            datavinesTask.init();
+            requestUtilsStatic.when(() -> RequestUtils.executeJob(Mockito.any(), Mockito.any(), Mockito.any()))
+                    .thenReturn(executeJobResult);
+            assertDoesNotThrow(() -> datavinesTask.submitApplication());
+        }
     }
 
     @Test
@@ -113,12 +118,22 @@ class DatavinesTaskTest {
 
     @Test
     void trackApplicationStatusJobExecutionFailureSetsExitCodeFailure() throws TaskException {
-        when(taskExecutionContext.getTaskParams())
-                .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
-        datavinesTask.init();
-        datavinesTask.submitApplication();
-        datavinesTask.trackApplicationStatus();
-        Assertions.assertEquals(EXIT_CODE_FAILURE, datavinesTask.getExitStatusCode());
+        JsonNode executeJobResult = RequestUtils.parse("{\"code\":500,\"msg\":\"error\",\"data\":\"error\"}");
+        JsonNode failureStatus = RequestUtils.parse("{\"code\":200,\"data\":\"FAILURE\"}");
+        try (MockedStatic<RequestUtils> requestUtilsStatic = Mockito.mockStatic(RequestUtils.class)) {
+            when(taskExecutionContext.getTaskParams())
+                    .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
+            datavinesTask.init();
+            requestUtilsStatic.when(() -> RequestUtils.executeJob(Mockito.any(), Mockito.any(), Mockito.any()))
+                    .thenReturn(executeJobResult);
+            datavinesTask.submitApplication();
+
+            requestUtilsStatic
+                    .when(() -> RequestUtils.getJobExecutionStatus(Mockito.any(), Mockito.any(), Mockito.any()))
+                    .thenReturn(failureStatus);
+            datavinesTask.trackApplicationStatus();
+            Assertions.assertEquals(EXIT_CODE_FAILURE, datavinesTask.getExitStatusCode());
+        }
     }
 
     @Test
@@ -134,23 +149,27 @@ class DatavinesTaskTest {
         DatavinesParameters parameters = new DatavinesParameters();
         parameters.setAddress("http://localhost");
         parameters.setJobId("1");
+        parameters.setToken("token");
         Assertions.assertTrue(parameters.checkParameters());
     }
 
     static Stream<Arguments> invalidCheckParametersInputs() {
         return Stream.of(
-                Arguments.of("", "1"),
-                Arguments.of("http://localhost", ""),
-                Arguments.of(null, "1"),
-                Arguments.of("http://localhost", null));
+                Arguments.of("", "1", "token"),
+                Arguments.of("http://localhost", "", "token"),
+                Arguments.of(null, "1", "token"),
+                Arguments.of("http://localhost", null, "token"),
+                Arguments.of("http://localhost", "1", ""),
+                Arguments.of("http://localhost", "1", null));
     }
 
     @ParameterizedTest
     @MethodSource("invalidCheckParametersInputs")
-    void checkParametersInvalidInputsReturnsFalse(String address, String jobId) {
+    void checkParametersInvalidInputsReturnsFalse(String address, String jobId, String token) {
         DatavinesParameters parameters = new DatavinesParameters();
         parameters.setAddress(address);
         parameters.setJobId(jobId);
+        parameters.setToken(token);
         Assertions.assertFalse(parameters.checkParameters());
     }
 
