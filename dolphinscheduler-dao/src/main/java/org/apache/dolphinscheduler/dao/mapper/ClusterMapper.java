@@ -26,9 +26,6 @@ import java.util.List;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
-/**
- * cluster mapper interface
- */
 public interface ClusterMapper extends BaseMapper<Cluster> {
 
     /**

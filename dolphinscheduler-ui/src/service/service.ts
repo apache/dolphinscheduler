@@ -15,7 +15,12 @@
  * limitations under the License.
  */
 
-import axios, { AxiosRequestConfig, AxiosResponse, AxiosError } from 'axios'
+import axios, {
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+  InternalAxiosRequestConfig
+} from 'axios'
 import { useUserStore } from '@/store/user/user'
 import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import qs from 'qs'
@@ -60,8 +65,13 @@ const baseRequestConfig: AxiosRequestConfig = {
 
 const service = axios.create(baseRequestConfig)
 
-const err = (err: AxiosError): Promise<AxiosError> => {
-  if (err.response?.status === 401 || err.response?.status === 504) {
+const err = (error: unknown): Promise<never> => {
+  const axiosError = error as AxiosError
+
+  if (
+    axiosError.response?.status === 401 ||
+    axiosError.response?.status === 504
+  ) {
     userStore.setSessionId('')
     userStore.setSecurityConfigType('')
     userStore.setUserInfo({})
@@ -69,14 +79,13 @@ const err = (err: AxiosError): Promise<AxiosError> => {
     router.push({ path: '/login' })
   }
 
-  return Promise.reject(err)
+  return Promise.reject(error)
 }
 
-service.interceptors.request.use((config: AxiosRequestConfig<any>) => {
-  config.headers = config.headers || {}
-  config.headers.sessionId = userStore.getSessionId
+service.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  config.headers.set('sessionId', userStore.getSessionId)
   const language = cookies.get('language')
-  if (language) config.headers.language = language
+  if (language) config.headers.set('language', language)
 
   return config
 }, err)

@@ -22,6 +22,9 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 
 import java.util.List;
 
+import lombok.Data;
+
+@Data
 public class PythonParameters extends AbstractParameters {
 
     /**
@@ -29,26 +32,7 @@ public class PythonParameters extends AbstractParameters {
      */
     private String rawScript;
 
-    /**
-     * resource list
-     */
     private List<ResourceInfo> resourceList;
-
-    public String getRawScript() {
-        return rawScript;
-    }
-
-    public void setRawScript(String rawScript) {
-        this.rawScript = rawScript;
-    }
-
-    public List<ResourceInfo> getResourceList() {
-        return resourceList;
-    }
-
-    public void setResourceList(List<ResourceInfo> resourceList) {
-        this.resourceList = resourceList;
-    }
 
     @Override
     public boolean checkParameters() {

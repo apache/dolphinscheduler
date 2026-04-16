@@ -41,7 +41,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -68,9 +67,6 @@ import org.mockito.quality.Strictness;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * task instance service test
- */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class TaskInstanceServiceTest {
@@ -94,10 +90,8 @@ public class TaskInstanceServiceTest {
     UsersService usersService;
 
     @Mock
-    TaskDefinitionMapper taskDefinitionMapper;
-
-    @Mock
     TaskInstanceDao taskInstanceDao;
+
     @Mock
     WorkflowInstanceDao workflowInstanceDao;
 

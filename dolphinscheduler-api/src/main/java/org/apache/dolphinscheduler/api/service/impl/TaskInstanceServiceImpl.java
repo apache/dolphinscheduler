@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -88,9 +87,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Autowired
     UsersService usersService;
-
-    @Autowired
-    TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
     private TaskGroupQueueService taskGroupQueueService;
@@ -300,19 +296,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
         putMsg(result, Status.SUCCESS);
         return result;
-    }
-
-    @Override
-    public TaskInstance queryTaskInstanceById(User loginUser, long projectCode, Long taskInstanceId) {
-        Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, FORCED_SUCCESS);
-        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
-        if (taskInstance == null) {
-            log.error("Task instance can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
-                    taskInstanceId);
-        }
-        return taskInstance;
     }
 
     @Override

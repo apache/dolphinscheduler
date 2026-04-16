@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.api.service.impl.AlertPluginInstanceServiceIm
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -63,9 +62,6 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * alert plugin instance service test
- */
 @ExtendWith(MockitoExtension.class)
 public class AlertPluginInstanceServiceTest {
 
@@ -94,10 +90,6 @@ public class AlertPluginInstanceServiceTest {
     private User user;
 
     private User noPermUser;
-
-    private final Integer GLOBAL_ALERT_GROUP_ID = 2;
-
-    private static final WarningType warningType = WarningType.ALL;
 
     private String uiParams = "[\n"
             + "    {\n"

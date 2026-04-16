@@ -67,9 +67,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-/**
- * data source service impl
- */
 @Service
 @Slf4j
 public class DataSourceServiceImpl extends BaseServiceImpl implements DataSourceService {

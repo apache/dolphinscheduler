@@ -25,9 +25,6 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 
-/**
- * NettyUtils
- */
 public class NettyUtils {
 
     private NettyUtils() {

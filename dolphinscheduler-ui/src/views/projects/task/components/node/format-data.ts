@@ -304,6 +304,13 @@ export function formatParams(data: INodeData): {
     taskParams.stepsDefineJson = data.stepsDefineJson
   }
 
+  if (data.taskType === 'EMR_SERVERLESS') {
+    taskParams.applicationId = data.applicationId
+    taskParams.executionRoleArn = data.executionRoleArn
+    taskParams.jobName = data.jobName
+    taskParams.startJobRunRequestJson = data.startJobRunRequestJson
+  }
+
   if (data.taskType === 'ZEPPELIN') {
     taskParams.noteId = data.noteId
     taskParams.paragraphId = data.paragraphId

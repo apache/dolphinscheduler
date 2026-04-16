@@ -25,6 +25,12 @@ export default {
     directory_detail: '目录详情',
     host: '主机',
     directory: '注册目录',
+    running_workflows: '运行中的工作流',
+    workflow_name: '工作流实例',
+    workflow_state: '状态',
+    workflow_start_time: '开始时间',
+    workflow_run_times: '运行次数',
+    running_tasks: '运行中的任务',
     master_no_data_result_title: 'Master节点不存在',
     master_no_data_result_desc:
       '目前没有任何Master节点，请先创建Master节点，再访问该页面'
@@ -39,6 +45,11 @@ export default {
     directory_detail: '目录详情',
     host: '主机',
     directory: '注册目录',
+    running_tasks: '运行中的任务',
+    task_name: '任务名称',
+    task_type: '任务类型',
+    task_workflow_instance: '工作流实例',
+    task_start_time: '开始时间',
     worker_no_data_result_title: 'Worker节点不存在',
     worker_no_data_result_desc:
       '目前没有任何Worker节点，请先创建Worker节点，再访问该页面'

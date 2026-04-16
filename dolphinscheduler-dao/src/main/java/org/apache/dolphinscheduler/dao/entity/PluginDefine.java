@@ -30,39 +30,21 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_plugin_define")
 public class PluginDefine {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * plugin name
-     */
     @TableField("plugin_name")
     private String pluginName;
 
-    /**
-     * plugin_type
-     */
     @TableField("plugin_type")
     private String pluginType;
 
-    /**
-     * plugin_params
-     */
     @TableField("plugin_params")
     private String pluginParams;
 
-    /**
-     * create_time
-     */
     @TableField("create_time")
     private Date createTime;
 
-    /**
-     * update_time
-     */
     @TableField("update_time")
     private Date updateTime;
 

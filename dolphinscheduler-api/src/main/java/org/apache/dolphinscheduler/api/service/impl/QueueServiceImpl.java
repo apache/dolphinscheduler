@@ -52,9 +52,6 @@ import org.springframework.stereotype.Service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * queue service impl
- */
 @Service
 @Slf4j
 public class QueueServiceImpl extends BaseServiceImpl implements QueueService {

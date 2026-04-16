@@ -32,6 +32,4 @@ public interface RelationSubWorkflowMapper extends BaseMapper<RelationSubWorkflo
     List<RelationSubWorkflow> queryAllSubWorkflowInstance(@Param("parentWorkflowInstanceId") Long parentWorkflowInstanceId,
                                                           @Param("parentTaskCode") Long parentTaskCode);
 
-    RelationSubWorkflow queryParentWorkflowInstance(@Param("subWorkflowInstanceId") Long subWorkflowInstanceId);
-
 }

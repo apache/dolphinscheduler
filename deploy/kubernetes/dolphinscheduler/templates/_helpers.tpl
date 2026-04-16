@@ -151,7 +151,7 @@ Create a database environment variables.
 {{- end }}
 - name: SPRING_DATASOURCE_URL
   {{- if .Values.postgresql.enabled }}
-  value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?{{ .Values.postgresql.params }}
+  value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.auth.database }}?{{ .Values.postgresql.params }}
   {{- else if .Values.mysql.enabled }}
   value: jdbc:mysql://{{ template "dolphinscheduler.mysql.fullname" . }}:3306/{{ .Values.mysql.auth.database }}?{{ .Values.mysql.auth.params }}
   {{- else }}
@@ -159,7 +159,7 @@ Create a database environment variables.
   {{- end }}
 - name: SPRING_DATASOURCE_USERNAME
   {{- if .Values.postgresql.enabled }}
-  value: {{ .Values.postgresql.postgresqlUsername }}
+  value: {{ .Values.postgresql.auth.username }}
   {{- else if .Values.mysql.enabled }}
   value: {{ .Values.mysql.auth.username }}
   {{- else }}
@@ -170,7 +170,7 @@ Create a database environment variables.
     secretKeyRef:
       {{- if .Values.postgresql.enabled }}
       name: {{ template "dolphinscheduler.postgresql.fullname" . }}
-      key: postgresql-password
+      key: password
       {{- else if .Values.mysql.enabled }}
       name: {{ template "dolphinscheduler.mysql.fullname" . }}
       key: mysql-password

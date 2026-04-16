@@ -22,9 +22,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * alert data
- */
 @AllArgsConstructor
 @Builder
 @Data

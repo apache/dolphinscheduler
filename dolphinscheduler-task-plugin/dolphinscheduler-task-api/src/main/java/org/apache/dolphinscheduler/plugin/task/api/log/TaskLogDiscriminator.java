@@ -28,9 +28,6 @@ import org.slf4j.MDC;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.sift.AbstractDiscriminator;
 
-/**
- * Task Log Discriminator
- */
 @Slf4j
 @Getter
 @Setter

@@ -38,15 +38,12 @@ import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -70,9 +67,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
-/**
- * users service test
- */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class UsersServiceTest {
@@ -86,9 +80,6 @@ public class UsersServiceTest {
     private UserMapper userMapper;
 
     @Mock
-    private AccessTokenMapper accessTokenMapper;
-
-    @Mock
     private TenantMapper tenantMapper;
 
     @Mock
@@ -98,22 +89,13 @@ public class UsersServiceTest {
     private DataSourceUserMapper datasourceUserMapper;
 
     @Mock
-    private ProjectUserMapper projectUserMapper;
-
-    @Mock
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
 
     @Mock
     private ProjectMapper projectMapper;
 
     @Mock
-    private StorageOperator storageOperator;
-
-    @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
-
-    @Mock
-    private SessionService sessionService;
 
     private String queueName = "UsersServiceTestQueue";
 

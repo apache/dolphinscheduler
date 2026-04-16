@@ -39,9 +39,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-/**
- * users controller test
- */
 public class UsersControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(UsersControllerTest.class);

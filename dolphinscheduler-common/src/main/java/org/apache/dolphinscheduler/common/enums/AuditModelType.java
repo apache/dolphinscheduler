@@ -23,9 +23,6 @@ import java.util.List;
 
 import lombok.Getter;
 
-/**
- * Audit Model type
- */
 @Getter
 public enum AuditModelType {
 

@@ -20,13 +20,13 @@ package org.apache.dolphinscheduler.plugin.datasource.azuresql.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+@EqualsAndHashCode(callSuper = true)
 @ToString
-@Getter
-@Setter
+@Data
 public class AzureSQLDataSourceParamDTO extends BaseDataSourceParamDTO {
 
     protected AzureSQLAuthMode mode;

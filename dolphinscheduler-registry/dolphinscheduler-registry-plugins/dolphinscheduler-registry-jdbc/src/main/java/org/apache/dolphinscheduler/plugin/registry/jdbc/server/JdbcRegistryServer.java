@@ -61,8 +61,6 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
 
     private final JdbcRegistryProperties jdbcRegistryProperties;
 
-    private final JdbcRegistryDataRepository jdbcRegistryDataRepository;
-
     private final JdbcRegistryLockRepository jdbcRegistryLockRepository;
 
     private final JdbcRegistryClientRepository jdbcRegistryClientRepository;
@@ -88,7 +86,6 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                               JdbcRegistryDataChangeEventRepository jdbcRegistryDataChangeEventRepository,
                               JdbcRegistryProperties jdbcRegistryProperties,
                               TransactionTemplate transactionTemplate) {
-        this.jdbcRegistryDataRepository = checkNotNull(jdbcRegistryDataRepository);
         this.jdbcRegistryLockRepository = checkNotNull(jdbcRegistryLockRepository);
         this.jdbcRegistryClientRepository = checkNotNull(jdbcRegistryClientRepository);
         this.jdbcRegistryProperties = checkNotNull(jdbcRegistryProperties);

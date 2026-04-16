@@ -23,9 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Task Definition Log DAO
- */
 public interface TaskDefinitionLogDao extends IDao<TaskDefinitionLog> {
 
     List<TaskDefinitionLog> queryByWorkflowDefinitionCodeAndVersion(Long workflowDefinitionCode,

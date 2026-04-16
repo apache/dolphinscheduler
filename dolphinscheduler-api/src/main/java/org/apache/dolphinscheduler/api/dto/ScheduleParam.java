@@ -19,9 +19,12 @@ package org.apache.dolphinscheduler.api.dto;
 
 import java.util.Date;
 
+import lombok.Data;
+
 /**
  * schedule parameters
  */
+@Data
 public class ScheduleParam {
 
     private Date startTime;
@@ -37,38 +40,6 @@ public class ScheduleParam {
         this.endTime = endTime;
         this.timezoneId = timezoneId;
         this.crontab = crontab;
-    }
-
-    public Date getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(Date startTime) {
-        this.startTime = startTime;
-    }
-
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getCrontab() {
-        return crontab;
-    }
-
-    public void setCrontab(String crontab) {
-        this.crontab = crontab;
-    }
-
-    public String getTimezoneId() {
-        return timezoneId;
-    }
-
-    public void setTimezoneId(String timezoneId) {
-        this.timezoneId = timezoneId;
     }
 
     @Override

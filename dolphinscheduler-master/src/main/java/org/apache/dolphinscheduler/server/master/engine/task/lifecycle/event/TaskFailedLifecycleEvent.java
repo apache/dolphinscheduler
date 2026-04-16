@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import java.util.Date;
 
@@ -33,7 +33,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class TaskFailedLifecycleEvent extends AbstractTaskLifecycleEvent {
 
-    private final ITaskExecutionRunnable taskExecutionRunnable;
+    private final ITaskExecution taskExecution;
 
     private final Date endTime;
 
@@ -45,7 +45,7 @@ public class TaskFailedLifecycleEvent extends AbstractTaskLifecycleEvent {
     @Override
     public String toString() {
         return "TaskFailedLifecycleEvent{" +
-                "task=" + taskExecutionRunnable.getName() +
+                "task=" + taskExecution.getName() +
                 ", endTime=" + endTime +
                 '}';
     }

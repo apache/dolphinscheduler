@@ -552,10 +552,14 @@ export default {
     sql_type_query: 'Query',
     sql_type_non_query: 'Non Query',
     sql_statement: 'SQL Statement',
+    sql_source: 'SQL Source',
+    sql_source_script: 'Script',
+    sql_source_file: 'Resource file',
     pre_sql_statement: 'Pre SQL Statement',
     post_sql_statement: 'Post SQL Statement',
     sql_input_placeholder: 'Please enter non-query sql.',
     sql_empty_tips: 'The sql can not be empty.',
+    sql_resource_file: 'SQL Resource File',
     procedure_method: 'SQL Statement',
     procedure_method_tips: 'Please enter the procedure script',
     procedure_method_snippet:
@@ -742,6 +746,18 @@ export default {
     emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
     emr_steps_define_json: 'stepsDefineJson',
     emr_steps_define_json_tips: 'Please enter the definition of the emr step.',
+    emr_serverless_application_id: 'Application ID',
+    emr_serverless_application_id_tips:
+      'Please enter the EMR Serverless Application ID',
+    emr_serverless_execution_role_arn: 'Execution Role ARN',
+    emr_serverless_execution_role_arn_tips:
+      'Please enter the IAM execution role ARN',
+    emr_serverless_job_name: 'Job Name',
+    emr_serverless_job_name_tips:
+      'Optional. Defaults to the task name if empty',
+    emr_serverless_start_job_run_json: 'StartJobRun JSON',
+    emr_serverless_start_job_run_json_tips:
+      'Please enter the StartJobRun request JSON (jobDriver, configurationOverrides, etc.)',
     zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: 'Please enter the note id of your zeppelin note',
     zeppelin_paragraph_id: 'zeppelinParagraphId',

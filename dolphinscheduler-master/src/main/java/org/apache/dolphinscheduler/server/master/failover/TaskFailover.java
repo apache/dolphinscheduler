@@ -18,8 +18,8 @@
 package org.apache.dolphinscheduler.server.master.failover;
 
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailoverLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
 import org.springframework.stereotype.Component;
@@ -27,10 +27,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskFailover {
 
-    public void failoverTask(final ITaskExecutionRunnable taskExecutionRunnable) {
-        LogUtils.setWorkflowInstanceIdMDC(taskExecutionRunnable.getWorkflowInstance().getId());
-        WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(taskExecutionRunnable.getWorkflowInstance().getLogPath());
-        taskExecutionRunnable.getWorkflowEventBus().publish(TaskFailoverLifecycleEvent.of(taskExecutionRunnable));
+    public void failoverTask(final ITaskExecution taskExecution) {
+        LogUtils.setWorkflowInstanceIdMDC(taskExecution.getWorkflowInstance().getId());
+        taskExecution.getWorkflowEventBus().publish(TaskFailoverLifecycleEvent.of(taskExecution));
         LogUtils.removeWorkflowInstanceIdMDC();
         WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
     }

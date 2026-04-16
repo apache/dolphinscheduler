@@ -23,15 +23,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
 @ToString
 public class DatasyncParameters extends AbstractParameters {
@@ -64,8 +62,7 @@ public class DatasyncParameters extends AbstractParameters {
         }
     }
 
-    @Setter
-    @Getter
+    @Data
     @NoArgsConstructor
     @ToString
     public class Options {
@@ -86,16 +83,14 @@ public class DatasyncParameters extends AbstractParameters {
         private String securityDescriptorCopyFlags;
         private String objectTags;
     }
-    @Setter
-    @Getter
+    @Data
     @NoArgsConstructor
     @ToString
     public static class TaskSchedule {
 
         private String scheduleExpression;
     }
-    @Setter
-    @Getter
+    @Data
     @NoArgsConstructor
     @ToString
     public static class FilterRule {
@@ -103,8 +98,7 @@ public class DatasyncParameters extends AbstractParameters {
         private String filterType;
         private String value;
     }
-    @Setter
-    @Getter
+    @Data
     @NoArgsConstructor
     @ToString
     public static class TagListEntry {

@@ -44,15 +44,9 @@ public class AlertSendStatus {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * alert id
-     */
     @TableField(value = "alert_id")
     private int alertId;
 
-    /**
-     * alert plugin instance id
-     */
     @TableField(value = "alert_plugin_instance_id")
     private int alertPluginInstanceId;
 
@@ -62,15 +56,9 @@ public class AlertSendStatus {
     @TableField(value = "send_status")
     private AlertStatus sendStatus;
 
-    /**
-     * log
-     */
     @TableField(value = "log")
     private String log;
 
-    /**
-     * create_time
-     */
     @TableField("create_time")
     private Date createTime;
 

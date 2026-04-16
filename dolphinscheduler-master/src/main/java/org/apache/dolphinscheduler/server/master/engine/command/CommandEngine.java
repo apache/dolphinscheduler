@@ -35,9 +35,9 @@ import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtecti
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBusCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.CommandDuplicateHandleException;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.WorkflowExecutionFactory;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStartLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnableFactory;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 import org.apache.dolphinscheduler.service.command.CommandService;
@@ -82,7 +82,7 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private WorkflowExecutionRunnableFactory workflowExecutionRunnableFactory;
+    private WorkflowExecutionFactory workflowExecutionFactory;
 
     @Autowired
     private MetricsProvider metricsProvider;
@@ -144,7 +144,7 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
                         return command;
                     }, commandHandleThreadPool)
                             .thenApply(this::bootstrapCommand)
-                            .thenAccept(this::bootstrapWorkflowExecutionRunnable)
+                            .thenAccept(this::bootstrapWorkflowExecution)
                             .thenAccept((unused) -> bootstrapSuccess(command))
                             .exceptionally(throwable -> bootstrapError(command, throwable))
                             .whenComplete((result, throwable) -> LogUtils.removeWorkflowInstanceIdMDC());
@@ -163,13 +163,13 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
         }
     }
 
-    private IWorkflowExecutionRunnable bootstrapCommand(Command command) {
-        return workflowExecutionRunnableFactory.createWorkflowExecuteRunnable(command);
+    private IWorkflowExecution bootstrapCommand(Command command) {
+        return workflowExecutionFactory.createWorkflowExecuteRunnable(command);
     }
 
-    private CompletableFuture<Void> bootstrapWorkflowExecutionRunnable(IWorkflowExecutionRunnable workflowExecutionRunnable) {
+    private CompletableFuture<Void> bootstrapWorkflowExecution(IWorkflowExecution workflowExecution) {
         final WorkflowInstance workflowInstance =
-                workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance();
+                workflowExecution.getWorkflowExecuteContext().getWorkflowInstance();
 
         if (workflowInstance.getState() == WorkflowExecutionStatus.SERIAL_WAIT) {
             log.info("The workflow {} state is: {} will not be trigger now",
@@ -179,10 +179,10 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
         }
 
         WorkflowInstanceMetrics.recordWorkflowInstanceSubmit(workflowInstance.getWorkflowDefinitionCode());
-        workflowRepository.put(workflowExecutionRunnable);
-        workflowEventBusCoordinator.registerWorkflowEventBus(workflowExecutionRunnable);
-        workflowExecutionRunnable.getWorkflowEventBus()
-                .publish(WorkflowStartLifecycleEvent.of(workflowExecutionRunnable));
+        workflowRepository.put(workflowExecution);
+        workflowEventBusCoordinator.registerWorkflowEventBus(workflowExecution);
+        workflowExecution.getWorkflowEventBus()
+                .publish(WorkflowStartLifecycleEvent.of(workflowExecution));
         return CompletableFuture.completedFuture(null);
     }
 

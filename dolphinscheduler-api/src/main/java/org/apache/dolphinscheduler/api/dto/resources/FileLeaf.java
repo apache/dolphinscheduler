@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.api.dto.resources;
 
-/**
- * file leaf
- */
 public class FileLeaf extends ResourceComponent {
 
 }

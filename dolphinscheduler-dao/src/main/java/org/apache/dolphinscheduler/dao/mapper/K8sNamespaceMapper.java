@@ -51,14 +51,6 @@ public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
     Boolean existNamespace(@Param("namespace") String namespace, @Param("clusterCode") Long clusterCode);
 
     /**
-     * query namespace except userId
-     *
-     * @param userId userId
-     * @return namespace list
-     */
-    List<K8sNamespace> queryNamespaceExceptUserId(@Param("userId") int userId);
-
-    /**
      * query authed namespace list by userId
      *
      * @param userId userId
@@ -66,11 +58,4 @@ public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
      */
     List<K8sNamespace> queryAuthedNamespaceListByUserId(@Param("userId") Integer userId);
 
-    /**
-     * check the target namespace
-     *
-     * @param namespaceCode namespaceCode
-     * @return true if exist else return null
-     */
-    K8sNamespace queryByNamespaceCode(@Param("clusterCode") Long namespaceCode);
 }

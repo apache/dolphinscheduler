@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -60,19 +59,14 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskModel;
@@ -144,12 +138,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
-
-    @Mock
-    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
-
-    @Mock
     private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
@@ -174,31 +162,10 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Mock
-    private WorkflowInstanceService workflowInstanceService;
-
-    @Mock
-    private DataSourceMapper dataSourceMapper;
-
-    @Mock
     private WorkflowLineageService workflowLineageService;
 
     @Mock
-    private TaskDefinitionService taskDefinitionService;
-
-    @Mock
-    private TaskDefinitionLogService taskDefinitionLogService;
-
-    @Mock
-    private WorkflowDefinitionLogDao workflowDefinitionLogDao;
-
-    @Mock
-    private TaskDefinitionLogMapper taskDefinitionLogMapper;
-
-    @Mock
     private UserMapper userMapper;
-
-    @Mock
-    private GlobalParamsValidator globalParamsValidator;
 
     protected User user;
     protected Exception exception;
@@ -207,10 +174,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     protected final static long processDefinitionCode = 11L;
     protected final static String name = "testProcessDefinitionName";
     protected final static String description = "this is a description";
-    protected final static String releaseState = "ONLINE";
-    protected final static int warningGroupId = 1;
     protected final static int timeout = 60;
-    protected final static String executionType = "PARALLEL";
 
     @BeforeEach
     public void before() {

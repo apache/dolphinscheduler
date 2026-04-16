@@ -46,16 +46,6 @@ public class PostgresqlDialect implements DatabaseDialect {
         }
     }
 
-    @SneakyThrows
-    @Override
-    public boolean columnExists(String tableName, String columnName) {
-        try (
-                Connection conn = dataSource.getConnection();
-                ResultSet rs = conn.getMetaData().getTables(conn.getCatalog(), getSchema(), tableName, null)) {
-            return rs.next();
-        }
-    }
-
     private String getSchema() throws SQLException {
         try (
                 Connection conn = dataSource.getConnection();

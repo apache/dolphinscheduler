@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 import org.springframework.stereotype.Component;
 
@@ -31,10 +31,10 @@ public class TaskFatalLifecycleEventHandler extends AbstractTaskLifecycleEventHa
 
     @Override
     public void handle(final ITaskStateAction taskStateAction,
-                       final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                       final ITaskExecutionRunnable taskExecutionRunnable,
+                       final IWorkflowExecution workflowExecution,
+                       final ITaskExecution taskExecution,
                        final TaskFatalLifecycleEvent taskFatalEvent) {
-        taskStateAction.onFatalEvent(workflowExecutionRunnable, taskExecutionRunnable, taskFatalEvent);
+        taskStateAction.onFatalEvent(workflowExecution, taskExecution, taskFatalEvent);
     }
 
     @Override
