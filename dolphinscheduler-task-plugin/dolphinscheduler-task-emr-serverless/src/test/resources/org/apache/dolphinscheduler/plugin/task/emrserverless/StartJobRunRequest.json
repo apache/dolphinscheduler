@@ -1,0 +1,16 @@
+{
+  "JobDriver": {
+    "SparkSubmit": {
+      "EntryPoint": "s3://my-bucket/scripts/spark-etl.py",
+      "EntryPointArguments": ["--input", "s3://data/raw", "--output", "s3://data/processed"],
+      "SparkSubmitParameters": "--conf spark.executor.cores=4 --conf spark.executor.memory=16g --conf spark.executor.instances=10"
+    }
+  },
+  "ConfigurationOverrides": {
+    "MonitoringConfiguration": {
+      "S3MonitoringConfiguration": {
+        "LogUri": "s3://my-bucket/emr-serverless-logs/"
+      }
+    }
+  }
+}

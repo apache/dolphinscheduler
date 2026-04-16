@@ -33,6 +33,7 @@ task:
     - 'REMOTESHELL'
   cloud:
     - 'EMR'
+    - 'EMR_SERVERLESS'
     - 'K8S'
     - 'DMS'
     - 'DATA_FACTORY'

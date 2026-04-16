@@ -23,9 +23,6 @@ import org.apache.ibatis.annotations.Param;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-/**
- * project user mapper interface
- */
 public interface ProjectUserMapper extends BaseMapper<ProjectUser> {
 
     /**

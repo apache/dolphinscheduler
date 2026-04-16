@@ -28,14 +28,8 @@ import lombok.Data;
 @Data
 public class SparkParameters extends AbstractParameters {
 
-    /**
-     * main jar
-     */
     private ResourceInfo mainJar;
 
-    /**
-     * main class
-     */
     private String mainClass;
 
     /**
@@ -79,9 +73,6 @@ public class SparkParameters extends AbstractParameters {
      */
     private String executorMemory;
 
-    /**
-     * app name
-     */
     private String appName;
 
     /**

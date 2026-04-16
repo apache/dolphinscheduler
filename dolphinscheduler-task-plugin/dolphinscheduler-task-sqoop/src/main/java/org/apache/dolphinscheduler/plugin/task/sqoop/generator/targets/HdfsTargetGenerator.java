@@ -36,9 +36,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * hdfs target generator
- */
 @Slf4j
 public class HdfsTargetGenerator implements ITargetGenerator {
 

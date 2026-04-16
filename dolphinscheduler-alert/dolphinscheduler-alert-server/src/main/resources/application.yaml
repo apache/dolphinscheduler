@@ -16,6 +16,8 @@
 #
 
 spring:
+  application:
+    name: alert-server
   profiles:
     active: postgresql
   jackson:

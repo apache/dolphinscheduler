@@ -52,9 +52,6 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * cluster service test
- */
 @ExtendWith(MockitoExtension.class)
 public class ClusterServiceTest {
 

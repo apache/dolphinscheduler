@@ -19,10 +19,7 @@ package org.apache.dolphinscheduler.plugin.registry.jdbc.repository;
 
 import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryDataMapper;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryData;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataDTO;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,13 +45,6 @@ public class JdbcRegistryDataRepository {
     public Optional<JdbcRegistryDataDTO> selectByKey(String key) {
         return Optional.ofNullable(jdbcRegistryDataMapper.selectByKey(key))
                 .map(JdbcRegistryDataDTO::fromJdbcRegistryData);
-    }
-
-    public void deleteEphemeralDateByClientIds(List<Long> clientIds) {
-        if (CollectionUtils.isEmpty(clientIds)) {
-            return;
-        }
-        jdbcRegistryDataMapper.deleteByClientIds(clientIds, DataType.EPHEMERAL.name());
     }
 
     public void deleteByKey(String key) {

@@ -19,21 +19,13 @@ package org.apache.dolphinscheduler.plugin.task.sqoop.parameter.sources;
 
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SourceCommonParameter;
 
-/**
- * source hdfs parameter
- */
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class SourceHdfsParameter extends SourceCommonParameter {
 
-    /**
-     * export dir
-     */
     private String exportDir;
 
-    public String getExportDir() {
-        return exportDir;
-    }
-
-    public void setExportDir(String exportDir) {
-        this.exportDir = exportDir;
-    }
 }

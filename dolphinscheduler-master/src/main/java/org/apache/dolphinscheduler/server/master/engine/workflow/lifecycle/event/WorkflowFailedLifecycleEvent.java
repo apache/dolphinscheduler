@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -33,10 +33,10 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorkflowFailedLifecycleEvent extends AbstractWorkflowLifecycleLifecycleEvent {
 
-    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
+    private final IWorkflowExecution workflowExecution;
 
-    public static WorkflowFailedLifecycleEvent of(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        return new WorkflowFailedLifecycleEvent(workflowExecutionRunnable);
+    public static WorkflowFailedLifecycleEvent of(final IWorkflowExecution workflowExecution) {
+        return new WorkflowFailedLifecycleEvent(workflowExecution);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class WorkflowFailedLifecycleEvent extends AbstractWorkflowLifecycleLifec
     @Override
     public String toString() {
         return "WorkflowFailedLifecycleEvent{" +
-                "workflow=" + workflowExecutionRunnable.getName() +
+                "workflow=" + workflowExecution.getName() +
                 '}';
     }
 }

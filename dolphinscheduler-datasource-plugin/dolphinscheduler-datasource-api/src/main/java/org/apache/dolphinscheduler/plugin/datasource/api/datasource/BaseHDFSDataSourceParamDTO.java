@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.datasource;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
 public abstract class BaseHDFSDataSourceParamDTO extends BaseDataSourceParamDTO {
 
     protected String principal;
@@ -27,35 +32,4 @@ public abstract class BaseHDFSDataSourceParamDTO extends BaseDataSourceParamDTO 
 
     protected String loginUserKeytabPath;
 
-    public String getPrincipal() {
-        return principal;
-    }
-
-    public void setPrincipal(String principal) {
-        this.principal = principal;
-    }
-
-    public String getLoginUserKeytabUsername() {
-        return loginUserKeytabUsername;
-    }
-
-    public void setLoginUserKeytabUsername(String loginUserKeytabUsername) {
-        this.loginUserKeytabUsername = loginUserKeytabUsername;
-    }
-
-    public String getLoginUserKeytabPath() {
-        return loginUserKeytabPath;
-    }
-
-    public void setLoginUserKeytabPath(String loginUserKeytabPath) {
-        this.loginUserKeytabPath = loginUserKeytabPath;
-    }
-
-    public String getJavaSecurityKrb5Conf() {
-        return javaSecurityKrb5Conf;
-    }
-
-    public void setJavaSecurityKrb5Conf(String javaSecurityKrb5Conf) {
-        this.javaSecurityKrb5Conf = javaSecurityKrb5Conf;
-    }
 }

@@ -154,6 +154,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/emr.html',
                             },
                             {
+                                title: 'Amazon EMR Serverless',
+                                link: '/en-us/docs/dev/user_doc/guide/task/emr-serverless.html',
+                            },
+                            {
                                 title: 'Apache Zeppelin',
                                 link: '/en-us/docs/dev/user_doc/guide/task/zeppelin.html',
                             },
@@ -876,6 +880,10 @@ export default {
                             {
                                 title: 'Amazon EMR',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/emr.html',
+                            },
+                            {
+                                title: 'Amazon EMR Serverless',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/emr-serverless.html',
                             },
                             {
                                 title: 'Apache Zeppelin',

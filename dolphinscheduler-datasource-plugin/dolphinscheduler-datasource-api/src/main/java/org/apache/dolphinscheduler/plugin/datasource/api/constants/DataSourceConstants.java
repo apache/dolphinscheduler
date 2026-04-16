@@ -103,24 +103,12 @@ public class DataSourceConstants {
     public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
     public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
 
-    /**
-     * kerberos
-     */
     public static final String KERBEROS = "kerberos";
 
-    /**
-     * kerberos expire time
-     */
     public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
 
-    /**
-     * java.security.krb5.conf
-     */
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
 
-    /**
-     * java.security.krb5.conf.path
-     */
     public static final String JAVA_SECURITY_KRB5_CONF_PATH = "java.security.krb5.conf.path";
 
     /**
@@ -133,9 +121,6 @@ public class DataSourceConstants {
      */
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
 
-    /**
-     * hadoop.security.authentication
-     */
     public static final String HADOOP_SECURITY_AUTHENTICATION = "hadoop.security.authentication";
 
     /**

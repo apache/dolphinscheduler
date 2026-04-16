@@ -60,9 +60,6 @@ import org.springframework.dao.DuplicateKeyException;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * alert group service test
- */
 @ExtendWith(MockitoExtension.class)
 public class AlertGroupServiceTest {
 

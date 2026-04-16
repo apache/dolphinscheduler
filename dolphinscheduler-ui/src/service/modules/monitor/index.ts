@@ -31,3 +31,19 @@ export function listMonitorServerNode(nodeType: ServerNodeType): any {
     method: 'get'
   })
 }
+
+export function queryWorkflowExecutors(masterAddress: string): any {
+  return axios({
+    url: '/monitor/masters/workflow-executors',
+    method: 'get',
+    params: { masterAddress }
+  })
+}
+
+export function queryTaskExecutors(serverAddress: string): any {
+  return axios({
+    url: '/monitor/workers/task-executors',
+    method: 'get',
+    params: { serverAddress }
+  })
+}

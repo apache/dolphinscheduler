@@ -90,34 +90,36 @@ public class WorkflowTestCaseContextFactory {
         initializeWorkflowDefinitionToDB(workflowTestCaseContext.getWorkflows());
         initializeTaskDefinitionsToDB(workflowTestCaseContext.getTasks());
         initializeTaskRelationsToDB(workflowTestCaseContext.getTaskRelations());
-        if (CollectionUtils.isNotEmpty(workflowTestCaseContext.getWorkflowInstances())) {
-            initializeWorkflowInstancesToDB(workflowTestCaseContext.getWorkflowInstances());
-        }
-        if (CollectionUtils.isNotEmpty(workflowTestCaseContext.getTaskInstances())) {
-            initializeTaskInstancesToDB(workflowTestCaseContext.getTaskInstances());
-        }
-        if (CollectionUtils.isNotEmpty(workflowTestCaseContext.getTaskGroups())) {
-            initializeTaskGroupsToDB(workflowTestCaseContext.getTaskGroups());
-        }
-        if (CollectionUtils.isNotEmpty(workflowTestCaseContext.getEnvironments())) {
-            initializeEnvironmentToDB(workflowTestCaseContext.getEnvironments());
-        }
+
+        initializeWorkflowInstancesToDB(workflowTestCaseContext.getWorkflowInstances());
+        initializeTaskInstancesToDB(workflowTestCaseContext.getTaskInstances());
+        initializeTaskGroupsToDB(workflowTestCaseContext.getTaskGroups());
+        initializeEnvironmentToDB(workflowTestCaseContext.getEnvironments());
         return workflowTestCaseContext;
     }
 
     private void initializeTaskInstancesToDB(List<TaskInstance> taskInstances) {
+        if (CollectionUtils.isEmpty(taskInstances)) {
+            return;
+        }
         for (TaskInstance taskInstance : taskInstances) {
             taskInstanceDao.insert(taskInstance);
         }
     }
 
     private void initializeWorkflowInstancesToDB(List<WorkflowInstance> workflowInstances) {
+        if (CollectionUtils.isEmpty(workflowInstances)) {
+            return;
+        }
         for (WorkflowInstance workflowInstance : workflowInstances) {
             workflowInstanceDao.insert(workflowInstance);
         }
     }
 
     private void initializeWorkflowDefinitionToDB(final List<WorkflowDefinition> workflowDefinitions) {
+        if (CollectionUtils.isEmpty(workflowDefinitions)) {
+            return;
+        }
         for (final WorkflowDefinition workflowDefinition : workflowDefinitions) {
             workflowDefinitionDao.insert(workflowDefinition);
             final WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
@@ -128,6 +130,9 @@ public class WorkflowTestCaseContextFactory {
     }
 
     private void initializeTaskDefinitionsToDB(final List<TaskDefinition> taskDefinitions) {
+        if (CollectionUtils.isEmpty(taskDefinitions)) {
+            return;
+        }
         for (final TaskDefinition taskDefinition : taskDefinitions) {
             taskDefinitionDao.insert(taskDefinition);
 
@@ -139,6 +144,9 @@ public class WorkflowTestCaseContextFactory {
     }
 
     private void initializeTaskRelationsToDB(final List<WorkflowTaskRelation> taskRelations) {
+        if (CollectionUtils.isEmpty(taskRelations)) {
+            return;
+        }
         for (final WorkflowTaskRelation taskRelation : taskRelations) {
             workflowTaskRelationMapper.insert(taskRelation);
 
@@ -153,12 +161,18 @@ public class WorkflowTestCaseContextFactory {
     }
 
     private void initializeTaskGroupsToDB(final List<TaskGroup> taskGroups) {
+        if (CollectionUtils.isEmpty(taskGroups)) {
+            return;
+        }
         for (final TaskGroup taskGroup : taskGroups) {
             taskGroupDao.insert(taskGroup);
         }
     }
 
     private void initializeEnvironmentToDB(final List<Environment> environments) {
+        if (CollectionUtils.isEmpty(environments)) {
+            return;
+        }
         for (final Environment environment : environments) {
             environmentDao.insert(environment);
         }

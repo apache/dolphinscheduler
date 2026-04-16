@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
@@ -142,18 +141,6 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     @Override
     public WorkflowInstance queryFirstStartWorkflowInstance(Long definitionCode) {
         return mybatisMapper.queryFirstStartWorkflowInstance(definitionCode);
-    }
-
-    @Override
-    public WorkflowInstance querySubWorkflowInstanceByParentId(Integer workflowInstanceId, Integer taskInstanceId) {
-        WorkflowInstance workflowInstance = null;
-        WorkflowInstanceRelation workflowInstanceRelation =
-                workflowInstanceRelationMapper.queryByParentId(workflowInstanceId, taskInstanceId);
-        if (workflowInstanceRelation == null || workflowInstanceRelation.getWorkflowInstanceId() == 0) {
-            return workflowInstance;
-        }
-        workflowInstance = queryById(workflowInstanceRelation.getWorkflowInstanceId());
-        return workflowInstance;
     }
 
     @Override

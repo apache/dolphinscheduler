@@ -27,9 +27,6 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_relation_sub_workflow")
 public class RelationSubWorkflow {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 

@@ -19,9 +19,12 @@ package org.apache.dolphinscheduler.spi.params.input.number;
 
 import org.apache.dolphinscheduler.spi.params.base.ParamsProps;
 
+import lombok.Data;
+
 /**
  * front-end input number component props attributes
  */
+@Data
 public class InputNumberParamProps extends ParamsProps {
 
     /**
@@ -64,67 +67,4 @@ public class InputNumberParamProps extends ParamsProps {
      */
     private String label;
 
-    public Integer getMin() {
-        return min;
-    }
-
-    public void setMin(Integer min) {
-        this.min = min;
-    }
-
-    public Integer getMax() {
-        return max;
-    }
-
-    public void setMax(Integer max) {
-        this.max = max;
-    }
-
-    public Integer getStep() {
-        return step;
-    }
-
-    public void setStep(Integer step) {
-        this.step = step;
-    }
-
-    public Integer getPrecision() {
-        return precision;
-    }
-
-    public void setPrecision(Integer precision) {
-        this.precision = precision;
-    }
-
-    public Boolean getControls() {
-        return controls;
-    }
-
-    public void setControls(Boolean controls) {
-        this.controls = controls;
-    }
-
-    public String getControlsPosition() {
-        return controlsPosition;
-    }
-
-    public void setControlsPosition(String controlsPosition) {
-        this.controlsPosition = controlsPosition;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
 }

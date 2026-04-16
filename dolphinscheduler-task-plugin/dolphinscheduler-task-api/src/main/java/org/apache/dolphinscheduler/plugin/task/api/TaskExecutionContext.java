@@ -75,6 +75,10 @@ public class TaskExecutionContext implements Serializable {
 
     private int workflowInstanceId;
 
+    private String workflowInstanceName;
+
+    private Long projectCode;
+
     private long scheduleTime;
 
     private String globalParams;
@@ -123,8 +127,6 @@ public class TaskExecutionContext implements Serializable {
     private Integer memoryMax;
 
     private int dispatchFailTimes;
-
-    private boolean failover;
 
     private final long firstDispatchTime = System.currentTimeMillis();
 
