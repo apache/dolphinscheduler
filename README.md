@@ -1,5 +1,7 @@
 # Apache Dolphinscheduler
 
+> An open-source, low-code data orchestration platform for building and managing complex, high-performance workflows at scale.
+
 [![License](https://img.shields.io/badge/license-Apache%202-4EB1BA.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 ![codecov](https://codecov.io/gh/apache/dolphinscheduler/branch/dev/graph/badge.svg)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=apache-dolphinscheduler&metric=alert_status)](https://sonarcloud.io/dashboard?id=apache-dolphinscheduler)
