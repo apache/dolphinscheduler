@@ -118,7 +118,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                     buildAliyunServerlessSparkClient(accessKeyId, accessKeySecret, regionId, endpoint);
         } catch (Exception e) {
             log.error("Failed to build Aliyun-Serverless-Spark client!", e);
-            throw new AliyunServerlessSparkTaskException("Failed to build Aliyun-Serverless-Spark client!");
+            throw new AliyunServerlessSparkTaskException("Failed to build Aliyun-Serverless-Spark client! " + e.getMessage(), e);
         }
 
         currentState = RunState.Submitted;
@@ -154,7 +154,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                 return aliyunServerlessSparkClient.startJobRun(
                         aliyunServerlessSparkParameters.getWorkspaceId(), startJobRunRequest);
             } catch (Exception e) {
-                throw new AliyunServerlessSparkTaskException("Failed to start job run!");
+                throw new AliyunServerlessSparkTaskException("Failed to start job run! " + e.getMessage(), e);
             }
         }, retryPolicy);
 
@@ -224,7 +224,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                                 aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId,
                                 cancelJobRunRequest);
                     } catch (Exception e) {
-                        throw new AliyunServerlessSparkTaskException("Failed to cancel job run!");
+                        throw new AliyunServerlessSparkTaskException("Failed to cancel job run! " + e.getMessage(), e);
                     }
                 }, retryPolicy);
     }
