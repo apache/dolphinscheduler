@@ -16,68 +16,68 @@
   ~ limitations under the License.
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.apache.dolphinscheduler</groupId>
-        <artifactId>dolphinscheduler-datasource-plugin</artifactId>
-        <version>dev-SNAPSHOT</version>
-    </parent>
+           xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+      <modelVersion>4.0.0</modelVersion>
+      <parent>
+                <groupId>org.apache.dolphinscheduler</groupId>
+                <artifactId>dolphinscheduler-datasource-plugin</artifactId>
+                <version>dev-SNAPSHOT</version>
+      </parent>
 
-    <artifactId>dolphinscheduler-datasource-aliyunserverlessspark</artifactId>
-    <packaging>jar</packaging>
-    <name>${project.artifactId}</name>
+      <artifactId>dolphinscheduler-datasource-aliyunserverlessspark</artifactId>
+      <packaging>jar</packaging>
+      <name>${project.artifactId}</name>
 
-    <properties>
-        <plugin.name>datasource.aliyun.serverlessspark</plugin.name>
-    </properties>
+      <properties>
+                <plugin.name>datasource.aliyun.serverlessspark</plugin.name>
+      </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-spi</artifactId>
-            <scope>provided</scope>
-        </dependency>
+      <dependencies>
+                <dependency>
+                              <groupId>org.apache.dolphinscheduler</groupId>
+                              <artifactId>dolphinscheduler-spi</artifactId>
+                              <scope>provided</scope>
+                </dependency>
 
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-datasource-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
+                <dependency>
+                              <groupId>org.apache.dolphinscheduler</groupId>
+                              <artifactId>dolphinscheduler-datasource-api</artifactId>
+                              <scope>provided</scope>
+                </dependency>
 
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-common</artifactId>
-            <scope>provided</scope>
-        </dependency>
+                <dependency>
+                              <groupId>org.apache.dolphinscheduler</groupId>
+                              <artifactId>dolphinscheduler-common</artifactId>
+                              <scope>provided</scope>
+                </dependency>
 
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>emr_serverless_spark20230808</artifactId>
-            <version>1.0.0</version>
-        </dependency>
+                <dependency>
+                              <groupId>com.aliyun</groupId>
+                              <artifactId>emr_serverless_spark20230808</artifactId>
+                              <version>2.4.1</version>
+                </dependency>
 
-        <dependency>
-            <groupId>com.aliyun</groupId>
-            <artifactId>credentials-java</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-    </dependencies>
+                <dependency>
+                              <groupId>com.aliyun</groupId>
+                              <artifactId>credentials-java</artifactId>
+                              <version>1.0.1</version>
+                </dependency>
+      </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <phase>package</phase>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+      <build>
+                <plugins>
+                              <plugin>
+                                                <groupId>org.apache.maven.plugins</groupId>
+                                                <artifactId>maven-shade-plugin</artifactId>
+                                                <executions>
+                                                                      <execution>
+                                                                                                <goals>
+                                                                                                                              <goal>shade</goal>
+                                                                                                  </goals>
+                                                                                                <phase>package</phase>
+                                                                      </execution>
+                                                </executions>
+                              </plugin>
+                </plugins>
+      </build>
 </project>
