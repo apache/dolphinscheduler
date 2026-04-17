@@ -23,13 +23,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 @ToString
 @Slf4j
-@Data
 public class ResponseFuture {
 
     private static final ConcurrentHashMap<Long, ResponseFuture> FUTURE_TABLE = new ConcurrentHashMap<>();
@@ -42,10 +42,15 @@ public class ResponseFuture {
 
     private final long beginTimestamp = System.currentTimeMillis();
 
+    @Getter
+    @Setter
     private IRpcResponse iRpcResponse;
 
+    @Setter
     private volatile boolean sendOk = true;
 
+    @Getter
+    @Setter
     private Throwable cause;
 
     public ResponseFuture(long opaque, long timeoutMillis) {

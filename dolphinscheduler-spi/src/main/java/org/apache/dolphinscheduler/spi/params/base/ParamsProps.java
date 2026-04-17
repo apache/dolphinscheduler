@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.spi.params.base;
 
 import lombok.Data;
-import lombok.experimental.Accessors;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -26,7 +25,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * the props field in form-create`s json rule
  */
 @Data
-@Accessors(chain = true)
 public class ParamsProps {
 
     @JsonProperty("placeholder")
