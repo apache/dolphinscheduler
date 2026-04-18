@@ -183,19 +183,27 @@ public class ObsStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public List<StorageEntity> listStorageEntity(String resourceAbsolutePath) {
-        resourceAbsolutePath = transformObsKeyToAbsolutePath(resourceAbsolutePath);
+        String obsResourceAbsolutePath = transformAbsolutePathToObsKey(resourceAbsolutePath);
 
         ListObjectsRequest request = new ListObjectsRequest();
         request.setBucketName(bucketName);
-        request.setPrefix(resourceAbsolutePath);
+        request.setPrefix(obsResourceAbsolutePath);
         request.setDelimiter("/");
 
         ObjectListing result = obsClient.listObjects(request);
 
-        return result.getObjects()
+        List<StorageEntity> storageEntities = new ArrayList<>();
+        storageEntities.addAll(result.getCommonPrefixes()
                 .stream()
+                .map(this::transformCommonPrefixToStorageEntity)
+                .collect(Collectors.toList()));
+        storageEntities.addAll(result.getObjects()
+                .stream()
+                .filter(object -> !object.getObjectKey().equals(obsResourceAbsolutePath))
                 .map(this::transformObsObjectToStorageEntity)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
+
+        return storageEntities;
     }
 
     @Override
@@ -264,6 +272,21 @@ public class ObsStorageOperator extends AbstractStorageOperator implements Close
                 .createTime(metadata.getLastModified())
                 .updateTime(metadata.getLastModified())
                 .build();
+    }
+
+    private StorageEntity transformCommonPrefixToStorageEntity(String commonPrefix) {
+        String absolutePath = transformObsKeyToAbsolutePath(commonPrefix);
+        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
+
+        StorageEntity entity = new StorageEntity();
+        entity.setFileName(new File(absolutePath).getName());
+        entity.setFullName(absolutePath);
+        entity.setDirectory(resourceMetaData.isDirectory());
+        entity.setType(resourceMetaData.getResourceType());
+        entity.setSize(0L);
+        entity.setCreateTime(null);
+        entity.setUpdateTime(null);
+        return entity;
     }
 
     private String transformAbsolutePathToObsKey(String absolutePath) {

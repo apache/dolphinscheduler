@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.task.ConditionsLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ILogicTaskPluginFactory;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -38,14 +38,14 @@ public class ConditionLogicTaskPluginFactory implements ILogicTaskPluginFactory<
     private TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    private IWorkflowRepository workflowExecutionRunnableMemoryRepository;
+    private IWorkflowRepository workflowExecutionMemoryRepository;
 
     @Override
     public ConditionLogicTask createLogicTask(final ITaskExecutor taskExecutor) {
         final TaskExecutionContext taskExecutionContext = taskExecutor.getTaskExecutionContext();
-        final IWorkflowExecutionRunnable workflowExecutionRunnable =
-                workflowExecutionRunnableMemoryRepository.get(taskExecutionContext.getWorkflowInstanceId());
-        return new ConditionLogicTask(workflowExecutionRunnable, taskExecutionContext, taskInstanceDao);
+        final IWorkflowExecution workflowExecution =
+                workflowExecutionMemoryRepository.get(taskExecutionContext.getWorkflowInstanceId());
+        return new ConditionLogicTask(workflowExecution, taskExecutionContext, taskInstanceDao);
     }
 
     @Override

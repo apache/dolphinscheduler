@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine;
 
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 
 import java.util.Collection;
@@ -35,37 +35,37 @@ import com.google.common.collect.ImmutableList;
 @Component
 public class WorkflowCacheRepository implements IWorkflowRepository {
 
-    private final Map<Integer, IWorkflowExecutionRunnable> workflowExecutionRunnableMap = new ConcurrentHashMap<>();
+    private final Map<Integer, IWorkflowExecution> workflowExecutionMap = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void registerMetrics() {
-        WorkflowInstanceMetrics.registerWorkflowInstanceRunningGauge(workflowExecutionRunnableMap::size);
+        WorkflowInstanceMetrics.registerWorkflowInstanceRunningGauge(workflowExecutionMap::size);
     }
 
     @Override
-    public IWorkflowExecutionRunnable get(final int workflowInstanceId) {
-        return workflowExecutionRunnableMap.get(workflowInstanceId);
+    public IWorkflowExecution get(final int workflowInstanceId) {
+        return workflowExecutionMap.get(workflowInstanceId);
     }
 
     @Override
     public boolean contains(final int workflowInstanceId) {
-        return workflowExecutionRunnableMap.containsKey(workflowInstanceId);
+        return workflowExecutionMap.containsKey(workflowInstanceId);
     }
 
     @Override
     public void remove(final int workflowInstanceId) {
-        workflowExecutionRunnableMap.remove(workflowInstanceId);
+        workflowExecutionMap.remove(workflowInstanceId);
     }
 
     @Override
-    public void put(@NonNull final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final Integer workflowInstanceId = workflowExecutionRunnable.getId();
-        workflowExecutionRunnableMap.put(workflowInstanceId, workflowExecutionRunnable);
+    public void put(@NonNull final IWorkflowExecution workflowExecution) {
+        final Integer workflowInstanceId = workflowExecution.getId();
+        workflowExecutionMap.put(workflowInstanceId, workflowExecution);
     }
 
     @Override
-    public Collection<IWorkflowExecutionRunnable> getAll() {
-        return ImmutableList.copyOf(workflowExecutionRunnableMap.values());
+    public Collection<IWorkflowExecution> getAll() {
+        return ImmutableList.copyOf(workflowExecutionMap.values());
     }
 
 }

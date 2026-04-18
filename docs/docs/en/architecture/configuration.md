@@ -28,7 +28,6 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler alert-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of alert-server
-│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for alert-server
 │   │   └── logback-spring.xml                  configurations of alert-service log
@@ -40,7 +39,6 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler api-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of api-server
-│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for api-server
 │   │   └── logback-spring.xml                  configurations of api-service log
@@ -53,7 +51,6 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler master-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of master-server
-│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for master-server
 │   │   └── logback-spring.xml                  configurations of master-service log
@@ -65,7 +62,6 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── jvm_args_env.sh                     script to set JVM args of DolphinScheduler standalone-server
 │   ├── conf
 │   │   ├── application.yaml                    configurations of standalone-server
-│   │   ├── bootstrap.yaml                      configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties                   configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh             script to load environment variables for standalone-server
 │   │   ├── logback-spring.xml                  configurations of standalone-service log
@@ -88,7 +84,6 @@ The directory structure of DolphinScheduler is as follows:
 │   │   └── jvm_args_env.sh                 script to set JVM args of DolphinScheduler worker-server
 │   ├── conf
 │   │   ├── application.yaml                configurations of worker-server
-│   │   ├── bootstrap.yaml                  configurations for Spring Cloud bootstrap, mostly you don't need to modify this,
 │   │   ├── common.properties               configurations of common-service like storage, credentials, etc.
 │   │   ├── dolphinscheduler_env.sh         script to load environment variables for worker-server
 │   │   └── logback-spring.xml              configurations of worker-service log

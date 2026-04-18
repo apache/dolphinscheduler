@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.workflow.runnable;
+package org.apache.dolphinscheduler.server.master.engine.workflow.execution;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.dao.entity.Command;
@@ -34,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Component
-public class WorkflowExecutionRunnableFactory {
+public class WorkflowExecutionFactory {
 
     @Autowired
     private List<ICommandHandler> commandHandlers;
@@ -46,21 +46,21 @@ public class WorkflowExecutionRunnableFactory {
     private CommandDao commandDao;
 
     /**
-     * Generate WorkflowExecutionRunnable from command.
+     * Generate WorkflowExecution from command.
      * <p> We use transaction here to make sure that the command will be handled only once. Since in some case if the
      * master cluster is reblancing, the master slot might different in different master.
      */
     @Transactional
-    public IWorkflowExecutionRunnable createWorkflowExecuteRunnable(Command command) {
+    public IWorkflowExecution createWorkflowExecuteRunnable(Command command) {
         deleteCommandOrThrow(command);
-        return doCreateWorkflowExecutionRunnable(command);
+        return doCreateWorkflowExecution(command);
     }
 
     /**
-     * Create WorkflowExecutionRunnable from command.
-     * <p> Each WorkflowExecutionRunnable represent a workflow instance, so this method might create workflow instance in db, dependents on the command type.
+     * Create WorkflowExecution from command.
+     * <p> Each WorkflowExecution represent a workflow instance, so this method might create workflow instance in db, dependents on the command type.
      */
-    private IWorkflowExecutionRunnable doCreateWorkflowExecutionRunnable(Command command) {
+    private IWorkflowExecution doCreateWorkflowExecution(Command command) {
         final CommandType commandType = command.getCommandType();
         final ICommandHandler commandHandler = commandHandlers
                 .stream()

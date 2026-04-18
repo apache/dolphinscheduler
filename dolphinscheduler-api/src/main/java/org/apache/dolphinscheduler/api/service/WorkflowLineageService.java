@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.DependentLineageTask;
 import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 
 import java.util.List;
@@ -41,6 +42,37 @@ public interface WorkflowLineageService {
      * @return downstream dependent workflow definition list
      */
     List<DependentWorkflowDefinition> queryDownstreamDependentWorkflowDefinitions(Long workflowDefinitionCode);
+
+    /**
+     * Resolve downstream workflow definitions that depend on the given root workflow, using stored lineage.
+     * <ul>
+     *     <li>{@code allLevelDependent == false}: only direct dependents of the root.</li>
+     *     <li>{@code allLevelDependent == true}: transitive dependents (BFS over direct dependents), skipping the root
+     *     when it reappears as an edge target (cycle back to root).</li>
+     * </ul>
+     *
+     * @param rootWorkflowDefinitionCode workflow to start from (not included in the result)
+     * @param allLevelDependent          {@code true} for transitive closure, {@code false} for one hop only
+     * @return ordered distinct downstream workflow definitions (stable order: BFS / insertion order)
+     */
+    default List<WorkflowDefinition> resolveDownstreamWorkflowDefinitionCodes(long rootWorkflowDefinitionCode,
+                                                                              boolean allLevelDependent) {
+        return resolveDownstreamWorkflowDefinitionCodes(rootWorkflowDefinitionCode, allLevelDependent, false);
+    }
+
+    /**
+     * Resolve downstream workflow definitions and optionally filter offline workflows.
+     * When {@code filterOfflineWorkflow} is true, offline workflow definitions are excluded from the result and are
+     * not expanded further during transitive traversal.
+     *
+     * @param rootWorkflowDefinitionCode workflow to start from (not included in the result)
+     * @param allLevelDependent          {@code true} for transitive closure, {@code false} for one hop only
+     * @param filterOfflineWorkflow      whether offline workflows should be filtered out during traversal
+     * @return ordered distinct downstream workflow definitions (stable order: BFS / insertion order)
+     */
+    List<WorkflowDefinition> resolveDownstreamWorkflowDefinitionCodes(long rootWorkflowDefinitionCode,
+                                                                      boolean allLevelDependent,
+                                                                      boolean filterOfflineWorkflow);
 
     /**
      * Query and return tasks dependence with string format, is a wrapper of queryTaskDepOnTask and task query method.

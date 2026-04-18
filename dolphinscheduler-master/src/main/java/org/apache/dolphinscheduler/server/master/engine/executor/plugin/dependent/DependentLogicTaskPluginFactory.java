@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.task.DependentLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ILogicTaskPluginFactory;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 
@@ -65,8 +65,8 @@ public class DependentLogicTaskPluginFactory implements ILogicTaskPluginFactory<
     public DependentLogicTask createLogicTask(final ITaskExecutor taskExecutor) throws LogicTaskInitializeException {
         final TaskExecutionContext taskExecutionContext = taskExecutor.getTaskExecutionContext();
         final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
-        final IWorkflowExecutionRunnable workflowExecutionRunnable = IWorkflowRepository.get(workflowInstanceId);
-        if (workflowExecutionRunnable == null) {
+        final IWorkflowExecution workflowExecution = IWorkflowRepository.get(workflowInstanceId);
+        if (workflowExecution == null) {
             throw new LogicTaskInitializeException("Cannot find the WorkflowExecuteRunnable: " + workflowInstanceId);
         }
         return new DependentLogicTask(
@@ -76,7 +76,7 @@ public class DependentLogicTaskPluginFactory implements ILogicTaskPluginFactory<
                 taskDefinitionDao,
                 taskInstanceDao,
                 workflowInstanceDao,
-                workflowExecutionRunnable,
+                workflowExecution,
                 taskInstanceContextDao);
     }
 

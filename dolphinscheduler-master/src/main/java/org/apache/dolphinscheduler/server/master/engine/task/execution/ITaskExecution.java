@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.task.runnable;
+package org.apache.dolphinscheduler.server.master.engine.task.execution;
 
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -23,14 +23,14 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.WorkflowExecution;
 
 /**
- * The interface represent a running TaskInstance which belongs to a {@link WorkflowExecutionRunnable}.
+ * The interface represent a running TaskInstance which belongs to a {@link WorkflowExecution}.
  */
-public interface ITaskExecutionRunnable
+public interface ITaskExecution
         extends
-            Comparable<ITaskExecutionRunnable> {
+            Comparable<ITaskExecution> {
 
     /**
      * Get the task instance id.
@@ -46,8 +46,8 @@ public interface ITaskExecutionRunnable
 
     /**
      * Whether the task instance is initialized.
-     * <p> If the ITaskExecutionRunnable is never triggered, it is not initialized.
-     * <p> If the ITaskExecutionRunnable is created by failover, recovered then it is initialized.
+     * <p> If the ITaskExecution is never triggered, it is not initialized.
+     * <p> If the ITaskExecution is created by failover, recovered then it is initialized.
      */
     boolean isTaskInstanceInitialized();
 
@@ -70,24 +70,24 @@ public interface ITaskExecutionRunnable
     boolean isFailure();
 
     /**
-     * Retry the TaskExecutionRunnable.
+     * Retry the TaskExecution.
      * <p> Will create retry task instance and start it.
      */
     void retry();
 
     /**
-     * Failover the TaskExecutionRunnable.
+     * Failover the TaskExecution.
      * <p> The failover logic is judged by the task instance state.
      */
     void failover();
 
     /**
-     * Pause the TaskExecutionRunnable.
+     * Pause the TaskExecution.
      */
     void pause();
 
     /**
-     * Kill the TaskExecutionRunnable.
+     * Kill the TaskExecution.
      */
     void kill();
 

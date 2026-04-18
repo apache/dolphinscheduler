@@ -342,12 +342,6 @@
             <artifactId>brace-expansion</artifactId>
         </dependency>
 
-        <!-- TODO: Have to use spring-cloud-starter-kubernetes-fabric8-config after upgrading to Spring 3.x to unify kubernetes client (fabric8)  -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-actuator-authentication</artifactId>

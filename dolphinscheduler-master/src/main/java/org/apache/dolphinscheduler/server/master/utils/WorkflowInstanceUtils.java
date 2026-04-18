@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 
 import java.util.List;
@@ -36,8 +36,8 @@ import com.google.common.base.Strings;
 @UtilityClass
 public class WorkflowInstanceUtils {
 
-    public static String logWorkflowInstanceInDetails(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
+    public static String logWorkflowInstanceInDetails(IWorkflowExecution workflowExecution) {
+        final IWorkflowExecuteContext workflowExecuteContext = workflowExecution.getWorkflowExecuteContext();
         final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecuteContext.getWorkflowExecutionGraph();
         final IWorkflowGraph workflowGraph = workflowExecuteContext.getWorkflowGraph();
         final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
@@ -46,7 +46,7 @@ public class WorkflowInstanceUtils {
         final List<String> startNodes = workflowExecutionGraph
                 .getStartNodes()
                 .stream()
-                .map(ITaskExecutionRunnable::getName)
+                .map(ITaskExecution::getName)
                 .collect(Collectors.toList());
 
         final StringBuilder logBuilder = new StringBuilder();
@@ -64,8 +64,8 @@ public class WorkflowInstanceUtils {
                 .append("State:                   ").append(workflowInstance.getState().name()).append("\n")
                 .append("StartNodes:              ").append(startNodes).append("\n")
                 .append("TotalTasks:              ")
-                .append(workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowExecutionGraph()
-                        .getAllTaskExecutionRunnable().size())
+                .append(workflowExecution.getWorkflowExecuteContext().getWorkflowExecutionGraph()
+                        .getAllTaskExecution().size())
                 .append("\n")
                 .append("Host:                    ").append(workflowInstance.getHost()).append("\n")
                 .append("Is SubWorkflow:          ").append(workflowInstance.getIsSubWorkflow().name()).append("\n")
