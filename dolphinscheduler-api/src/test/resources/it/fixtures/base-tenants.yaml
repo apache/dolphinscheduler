@@ -1,0 +1,14 @@
+t_ds_queue:
+  - id: 1
+    queue_name: default
+    queue: default
+    create_time: <now>
+    update_time: <now>
+
+t_ds_tenant:
+  - id: 100
+    tenant_code: it_default_tenant
+    description: default IT tenant
+    queue_id: 1
+    create_time: <now>
+    update_time: <now>

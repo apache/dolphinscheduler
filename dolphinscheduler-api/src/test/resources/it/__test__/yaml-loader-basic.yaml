@@ -1,0 +1,7 @@
+t_ds_tenant:
+  - id: 9001
+    tenant_code: it_loader_basic
+    description: yaml loader basic test
+    queue_id: 1
+    create_time: 2026-04-19T10:00:00
+    update_time: 2026-04-19T10:00:00

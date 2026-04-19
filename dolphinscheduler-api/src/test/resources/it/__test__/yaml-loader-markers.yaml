@@ -1,0 +1,18 @@
+t_ds_tenant:
+  - id: 9100
+    tenant_code: it_marker_tenant
+    description: marker test
+    queue_id: 1
+    create_time: <now>
+    update_time: <now>
+
+t_ds_user:
+  - id: 9100
+    user_name: it_marker_user
+    user_password: <auto-md5:secret123>
+    user_type: 0
+    email: marker@example.com
+    tenant_id: 9100
+    state: 1
+    create_time: <now>
+    update_time: <now>

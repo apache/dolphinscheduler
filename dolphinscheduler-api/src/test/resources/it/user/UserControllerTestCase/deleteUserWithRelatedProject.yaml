@@ -1,0 +1,23 @@
+t_ds_user:
+  - id: 1400
+    user_name: project_owner
+    user_password: <auto-md5:whatever>
+    user_type: 1
+    email: owner@example.com
+    phone: ''
+    tenant_id: 100
+    state: 1
+    queue: default
+    time_zone: Asia/Shanghai
+    create_time: <now>
+    update_time: <now>
+
+t_ds_project:
+  - id: 5000
+    name: it_owned_project
+    code: 5000000001
+    user_id: 1400
+    description: project owned by user 1400
+    flag: 1
+    create_time: <now>
+    update_time: <now>
