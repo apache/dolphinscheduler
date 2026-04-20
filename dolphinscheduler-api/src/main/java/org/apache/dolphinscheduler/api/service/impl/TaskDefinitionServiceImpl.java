@@ -615,7 +615,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
 
-        if (taskDefinition == null) {
+        if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
             log.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
             putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
         } else {
