@@ -154,7 +154,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                 return aliyunServerlessSparkClient.startJobRun(
                         aliyunServerlessSparkParameters.getWorkspaceId(), startJobRunRequest);
             } catch (Exception e) {
-                throw new AliyunServerlessSparkTaskException("Failed to start job run! " + e.getMessage(), e);
+                throw new AliyunServerlessSparkTaskException("Failed to start job run! " , e);
             }
         }, retryPolicy);
 
