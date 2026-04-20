@@ -118,7 +118,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                     buildAliyunServerlessSparkClient(accessKeyId, accessKeySecret, regionId, endpoint);
         } catch (Exception e) {
             log.error("Failed to build Aliyun-Serverless-Spark client!", e);
-            throw new AliyunServerlessSparkTaskException("Failed to build Aliyun-Serverless-Spark client! " + e.getMessage(), e);
+            throw new AliyunServerlessSparkTaskException("Failed to build Aliyun-Serverless-Spark client!");
         }
 
         currentState = RunState.Submitted;
