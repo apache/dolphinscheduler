@@ -35,13 +35,15 @@ public final class StreamGobbler extends Thread {
 
     @Override
     public void run() {
-        InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-        BufferedReader inputBufferReader = new BufferedReader(inputStreamReader);
-
-        try {
+        try (
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader inputBufferReader = new BufferedReader(inputStreamReader)) {
             String line;
             StringBuilder output = new StringBuilder();
             while ((line = inputBufferReader.readLine()) != null) {
+                if (Thread.currentThread().isInterrupted()) {
+                    break;
+                }
                 output.append(line);
                 output.append(System.getProperty("line.separator"));
             }
@@ -49,12 +51,9 @@ public final class StreamGobbler extends Thread {
                 log.info("out put msg is{}", output);
             }
         } catch (IOException e) {
-            log.error("I/O error occurs {}", e.getMessage());
-        } finally {
-            try {
-                inputBufferReader.close();
-                inputStreamReader.close();
-            } catch (IOException e) {
+            if (Thread.currentThread().isInterrupted()) {
+                log.warn("Stream gobbler interrupted while reading output", e);
+            } else {
                 log.error("I/O error occurs {}", e.getMessage());
             }
         }
