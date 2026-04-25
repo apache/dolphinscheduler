@@ -20,7 +20,7 @@ specifiers:
   '@antv/layout': 0.1.31
   '@antv/x6': ^1.34.1
   '@types/js-cookie': ^3.0.2
-  '@types/lodash': ^4.18.0
+  '@types/lodash': ^4.17.0
   '@types/node': ^18.7.18
   '@types/nprogress': ^0.2.0
   '@types/qs': ^6.9.7
@@ -89,7 +89,7 @@ dependencies:
 
 devDependencies:
   '@types/js-cookie': 3.0.3
-  '@types/lodash': 4.14.195
+  '@types/lodash': 4.17.24
   '@types/node': 18.16.18
   '@types/nprogress': 0.2.0
   '@types/qs': 6.9.7
@@ -759,11 +759,11 @@ packages:
   /@types/lodash-es/4.17.7:
     resolution: {integrity: sha512-z0ptr6UI10VlU6l5MYhGwS4mC8DZyYer2mCoyysZtSF7p26zOX8UpbrV0YpNYLGS8K4PUFIyEr62IMFFjveSiQ==}
     dependencies:
-      '@types/lodash': 4.14.195
+      '@types/lodash': 4.17.24
     dev: false
 
-  /@types/lodash/4.14.195:
-    resolution: {integrity: sha512-Hwx9EUgdwf2GLarOjQp5ZH8ZmblzcbTBC2wtQWNKARBSxM9ezRIAUpeDTgoQRAFB0+8CNWXVA9+MaSOzOF3nPg==}
+  /@types/lodash/4.17.24:
+    resolution: {integrity: sha512-gIW7lQLZbue7lRSWEFql49QJJWThrTFFeIMJdp3eH4tKoxm1OvEPg02rm4wCCSHS0cL3/Fizimb35b7k8atwsQ==}
 
   /@types/trusted-types/1.0.6:
     resolution: {integrity: sha512-230RC8sFeHoT6sSUlRO6a8cAnclO06eeiq1QDfiv2FGCLWFvvERWgwIQD4FWqD9A69BN7Lzee4OXwoMVnnsWDw==}
@@ -2817,7 +2817,7 @@ packages:
     dependencies:
       '@css-render/plugin-bem': 0.15.12_css-render@0.15.12
       '@css-render/vue3-ssr': 0.15.12_vue@3.3.4
-      '@types/lodash': 4.14.195
+      '@types/lodash': 4.17.24
       '@types/lodash-es': 4.17.7
       async-validator: 4.2.5
       css-render: 0.15.12
