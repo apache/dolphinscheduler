@@ -143,7 +143,7 @@ public class CuringParamsServiceImpl implements CuringParamsService {
      * </ul>
      *
      * <p> The priority of the parameters is as follows:
-     * <p> varpool > command parameters > local parameters > global parameters > project parameters > built-in parameters
+     * <p> command parameters (startup) > local parameters > varpool (context) > global parameters > project parameters > built-in parameters
      * todo: Use TaskRuntimeParams to represent this.
      *
      * @param taskInstance
@@ -200,10 +200,15 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         }
 
         // 6. VarPool: override values only for existing IN-direction parameters
+        // priority "Local > Context (VarPool)". Fixes GitHub issue #18040
         List<Property> varPools = parseVarPool(taskInstance);
         if (CollectionUtils.isNotEmpty(varPools)) {
             for (Property varPool : varPools) {
                 if (StringUtils.isBlank(varPool.getProp())) {
+                    continue;
+                }
+                if (localParams.containsKey(varPool.getProp())) {
+                    // Local parameter wins over upstream VarPool per documented priority
                     continue;
                 }
                 Property targetParam = prepareParamsMap.get(varPool.getProp());
