@@ -24,15 +24,12 @@ import {
   downloadLog,
   downloadOutput
 } from '@/service/modules/task-instances'
-import { queryTaskOutput } from '@/service/modules/log'
-import { NButton, NIcon, NSpace, NTooltip, NSpin, NEllipsis } from 'naive-ui'
+import { NButton, NDropdown, NIcon, NSpace, NTooltip, NSpin, NEllipsis } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
 import {
   AlignLeftOutlined,
   CheckCircleOutlined,
-  DownloadOutlined,
-  EyeOutlined,
-  FileSearchOutlined
+  DownloadOutlined
 } from '@vicons/antd'
 import { format } from 'date-fns'
 import { useRoute, useRouter } from 'vue-router'
@@ -199,8 +196,19 @@ export function useTable() {
       {
         title: t('project.task.operation'),
         key: 'operation',
-        ...COLUMN_WIDTH_CONFIG['operation'](5),
+        ...COLUMN_WIDTH_CONFIG['operation'](3),
         render(row: any) {
+          const logOptions = [
+            {
+              label: t('project.task.log'),
+              key: 'log'
+            },
+            {
+              label: t('project.task.output'),
+              key: 'output'
+            }
+          ]
+
           return h(NSpace, null, {
             default: () => [
               h(
@@ -235,96 +243,82 @@ export function useTable() {
                 }
               ),
               h(
-                NTooltip,
-                {},
+                NDropdown,
                 {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'info',
-                        size: 'small',
-                        disabled: !row.host,
-                        onClick: () => handleLog(row)
-                      },
-                      {
-                        icon: () =>
-                          h(NIcon, null, {
-                            default: () => h(AlignLeftOutlined)
-                          })
-                      }
-                    ),
-                  default: () => t('project.task.view_log')
-                }
+                  trigger: 'click',
+                  options: logOptions,
+                  disabled: !row.host,
+                  onSelect: (key: string) => {
+                    if (key === 'log') {
+                      handleLog(row)
+                      return
+                    }
+                    handleOutput(row)
+                  }
+                },
+                () =>
+                  h(
+                    NTooltip,
+                    {},
+                    {
+                      trigger: () =>
+                        h(
+                          NButton,
+                          {
+                            circle: true,
+                            type: 'info',
+                            size: 'small',
+                            disabled: !row.host
+                          },
+                          {
+                            icon: () =>
+                              h(NIcon, null, {
+                                default: () => h(AlignLeftOutlined)
+                              })
+                          }
+                        ),
+                      default: () => t('project.task.view_log')
+                    }
+                  )
               ),
               h(
-                NTooltip,
-                {},
+                NDropdown,
                 {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'info',
-                        size: 'small',
-                        disabled: !row.host,
-                        onClick: () => handleOutput(row)
-                      },
-                      {
-                        icon: () =>
-                          h(NIcon, null, {
-                            default: () => h(EyeOutlined)
-                          })
-                      }
-                    ),
-                  default: () => t('project.task.view_output')
-                }
-              ),
-              h(
-                NTooltip,
-                {},
-                {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'info',
-                        size: 'small',
-                        disabled: !row.host,
-                        onClick: () => downloadLog(row.id)
-                      },
-                      {
-                        icon: () =>
-                          h(NIcon, null, { default: () => h(DownloadOutlined) })
-                      }
-                    ),
-                  default: () => t('project.task.download_log')
-                }
-              ),
-              h(
-                NTooltip,
-                {},
-                {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'info',
-                        size: 'small',
-                        disabled: !row.host,
-                        onClick: () => downloadOutput(row.id)
-                      },
-                      {
-                        icon: () =>
-                          h(NIcon, null, { default: () => h(FileSearchOutlined) })
-                      }
-                    ),
-                  default: () => t('project.task.download_output')
-                }
+                  trigger: 'click',
+                  options: logOptions,
+                  disabled: !row.host,
+                  onSelect: (key: string) => {
+                    if (key === 'log') {
+                      downloadLog(row.id)
+                      return
+                    }
+                    downloadOutput(row.id)
+                  }
+                },
+                () =>
+                  h(
+                    NTooltip,
+                    {},
+                    {
+                      trigger: () =>
+                        h(
+                          NButton,
+                          {
+                            circle: true,
+                            type: 'info',
+                            size: 'small',
+                            disabled: !row.host
+                          },
+                          {
+                            icon: () =>
+                              h(NIcon, null, {
+                                default: () => h(DownloadOutlined)
+                              })
+                          }
+                        ),
+                      default: () => t('project.task.download_log')
+                    }
+                  )
               )
             ]
           })

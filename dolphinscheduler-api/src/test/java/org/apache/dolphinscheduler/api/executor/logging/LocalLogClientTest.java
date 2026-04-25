@@ -116,7 +116,7 @@ public class LocalLogClientTest {
         taskInstance.setId(1);
         taskInstance.setLogPath("/path/to/log");
 
-        TaskInstanceLogFileDownloadResponse actualResponse = localLogClient.getTaskLog(taskInstance);
+        TaskInstanceLogFileDownloadResponse actualResponse = localLogClient.getLog(taskInstance, TaskLogType.LOG);
 
         assertNotNull(actualResponse);
         assertArrayEquals("".getBytes(), actualResponse.getLogBytes());
@@ -129,7 +129,8 @@ public class LocalLogClientTest {
         taskInstance.setHost("127.0.0.1:" + nettyServerPort);
         taskInstance.setLogPath("/path/to/log");
 
-        TaskInstanceLogPageQueryResponse actualResponse = localLogClient.getTaskLog(taskInstance, 0, 10);
+        TaskInstanceLogPageQueryResponse actualResponse = localLogClient.getLog(taskInstance, 0, 10,
+                TaskLogType.LOG);
 
         assertNotNull(actualResponse);
         assertEquals("Partial log content", actualResponse.getLogContent());

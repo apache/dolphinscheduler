@@ -17,24 +17,7 @@
 
 package org.apache.dolphinscheduler.api.executor.logging;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-
 public enum TaskLogType {
-
-    LOG {
-
-        @Override
-        public String getLogPath(TaskInstance taskInstance) {
-            return taskInstance.getLogPath();
-        }
-    },
-    OUTPUT {
-
-        @Override
-        public String getLogPath(TaskInstance taskInstance) {
-            return taskInstance.getTaskOutputLogPath();
-        }
-    };
-
-    public abstract String getLogPath(TaskInstance taskInstance);
+    LOG,
+    OUTPUT
 }

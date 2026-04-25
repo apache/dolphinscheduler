@@ -78,8 +78,7 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
             final TaskRunningLifecycleEvent taskRunningEvent = TaskRunningLifecycleEvent.builder()
                     .taskExecution(taskExecution)
                     .startTime(new Date(taskExecutorStartedLifecycleEvent.getStartTime()))
-                    .logPath(taskExecutorStartedLifecycleEvent.getLogPath())
-                    .taskOutputLogPath(taskExecutorStartedLifecycleEvent.getTaskOutputLogPath())
+                    .taskLogsRootPath(taskExecutorStartedLifecycleEvent.getTaskLogsRootPath())
                     .build();
 
             taskExecution.getWorkflowEventBus().publish(taskRunningEvent);

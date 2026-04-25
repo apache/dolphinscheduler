@@ -36,8 +36,8 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
-import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskOutputLogWriter;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -67,17 +67,12 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Slf4j
 public class SqlTask extends AbstractTask {
-
-    private static final Logger TASK_OUTPUT_LOGGER = LoggerFactory.getLogger(LogUtils.TASK_OUTPUT_LOGGER_NAME);
 
     private final TaskExecutionContext taskExecutionContext;
 
@@ -324,16 +319,7 @@ public class SqlTask extends AbstractTask {
     }
 
     private void logSqlResultPreview(String[] columnLabels, ArrayNode resultJSONArray, int displayRows) {
-        if (StringUtils.isBlank(taskExecutionContext.getTaskOutputLogPath())) {
-            doLogSqlResultPreview(columnLabels, resultJSONArray, displayRows);
-            return;
-        }
-
-        try (
-                LogUtils.MDCAutoClosableContext ignored =
-                        LogUtils.withTaskOutputLogPathMDC(taskExecutionContext.getTaskOutputLogPath())) {
-            doLogSqlResultPreview(columnLabels, resultJSONArray, displayRows);
-        }
+        doLogSqlResultPreview(columnLabels, resultJSONArray, displayRows);
     }
 
     private void doLogSqlResultPreview(String[] columnLabels, ArrayNode resultJSONArray, int displayRows) {
@@ -349,11 +335,7 @@ public class SqlTask extends AbstractTask {
     }
 
     private void logSqlResultLine(String line) {
-        if (StringUtils.isBlank(taskExecutionContext.getTaskOutputLogPath())) {
-            log.info(line);
-            return;
-        }
-        TASK_OUTPUT_LOGGER.info(line);
+        TaskOutputLogWriter.writeTaskOutput(taskExecutionContext, line);
     }
 
     private String formatSqlResultValue(com.fasterxml.jackson.databind.JsonNode valueNode) {

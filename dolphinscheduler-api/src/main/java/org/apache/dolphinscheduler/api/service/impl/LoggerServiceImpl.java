@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.logging.LogClientDelegate;
+import org.apache.dolphinscheduler.api.executor.logging.TaskLogFileTypeMapping;
 import org.apache.dolphinscheduler.api.executor.logging.TaskLogType;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskLogFileProvider;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -75,21 +77,11 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Result<ResponseTaskLog> queryTaskLog(User loginUser, int taskInstId, int skipLineNum, int limit) {
-        return queryLog(loginUser, taskInstId, skipLineNum, limit, TaskLogType.LOG);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Result<ResponseTaskLog> queryTaskOutput(User loginUser, int taskInstId, int skipLineNum, int limit) {
-        return queryLog(loginUser, taskInstId, skipLineNum, limit, TaskLogType.OUTPUT);
-    }
-
-    private Result<ResponseTaskLog> queryLog(User loginUser,
-                                             int taskInstId,
-                                             int skipLineNum,
-                                             int limit,
-                                             TaskLogType taskLogType) {
+    public Result<ResponseTaskLog> queryLog(User loginUser,
+                                            int taskInstId,
+                                            int skipLineNum,
+                                            int limit,
+                                            TaskLogType taskLogType) {
         TaskInstance taskInstance = taskInstanceDao.queryById(taskInstId);
 
         if (taskInstance == null) {
@@ -116,16 +108,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      * @return log byte array
      */
     @Override
-    public byte[] getTaskLogBytes(User loginUser, int taskInstId) {
-        return getLogBytes(loginUser, taskInstId, TaskLogType.LOG);
-    }
-
-    @Override
-    public byte[] getTaskOutputBytes(User loginUser, int taskInstId) {
-        return getLogBytes(loginUser, taskInstId, TaskLogType.OUTPUT);
-    }
-
-    private byte[] getLogBytes(User loginUser, int taskInstId, TaskLogType taskLogType) {
+    public byte[] getLogBytes(User loginUser, int taskInstId, TaskLogType taskLogType) {
         TaskInstance taskInstance = taskInstanceDao.queryById(taskInstId);
         if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
             throw new ServiceException("task instance is null or host is null");
@@ -144,7 +127,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      * @return log string data
      */
     private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit, TaskLogType taskLogType) {
-        String logPath = taskLogType.getLogPath(taskInstance);
+        String logPath = getLogPath(taskInstance, taskLogType);
         log.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host: {}, logPath:{}",
                 taskInstance.getId(), taskInstance.getName(), taskInstance.getHost(), logPath);
         if (StringUtils.isBlank(logPath)) {
@@ -162,9 +145,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         }
 
         try {
-            String logContent = taskLogType == TaskLogType.LOG
-                    ? logClientDelegate.getTaskLogString(taskInstance, skipLineNum, limit)
-                    : logClientDelegate.getTaskOutputString(taskInstance, skipLineNum, limit);
+            String logContent = logClientDelegate.getLogString(taskInstance, skipLineNum, limit, taskLogType);
             if (logContent != null) {
                 sb.append(logContent);
             }
@@ -182,7 +163,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      */
     private byte[] getLogBytes(TaskInstance taskInstance, TaskLogType taskLogType) {
         String host = taskInstance.getHost();
-        String logPath = taskLogType.getLogPath(taskInstance);
+        String logPath = getLogPath(taskInstance, taskLogType);
 
         byte[] head = String.format(LOG_HEAD_FORMAT,
                 logPath,
@@ -192,9 +173,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         byte[] logBytes;
 
         try {
-            logBytes = taskLogType == TaskLogType.LOG
-                    ? logClientDelegate.getTaskLogBytes(taskInstance)
-                    : logClientDelegate.getTaskOutputBytes(taskInstance);
+            logBytes = logClientDelegate.getLogBytes(taskInstance, taskLogType);
             if (!shouldAppendLogHead(taskLogType)) {
                 return logBytes;
             }
@@ -207,5 +186,10 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
     private boolean shouldAppendLogHead(TaskLogType taskLogType) {
         return taskLogType == TaskLogType.LOG;
+    }
+
+    private String getLogPath(TaskInstance taskInstance, TaskLogType taskLogType) {
+        return TaskLogFileProvider.getFilePath(taskInstance.getTaskLogsRootPath(),
+                TaskLogFileTypeMapping.toTaskLogFileType(taskLogType));
     }
 }

@@ -22,6 +22,7 @@ interface IdReq {
 interface LogReq extends IdReq {
   limit: number
   skipLineNum: number
+  logType: 'LOG' | 'OUTPUT'
 }
 
 export { IdReq, LogReq }

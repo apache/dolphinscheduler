@@ -35,8 +35,7 @@ public class TaskRunningLifecycleEvent extends AbstractTaskLifecycleEvent {
 
     private final ITaskExecution taskExecution;
 
-    private final String logPath;
-    private final String taskOutputLogPath;
+    private final String taskLogsRootPath;
 
     private final Date startTime;
 
@@ -49,8 +48,7 @@ public class TaskRunningLifecycleEvent extends AbstractTaskLifecycleEvent {
     public String toString() {
         return "TaskRunningLifecycleEvent{" +
                 "task=" + taskExecution.getName() +
-                ", logPath='" + logPath + '\'' +
-                ", taskOutputLogPath='" + taskOutputLogPath + '\'' +
+                ", taskLogsRootPath='" + taskLogsRootPath + '\'' +
                 ", startTime=" + startTime +
                 '}';
     }

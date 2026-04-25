@@ -93,7 +93,7 @@ interface TotalList {
   workflowDefinition?: any
   taskType: string
   taskInstancePriority: string
-  logPath: string
+  taskLogsRootPath: string
   startTime: string
   environmentConfig?: any
   executorId: number

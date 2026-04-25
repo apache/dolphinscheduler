@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilde
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskOutputLogWriter;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -47,16 +48,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import io.fabric8.kubernetes.client.dsl.LogWatch;
 
 @Slf4j
 public abstract class AbstractCommandExecutor {
-
-    private static final Logger TASK_OUTPUT_LOGGER = LoggerFactory.getLogger(LogUtils.TASK_OUTPUT_LOGGER_NAME);
 
     protected volatile Map<String, String> taskOutputParams = new HashMap<>();
     private Process process;
@@ -211,11 +206,7 @@ public abstract class AbstractCommandExecutor {
                     String line;
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                         while ((line = reader.readLine()) != null) {
-                            if (StringUtils.isBlank(taskRequest.getTaskOutputLogPath())) {
-                                log.info("[K8S-pod-log-{}]: {}", taskRequest.getTaskName(), line);
-                            } else {
-                                TASK_OUTPUT_LOGGER.info(line);
-                            }
+                            TaskOutputLogWriter.writeTaskOutput(taskRequest, line);
                         }
                     }
                 }
@@ -243,11 +234,7 @@ public abstract class AbstractCommandExecutor {
                         LogUtils.MDCAutoClosableContext ignored =
                                 LogUtils.withTaskOutputLogPathMDC(taskRequest.getTaskOutputLogPath())) {
                     for (String line : (Iterable<String>) inReader.lines()::iterator) {
-                        if (StringUtils.isBlank(taskRequest.getTaskOutputLogPath())) {
-                            log.info(" -> {}", line);
-                        } else {
-                            TASK_OUTPUT_LOGGER.info(line);
-                        }
+                        TaskOutputLogWriter.writeTaskOutput(taskRequest, line);
                         taskOutputParameterParser.appendParseLog(line);
                     }
                 } finally {

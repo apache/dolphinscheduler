@@ -21,14 +21,19 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskLogFileProvider;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskLogFileType;
 
 import java.io.Serializable;
 import java.util.Date;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -79,9 +84,8 @@ public class TaskInstance implements Serializable {
 
     private String executePath;
 
-    private String logPath;
-    @TableField("task_output_log_path")
-    private String taskOutputLogPath;
+    @TableField("task_logs_root_path")
+    private String taskLogsRootPath;
 
     private int retryTimes;
 
@@ -139,5 +143,49 @@ public class TaskInstance implements Serializable {
     private Integer memoryMax;
 
     private TaskExecuteType taskExecuteType;
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @Builder.Default
+    @TableField(exist = false)
+    private transient String legacyLogPath = null;
+
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    @Builder.Default
+    @TableField(exist = false)
+    private transient String legacyTaskOutputLogPath = null;
+
+    public String getLogPath() {
+        return TaskLogFileProvider.getFilePath(taskLogsRootPath, TaskLogFileType.TASK_LOG);
+    }
+
+    public void setLogPath(String logPath) {
+        legacyLogPath = logPath;
+        if (logPath == null) {
+            if (legacyTaskOutputLogPath == null) {
+                taskLogsRootPath = null;
+            }
+            return;
+        }
+        taskLogsRootPath = TaskLogFileProvider.getTaskLogsRootPathFromFilePath(logPath);
+    }
+
+    public String getTaskOutputLogPath() {
+        return TaskLogFileProvider.getFilePath(taskLogsRootPath, TaskLogFileType.TASK_OUTPUT);
+    }
+
+    public void setTaskOutputLogPath(String taskOutputLogPath) {
+        legacyTaskOutputLogPath = taskOutputLogPath;
+        if (taskOutputLogPath == null) {
+            if (legacyLogPath == null) {
+                taskLogsRootPath = null;
+            }
+            return;
+        }
+        if (taskLogsRootPath == null) {
+            taskLogsRootPath = TaskLogFileProvider.getTaskLogsRootPathFromFilePath(taskOutputLogPath);
+        }
+    }
 
 }

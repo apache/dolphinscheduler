@@ -34,8 +34,8 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskOutputLogWriter;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -52,13 +52,8 @@ import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @Slf4j
 public class ProcedureTask extends AbstractTask {
-
-    private static final Logger TASK_OUTPUT_LOGGER = LoggerFactory.getLogger(LogUtils.TASK_OUTPUT_LOGGER_NAME);
 
     private final ProcedureParameters procedureParameters;
 
@@ -275,18 +270,7 @@ public class ProcedureTask extends AbstractTask {
 
     private void logOutputParameter(String prop, DataType dataType, Object value) {
         String message = String.format("out parameter %s key : {} , value : {}", dataType.name().toLowerCase());
-        if (StringUtils.isBlank(taskExecutionContext.getTaskOutputLogPath())) {
-            log.info(message, prop, value);
-            return;
-        }
-        LogUtils.setTaskInstanceLogFullPathMDC(taskExecutionContext.getLogPath());
-        try (
-                LogUtils.MDCAutoClosableContext ignored =
-                        LogUtils.withTaskOutputLogPathMDC(taskExecutionContext.getTaskOutputLogPath())) {
-            TASK_OUTPUT_LOGGER.info(message, prop, value);
-        } finally {
-            LogUtils.removeTaskInstanceLogFullPathMDC();
-        }
+        TaskOutputLogWriter.writeTaskOutput(taskExecutionContext, message, prop, value);
     }
 
     @Override

@@ -50,7 +50,7 @@ public class RetryTaskInstanceFactory extends AbstractTaskInstanceFactory<RetryT
         taskInstance.setPid(0);
         taskInstance.setHost(null);
         taskInstance.setExecutePath(null);
-        taskInstance.setLogPath(null);
+        taskInstance.setTaskLogsRootPath(null);
         taskInstance.setStartTime(null);
         taskInstance.setEndTime(null);
         taskInstance.setSubmitTime(new Date());

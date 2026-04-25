@@ -38,11 +38,11 @@ export function forceSuccess(taskId: IdReq, projectCode: ProjectCodeReq): any {
 }
 
 export function downloadLog(id: number): void {
-  utils.downloadFile('log/download-log', { taskInstanceId: id })
+  utils.downloadFile('log/download-log', { taskInstanceId: id, logType: 'LOG' })
 }
 
 export function downloadOutput(id: number): void {
-  utils.downloadFile('log/download-output', { taskInstanceId: id })
+  utils.downloadFile('log/download-log', { taskInstanceId: id, logType: 'OUTPUT' })
 }
 
 export function streamTaskStop(projectCode: number, taskId: number): any {

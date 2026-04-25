@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.DOWNLOAD_TASK_INSTANC
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_INSTANCE_LOG_ERROR;
 
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
+import org.apache.dolphinscheduler.api.executor.logging.TaskLogType;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -74,33 +75,9 @@ public class LoggerController extends BaseController {
     public Result<ResponseTaskLog> queryTaskLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                 @RequestParam(value = "taskInstanceId") int taskInstanceId,
                                                 @RequestParam(value = "skipLineNum") int skipNum,
-                                                @RequestParam(value = "limit") int limit) {
-        return loggerService.queryTaskLog(loginUser, taskInstanceId, skipNum, limit);
-    }
-
-    /**
-     * query task output
-     *
-     * @param loginUser login user
-     * @param taskInstanceId task instance id
-     * @param skipNum skip number
-     * @param limit limit
-     * @return task log content
-     */
-    @Operation(summary = "queryOutput", description = "QUERY_TASK_INSTANCE_OUTPUT_NOTES")
-    @Parameters({
-            @Parameter(name = "taskInstanceId", description = "TASK_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "skipLineNum", description = "SKIP_LINE_NUM", required = true, schema = @Schema(implementation = int.class, example = "100")),
-            @Parameter(name = "limit", description = "LIMIT", required = true, schema = @Schema(implementation = int.class, example = "100"))
-    })
-    @GetMapping(value = "/output_detail")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_TASK_INSTANCE_LOG_ERROR)
-    public Result<ResponseTaskLog> queryTaskOutput(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                   @RequestParam(value = "taskInstanceId") int taskInstanceId,
-                                                   @RequestParam(value = "skipLineNum") int skipNum,
-                                                   @RequestParam(value = "limit") int limit) {
-        return loggerService.queryTaskOutput(loginUser, taskInstanceId, skipNum, limit);
+                                                @RequestParam(value = "limit") int limit,
+                                                @RequestParam(value = "logType", defaultValue = "LOG") TaskLogType logType) {
+        return loggerService.queryLog(loginUser, taskInstanceId, skipNum, limit, logType);
     }
 
     /**
@@ -118,37 +95,15 @@ public class LoggerController extends BaseController {
     @ResponseBody
     @ApiException(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR)
     public ResponseEntity downloadTaskLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @RequestParam(value = "taskInstanceId") int taskInstanceId) {
-        byte[] logBytes = loggerService.getTaskLogBytes(loginUser, taskInstanceId);
+                                          @RequestParam(value = "taskInstanceId") int taskInstanceId,
+                                          @RequestParam(value = "logType", defaultValue = "LOG") TaskLogType logType) {
+        byte[] logBytes = loggerService.getLogBytes(loginUser, taskInstanceId, logType);
+        String fileName = logType == TaskLogType.LOG ? "task.log" : "task.out";
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
+                        "attachment; filename=\"" + fileName + "\"")
                 .body(logBytes);
-    }
-
-    /**
-     * download task output file
-     *
-     * @param loginUser login user
-     * @param taskInstanceId task instance id
-     * @return task output file content
-     */
-    @Operation(summary = "downloadTaskOutput", description = "DOWNLOAD_TASK_INSTANCE_OUTPUT_NOTES")
-    @Parameters({
-            @Parameter(name = "taskInstanceId", description = "TASK_ID", required = true, schema = @Schema(implementation = int.class, example = "100"))
-    })
-    @GetMapping(value = "/download-output")
-    @ResponseBody
-    @ApiException(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR)
-    public ResponseEntity downloadTaskOutput(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                             @RequestParam(value = "taskInstanceId") int taskInstanceId) {
-        byte[] outputBytes = loggerService.getTaskOutputBytes(loginUser, taskInstanceId);
-        return ResponseEntity
-                .ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION,
-                        "attachment; filename=\"" + System.currentTimeMillis() + ".output.log" + "\"")
-                .body(outputBytes);
     }
 
 }

@@ -36,7 +36,7 @@ import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
-import { queryLog, queryTaskOutput } from '@/service/modules/log'
+import { queryLog } from '@/service/modules/log'
 import { stateType } from '@/common/common'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
@@ -120,7 +120,8 @@ const BatchTaskInstance = defineComponent({
         queryLog({
           taskInstanceId: Number(row.id),
           limit: variables.limit,
-          skipLineNum: variables.skipLineNum
+          skipLineNum: variables.skipLineNum,
+          logType: 'LOG'
         }).then((res: any) => {
           variables.logRef += res.message || ''
           if (res && res.message !== '') {
@@ -138,10 +139,11 @@ const BatchTaskInstance = defineComponent({
 
     const getOutputs = (row: any) => {
       const { state } = useAsyncState(
-        queryTaskOutput({
+        queryLog({
           taskInstanceId: Number(row.id),
           limit: variables.limit,
-          skipLineNum: variables.skipLineNum
+          skipLineNum: variables.skipLineNum,
+          logType: 'OUTPUT'
         }).then((res: any) => {
           variables.outputRef += res.message || ''
           if (res && res.message !== '') {

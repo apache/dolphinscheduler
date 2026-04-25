@@ -291,6 +291,8 @@ export default {
     delete: 'Delete',
     delete_confirm: 'Delete?',
     forced_success: 'Forced Success',
+    log: 'Log',
+    output: 'Output',
     view_log: 'View Log',
     view_output: 'View Output',
     download_log: 'Download Log',
