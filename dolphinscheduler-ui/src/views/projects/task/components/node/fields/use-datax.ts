@@ -119,6 +119,45 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     }
   ]
 
+  const batchSizeOptions = [
+    {
+      label: `0(${t('project.node.unlimited')})`,
+      value: 0
+    },
+    {
+      label: '1024',
+      value: 1024
+    },
+    {
+      label: '2048',
+      value: 2048
+    },
+    {
+      label: '4096',
+      value: 4096
+    },
+    {
+      label: '8192',
+      value: 8192
+    },
+    {
+      label: '16384',
+      value: 16384
+    },
+    {
+      label: '32768',
+      value: 32768
+    },
+    {
+      label: '65536',
+      value: 65536
+    },
+    {
+      label: '131072',
+      value: 131072
+    }
+  ]
+
   const sqlEditorSpan = ref(24)
   const jsonEditorSpan = ref(0)
   const datasourceSpan = ref(12)
@@ -253,6 +292,14 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
         type: 'textarea',
         autosize: { minRows: 1 }
       }
+    },
+    {
+      type: 'select',
+      field: 'batchSize',
+      name: t('project.node.datax_writer_batch_size'),
+      span: otherStatementSpan,
+      options: batchSizeOptions,
+      value: 2048
     },
     {
       type: 'select',
