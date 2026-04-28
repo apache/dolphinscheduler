@@ -32,9 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * AlertGroup mapper test
- */
 public class AlertGroupMapperTest extends BaseDaoTest {
 
     @Autowired

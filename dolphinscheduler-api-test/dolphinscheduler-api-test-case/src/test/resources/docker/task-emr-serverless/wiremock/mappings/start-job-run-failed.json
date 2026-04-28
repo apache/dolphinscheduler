@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPattern": "/applications/test-app-id-456/jobruns"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "applicationId": "test-app-id-456",
+      "jobRunId": "test-job-run-id-failed",
+      "arn": "arn:aws:emr-serverless:us-east-1:123456789012:/applications/test-app-id-456/jobruns/test-job-run-id-failed"
+    }
+  }
+}

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.integration.cases;
 import static com.google.common.truth.Truth.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
@@ -212,12 +213,16 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId1).getState())
-                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId2).getState())
-                            .isEqualTo(WorkflowExecutionStatus.STOP);
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId3).getState())
-                            .isEqualTo(WorkflowExecutionStatus.STOP);
+                    final WorkflowInstance workflowInstance1 = repository.queryWorkflowInstance(workflowInstanceId1);
+                    final WorkflowInstance workflowInstance2 = repository.queryWorkflowInstance(workflowInstanceId2);
+                    final WorkflowInstance workflowInstance3 = repository.queryWorkflowInstance(workflowInstanceId3);
+                    assertThat(workflowInstance1.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    assertThat(workflowInstance2.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(workflowInstance2.getEndTime()).isNotNull();
+                    assertThat(workflowInstance2.getEndTime()).isAtLeast(workflowInstance2.getStartTime());
+                    assertThat(workflowInstance3.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(workflowInstance3.getEndTime()).isNotNull();
+                    assertThat(workflowInstance3.getEndTime()).isAtLeast(workflowInstance3.getStartTime());
                 });
 
         masterContainer.assertAllResourceReleased();
@@ -241,12 +246,16 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         await()
                 .atMost(Duration.ofMinutes(1))
                 .untilAsserted(() -> {
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId1).getState())
-                            .isEqualTo(WorkflowExecutionStatus.STOP);
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId2).getState())
-                            .isEqualTo(WorkflowExecutionStatus.STOP);
-                    assertThat(repository.queryWorkflowInstance(workflowInstanceId3).getState())
-                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    final WorkflowInstance workflowInstance1 = repository.queryWorkflowInstance(workflowInstanceId1);
+                    final WorkflowInstance workflowInstance2 = repository.queryWorkflowInstance(workflowInstanceId2);
+                    final WorkflowInstance workflowInstance3 = repository.queryWorkflowInstance(workflowInstanceId3);
+                    assertThat(workflowInstance1.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(workflowInstance1.getEndTime()).isNotNull();
+                    assertThat(workflowInstance1.getEndTime()).isAtLeast(workflowInstance1.getStartTime());
+                    assertThat(workflowInstance2.getState()).isEqualTo(WorkflowExecutionStatus.STOP);
+                    assertThat(workflowInstance2.getEndTime()).isNotNull();
+                    assertThat(workflowInstance2.getEndTime()).isAtLeast(workflowInstance2.getStartTime());
+                    assertThat(workflowInstance3.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
                 });
 
         masterContainer.assertAllResourceReleased();
@@ -372,6 +381,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .failureStrategy(FailureStrategy.CONTINUE)
                 .build();
         final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
@@ -601,6 +611,7 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
         final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
                 .workflowDefinition(parentWorkflow)
                 .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .failureStrategy(FailureStrategy.CONTINUE)
                 .build();
         final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
 
@@ -625,6 +636,45 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
                             })
                             .anySatisfy(taskInstance -> {
                                 assertThat(taskInstance.getName()).isEqualTo("C");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+                });
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow with shared downstream task when failed predecessor finishes first using continue failure strategy")
+    void testStartWorkflow_with_sharedDownstreamTask_whenFailedPredecessorFinishFirst_usingFailureStrategyContinue() {
+        final String yaml =
+                "/it/start/workflow_with_shared_downstream_task_when_failed_predecessor_finish_first.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition parentWorkflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(parentWorkflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .failureStrategy(FailureStrategy.CONTINUE)
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE)
+                            .matches(workflowInstance -> workflowInstance.getEndTime() != null);
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .hasSize(2)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("B");
                                 assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
                             });
                 });
@@ -1768,6 +1818,150 @@ public class WorkflowStartTestCase extends AbstractMasterIntegrationTestCase {
 
         // This test intentionally leaves the workflow running, so we skip the resource cleanup check.
         // masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow when timeout should trigger alert when warningGroupId is set")
+    public void testWorkflowTimeout_WithAlertGroup_ShouldSendAlert() {
+        final String yaml = "/it/start/workflow_with_workflow_timeout_alert.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .warningGroupId(workflow.getWarningGroupId())
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await().atMost(Duration.ofMinutes(2))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(
+                                    workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.SUCCESS);
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("long_running_task");
+                                assertThat(taskInstance.getWorkerGroup()).isEqualTo("default");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            });
+                    Assertions
+                            .assertThat(repository.queryAlert(workflowInstanceId))
+                            .hasSize(1)
+                            .anySatisfy(alert -> {
+                                assertThat(alert.getTitle()).isEqualTo("Workflow Timeout Warn");
+                                assertThat(alert.getProjectCode()).isEqualTo(1);
+                                assertThat(alert.getWorkflowDefinitionCode()).isEqualTo(1);
+                                assertThat(alert.getAlertType()).isEqualTo(AlertType.WORKFLOW_INSTANCE_TIMEOUT);
+                            });
+                });
+
+        masterContainer.assertAllResourceReleased();
+    }
+    @Test
+    @DisplayName("Test start a workflow which contains a dep task with timeout warn strategy")
+    public void testStartWorkflow_withTimeoutWarnTask() {
+        masterConfig.getServerLoadProtection().setEnabled(false);
+
+        final String yaml = "/it/start/workflow_with_timeout_warn_task.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_warn_task");
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .warningGroupId(workflow.getWarningGroupId())
+                .build();
+
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofSeconds(90))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION));
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("dep_task_with_timeout_warn");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.RUNNING_EXECUTION);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryAlert(workflowInstanceId))
+                            .isNotEmpty()
+                            .anySatisfy(alert -> {
+                                assertThat(alert.getAlertType())
+                                        .isEqualTo(AlertType.TASK_TIMEOUT);
+                            });
+                });
+
+        workflowOperator.stopWorkflowInstance(workflowInstanceId);
+        await()
+                .atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> Assertions.assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                        .matches(w -> w.getState() == WorkflowExecutionStatus.STOP));
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
+    @DisplayName("Test start a workflow which contains a dep task with timeout warn failed strategy")
+    public void testStartWorkflow_withTimeoutWarnFailedTask() {
+        masterConfig.getServerLoadProtection().setEnabled(false);
+
+        final String yaml = "/it/start/workflow_with_timeout_warnfailed_task.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getWorkflow("workflow_with_timeout_warnfailed_task");
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO
+                .builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .warningGroupId(workflow.getWarningGroupId())
+                .build();
+
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofSeconds(90))
+                .untilAsserted(() -> {
+                    Assertions
+                            .assertThat(repository.queryWorkflowInstance(workflow))
+                            .satisfiesExactly(workflowInstance -> assertThat(
+                                    workflowInstance.getState())
+                                            .isEqualTo(WorkflowExecutionStatus.STOP));
+
+                    Assertions
+                            .assertThat(repository.queryTaskInstance(workflow))
+                            .hasSize(1)
+                            .satisfiesExactly(taskInstance -> {
+                                assertThat(taskInstance.getName())
+                                        .isEqualTo("dep_task_with_timeout_warnfailed");
+                                assertThat(taskInstance.getState())
+                                        .isEqualTo(TaskExecutionStatus.KILL);
+                            });
+
+                    Assertions
+                            .assertThat(repository.queryAlert(workflowInstanceId))
+                            .isNotEmpty()
+                            .anySatisfy(alert -> {
+                                assertThat(alert.getAlertType())
+                                        .isEqualTo(AlertType.TASK_TIMEOUT);
+                            });
+                });
+
+        masterContainer.assertAllResourceReleased();
     }
 
 }

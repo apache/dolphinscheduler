@@ -32,11 +32,8 @@ import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
-import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -82,6 +79,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
@@ -153,13 +151,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     WorkflowDefinitionService workflowDefinitionService;
 
     @Autowired
-    ExecutorService execService;
-
-    @Autowired
     TaskInstanceMapper taskInstanceMapper;
-
-    @Autowired
-    LoggerService loggerService;
 
     @Autowired
     WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
@@ -268,31 +260,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         return result;
     }
 
-    @Override
-    public WorkflowInstance queryByWorkflowInstanceIdThrowExceptionIfNotFound(Integer workflowInstanceId) {
-        WorkflowInstance workflowInstance = workflowInstanceDao.queryById(workflowInstanceId);
-        if (workflowInstance == null) {
-            throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
-        }
-        return workflowInstance;
-    }
-
-    /**
-     * query workflow instance by id
-     *
-     * @param loginUser          login user
-     * @param workflowInstanceId workflow instance id
-     * @return workflow instance detail
-     */
-    @Override
-    public Map<String, Object> queryWorkflowInstanceById(User loginUser, Integer workflowInstanceId) {
-        WorkflowInstance workflowInstance = workflowInstanceMapper.selectById(workflowInstanceId);
-        WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(workflowInstance.getWorkflowDefinitionCode());
-
-        return queryWorkflowInstanceById(loginUser, workflowDefinition.getProjectCode(), workflowInstanceId);
-    }
-
     /**
      * paging query workflow instance list, filtering according to project, workflow definition, time range, keyword, workflow status
      *
@@ -366,69 +333,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             User executor = idToUserMap.get(workflowInstance.getExecutorId());
             if (null != executor) {
                 workflowInstance.setExecutorName(executor.getUserName());
-            }
-        }
-
-        pageInfo.setTotal((int) workflowInstanceList.getTotal());
-        pageInfo.setTotalList(workflowInstances);
-        result.setData(pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * paging query workflow instance list, filtering according to project, workflow definition, time range, keyword, process status
-     *
-     * @param loginUser                    login user
-     * @param workflowInstanceQueryRequest workflowInstanceQueryRequest
-     * @return workflow instance list
-     */
-    @Override
-    public Result queryWorkflowInstanceList(User loginUser, WorkflowInstanceQueryRequest workflowInstanceQueryRequest) {
-        Result result = new Result();
-        WorkflowInstance workflowInstance = workflowInstanceQueryRequest.convert2WorkflowInstance();
-        String projectName = workflowInstanceQueryRequest.getProjectName();
-        if (!StringUtils.isBlank(projectName)) {
-            Project project = projectMapper.queryByName(projectName);
-            projectService.checkProjectAndAuthThrowException(loginUser, project,
-                    ApiFuncIdentificationConstant.WORKFLOW_DEFINITION);
-            WorkflowDefinition workflowDefinition =
-                    workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowInstance.getName());
-            workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
-            workflowInstance.setProjectCode(project.getCode());
-        }
-
-        Page<WorkflowInstance> page =
-                new Page<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
-        PageInfo<WorkflowInstance> pageInfo =
-                new PageInfo<>(workflowInstanceQueryRequest.getPageNo(), workflowInstanceQueryRequest.getPageSize());
-
-        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryWorkflowInstanceListV2Paging(
-                page,
-                workflowInstance.getProjectCode(),
-                workflowInstance.getWorkflowDefinitionCode(),
-                workflowInstance.getName(),
-                workflowInstanceQueryRequest.getStartTime(),
-                workflowInstanceQueryRequest.getEndTime(),
-                workflowInstanceQueryRequest.getState(),
-                workflowInstance.getHost());
-
-        List<WorkflowInstance> workflowInstances = workflowInstanceList.getRecords();
-        List<Integer> userIds = Collections.emptyList();
-        if (CollectionUtils.isNotEmpty(workflowInstances)) {
-            userIds = workflowInstances.stream().map(WorkflowInstance::getExecutorId).collect(Collectors.toList());
-        }
-        List<User> users = usersService.queryUser(userIds);
-        Map<Integer, User> idToUserMap = Collections.emptyMap();
-        if (CollectionUtils.isNotEmpty(users)) {
-            idToUserMap = users.stream().collect(Collectors.toMap(User::getId, Function.identity()));
-        }
-
-        for (WorkflowInstance Instance : workflowInstances) {
-            Instance.setDuration(WorkflowUtils.getWorkflowInstanceDuration(Instance));
-            User executor = idToUserMap.get(Instance.getExecutorId());
-            if (null != executor) {
-                Instance.setExecutorName(executor.getUserName());
             }
         }
 
@@ -764,7 +668,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             schedule = DateUtils.stringToDate(scheduleTime);
         }
         workflowInstance.setScheduleTime(schedule);
-        List<Property> globalParamList = JSONUtils.toList(globalParams, Property.class);
+        List<Property> globalParamList = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
         Map<String, String> globalParamMap =
                 globalParamList.stream().collect(Collectors.toMap(Property::getProp, Property::getValue));
         globalParams = curingGlobalParamsService.curingGlobalParams(workflowInstance.getId(), globalParamMap,
@@ -889,14 +793,15 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         // global param string
         String globalParamStr =
-                ParameterUtils.convertParameterPlaceholders(JSONUtils.toJsonString(globalParams), timeParams);
-        globalParams = JSONUtils.toList(globalParamStr, Property.class);
+                ParameterUtils.convertParameterPlaceholders(GlobalParameterUtils.serializeGlobalParameter(globalParams),
+                        timeParams);
+        globalParams = GlobalParameterUtils.deserializeGlobalParameter(globalParamStr);
         for (Property property : globalParams) {
             timeParams.put(property.getProp(), property.getValue());
         }
 
         if (userDefinedParams != null && userDefinedParams.length() > 0) {
-            globalParams = JSONUtils.toList(userDefinedParams, Property.class);
+            globalParams = GlobalParameterUtils.deserializeGlobalParameter(userDefinedParams);
         }
 
         Map<String, Map<String, Object>> localUserDefParams = getLocalParams(workflowInstance, timeParams);

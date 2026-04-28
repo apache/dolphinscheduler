@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 
 @Slf4j
@@ -47,7 +48,9 @@ public class VarPoolUtils {
     }
 
     public List<Property> deserializeVarPool(String varPoolJson) {
-        return JSONUtils.toList(varPoolJson, Property.class);
+        List<Property> result = JSONUtils.parseObject(varPoolJson, new TypeReference<List<Property>>() {
+        });
+        return result == null ? Collections.emptyList() : result;
     }
 
     public List<Property> mergeVarPoolJsonString(String... varPoolJsons) {

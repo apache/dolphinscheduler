@@ -23,8 +23,6 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.mapper.JdbcRegistryLockM
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryLock;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryLockDTO;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,13 +40,6 @@ public class JdbcRegistryLockRepository {
                 .stream()
                 .map(JdbcRegistryLockDTO::fromJdbcRegistryLock)
                 .collect(Collectors.toList());
-    }
-
-    public void deleteByClientIds(List<Long> clientIds) {
-        if (CollectionUtils.isEmpty(clientIds)) {
-            return;
-        }
-        jdbcRegistryLockMapper.deleteByClientIds(clientIds);
     }
 
     public void insert(JdbcRegistryLockDTO jdbcRegistryLock) {

@@ -48,9 +48,6 @@ import com.cronutils.model.field.expression.Every;
 import com.cronutils.model.field.expression.On;
 import com.cronutils.model.field.expression.QuestionMark;
 
-/**
- * CronUtilsTest
- */
 public class CronUtilsTest {
 
     private static final Logger logger = LoggerFactory.getLogger(CronUtilsTest.class);

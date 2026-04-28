@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.api.dto.resources.visitor;
 
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 
-/**
- * Visitor
- */
 public interface Visitor {
 
     /**

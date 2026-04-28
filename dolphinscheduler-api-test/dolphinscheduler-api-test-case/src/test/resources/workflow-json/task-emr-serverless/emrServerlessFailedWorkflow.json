@@ -1,0 +1,47 @@
+{
+  "taskDefinitionJson": [
+    {
+      "code": 152040321402529,
+      "delayTime": "0",
+      "description": "",
+      "environmentCode": -1,
+      "failRetryInterval": "1",
+      "failRetryTimes": "0",
+      "flag": "YES",
+      "name": "emr_serverless_failed_test",
+      "taskParams": {
+        "localParams": [],
+        "resourceList": [],
+        "applicationId": "test-app-id-456",
+        "executionRoleArn": "arn:aws:iam::123456789012:role/EMRServerlessExecutionRole",
+        "jobName": "test name failed",
+        "startJobRunRequestJson": "{\"jobDriver\":{\"sparkSubmit\":{\"entryPoint\":\"s3://test-bucket/test.py\",\"sparkSubmitParameters\":\"--conf spark.executor.memory=1g\"}},\"configurationOverrides\":{}}"
+      },
+      "taskPriority": "MEDIUM",
+      "taskType": "EMR_SERVERLESS",
+      "timeout": 0,
+      "timeoutFlag": "CLOSE",
+      "timeoutNotifyStrategy": "",
+      "workerGroup": "default",
+      "cpuQuota": -1,
+      "memoryMax": -1,
+      "taskExecuteType": "BATCH"
+    }
+  ],
+  "taskRelationJson": [
+    {
+      "name": "",
+      "preTaskCode": 0,
+      "preTaskVersion": 0,
+      "postTaskCode": 152040321402529,
+      "postTaskVersion": 1,
+      "conditionType": "NONE",
+      "conditionParams": {}
+    }
+  ],
+  "name": "emrServerlessFailedWorkflow",
+  "executionType": "PARALLEL",
+  "description": "",
+  "globalParams": [],
+  "timeout": 0
+}

@@ -31,15 +31,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_alert_plugin_instance")
 public class AlertPluginInstance {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * plugin_define_id
-     */
     @TableField(value = "plugin_define_id", updateStrategy = FieldStrategy.NEVER)
     private int pluginDefineId;
 
@@ -49,21 +43,12 @@ public class AlertPluginInstance {
     @TableField("instance_name")
     private String instanceName;
 
-    /**
-     * plugin_instance_params
-     */
     @TableField("plugin_instance_params")
     private String pluginInstanceParams;
 
-    /**
-     * create_time
-     */
     @TableField("create_time")
     private Date createTime;
 
-    /**
-     * update_time
-     */
     @TableField("update_time")
     private Date updateTime;
 

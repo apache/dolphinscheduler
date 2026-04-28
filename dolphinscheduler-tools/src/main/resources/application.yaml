@@ -40,11 +40,6 @@ mybatis-plus:
       id-type: auto
     banner: false
 
-demo:
-  tenant-code: default
-  domain-name: localhost
-  api-server-port: 5173
-
 # Override by profile
 
 ---

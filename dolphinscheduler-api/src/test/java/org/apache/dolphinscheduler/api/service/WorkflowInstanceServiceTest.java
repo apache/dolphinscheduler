@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -56,9 +55,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
@@ -66,7 +63,6 @@ import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -74,7 +70,6 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -136,9 +131,6 @@ public class WorkflowInstanceServiceTest {
     WorkflowDefinitionService workflowDefinitionService;
 
     @Mock
-    TaskInstanceMapper taskInstanceMapper;
-
-    @Mock
     LoggerServiceImpl loggerService;
 
     @Mock
@@ -146,23 +138,9 @@ public class WorkflowInstanceServiceTest {
 
     @Mock
     TenantMapper tenantMapper;
+
     @Mock
     TaskDefinitionMapper taskDefinitionMapper;
-
-    @Mock
-    ScheduleMapper scheduleMapper;
-
-    @Mock
-    CuringParamsService curingGlobalParamsService;
-
-    @Mock
-    AlertDao alertDao;
-
-    @Mock
-    private TaskInstanceService taskInstanceService;
-
-    @Mock
-    private WorkflowInstanceMapDao workflowInstanceMapDao;
 
     @Mock
     private TaskInstanceContextDao taskInstanceContextDao;
@@ -321,15 +299,15 @@ public class WorkflowInstanceServiceTest {
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object> proejctAuthFailMap =
+        Map<String, Object> projectAuthFailMap =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, proejctAuthFailMap.get(Constants.STATUS));
-        // project auth sucess
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, projectAuthFailMap.get(Constants.STATUS));
+        // project auth success
         putMsg(result, Status.SUCCESS, projectCode);
         when(workflowInstanceMapper.queryByTriggerCode(projectCode)).thenReturn(new ArrayList());
-        proejctAuthFailMap =
+        projectAuthFailMap =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
-        Assertions.assertEquals(Status.SUCCESS, proejctAuthFailMap.get(Constants.STATUS));
+        Assertions.assertEquals(Status.SUCCESS, projectAuthFailMap.get(Constants.STATUS));
     }
 
     @Test

@@ -19,17 +19,14 @@ package org.apache.dolphinscheduler.plugin.datasource.athena.param;
 
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class AthenaConnectionParam extends BaseConnectionParam {
 
     protected String awsRegion;
-
-    public String getAwsRegion() {
-        return awsRegion;
-    }
-
-    public void setAwsRegion(String awsRegion) {
-        this.awsRegion = awsRegion;
-    }
 
     @Override
     public String toString() {

@@ -17,9 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.engine;
 
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.extract.master.dto.WorkflowExecutorDTO;
 import org.apache.dolphinscheduler.server.master.engine.command.CommandEngine;
 import org.apache.dolphinscheduler.server.master.engine.executor.LogicTaskEngineDelegator;
 import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.WorkerGroupDispatcherCoordinator;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,6 +47,9 @@ public class WorkflowEngine implements AutoCloseable {
     @Autowired
     private LogicTaskEngineDelegator logicTaskEngineDelegator;
 
+    @Autowired
+    private IWorkflowRepository workflowRepository;
+
     public void start() {
 
         workflowEventBusCoordinator.start();
@@ -53,6 +61,24 @@ public class WorkflowEngine implements AutoCloseable {
         logicTaskEngineDelegator.start();
 
         log.info("WorkflowEngine started");
+    }
+
+    public List<WorkflowExecutorDTO> queryWorkflowExecutors() {
+        return workflowRepository.getAll()
+                .stream()
+                .map(runnable -> {
+                    WorkflowInstance wi = runnable.getWorkflowInstance();
+                    return WorkflowExecutorDTO.builder()
+                            .id(wi.getId())
+                            .name(wi.getName())
+                            .projectCode(wi.getProjectCode())
+                            .workflowDefinitionCode(wi.getWorkflowDefinitionCode())
+                            .state(wi.getState())
+                            .startTime(wi.getStartTime())
+                            .runTimes(wi.getRunTimes())
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 
     @Override

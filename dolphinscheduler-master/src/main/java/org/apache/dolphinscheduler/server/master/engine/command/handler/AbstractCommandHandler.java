@@ -34,9 +34,9 @@ import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.command.ICommandHandler;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphFactory;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.WorkflowExecution;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.WorkflowExecutionBuilder;
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnableBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
@@ -70,7 +70,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
     protected ProjectDao projectDao;
 
     @Override
-    public WorkflowExecutionRunnable handleCommand(final Command command) {
+    public WorkflowExecution handleCommand(final Command command) {
         final WorkflowExecuteContextBuilder workflowExecuteContextBuilder = WorkflowExecuteContext.builder()
                 .withCommand(command);
 
@@ -82,12 +82,12 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         assembleWorkflowEventBus(workflowExecuteContextBuilder);
         assembleWorkflowExecutionGraph(workflowExecuteContextBuilder);
 
-        final WorkflowExecutionRunnableBuilder workflowExecutionRunnableBuilder = WorkflowExecutionRunnableBuilder
+        final WorkflowExecutionBuilder workflowExecutionBuilder = WorkflowExecutionBuilder
                 .builder()
                 .workflowExecuteContextBuilder(workflowExecuteContextBuilder)
                 .applicationContext(applicationContext)
                 .build();
-        return new WorkflowExecutionRunnable(workflowExecutionRunnableBuilder);
+        return new WorkflowExecution(workflowExecutionBuilder);
     }
 
     protected void assembleWorkflowEventBus(

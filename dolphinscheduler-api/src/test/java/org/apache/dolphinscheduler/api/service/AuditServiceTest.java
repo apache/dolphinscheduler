@@ -38,19 +38,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * audit service test
- */
 @ExtendWith(MockitoExtension.class)
 public class AuditServiceTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(AuditServiceTest.class);
 
     @InjectMocks
     private AuditServiceImpl auditService;

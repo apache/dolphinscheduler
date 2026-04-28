@@ -30,9 +30,12 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 import java.util.Objects;
 
+import lombok.Data;
+
 /**
  * DataX parameter
  */
+@Data
 public class DataxParameters extends AbstractParameters {
 
     /**
@@ -65,24 +68,12 @@ public class DataxParameters extends AbstractParameters {
      */
     private int dataTarget;
 
-    /**
-     * sql
-     */
     private String sql;
 
-    /**
-     * target table
-     */
     private String targetTable;
 
-    /**
-     * Pre Statements
-     */
     private List<String> preStatements;
 
-    /**
-     * Post Statements
-     */
     private List<String> postStatements;
 
     /**
@@ -96,6 +87,11 @@ public class DataxParameters extends AbstractParameters {
     private int jobSpeedRecord;
 
     /**
+     * datax channel
+     */
+    private int jobChannel;
+
+    /**
      * Xms memory
      */
     private int xms;
@@ -105,130 +101,7 @@ public class DataxParameters extends AbstractParameters {
      */
     private int xmx;
 
-    /**
-     * resource list
-     */
     private List<ResourceInfo> resourceList;
-
-    public int getCustomConfig() {
-        return customConfig;
-    }
-
-    public void setCustomConfig(int customConfig) {
-        this.customConfig = customConfig;
-    }
-
-    public String getJson() {
-        return json;
-    }
-
-    public void setJson(String json) {
-        this.json = json;
-    }
-
-    public String getDsType() {
-        return dsType;
-    }
-
-    public void setDsType(String dsType) {
-        this.dsType = dsType;
-    }
-
-    public int getDataSource() {
-        return dataSource;
-    }
-
-    public void setDataSource(int dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public String getDtType() {
-        return dtType;
-    }
-
-    public void setDtType(String dtType) {
-        this.dtType = dtType;
-    }
-
-    public int getDataTarget() {
-        return dataTarget;
-    }
-
-    public void setDataTarget(int dataTarget) {
-        this.dataTarget = dataTarget;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
-
-    public String getTargetTable() {
-        return targetTable;
-    }
-
-    public void setTargetTable(String targetTable) {
-        this.targetTable = targetTable;
-    }
-
-    public List<String> getPreStatements() {
-        return preStatements;
-    }
-
-    public void setPreStatements(List<String> preStatements) {
-        this.preStatements = preStatements;
-    }
-
-    public List<String> getPostStatements() {
-        return postStatements;
-    }
-
-    public void setPostStatements(List<String> postStatements) {
-        this.postStatements = postStatements;
-    }
-
-    public int getJobSpeedByte() {
-        return jobSpeedByte;
-    }
-
-    public void setJobSpeedByte(int jobSpeedByte) {
-        this.jobSpeedByte = jobSpeedByte;
-    }
-
-    public int getJobSpeedRecord() {
-        return jobSpeedRecord;
-    }
-
-    public void setJobSpeedRecord(int jobSpeedRecord) {
-        this.jobSpeedRecord = jobSpeedRecord;
-    }
-
-    public int getXms() {
-        return xms;
-    }
-
-    public void setXms(int xms) {
-        this.xms = xms;
-    }
-
-    public int getXmx() {
-        return xmx;
-    }
-
-    public void setXmx(int xmx) {
-        this.xmx = xmx;
-    }
-
-    public List<ResourceInfo> getResourceList() {
-        return resourceList;
-    }
-
-    public void setResourceList(List<ResourceInfo> resourceList) {
-        this.resourceList = resourceList;
-    }
 
     @Override
     public boolean checkParameters() {
@@ -249,23 +122,24 @@ public class DataxParameters extends AbstractParameters {
 
     @Override
     public String toString() {
-        return "DataxParameters{"
-                + "customConfig=" + customConfig
-                + ", json='" + json + '\''
-                + ", dsType='" + dsType + '\''
-                + ", dataSource=" + dataSource
-                + ", dtType='" + dtType + '\''
-                + ", dataTarget=" + dataTarget
-                + ", sql='" + sql + '\''
-                + ", targetTable='" + targetTable + '\''
-                + ", preStatements=" + preStatements
-                + ", postStatements=" + postStatements
-                + ", jobSpeedByte=" + jobSpeedByte
-                + ", jobSpeedRecord=" + jobSpeedRecord
-                + ", xms=" + xms
-                + ", xmx=" + xmx
-                + ", resourceList=" + JSONUtils.toJsonString(resourceList)
-                + '}';
+        return "DataxParameters{" +
+                "customConfig=" + customConfig +
+                ", json='" + json + '\'' +
+                ", dsType='" + dsType + '\'' +
+                ", dataSource=" + dataSource +
+                ", dtType='" + dtType + '\'' +
+                ", dataTarget=" + dataTarget +
+                ", sql='" + sql + '\'' +
+                ", targetTable='" + targetTable + '\'' +
+                ", preStatements=" + preStatements +
+                ", postStatements=" + postStatements +
+                ", jobSpeedByte=" + jobSpeedByte +
+                ", jobSpeedRecord=" + jobSpeedRecord +
+                ", jobChannel=" + jobChannel +
+                ", xms=" + xms +
+                ", xmx=" + xmx +
+                ", resourceList=" + JSONUtils.toJsonString(resourceList) +
+                '}';
     }
 
     @Override

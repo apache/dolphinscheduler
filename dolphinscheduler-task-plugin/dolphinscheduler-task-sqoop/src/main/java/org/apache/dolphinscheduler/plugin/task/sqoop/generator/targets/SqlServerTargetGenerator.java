@@ -45,9 +45,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * sqlServer target generator
- */
 public class SqlServerTargetGenerator implements ITargetGenerator {
 
     private static final Logger logger = LoggerFactory.getLogger(SqlServerTargetGenerator.class);

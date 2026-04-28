@@ -32,9 +32,6 @@ public class EnvironmentWorkerGroupRelation {
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * environment code
-     */
     private Long environmentCode;
 
     /**

@@ -25,23 +25,25 @@ export function queryDatabaseState(): any {
   })
 }
 
-export function listMaster(): any {
-  return axios({
-    url: '/monitor/masters',
-    method: 'get'
-  })
-}
-
-export function listWorker(): any {
-  return axios({
-    url: '/monitor/workers',
-    method: 'get'
-  })
-}
-
 export function listMonitorServerNode(nodeType: ServerNodeType): any {
   return axios({
     url: `/monitor/${nodeType}`,
     method: 'get'
+  })
+}
+
+export function queryWorkflowExecutors(masterAddress: string): any {
+  return axios({
+    url: '/monitor/masters/workflow-executors',
+    method: 'get',
+    params: { masterAddress }
+  })
+}
+
+export function queryTaskExecutors(serverAddress: string): any {
+  return axios({
+    url: '/monitor/workers/task-executors',
+    method: 'get',
+    params: { serverAddress }
   })
 }

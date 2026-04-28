@@ -154,6 +154,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/task/emr.html',
                             },
                             {
+                                title: 'Amazon EMR Serverless',
+                                link: '/en-us/docs/dev/user_doc/guide/task/emr-serverless.html',
+                            },
+                            {
                                 title: 'Apache Zeppelin',
                                 link: '/en-us/docs/dev/user_doc/guide/task/zeppelin.html',
                             },
@@ -473,10 +477,6 @@ export default {
                     {
                         title: 'Expansion and Reduction',
                         link: '/en-us/docs/dev/user_doc/guide/expansion-reduction.html',
-                    },
-                    {
-                        title: 'Demo',
-                        link: '/en-us/docs/dev/user_doc/guide/demo.html',
                     },
                 ],
             },
@@ -882,6 +882,10 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/emr.html',
                             },
                             {
+                                title: 'Amazon EMR Serverless',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/emr-serverless.html',
+                            },
+                            {
                                 title: 'Apache Zeppelin',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/zeppelin.html',
                             },
@@ -1185,10 +1189,6 @@ export default {
                     {
                         title: '扩/缩容',
                         link: '/zh-cn/docs/dev/user_doc/guide/expansion-reduction.html',
-                    },
-                    {
-                        title: 'Demo',
-                        link: '/zh-cn/docs/dev/user_doc/guide/demo.html',
                     },
                 ],
             },

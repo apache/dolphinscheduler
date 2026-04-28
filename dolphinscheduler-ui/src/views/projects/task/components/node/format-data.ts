@@ -274,6 +274,7 @@ export function formatParams(data: INodeData): {
       taskParams.targetTable = data.targetTable
       taskParams.jobSpeedByte = data.jobSpeedByte
       taskParams.jobSpeedRecord = data.jobSpeedRecord
+      taskParams.jobChannel = data.jobChannel
       taskParams.preStatements = data.preStatements
       taskParams.postStatements = data.postStatements
     } else {
@@ -301,6 +302,13 @@ export function formatParams(data: INodeData): {
     taskParams.programType = data.programType
     taskParams.jobFlowDefineJson = data.jobFlowDefineJson
     taskParams.stepsDefineJson = data.stepsDefineJson
+  }
+
+  if (data.taskType === 'EMR_SERVERLESS') {
+    taskParams.applicationId = data.applicationId
+    taskParams.executionRoleArn = data.executionRoleArn
+    taskParams.jobName = data.jobName
+    taskParams.startJobRunRequestJson = data.startJobRunRequestJson
   }
 
   if (data.taskType === 'ZEPPELIN') {

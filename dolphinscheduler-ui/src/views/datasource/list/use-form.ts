@@ -197,14 +197,6 @@ export function useForm(id?: number) {
           }
         }
       }
-      // databaseUserName: {
-      //   trigger: ['input'],
-      //   validator() {
-      //     if (!state.detailForm.userName) {
-      //       return new Error(t('datasource.user_name_tips'))
-      //     }
-      //   }
-      // },
     } as FormRules,
     modeOptions: [
       {

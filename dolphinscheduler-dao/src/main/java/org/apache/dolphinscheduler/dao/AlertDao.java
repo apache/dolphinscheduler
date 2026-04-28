@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,15 +70,20 @@ public class AlertDao {
     private static final int ADMIN_ALERT_GROUP_ID = 1;
 
     @Value("${alert.alarm-suppression.crash:60}")
+    @Setter
     private Integer crashAlarmSuppression;
 
     @Autowired
     private AlertMapper alertMapper;
 
     @Autowired
+    @Getter
+    @Setter
     private AlertPluginInstanceMapper alertPluginInstanceMapper;
 
     @Autowired
+    @Getter
+    @Setter
     private AlertGroupMapper alertGroupMapper;
 
     @Autowired
@@ -195,6 +202,13 @@ public class AlertDao {
      * @param projectUser     projectUser
      */
     public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance, ProjectUser projectUser) {
+        if (projectUser == null) {
+            throw new IllegalArgumentException("projectUser must not be null");
+        }
+        if (workflowInstance.getWarningGroupId() == null) {
+            throw new IllegalArgumentException("warningGroupId of the workflow instance must not be null");
+        }
+
         int alertGroupId = workflowInstance.getWarningGroupId();
         Alert alert = new Alert();
         List<WorkflowAlertContent> workflowAlertContentList = new ArrayList<>(1);
@@ -220,10 +234,11 @@ public class AlertDao {
         alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
         alert.setWorkflowInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.WORKFLOW_INSTANCE_TIMEOUT);
-        saveTaskTimeoutAlert(alert, content, alertGroupId);
+
+        saveTimeoutAlert(alert, content, alertGroupId);
     }
 
-    private void saveTaskTimeoutAlert(Alert alert, String content, int alertGroupId) {
+    private void saveTimeoutAlert(Alert alert, String content, int alertGroupId) {
         alert.setAlertGroupId(alertGroupId);
         alert.setWarningType(WarningType.FAILURE);
         alert.setContent(content);
@@ -275,7 +290,8 @@ public class AlertDao {
         alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
         alert.setWorkflowInstanceId(workflowInstance.getId());
         alert.setAlertType(AlertType.TASK_TIMEOUT);
-        saveTaskTimeoutAlert(alert, content, workflowInstance.getWarningGroupId());
+
+        saveTimeoutAlert(alert, content, workflowInstance.getWarningGroupId());
     }
 
     /**
@@ -308,26 +324,6 @@ public class AlertDao {
             return alertPluginInstanceMapper.queryByIds(ids);
         }
         return null;
-    }
-
-    public AlertPluginInstanceMapper getAlertPluginInstanceMapper() {
-        return alertPluginInstanceMapper;
-    }
-
-    public void setAlertPluginInstanceMapper(AlertPluginInstanceMapper alertPluginInstanceMapper) {
-        this.alertPluginInstanceMapper = alertPluginInstanceMapper;
-    }
-
-    public AlertGroupMapper getAlertGroupMapper() {
-        return alertGroupMapper;
-    }
-
-    public void setAlertGroupMapper(AlertGroupMapper alertGroupMapper) {
-        this.alertGroupMapper = alertGroupMapper;
-    }
-
-    public void setCrashAlarmSuppression(Integer crashAlarmSuppression) {
-        this.crashAlarmSuppression = crashAlarmSuppression;
     }
 
     public void deleteByWorkflowInstanceId(Integer workflowInstanceId) {

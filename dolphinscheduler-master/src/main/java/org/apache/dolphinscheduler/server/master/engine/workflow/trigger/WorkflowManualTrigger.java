@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowM
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerResponse;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.Date;
@@ -61,6 +62,7 @@ public class WorkflowManualTrigger
         workflowInstance.setCommandType(commandType);
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.SUBMITTED_SUCCESS, commandType.name());
         workflowInstance.setRecovery(Flag.NO);
+        workflowInstance.setScheduleTime(workflowManualTriggerRequest.getScheduleTime());
         workflowInstance.setStartTime(new Date());
         workflowInstance.setRestartTime(workflowInstance.getStartTime());
         workflowInstance.setRunTimes(1);
@@ -91,7 +93,8 @@ public class WorkflowManualTrigger
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .commandParams(workflowManualTriggerRequest.getStartParamList())
                 .startNodes(workflowManualTriggerRequest.getStartNodes())
-                .timeZone(DateUtils.getTimezone())
+                .timeZone(
+                        StringUtils.defaultIfBlank(workflowManualTriggerRequest.getTimeZone(), DateUtils.getTimezone()))
                 .build();
         return Command.builder()
                 .commandType(CommandType.START_PROCESS)

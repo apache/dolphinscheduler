@@ -24,9 +24,6 @@ import java.net.InetSocketAddress;
 import lombok.extern.slf4j.Slf4j;
 import io.netty.channel.Channel;
 
-/**
- * channel utils
- */
 @Slf4j
 public class ChannelUtils {
 

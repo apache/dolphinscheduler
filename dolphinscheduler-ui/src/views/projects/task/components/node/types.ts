@@ -340,6 +340,7 @@ interface ITaskParams {
   targetTable?: string
   jobSpeedByte?: number
   jobSpeedRecord?: number
+  jobChannel?: number
   xms?: number
   xmx?: number
   sparkParameters?: ISparkParameters
@@ -347,6 +348,9 @@ interface ITaskParams {
   ruleInputParameter?: IRuleParameters
   jobFlowDefineJson?: string
   stepsDefineJson?: string
+  applicationId?: string
+  executionRoleArn?: string
+  startJobRunRequestJson?: string
   zeppelinNoteId?: string
   zeppelinParagraphId?: string
   zeppelinRestEndpoint?: string

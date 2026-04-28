@@ -49,9 +49,6 @@ public class Property implements Serializable {
      */
     private DataType type;
 
-    /**
-     * value
-     */
     private String value;
 
 }

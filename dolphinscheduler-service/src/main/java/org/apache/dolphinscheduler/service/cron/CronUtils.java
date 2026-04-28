@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.service.cron;
 
 import static com.cronutils.model.CronType.QUARTZ;
-import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST;
-import static org.apache.dolphinscheduler.common.constants.Constants.COMMA;
 import static org.apache.dolphinscheduler.service.cron.CycleFactory.day;
 import static org.apache.dolphinscheduler.service.cron.CycleFactory.hour;
 import static org.apache.dolphinscheduler.service.cron.CycleFactory.min;
@@ -35,18 +33,14 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -206,17 +200,6 @@ public class CronUtils {
         return executeTimes;
     }
 
-    public static List<Date> getSelfFireDateList(@NonNull final Date startTime,
-                                                 @NonNull final Date endTime,
-                                                 @NonNull final List<Schedule> schedules) throws CronParseException {
-        ZonedDateTime zonedDateTimeStart = ZonedDateTime.ofInstant(startTime.toInstant(), ZoneId.systemDefault());
-        ZonedDateTime zonedDateTimeEnd = ZonedDateTime.ofInstant(endTime.toInstant(), ZoneId.systemDefault());
-
-        return getSelfFireDateList(zonedDateTimeStart, zonedDateTimeEnd, schedules).stream()
-                .map(zonedDateTime -> new Date(zonedDateTime.toInstant().toEpochMilli()))
-                .collect(Collectors.toList());
-    }
-
     /**
      * gets all scheduled times for a period of time based on self dependency
      * if schedulers is empty then default scheduler = 1 day
@@ -299,24 +282,6 @@ public class CronUtils {
         end.set(Calendar.SECOND, 59);
         end.set(Calendar.MILLISECOND, 999);
         return end.getTime();
-    }
-
-    /**
-     * get Schedule Date
-     *
-     * @param param
-     * @return date list
-     */
-    public static List<Date> getSelfScheduleDateList(Map<String, String> param) {
-        List<Date> result = new ArrayList<>();
-        String scheduleDates = param.get(CMD_PARAM_COMPLEMENT_DATA_SCHEDULE_DATE_LIST);
-        if (StringUtils.isNotEmpty(scheduleDates)) {
-            for (String stringDate : scheduleDates.split(COMMA)) {
-                result.add(DateUtils.stringToDate(stringDate.trim()));
-            }
-            return result;
-        }
-        return null;
     }
 
 }

@@ -42,7 +42,7 @@ public class RedshiftPooledDataSourceClient extends BasePooledDataSourceClient {
         if (connectionParam.getMode().equals(RedshiftAuthMode.PASSWORD)) {
             return super.getConnection();
         }
-        return RedshiftDataSourceProcessor.getConnectionByIAM(connectionParam);
+        return new RedshiftDataSourceProcessor().getConnection(connectionParam);
     }
 
 }

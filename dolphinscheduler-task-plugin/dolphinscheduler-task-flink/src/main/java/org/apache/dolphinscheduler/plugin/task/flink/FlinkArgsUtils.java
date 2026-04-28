@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * flink args utils
- */
 public class FlinkArgsUtils {
 
     private FlinkArgsUtils() {
@@ -263,11 +260,6 @@ public class FlinkArgsUtils {
             args.add(FlinkConstants.FLINK_PARALLELISM);
             args.add(String.format("%d", parallelism)); // -p
         }
-
-        // If the job is submitted in attached mode, perform a best-effort cluster shutdown when the CLI is terminated
-        // abruptly
-        // The task status will be synchronized with the cluster job status
-        args.add(FlinkConstants.FLINK_SHUTDOWN_ON_ATTACHED_EXIT); // -sae
 
         // -s -yqu -yat -yD -D
         if (StringUtils.isNotEmpty(others)) {

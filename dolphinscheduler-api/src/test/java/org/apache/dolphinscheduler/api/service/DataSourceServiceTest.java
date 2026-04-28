@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -35,7 +34,7 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
@@ -77,9 +76,6 @@ import org.springframework.dao.DuplicateKeyException;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
-/**
- * data source service test
- */
 @ExtendWith(MockitoExtension.class)
 public class DataSourceServiceTest {
 
@@ -92,9 +88,6 @@ public class DataSourceServiceTest {
 
     @Mock
     private DataSourceMapper dataSourceMapper;
-
-    @Mock
-    private DataSourceUserMapper datasourceUserMapper;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -268,9 +261,11 @@ public class DataSourceServiceTest {
 
     @Test
     public void testConnectionTest() {
+        User loginUser = getAdminUser();
         int dataSourceId = -1;
         when(dataSourceMapper.selectById(dataSourceId)).thenReturn(null);
-        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST, () -> dataSourceService.connectionTest(dataSourceId));
+        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST,
+                () -> dataSourceService.connectionTest(loginUser, dataSourceId));
 
         try (
                 MockedStatic<DataSourceUtils> ignored =
@@ -281,11 +276,12 @@ public class DataSourceServiceTest {
 
             when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
             when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
-            assertDoesNotThrow(() -> dataSourceService.connectionTest(dataSource.getId()));
+            passResourcePermissionCheckService();
+            assertDoesNotThrow(() -> dataSourceService.connectionTest(loginUser, dataSource.getId()));
 
             when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
             assertThrowsServiceException(Status.CONNECTION_TEST_FAILURE,
-                    () -> dataSourceService.connectionTest(dataSource.getId()));
+                    () -> dataSourceService.connectionTest(loginUser, dataSource.getId()));
         }
 
     }
@@ -605,13 +601,15 @@ public class DataSourceServiceTest {
 
     @Test
     public void testGetDatabases() throws SQLException {
+        User loginUser = getAdminUser();
+
         DataSource dataSource = getOracleDataSource();
         int datasourceId = 1;
         dataSource.setId(datasourceId);
         when(dataSourceMapper.selectById(datasourceId)).thenReturn(null);
 
         try {
-            dataSourceService.getDatabases(datasourceId);
+            dataSourceService.getDatabases(loginUser, datasourceId);
         } catch (Exception e) {
             Assertions.assertTrue(e.getMessage().contains(Status.QUERY_DATASOURCE_ERROR.getMsg()));
         }
@@ -623,9 +621,10 @@ public class DataSourceServiceTest {
         dataSourceUtils.when(() -> DataSourceUtils.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
         dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
                 .thenReturn(connectionParam);
+        passResourcePermissionCheckService();
 
         try {
-            dataSourceService.getDatabases(datasourceId);
+            dataSourceService.getDatabases(loginUser, datasourceId);
         } catch (Exception e) {
             Assertions.assertTrue(e.getMessage().contains(Status.GET_DATASOURCE_TABLES_ERROR.getMsg()));
         }
@@ -634,7 +633,7 @@ public class DataSourceServiceTest {
                 .thenReturn(null);
 
         try {
-            dataSourceService.getDatabases(datasourceId);
+            dataSourceService.getDatabases(loginUser, datasourceId);
         } catch (Exception e) {
             Assertions.assertTrue(e.getMessage().contains(Status.DATASOURCE_CONNECT_FAILED.getMsg()));
         }

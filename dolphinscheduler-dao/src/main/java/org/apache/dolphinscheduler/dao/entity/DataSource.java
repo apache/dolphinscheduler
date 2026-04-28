@@ -33,20 +33,11 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_datasource")
 public class DataSource {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * user id
-     */
     private int userId;
 
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
 
@@ -55,9 +46,6 @@ public class DataSource {
      */
     private String name;
 
-    /**
-     * note
-     */
     private String note;
 
     /**
@@ -65,19 +53,10 @@ public class DataSource {
      */
     private DbType type;
 
-    /**
-     * connection parameters
-     */
     private String connectionParams;
 
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 
     @Override

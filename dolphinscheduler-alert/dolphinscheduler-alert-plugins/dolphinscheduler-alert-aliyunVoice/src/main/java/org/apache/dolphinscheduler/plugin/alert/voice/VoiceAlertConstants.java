@@ -44,11 +44,6 @@ public class VoiceAlertConstants {
      */
     static final String TTS_CODE = "$t('ttsCode')";
     /**
-     * tts Param
-     */
-    static final String TTS_PARAM = "ttsParam";
-
-    /**
      * address
      */
     static final String NAME_ADDRESS = "address";

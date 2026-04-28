@@ -53,23 +53,20 @@ public class YarnClientAspect {
      *
      * @param appContext     application context when invoking YarnClientImpl.submitApplication
      * @param submittedAppId the submitted application id returned by YarnClientImpl.submitApplication
-     * @throws Throwable exceptions
      */
     @AfterReturning(pointcut = "execution(ApplicationId org.apache.hadoop.yarn.client.api.impl.YarnClientImpl." +
             "submitApplication(ApplicationSubmissionContext)) && args(appContext)", returning = "submittedAppId", argNames = "appContext,submittedAppId")
     public void registerApplicationInfo(ApplicationSubmissionContext appContext, ApplicationId submittedAppId) {
-        if (appInfoFilePath != null) {
-            try {
-                Files.write(Paths.get(appInfoFilePath),
-                        Collections.singletonList(submittedAppId.toString()),
-                        StandardOpenOption.CREATE,
-                        StandardOpenOption.WRITE,
-                        StandardOpenOption.APPEND);
-            } catch (IOException ioException) {
-                logger.error(
-                        "YarnClientAspect[registerAppInfo]: can't output current application information, because {}",
-                        ioException.getMessage());
-            }
+        try {
+            Files.write(Paths.get(appInfoFilePath),
+                    Collections.singletonList(submittedAppId.toString()),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.WRITE,
+                    StandardOpenOption.APPEND);
+        } catch (IOException ioException) {
+            logger.error(
+                    "YarnClientAspect[registerAppInfo]: can't output current application information, because {}",
+                    ioException.getMessage());
         }
         logger.info("YarnClientAspect[submitApplication]: current application context {}", appContext);
         logger.info("YarnClientAspect[submitApplication]: submitted application id {}", submittedAppId);
@@ -82,12 +79,11 @@ public class YarnClientAspect {
      * This method will invoke many times, however, the last ApplicationReport instance assigned to currentApplicationReport
      *
      * @param appReport current application report when invoking getApplicationReport within submitApplication
-     * @param appId     current application id, which is the parameter of getApplicationReport
      */
     @AfterReturning(pointcut = "cflow(execution(ApplicationId org.apache.hadoop.yarn.client.api.impl.YarnClientImpl.submitApplication(ApplicationSubmissionContext))) "
             +
-            "&& !within(YarnClientAspect) && execution(ApplicationReport org.apache.hadoop.yarn.client.api.impl.YarnClientImpl.getApplicationReport(ApplicationId)) && args(appId)", returning = "appReport", argNames = "appReport,appId")
-    public void registerApplicationReport(ApplicationReport appReport, ApplicationId appId) {
+            "&& !within(YarnClientAspect) && execution(ApplicationReport org.apache.hadoop.yarn.client.api.impl.YarnClientImpl.getApplicationReport(ApplicationId))", returning = "appReport", argNames = "appReport")
+    public void registerApplicationReport(ApplicationReport appReport) {
         currentApplicationReport = appReport;
     }
 }

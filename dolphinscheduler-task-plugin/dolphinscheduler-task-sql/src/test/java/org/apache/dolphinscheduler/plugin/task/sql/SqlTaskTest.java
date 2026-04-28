@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -31,11 +32,15 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.HashMap;
@@ -44,6 +49,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -67,6 +73,47 @@ class SqlTaskTest {
         ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\"}");
 
         sqlTask = new SqlTask(ctx);
+    }
+
+    @Test
+    void testSqlLoadedFromResourceFileWhenSqlIsEmpty(@TempDir Path tempDir) throws Exception {
+        Path sqlFile = tempDir.resolve("test.sql");
+        String sqlContent = "SELECT 1";
+        Files.write(sqlFile, sqlContent.getBytes(StandardCharsets.UTF_8));
+
+        SqlParameters sqlParameters = new SqlParameters();
+        sqlParameters.setType("MYSQL");
+        sqlParameters.setDatasource(1);
+        sqlParameters.setSql(null);
+        sqlParameters.setSqlResource("/sql/test.sql");
+
+        DataSourceParameters dataSourceParameters = new DataSourceParameters();
+        dataSourceParameters.setType(DbType.MYSQL);
+        dataSourceParameters.setResourceType(ResourceType.DATASOURCE.name());
+
+        ResourceParametersHelper resourceParametersHelper = new ResourceParametersHelper();
+        resourceParametersHelper.put(ResourceType.DATASOURCE, 1, dataSourceParameters);
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(sqlParameters));
+        taskExecutionContext.setScheduleTime(System.currentTimeMillis());
+        taskExecutionContext.setResourceParametersHelper(resourceParametersHelper);
+
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(ResourceContext.ResourceItem.builder()
+                .resourceAbsolutePathInStorage(sqlParameters.getSqlResource())
+                .resourceAbsolutePathInLocal(sqlFile.toString())
+                .build());
+        taskExecutionContext.setResourceContext(resourceContext);
+
+        SqlTask task = new SqlTask(taskExecutionContext);
+
+        Method ensureSqlContent = SqlTask.class.getDeclaredMethod("ensureSqlContent");
+        ensureSqlContent.setAccessible(true);
+        ensureSqlContent.invoke(task);
+
+        SqlParameters loadedParameters = (SqlParameters) task.getParameters();
+        Assertions.assertEquals(sqlContent, loadedParameters.getSql());
     }
 
     @Test
@@ -210,7 +257,6 @@ class SqlTaskTest {
 
     @Test
     void testGenerateEmptyRow_WithNonNullResultSet_ReturnsEmptyValuesForAllColumns() throws Exception {
-        // Arrange
         ResultSet mockResultSet = mock(ResultSet.class);
         ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
 
@@ -222,10 +268,8 @@ class SqlTaskTest {
         Method method = SqlTask.class.getDeclaredMethod("generateEmptyRow", ResultSet.class);
         method.setAccessible(true);
 
-        // Act
         ArrayNode result = (ArrayNode) method.invoke(sqlTask, mockResultSet);
 
-        // Assert
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.size());
 
@@ -236,14 +280,11 @@ class SqlTaskTest {
 
     @Test
     void testGenerateEmptyRow_WithNullResultSet_ReturnsErrorObject() throws Exception {
-        // Arrange
         Method method = SqlTask.class.getDeclaredMethod("generateEmptyRow", ResultSet.class);
         method.setAccessible(true);
 
-        // Act
         ArrayNode result = (ArrayNode) method.invoke(sqlTask, (ResultSet) null);
 
-        // Assert
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1, result.size());
 
@@ -260,7 +301,7 @@ class SqlTaskTest {
         when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
         when(mockMetaData.getColumnCount()).thenReturn(3);
         when(mockMetaData.getColumnLabel(1)).thenReturn("id");
-        when(mockMetaData.getColumnLabel(2)).thenReturn("id"); // duplicate
+        when(mockMetaData.getColumnLabel(2)).thenReturn("id");
         when(mockMetaData.getColumnLabel(3)).thenReturn("name");
 
         Method method = SqlTask.class.getDeclaredMethod("generateEmptyRow", ResultSet.class);
@@ -281,7 +322,6 @@ class SqlTaskTest {
         Method resultProcessMethod = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
         resultProcessMethod.setAccessible(true);
 
-        // Mock a null ResultSet
         String result = (String) resultProcessMethod.invoke(sqlTask, (ResultSet) null);
 
         Assertions.assertNotNull(result);
@@ -290,7 +330,6 @@ class SqlTaskTest {
 
     @Test
     void testResultProcess_EmptyResultSet_ReturnsEmptyResult() throws Exception {
-        // Mock a non-null ResultSet that contains no data rows
         ResultSet mockResultSet = mock(ResultSet.class);
         ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
 
@@ -298,7 +337,7 @@ class SqlTaskTest {
         when(mockMetaData.getColumnCount()).thenReturn(2);
         when(mockMetaData.getColumnLabel(1)).thenReturn("id");
         when(mockMetaData.getColumnLabel(2)).thenReturn("name");
-        when(mockResultSet.next()).thenReturn(false); // no rows available
+        when(mockResultSet.next()).thenReturn(false);
 
         Method resultProcessMethod = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
         resultProcessMethod.setAccessible(true);
@@ -306,7 +345,6 @@ class SqlTaskTest {
         String result = (String) resultProcessMethod.invoke(sqlTask, mockResultSet);
 
         Assertions.assertNotNull(result);
-        // Verify the result contains empty string values for all columns and is a valid JSON array
         Assertions.assertTrue(result.contains("\"id\":\"\""));
         Assertions.assertTrue(result.contains("\"name\":\"\""));
         Assertions.assertTrue(result.startsWith("[{"));
@@ -321,17 +359,15 @@ class SqlTaskTest {
         when(mockRs.getMetaData()).thenReturn(mockMd);
         when(mockMd.getColumnCount()).thenReturn(2);
         when(mockMd.getColumnLabel(1)).thenReturn("id");
-        when(mockMd.getColumnLabel(2)).thenReturn("id"); // duplicate column name
+        when(mockMd.getColumnLabel(2)).thenReturn("id");
 
         Method method = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
         method.setAccessible(true);
 
-        // Assert that InvocationTargetException is thrown
         InvocationTargetException thrown = Assertions.assertThrows(
                 InvocationTargetException.class,
                 () -> method.invoke(sqlTask, mockRs));
 
-        // Check the actual cause
         Throwable cause = thrown.getCause();
         Assertions.assertNotNull(cause);
         Assertions.assertInstanceOf(TaskException.class, cause,
@@ -339,6 +375,118 @@ class SqlTaskTest {
         Assertions.assertTrue(
                 cause.getMessage().contains("duplicate column name"),
                 "TaskException message should mention duplicate column name");
+    }
+
+    @Test
+    void testGetSqlAndSqlParamsMap_nullPrepareParamsMap_replacesScheduleTimeAndTitlePlaceholder() throws Exception {
+        long scheduleTimeMillis = 1700000000000L;
+        String expectedDate = DateUtils.format(new java.util.Date(scheduleTimeMillis), "yyyyMMdd");
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\",\"title\":\"title-$[yyyyMMdd]\"}");
+        ctx.setScheduleTime(scheduleTimeMillis);
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+
+        // Ensure prepareParamsMap == null
+        ctx.setPrepareParamsMap(null);
+
+        SqlTask task = new SqlTask(ctx);
+
+        Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
+        method.setAccessible(true);
+
+        String inputSql = "select '" + "$[yyyyMMdd]" + "'";
+        SqlBinds binds = (SqlBinds) method.invoke(task, inputSql);
+
+        Assertions.assertEquals("select '" + expectedDate + "'", binds.getSql());
+        SqlParameters loadedParameters = (SqlParameters) task.getParameters();
+        Assertions.assertTrue(loadedParameters.getTitle().matches("title-\\d{8}"));
+    }
+
+    @Test
+    void testGetSqlAndSqlParamsMap_withPrepareParamsMap_coversPrintReplacedSql() throws Exception {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("dt", new Property("dt", Direct.IN, DataType.VARCHAR, "1970"));
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\"}");
+        ctx.setScheduleTime(System.currentTimeMillis());
+        ctx.setTaskInstanceId(1);
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+        ctx.setPrepareParamsMap(prepareParamsMap);
+
+        SqlTask task = new SqlTask(ctx);
+
+        Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
+        method.setAccessible(true);
+
+        String inputSql = "select * from student where dt=${dt}";
+        SqlBinds binds = (SqlBinds) method.invoke(task, inputSql);
+
+        Assertions.assertEquals("select * from student where dt=?", binds.getSql());
+        Assertions.assertNotNull(binds.getParamsMap());
+        Assertions.assertEquals("1970", binds.getParamsMap().get(1).getValue());
+    }
+
+    @Test
+    void testEnsureSqlContent_whenSqlAlreadyPresent_doesNotReadResource() throws Exception {
+        SqlTask task = this.sqlTask;
+
+        Method ensureSqlContent = SqlTask.class.getDeclaredMethod("ensureSqlContent");
+        ensureSqlContent.setAccessible(true);
+
+        // Should early return because sqlParameters.getSql() is not empty.
+        ensureSqlContent.invoke(task);
+    }
+
+    @Test
+    void testEnsureSqlContent_whenResourceMissing_throwsTaskException(@TempDir Path tempDir) throws Exception {
+        SqlParameters sqlParameters = new SqlParameters();
+        sqlParameters.setType("HIVE");
+        sqlParameters.setDatasource(1);
+        sqlParameters.setSql(null);
+        sqlParameters.setSqlResource("/sql/missing.sql");
+
+        DataSourceParameters dataSourceParameters = new DataSourceParameters();
+        dataSourceParameters.setType(DbType.HIVE);
+        dataSourceParameters.setResourceType(ResourceType.DATASOURCE.name());
+
+        ResourceParametersHelper resourceParametersHelper = new ResourceParametersHelper();
+        resourceParametersHelper.put(ResourceType.DATASOURCE, 1, dataSourceParameters);
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(sqlParameters));
+        taskExecutionContext.setScheduleTime(System.currentTimeMillis());
+        taskExecutionContext.setResourceParametersHelper(resourceParametersHelper);
+
+        ResourceContext resourceContext = new ResourceContext();
+        // Point to a file that does not exist to trigger IOException in ensureSqlContent.
+        Path missingLocalPath = tempDir.resolve("missing.sql");
+        resourceContext.addResourceItem(ResourceContext.ResourceItem.builder()
+                .resourceAbsolutePathInStorage(sqlParameters.getSqlResource())
+                .resourceAbsolutePathInLocal(missingLocalPath.toString())
+                .build());
+        taskExecutionContext.setResourceContext(resourceContext);
+
+        SqlTask task = new SqlTask(taskExecutionContext);
+
+        Method ensureSqlContent = SqlTask.class.getDeclaredMethod("ensureSqlContent");
+        ensureSqlContent.setAccessible(true);
+
+        InvocationTargetException thrown = Assertions.assertThrows(
+                InvocationTargetException.class,
+                () -> ensureSqlContent.invoke(task));
+        Assertions.assertInstanceOf(TaskException.class, thrown.getCause());
+    }
+
+    private ResourceParametersHelper getResourceParametersHelperWithDatasourceType(DbType dbType) {
+        DataSourceParameters parameters = new DataSourceParameters();
+        parameters.setType(dbType);
+        parameters.setResourceType(ResourceType.DATASOURCE.name());
+
+        ResourceParametersHelper resourceParametersHelper = new ResourceParametersHelper();
+        resourceParametersHelper.put(ResourceType.DATASOURCE, 1, parameters);
+        return resourceParametersHelper;
     }
 
 }

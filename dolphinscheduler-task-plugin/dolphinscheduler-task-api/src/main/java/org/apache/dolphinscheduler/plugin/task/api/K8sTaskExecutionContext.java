@@ -27,9 +27,6 @@ import lombok.NoArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-/**
- *  k8s Task ExecutionContext
- */
 @Data
 @Builder
 @AllArgsConstructor

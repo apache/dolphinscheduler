@@ -50,9 +50,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * task instance controller
- */
 @Tag(name = "TASK_INSTANCE_TAG")
 @RestController
 @RequestMapping("/projects/{projectCode}/task-instances")

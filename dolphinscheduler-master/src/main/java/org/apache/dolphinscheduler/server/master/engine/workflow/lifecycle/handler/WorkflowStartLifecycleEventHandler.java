@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.handler;
 
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowStartLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTimeoutLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.statemachine.IWorkflowStateAction;
 
 import lombok.extern.slf4j.Slf4j;
@@ -35,14 +37,27 @@ public class WorkflowStartLifecycleEventHandler
 
     @Override
     public void handle(final IWorkflowStateAction workflowStateAction,
-                       final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                       final IWorkflowExecution workflowExecution,
                        final WorkflowStartLifecycleEvent workflowStartEvent) {
 
-        workflowStateAction.onStartEvent(workflowExecutionRunnable, workflowStartEvent);
+        workflowTimeoutMonitor(workflowExecution);
+        workflowStateAction.onStartEvent(workflowExecution, workflowStartEvent);
     }
 
     @Override
     public ILifecycleEventType matchEventType() {
         return WorkflowLifecycleEventType.START;
+    }
+
+    private void workflowTimeoutMonitor(final IWorkflowExecution workflowExecution) {
+        final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
+        if (workflowInstance.getTimeout() <= 0) {
+            log.debug("The workflow {} timeout {} is not configured or invalid, skip timeout monitor.",
+                    workflowInstance.getName(),
+                    workflowInstance.getTimeout());
+            return;
+        }
+        workflowExecution.getWorkflowEventBus()
+                .publish(WorkflowTimeoutLifecycleEvent.of(workflowExecution));
     }
 }

@@ -50,9 +50,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ChunJunTask extends AbstractTask {
 
-    /**
-     * chunjun path
-     */
     private static final String CHUNJUN_PATH = "${CHUNJUN_HOME}/bin/start-chunjun";
 
     /**

@@ -30,9 +30,6 @@ import java.util.regex.Pattern;
 
 import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 
-/**
- * check utils
- */
 public class CheckUtils {
 
     private CheckUtils() {

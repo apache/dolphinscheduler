@@ -33,6 +33,7 @@ import { useConditions } from './use-conditions'
 import { useDataX } from './use-datax'
 import { useDependent } from './use-dependent'
 import { useEmr } from './use-emr'
+import { useEmrServerless } from './use-emr-serverless'
 import { useZeppelin } from './use-zeppelin'
 import { useK8s } from './use-k8s'
 import { useJupyter } from './use-jupyter'
@@ -70,6 +71,7 @@ export default {
   DATAX: useDataX,
   DEPENDENT: useDependent,
   EMR: useEmr,
+  EMR_SERVERLESS: useEmrServerless,
   ZEPPELIN: useZeppelin,
   K8S: useK8s,
   JUPYTER: useJupyter,

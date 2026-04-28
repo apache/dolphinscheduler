@@ -55,6 +55,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -90,17 +91,11 @@ public class DataxTask extends AbstractTask {
      */
     private static final String SELECT_ALL_CHARACTER = "*";
 
-    /**
-     * post jdbc info regex
-     */
     private static final String POST_JDBC_INFO_REGEX = "(?<=(post jdbc info:)).*(?=)";
     /**
      * datax path
      */
     private static final String DATAX_LAUNCHER = "${DATAX_LAUNCHER}";
-    /**
-     * datax channel count
-     */
     private static final int DATAX_CHANNEL_COUNT = 1;
 
     private DataxParameters dataXParameters;
@@ -309,7 +304,7 @@ public class DataxTask extends AbstractTask {
 
         ObjectNode speed = JSONUtils.createObjectNode();
 
-        speed.put("channel", DATAX_CHANNEL_COUNT);
+        speed.put("channel", Optional.of(dataXParameters.getJobChannel()).orElse(DATAX_CHANNEL_COUNT));
 
         if (dataXParameters.getJobSpeedByte() > 0) {
             speed.put("byte", dataXParameters.getJobSpeedByte());
@@ -333,7 +328,7 @@ public class DataxTask extends AbstractTask {
     private ObjectNode buildDataxCoreJson() {
 
         ObjectNode speed = JSONUtils.createObjectNode();
-        speed.put("channel", DATAX_CHANNEL_COUNT);
+        speed.put("channel", Optional.of(dataXParameters.getJobChannel()).orElse(DATAX_CHANNEL_COUNT));
 
         if (dataXParameters.getJobSpeedByte() > 0) {
             speed.put("byte", dataXParameters.getJobSpeedByte());

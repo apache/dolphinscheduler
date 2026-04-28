@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine;
 
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 import java.util.Collection;
 
@@ -25,11 +25,11 @@ import lombok.NonNull;
 
 public interface IWorkflowRepository {
 
-    IWorkflowExecutionRunnable get(int workflowInstanceId);
+    IWorkflowExecution get(int workflowInstanceId);
 
-    Collection<IWorkflowExecutionRunnable> getAll();
+    Collection<IWorkflowExecution> getAll();
 
-    void put(@NonNull IWorkflowExecutionRunnable workflowExecuteThread);
+    void put(@NonNull IWorkflowExecution workflowExecuteThread);
 
     boolean contains(int workflowInstanceId);
 

@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
-import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 
 import org.apache.ibatis.annotations.Param;
@@ -55,22 +54,6 @@ public interface WorkflowTaskRelationLogMapper extends BaseMapper<WorkflowTaskRe
      */
     int deleteByCode(@Param("workflowDefinitionCode") long workflowDefinitionCode,
                      @Param("workflowDefinitionVersion") int workflowDefinitionVersion);
-
-    /**
-     * delete workflow task relation
-     *
-     * @param workflowTaskRelationLog  workflowTaskRelationLog
-     * @return int
-     */
-    int deleteRelation(@Param("workflowTaskRelationLog") WorkflowTaskRelationLog workflowTaskRelationLog);
-
-    /**
-     * query workflow task relation log
-     *
-     * @param workflowTaskRelation workflowTaskRelation
-     * @return workflow task relation log
-     */
-    WorkflowTaskRelationLog queryRelationLogByRelation(@Param("workflowTaskRelation") WorkflowTaskRelation workflowTaskRelation);
 
     List<WorkflowTaskRelationLog> queryByWorkflowDefinitionCode(@Param("workflowDefinitionCode") long workflowDefinitionCode);
 

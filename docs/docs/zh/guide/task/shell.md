@@ -6,31 +6,26 @@ Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 She
 
 ## 创建任务
 
-- 点击项目管理-项目名称-工作流定义，点击"创建工作流"按钮，进入 DAG 编辑页面。
-- 工具栏中拖动 <img src="../../../../img/tasks/icons/shell.png" width="15"/> 到画板中，即可完成创建。
+- 点击 `项目管理 -> 项目名称 -> 工作流定义`，点击"创建工作流"按钮，进入 DAG 编辑页面。
+- 从工具栏拖动 <img src="../../../../img/tasks/icons/shell.png" width="15"/> 到画板中。
 
 ## 任务参数
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
-
-- 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+- 默认参数说明请参考 [DolphinScheduler 任务参数附录](appendix.md) 的 `默认任务参数` 一栏。
 - 除上述默认参数，此任务没有其他参数
 
 ## 任务样例
 
 ### 简单打印一行文字
 
-该样例模拟了常见的简单任务，这些任务只需要简单的一两行命令就能运行起来。我们以打印一行日志为例，该任务仅会在日志文件中打印一行
+该样例模拟了常见的简单任务，这些任务只需要一两行命令就能运行起来。我们以打印一行日志为例，该任务会在日志文件中打印一行
 "This is a demo of shell task"
 
 ![demo-shell-simple](../../../../img/tasks/demo/shell.jpg)
 
 ### 使用自定义参数
 
-该样例模拟了自定义参数任务，为了更方便的复用已有的任务，或者面对动态的需求时，我们会使用变量保证脚本的复用性。本例中，我们先在自定义脚本
-中定义了参数 "param_key"，并将他的值设置为 "param_val"。接着在"脚本"中声明了 echo 命令，将参数 "param_key" 打印了出来。当我们保存
-并运行任务后，在日志中会看到将参数 "param_key" 对应的值 "param_val" 打印出来。
+该样例模拟了自定义参数任务。为了方便复用已有任务或应对动态需求，我们会使用变量来保证脚本的可复用性。本例中，我们首先在自定义脚本中定义了参数 "param_key"，并将其值设置为 "param_val"。然后在"脚本"中使用 echo 命令打印参数 "param_key"。保存并运行任务后，可以在日志中看到参数 "param_key" 对应的值 "param_val" 被打印出来。
 
 ![demo-shell-custom-param](../../../../img/tasks/demo/shell_custom_param.jpg)
 

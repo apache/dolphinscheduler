@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.alert.api;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
-import org.springframework.context.i18n.LocaleContextHolder;
+import lombok.Getter;
 
+@Getter
 public enum AlertInputTips {
 
     PASSWORD("if enable use authentication, you need input password", "如果开启鉴权校验，则需要输入密码"),
@@ -31,8 +31,6 @@ public enum AlertInputTips {
     URL("input request URL", "请输入请求的URL"),
     HEADER("input request headers as JSON format", "请输入JSON格式的请求头"),
     JSON_BODY("input request body as JSON format", "请输入JSON格式的请求体"),
-    FIELD_NAME("input alert msg field name", "请输入告警信息的内容字段名称"),
-    HTTP_METHOD("input request type POST or GET", "请输入HTTP请求类型POST或GET"),
     CUSTOMIZED_PARAMS("the custom parameters passed when calling scripts", "请输入调用脚本时传入的自定义参数"),
     SCRIPT_PATH("the absolute script path under alert-server, and make sure access rights",
             "请输入alert-server机器的脚本的绝对路径，并确保文件有权接入"),
@@ -66,14 +64,6 @@ public enum AlertInputTips {
     AlertInputTips(String enMsg, String zhMsg) {
         this.enMsg = enMsg;
         this.zhMsg = zhMsg;
-    }
-
-    public String getMsg() {
-        if (Locale.SIMPLIFIED_CHINESE.getLanguage().equals(LocaleContextHolder.getLocale().getLanguage())) {
-            return this.zhMsg;
-        } else {
-            return this.enMsg;
-        }
     }
 
     public static Map<String, String> getAllMsg(AlertInputTips alertInputTips) {
