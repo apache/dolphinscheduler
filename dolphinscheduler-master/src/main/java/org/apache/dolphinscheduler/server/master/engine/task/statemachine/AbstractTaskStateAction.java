@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
-import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
@@ -65,9 +64,6 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
 
     @Autowired
     protected TaskInstanceDao taskInstanceDao;
-
-    @Autowired
-    protected IWorkflowRepository workflowRepository;
 
     @Autowired
     protected ITaskExecutorClient taskExecutorClient;

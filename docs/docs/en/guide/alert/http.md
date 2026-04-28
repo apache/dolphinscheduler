@@ -12,7 +12,7 @@ If you need to use `Http script` for alerting, create an alert instance in the a
 | Body          | The request body of the `Http` request in JSON format, when using `POST` or `PUT` method to alert.  |
 | Content Type  | The content-type of header.                                                                         |
 
-> Alarm message supports variables `$msg`, which can be used in `URL`, `Headers`, and `Body`.
+> Alarm message supports variables `${msg}`, which can be used in `URL`, `Headers`, and `Body`.
 
 ### GET HTTP
 
