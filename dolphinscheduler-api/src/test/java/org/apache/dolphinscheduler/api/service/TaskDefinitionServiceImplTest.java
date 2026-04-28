@@ -180,6 +180,35 @@ public class TaskDefinitionServiceImplTest {
         assertEquals(Status.SUCCESS, relation.get(Constants.STATUS));
     }
 
+    @Test
+    public void deleteByCodeAndVersion() {
+        Project project = getProject();
+        when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
+        when(projectService.hasProjectAndWritePerm(user, project, new HashMap<>())).thenReturn(true);
+
+        // cross-project privilege escalation: taskCode belongs to another project - must be rejected
+        TaskDefinition otherProjectTask = new TaskDefinition();
+        otherProjectTask.setProjectCode(PROJECT_CODE + 1);
+        otherProjectTask.setCode(TASK_CODE);
+        otherProjectTask.setVersion(VERSION + 1);
+        when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(otherProjectTask);
+        Map<String, Object> crossProjectResult =
+                taskDefinitionService.deleteByCodeAndVersion(user, PROJECT_CODE, TASK_CODE, VERSION);
+        assertEquals(Status.TASK_DEFINE_NOT_EXIST, crossProjectResult.get(Constants.STATUS));
+        Mockito.verify(taskDefinitionLogMapper, Mockito.never()).deleteByCodeAndVersion(TASK_CODE, VERSION);
+
+        // normal path: taskCode belongs to the project - should succeed
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(PROJECT_CODE);
+        taskDefinition.setCode(TASK_CODE);
+        taskDefinition.setVersion(VERSION + 1);
+        when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        when(taskDefinitionLogMapper.deleteByCodeAndVersion(TASK_CODE, VERSION)).thenReturn(1);
+        Map<String, Object> successResult =
+                taskDefinitionService.deleteByCodeAndVersion(user, PROJECT_CODE, TASK_CODE, VERSION);
+        assertEquals(Status.SUCCESS, successResult.get(Constants.STATUS));
+    }
+
     private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
         result.put(Constants.STATUS, status);
         if (statusParams != null && statusParams.length > 0) {
