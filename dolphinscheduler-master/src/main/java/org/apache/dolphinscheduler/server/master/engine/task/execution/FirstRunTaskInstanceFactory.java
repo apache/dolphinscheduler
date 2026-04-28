@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.task.runnable;
+package org.apache.dolphinscheduler.server.master.engine.task.execution;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.FirstRunTaskInstanceFactory.FirstRunTaskInstanceBuilder;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.FirstRunTaskInstanceFactory.FirstRunTaskInstanceBuilder;
 
 import java.util.Date;
 

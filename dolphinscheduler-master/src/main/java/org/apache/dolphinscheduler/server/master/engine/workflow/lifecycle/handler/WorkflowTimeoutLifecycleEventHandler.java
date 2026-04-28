@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.hand
 
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTimeoutLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.engine.workflow.statemachine.IWorkflowStateAction;
 import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 
@@ -43,13 +43,13 @@ public class WorkflowTimeoutLifecycleEventHandler
 
     @Override
     public void handle(final IWorkflowStateAction workflowStateAction,
-                       final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                       final IWorkflowExecution workflowExecution,
                        final WorkflowTimeoutLifecycleEvent workflowTimeoutLifecycleEvent) {
-        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
         final boolean shouldSendAlert = workflowInstance.getWarningGroupId() != null;
 
         if (shouldSendAlert) {
-            doWorkflowTimeoutAlert(workflowExecutionRunnable);
+            doWorkflowTimeoutAlert(workflowExecution);
         } else {
             log.info("Skipped sending timeout alert for workflow {} because warningGroupId is null.",
                     workflowInstance.getName());
@@ -62,8 +62,8 @@ public class WorkflowTimeoutLifecycleEventHandler
         return WorkflowLifecycleEventType.TIMEOUT;
     }
 
-    private void doWorkflowTimeoutAlert(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+    private void doWorkflowTimeoutAlert(final IWorkflowExecution workflowExecution) {
+        final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
         workflowAlertManager.sendWorkflowTimeoutAlert(workflowInstance);
     }
 }

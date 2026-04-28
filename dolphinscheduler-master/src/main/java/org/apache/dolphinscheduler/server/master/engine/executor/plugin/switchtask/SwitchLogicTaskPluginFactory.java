@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.task.SwitchLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ILogicTaskPluginFactory;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.exception.LogicTaskInitializeException;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 
@@ -41,13 +41,13 @@ public class SwitchLogicTaskPluginFactory implements ILogicTaskPluginFactory<Swi
     public SwitchLogicTask createLogicTask(final ITaskExecutor taskExecutor) throws LogicTaskInitializeException {
         final TaskExecutionContext taskExecutionContext = taskExecutor.getTaskExecutionContext();
         final int workflowInstanceId = taskExecutionContext.getWorkflowInstanceId();
-        IWorkflowExecutionRunnable workflowExecutionRunnable =
+        IWorkflowExecution workflowExecution =
                 IWorkflowRepository.get(workflowInstanceId);
-        if (workflowExecutionRunnable == null) {
+        if (workflowExecution == null) {
             throw new LogicTaskInitializeException(
                     "Cannot find the WorkflowExecuteRunnable by : " + workflowInstanceId);
         }
-        return new SwitchLogicTask(workflowExecutionRunnable, taskExecutionContext);
+        return new SwitchLogicTask(workflowExecution, taskExecutionContext);
     }
 
     @Override

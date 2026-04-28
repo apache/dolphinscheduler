@@ -21,9 +21,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -35,16 +35,16 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorkflowTimeoutLifecycleEvent extends AbstractWorkflowLifecycleLifecycleEvent {
 
-    private IWorkflowExecutionRunnable workflowExecutionRunnable;
+    private IWorkflowExecution workflowExecution;
 
-    protected WorkflowTimeoutLifecycleEvent(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    protected WorkflowTimeoutLifecycleEvent(final IWorkflowExecution workflowExecution,
                                             final long timeout) {
         super(timeout);
-        this.workflowExecutionRunnable = workflowExecutionRunnable;
+        this.workflowExecution = workflowExecution;
     }
 
-    public static WorkflowTimeoutLifecycleEvent of(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+    public static WorkflowTimeoutLifecycleEvent of(IWorkflowExecution workflowExecution) {
+        final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
         checkState(workflowInstance != null,
                 "The workflow instance must be initialized before creating workflow timeout event.");
 
@@ -53,7 +53,7 @@ public class WorkflowTimeoutLifecycleEvent extends AbstractWorkflowLifecycleLife
 
         long delayTime = System.currentTimeMillis() - workflowInstance.getRestartTime().getTime()
                 + TimeUnit.MINUTES.toMillis(timeout);
-        return new WorkflowTimeoutLifecycleEvent(workflowExecutionRunnable, delayTime);
+        return new WorkflowTimeoutLifecycleEvent(workflowExecution, delayTime);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class WorkflowTimeoutLifecycleEvent extends AbstractWorkflowLifecycleLife
     @Override
     public String toString() {
         return "WorkflowTimeoutLifecycleEvent{" +
-                "workflow=" + workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance().getName() +
+                "workflow=" + workflowExecution.getWorkflowExecuteContext().getWorkflowInstance().getName() +
                 '}';
     }
 }

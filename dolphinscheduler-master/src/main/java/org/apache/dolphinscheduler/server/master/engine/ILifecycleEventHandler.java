@@ -17,14 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.engine;
 
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 /**
  * The event handler interface, used to handle the event
  */
 public interface ILifecycleEventHandler<T extends AbstractLifecycleEvent> {
 
-    void handle(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    void handle(final IWorkflowExecution workflowExecution,
                 final T event);
 
     ILifecycleEventType matchEventType();

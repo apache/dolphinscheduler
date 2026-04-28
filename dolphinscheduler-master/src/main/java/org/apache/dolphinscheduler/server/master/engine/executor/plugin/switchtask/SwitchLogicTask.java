@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.AbstractLogicTask;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.utils.SwitchTaskUtils;
 
@@ -45,17 +45,17 @@ import com.fasterxml.jackson.core.type.TypeReference;
 @Slf4j
 public class SwitchLogicTask extends AbstractLogicTask<SwitchParameters> {
 
-    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
+    private final IWorkflowExecution workflowExecution;
     private final TaskInstance taskInstance;
 
-    public SwitchLogicTask(IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public SwitchLogicTask(IWorkflowExecution workflowExecution,
                            TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-        this.workflowExecutionRunnable = workflowExecutionRunnable;
-        this.taskInstance = workflowExecutionRunnable
+        this.workflowExecution = workflowExecution;
+        this.taskInstance = workflowExecution
                 .getWorkflowExecuteContext()
                 .getWorkflowExecutionGraph()
-                .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
+                .getTaskExecutionById(taskExecutionContext.getTaskInstanceId())
                 .getTaskInstance();
         onTaskRunning();
     }
@@ -127,7 +127,7 @@ public class SwitchLogicTask extends AbstractLogicTask<SwitchParameters> {
         if (branchNode == null) {
             throw new IllegalArgumentException("The branch is empty, please check the switch task configuration");
         }
-        if (workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowGraph()
+        if (workflowExecution.getWorkflowExecuteContext().getWorkflowGraph()
                 .getTaskNodeByCode(branchNode) == null) {
             throw new IllegalArgumentException(
                     "The branch(code= " + branchNode
@@ -136,7 +136,7 @@ public class SwitchLogicTask extends AbstractLogicTask<SwitchParameters> {
     }
 
     private String getTaskName(Long taskCode) {
-        return Optional.ofNullable(workflowExecutionRunnable.getWorkflowExecuteContext())
+        return Optional.ofNullable(workflowExecution.getWorkflowExecuteContext())
                 .map(IWorkflowExecuteContext::getWorkflowGraph)
                 .map(iWorkflowGraph -> iWorkflowGraph.getTaskNodeByCode(taskCode))
                 .map(TaskDefinition::getName)

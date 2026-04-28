@@ -15,6 +15,8 @@
 # limitations under the License.
 #
 spring:
+  application:
+    name: master-server
   profiles:
     active: postgresql
   banner:

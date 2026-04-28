@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.DependentLineageTask;
 import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -37,9 +38,15 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -317,6 +324,112 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
             dependentLineageTaskList.add(dependentLineageTask);
         }
         return dependentLineageTaskList;
+    }
+
+    @Override
+    public List<WorkflowDefinition> resolveDownstreamWorkflowDefinitionCodes(long rootWorkflowDefinitionCode,
+                                                                             boolean allLevelDependent,
+                                                                             boolean filterOfflineWorkflow) {
+
+        Set<Long> resultCodes = new LinkedHashSet<>();
+        Set<Long> visitedWorkflowCodes = new HashSet<>();
+        List<Long> frontier = Collections.singletonList(rootWorkflowDefinitionCode);
+        Map<Long, WorkflowDefinition> workflowDefinitionCache = new HashMap<>();
+
+        while (!CollectionUtils.isEmpty(frontier)) {
+            List<Long> currentLevel = new ArrayList<>(frontier);
+            frontier = new ArrayList<>();
+
+            for (Long upstreamCode : currentLevel) {
+                if (!visitedWorkflowCodes.add(upstreamCode)) {
+                    continue;
+                }
+                List<Long> directDownstreamCodes = queryDirectDownstreamWorkflowCodes(upstreamCode);
+                if (CollectionUtils.isEmpty(directDownstreamCodes)) {
+                    continue;
+                }
+
+                cacheWorkflowDefinitions(directDownstreamCodes, workflowDefinitionCache);
+                for (Long downstreamCode : directDownstreamCodes) {
+                    if (downstreamCode == rootWorkflowDefinitionCode) {
+                        // Skip cycle edge back to root; root should never appear in downstream result.
+                        continue;
+                    }
+                    WorkflowDefinition downstreamWorkflow = workflowDefinitionCache.get(downstreamCode);
+                    if (downstreamWorkflow == null) {
+                        continue;
+                    }
+                    if (!resultCodes.add(downstreamCode)) {
+                        continue;
+                    }
+                    if (allLevelDependent && (!filterOfflineWorkflow
+                            || downstreamWorkflow.getReleaseState() != ReleaseState.OFFLINE)) {
+                        frontier.add(downstreamCode);
+                    }
+                }
+            }
+
+            if (!allLevelDependent) {
+                break;
+            }
+        }
+
+        if (resultCodes.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        if (filterOfflineWorkflow) {
+            resultCodes = resultCodes.stream()
+                    .filter(code -> {
+                        WorkflowDefinition definition = workflowDefinitionCache.get(code);
+                        return definition != null
+                                && definition.getReleaseState() != ReleaseState.OFFLINE;
+                    })
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            if (resultCodes.isEmpty()) {
+                return Collections.emptyList();
+            }
+        }
+
+        List<WorkflowDefinition> orderedDefinitions = new ArrayList<>();
+        for (Long code : resultCodes) {
+            WorkflowDefinition definition = workflowDefinitionCache.get(code);
+            if (definition != null) {
+                orderedDefinitions.add(definition);
+            }
+        }
+        return orderedDefinitions;
+    }
+
+    private List<Long> queryDirectDownstreamWorkflowCodes(long upstreamWorkflowDefinitionCode) {
+        List<WorkflowTaskLineage> workflowTaskLineageList =
+                workflowTaskLineageDao.queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE,
+                        upstreamWorkflowDefinitionCode,
+                        Constants.DEPENDENT_ALL_TASK);
+        if (CollectionUtils.isEmpty(workflowTaskLineageList)) {
+            return Collections.emptyList();
+        }
+        return workflowTaskLineageList.stream()
+                .map(WorkflowTaskLineage::getWorkflowDefinitionCode)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    private void cacheWorkflowDefinitions(Collection<Long> workflowDefinitionCodes,
+                                          Map<Long, WorkflowDefinition> workflowDefinitionCache) {
+        List<Long> missingCodes = workflowDefinitionCodes.stream()
+                .filter(code -> !workflowDefinitionCache.containsKey(code))
+                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(missingCodes)) {
+            return;
+        }
+        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionMapper.queryByCodes(missingCodes);
+        if (CollectionUtils.isEmpty(workflowDefinitions)) {
+            return;
+        }
+        for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
+            workflowDefinitionCache.put(workflowDefinition.getCode(), workflowDefinition);
+        }
     }
 
     @Override

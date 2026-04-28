@@ -21,9 +21,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
 
 import java.util.concurrent.TimeUnit;
 
@@ -32,16 +32,16 @@ import lombok.Getter;
 @Getter
 public class TaskRetryLifecycleEvent extends AbstractTaskLifecycleEvent {
 
-    private final ITaskExecutionRunnable taskExecutionRunnable;
+    private final ITaskExecution taskExecution;
 
-    protected TaskRetryLifecycleEvent(final ITaskExecutionRunnable taskExecutionRunnable,
+    protected TaskRetryLifecycleEvent(final ITaskExecution taskExecution,
                                       final long delayTime) {
         super(delayTime);
-        this.taskExecutionRunnable = taskExecutionRunnable;
+        this.taskExecution = taskExecution;
     }
 
-    public static TaskRetryLifecycleEvent of(final ITaskExecutionRunnable taskExecutionRunnable) {
-        final TaskInstance taskInstance = taskExecutionRunnable.getTaskInstance();
+    public static TaskRetryLifecycleEvent of(final ITaskExecution taskExecution) {
+        final TaskInstance taskInstance = taskExecution.getTaskInstance();
         checkState(taskInstance != null, "The task instance must be initialized before retrying.");
         final int delayTime = taskInstance.getRetryInterval();
 
@@ -53,7 +53,7 @@ public class TaskRetryLifecycleEvent extends AbstractTaskLifecycleEvent {
                 maxRetryTimes);
         final long remainingTime =
                 TimeUnit.MINUTES.toMillis(delayTime) + System.currentTimeMillis() - taskInstance.getEndTime().getTime();
-        return new TaskRetryLifecycleEvent(taskExecutionRunnable, remainingTime);
+        return new TaskRetryLifecycleEvent(taskExecution, remainingTime);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class TaskRetryLifecycleEvent extends AbstractTaskLifecycleEvent {
     @Override
     public String toString() {
         return "TaskRetryLifecycleEvent{" +
-                "task=" + taskExecutionRunnable.getName() +
+                "task=" + taskExecution.getName() +
                 ", delayTime=" + delayTime + "/ms" +
                 '}';
     }

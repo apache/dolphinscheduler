@@ -27,7 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParamete
 import org.apache.dolphinscheduler.plugin.task.api.utils.DependentUtils;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.AbstractLogicTask;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 
 import java.util.List;
@@ -47,14 +47,14 @@ public class ConditionLogicTask extends AbstractLogicTask<ConditionsParameters> 
 
     private final TaskInstance taskInstance;
 
-    public ConditionLogicTask(IWorkflowExecutionRunnable workflowExecutionRunnable,
+    public ConditionLogicTask(IWorkflowExecution workflowExecution,
                               TaskExecutionContext taskExecutionContext,
                               TaskInstanceDao taskInstanceDao) {
         super(taskExecutionContext);
-        this.taskInstance = workflowExecutionRunnable
+        this.taskInstance = workflowExecution
                 .getWorkflowExecuteContext()
                 .getWorkflowExecutionGraph()
-                .getTaskExecutionRunnableById(taskExecutionContext.getTaskInstanceId())
+                .getTaskExecutionById(taskExecutionContext.getTaskInstanceId())
                 .getTaskInstance();
         this.taskInstanceDao = taskInstanceDao;
         onTaskRunning();

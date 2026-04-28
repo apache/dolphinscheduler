@@ -42,7 +42,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.AbstractLogicTask;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
@@ -66,7 +66,7 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
 
     private SubWorkflowLogicTaskRuntimeContext subWorkflowLogicTaskRuntimeContext;
 
-    private final IWorkflowExecutionRunnable workflowExecutionRunnable;
+    private final IWorkflowExecution workflowExecution;
 
     private final ApplicationContext applicationContext;
 
@@ -75,12 +75,12 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
     private ITaskExecutor taskExecutor;
 
     public SubWorkflowLogicTask(final TaskExecutionContext taskExecutionContext,
-                                final IWorkflowExecutionRunnable workflowExecutionRunnable,
+                                final IWorkflowExecution workflowExecution,
                                 final ITaskExecutor taskExecutor,
                                 final ApplicationContext applicationContext) {
         super(taskExecutionContext);
         this.taskExecutor = taskExecutor;
-        this.workflowExecutionRunnable = workflowExecutionRunnable;
+        this.workflowExecution = workflowExecution;
         this.applicationContext = applicationContext;
         this.subWorkflowLogicTaskRuntimeContext = JSONUtils.parseObject(
                 taskExecutionContext.getAppIds(),
@@ -162,7 +162,7 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
 
         // In some cases, workflow instance's command type has not been changed,
         // there should better to use command.type instead
-        switch (workflowExecutionRunnable.getWorkflowExecuteContext().getCommand().getCommandType()) {
+        switch (workflowExecution.getWorkflowExecuteContext().getCommand().getCommandType()) {
             case RECOVER_TOLERANCE_FAULT_PROCESS:
                 return recoverFromFaultTolerantTasks();
             case RECOVER_SUSPENDED_PROCESS:
@@ -224,7 +224,7 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
     }
 
     private SubWorkflowLogicTaskRuntimeContext triggerNewSubWorkflow() {
-        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
 
         final WorkflowDefinition subWorkflowDefinition = applicationContext.getBean(WorkflowDefinitionDao.class)
                 .queryByCode(taskParameters.getWorkflowDefinitionCode())

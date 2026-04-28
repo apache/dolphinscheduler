@@ -18,9 +18,9 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event;
 
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.AbstractWorkflowLifecycleLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.WorkflowLifecycleEventType;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -30,10 +30,10 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class WorkflowStartLifecycleEvent extends AbstractWorkflowLifecycleLifecycleEvent {
 
-    private IWorkflowExecutionRunnable workflowExecutionRunnable;
+    private IWorkflowExecution workflowExecution;
 
-    public static WorkflowStartLifecycleEvent of(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        return new WorkflowStartLifecycleEvent(workflowExecutionRunnable);
+    public static WorkflowStartLifecycleEvent of(IWorkflowExecution workflowExecution) {
+        return new WorkflowStartLifecycleEvent(workflowExecution);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class WorkflowStartLifecycleEvent extends AbstractWorkflowLifecycleLifecy
     @Override
     public String toString() {
         return "WorkflowStartLifecycleEvent{" +
-                "workflow=" + workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowInstance().getName() +
+                "workflow=" + workflowExecution.getWorkflowExecuteContext().getWorkflowInstance().getName() +
                 '}';
     }
 }

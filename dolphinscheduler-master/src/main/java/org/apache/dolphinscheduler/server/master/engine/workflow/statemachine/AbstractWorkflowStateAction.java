@@ -30,12 +30,12 @@ import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBusCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.SuccessorFlowAdjuster;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskStartLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowFinalizeLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.event.WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.policy.IWorkflowFailureStrategy;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
 import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowInstanceUtils;
 import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
@@ -80,88 +80,88 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
      * Try to trigger the tasks if the trigger condition is met.
      * <p> If all the given tasks trigger condition is not met then will try to emit workflow finish event.
      */
-    protected void triggerTasks(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                final List<ITaskExecutionRunnable> triggerCandidateTasks) {
-        final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecutionRunnable.getWorkflowExecutionGraph();
-        final List<ITaskExecutionRunnable> readyToTriggerTasks = triggerCandidateTasks
+    protected void triggerTasks(final IWorkflowExecution workflowExecution,
+                                final List<ITaskExecution> triggerCandidateTasks) {
+        final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecution.getWorkflowExecutionGraph();
+        final List<ITaskExecution> readyToTriggerTasks = triggerCandidateTasks
                 .stream()
                 .filter(workflowExecutionGraph::isTriggerConditionMet)
-                .sorted(Comparator.comparing(ITaskExecutionRunnable::getName))
+                .sorted(Comparator.comparing(ITaskExecution::getName))
                 .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(readyToTriggerTasks)) {
             final boolean isAllCandidateTaskPredecessorsInActive = triggerCandidateTasks.stream()
-                    .flatMap(taskExecutionRunnable -> workflowExecutionGraph
-                            .getPredecessors(taskExecutionRunnable.getName())
+                    .flatMap(taskExecution -> workflowExecutionGraph
+                            .getPredecessors(taskExecution.getName())
                             .stream())
-                    .allMatch(workflowExecutionGraph::isTaskExecutionRunnableInActive);
+                    .allMatch(workflowExecutionGraph::isTaskExecutionInActive);
             if (isAllCandidateTaskPredecessorsInActive) {
-                emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
+                emitWorkflowFinishedEventIfApplicable(workflowExecution);
             }
             return;
         }
-        final WorkflowEventBus workflowEventBus = workflowExecutionRunnable.getWorkflowEventBus();
-        for (ITaskExecutionRunnable readyToTriggerTask : readyToTriggerTasks) {
-            workflowExecutionGraph.markTaskExecutionRunnableActive(readyToTriggerTask);
-            if (workflowExecutionGraph.isTaskExecutionRunnableSkipped(readyToTriggerTask)
-                    || workflowExecutionGraph.isTaskExecutionRunnableForbidden(readyToTriggerTask)) {
+        final WorkflowEventBus workflowEventBus = workflowExecution.getWorkflowEventBus();
+        for (ITaskExecution readyToTriggerTask : readyToTriggerTasks) {
+            workflowExecutionGraph.markTaskExecutionActive(readyToTriggerTask);
+            if (workflowExecutionGraph.isTaskExecutionSkipped(readyToTriggerTask)
+                    || workflowExecutionGraph.isTaskExecutionForbidden(readyToTriggerTask)) {
                 workflowEventBus.publish(
                         WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent.of(
-                                workflowExecutionRunnable, readyToTriggerTask));
+                                workflowExecution, readyToTriggerTask));
                 continue;
             }
             workflowEventBus.publish(TaskStartLifecycleEvent.of(readyToTriggerTask));
         }
     }
 
-    protected void pauseActiveTask(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
+    protected void pauseActiveTask(final IWorkflowExecution workflowExecution) {
         try {
-            LogUtils.setWorkflowInstanceIdMDC(workflowExecutionRunnable.getId());
-            workflowExecutionRunnable
+            LogUtils.setWorkflowInstanceIdMDC(workflowExecution.getId());
+            workflowExecution
                     .getWorkflowExecutionGraph()
-                    .getActiveTaskExecutionRunnable()
-                    .forEach(ITaskExecutionRunnable::pause);
+                    .getActiveTaskExecution()
+                    .forEach(ITaskExecution::pause);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
         }
     }
 
-    protected void tryToTriggerSuccessorsAfterTaskFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,
-                                                         final ITaskExecutionRunnable taskExecutionRunnable) {
-        successorFlowAdjuster.adjustSuccessorFlow(taskExecutionRunnable);
+    protected void tryToTriggerSuccessorsAfterTaskFinish(final IWorkflowExecution workflowExecution,
+                                                         final ITaskExecution taskExecution) {
+        successorFlowAdjuster.adjustSuccessorFlow(taskExecution);
 
-        final IWorkflowFailureStrategy workflowFailureStrategy = workflowExecutionRunnable.getWorkflowFailureStrategy();
-        if (taskExecutionRunnable.isFailure()) {
-            workflowFailureStrategy.onTaskFailure(workflowExecutionRunnable, taskExecutionRunnable);
+        final IWorkflowFailureStrategy workflowFailureStrategy = workflowExecution.getWorkflowFailureStrategy();
+        if (taskExecution.isFailure()) {
+            workflowFailureStrategy.onTaskFailure(workflowExecution, taskExecution);
         }
 
-        final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecutionRunnable.getWorkflowExecutionGraph();
-        if (workflowExecutionGraph.isEndOfTaskChain(taskExecutionRunnable)) {
-            emitWorkflowFinishedEventIfApplicable(workflowExecutionRunnable);
+        final IWorkflowExecutionGraph workflowExecutionGraph = workflowExecution.getWorkflowExecutionGraph();
+        if (workflowExecutionGraph.isEndOfTaskChain(taskExecution)) {
+            emitWorkflowFinishedEventIfApplicable(workflowExecution);
             return;
         }
 
-        triggerTasks(workflowExecutionRunnable, workflowExecutionGraph.getSuccessors(taskExecutionRunnable));
+        triggerTasks(workflowExecution, workflowExecutionGraph.getSuccessors(taskExecution));
     }
 
-    protected void workflowFinish(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    protected void workflowFinish(final IWorkflowExecution workflowExecution,
                                   final WorkflowExecutionStatus workflowExecutionStatus) {
         // todo: add transaction configuration in lifecycle event, all sync lifecycle should be in transaction
         transactionTemplate.execute(status -> {
-            final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+            final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
             workflowInstance.setEndTime(new Date());
-            transformWorkflowInstanceState(workflowExecutionRunnable, workflowExecutionStatus);
+            transformWorkflowInstanceState(workflowExecution, workflowExecutionStatus);
             WorkflowInstanceMetrics.recordWorkflowInstanceFinish(
                     workflowExecutionStatus,
                     workflowInstance.getWorkflowDefinitionCode());
-            if (workflowExecutionRunnable.getWorkflowExecuteContext().getWorkflowDefinition().getExecutionType()
+            if (workflowExecution.getWorkflowExecuteContext().getWorkflowDefinition().getExecutionType()
                     .isSerial()) {
                 if (serialCommandDao.deleteByWorkflowInstanceId(workflowInstance.getId()) > 0) {
                     log.info("Success clear SerialCommand for WorkflowExecuteRunnable: {}",
-                            workflowExecutionRunnable.getName());
+                            workflowExecution.getName());
                 }
             }
-            workflowExecutionRunnable.getWorkflowEventBus()
-                    .publish(WorkflowFinalizeLifecycleEvent.of(workflowExecutionRunnable));
+            workflowExecution.getWorkflowEventBus()
+                    .publish(WorkflowFinalizeLifecycleEvent.of(workflowExecution));
             return null;
         });
     }
@@ -170,9 +170,9 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
      * Transformer the workflow instance state to targetState. This method will both update the
      * workflow instance state in memory and in the database.
      */
-    protected void transformWorkflowInstanceState(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    protected void transformWorkflowInstanceState(final IWorkflowExecution workflowExecution,
                                                   final WorkflowExecutionStatus targetState) {
-        final WorkflowInstance workflowInstance = workflowExecutionRunnable.getWorkflowInstance();
+        final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
         WorkflowExecutionStatus originState = workflowInstance.getState();
         try {
             workflowInstance.setState(targetState);
@@ -189,10 +189,10 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
      * Emit the workflow finished event if the workflow can finish, otherwise do nothing.
      * <p> The workflow finish state is determined by the state of the task in the workflow.
      */
-    protected abstract void emitWorkflowFinishedEventIfApplicable(final IWorkflowExecutionRunnable workflowExecutionRunnable);
+    protected abstract void emitWorkflowFinishedEventIfApplicable(final IWorkflowExecution workflowExecution);
 
-    protected boolean isWorkflowFinishable(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        return workflowExecutionRunnable.getWorkflowExecutionGraph().isAllTaskExecutionRunnableChainFinish();
+    protected boolean isWorkflowFinishable(final IWorkflowExecution workflowExecution) {
+        return workflowExecution.getWorkflowExecutionGraph().isAllTaskExecutionChainFinish();
     }
 
     /**
@@ -200,32 +200,32 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
      *
      * @throws IllegalStateException if the state of the task is not the expected state.
      */
-    protected void throwExceptionIfStateIsNotMatch(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        checkNotNull(workflowExecutionRunnable, "workflowExecutionRunnable is null");
-        final WorkflowExecutionStatus actualState = workflowExecutionRunnable.getState();
+    protected void throwExceptionIfStateIsNotMatch(final IWorkflowExecution workflowExecution) {
+        checkNotNull(workflowExecution, "workflowExecution is null");
+        final WorkflowExecutionStatus actualState = workflowExecution.getState();
         final WorkflowExecutionStatus expectState = matchState();
         if (actualState != expectState) {
-            final String workflowName = workflowExecutionRunnable.getName();
+            final String workflowName = workflowExecution.getName();
             throw new IllegalStateException(
                     "The workflow: " + workflowName + " state: " + actualState + " is not match:" + expectState);
         }
     }
 
-    protected void logWarningIfCannotDoAction(final IWorkflowExecutionRunnable workflowExecutionRunnable,
+    protected void logWarningIfCannotDoAction(final IWorkflowExecution workflowExecution,
                                               final AbstractLifecycleEvent event) {
         log.warn("Workflow {} state is {} cannot do action on event: {}",
-                workflowExecutionRunnable.getName(),
-                workflowExecutionRunnable.getState(),
+                workflowExecution.getName(),
+                workflowExecution.getState(),
                 event);
     }
 
-    protected void finalizeEventAction(final IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        log.info(WorkflowInstanceUtils.logWorkflowInstanceInDetails(workflowExecutionRunnable));
+    protected void finalizeEventAction(final IWorkflowExecution workflowExecution) {
+        log.info(WorkflowInstanceUtils.logWorkflowInstanceInDetails(workflowExecution));
 
-        workflowCacheRepository.remove(workflowExecutionRunnable.getId());
-        workflowEventBusCoordinator.unRegisterWorkflowEventBus(workflowExecutionRunnable);
-        workflowAlertManager.sendAlertWorkflowInstance(workflowExecutionRunnable.getWorkflowInstance());
+        workflowCacheRepository.remove(workflowExecution.getId());
+        workflowEventBusCoordinator.unRegisterWorkflowEventBus(workflowExecution);
+        workflowAlertManager.sendAlertWorkflowInstance(workflowExecution.getWorkflowInstance());
 
-        log.info("Successfully finalize WorkflowExecuteRunnable: {}", workflowExecutionRunnable.getName());
+        log.info("Successfully finalize WorkflowExecuteRunnable: {}", workflowExecution.getName());
     }
 }

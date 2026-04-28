@@ -64,7 +64,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
-import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
@@ -155,9 +154,6 @@ public class ProcessServiceImpl implements ProcessService {
 
     @Autowired
     private ClusterMapper clusterMapper;
-
-    @Autowired
-    private CuringParamsService curingGlobalParamsService;
 
     /**
      * find workflow instance detail by id
@@ -737,7 +733,6 @@ public class ProcessServiceImpl implements ProcessService {
      * @param clusterName clusterName
      * @return datasource
      */
-
     @Override
     public String findConfigYamlByName(String clusterName) {
         if (Strings.isNullOrEmpty(clusterName)) {
