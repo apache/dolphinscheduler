@@ -26,4 +26,5 @@ public class MasterTaskExecuteException extends MasterException {
     public MasterTaskExecuteException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }
