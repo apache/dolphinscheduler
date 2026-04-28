@@ -331,11 +331,13 @@ public class DataxTaskTest {
 
             Method method = DataxTask.class.getDeclaredMethod("buildDataxJobContentJson");
             method.setAccessible(true);
-            @SuppressWarnings("unchecked")
-            List<ObjectNode> result = (List<ObjectNode>) method.invoke(dataxTask);
+            Object invokeResult = method.invoke(dataxTask);
+            Assertions.assertNotNull(invokeResult);
+            List<?> result = (List<?>) invokeResult;
 
             Assertions.assertEquals(1, result.size());
-            ObjectNode writerParam = (ObjectNode) result.get(0).get("writer").get("parameter");
+            ObjectNode contentNode = (ObjectNode) result.get(0);
+            ObjectNode writerParam = (ObjectNode) contentNode.get("writer").get("parameter");
             Assertions.assertTrue(writerParam.has("batchSize"));
             Assertions.assertEquals(1024, writerParam.get("batchSize").asInt());
         }
