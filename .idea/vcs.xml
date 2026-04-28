@@ -18,7 +18,13 @@
 <project version="4">
     <component name="IssueNavigationConfiguration">
         <option name="links">
-        @@ -28,5 +12,7 @@
+            <list>
+                <IssueNavigationLink>
+                    <option name="issueRegexp" value="#(\d+)" />
+                    <option name="linkRegexp" value="https://github.com/apache/dolphinscheduler/issues/$1" />
+                </IssueNavigationLink>
+            </list>
+        </option>
     </component>
     <component name="VcsDirectoryMappings">
         <mapping directory="" vcs="Git" />
