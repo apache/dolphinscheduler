@@ -784,31 +784,18 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             timezone = commandParam.getTimeZone();
         }
 
-        Map<String, String> timeParams = BusinessTimeUtils
+        Map<String, String> parameterMap = BusinessTimeUtils
                 .getBusinessTime(workflowInstance.getCmdTypeIfComplement(),
                         workflowInstance.getScheduleTime(), timezone);
-        String userDefinedParams = workflowInstance.getGlobalParams();
-        // global params
-        List<Property> globalParams = new ArrayList<>();
 
-        // global param string
-        String globalParamStr =
-                ParameterUtils.convertParameterPlaceholders(GlobalParameterUtils.serializeGlobalParameter(globalParams),
-                        timeParams);
-        globalParams = GlobalParameterUtils.deserializeGlobalParameter(globalParamStr);
-        for (Property property : globalParams) {
-            timeParams.put(property.getProp(), property.getValue());
-        }
+        // finalGlobalParams
+        List<Property> finalGlobalParams = processGlobalParams(workflowInstance, parameterMap);
 
-        if (userDefinedParams != null && userDefinedParams.length() > 0) {
-            globalParams = GlobalParameterUtils.deserializeGlobalParameter(userDefinedParams);
-        }
-
-        Map<String, Map<String, Object>> localUserDefParams = getLocalParams(workflowInstance, timeParams);
+        // localUserDefParams
+        Map<String, Map<String, Object>> localUserDefParams = processLocalParams(workflowInstance, parameterMap);
 
         Map<String, Object> resultMap = new HashMap<>();
-
-        resultMap.put(GLOBAL_PARAMS, globalParams);
+        resultMap.put(GLOBAL_PARAMS, finalGlobalParams);
         resultMap.put(LOCAL_PARAMS, localUserDefParams);
 
         result.put(DATA_LIST, resultMap);
@@ -817,25 +804,63 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     }
 
     /**
-     * get local params
+     * Process global parameters: resolve placeholders and merge into context.
+     *
+     * @param workflowInstance The workflow instance.
+     * @param parameterMap Context parameters for placeholder replacement and merging
+     * @return Deserialized global properties list
      */
-    private Map<String, Map<String, Object>> getLocalParams(WorkflowInstance workflowInstance,
-                                                            Map<String, String> timeParams) {
+    private List<Property> processGlobalParams(WorkflowInstance workflowInstance, Map<String, String> parameterMap) {
+        List<Property> finalGlobalParams = new ArrayList<>();
+
+        String globalParamsJson = workflowInstance.getGlobalParams();
+        if (StringUtils.isNotEmpty(globalParamsJson)) {
+            // Replace placeholders
+            String replacedJsonStr = ParameterUtils.convertParameterPlaceholders(globalParamsJson, parameterMap);
+            finalGlobalParams = GlobalParameterUtils.deserializeGlobalParameter(replacedJsonStr);
+
+            // Merge into context map
+            if (finalGlobalParams != null) {
+                for (Property property : finalGlobalParams) {
+                    if (property.getProp() != null && property.getValue() != null) {
+                        parameterMap.put(property.getProp(), property.getValue());
+                    }
+                }
+            }
+        }
+        return finalGlobalParams;
+    }
+
+    /**
+     * Process local parameters for tasks within a workflow instance.
+     *
+     * @param workflowInstance The workflow instance.
+     * @param parameterMap     Context parameters for placeholder replacement.
+     * @return Map of task name to its local parameters and type.
+     */
+    private Map<String, Map<String, Object>> processLocalParams(WorkflowInstance workflowInstance,
+                                                                Map<String, String> parameterMap) {
         Map<String, Map<String, Object>> localUserDefParams = new HashMap<>();
+
+        // Fetch valid task instances for the workflow
         List<TaskInstance> taskInstanceList =
                 taskInstanceMapper.findValidTaskListByWorkflowInstanceId(workflowInstance.getId(), Flag.YES);
+
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                     taskInstance.getTaskCode(), taskInstance.getTaskDefinitionVersion());
 
             String localParams = JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), LOCAL_PARAMS);
+
             if (!StringUtils.isEmpty(localParams)) {
-                localParams = ParameterUtils.convertParameterPlaceholders(localParams, timeParams);
+                // Replace placeholders and deserialize
+                localParams = ParameterUtils.convertParameterPlaceholders(localParams, parameterMap);
                 List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
 
                 Map<String, Object> localParamsMap = new HashMap<>();
                 localParamsMap.put(TASK_TYPE, taskDefinitionLog.getTaskType());
                 localParamsMap.put(LOCAL_PARAMS_LIST, localParamsList);
+
                 if (CollectionUtils.isNotEmpty(localParamsList)) {
                     localUserDefParams.put(taskDefinitionLog.getName(), localParamsMap);
                 }
