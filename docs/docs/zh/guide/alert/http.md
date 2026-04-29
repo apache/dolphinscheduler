@@ -12,7 +12,7 @@
 | 请求体(Body)    | Http`请求的完整请求体，以JSON为格式，非必填                     |
 | Content-Type | 请求体的`Content-Type`，默认为`application/json`       |
 
-> 告警消息，支持变量`$msg`，可在`URL`,`请求头`,`请求体`中使用，非必填。
+> 告警消息，支持变量`${msg}`，可在`URL`,`请求头`,`请求体`中使用，非必填。
 
 ### GET Http告警
 
