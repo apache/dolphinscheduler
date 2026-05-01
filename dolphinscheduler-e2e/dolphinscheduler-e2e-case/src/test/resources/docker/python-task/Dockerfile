@@ -17,8 +17,10 @@
 
 FROM apache/dolphinscheduler-standalone-server:ci
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt update \
-    && apt install -y software-properties-common \
+    && apt install -y --no-install-recommends software-properties-common \
     && add-apt-repository ppa:deadsnakes/ppa \
     && apt update \
     && apt-get install -y python3.8 libpython3.8-dev python3.8-dev python3.8-distutils \
