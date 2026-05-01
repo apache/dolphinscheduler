@@ -134,9 +134,7 @@ jobs:
           ./mvnw verify -B \
             -pl "${{ matrix.module }}" \
             -am \
-            -DskipTests=true \
             -Dmaven.test.skip=false \
-            -pl "${{ matrix.module }}" \
             -Dspotless.skip=true \
             -DskipUT=false \
             -Danalyze.skip=true

@@ -162,7 +162,7 @@ class WorkflowLineageServiceImplTest {
                 .thenReturn(Collections.singletonList(WorkflowDefinition.builder().code(child).version(1).build()));
 
         List<WorkflowDefinition> result =
-                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(root, false);
+                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(root, false, false);
 
         assertThat(result).extracting(WorkflowDefinition::getCode).containsExactly(child);
     }
@@ -201,7 +201,7 @@ class WorkflowLineageServiceImplTest {
                 .thenReturn(Collections.singletonList(workflowC));
 
         List<WorkflowDefinition> result =
-                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(codeA, true);
+                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(codeA, true, false);
 
         assertThat(result).extracting(WorkflowDefinition::getCode).containsExactly(codeB, codeC);
     }
