@@ -45,6 +45,9 @@ public class WorkflowInstanceMapperTest extends BaseDaoTest {
     @Autowired
     private WorkflowDefinitionMapper workflowDefinitionMapper;
 
+    @Autowired
+    private ProjectMapper projectMapper;
+
     /**
      * insert process instance with specified start time and end time,set state to SUCCESS
      */

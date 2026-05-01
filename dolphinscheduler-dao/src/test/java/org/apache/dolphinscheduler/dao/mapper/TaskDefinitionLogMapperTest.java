@@ -89,6 +89,7 @@ public class TaskDefinitionLogMapperTest extends BaseDaoTest {
         ArrayList<TaskDefinition> taskDefinitions = new ArrayList<>();
         taskDefinitions.add(taskDefinition);
 
+        TaskDefinitionLog taskDefinitionLog = insertOne();
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitions);
         Assertions.assertNotEquals(0, taskDefinitionLogs.size());
     }
