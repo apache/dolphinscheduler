@@ -19,7 +19,7 @@ version: "3.8"
 
 services:
   dolphinscheduler:
-    image: apache/dolphinscheduler-standalone-server:ci-python
+    image: apache/dolphinscheduler-standalone-server:ci
     build:
         context: .
         dockerfile: ./Dockerfile
