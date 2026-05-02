@@ -52,6 +52,8 @@ jobs:
   sanity-check:
     name: Sanity Check
     runs-on: ubuntu-latest
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -64,6 +66,8 @@ jobs:
   generate-matrix:
     name: Generate Module Matrix
     runs-on: ubuntu-latest
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push' }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
