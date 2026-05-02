@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -50,6 +51,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class WorkflowTestCaseContextFactory {
+
+    private static final String DEFAULT_MASTER_ADDRESS = "127.0.0.1:5678";
 
     @Autowired
     private ProjectDao projectDao;
@@ -84,8 +87,12 @@ public class WorkflowTestCaseContextFactory {
     @Autowired
     private IEnvironmentDao environmentDao;
 
+    @Autowired
+    private MasterConfig masterConfig;
+
     public WorkflowTestCaseContext initializeContextFromYaml(final String yamlPath) {
         final WorkflowTestCaseContext workflowTestCaseContext = YamlFactory.load(yamlPath);
+        normalizeDefaultMasterAddress(workflowTestCaseContext);
         initializeProjectToDB(workflowTestCaseContext.getProject());
         initializeWorkflowDefinitionToDB(workflowTestCaseContext.getWorkflows());
         initializeTaskDefinitionsToDB(workflowTestCaseContext.getTasks());
@@ -96,6 +103,33 @@ public class WorkflowTestCaseContextFactory {
         initializeTaskGroupsToDB(workflowTestCaseContext.getTaskGroups());
         initializeEnvironmentToDB(workflowTestCaseContext.getEnvironments());
         return workflowTestCaseContext;
+    }
+
+    private void normalizeDefaultMasterAddress(final WorkflowTestCaseContext workflowTestCaseContext) {
+        normalizeWorkflowInstanceHost(workflowTestCaseContext.getWorkflowInstances());
+        normalizeTaskInstanceHost(workflowTestCaseContext.getTaskInstances());
+    }
+
+    private void normalizeWorkflowInstanceHost(final List<WorkflowInstance> workflowInstances) {
+        if (CollectionUtils.isEmpty(workflowInstances)) {
+            return;
+        }
+        for (final WorkflowInstance workflowInstance : workflowInstances) {
+            if (DEFAULT_MASTER_ADDRESS.equals(workflowInstance.getHost())) {
+                workflowInstance.setHost(masterConfig.getMasterAddress());
+            }
+        }
+    }
+
+    private void normalizeTaskInstanceHost(final List<TaskInstance> taskInstances) {
+        if (CollectionUtils.isEmpty(taskInstances)) {
+            return;
+        }
+        for (final TaskInstance taskInstance : taskInstances) {
+            if (DEFAULT_MASTER_ADDRESS.equals(taskInstance.getHost())) {
+                taskInstance.setHost(masterConfig.getMasterAddress());
+            }
+        }
     }
 
     private void initializeTaskInstancesToDB(List<TaskInstance> taskInstances) {

@@ -157,12 +157,7 @@ jobs:
             -Dsurefire.printSummary=true \
             -Dsurefire.useFile=false \
             -Dsurefire.reportFormat=plain \
-            -Dsurefire.redirectTestOutputToFile=false \
-            -Djunit.jupiter.execution.parallel.enabled=true \
-            -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent \
-            -Djunit.jupiter.execution.parallel.mode.default=same_thread \
-            -Djunit.jupiter.execution.parallel.config.strategy=fixed \
-            -Djunit.jupiter.execution.parallel.config.fixed.parallelism=4
+            -Dsurefire.redirectTestOutputToFile=false
 
       - name: Collect jacoco exec files
         if: always()
