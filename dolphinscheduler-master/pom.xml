@@ -386,10 +386,10 @@
                     </execution>
                     <execution>
                         <id>spring-boot-integration-test</id>
-                        <phase>test</phase>
                         <goals>
                             <goal>test</goal>
                         </goals>
+                        <phase>test</phase>
                         <configuration>
                             <includes>
                                 <include>**/integration/cases/*TestCase.java</include>
