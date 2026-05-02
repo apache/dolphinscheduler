@@ -148,12 +148,16 @@ jobs:
       - name: Run Unit Tests (${{ matrix.module }})
         run: |
           export MAVEN_OPTS="-Xmx14g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
-          ./mvnw verify -B \
+          ./mvnw -T 1C verify -B \
             -pl "${{ matrix.module }}" \
             -Dmaven.test.skip=false \
             -Dspotless.skip=true \
             -DskipUT=false \
-            -Danalyze.skip=true
+            -Danalyze.skip=true \
+            -Dsurefire.printSummary=true \
+            -Dsurefire.useFile=false \
+            -Dsurefire.reportFormat=plain \
+            -Dsurefire.redirectTestOutputToFile=false
 
       - name: Collect jacoco exec files
         if: always()
