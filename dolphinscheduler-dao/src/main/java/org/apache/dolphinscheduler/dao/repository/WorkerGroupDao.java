@@ -23,6 +23,8 @@ import java.util.List;
 
 public interface WorkerGroupDao extends IDao<WorkerGroup> {
 
+    boolean deleteByWorkerGroupName(String workerGroupName);
+
     List<String> queryAllWorkerGroupNames();
 
     List<WorkerGroup> queryAllWorkerGroup();

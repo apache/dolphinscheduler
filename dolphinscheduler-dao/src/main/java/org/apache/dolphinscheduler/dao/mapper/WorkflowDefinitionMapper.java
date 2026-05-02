@@ -104,6 +104,16 @@ public interface WorkflowDefinitionMapper extends BaseMapper<WorkflowDefinition>
                                                     @Param("projectCode") long projectCode);
 
     /**
+     * Filter workflow definitions
+     *
+     * @param page page
+     * @param workflowDefinition workflow definition object
+     * @return workflow definition IPage
+     */
+    IPage<WorkflowDefinition> filterWorkflowDefinition(IPage<WorkflowDefinition> page,
+                                                       @Param("pd") WorkflowDefinition workflowDefinition);
+
+    /**
      * query all workflow definition list
      *
      * @param projectCode projectCode
@@ -137,6 +147,20 @@ public interface WorkflowDefinitionMapper extends BaseMapper<WorkflowDefinition>
      * @return definition group by user
      */
     List<WorkflowDefinitionCountDto> countDefinitionByProjectCodes(@Param("projectCodes") Collection<Long> projectCodes);
+
+    /**
+     * Statistics workflow definition group by project codes list
+     * <p>
+     * We only need project codes to determine whether the definition belongs to the user or not.
+     *
+     * @param projectCodes projectCodes
+     * @param userId userId
+     * @param releaseState releaseState
+     * @return definition group by user
+     */
+    List<WorkflowDefinitionCountDto> countDefinitionByProjectCodesV2(@Param("projectCodes") List<Long> projectCodes,
+                                                                     @Param("userId") Integer userId,
+                                                                     @Param("releaseState") Integer releaseState);
 
     /**
      * list all project ids

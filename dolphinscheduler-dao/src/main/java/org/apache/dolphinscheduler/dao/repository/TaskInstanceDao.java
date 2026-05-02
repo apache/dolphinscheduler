@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.List;
 import java.util.Set;
@@ -35,6 +37,15 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
     boolean upsertTaskInstance(TaskInstance taskInstance);
 
     /**
+     * Submit a task instance to DB.
+     *
+     * @param taskInstance    task instance
+     * @param workflowInstance workflow instance
+     * @return task instance
+     */
+    boolean submitTaskInstanceToDB(TaskInstance taskInstance, WorkflowInstance workflowInstance);
+
+    /**
      * Mark the task instance as invalid
      */
     void markTaskInstanceInvalid(List<TaskInstance> taskInstances);
@@ -46,6 +57,23 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
      * @return list of valid task instance
      */
     List<TaskInstance> queryValidTaskListByWorkflowInstanceId(Integer workflowInstanceId);
+
+    /**
+     * Query list of task instance by workflow instance id and task code
+     *
+     * @param workflowInstanceId workflowInstanceId
+     * @param taskCode          task code
+     * @return list of valid task instance
+     */
+    TaskInstance queryByWorkflowInstanceIdAndTaskCode(Integer workflowInstanceId, Long taskCode);
+
+    /**
+     * find previous task list by work workflow id
+     *
+     * @param workflowInstanceId workflowInstanceId
+     * @return task instance list
+     */
+    List<TaskInstance> queryPreviousTaskListByWorkflowInstanceId(Integer workflowInstanceId);
 
     void deleteByWorkflowInstanceId(int workflowInstanceId);
 
@@ -71,4 +99,6 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
     TaskInstance queryLastTaskInstanceIntervalInWorkflowInstance(Integer workflowInstanceId,
                                                                  long depTaskCode);
 
+    void updateTaskInstanceState(Integer taskInstanceId, TaskExecutionStatus originState,
+                                 TaskExecutionStatus targetState);
 }

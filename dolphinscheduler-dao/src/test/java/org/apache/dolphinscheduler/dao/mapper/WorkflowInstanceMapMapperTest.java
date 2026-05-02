@@ -74,6 +74,7 @@ public class WorkflowInstanceMapMapperTest extends BaseDaoTest {
      */
     @Test
     public void testQuery() {
+        WorkflowInstanceRelation workflowInstanceRelation = insertOne();
         // query
         List<WorkflowInstanceRelation> dataSources = workflowInstanceRelationMapper.selectList(null);
         Assertions.assertNotEquals(0, dataSources.size());

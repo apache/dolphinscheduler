@@ -38,10 +38,12 @@ import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 
@@ -80,7 +82,13 @@ public class UsersServiceTest {
     private UserMapper userMapper;
 
     @Mock
+    private AccessTokenMapper accessTokenMapper;
+
+    @Mock
     private TenantMapper tenantMapper;
+
+    @Mock
+    private ProjectUserMapper projectUserMapper;
 
     @Mock
     private AlertGroupMapper alertGroupMapper;
@@ -96,6 +104,9 @@ public class UsersServiceTest {
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
+
+    @Mock
+    private SessionService sessionService;
 
     private String queueName = "UsersServiceTestQueue";
 

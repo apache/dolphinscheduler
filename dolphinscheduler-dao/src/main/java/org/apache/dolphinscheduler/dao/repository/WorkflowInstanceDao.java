@@ -80,6 +80,8 @@ public interface WorkflowInstanceDao extends IDao<WorkflowInstance> {
      */
     WorkflowInstance queryFirstStartWorkflowInstance(Long definitionCode);
 
+    WorkflowInstance querySubWorkflowInstanceByParentId(Integer workflowInstanceId, Integer taskInstanceId);
+
     List<WorkflowInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
                                                             int workflowDefinitionVersion,
                                                             int[] states);

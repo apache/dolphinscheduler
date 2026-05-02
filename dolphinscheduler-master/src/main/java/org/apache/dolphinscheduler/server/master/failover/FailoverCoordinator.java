@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.RegistryLock;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
@@ -139,9 +140,9 @@ public class FailoverCoordinator implements IFailoverCoordinator {
         // Once the FAILOVER workflow has been refired, then it's host will be changed to the new master and have a new
         // start time.
         // So if a master has been failovered multiple times, there is no problem.
+        final String masterFailoverLockPath = RegistryUtils.getMasterFailoverLockPath(masterAddress);
         final StopWatch failoverTimeCost = StopWatch.createStarted();
-        registryClient.getLock(RegistryUtils.getMasterFailoverLockPath(masterAddress));
-        try {
+        try (RegistryLock ignored = registryClient.getLock(masterFailoverLockPath)) {
             // If the master has already been failovered, then we skip the failover.
             if (registryClient.exists(masterFailoverNodePath)
                     && String.valueOf(workflowFailoverDeadline).equals(registryClient.get(masterFailoverNodePath))) {
@@ -160,8 +161,6 @@ public class FailoverCoordinator implements IFailoverCoordinator {
                     masterAddress,
                     needFailoverWorkflows.size(),
                     failoverTimeCost.getTime());
-        } finally {
-            registryClient.releaseLock(RegistryNodeType.MASTER_FAILOVER_LOCK.getRegistryPath());
         }
     }
 

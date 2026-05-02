@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.impl.K8SNamespaceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -67,6 +68,9 @@ public class K8SNamespaceServiceTest {
 
     @Mock
     private ClusterMapper clusterMapper;
+
+    @Mock
+    private K8sClientService k8sClientService;
 
     private String namespace = "default";
     private Long clusterCode = 100L;

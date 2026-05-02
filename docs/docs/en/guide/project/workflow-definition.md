@@ -56,7 +56,7 @@ Click the `Save` button and configure `process execution type` in the pop-up win
 
 - `Parallel`: If there are multiple instances of the same workflow definition, execute the instances in parallel.
 - `Serial Wait`: If there are multiple instances of the same workflow definition, execute the instances in serial.
-- `Serial Discard`: If there are multiple instances of the same workflow definition, discard the later ones and kill the current running ones.
+- `Serial Discard`: If there is a running instance of the same workflow definition, the later ones will be discarded; the running instance is not affected.
 - `Serial Priority`: If there are multiple instances of the same workflow definition, execute the instances according to the priority in serial.
 
 ![workflow-execution-type](../../../../img/new_ui/dev/project/workflow-execution-type.png)
