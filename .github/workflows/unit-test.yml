@@ -148,7 +148,7 @@ jobs:
       - name: Run Unit Tests (${{ matrix.module }})
         run: |
           export MAVEN_OPTS="-Xmx14g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
-          ./mvnw -T 1C verify -B \
+          ./mvnw verify -B \
             -pl "${{ matrix.module }}" \
             -Dmaven.test.skip=false \
             -Dspotless.skip=true \
@@ -157,7 +157,12 @@ jobs:
             -Dsurefire.printSummary=true \
             -Dsurefire.useFile=false \
             -Dsurefire.reportFormat=plain \
-            -Dsurefire.redirectTestOutputToFile=false
+            -Dsurefire.redirectTestOutputToFile=false \
+            -Djunit.jupiter.execution.parallel.enabled=true \
+            -Djunit.jupiter.execution.parallel.mode.classes.default=concurrent \
+            -Djunit.jupiter.execution.parallel.mode.default=same_thread \
+            -Djunit.jupiter.execution.parallel.config.strategy=fixed \
+            -Djunit.jupiter.execution.parallel.config.fixed.parallelism=4
 
       - name: Collect jacoco exec files
         if: always()
