@@ -347,7 +347,7 @@ public class WorkflowInstanceController extends BaseController {
     public Result viewVariables(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                 @PathVariable("id") Integer id) {
-        Map<String, Object> result = workflowInstanceService.viewVariables(projectCode, id);
+        Map<String, Object> result = workflowInstanceService.viewVariables(loginUser, projectCode, id);
         return returnDataList(result);
     }
 
@@ -369,7 +369,7 @@ public class WorkflowInstanceController extends BaseController {
     public Result viewTree(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                            @PathVariable("id") Integer id) throws Exception {
-        Map<String, Object> result = workflowInstanceService.viewGantt(projectCode, id);
+        Map<String, Object> result = workflowInstanceService.viewGantt(loginUser, projectCode, id);
         return returnDataList(result);
     }
 

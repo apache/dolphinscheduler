@@ -201,7 +201,8 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
     public void testViewVariables() throws Exception {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put(Constants.STATUS, Status.SUCCESS);
-        Mockito.when(workflowInstanceService.viewVariables(1113L, 123)).thenReturn(mockResult);
+        Mockito.when(workflowInstanceService.viewVariables(Mockito.any(), Mockito.eq(1113L), Mockito.eq(123)))
+                .thenReturn(mockResult);
         MvcResult mvcResult = mockMvc
                 .perform(get("/projects/{projectCode}/workflow-instances/{id}/view-variables", "1113", "123")
                         .header(SESSION_ID, sessionId))

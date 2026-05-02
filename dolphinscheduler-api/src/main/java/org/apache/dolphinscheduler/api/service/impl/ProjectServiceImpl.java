@@ -200,6 +200,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @param projectCode project code
      * @return true if the login user have permission to see the project
      */
+    @Deprecated
     @Override
     public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode,
                                                    String permission) {
@@ -819,6 +820,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @param projectCode project code
      * @return true if the login user have permission to see the project
      */
+    @Deprecated
     @Override
     public void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode,
                                     String permission) {
