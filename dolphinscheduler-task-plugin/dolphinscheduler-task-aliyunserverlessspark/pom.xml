@@ -28,8 +28,6 @@
 
     <properties>
         <plugin.name>task.aliyun.serverlessspark</plugin.name>
-        <emr-serverless-spark.version>2.4.1</emr-serverless-spark.version>
-        <credentials-java.version>1.0.1</credentials-java.version>
     </properties>
 
     <dependencies>
@@ -69,13 +67,11 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>emr_serverless_spark20230808</artifactId>
-            <version>${emr-serverless-spark.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>credentials-java</artifactId>
-            <version>${credentials-java.version}</version>
         </dependency>
     </dependencies>
 
