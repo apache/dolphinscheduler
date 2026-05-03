@@ -231,11 +231,14 @@ public class RemoteExecutorTest {
 
         when(clientSession.auth().verify().isSuccess()).thenReturn(true);
         when(clientSession.createExecChannel(anyString())).thenReturn(channel);
+        mockChannelOutput(channel, "partial output before failure\n");
         when(channel.getExitStatus()).thenReturn(1);
         when(channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0))
                 .thenReturn(EnumSet.of(ClientChannelEvent.CLOSED));
 
-        Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("failing_command"));
+        TaskException ex =
+                Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("failing_command"));
+        Assertions.assertTrue(ex.getMessage().contains("exitStatus: 1"));
     }
 
     @Test
@@ -245,11 +248,14 @@ public class RemoteExecutorTest {
 
         when(clientSession.auth().verify().isSuccess()).thenReturn(true);
         when(clientSession.createExecChannel(anyString())).thenReturn(channel);
+        mockChannelOutput(channel, "some output\n");
         when(channel.getExitStatus()).thenReturn(null);
         when(channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0))
                 .thenReturn(EnumSet.of(ClientChannelEvent.CLOSED));
 
-        Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("command"));
+        TaskException ex =
+                Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("command"));
+        Assertions.assertTrue(ex.getMessage().contains("exitStatus: null"));
     }
 
     @Test

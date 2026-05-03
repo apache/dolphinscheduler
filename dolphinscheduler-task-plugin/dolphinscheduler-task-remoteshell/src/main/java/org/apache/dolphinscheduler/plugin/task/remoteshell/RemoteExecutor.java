@@ -241,11 +241,6 @@ public class RemoteExecutor implements AutoCloseable {
             channel.setErr(err);
             channel.open();
             channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0);
-            Integer exitStatus = channel.getExitStatus();
-            if (exitStatus == null || exitStatus != 0) {
-                throw new TaskException(
-                        "Remote shell task error, exitStatus: " + exitStatus + " error message: " + err);
-            }
             int readLines = 0;
             try (
                     BufferedReader reader = new BufferedReader(
@@ -256,6 +251,12 @@ public class RemoteExecutor implements AutoCloseable {
                     readLines++;
                     lineConsumer.accept(line);
                 }
+            }
+            Integer exitStatus = channel.getExitStatus();
+            if (exitStatus == null || exitStatus != 0) {
+                throw new TaskException(
+                        "Remote shell task error, exitStatus: " + exitStatus + " error message: "
+                                + new String(err.toByteArray(), StandardCharsets.UTF_8));
             }
             return readLines;
         }
