@@ -648,6 +648,8 @@ export default {
     datax_target_database_pre_sql: 'Pre SQL Statement',
     datax_target_database_post_sql: 'Post SQL Statement',
     datax_non_query_sql_tips: 'Please enter the non-query sql statement',
+    datax_writer_batch_size: 'Writer Batch Size',
+    datax_writer_batch_size_tips: '0 or empty = default 2048',
     datax_job_speed_byte: 'Speed(Byte count)',
     datax_job_speed_byte_info: '(0 means unlimited)',
     datax_job_speed_record: 'Speed(Record count)',

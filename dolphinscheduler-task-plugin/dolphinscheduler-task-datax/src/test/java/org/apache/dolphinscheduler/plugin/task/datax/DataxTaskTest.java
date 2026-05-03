@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
@@ -45,6 +46,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -52,6 +54,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
@@ -61,6 +64,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @ExtendWith(MockitoExtension.class)
 public class DataxTaskTest {
@@ -271,6 +276,71 @@ public class DataxTaskTest {
         taskExecutionContext.setTaskAppId("app-id");
         taskExecutionContext.setExecutePath("/tmp/execution");
         return taskExecutionContext;
+    }
+
+    @Test
+    public void testBuildDataxJobContentJsonWithBatchSize() throws Exception {
+        // set batchSize > 0 via reflection
+        Field dataXParametersField = DataxTask.class.getDeclaredField("dataXParameters");
+        dataXParametersField.setAccessible(true);
+        DataxParameters params = (DataxParameters) dataXParametersField.get(dataxTask);
+        params.setBatchSize(1024);
+        params.setDsType("MYSQL");
+        params.setDtType("MYSQL");
+
+        // set dataxTaskExecutionContext via reflection
+        DataxTaskExecutionContext ctx = new DataxTaskExecutionContext();
+        ctx.setSourcetype(DbType.MYSQL);
+        ctx.setTargetType(DbType.MYSQL);
+        ctx.setSourceConnectionParams(
+                "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://localhost:3306\"}");
+        ctx.setTargetConnectionParams(
+                "{\"user\":\"root\",\"password\":\"123456\",\"address\":\"jdbc:mysql://localhost:3306\"}");
+
+        Field ctxField = DataxTask.class.getDeclaredField("dataxTaskExecutionContext");
+        ctxField.setAccessible(true);
+        ctxField.set(dataxTask, ctx);
+
+        BaseConnectionParam mockConnParam = mock(BaseConnectionParam.class);
+        when(mockConnParam.getUser()).thenReturn("root");
+        when(mockConnParam.getPassword()).thenReturn("123456");
+        when(mockConnParam.getCompatibleMode()).thenReturn(null);
+
+        try (
+                MockedStatic<DataSourceUtils> mockedDataSourceUtils = mockStatic(DataSourceUtils.class);
+                MockedStatic<DataSourceClientProvider> mockedProvider = mockStatic(DataSourceClientProvider.class)) {
+
+            mockedDataSourceUtils
+                    .when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(DbType.class), Mockito.anyString()))
+                    .thenReturn(mockConnParam);
+            mockedDataSourceUtils.when(() -> DataSourceUtils.getJdbcUrl(Mockito.any(DbType.class), Mockito.any()))
+                    .thenReturn("jdbc:mysql://localhost:3306/test");
+
+            Connection connection = mock(Connection.class);
+            mockedProvider.when(() -> DataSourceClientProvider.getAdHocConnection(Mockito.any(), Mockito.any()))
+                    .thenReturn(connection);
+
+            PreparedStatement stmt = mock(PreparedStatement.class);
+            when(connection.prepareStatement(anyString())).thenReturn(stmt);
+            ResultSetMetaData md = mock(ResultSetMetaData.class);
+            when(md.getColumnCount()).thenReturn(1);
+            when(md.getColumnLabel(eq(1))).thenReturn("col1");
+            ResultSet resultSet = mock(ResultSet.class);
+            when(resultSet.getMetaData()).thenReturn(md);
+            when(stmt.executeQuery()).thenReturn(resultSet);
+
+            Method method = DataxTask.class.getDeclaredMethod("buildDataxJobContentJson");
+            method.setAccessible(true);
+            Object invokeResult = method.invoke(dataxTask);
+            Assertions.assertNotNull(invokeResult);
+            List<?> result = (List<?>) invokeResult;
+
+            Assertions.assertEquals(1, result.size());
+            ObjectNode contentNode = (ObjectNode) result.get(0);
+            ObjectNode writerParam = (ObjectNode) contentNode.get("writer").get("parameter");
+            Assertions.assertTrue(writerParam.has("batchSize"));
+            Assertions.assertEquals(1024, writerParam.get("batchSize").asInt());
+        }
     }
 
     private String getJsonString() {

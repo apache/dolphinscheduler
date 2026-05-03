@@ -52,6 +52,8 @@ jobs:
   sanity-check:
     name: Sanity Check
     runs-on: ubuntu-latest
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -64,6 +66,8 @@ jobs:
   generate-matrix:
     name: Generate Module Matrix
     runs-on: ubuntu-latest
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push' }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -124,19 +128,29 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
 
-      # Use -am (--also-make) so Maven automatically builds all upstream
-      # dependency modules before running tests in the target module.
-      # -DskipTests=true skips tests in dependency modules; only the
-      # target module (-pl) runs its unit tests via verify.
-      - name: Run Unit Tests (${{ matrix.module }})
+      # Install the target module and its upstream dependencies into the local
+      # Maven repository without running tests. The following unit-test step
+      # resolves these artifacts from the same runner's ~/.m2/repository.
+      - name: Install Dependencies (${{ matrix.module }})
         run: |
-          export MAVEN_OPTS="-Xmx8g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
-          ./mvnw verify -B \
+          export MAVEN_OPTS="-Xmx14g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
+          ./mvnw install -B \
             -pl "${{ matrix.module }}" \
             -am \
-            -DskipTests=true \
-            -Dmaven.test.skip=false \
+            -Dmaven.test.skip=true \
+            -Dspotless.skip=true \
+            -DskipUT=true \
+            -Djacoco.skip=true \
+            -Danalyze.skip=true
+
+      # Verify only the target module. Do not use -am here, otherwise Maven
+      # will run the verify lifecycle for dependency modules too.
+      - name: Run Unit Tests (${{ matrix.module }})
+        run: |
+          export MAVEN_OPTS="-Xmx14g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
+          ./mvnw verify -B \
             -pl "${{ matrix.module }}" \
+            -Dmaven.test.skip=false \
             -Dspotless.skip=true \
             -DskipUT=false \
             -Danalyze.skip=true

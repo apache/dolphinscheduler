@@ -20,18 +20,12 @@ package org.apache.dolphinscheduler.server.master.engine.task.execution;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.utils.EnvironmentUtils;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
-
-import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceFactory.ITaskInstanceBuilder>
         implements
             ITaskInstanceFactory<BUILDER> {
-
-    @Autowired
-    protected EnvironmentMapper environmentMapper;
 
     protected TaskInstance cloneTaskInstance(TaskInstance originTaskInstance) {
         final TaskInstance result = new TaskInstance();

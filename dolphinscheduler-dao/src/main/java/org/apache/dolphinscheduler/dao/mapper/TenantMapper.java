@@ -25,6 +25,7 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface TenantMapper extends BaseMapper<Tenant> {
 
@@ -78,6 +79,16 @@ public interface TenantMapper extends BaseMapper<Tenant> {
      * @return true if exist else return null
      */
     Boolean existTenant(@Param("tenantCode") String tenantCode);
+
+    /**
+     * queryTenantPagingByIds
+     * @param page
+     * @param ids
+     * @param searchVal
+     * @return
+     */
+    IPage<Tenant> queryTenantPagingByIds(Page<Tenant> page, @Param("ids") List<Integer> ids,
+                                         @Param("searchVal") String searchVal);
 
     /**
      * queryAll

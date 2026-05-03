@@ -76,7 +76,7 @@ public class BackfillWorkflowExecutorDelegateTest {
                 WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
         WorkflowDefinition downstreamWorkflow =
                 WorkflowDefinition.builder().code(downstreamCode).releaseState(ReleaseState.ONLINE).build();
-        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(upstreamCode), eq(false)))
+        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(upstreamCode), eq(false), eq(true)))
                 .thenReturn(Collections.singletonList(downstreamWorkflow));
         User loginUser = new User();
         loginUser.setId(1);
@@ -121,7 +121,7 @@ public class BackfillWorkflowExecutorDelegateTest {
                 WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
         WorkflowDefinition downstreamWorkflow =
                 WorkflowDefinition.builder().code(downstreamCode).releaseState(ReleaseState.ONLINE).build();
-        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(upstreamCode), eq(false)))
+        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(upstreamCode), eq(false), eq(true)))
                 .thenReturn(Collections.singletonList(downstreamWorkflow));
         User loginUser = new User();
         loginUser.setId(1);
@@ -163,7 +163,7 @@ public class BackfillWorkflowExecutorDelegateTest {
                 WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
         WorkflowDefinition downstreamWorkflow =
                 WorkflowDefinition.builder().code(downstreamCode).releaseState(ReleaseState.ONLINE).build();
-        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(upstreamCode), eq(false)))
+        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(upstreamCode), eq(false), eq(true)))
                 .thenReturn(Collections.singletonList(downstreamWorkflow));
         User loginUser = new User();
         loginUser.setId(1);
@@ -203,7 +203,7 @@ public class BackfillWorkflowExecutorDelegateTest {
                 WorkflowDefinition.builder().code(codeA).releaseState(ReleaseState.ONLINE).build();
         WorkflowDefinition workflowB =
                 WorkflowDefinition.builder().code(codeB).releaseState(ReleaseState.ONLINE).build();
-        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(codeA), eq(true)))
+        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(codeA), eq(true), eq(true)))
                 .thenReturn(Collections.singletonList(workflowB));
         User loginUser = new User();
         loginUser.setId(1);
@@ -245,7 +245,7 @@ public class BackfillWorkflowExecutorDelegateTest {
         WorkflowDefinition workflowC =
                 WorkflowDefinition.builder().code(codeC).releaseState(ReleaseState.ONLINE).build();
 
-        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(codeA), eq(true)))
+        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(codeA), eq(true), eq(true)))
                 .thenReturn(Arrays.asList(workflowB, workflowC));
         User loginUser = new User();
         loginUser.setId(1);
@@ -293,7 +293,7 @@ public class BackfillWorkflowExecutorDelegateTest {
         WorkflowDefinition workflowC =
                 WorkflowDefinition.builder().code(codeC).releaseState(ReleaseState.ONLINE).build();
 
-        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(codeA), eq(true)))
+        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(codeA), eq(true), eq(true)))
                 .thenReturn(Arrays.asList(workflowB, workflowC));
 
         User loginUser = new User();
@@ -347,13 +347,13 @@ public class BackfillWorkflowExecutorDelegateTest {
 
     @Test
     public void testOfflineOrMissingDownstream_skipped() {
-        long upstreamCode = 1L, offlineCode = 2L, missingCode = 3L;
+        long upstreamCode = 1L;
         WorkflowDefinition upstreamWorkflow =
                 WorkflowDefinition.builder().code(upstreamCode).releaseState(ReleaseState.ONLINE).build();
-        WorkflowDefinition offlineWorkflow =
-                WorkflowDefinition.builder().code(offlineCode).releaseState(ReleaseState.OFFLINE).build();
-        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(upstreamCode), eq(true)))
-                .thenReturn(Collections.singletonList(offlineWorkflow));
+        // Service is asked to filter offline workflows (filterOfflineWorkflow=true) and returns an
+        // empty list when only offline/missing downstreams exist; the executor must then trigger upstream only.
+        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(eq(upstreamCode), eq(true), eq(true)))
+                .thenReturn(Collections.emptyList());
         User loginUser = new User();
         loginUser.setId(1);
         BackfillWorkflowDTO.BackfillParamsDTO params = BackfillWorkflowDTO.BackfillParamsDTO.builder()

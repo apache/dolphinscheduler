@@ -91,10 +91,24 @@ public class DataxParametersTest {
                 + "jobChannel=1, "
                 + "xms=0, "
                 + "xmx=-100, "
+                + "batchSize=0, "
                 + "resourceList=[{\"id\":null,\"resourceName\":\"/hdfs.keytab\",\"res\":null}]"
                 + "}";
 
         Assertions.assertEquals(expected, dataxParameters.toString());
+    }
+
+    @Test
+    public void testBatchSize() {
+        DataxParameters dataxParameters = new DataxParameters();
+        dataxParameters.setBatchSize(0);
+        Assertions.assertEquals(0, dataxParameters.getBatchSize());
+
+        dataxParameters.setBatchSize(2048);
+        Assertions.assertEquals(2048, dataxParameters.getBatchSize());
+
+        dataxParameters.setBatchSize(65536);
+        Assertions.assertEquals(65536, dataxParameters.getBatchSize());
     }
 
     public String loadJvmEnvTest(DataxParameters dataXParameters) {

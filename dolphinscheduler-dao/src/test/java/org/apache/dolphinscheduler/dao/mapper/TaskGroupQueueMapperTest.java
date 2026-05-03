@@ -33,6 +33,8 @@ public class TaskGroupQueueMapperTest extends BaseDaoTest {
     @Autowired
     TaskGroupQueueMapper taskGroupQueueMapper;
 
+    int userId = 1;
+
     public TaskGroupQueue insertOne() {
         TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
         taskGroupQueue.setTaskName("task1");

@@ -87,6 +87,16 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
     }
 
     @Override
+    public TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion) {
+        return taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinitionVersion);
+    }
+
+    @Override
+    public void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion) {
+        mybatisMapper.deleteByWorkflowDefinitionCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion);
+    }
+
+    @Override
     public void deleteByTaskDefinitionCodes(Set<Long> needToDeleteTaskDefinitionCodes) {
         if (CollectionUtils.isEmpty(needToDeleteTaskDefinitionCodes)) {
             return;
