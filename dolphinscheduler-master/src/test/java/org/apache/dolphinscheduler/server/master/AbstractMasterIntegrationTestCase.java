@@ -25,18 +25,12 @@ import org.apache.dolphinscheduler.server.master.integration.Repository;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContextFactory;
 
-import java.util.UUID;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.AfterEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.event.EventPublishingTestExecutionListener;
 import org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener;
@@ -69,9 +63,6 @@ import io.micrometer.core.instrument.Metrics;
         EventPublishingTestExecutionListener.class})
 public abstract class AbstractMasterIntegrationTestCase {
 
-    private static final AtomicInteger NEXT_MASTER_LISTEN_PORT =
-            new AtomicInteger(ThreadLocalRandom.current().nextInt(20_000, 50_000));
-
     @Autowired
     protected WorkflowTestCaseContextFactory workflowTestCaseContextFactory;
 
@@ -92,17 +83,6 @@ public abstract class AbstractMasterIntegrationTestCase {
 
     @Autowired
     private MeterRegistry meterRegistry;
-
-    @DynamicPropertySource
-    static void registerParallelSafeProperties(DynamicPropertyRegistry registry) {
-        final String databaseName = "dolphinscheduler_" + UUID.randomUUID().toString().replace("-", "");
-        final int masterListenPort = NEXT_MASTER_LISTEN_PORT.getAndIncrement();
-
-        registry.add("spring.datasource.url", () -> "jdbc:h2:mem:" + databaseName
-                + ";MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true;");
-        registry.add("master.listen-port", () -> masterListenPort);
-        registry.add("server.port", () -> 0);
-    }
 
     /**
      * Unbind this test method's {@link MeterRegistry} from {@link Metrics#globalRegistry}.

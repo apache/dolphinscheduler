@@ -1,0 +1,2 @@
+org.springframework.test.context.ContextCustomizerFactory=\
+org.apache.dolphinscheduler.server.master.integration.MasterIntegrationTestContextCustomizerFactory
