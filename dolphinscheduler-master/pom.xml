@@ -382,6 +382,9 @@
                             <excludes>
                                 <exclude>**/integration/cases/*TestCase.java</exclude>
                             </excludes>
+                            <properties>
+                                <configurationParameters>junit.jupiter.execution.parallel.enabled = false</configurationParameters>
+                            </properties>
                         </configuration>
                     </execution>
                     <execution>
@@ -394,13 +397,17 @@
                             <includes>
                                 <include>**/integration/cases/*TestCase.java</include>
                             </includes>
+                            <forkCount>4</forkCount>
+                            <reuseForks>true</reuseForks>
+                            <properties>
+                                <configurationParameters>junit.jupiter.execution.parallel.enabled = false</configurationParameters>
+                            </properties>
                             <systemPropertyVariables>
                                 <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
-                                <junit.jupiter.execution.parallel.enabled>true</junit.jupiter.execution.parallel.enabled>
-                                <junit.jupiter.execution.parallel.mode.classes.default>concurrent</junit.jupiter.execution.parallel.mode.classes.default>
-                                <junit.jupiter.execution.parallel.mode.default>same_thread</junit.jupiter.execution.parallel.mode.default>
-                                <junit.jupiter.execution.parallel.config.strategy>fixed</junit.jupiter.execution.parallel.config.strategy>
-                                <junit.jupiter.execution.parallel.config.fixed.parallelism>4</junit.jupiter.execution.parallel.config.fixed.parallelism>
+                                <spring.datasource.url>jdbc:h2:mem:dolphinscheduler-${surefire.forkNumber};MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true;</spring.datasource.url>
+                                <master.listen-port>567${surefire.forkNumber}</master.listen-port>
+                                <server.port>0</server.port>
+                                <master.worker-group-refresh-interval>1d</master.worker-group-refresh-interval>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
