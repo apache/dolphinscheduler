@@ -153,13 +153,22 @@ jobs:
             -Dmaven.test.skip=false \
             -Dspotless.skip=true \
             -DskipUT=false \
-            -Danalyze.skip=true
+            -Danalyze.skip=true \
+            -Dsurefire.printSummary=true \
+            -Dsurefire.useFile=false \
+            -Dsurefire.reportFormat=plain \
+            -Dsurefire.redirectTestOutputToFile=false
 
       - name: Collect jacoco exec files
         if: always()
         run: |
           mkdir -p /tmp/jacoco-exec
-          find . -name "jacoco.exec" -exec cp --backup=numbered {} /tmp/jacoco-exec/ \;
+          find . -path "*/target/*.exec" -type f | while IFS= read -r exec_file; do
+            target_file="/tmp/jacoco-exec/${exec_file#./}"
+            mkdir -p "$(dirname "$target_file")"
+            cp "$exec_file" "$target_file"
+          done
+          find /tmp/jacoco-exec -name "*.exec" -print
 
       - name: Upload jacoco exec
         uses: actions/upload-artifact@v6

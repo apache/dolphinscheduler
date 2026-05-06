@@ -43,7 +43,7 @@ import io.micrometer.core.instrument.Metrics;
 @Slf4j
 @SpringBootTest(classes = {
         MasterServer.class,
-        DaoConfiguration.class})
+        DaoConfiguration.class}, properties = "spring.config.additional-location=classpath:/spring-it-application.yaml")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 public abstract class AbstractMasterIntegrationTestCase {
 
