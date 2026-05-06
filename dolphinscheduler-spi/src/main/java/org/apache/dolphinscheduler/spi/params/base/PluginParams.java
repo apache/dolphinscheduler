@@ -29,15 +29,12 @@ import static org.apache.dolphinscheduler.common.constants.Constants.STRING_PLUG
 
 import java.util.List;
 
-import lombok.Data;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 
 @JsonDeserialize(builder = PluginParams.Builder.class)
-@Data
 public class PluginParams {
 
     /**
@@ -186,6 +183,38 @@ public class PluginParams {
         public PluginParams build() {
             return new PluginParams(this);
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public ParamsProps getProps() {
+        return props;
+    }
+
+    public String getFormType() {
+        return formType;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public Object getValue() {
+        return value;
+    }
+
+    public List<Validate> getValidateList() {
+        return validateList;
+    }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
+    public List<String> getEmit() {
+        return emit;
     }
 
 }
