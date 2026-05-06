@@ -127,6 +127,7 @@ public class ExecutorController extends BaseController {
     @ApiException(START_WORKFLOW_INSTANCE_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_START)
     public Result<List<Integer>> triggerWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                            @RequestParam(value = "workflowDefinitionCode") long workflowDefinitionCode,
                                                            @RequestParam(value = "scheduleTime") String scheduleTime,
                                                            @RequestParam(value = "failureStrategy") FailureStrategy failureStrategy,
@@ -150,6 +151,7 @@ public class ExecutorController extends BaseController {
             case START_PROCESS:
                 final WorkflowTriggerRequest workflowTriggerRequest = WorkflowTriggerRequest.builder()
                         .loginUser(loginUser)
+                        .projectCode(projectCode)
                         .workflowDefinitionCode(workflowDefinitionCode)
                         .startNodes(startNodeList)
                         .failureStrategy(failureStrategy)
@@ -169,6 +171,7 @@ public class ExecutorController extends BaseController {
             case COMPLEMENT_DATA:
                 final WorkflowBackFillRequest workflowBackFillRequest = WorkflowBackFillRequest.builder()
                         .loginUser(loginUser)
+                        .projectCode(projectCode)
                         .workflowDefinitionCode(workflowDefinitionCode)
                         .startNodes(startNodeList)
                         .failureStrategy(failureStrategy)
@@ -243,6 +246,7 @@ public class ExecutorController extends BaseController {
     @ApiException(BATCH_START_WORKFLOW_INSTANCE_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_BATCH_START)
     public Result<List<Integer>> batchTriggerWorkflowDefinitions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                  @RequestParam(value = "workflowDefinitionCodes") String workflowDefinitionCodes,
                                                                  @RequestParam(value = "scheduleTime") String scheduleTime,
                                                                  @RequestParam(value = "failureStrategy") FailureStrategy failureStrategy,
@@ -269,6 +273,7 @@ public class ExecutorController extends BaseController {
         List<Integer> result = new ArrayList<>();
         for (Long workflowDefinitionCode : workflowDefinitionCodeList) {
             Result<List<Integer>> workflowInstanceIds = triggerWorkflowDefinition(loginUser,
+                    projectCode,
                     workflowDefinitionCode,
                     scheduleTime,
                     failureStrategy,

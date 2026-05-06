@@ -367,6 +367,7 @@ public class PythonGateway {
 
         WorkflowTriggerRequest workflowTriggerRequest = WorkflowTriggerRequest.builder()
                 .loginUser(user)
+                .projectCode(project.getCode())
                 .workflowDefinitionCode(workflowDefinition.getCode())
                 .workerGroup(workerGroup)
                 .warningType(WarningType.of(warningType))

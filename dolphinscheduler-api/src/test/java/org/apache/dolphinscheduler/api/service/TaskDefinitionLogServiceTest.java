@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionLogServiceImpl;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
 
 import java.util.Arrays;
@@ -32,6 +33,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
@@ -45,6 +47,9 @@ public class TaskDefinitionLogServiceTest {
 
     @Mock
     private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;
+
+    @Mock
+    private TaskDefinitionLogDao taskDefinitionLogDao;
 
     private List<WorkflowTaskRelationLog> getProcessTaskRelationList() {
         WorkflowTaskRelationLog processTaskRelationLog1 = new WorkflowTaskRelationLog();
@@ -70,5 +75,6 @@ public class TaskDefinitionLogServiceTest {
 
         when(workflowTaskRelationLogDao.queryByWorkflowDefinitionCode(2L)).thenReturn(getProcessTaskRelationList());
         assertDoesNotThrow(() -> taskDefinitionLogService.deleteTaskByWorkflowDefinitionCode(2L));
+        Mockito.verify(taskDefinitionLogDao).deleteByTaskDefinitionCodes(Mockito.anySet());
     }
 }

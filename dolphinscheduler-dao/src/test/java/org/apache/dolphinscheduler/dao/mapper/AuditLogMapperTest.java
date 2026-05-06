@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
+import org.apache.dolphinscheduler.dao.entity.Project;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +40,9 @@ public class AuditLogMapperTest extends BaseDaoTest {
     @Autowired
     private AuditLogMapper logMapper;
 
+    @Autowired
+    private ProjectMapper projectMapper;
+
     private void insertOne(AuditModelType objectType) {
         AuditLog auditLog = new AuditLog();
         auditLog.setUserId(1);
@@ -51,6 +55,17 @@ public class AuditLogMapperTest extends BaseDaoTest {
         auditLog.setModelId(1L);
         auditLog.setDescription("description");
         logMapper.insert(auditLog);
+    }
+
+    private Project insertProject() {
+        Project project = new Project();
+        project.setName("ut project");
+        project.setUserId(111);
+        project.setCode(1L);
+        project.setCreateTime(new Date());
+        project.setUpdateTime(new Date());
+        projectMapper.insert(project);
+        return project;
     }
 
     /**

@@ -62,6 +62,7 @@ public interface ProjectService {
      * @param projectCode project code
      * @param perm String
      * @return true if the login user have permission to see the project
+     * @deprecated use {@link #checkProjectAndAuthThrowException(User, Long, String)} instead
      */
     @Deprecated
     Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode, String perm);
@@ -203,7 +204,9 @@ public interface ProjectService {
      * @param projectCode project code
      * @param perm String
      * @return true if the login user have permission to see the project
+     * @deprecated use {@link #checkProjectAndAuthThrowException(User, Long, String)} instead
      */
+    @Deprecated
     void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode, String perm);
 
     /**

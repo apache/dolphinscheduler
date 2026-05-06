@@ -53,6 +53,13 @@ public interface ProjectMapper extends BaseMapper<Project> {
     Project queryDetailById(@Param("projectId") int projectId);
 
     /**
+     * query project detail by code
+     * @param projectCode projectCode
+     * @return project
+     */
+    Project queryDetailByCode(@Param("projectCode") long projectCode);
+
+    /**
      * query project by name
      * @param projectName projectName
      * @return project
@@ -83,6 +90,13 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * @return project list
      */
     List<Project> queryAuthedProjectListByUserId(@Param("userId") int userId);
+
+    /**
+     * query relation project list by userId
+     * @param userId userId
+     * @return project list
+     */
+    List<Project> queryRelationProjectListByUserId(@Param("userId") int userId);
 
     /**
      * query project except userId
@@ -116,6 +130,7 @@ public interface ProjectMapper extends BaseMapper<Project> {
      * list authorized Projects
      * @param userId
      * @param projectsIds
+     * @param <T>
      * @return
      */
     List<Project> listAuthorizedProjects(@Param("userId") int userId, @Param("projectsIds") List<Integer> projectsIds);
@@ -133,4 +148,10 @@ public interface ProjectMapper extends BaseMapper<Project> {
      */
     Project queryProjectByTaskInstanceId(@Param("taskInstanceId") int taskInstanceId);
 
+    /**
+     * query all workflow count
+     * @param projectsCodes projectsCodes
+     * @return workflow count
+     */
+    int queryAllWorkflowCounts(@Param("projectsCodes") List<Long> projectsCodes);
 }

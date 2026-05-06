@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -61,12 +62,18 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskModel;
@@ -141,7 +148,16 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
+    private WorkflowDefinitionLogDao workflowDefinitionLogDao;
+
+    @Mock
+    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
+
+    @Mock
     private WorkflowTaskRelationMapper workflowTaskRelationMapper;
+
+    @Mock
+    private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     @Mock
     private ProjectMapper projectMapper;
@@ -159,10 +175,31 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private ProcessService processService;
 
     @Mock
+    private WorkflowInstanceService workflowInstanceService;
+
+    @Mock
+    private TaskInstanceMapper taskInstanceMapper;
+
+    @Mock
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Mock
+    private TaskDefinitionLogMapper taskDefinitionLogMapper;
+
+    @Mock
+    private TaskDefinitionService taskDefinitionService;
+
+    @Mock
+    private TaskDefinitionLogService taskDefinitionLogService;
+
+    @Mock
+    private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
     private WorkflowLineageService workflowLineageService;
+
+    @Mock
+    private GlobalParamsValidator globalParamsValidator;
 
     @Mock
     private UserMapper userMapper;

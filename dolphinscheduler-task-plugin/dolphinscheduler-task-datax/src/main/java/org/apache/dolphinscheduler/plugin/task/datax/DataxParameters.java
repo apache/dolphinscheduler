@@ -101,6 +101,11 @@ public class DataxParameters extends AbstractParameters {
      */
     private int xmx;
 
+    /**
+     * writer batch size for DataX
+     */
+    private int batchSize;
+
     private List<ResourceInfo> resourceList;
 
     @Override
@@ -138,6 +143,7 @@ public class DataxParameters extends AbstractParameters {
                 ", jobChannel=" + jobChannel +
                 ", xms=" + xms +
                 ", xmx=" + xmx +
+                ", batchSize=" + batchSize +
                 ", resourceList=" + JSONUtils.toJsonString(resourceList) +
                 '}';
     }

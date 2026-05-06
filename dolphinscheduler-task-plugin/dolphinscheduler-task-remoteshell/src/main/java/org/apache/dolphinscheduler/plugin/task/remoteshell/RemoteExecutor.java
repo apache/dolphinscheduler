@@ -35,9 +35,9 @@ import org.apache.sshd.sftp.client.SftpClientFactory;
 import org.apache.sshd.sftp.client.fs.SftpFileSystem;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -235,23 +235,28 @@ public class RemoteExecutor implements AutoCloseable {
     private int runRemoteAndProcessLines(String command, Consumer<String> lineConsumer) throws IOException {
         try (
                 ChannelExec channel = getSession().createExecChannel(command);
+                ByteArrayOutputStream out = new ByteArrayOutputStream();
                 ByteArrayOutputStream err = new ByteArrayOutputStream()) {
-            InputStream out = channel.getInvertedOut();
+            channel.setOut(out);
             channel.setErr(err);
             channel.open();
+            channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0);
             int readLines = 0;
-            try (BufferedReader reader = new BufferedReader(new InputStreamReader(out, StandardCharsets.UTF_8))) {
+            try (
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(new ByteArrayInputStream(out.toByteArray()),
+                                    StandardCharsets.UTF_8))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     readLines++;
                     lineConsumer.accept(line);
                 }
             }
-            channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0);
             Integer exitStatus = channel.getExitStatus();
             if (exitStatus == null || exitStatus != 0) {
                 throw new TaskException(
-                        "Remote shell task error, exitStatus: " + exitStatus + " error message: " + err);
+                        "Remote shell task error, exitStatus: " + exitStatus + " error message: "
+                                + new String(err.toByteArray(), StandardCharsets.UTF_8));
             }
             return readLines;
         }
