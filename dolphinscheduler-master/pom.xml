@@ -403,11 +403,7 @@
                                 <configurationParameters>junit.jupiter.execution.parallel.enabled = false</configurationParameters>
                             </properties>
                             <systemPropertyVariables>
-                                <jacoco-agent.destfile>${project.build.directory}/jacoco.exec</jacoco-agent.destfile>
-                                <spring.datasource.url>jdbc:h2:mem:dolphinscheduler-${surefire.forkNumber};MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=true;</spring.datasource.url>
-                                <master.listen-port>567${surefire.forkNumber}</master.listen-port>
-                                <server.port>0</server.port>
-                                <master.worker-group-refresh-interval>1d</master.worker-group-refresh-interval>
+                                <jacoco-agent.destfile>${project.build.directory}/jacoco-${surefire.forkNumber}.exec</jacoco-agent.destfile>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
