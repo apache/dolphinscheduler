@@ -290,7 +290,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionLogJson, TaskDefinitionLog.class);
 
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_BATCH_COPY)).thenReturn(result);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_BATCH_COPY);
         when(workflowDefinitionMapper.queryByCodes(definitionCodes)).thenReturn(workflowDefinitionList);
         when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(Long.parseLong(codes)))
                 .thenReturn(workflowTaskRelations);
@@ -304,23 +305,19 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
     @Test
     public void testQueryWorkflowDefinitionList() {
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
         Project project = getProject(projectCode);
-
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         // project not found
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
-        Map<String, Object> map = workflowDefinitionService.queryWorkflowDefinitionList(user, projectCode);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.queryWorkflowDefinitionList(user, projectCode));
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ex.getCode());
 
         // project check auth success
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
         List<WorkflowDefinition> resourceList = new ArrayList<>();
         resourceList.add(getWorkflowDefinition());
         when(workflowDefinitionMapper.queryAllDefinitionList(project.getCode())).thenReturn(resourceList);
@@ -401,23 +398,19 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testQueryWorkflowDefinitionByCode() {
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
         Project project = getProject(projectCode);
-
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         // project check auth fail
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
-        Map<String, Object> map = workflowDefinitionService.queryWorkflowDefinitionByCode(user, 1L, 1L);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.queryWorkflowDefinitionByCode(user, projectCode, 1L));
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ex.getCode());
 
         // project check auth success, instance not exist
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
         DagData dagData = new DagData(getWorkflowDefinition(), null, null);
         when(processService.genDagData(any())).thenReturn(dagData);
 
@@ -427,9 +420,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
         // instance exit
         when(workflowDefinitionMapper.queryByCode(46L)).thenReturn(getWorkflowDefinition());
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
         Map<String, Object> successRes =
                 workflowDefinitionService.queryWorkflowDefinitionByCode(user, projectCode, 46L);
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
@@ -437,24 +427,19 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testQueryWorkflowDefinitionByName() {
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
         Project project = getProject(projectCode);
-
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         // project check auth fail
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
-        Map<String, Object> map =
-                workflowDefinitionService.queryWorkflowDefinitionByName(user, projectCode, "test_def");
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.queryWorkflowDefinitionByName(user, projectCode, "test_def"));
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ex.getCode());
 
         // project check auth success, instance not exist
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
         when(workflowDefinitionMapper.queryByDefineName(project.getCode(), "test_def")).thenReturn(null);
 
         Map<String, Object> instanceNotExitRes =
@@ -464,9 +449,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         // instance exit
         when(workflowDefinitionMapper.queryByDefineName(project.getCode(), "test"))
                 .thenReturn(getWorkflowDefinition());
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
         Map<String, Object> successRes =
                 workflowDefinitionService.queryWorkflowDefinitionByName(user, projectCode, "test");
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
@@ -476,34 +458,31 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     public void testBatchCopyWorkflowDefinition() {
         Project project = getProject(projectCode);
 
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
-        Mockito.doReturn(result)
-                .when(projectService)
-                .checkProjectAndAuth(user, project, projectCode, WORKFLOW_BATCH_COPY);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_BATCH_COPY);
 
         // copy project definition ids empty test
-        Map<String, Object> map =
-                workflowDefinitionService.batchCopyWorkflowDefinition(user, projectCode, StringUtils.EMPTY, 2L);
-        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_CODES_IS_EMPTY, map.get(Constants.STATUS));
+        ServiceException emptyEx = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchCopyWorkflowDefinition(user, projectCode, StringUtils.EMPTY, 2L));
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_CODES_IS_EMPTY.getCode(), emptyEx.getCode());
 
         // project check auth fail
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_BATCH_COPY))
-                .thenReturn(result);
-        Map<String, Object> map1 = workflowDefinitionService.batchCopyWorkflowDefinition(
-                user, projectCode, String.valueOf(project.getId()), 2L);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map1.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_BATCH_COPY);
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchCopyWorkflowDefinition(
+                        user, projectCode, String.valueOf(project.getId()), 2L));
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ex.getCode());
 
-        // project check auth success, target project name not equal project name, check auth target project fail
+        // project check auth success, target project name not equal project name
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_BATCH_COPY);
         Project project1 = getProject(projectCodeOther);
         when(projectMapper.queryByCode(projectCodeOther)).thenReturn(project1);
-        Mockito.doReturn(result)
-                .when(projectService)
-                .checkProjectAndAuth(user, project1, projectCodeOther, WORKFLOW_BATCH_COPY);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project1, WORKFLOW_BATCH_COPY);
 
-        putMsg(result, Status.SUCCESS, projectCodeOther);
         WorkflowDefinition definition = getWorkflowDefinition();
         List<WorkflowDefinition> workflowDefinitionList = new ArrayList<>();
         workflowDefinitionList.add(definition);
@@ -532,13 +511,10 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Project project2 = getProject(projectCodeOther);
         when(projectMapper.queryByCode(projectCodeOther)).thenReturn(project2);
 
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
-
-        when(projectService.checkProjectAndAuth(user, project1, projectCode, TASK_DEFINITION_MOVE))
-                .thenReturn(result);
-        when(projectService.checkProjectAndAuth(user, project2, projectCodeOther, TASK_DEFINITION_MOVE))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project1, TASK_DEFINITION_MOVE);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project2, TASK_DEFINITION_MOVE);
 
         WorkflowDefinition definition = getWorkflowDefinition();
         definition.setVersion(1);
@@ -558,7 +534,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(processService.saveWorkflowDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
         when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(processDefinitionCode))
                 .thenReturn(getProcessTaskRelation());
-        putMsg(result, Status.SUCCESS);
 
         Map<String, Object> successRes = workflowDefinitionService.batchMoveWorkflowDefinition(
                 user, projectCode, String.valueOf(processDefinitionCode), projectCodeOther);
@@ -705,20 +680,19 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testVerifyWorkflowDefinitionName() {
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Project project = getProject(projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         // project check auth fail
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_CREATE))
-                .thenReturn(result);
-        Map<String, Object> map = workflowDefinitionService.verifyWorkflowDefinitionName(user,
-                projectCode, "test_pdf", 0);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.verifyWorkflowDefinitionName(user, projectCode, "test_pdf", 0));
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ex.getCode());
 
         // project check auth success, process not exist
-        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_CREATE);
         when(workflowDefinitionMapper.verifyByDefineName(project.getCode(), "test_pdf")).thenReturn(null);
         Map<String, Object> processNotExistRes =
                 workflowDefinitionService.verifyWorkflowDefinitionName(user, projectCode, "test_pdf", 0);
@@ -746,13 +720,10 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testGetTaskNodeListByDefinitionCode() {
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Project project = getProject(projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, null);
 
-        // project check auth fail
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         // process definition not exist
         when(workflowDefinitionMapper.queryByCode(46L)).thenReturn(null);
         Map<String, Object> processDefinitionNullRes =
@@ -761,7 +732,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
         // success
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.genDagData(any())).thenReturn(new DagData(workflowDefinition, null, null));
         when(workflowDefinitionMapper.queryByCode(46L)).thenReturn(workflowDefinition);
         Map<String, Object> dataNotValidRes =
@@ -771,13 +741,10 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testGetTaskNodeListByDefinitionCodes() {
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Project project = getProject(projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, null);
 
-        // project check auth fail
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, null)).thenReturn(result);
         // process definition not exist
         String defineCodes = "46";
         Set<Long> defineCodeSet = Lists.newArrayList(defineCodes.split(Constants.COMMA)).stream().map(Long::parseLong)
@@ -787,7 +754,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 workflowDefinitionService.getNodeListMapByDefinitionCodes(user, projectCode, defineCodes);
         Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST, processNotExistRes.get(Constants.STATUS));
 
-        putMsg(result, Status.SUCCESS, projectCode);
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
         List<WorkflowDefinition> workflowDefinitionList = new ArrayList<>();
         workflowDefinitionList.add(workflowDefinition);
@@ -806,12 +772,10 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testQueryAllWorkflowDefinitionByProjectCode() {
-        Map<String, Object> result = new HashMap<>();
         Project project = getProject(projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
         List<WorkflowDefinition> workflowDefinitionList = new ArrayList<>();
         workflowDefinitionList.add(workflowDefinition);
@@ -824,11 +788,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     @Test
     public void testViewTree() {
         Project project1 = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(1)).thenReturn(project1);
-        when(projectService.checkProjectAndAuth(user, project1, projectCode, WORKFLOW_TREE_VIEW))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project1, WORKFLOW_TREE_VIEW);
         // process definition not exist
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
         Map<String, Object> processDefinitionNullRes =
@@ -836,9 +798,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST, processDefinitionNullRes.get(Constants.STATUS));
 
         // task instance not existproject
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(1)).thenReturn(project1);
-        when(projectService.checkProjectAndAuth(user, project1, 1, WORKFLOW_TREE_VIEW)).thenReturn(result);
         when(workflowDefinitionMapper.queryByCode(46L)).thenReturn(workflowDefinition);
         when(processService.genDagGraph(workflowDefinition)).thenReturn(new DAG<>());
         Map<String, Object> taskNullRes =
@@ -857,10 +816,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(workflowDefinitionMapper.queryByCode(46L)).thenReturn(workflowDefinition);
 
         Project project1 = getProject(1);
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
         when(projectMapper.queryByCode(1)).thenReturn(project1);
-        when(projectService.checkProjectAndAuth(user, project1, 1, WORKFLOW_TREE_VIEW)).thenReturn(result);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project1, WORKFLOW_TREE_VIEW);
         when(processService.genDagGraph(workflowDefinition)).thenReturn(new DAG<>());
         Map<String, Object> taskNotNuLLRes =
                 workflowDefinitionService.viewTree(user, workflowDefinition.getProjectCode(), 46, 10);
@@ -948,24 +906,19 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testViewVariables() {
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-
         Project project = getProject(projectCode);
+        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
 
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
 
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
-
         // project check auth fail
-        when(projectService.checkProjectAndAuth(user, project, projectCode, WORKFLOW_DEFINITION))
-                .thenReturn(result);
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
 
-        Map<String, Object> map =
-                workflowDefinitionService.viewVariables(user, workflowDefinition.getProjectCode(),
-                        workflowDefinition.getCode());
-
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, map.get(Constants.STATUS));
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.viewVariables(user, workflowDefinition.getProjectCode(),
+                        workflowDefinition.getCode()));
+        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ex.getCode());
     }
 
     /**

@@ -140,11 +140,8 @@ public class TaskDefinitionServiceImplTest {
         String taskName = "task";
         Project project = getProject();
         when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
-
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.SUCCESS, PROJECT_CODE);
-        when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, TASK_DEFINITION))
-                .thenReturn(result);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, TASK_DEFINITION);
 
         when(taskDefinitionMapper.queryByName(project.getCode(), PROCESS_DEFINITION_CODE, taskName))
                 .thenReturn(new TaskDefinition());
@@ -159,13 +156,8 @@ public class TaskDefinitionServiceImplTest {
     public void switchVersion() {
         Project project = getProject();
         when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
-
-        Map<String, Object> result = new HashMap<>();
-
-        putMsg(result, Status.SUCCESS, PROJECT_CODE);
-        when(
-                projectService.checkProjectAndAuth(user, project, PROJECT_CODE, WORKFLOW_SWITCH_TO_THIS_VERSION))
-                        .thenReturn(result);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_SWITCH_TO_THIS_VERSION);
 
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
                 .thenReturn(new TaskDefinitionLog());
@@ -262,17 +254,14 @@ public class TaskDefinitionServiceImplTest {
     public void testReleaseTaskDefinition() {
         when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(getProject());
         Project project = getProject();
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, null);
 
         // check task dose not exist
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.TASK_DEFINE_NOT_EXIST, TASK_CODE);
-        when(projectService.checkProjectAndAuth(user, project, PROJECT_CODE, null)).thenReturn(result);
         Map<String, Object> map =
                 taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE, ReleaseState.OFFLINE);
         assertEquals(Status.TASK_DEFINE_NOT_EXIST, map.get(Constants.STATUS));
 
         // process definition offline
-        putMsg(result, Status.SUCCESS);
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
         taskDefinition.setVersion(1);

@@ -483,10 +483,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                                       long environmentCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
+
+        Map<String, Object> result = new HashMap<>();
         // check schedule exists
         Schedule schedule = scheduleMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         if (schedule == null) {
