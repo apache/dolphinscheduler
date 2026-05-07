@@ -492,8 +492,12 @@ public class SqlTask extends AbstractTask {
                 break;
             }
             String paramName = m.group(1);
-            String paramValue = sqlParamsMap.get(paramName).getValue();
-            content = m.replaceFirst(paramValue);
+            Property prop = sqlParamsMap.get(paramName);
+            if (prop == null || prop.getValue() == null) {
+                log.warn("Cannot find parameter: {} for !{{}} replacement, skipping", paramName, paramName);
+                break;
+            }
+            content = m.replaceFirst(Matcher.quoteReplacement(prop.getValue()));
         }
         return content;
     }
