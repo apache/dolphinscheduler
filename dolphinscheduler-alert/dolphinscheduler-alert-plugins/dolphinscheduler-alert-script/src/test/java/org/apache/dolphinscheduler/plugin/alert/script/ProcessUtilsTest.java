@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.alert.script;
 
 import java.io.File;
+import java.util.Locale;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ public class ProcessUtilsTest {
     }
 
     private static String getJavaBin() {
-        String executableName = System.getProperty("os.name").toLowerCase().contains("win")
+        String executableName = System.getProperty("os.name").toLowerCase(Locale.ROOT).contains("win")
                 ? "java.exe"
                 : "java";
         return System.getProperty("java.home") + File.separator + "bin" + File.separator + executableName;
