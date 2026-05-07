@@ -41,14 +41,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * datasource mapper test
- */
 public class DataSourceMapperTest extends BaseDaoTest {
 
-    /**
-     * datasource mapper
-     */
     @Autowired
     private DataSourceMapper dataSourceMapper;
 

@@ -23,9 +23,6 @@ import lombok.Data;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 
-/**
- * task definition log
- */
 @Data
 @TableName("t_ds_task_definition_log")
 public class TaskDefinitionLog extends TaskDefinition {
@@ -35,9 +32,6 @@ public class TaskDefinitionLog extends TaskDefinition {
      */
     private int operator;
 
-    /**
-     * operate time
-     */
     private Date operateTime;
 
     public TaskDefinitionLog() {

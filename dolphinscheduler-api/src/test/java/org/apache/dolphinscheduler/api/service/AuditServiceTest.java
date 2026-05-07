@@ -42,9 +42,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * audit service test
- */
 @ExtendWith(MockitoExtension.class)
 public class AuditServiceTest {
 

@@ -19,9 +19,9 @@ package org.apache.dolphinscheduler.api.dto;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 
-/**
- * command state count
- */
+import lombok.Data;
+
+@Data
 public class CommandStateCount {
 
     private int errorCount;
@@ -37,55 +37,4 @@ public class CommandStateCount {
         this.commandState = commandState;
     }
 
-    public int getErrorCount() {
-        return errorCount;
-    }
-
-    public void setErrorCount(int errorCount) {
-        this.errorCount = errorCount;
-    }
-
-    public int getNormalCount() {
-        return normalCount;
-    }
-
-    public void setNormalCount(int normalCount) {
-        this.normalCount = normalCount;
-    }
-
-    public CommandType getCommandState() {
-        return commandState;
-    }
-
-    public void setCommandState(CommandType commandState) {
-        this.commandState = commandState;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        CommandStateCount that = (CommandStateCount) o;
-
-        if (errorCount != that.errorCount) {
-            return false;
-        }
-        if (normalCount != that.normalCount) {
-            return false;
-        }
-        return commandState == that.commandState;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = errorCount;
-        result = 31 * result + normalCount;
-        result = 31 * result + (commandState != null ? commandState.hashCode() : 0);
-        return result;
-    }
 }

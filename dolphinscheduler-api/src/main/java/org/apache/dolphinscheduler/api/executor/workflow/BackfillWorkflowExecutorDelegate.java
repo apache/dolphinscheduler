@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.executor.workflow;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
 import org.apache.dolphinscheduler.common.enums.ExecutionOrder;
@@ -50,16 +51,56 @@ import com.google.common.collect.Lists;
 public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<BackfillWorkflowDTO, List<Integer>> {
 
     @Autowired
+    private WorkflowLineageService workflowLineageService;
+
+    @Autowired
     private RegistryClient registryClient;
 
     @Override
     public List<Integer> execute(final BackfillWorkflowDTO backfillWorkflowDTO) {
+        return executeWithDependentExpansion(backfillWorkflowDTO);
+    }
+
+    /**
+     * Expands optional downstream workflows, then submits root and each downstream in list order.
+     * <p>
+     * {@link RunMode} (serial vs parallel date sharding) is taken only from the <strong>root</strong>
+     * {@code backfillWorkflowDTO}'s {@link BackfillWorkflowDTO.BackfillParamsDTO#getRunMode()}; downstream DTOs
+     * mirror the same mode in their params for consistency.
+     */
+    List<Integer> executeWithDependentExpansion(final BackfillWorkflowDTO backfillWorkflowDTO) {
         // todo: directly call the master api to do backfill
-        if (backfillWorkflowDTO.getBackfillParams().getRunMode() == RunMode.RUN_MODE_SERIAL) {
-            return doSerialBackfillWorkflow(backfillWorkflowDTO);
-        } else {
-            return doParallelBackfillWorkflow(backfillWorkflowDTO);
+        List<BackfillWorkflowDTO> dependentBackfillDtos = new ArrayList<>();
+        dependentBackfillDtos.add(backfillWorkflowDTO);
+        if (backfillWorkflowDTO.getBackfillParams()
+                .getBackfillDependentMode() == ComplementDependentMode.ALL_DEPENDENT) {
+
+            List<WorkflowDefinition> downstreamWorkflowList =
+                    workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(
+                            backfillWorkflowDTO.getWorkflowDefinition().getCode(),
+                            backfillWorkflowDTO.getBackfillParams().isAllLevelDependent(),
+                            true);
+            if (downstreamWorkflowList.isEmpty()) {
+                log.info("No downstream dependent workflows found for workflow code {}",
+                        backfillWorkflowDTO.getWorkflowDefinition().getCode());
+            } else {
+                dependentBackfillDtos.addAll(buildResolvedDownstreamBackfillDtos(backfillWorkflowDTO,
+                        backfillWorkflowDTO.getBackfillParams().getBackfillDateList(),
+                        downstreamWorkflowList));
+            }
         }
+        List<Integer> workflowInstanceIdList = new ArrayList<>();
+        // RunMode is defined by the root request only (not per downstream DTO).
+        if (backfillWorkflowDTO.getBackfillParams().getRunMode() == RunMode.RUN_MODE_SERIAL) {
+            for (BackfillWorkflowDTO dependentDto : dependentBackfillDtos) {
+                workflowInstanceIdList.addAll(doSerialBackfillWorkflow(dependentDto));
+            }
+        } else {
+            for (BackfillWorkflowDTO dependentDto : dependentBackfillDtos) {
+                workflowInstanceIdList.addAll(doParallelBackfillWorkflow(dependentDto));
+            }
+        }
+        return workflowInstanceIdList;
     }
 
     private List<Integer> doSerialBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO) {
@@ -71,9 +112,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
             Collections.sort(backfillTimeList);
         }
 
-        final Integer workflowInstanceId = doBackfillWorkflow(
-                backfillWorkflowDTO,
-                backfillTimeList.stream().map(DateUtils::dateToString).collect(Collectors.toList()));
+        final Integer workflowInstanceId = doBackfillWorkflow(backfillWorkflowDTO, backfillTimeList);
         return Lists.newArrayList(workflowInstanceId);
     }
 
@@ -92,8 +131,7 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
         final List<Integer> workflowInstanceIdList = Lists.newArrayList();
         for (List<ZonedDateTime> stringDate : splitDateTime(listDate, expectedParallelismNumber)) {
             final Integer workflowInstanceId = doBackfillWorkflow(
-                    backfillWorkflowDTO,
-                    stringDate.stream().map(DateUtils::dateToString).collect(Collectors.toList()));
+                    backfillWorkflowDTO, stringDate);
             workflowInstanceIdList.add(workflowInstanceId);
         }
         return workflowInstanceIdList;
@@ -124,11 +162,14 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
     }
 
     private Integer doBackfillWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
-                                       final List<String> backfillTimeList) {
+                                       final List<ZonedDateTime> backfillDateTimes) {
         final Server masterServer = registryClient.getRandomServer(RegistryNodeType.MASTER).orElse(null);
         if (masterServer == null) {
             throw new ServiceException("no master server available");
         }
+
+        final List<String> backfillTimeList =
+                backfillDateTimes.stream().map(DateUtils::dateToString).collect(Collectors.toList());
 
         final WorkflowDefinition workflowDefinition = backfillWorkflowDTO.getWorkflowDefinition();
         final WorkflowBackfillTriggerRequest backfillTriggerRequest = WorkflowBackfillTriggerRequest.builder()
@@ -149,22 +190,76 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 .dryRun(backfillWorkflowDTO.getDryRun())
                 .build();
 
-        final WorkflowBackfillTriggerResponse backfillTriggerResponse = Clients
-                .withService(IWorkflowControlClient.class)
-                .withHost(masterServer.getHost() + ":" + masterServer.getPort())
-                .backfillTriggerWorkflow(backfillTriggerRequest);
+        final WorkflowBackfillTriggerResponse backfillTriggerResponse =
+                triggerBackfillWorkflow(backfillTriggerRequest, masterServer);
         if (!backfillTriggerResponse.isSuccess()) {
             throw new ServiceException("Backfill workflow failed: " + backfillTriggerResponse.getMessage());
-        }
-        final BackfillWorkflowDTO.BackfillParamsDTO backfillParams = backfillWorkflowDTO.getBackfillParams();
-        if (backfillParams.getBackfillDependentMode() == ComplementDependentMode.ALL_DEPENDENT) {
-            doBackfillDependentWorkflow(backfillWorkflowDTO, backfillTimeList);
         }
         return backfillTriggerResponse.getWorkflowInstanceId();
     }
 
-    private void doBackfillDependentWorkflow(final BackfillWorkflowDTO backfillWorkflowDTO,
-                                             final List<String> backfillTimeList) {
-        // todo:
+    protected WorkflowBackfillTriggerResponse triggerBackfillWorkflow(final WorkflowBackfillTriggerRequest request,
+                                                                      final Server masterServer) {
+        return Clients
+                .withService(IWorkflowControlClient.class)
+                .withHost(masterServer.getHost() + ":" + masterServer.getPort())
+                .backfillTriggerWorkflow(request);
+    }
+
+    /**
+     * Builds {@link BackfillWorkflowDTO} list for resolved downstream workflows.
+     * {@link RunMode} in each downstream {@link BackfillWorkflowDTO.BackfillParamsDTO} matches the root (see
+     * {@link #executeWithDependentExpansion(BackfillWorkflowDTO)}).
+     */
+    private List<BackfillWorkflowDTO> buildResolvedDownstreamBackfillDtos(final BackfillWorkflowDTO backfillWorkflowDTO,
+                                                                          final List<ZonedDateTime> backfillDateTimes,
+                                                                          final List<WorkflowDefinition> downstreamWorkflows) {
+        final long upstreamWorkflowCode = backfillWorkflowDTO.getWorkflowDefinition().getCode();
+        final List<ZonedDateTime> upstreamBackfillDates = new ArrayList<>(backfillDateTimes);
+        final BackfillWorkflowDTO.BackfillParamsDTO originalParams = backfillWorkflowDTO.getBackfillParams();
+        final boolean allLevelDependent = originalParams.isAllLevelDependent();
+
+        final List<BackfillWorkflowDTO> result = new ArrayList<>();
+        for (WorkflowDefinition downstreamWorkflow : downstreamWorkflows) {
+            final long downstreamCode = downstreamWorkflow.getCode();
+
+            final BackfillWorkflowDTO.BackfillParamsDTO dependentParams =
+                    BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                            // Same as root; executor also branches on root RunMode only.
+                            .runMode(originalParams.getRunMode())
+                            .backfillDateList(upstreamBackfillDates)
+                            .expectedParallelismNumber(originalParams.getExpectedParallelismNumber())
+                            // Downstream expansion has already been decided in resolution stage.
+                            .backfillDependentMode(ComplementDependentMode.OFF_MODE)
+                            .allLevelDependent(allLevelDependent)
+                            .executionOrder(originalParams.getExecutionOrder())
+                            .build();
+
+            final BackfillWorkflowDTO dependentBackfillDTO = BackfillWorkflowDTO.builder()
+                    .loginUser(backfillWorkflowDTO.getLoginUser())
+                    .workflowDefinition(downstreamWorkflow)
+                    .startNodes(null)
+                    .failureStrategy(backfillWorkflowDTO.getFailureStrategy())
+                    .taskDependType(backfillWorkflowDTO.getTaskDependType())
+                    .execType(backfillWorkflowDTO.getExecType())
+                    .warningType(backfillWorkflowDTO.getWarningType())
+                    .warningGroupId(downstreamWorkflow.getWarningGroupId())
+                    .runMode(dependentParams.getRunMode())
+                    .workflowInstancePriority(backfillWorkflowDTO.getWorkflowInstancePriority())
+                    .workerGroup(backfillWorkflowDTO.getWorkerGroup())
+                    .tenantCode(backfillWorkflowDTO.getTenantCode())
+                    .environmentCode(backfillWorkflowDTO.getEnvironmentCode())
+                    .startParamList(backfillWorkflowDTO.getStartParamList())
+                    .dryRun(backfillWorkflowDTO.getDryRun())
+                    .backfillParams(dependentParams)
+                    .build();
+
+            log.info("Built dependent backfill DTO for workflow {} (upstream {}) with backfill dates {}",
+                    downstreamCode, upstreamWorkflowCode,
+                    backfillDateTimes.stream().map(DateUtils::dateToString).collect(Collectors.toList()));
+
+            result.add(dependentBackfillDTO);
+        }
+        return result;
     }
 }

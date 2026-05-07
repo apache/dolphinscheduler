@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -56,6 +57,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
@@ -63,6 +65,7 @@ import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -70,12 +73,14 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -144,6 +149,21 @@ public class WorkflowInstanceServiceTest {
 
     @Mock
     private TaskInstanceContextDao taskInstanceContextDao;
+
+    @Mock
+    TaskInstanceMapper taskInstanceMapper;
+
+    @Mock
+    CuringParamsService curingGlobalParamsService;
+
+    @Mock
+    TaskInstanceService taskInstanceService;
+
+    @Mock
+    WorkflowInstanceMapDao workflowInstanceMapDao;
+
+    @Mock
+    AlertDao alertDao;
 
     private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
             + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
@@ -753,23 +773,140 @@ public class WorkflowInstanceServiceTest {
 
     @Test
     public void testViewVariables() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
         // process instance not null
         WorkflowInstance workflowInstance = getProcessInstance();
         workflowInstance.setCommandType(CommandType.SCHEDULER);
         workflowInstance.setScheduleTime(new Date());
         workflowInstance.setGlobalParams("");
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
-        Map<String, Object> successRes = workflowInstanceService.viewVariables(1L, 1);
+        Map<String, Object> successRes = workflowInstanceService.viewVariables(loginUser, projectCode, 1);
 
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(null);
-        Map<String, Object> processNotExist = workflowInstanceService.viewVariables(1L, 1);
+        Map<String, Object> processNotExist = workflowInstanceService.viewVariables(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.WORKFLOW_INSTANCE_NOT_EXIST, processNotExist.get(Constants.STATUS));
+
+        // project auth fail
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                loginUser.getUserName(), projectCode))
+                        .when(projectService)
+                        .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> workflowInstanceService.viewVariables(loginUser, projectCode, 1));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), exception.getCode());
+    }
+
+    @Test
+    public void testViewVariables_WithTimePlaceholders() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
+        String globalParamsJson = "[{\"prop\":\"biz_date\",\"value\":\"$[yyyyMMdd]\",\"type\":\"VARCHAR\"}," +
+                "{\"prop\":\"env\",\"value\":\"${ENV_TYPE}\",\"type\":\"VARCHAR\"}]";
+
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setId(1);
+        workflowInstance.setCommandType(CommandType.SCHEDULER);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2026, Calendar.MARCH, 13, 10, 0, 0);
+        workflowInstance.setScheduleTime(calendar.getTime());
+        workflowInstance.setGlobalParams(globalParamsJson);
+        workflowInstance.setWorkflowDefinitionCode(100L);
+
+        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
+
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(100L);
+        workflowDefinition.setProjectCode(1L);
+        when(workflowDefinitionMapper.queryByCode(100L)).thenReturn(workflowDefinition);
+
+        Map<String, Object> result = workflowInstanceService.viewVariables(loginUser, projectCode, 1);
+
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        Map<String, Object> dataList = (Map<String, Object>) result.get(Constants.DATA_LIST);
+        Assertions.assertNotNull(dataList);
+
+        List<Property> globalParams = (List<Property>) dataList.get(Constants.GLOBAL_PARAMS);
+        Assertions.assertNotNull(globalParams);
+        Assertions.assertEquals(2, globalParams.size());
+
+        Property dateParam = globalParams.stream()
+                .filter(p -> "biz_date".equals(p.getProp()))
+                .findFirst()
+                .orElse(null);
+        Assertions.assertNotNull(dateParam);
+        Assertions.assertEquals("20260313", dateParam.getValue(),
+                "Time placeholder $[yyyyMMdd] should be replaced with schedule time");
+
+        Property envParam = globalParams.stream()
+                .filter(p -> "env".equals(p.getProp()))
+                .findFirst()
+                .orElse(null);
+        Assertions.assertNotNull(envParam);
+    }
+
+    @Test
+    public void testViewVariables_InstanceNotFound() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
+        when(workflowInstanceMapper.queryDetailById(999)).thenReturn(null);
+
+        Map<String, Object> result = workflowInstanceService.viewVariables(loginUser, projectCode, 999);
+
+        Assertions.assertEquals(Status.WORKFLOW_INSTANCE_NOT_EXIST, result.get(Constants.STATUS));
+        Assertions.assertNull(result.get(Constants.DATA_LIST));
+    }
+
+    @Test
+    public void testViewVariables_EmptyGlobalParams() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setId(2);
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
+        workflowInstance.setScheduleTime(new Date());
+        workflowInstance.setGlobalParams("");
+        workflowInstance.setWorkflowDefinitionCode(101L);
+
+        when(workflowInstanceMapper.queryDetailById(2)).thenReturn(workflowInstance);
+
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(101L);
+        workflowDefinition.setProjectCode(1L);
+        when(workflowDefinitionMapper.queryByCode(101L)).thenReturn(workflowDefinition);
+
+        Map<String, Object> result = workflowInstanceService.viewVariables(loginUser, projectCode, 2);
+
+        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+
+        Map<String, Object> dataList = (Map<String, Object>) result.get(Constants.DATA_LIST);
+        List<Property> globalParams = (List<Property>) dataList.get(Constants.GLOBAL_PARAMS);
+        Assertions.assertTrue(globalParams.isEmpty(), "Global params list should be empty when input is empty string");
     }
 
     @Test
     public void testViewGantt() throws Exception {
+        long projectCode = 0L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
         WorkflowInstance workflowInstance = getProcessInstance();
         TaskInstance taskInstance = getTaskInstance();
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
@@ -787,16 +924,30 @@ public class WorkflowInstanceServiceTest {
         when(processService.genDagGraph(Mockito.any(WorkflowDefinition.class)))
                 .thenReturn(graph);
 
-        Map<String, Object> successRes = workflowInstanceService.viewGantt(0L, 1);
+        Map<String, Object> successRes = workflowInstanceService.viewGantt(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(null);
-        Map<String, Object> processNotExist = workflowInstanceService.viewVariables(1L, 1);
+        Map<String, Object> processNotExist = workflowInstanceService.viewGantt(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.WORKFLOW_INSTANCE_NOT_EXIST, processNotExist.get(Constants.STATUS));
+
+        // project auth fail
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                loginUser.getUserName(), projectCode))
+                        .when(projectService)
+                        .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> workflowInstanceService.viewGantt(loginUser, projectCode, 1));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), exception.getCode());
     }
 
     @Test
     public void testViewVariablesWithStartingParam() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .commandParams(Lists.newArrayList(Property.builder()
                         .prop("name")
@@ -812,7 +963,7 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setCommandParam(JSONUtils.toJsonString(runWorkflowCommandParam));
 
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
-        Map<String, Object> successRes = workflowInstanceService.viewVariables(1L, 1);
+        Map<String, Object> successRes = workflowInstanceService.viewVariables(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
 
         final RunWorkflowCommandParam commandParamWithEmptyTimeZone = RunWorkflowCommandParam.builder()
@@ -826,7 +977,7 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setCommandType(CommandType.SCHEDULER);
         workflowInstance.setScheduleTime(new Date());
         workflowInstance.setCommandParam(JSONUtils.toJsonString(commandParamWithEmptyTimeZone));
-        Map<String, Object> successRes2 = workflowInstanceService.viewVariables(1L, 1);
+        Map<String, Object> successRes2 = workflowInstanceService.viewVariables(loginUser, projectCode, 1);
         Assertions.assertEquals(Status.SUCCESS, successRes2.get(Constants.STATUS));
 
     }

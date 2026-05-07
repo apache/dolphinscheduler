@@ -62,9 +62,6 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * alert plugin instance service test
- */
 @ExtendWith(MockitoExtension.class)
 public class AlertPluginInstanceServiceTest {
 

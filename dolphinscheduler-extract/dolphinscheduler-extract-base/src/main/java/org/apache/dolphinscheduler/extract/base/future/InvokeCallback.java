@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.extract.base.future;
 
-/**
- * invoke callback
- */
 public interface InvokeCallback {
 
     /**

@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.server.master.engine.command.handler.ReRunWorkflowCommandHandler;
 import org.apache.dolphinscheduler.server.master.engine.command.handler.RecoverFailureTaskCommandHandler;
 import org.apache.dolphinscheduler.server.master.engine.command.handler.RunWorkflowCommandHandler;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.WorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.WorkflowExecution;
 
 /**
  * The interface represent the handler used to handle the {@link Command}.
@@ -35,9 +35,9 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.Workfl
 public interface ICommandHandler {
 
     /**
-     * Handle the command and return the WorkflowExecutionRunnable.
+     * Handle the command and return the WorkflowExecution.
      */
-    WorkflowExecutionRunnable handleCommand(final Command command);
+    WorkflowExecution handleCommand(final Command command);
 
     /**
      * The type of the command which should be handled by this handler.

@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- * task execute type
- */
 public enum TaskExecuteType {
 
     /**

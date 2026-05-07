@@ -30,27 +30,15 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_queue")
 public class Queue {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    /**
-     * queue name
-     */
     private String queueName;
     /**
      * yarn queue name
      */
     private String queue;
 
-    /**
-     * create time
-     */
     private Date createTime;
-    /**
-     * update time
-     */
     private Date updateTime;
 
     public Queue() {

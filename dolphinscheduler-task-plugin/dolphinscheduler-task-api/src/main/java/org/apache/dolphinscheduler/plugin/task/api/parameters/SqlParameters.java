@@ -37,11 +37,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.Data;
+
 import com.google.common.collect.Lists;
 
 /**
  * Sql/Hql parameter
  */
+@Data
 public class SqlParameters extends AbstractParameters {
 
     /**
@@ -54,14 +57,8 @@ public class SqlParameters extends AbstractParameters {
      */
     private int datasource;
 
-    /**
-     * sql
-     */
     private String sql;
 
-    /**
-     * sql source
-     */
     private SqlSourceType sqlSource;
 
     /**
@@ -76,14 +73,8 @@ public class SqlParameters extends AbstractParameters {
      */
     private int sqlType;
 
-    /**
-     * send email
-     */
     private Boolean sendEmail;
 
-    /**
-     * display rows
-     */
     private int displayRows;
 
     /**
@@ -98,145 +89,13 @@ public class SqlParameters extends AbstractParameters {
      * SQL connection parameters
      */
     private String connParams;
-    /**
-     * Pre Statements
-     */
     private List<String> preStatements;
-    /**
-     * Post Statements
-     */
     private List<String> postStatements;
 
-    /**
-     * groupId
-     */
     private int groupId;
-    /**
-     * title
-     */
     private String title;
 
     private int limit;
-
-    public int getLimit() {
-        return limit;
-    }
-
-    public void setLimit(int limit) {
-        this.limit = limit;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public int getDatasource() {
-        return datasource;
-    }
-
-    public void setDatasource(int datasource) {
-        this.datasource = datasource;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
-
-    public SqlSourceType getSqlSource() {
-        return sqlSource;
-    }
-
-    public void setSqlSource(SqlSourceType sqlSource) {
-        this.sqlSource = sqlSource;
-    }
-
-    public String getSqlResource() {
-        return sqlResource;
-    }
-
-    public void setSqlResource(String sqlResource) {
-        this.sqlResource = sqlResource;
-    }
-
-    public int getSqlType() {
-        return sqlType;
-    }
-
-    public void setSqlType(int sqlType) {
-        this.sqlType = sqlType;
-    }
-
-    public Boolean getSendEmail() {
-        return sendEmail;
-    }
-
-    public void setSendEmail(Boolean sendEmail) {
-        this.sendEmail = sendEmail;
-    }
-
-    public int getDisplayRows() {
-        return displayRows;
-    }
-
-    public void setDisplayRows(int displayRows) {
-        this.displayRows = displayRows;
-    }
-
-    public String getShowType() {
-        return showType;
-    }
-
-    public void setShowType(String showType) {
-        this.showType = showType;
-    }
-
-    public String getConnParams() {
-        return connParams;
-    }
-
-    public void setConnParams(String connParams) {
-        this.connParams = connParams;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public List<String> getPreStatements() {
-        return preStatements;
-    }
-
-    public void setPreStatements(List<String> preStatements) {
-        this.preStatements = preStatements;
-    }
-
-    public List<String> getPostStatements() {
-        return postStatements;
-    }
-
-    public void setPostStatements(List<String> postStatements) {
-        this.postStatements = postStatements;
-    }
-
-    public int getGroupId() {
-        return groupId;
-    }
-
-    public void setGroupId(int groupId) {
-        this.groupId = groupId;
-    }
 
     @Override
     public boolean checkParameters() {

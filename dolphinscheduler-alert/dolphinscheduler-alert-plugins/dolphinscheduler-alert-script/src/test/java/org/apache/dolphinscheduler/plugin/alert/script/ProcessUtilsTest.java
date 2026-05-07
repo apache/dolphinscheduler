@@ -23,9 +23,6 @@ import java.util.Locale;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/**
- * ProcessUtilsTest
- */
 public class ProcessUtilsTest {
 
     @Test

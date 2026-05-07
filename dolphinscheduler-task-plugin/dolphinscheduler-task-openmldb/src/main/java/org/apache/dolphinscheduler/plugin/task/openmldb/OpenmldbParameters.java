@@ -21,6 +21,9 @@ import org.apache.dolphinscheduler.plugin.task.python.PythonParameters;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.Data;
+
+@Data
 public class OpenmldbParameters extends PythonParameters {
 
     private String zk;
@@ -30,38 +33,6 @@ public class OpenmldbParameters extends PythonParameters {
      * origin sql script
      */
     private String sql;
-
-    public String getZk() {
-        return zk;
-    }
-
-    public void setZk(String zk) {
-        this.zk = zk;
-    }
-
-    public String getZkPath() {
-        return zkPath;
-    }
-
-    public void setZkPath(String zkPath) {
-        this.zkPath = zkPath;
-    }
-
-    public String getExecuteMode() {
-        return executeMode;
-    }
-
-    public void setExecuteMode(String executeMode) {
-        this.executeMode = executeMode;
-    }
-
-    public String getSql() {
-        return sql;
-    }
-
-    public void setSql(String sql) {
-        this.sql = sql;
-    }
 
     @Override
     public boolean checkParameters() {

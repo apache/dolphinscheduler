@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 
@@ -80,6 +81,12 @@ public class ProjectServiceTest {
 
     @Mock
     private ProjectMapper projectMapper;
+
+    @Mock
+    private ProjectUserMapper projectUserMapper;
+
+    @Mock
+    private TaskGroupService taskGroupService;
 
     @Mock
     private WorkflowDefinitionMapper workflowDefinitionMapper;

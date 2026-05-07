@@ -38,9 +38,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-/**
- * ui plugin service test
- */
 @ExtendWith(MockitoExtension.class)
 public class UiPluginServiceTest {
 

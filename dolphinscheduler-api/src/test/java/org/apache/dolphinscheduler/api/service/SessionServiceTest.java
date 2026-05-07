@@ -39,9 +39,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-/**
- * session service test
- */
 @ExtendWith(MockitoExtension.class)
 public class SessionServiceTest {
 

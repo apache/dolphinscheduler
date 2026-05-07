@@ -44,15 +44,4 @@ public class MysqlDialect implements DatabaseDialect {
         }
     }
 
-    @SneakyThrows
-    @Override
-    public boolean columnExists(String tableName, String columnName) {
-        try (
-                Connection conn = dataSource.getConnection();
-                ResultSet rs =
-                        conn.getMetaData().getColumns(conn.getCatalog(), conn.getSchema(), tableName, columnName)) {
-            return rs.next();
-
-        }
-    }
 }

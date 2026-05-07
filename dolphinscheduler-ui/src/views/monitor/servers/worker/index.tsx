@@ -24,16 +24,24 @@ import Card from '@/components/card'
 import Result from '@/components/result'
 import Gauge from '@/components/chart/modules/Gauge'
 import WorkerModal from './worker-modal'
+import RunningTasksModal from './running-tasks-modal'
+import { useUserStore } from '@/store/user/user'
 import type { Ref } from 'vue'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import type { WorkerNode } from '@/service/modules/monitor/types'
+import type { UserInfoRes } from '@/service/modules/users/types'
 import { capitalize } from 'lodash'
 
 const worker = defineComponent({
   name: 'worker',
   setup() {
     const showModalRef = ref(false)
+    const showRunningRef = ref(false)
+    const selectedWorkerAddressRef = ref('')
     const { t } = useI18n()
+    const userStore = useUserStore()
+    const IS_ADMIN =
+      (userStore.getUserInfo as UserInfoRes).userType === 'ADMIN_USER'
     const { variables, getTableWorker } = useWorker()
     const zkDirectoryRef: Ref<Array<RowData>> = ref([])
 
@@ -42,8 +50,17 @@ const worker = defineComponent({
       showModalRef.value = true
     }
 
+    const clickRunningTasks = (item: WorkerNode) => {
+      selectedWorkerAddressRef.value = item.host + ':' + item.port
+      showRunningRef.value = true
+    }
+
     const onConfirmModal = () => {
       showModalRef.value = false
+    }
+
+    const onConfirmRunningModal = () => {
+      showRunningRef.value = false
     }
 
     onMounted(() => {
@@ -54,14 +71,29 @@ const worker = defineComponent({
       t,
       ...toRefs(variables),
       clickDetails,
+      clickRunningTasks,
       onConfirmModal,
+      onConfirmRunningModal,
       showModalRef,
-      zkDirectoryRef
+      showRunningRef,
+      selectedWorkerAddressRef,
+      zkDirectoryRef,
+      IS_ADMIN
     }
   },
   render() {
-    const { t, clickDetails, onConfirmModal, showModalRef, zkDirectoryRef } =
-      this
+    const {
+      t,
+      clickDetails,
+      clickRunningTasks,
+      onConfirmModal,
+      onConfirmRunningModal,
+      showModalRef,
+      showRunningRef,
+      selectedWorkerAddressRef,
+      zkDirectoryRef,
+      IS_ADMIN
+    } = this
 
     const renderNodeServerStatusTag = (item: WorkerNode) => {
       const serverStatus = JSON.parse(item.heartBeatInfo)?.serverStatus
@@ -107,6 +139,14 @@ const worker = defineComponent({
                       >
                         {t('monitor.worker.directory_detail')}
                       </span>
+                      {IS_ADMIN && (
+                        <span
+                          class={styles['link-btn']}
+                          onClick={() => clickRunningTasks(item)}
+                        >
+                          {t('monitor.worker.running_tasks')}
+                        </span>
+                      )}
                     </NSpace>
                     <NSpace>
                       <span>{`${t('monitor.worker.create_time')}: ${
@@ -181,6 +221,11 @@ const worker = defineComponent({
           showModal={showModalRef}
           data={zkDirectoryRef}
           onConfirmModal={onConfirmModal}
+        />
+        <RunningTasksModal
+          showModal={showRunningRef}
+          serverAddress={selectedWorkerAddressRef}
+          onConfirmModal={onConfirmRunningModal}
         />
       </>
     )

@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine;
 
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 
 import lombok.extern.slf4j.Slf4j;
@@ -44,20 +44,20 @@ public class WorkflowEventBusCoordinator implements AutoCloseable {
      * Register a WorkflowExecuteRunnable to the corresponding WorkflowEventBusFireWorker, once the WorkflowExecuteRunnable has been registered,
      * then the event will auto handler by the WorkflowEventBusFireWorker
      */
-    public void registerWorkflowEventBus(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final int workerSlot = calculateWorkflowEventBusFireWorkerSlot(workflowExecutionRunnable);
+    public void registerWorkflowEventBus(IWorkflowExecution workflowExecution) {
+        final int workerSlot = calculateWorkflowEventBusFireWorkerSlot(workflowExecution);
         final WorkflowEventBusFireWorker workflowEventBusFireWorker = workflowEventBusFireWorkers.getWorker(workerSlot);
-        workflowEventBusFireWorker.registerWorkflowEventBus(workflowExecutionRunnable);
+        workflowEventBusFireWorker.registerWorkflowEventBus(workflowExecution);
     }
 
     /**
      * UeRegister a WorkflowExecuteRunnable to the corresponding WorkflowEventBusFireWorker, once the WorkflowExecuteRunnable has been deregistered,
      * then the EventBus will be removed from the WorkflowEventBusFireWorker.
      */
-    public void unRegisterWorkflowEventBus(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final int workerSlot = calculateWorkflowEventBusFireWorkerSlot(workflowExecutionRunnable);
+    public void unRegisterWorkflowEventBus(IWorkflowExecution workflowExecution) {
+        final int workerSlot = calculateWorkflowEventBusFireWorkerSlot(workflowExecution);
         final WorkflowEventBusFireWorker workflowEventBusFireWorker = workflowEventBusFireWorkers.getWorker(workerSlot);
-        workflowEventBusFireWorker.unRegisterWorkflowEventBus(workflowExecutionRunnable);
+        workflowEventBusFireWorker.unRegisterWorkflowEventBus(workflowExecution);
     }
 
     /**
@@ -66,8 +66,8 @@ public class WorkflowEventBusCoordinator implements AutoCloseable {
      * <p> e.g. If the workflowInstanceId is 1, and the workerSize is 3, then the slot is 1, the workflow will be registered to the worker[1].
      * <p> If the workflowInstanceIds are not consecutive numbers, these will cause some worker busy.
      */
-    private int calculateWorkflowEventBusFireWorkerSlot(IWorkflowExecutionRunnable workflowExecutionRunnable) {
-        final IWorkflowExecuteContext workflowExecuteContext = workflowExecutionRunnable.getWorkflowExecuteContext();
+    private int calculateWorkflowEventBusFireWorkerSlot(IWorkflowExecution workflowExecution) {
+        final IWorkflowExecuteContext workflowExecuteContext = workflowExecution.getWorkflowExecuteContext();
         final WorkflowInstance workflowInstance = workflowExecuteContext.getWorkflowInstance();
         final Integer workflowInstanceId = workflowInstance.getId();
         return workflowInstanceId % workflowEventBusFireWorkers.getWorkerSize();

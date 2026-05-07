@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.dto.ClusterDto;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.k8s.K8sManager;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
@@ -52,9 +53,6 @@ import org.slf4j.LoggerFactory;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * cluster service test
- */
 @ExtendWith(MockitoExtension.class)
 public class ClusterServiceTest {
 
@@ -65,6 +63,9 @@ public class ClusterServiceTest {
 
     @Mock
     private ClusterMapper clusterMapper;
+
+    @Mock
+    private K8sManager k8sManager;
 
     @Mock
     private K8sNamespaceMapper k8sNamespaceMapper;

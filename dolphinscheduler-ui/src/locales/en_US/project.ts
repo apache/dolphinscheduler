@@ -648,6 +648,8 @@ export default {
     datax_target_database_pre_sql: 'Pre SQL Statement',
     datax_target_database_post_sql: 'Post SQL Statement',
     datax_non_query_sql_tips: 'Please enter the non-query sql statement',
+    datax_writer_batch_size: 'Writer Batch Size',
+    datax_writer_batch_size_tips: '0 or empty = default 2048',
     datax_job_speed_byte: 'Speed(Byte count)',
     datax_job_speed_byte_info: '(0 means unlimited)',
     datax_job_speed_record: 'Speed(Record count)',
@@ -746,6 +748,18 @@ export default {
     emr_flow_define_json_tips: 'Please enter the definition of the job flow.',
     emr_steps_define_json: 'stepsDefineJson',
     emr_steps_define_json_tips: 'Please enter the definition of the emr step.',
+    emr_serverless_application_id: 'Application ID',
+    emr_serverless_application_id_tips:
+      'Please enter the EMR Serverless Application ID',
+    emr_serverless_execution_role_arn: 'Execution Role ARN',
+    emr_serverless_execution_role_arn_tips:
+      'Please enter the IAM execution role ARN',
+    emr_serverless_job_name: 'Job Name',
+    emr_serverless_job_name_tips:
+      'Optional. Defaults to the task name if empty',
+    emr_serverless_start_job_run_json: 'StartJobRun JSON',
+    emr_serverless_start_job_run_json_tips:
+      'Please enter the StartJobRun request JSON (jobDriver, configurationOverrides, etc.)',
     zeppelin_note_id: 'zeppelinNoteId',
     zeppelin_note_id_tips: 'Please enter the note id of your zeppelin note',
     zeppelin_paragraph_id: 'zeppelinParagraphId',

@@ -17,8 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.remoteshell;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -32,16 +34,13 @@ import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHDataSourcePara
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.io.input.NullInputStream;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.sshd.client.channel.ChannelExec;
 import org.apache.sshd.client.channel.ClientChannelEvent;
 import org.apache.sshd.client.session.ClientSession;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.EnumSet;
 
@@ -82,6 +81,15 @@ public class RemoteExecutorTest {
         sshConnectionUtilsMockedStatic.close();
     }
 
+    /** Helper: make channel write data to whichever OutputStream is passed to setOut(). */
+    private void mockChannelOutput(ChannelExec channel, String data) throws IOException {
+        doAnswer(invocation -> {
+            OutputStream out = invocation.getArgument(0);
+            out.write(data.getBytes(StandardCharsets.UTF_8));
+            return null;
+        }).when(channel).setOut(any(OutputStream.class));
+    }
+
     @Test
     void testRunRemote() throws IOException {
         RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
@@ -89,16 +97,13 @@ public class RemoteExecutorTest {
         when(clientSession.auth().verify().isSuccess()).thenReturn(true);
         when(clientSession.createExecChannel(Mockito.anyString())).thenReturn(channel);
         when(channel.getExitStatus()).thenReturn(1);
-        when(channel.getInvertedOut()).thenReturn(new NullInputStream());
         Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("ls -l"));
 
-        // Mock the streaming runRemote to simulate log output
         String output = "total 26392\n" +
                 "dr-xr-xr-x.   6 root root      3072 Aug 15  2023 boot\n" +
                 "drwxr-xr-x   18 root root      3120 Sep 23  2023 dev\n" +
                 "drwxr-xr-x.  91 root root      4096 Sep 23  2023 etc\n";
-        InputStream inputStream = IOUtils.toInputStream(output, StandardCharsets.UTF_8);
-        when(channel.getInvertedOut()).thenReturn(inputStream);
+        mockChannelOutput(channel, output);
         when(channel.getExitStatus()).thenReturn(0);
         String actualOut = Assertions.assertDoesNotThrow(() -> remoteExecutor.runRemote("ls -l"));
         Assertions.assertEquals(output, actualOut);
@@ -157,7 +162,6 @@ public class RemoteExecutorTest {
     void getAllRemotePidStr() throws IOException {
 
         RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
-        // Mock pstree output based on OS
         if (SystemUtils.IS_OS_MAC) {
             doReturn("-+= 9527 root\n \\-+= 9528 root").when(remoteExecutor).runRemote(anyString());
         } else {
@@ -186,37 +190,32 @@ public class RemoteExecutorTest {
         String taskId = "1234";
         ChannelExec channel = Mockito.mock(ChannelExec.class, RETURNS_DEEP_STUBS);
 
-        // Mock getTaskPid to control the loop, return a valid pid 2 times, then return empty
         doReturn("9527")
                 .doReturn("9527")
                 .doReturn("").when(remoteExecutor).getTaskPid(taskId);
         when(clientSession.auth().verify().isSuccess()).thenReturn(true);
         when(clientSession.createExecChannel(anyString())).thenReturn(channel);
 
-        // Mock the streaming runRemote to simulate log output
         String logContent = "some log line 1\n"
                 + "echo \"${setValue(my_prop=my_value)}\"\n"
                 + "some log line 2\n";
-        InputStream inputStream = IOUtils.toInputStream(logContent, StandardCharsets.UTF_8);
-        when(channel.getInvertedOut()).thenReturn(inputStream);
+        mockChannelOutput(channel, logContent);
         when(channel.getExitStatus()).thenReturn(0);
 
         remoteExecutor.track(taskId);
 
-        // Verify that the output parameter was parsed and stored
         Assertions.assertEquals(1, remoteExecutor.getTaskOutputParams().size());
         Assertions.assertEquals("my_value", remoteExecutor.getTaskOutputParams().get("my_prop"));
     }
 
     @Test
     void testRunRemoteWithEmptyOutput() throws Exception {
-        // Test empty output scenario (readLines = 0)
         RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
         ChannelExec channel = Mockito.mock(ChannelExec.class, RETURNS_DEEP_STUBS);
 
         when(clientSession.auth().verify().isSuccess()).thenReturn(true);
         when(clientSession.createExecChannel(anyString())).thenReturn(channel);
-        when(channel.getInvertedOut()).thenReturn(new ByteArrayInputStream(new byte[0]));
+        // no mockChannelOutput → setOut() is a no-op → ByteArrayOutputStream stays empty
         when(channel.getExitStatus()).thenReturn(0);
         when(channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0))
                 .thenReturn(EnumSet.of(ClientChannelEvent.CLOSED));
@@ -227,39 +226,40 @@ public class RemoteExecutorTest {
 
     @Test
     void testRunRemoteWithNonZeroExitStatus() throws Exception {
-        // Test command failure scenario (exitStatus != 0)
         RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
         ChannelExec channel = Mockito.mock(ChannelExec.class, RETURNS_DEEP_STUBS);
 
         when(clientSession.auth().verify().isSuccess()).thenReturn(true);
         when(clientSession.createExecChannel(anyString())).thenReturn(channel);
-        when(channel.getInvertedOut()).thenReturn(IOUtils.toInputStream("error output", StandardCharsets.UTF_8));
+        mockChannelOutput(channel, "partial output before failure\n");
         when(channel.getExitStatus()).thenReturn(1);
         when(channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0))
                 .thenReturn(EnumSet.of(ClientChannelEvent.CLOSED));
 
-        Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("failing_command"));
+        TaskException ex =
+                Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("failing_command"));
+        Assertions.assertTrue(ex.getMessage().contains("exitStatus: 1"));
     }
 
     @Test
     void testRunRemoteWithNullExitStatus() throws Exception {
-        // Test null exitStatus scenario
         RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
         ChannelExec channel = Mockito.mock(ChannelExec.class, RETURNS_DEEP_STUBS);
 
         when(clientSession.auth().verify().isSuccess()).thenReturn(true);
         when(clientSession.createExecChannel(anyString())).thenReturn(channel);
-        when(channel.getInvertedOut()).thenReturn(IOUtils.toInputStream("some output", StandardCharsets.UTF_8));
+        mockChannelOutput(channel, "some output\n");
         when(channel.getExitStatus()).thenReturn(null);
         when(channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0))
                 .thenReturn(EnumSet.of(ClientChannelEvent.CLOSED));
 
-        Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("command"));
+        TaskException ex =
+                Assertions.assertThrows(TaskException.class, () -> remoteExecutor.runRemote("command"));
+        Assertions.assertTrue(ex.getMessage().contains("exitStatus: null"));
     }
 
     @Test
     void testTrackWithEmptyLogOutput() throws Exception {
-        // Test track with empty log output (readLines = 0 scenario in track loop)
         RemoteExecutor remoteExecutor = spy(new RemoteExecutor(sshConnectionParam));
         String taskId = "1234";
         ChannelExec channel = Mockito.mock(ChannelExec.class, RETURNS_DEEP_STUBS);
@@ -267,7 +267,7 @@ public class RemoteExecutorTest {
         doReturn("9527").doReturn("").when(remoteExecutor).getTaskPid(taskId);
         when(clientSession.auth().verify().isSuccess()).thenReturn(true);
         when(clientSession.createExecChannel(anyString())).thenReturn(channel);
-        when(channel.getInvertedOut()).thenReturn(new ByteArrayInputStream(new byte[0]));
+        // no output → readLines=0 → sleep once, then getTaskPid returns "" → exit
         when(channel.getExitStatus()).thenReturn(0);
         when(channel.waitFor(EnumSet.of(ClientChannelEvent.CLOSED), 0))
                 .thenReturn(EnumSet.of(ClientChannelEvent.CLOSED));

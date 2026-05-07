@@ -49,11 +49,33 @@ interface WorkerNode extends ServerNode {
 
 interface AlertNode extends MasterNode {}
 
+interface WorkflowExecutor {
+  id: number
+  name: string
+  projectCode: number
+  workflowDefinitionCode: number
+  state: string
+  startTime: string
+  runTimes: number
+}
+
+interface TaskExecutor {
+  id: number
+  name: string
+  taskType: string
+  projectCode: number
+  workflowInstanceId: number
+  workflowInstanceName: string
+  startTime: number
+}
+
 export {
   DatabaseRes,
   MasterNode,
   WorkerNode,
   ServerNodeType,
   ServerNode,
-  AlertNode
+  AlertNode,
+  WorkflowExecutor,
+  TaskExecutor
 }

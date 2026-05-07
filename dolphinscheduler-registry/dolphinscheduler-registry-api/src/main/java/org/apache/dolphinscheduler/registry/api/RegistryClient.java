@@ -31,7 +31,6 @@ import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -42,7 +41,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
@@ -75,10 +73,6 @@ public class RegistryClient {
     public boolean isConnected() {
         return registry.isConnected();
 
-    }
-
-    public void connectUntilTimeout(@NonNull Duration duration) throws RegistryException {
-        registry.connectUntilTimeout(duration);
     }
 
     public List<Server> getServerList(RegistryNodeType registryNodeType) {
@@ -196,15 +190,14 @@ public class RegistryClient {
         return registry.exists(key);
     }
 
-    public boolean getLock(String key) {
+    public RegistryLock getLock(String key) {
         if (!registry.isConnected()) {
             throw new IllegalStateException("The registry is not connected");
         }
-        return registry.acquireLock(key);
-    }
-
-    public boolean releaseLock(String key) {
-        return registry.releaseLock(key);
+        if (!registry.acquireLock(key)) {
+            throw new RegistryException("Failed to acquire registry lock: " + key);
+        }
+        return new RegistryLock(registry, key);
     }
 
     public void setStoppable(IStoppable stoppable) {

@@ -59,9 +59,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * alert group controller
- */
 @Tag(name = "ALERT_GROUP_TAG")
 @RestController
 @RequestMapping("/alert-groups")

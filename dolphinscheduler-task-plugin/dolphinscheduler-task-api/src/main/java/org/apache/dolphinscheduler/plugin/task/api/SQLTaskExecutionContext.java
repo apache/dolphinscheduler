@@ -19,49 +19,16 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import java.io.Serializable;
 
-/**
- * SQL Task ExecutionContext
- */
+import lombok.Data;
+
+@Data
 public class SQLTaskExecutionContext implements Serializable {
 
-    /**
-     * warningGroupId
-     */
     private int warningGroupId;
 
-    /**
-     * connectionParams
-     */
     private String connectionParams;
 
-    /**
-     * DefaultFS
-     */
     private String defaultFS;
-
-    public int getWarningGroupId() {
-        return warningGroupId;
-    }
-
-    public void setWarningGroupId(int warningGroupId) {
-        this.warningGroupId = warningGroupId;
-    }
-
-    public String getConnectionParams() {
-        return connectionParams;
-    }
-
-    public void setConnectionParams(String connectionParams) {
-        this.connectionParams = connectionParams;
-    }
-
-    public String getDefaultFS() {
-        return defaultFS;
-    }
-
-    public void setDefaultFS(String defaultFS) {
-        this.defaultFS = defaultFS;
-    }
 
     @Override
     public String toString() {

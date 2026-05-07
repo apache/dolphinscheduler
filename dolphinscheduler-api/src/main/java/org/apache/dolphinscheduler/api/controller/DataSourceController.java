@@ -72,9 +72,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * data source controller
- */
 @Tag(name = "DATA_SOURCE_TAG")
 @RestController
 @RequestMapping("datasources")

@@ -342,12 +342,6 @@
             <artifactId>brace-expansion</artifactId>
         </dependency>
 
-        <!-- TODO: Have to use spring-cloud-starter-kubernetes-fabric8-config after upgrading to Spring 3.x to unify kubernetes client (fabric8)  -->
-        <dependency>
-            <groupId>org.springframework.cloud</groupId>
-            <artifactId>spring-cloud-starter-kubernetes-client-config</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-actuator-authentication</artifactId>
@@ -376,6 +370,44 @@
                         <exclude>*.xml</exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/integration/cases/*TestCase.java</exclude>
+                            </excludes>
+                            <properties>
+                                <configurationParameters>junit.jupiter.execution.parallel.enabled = false</configurationParameters>
+                            </properties>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>spring-boot-integration-test</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <phase>test</phase>
+                        <configuration>
+                            <includes>
+                                <include>**/integration/cases/*TestCase.java</include>
+                            </includes>
+                            <forkCount>4</forkCount>
+                            <reuseForks>true</reuseForks>
+                            <properties>
+                                <configurationParameters>junit.jupiter.execution.parallel.enabled = false</configurationParameters>
+                            </properties>
+                            <systemPropertyVariables>
+                                <jacoco-agent.destfile>${project.build.directory}/jacoco-${surefire.forkNumber}.exec</jacoco-agent.destfile>
+                            </systemPropertyVariables>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

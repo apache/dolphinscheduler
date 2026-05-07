@@ -105,9 +105,6 @@ public class Command {
     @TableField("worker_group")
     private String workerGroup;
 
-    /**
-     * tenant code
-     */
     @Deprecated
     private String tenantCode;
 

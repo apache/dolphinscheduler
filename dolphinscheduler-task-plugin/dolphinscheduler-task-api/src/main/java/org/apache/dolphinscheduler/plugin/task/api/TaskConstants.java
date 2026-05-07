@@ -38,75 +38,33 @@ public class TaskConstants {
     public static final String DATASOURCE_PASSWORD_REGEX =
             "(?<=((?i)password((\" : \")|(\":\")|(\\\\\":\\\\\")|(=')))).*?(?=((\")|(\\\\\")|(')))";
 
-    /**
-     * exit code kill
-     */
     public static final int EXIT_CODE_KILL = 137;
     public static final int EXIT_CODE_HARD_KILL = 143;
     public static final String PID = "pid";
 
-    /**
-     * QUESTION ?
-     */
     public static final String QUESTION = "?";
 
-    /**
-     * comma ,
-     */
     public static final String COMMA = ",";
 
-    /**
-     * hyphen
-     */
     public static final String HYPHEN = "-";
 
-    /**
-     * slash /
-     */
     public static final String SLASH = "/";
 
-    /**
-     * COLON :
-     */
     public static final String COLON = ":";
 
-    /**
-     * SPACE " "
-     */
     public static final String SPACE = " ";
 
-    /**
-     * SINGLE_SLASH /
-     */
     public static final String SINGLE_SLASH = "/";
 
-    /**
-     * DOUBLE_SLASH //
-     */
     public static final String DOUBLE_SLASH = "//";
 
-    /**
-     * SINGLE_QUOTES "'"
-     */
     public static final String SINGLE_QUOTES = "'";
-    /**
-     * DOUBLE_QUOTES "\""
-     */
     public static final String DOUBLE_QUOTES = "\"";
 
-    /**
-     * SEMICOLON ;
-     */
     public static final String SEMICOLON = ";";
 
-    /**
-     * EQUAL SIGN
-     */
     public static final String EQUAL_SIGN = "=";
 
-    /**
-     * UNDERLINE
-     */
     public static final String UNDERLINE = "_";
 
     /**
@@ -114,18 +72,9 @@ public class TaskConstants {
      */
     public static final int SLEEP_TIME_MILLIS = 1000;
 
-    /**
-     * exit code failure
-     */
     public static final int EXIT_CODE_FAILURE = -1;
 
-    /**
-     * exit code success
-     */
     public static final int EXIT_CODE_SUCCESS = 0;
-    /**
-     * running code
-     */
     public static final int RUNNING_CODE = 1;
 
     public static final String SH = "sh";
@@ -212,62 +161,23 @@ public class TaskConstants {
      * the name of the project to which current task belongs
      */
     public static final String PARAMETER_PROJECT_NAME = "system.project.name";
-    /**
-     * month_begin
-     */
     public static final String MONTH_BEGIN = "month_begin";
-    /**
-     * add_months
-     */
     public static final String ADD_MONTHS = "add_months";
-    /**
-     * month_end
-     */
     public static final String MONTH_END = "month_end";
-    /**
-     * week_begin
-     */
     public static final String WEEK_BEGIN = "week_begin";
-    /**
-     * week_end
-     */
     public static final String WEEK_END = "week_end";
-    /**
-     * this_day
-     */
     public static final String THIS_DAY = "this_day";
-    /**
-     * last_day
-     */
     public static final String LAST_DAY = "last_day";
 
-    /**
-     * month_first_day
-     */
     public static final String MONTH_FIRST_DAY = "month_first_day";
 
-    /**
-     * month_last_day
-     */
     public static final String MONTH_LAST_DAY = "month_last_day";
 
-    /**
-     * week_first_day
-     */
     public static final String WEEK_FIRST_DAY = "week_first_day";
 
-    /**
-     * week_last_day
-     */
     public static final String WEEK_LAST_DAY = "week_last_day";
 
-    /**
-     * year_week
-     */
     public static final String YEAR_WEEK = "year_week";
-    /**
-     * timestamp
-     */
     public static final String TIMESTAMP = "timestamp";
     public static final char SUBTRACT_CHAR = '-';
     public static final char ADD_CHAR = '+';
@@ -285,19 +195,10 @@ public class TaskConstants {
     public static final String LOCAL_PARAMS_LIST = "localParamsList";
     public static final String TASK_TYPE = "taskType";
     public static final String QUEUE = "queue";
-    /**
-     * default display rows
-     */
     public static final int DEFAULT_DISPLAY_ROWS = 10;
 
-    /**
-     * jar
-     */
     public static final String JAR = "jar";
 
-    /**
-     * hadoop
-     */
     public static final String HADOOP = "hadoop";
 
     /**
@@ -305,14 +206,8 @@ public class TaskConstants {
      */
     public static final String D = "-D";
 
-    /**
-     * java.security.krb5.conf
-     */
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
 
-    /**
-     * java.security.krb5.conf.path
-     */
     public static final String JAVA_SECURITY_KRB5_CONF_PATH = "java.security.krb5.conf.path";
 
     /**

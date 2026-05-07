@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle;
 
 import org.apache.dolphinscheduler.server.master.engine.AbstractLifecycleEvent;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 public abstract class AbstractWorkflowLifecycleLifecycleEvent extends AbstractLifecycleEvent {
 
@@ -30,6 +30,6 @@ public abstract class AbstractWorkflowLifecycleLifecycleEvent extends AbstractLi
         super(delayTime);
     }
 
-    public abstract IWorkflowExecutionRunnable getWorkflowExecutionRunnable();
+    public abstract IWorkflowExecution getWorkflowExecution();
 
 }

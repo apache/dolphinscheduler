@@ -160,7 +160,7 @@ class ExecuteTaskCommandHandlerTest {
         executeTaskCommandHandler.assembleWorkflowExecutionGraph(contextBuilder);
 
         assertNotNull(contextBuilder.getWorkflowExecutionGraph());
-        assertEquals(1, contextBuilder.getWorkflowExecutionGraph().getAllTaskExecutionRunnable().size());
+        assertEquals(1, contextBuilder.getWorkflowExecutionGraph().getAllTaskExecution().size());
     }
 
     @Test

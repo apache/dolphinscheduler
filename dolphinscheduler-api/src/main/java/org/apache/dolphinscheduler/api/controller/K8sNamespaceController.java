@@ -54,9 +54,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * k8s namespace controller
- */
 @Tag(name = "K8S_NAMESPACE_TAG")
 @RestController
 @RequestMapping("/k8s-namespace")

@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -76,9 +77,6 @@ import org.springframework.dao.DuplicateKeyException;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
-/**
- * data source service test
- */
 @ExtendWith(MockitoExtension.class)
 public class DataSourceServiceTest {
 
@@ -91,6 +89,9 @@ public class DataSourceServiceTest {
 
     @Mock
     private DataSourceMapper dataSourceMapper;
+
+    @Mock
+    private DataSourceUserMapper datasourceUserMapper;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -313,6 +314,7 @@ public class DataSourceServiceTest {
         passResourcePermissionCheckService();
         when(dataSourceMapper.selectById(dataSourceId)).thenReturn(dataSource);
         assertDoesNotThrow(() -> dataSourceService.delete(loginUser, dataSourceId));
+        Mockito.verify(datasourceUserMapper).deleteByDatasourceId(dataSourceId);
 
     }
 

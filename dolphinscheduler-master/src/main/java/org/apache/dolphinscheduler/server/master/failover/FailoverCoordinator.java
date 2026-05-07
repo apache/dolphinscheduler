@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.RegistryLock;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
@@ -31,8 +32,8 @@ import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
 import org.apache.dolphinscheduler.server.master.engine.system.event.MasterFailoverEvent;
 import org.apache.dolphinscheduler.server.master.engine.system.event.WorkerFailoverEvent;
-import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
-import org.apache.dolphinscheduler.server.master.engine.workflow.runnable.IWorkflowExecutionRunnable;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
+import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -139,9 +140,9 @@ public class FailoverCoordinator implements IFailoverCoordinator {
         // Once the FAILOVER workflow has been refired, then it's host will be changed to the new master and have a new
         // start time.
         // So if a master has been failovered multiple times, there is no problem.
+        final String masterFailoverLockPath = RegistryUtils.getMasterFailoverLockPath(masterAddress);
         final StopWatch failoverTimeCost = StopWatch.createStarted();
-        registryClient.getLock(RegistryUtils.getMasterFailoverLockPath(masterAddress));
-        try {
+        try (RegistryLock ignored = registryClient.getLock(masterFailoverLockPath)) {
             // If the master has already been failovered, then we skip the failover.
             if (registryClient.exists(masterFailoverNodePath)
                     && String.valueOf(workflowFailoverDeadline).equals(registryClient.get(masterFailoverNodePath))) {
@@ -160,8 +161,6 @@ public class FailoverCoordinator implements IFailoverCoordinator {
                     masterAddress,
                     needFailoverWorkflows.size(),
                     failoverTimeCost.getTime());
-        } finally {
-            registryClient.releaseLock(RegistryNodeType.MASTER_FAILOVER_LOCK.getRegistryPath());
         }
     }
 
@@ -244,7 +243,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
         final StopWatch failoverTimeCost = StopWatch.createStarted();
         // we don't check the workerFailoverNodePath exist, since the worker may be failovered multiple master
 
-        final List<ITaskExecutionRunnable> needFailoverTasks =
+        final List<ITaskExecution> needFailoverTasks =
                 getFailoverTaskForWorker(workerAddress, new Date(taskFailoverDeadline));
         needFailoverTasks.forEach(taskFailover::failoverTask);
 
@@ -255,26 +254,26 @@ public class FailoverCoordinator implements IFailoverCoordinator {
         log.info("Worker[{}] failover {} tasks finished, cost: {}/ms",
                 workerAddress,
                 needFailoverTasks.size(),
-                failoverTimeCost.getTime());
+                failoverTimeCost.getDuration());
     }
 
-    private List<ITaskExecutionRunnable> getFailoverTaskForWorker(final String workerAddress,
-                                                                  final Date taskFailoverDeadline) {
+    private List<ITaskExecution> getFailoverTaskForWorker(final String workerAddress,
+                                                          final Date taskFailoverDeadline) {
         return workflowRepository.getAll()
                 .stream()
-                .map(IWorkflowExecutionRunnable::getWorkflowExecutionGraph)
-                .flatMap(workflowExecutionGraph -> workflowExecutionGraph.getActiveTaskExecutionRunnable().stream())
-                .filter(ITaskExecutionRunnable::isTaskInstanceInitialized)
-                .filter(taskExecutionRunnable -> workerAddress
-                        .equals(taskExecutionRunnable.getTaskInstance().getHost()))
-                .filter(taskExecutionRunnable -> {
-                    final TaskExecutionStatus state = taskExecutionRunnable.getTaskInstance().getState();
+                .map(IWorkflowExecution::getWorkflowExecutionGraph)
+                .flatMap(workflowExecutionGraph -> workflowExecutionGraph.getActiveTaskExecution().stream())
+                .filter(ITaskExecution::isTaskInstanceInitialized)
+                .filter(taskExecution -> workerAddress
+                        .equals(taskExecution.getTaskInstance().getHost()))
+                .filter(taskExecution -> {
+                    final TaskExecutionStatus state = taskExecution.getTaskInstance().getState();
                     return state == TaskExecutionStatus.DISPATCH || state == TaskExecutionStatus.RUNNING_EXECUTION;
                 })
-                .filter(taskExecutionRunnable -> {
+                .filter(taskExecution -> {
                     // The submitTime should not be null.
                     // This is a bad case unless someone manually set the submitTime to null.
-                    final Date submitTime = taskExecutionRunnable.getTaskInstance().getSubmitTime();
+                    final Date submitTime = taskExecution.getTaskInstance().getSubmitTime();
                     return submitTime != null && submitTime.before(taskFailoverDeadline);
                 })
                 .collect(Collectors.toList());

@@ -79,9 +79,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * login controller
- */
 @Tag(name = "LOGIN_TAG")
 @RestController
 @RequestMapping("")

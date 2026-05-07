@@ -31,9 +31,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-/**
- * sqoop parameter entity test
- */
 public class SqoopParameterEntityTest {
 
     @Test
