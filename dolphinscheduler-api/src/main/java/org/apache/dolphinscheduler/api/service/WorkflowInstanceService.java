@@ -159,21 +159,23 @@ public interface WorkflowInstanceService {
     /**
      * view workflow instance variables
      *
+     * @param loginUser         login user
      * @param projectCode       project code
      * @param workflowInstanceId workflow instance id
      * @return variables data
      */
-    Map<String, Object> viewVariables(long projectCode, Integer workflowInstanceId);
+    Map<String, Object> viewVariables(User loginUser, long projectCode, Integer workflowInstanceId);
 
     /**
      * encapsulation gantt structure
      *
+     * @param loginUser         login user
      * @param projectCode       project code
      * @param workflowInstanceId workflow instance id
      * @return gantt tree data
      * @throws Exception exception when json parse
      */
-    Map<String, Object> viewGantt(long projectCode, Integer workflowInstanceId) throws Exception;
+    Map<String, Object> viewGantt(User loginUser, long projectCode, Integer workflowInstanceId) throws Exception;
 
     /**
      * query workflow instance by workflowDefinitionCode and stateArray

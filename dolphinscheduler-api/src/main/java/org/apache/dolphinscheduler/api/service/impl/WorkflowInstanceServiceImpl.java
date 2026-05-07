@@ -752,12 +752,15 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     /**
      * view workflow instance variables
      *
+     * @param loginUser         login user
      * @param projectCode       project code
      * @param workflowInstanceId workflow instance id
      * @return variables data
      */
     @Override
-    public Map<String, Object> viewVariables(long projectCode, Integer workflowInstanceId) {
+    public Map<String, Object> viewVariables(User loginUser, long projectCode, Integer workflowInstanceId) {
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
         Map<String, Object> result = new HashMap<>();
 
         WorkflowInstance workflowInstance = workflowInstanceMapper.queryDetailById(workflowInstanceId);
@@ -872,13 +875,17 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     /**
      * encapsulation gantt structure
      *
+     * @param loginUser         login user
      * @param projectCode       project code
      * @param workflowInstanceId workflow instance id
      * @return gantt tree data
      * @throws Exception exception when json parse
      */
     @Override
-    public Map<String, Object> viewGantt(long projectCode, Integer workflowInstanceId) throws Exception {
+    public Map<String, Object> viewGantt(User loginUser, long projectCode,
+                                         Integer workflowInstanceId) throws Exception {
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
         Map<String, Object> result = new HashMap<>();
         WorkflowInstance workflowInstance = workflowInstanceMapper.queryDetailById(workflowInstanceId);
 
