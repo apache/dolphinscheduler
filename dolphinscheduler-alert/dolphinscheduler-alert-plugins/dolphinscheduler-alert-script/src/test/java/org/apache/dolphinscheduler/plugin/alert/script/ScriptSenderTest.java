@@ -50,12 +50,7 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        if (isWindows()) {
-            Assertions.assertFalse(alertResult.isSuccess());
-            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
-        } else {
-            Assertions.assertTrue(alertResult.isSuccess());
-        }
+        Assertions.assertTrue(alertResult.isSuccess());
         alertResult = scriptSender.sendScriptAlert("error msg title", "test content");
         Assertions.assertFalse(alertResult.isSuccess());
     }
@@ -74,12 +69,7 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test user params NPE", "test content");
-        if (isWindows()) {
-            Assertions.assertFalse(alertResult.isSuccess());
-            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
-        } else {
-            Assertions.assertTrue(alertResult.isSuccess());
-        }
+        Assertions.assertTrue(alertResult.isSuccess());
     }
 
     @Test
@@ -98,11 +88,7 @@ public class ScriptSenderTest {
         AlertResult alertResult;
         alertResult = scriptSender.sendScriptAlert("test path NPE", "test content");
         assertFalse(alertResult.isSuccess());
-        if (isWindows()) {
-            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
-        } else {
-            Assertions.assertTrue(alertResult.getMessage().contains("shell script is invalid, only support .sh file"));
-        }
+        Assertions.assertTrue(alertResult.getMessage().contains("shell script is invalid, only support .sh file"));
     }
 
     @Test
@@ -118,12 +104,7 @@ public class ScriptSenderTest {
     public void testDefaultTimeout() {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        if (isWindows()) {
-            Assertions.assertFalse(alertResult.isSuccess());
-            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
-        } else {
-            Assertions.assertTrue(alertResult.isSuccess());
-        }
+        Assertions.assertTrue(alertResult.isSuccess());
     }
 
     @Test
@@ -131,12 +112,7 @@ public class ScriptSenderTest {
         scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_TIMEOUT, "30");
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        if (isWindows()) {
-            Assertions.assertFalse(alertResult.isSuccess());
-            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
-        } else {
-            Assertions.assertTrue(alertResult.isSuccess());
-        }
+        Assertions.assertTrue(alertResult.isSuccess());
     }
 
     @Test
@@ -145,11 +121,7 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
         Assertions.assertFalse(alertResult.isSuccess());
-        if (isWindows()) {
-            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
-        } else {
-            Assertions.assertEquals("script timeout config is invalid, should be a number", alertResult.getMessage());
-        }
+        Assertions.assertEquals("script timeout config is invalid, should be a number", alertResult.getMessage());
     }
 
     @Test
@@ -158,11 +130,7 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
         Assertions.assertFalse(alertResult.isSuccess());
-        if (isWindows()) {
-            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
-        } else {
-            Assertions.assertEquals("script timeout config must be greater than 0", alertResult.getMessage());
-        }
+        Assertions.assertEquals("script timeout config must be greater than 0", alertResult.getMessage());
     }
 
     @Test
@@ -171,15 +139,7 @@ public class ScriptSenderTest {
         ScriptSender scriptSender = new ScriptSender(scriptConfig);
         AlertResult alertResult = scriptSender.sendScriptAlert("timeout msg title", "test content");
         Assertions.assertFalse(alertResult.isSuccess());
-        if (isWindows()) {
-            Assertions.assertEquals("shell script not support windows os", alertResult.getMessage());
-        } else {
-            Assertions.assertTrue(alertResult.getMessage().contains("script execution timed out"));
-        }
-    }
-
-    private boolean isWindows() {
-        return Boolean.TRUE.equals(org.apache.dolphinscheduler.common.utils.OSUtils.isWindows());
+        Assertions.assertTrue(alertResult.getMessage().contains("script execution timed out"));
     }
 
 }
