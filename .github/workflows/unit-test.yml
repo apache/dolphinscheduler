@@ -136,7 +136,7 @@ jobs:
         run: |
           export MAVEN_OPTS="-Xmx14g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
           ./mvnw install -B \
-            -pl "${{ matrix.module }}" \
+            -pl "dolphinscheduler-bom,${{ matrix.module }}" \
             -am \
             -DskipTests=true \
             -Dspotless.skip=true \
