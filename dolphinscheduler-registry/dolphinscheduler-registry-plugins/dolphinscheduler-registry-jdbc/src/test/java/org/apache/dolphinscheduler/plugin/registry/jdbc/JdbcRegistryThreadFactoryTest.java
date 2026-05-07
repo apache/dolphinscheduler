@@ -40,4 +40,11 @@ class JdbcRegistryThreadFactoryTest {
                 .atMost(10, TimeUnit.SECONDS)
                 .untilAsserted(() -> assertThat(atomicInteger.get()).isEqualTo(100));
     }
+
+    @Test
+    void getDefaultSchedulerThreadExecutor_returnsSameInstance() {
+        ScheduledExecutorService first = JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor();
+        ScheduledExecutorService second = JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor();
+        assertThat(first).isSameInstanceAs(second);
+    }
 }

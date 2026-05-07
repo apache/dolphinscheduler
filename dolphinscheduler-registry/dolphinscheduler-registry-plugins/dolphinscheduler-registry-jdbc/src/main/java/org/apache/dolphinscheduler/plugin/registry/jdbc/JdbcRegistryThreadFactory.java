@@ -26,10 +26,20 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class JdbcRegistryThreadFactory {
 
+    private static volatile ScheduledExecutorService defaultSchedulerThreadExecutor;
+
     public static ScheduledExecutorService getDefaultSchedulerThreadExecutor() {
-        final String threadNameFormat = "ds-jdbc-registry-default-scheduler-thread-%d";
-        final int threadSize = Runtime.getRuntime().availableProcessors();
-        return ThreadUtils.newDaemonScheduledExecutorService(threadNameFormat, threadSize);
+        if (defaultSchedulerThreadExecutor == null) {
+            synchronized (JdbcRegistryThreadFactory.class) {
+                if (defaultSchedulerThreadExecutor == null) {
+                    final String threadNameFormat = "ds-jdbc-registry-default-scheduler-thread-%d";
+                    final int threadSize = Runtime.getRuntime().availableProcessors();
+                    defaultSchedulerThreadExecutor =
+                            ThreadUtils.newDaemonScheduledExecutorService(threadNameFormat, threadSize);
+                }
+            }
+        }
+        return defaultSchedulerThreadExecutor;
     }
 
 }
