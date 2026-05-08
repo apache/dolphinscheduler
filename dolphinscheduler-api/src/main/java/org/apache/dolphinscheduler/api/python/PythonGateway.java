@@ -331,11 +331,11 @@ public class PythonGateway {
         int scheduleId;
         if (scheduleObj == null) {
             workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
-            Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, workflowCode,
+            Schedule createdSchedule = schedulerService.insertSchedule(user, projectCode, workflowCode,
                     schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
                     DEFAULT_ENVIRONMENT_CODE);
-            scheduleId = (int) result.get("scheduleId");
+            scheduleId = createdSchedule.getId();
         } else {
             scheduleId = scheduleObj.getId();
             workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowCode);
