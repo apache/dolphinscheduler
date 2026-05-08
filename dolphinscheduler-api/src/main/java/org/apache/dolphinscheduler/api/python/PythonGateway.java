@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.python;
 
 import org.apache.dolphinscheduler.api.configuration.ApiConfig;
-import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -610,15 +609,13 @@ public class PythonGateway {
      * @param environmentName name of the environment
      */
     public Long getEnvironmentInfo(String environmentName) {
-        Map<String, Object> result = environmentService.queryEnvironmentByName(environmentName);
-
-        if (result.get("data") == null) {
+        try {
+            return environmentService.queryEnvironmentByName(environmentName).getCode();
+        } catch (ServiceException e) {
             String msg = String.format("Can not find valid environment by name %s", environmentName);
             log.error(msg);
             throw new IllegalArgumentException(msg);
         }
-        EnvironmentDto environmentDto = EnvironmentDto.class.cast(result.get("data"));
-        return environmentDto.getCode();
     }
 
     /**

@@ -397,7 +397,7 @@
                             <includes>
                                 <include>**/integration/cases/*TestCase.java</include>
                             </includes>
-                            <forkCount>4</forkCount>
+                            <forkCount>2</forkCount>
                             <reuseForks>true</reuseForks>
                             <properties>
                                 <configurationParameters>junit.jupiter.execution.parallel.enabled = false</configurationParameters>
