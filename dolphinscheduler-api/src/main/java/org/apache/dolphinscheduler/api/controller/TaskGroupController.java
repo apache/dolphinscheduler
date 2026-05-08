@@ -29,8 +29,10 @@ import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Map;
@@ -315,14 +317,14 @@ public class TaskGroupController extends BaseController {
     @GetMapping(value = "/query-list-by-group-id")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_GROUP_QUEUE_LIST_ERROR)
-    public Result queryTaskGroupQueues(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
-                                       @RequestParam(value = "taskInstanceName", required = false) String taskName,
-                                       @RequestParam(value = "workflowInstanceName", required = false) String workflowInstanceName,
-                                       @RequestParam(value = "status", required = false) Integer status,
-                                       @RequestParam("pageNo") Integer pageNo,
-                                       @RequestParam("pageSize") Integer pageSize) {
-        Map<String, Object> result = taskGroupQueueService.queryTasksByGroupId(
+    public Result<PageInfo<TaskGroupQueue>> queryTaskGroupQueues(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                 @RequestParam(value = "groupId", required = false, defaultValue = "-1") Integer groupId,
+                                                                 @RequestParam(value = "taskInstanceName", required = false) String taskName,
+                                                                 @RequestParam(value = "workflowInstanceName", required = false) String workflowInstanceName,
+                                                                 @RequestParam(value = "status", required = false) Integer status,
+                                                                 @RequestParam("pageNo") Integer pageNo,
+                                                                 @RequestParam("pageSize") Integer pageSize) {
+        PageInfo<TaskGroupQueue> pageInfo = taskGroupQueueService.queryTasksByGroupId(
                 loginUser,
                 taskName,
                 workflowInstanceName,
@@ -330,7 +332,7 @@ public class TaskGroupController extends BaseController {
                 groupId,
                 pageNo,
                 pageSize);
-        return returnDataList(result);
+        return Result.success(pageInfo);
     }
 
 }

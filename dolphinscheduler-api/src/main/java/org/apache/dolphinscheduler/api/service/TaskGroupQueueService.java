@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
-import java.util.Map;
 
 public interface TaskGroupQueueService {
 
@@ -33,12 +34,11 @@ public interface TaskGroupQueueService {
      * @param status      Task queue status
      * @param pageNo      page no
      * @param pageSize    page size
-    
-     * @return tasks list
+     * @return tasks list page
      */
-    Map<String, Object> queryTasksByGroupId(User loginUser, String taskName, String workflowInstanceName,
-                                            Integer status,
-                                            int groupId, int pageNo, int pageSize);
+    PageInfo<TaskGroupQueue> queryTasksByGroupId(User loginUser, String taskName, String workflowInstanceName,
+                                                 Integer status,
+                                                 int groupId, int pageNo, int pageSize);
 
     void deleteByWorkflowInstanceId(Integer workflowInstanceId);
 

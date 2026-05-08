@@ -26,9 +26,10 @@ import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -67,11 +68,10 @@ public class UiPluginController extends BaseController {
     @GetMapping(value = "/query-by-type")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(QUERY_PLUGINS_ERROR)
-    public Result queryUiPluginsByType(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                       @RequestParam(value = "pluginType") PluginType pluginType) {
-
-        Map<String, Object> result = uiPluginService.queryUiPluginsByType(pluginType);
-        return returnDataList(result);
+    public Result<List<PluginDefine>> queryUiPluginsByType(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                           @RequestParam(value = "pluginType") PluginType pluginType) {
+        List<PluginDefine> pluginDefines = uiPluginService.queryUiPluginsByType(pluginType);
+        return Result.success(pluginDefines);
     }
 
     @Operation(summary = "queryUiPluginDetailById", description = "QUERY_UI_PLUGIN_DETAIL_BY_ID")
@@ -81,11 +81,10 @@ public class UiPluginController extends BaseController {
     @GetMapping(value = "/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(QUERY_PLUGINS_ERROR)
-    public Result queryUiPluginDetailById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @PathVariable("id") Integer pluginId) {
-
-        Map<String, Object> result = uiPluginService.queryUiPluginDetailById(pluginId);
-        return returnDataList(result);
+    public Result<PluginDefine> queryUiPluginDetailById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                        @PathVariable("id") Integer pluginId) {
+        PluginDefine pluginDefine = uiPluginService.queryUiPluginDetailById(pluginId);
+        return Result.success(pluginDefine);
     }
 
     @Operation(summary = "queryProductInfo", description = "QUERY_PRODUCT_INFO")

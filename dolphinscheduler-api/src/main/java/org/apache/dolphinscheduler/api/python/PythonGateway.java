@@ -443,7 +443,7 @@ public class PythonGateway {
     }
 
     public Tenant queryTenantByCode(String tenantCode) {
-        return (Tenant) tenantService.queryByTenantCode(tenantCode).get(Constants.DATA_LIST);
+        return tenantService.queryByTenantCode(tenantCode);
     }
 
     public void updateTenant(String userName, int id, String tenantCode, int queueId, String desc) throws Exception {

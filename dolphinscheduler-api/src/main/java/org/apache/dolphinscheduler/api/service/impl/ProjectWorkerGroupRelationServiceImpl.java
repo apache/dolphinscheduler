@@ -193,14 +193,16 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
     }
 
     @Override
-    public Map<String, Object> queryAssignedWorkerGroupsByProject(User loginUser, Long projectCode) {
-        Map<String, Object> result = new HashMap<>();
-
+    public List<ProjectWorkerGroup> queryAssignedWorkerGroupsByProject(User loginUser, Long projectCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        if (!hasProjectAndPerm) {
-            return result;
+        Map<String, Object> permResult = new HashMap<>();
+        if (!projectService.hasProjectAndPerm(loginUser, project, permResult, null)) {
+            Status status = (Status) permResult.get(Constants.STATUS);
+            if (status == null) {
+                throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM);
+            }
+            throw new ServiceException(status.getCode(), (String) permResult.get(Constants.MSG));
         }
 
         Set<String> assignedWorkerGroups = getAllUsedWorkerGroups(project);
@@ -208,16 +210,12 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
         projectWorkerGroupDao.queryByProjectCode(projectCode)
                 .forEach(projectWorkerGroup -> assignedWorkerGroups.add(projectWorkerGroup.getWorkerGroup()));
 
-        List<ProjectWorkerGroup> projectWorkerGroups = assignedWorkerGroups.stream().map(workerGroup -> {
+        return assignedWorkerGroups.stream().map(workerGroup -> {
             ProjectWorkerGroup projectWorkerGroup = new ProjectWorkerGroup();
             projectWorkerGroup.setProjectCode(projectCode);
             projectWorkerGroup.setWorkerGroup(workerGroup);
             return projectWorkerGroup;
         }).distinct().collect(Collectors.toList());
-
-        result.put(Constants.DATA_LIST, projectWorkerGroups);
-        putMsg(result, Status.SUCCESS);
-        return result;
     }
 
     private Set<String> getAllUsedWorkerGroups(Project project) {
