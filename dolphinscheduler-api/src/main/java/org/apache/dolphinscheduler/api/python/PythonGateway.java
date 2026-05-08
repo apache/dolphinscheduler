@@ -157,7 +157,17 @@ public class PythonGateway {
     // TODO Should we import package in python client side? utils package can but service can not, why
     // Core api
     public Map<String, Object> genTaskCodeList(Integer genNum) {
-        return taskDefinitionService.genTaskCodeList(genNum);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<Long> taskCodes = taskDefinitionService.genTaskCodeList(genNum);
+            result.put(Constants.STATUS, Status.SUCCESS);
+            result.put(Constants.MSG, Status.SUCCESS.getMsg());
+            result.put(Constants.DATA_LIST, taskCodes);
+        } catch (ServiceException e) {
+            result.put(Constants.STATUS, Status.DATA_IS_NOT_VALID);
+            result.put(Constants.MSG, e.getMessage());
+        }
+        return result;
     }
 
     public Map<String, Long> getCodeAndVersion(String projectName, String workflowDefinitionName,
