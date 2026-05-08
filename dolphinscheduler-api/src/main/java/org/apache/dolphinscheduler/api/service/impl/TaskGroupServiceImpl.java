@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
@@ -40,9 +41,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -74,43 +73,26 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Autowired
     private ExecutorService executorService;
 
-    /**
-     * create a Task group
-     *
-     * @param loginUser   login user
-     * @param name        task group name
-     * @param description task group description
-     * @param groupSize   task group total size
-     * @return the result code and msg
-     */
     @Override
     @Transactional
-    public Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name, String description,
-                                               int groupSize) {
-        Map<String, Object> result = new HashMap<>();
-        if (!hasProjectPerm(loginUser, projectCode, result, true)) {
-            return result;
-        }
+    public TaskGroup createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize) {
+        requireProjectPerm(loginUser, projectCode, true);
         if (checkDescriptionLength(description)) {
             log.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
+            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         if (name == null) {
             log.warn("Parameter name can ot be null.");
-            putMsg(result, Status.NAME_NULL);
-            return result;
+            throw new ServiceException(Status.NAME_NULL);
         }
         if (groupSize <= 0) {
             log.warn("Parameter task group size is must bigger than 1.");
-            putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
-            return result;
+            throw new ServiceException(Status.TASK_GROUP_SIZE_ERROR);
         }
-        TaskGroup taskGroup1 = taskGroupMapper.queryByName(loginUser.getId(), name);
-        if (taskGroup1 != null) {
-            log.warn("Task group with the same name already exists, taskGroupName:{}.", taskGroup1.getName());
-            putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
-            return result;
+        TaskGroup duplicate = taskGroupMapper.queryByName(loginUser.getId(), name);
+        if (duplicate != null) {
+            log.warn("Task group with the same name already exists, taskGroupName:{}.", duplicate.getName());
+            throw new ServiceException(Status.TASK_GROUP_NAME_EXSIT);
         }
         Date now = new Date();
         TaskGroup taskGroup = TaskGroup.builder()
@@ -124,49 +106,29 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
                 .updateTime(now)
                 .build();
 
-        if (taskGroupMapper.insert(taskGroup) > 0) {
-            log.info("Create task group complete, taskGroupName:{}.", taskGroup.getName());
-            result.put(Constants.DATA_LIST, taskGroup);
-            putMsg(result, Status.SUCCESS);
-        } else {
+        if (taskGroupMapper.insert(taskGroup) <= 0) {
             log.error("Create task group error, taskGroupName:{}.", taskGroup.getName());
-            putMsg(result, Status.CREATE_TASK_GROUP_ERROR);
-            return result;
+            throw new ServiceException(Status.CREATE_TASK_GROUP_ERROR);
         }
-
-        return result;
+        log.info("Create task group complete, taskGroupName:{}.", taskGroup.getName());
+        return taskGroup;
     }
 
-    /**
-     * update the task group
-     *
-     * @param loginUser   login user
-     * @param name        task group name
-     * @param description task group description
-     * @param groupSize   task group total size
-     * @return the result code and msg
-     */
     @Override
-    public Map<String, Object> updateTaskGroup(User loginUser, int id, String name, String description, int groupSize) {
-        Map<String, Object> result = new HashMap<>();
+    public TaskGroup updateTaskGroup(User loginUser, int id, String name, String description, int groupSize) {
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
-        if (!hasProjectPerm(loginUser, taskGroup.getProjectCode(), result, true)) {
-            return result;
-        }
+        requireProjectPerm(loginUser, taskGroup.getProjectCode(), true);
         if (checkDescriptionLength(description)) {
             log.warn("Parameter description is too long.");
-            putMsg(result, Status.DESCRIPTION_TOO_LONG_ERROR);
-            return result;
+            throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         if (name == null) {
             log.warn("Parameter name can ot be null.");
-            putMsg(result, Status.NAME_NULL);
-            return result;
+            throw new ServiceException(Status.NAME_NULL);
         }
         if (groupSize <= 0) {
             log.warn("Parameter task group size is must bigger than 1.");
-            putMsg(result, Status.TASK_GROUP_SIZE_ERROR);
-            return result;
+            throw new ServiceException(Status.TASK_GROUP_SIZE_ERROR);
         }
         Long exists = taskGroupMapper.selectCount(new QueryWrapper<TaskGroup>().lambda()
                 .eq(TaskGroup::getName, name)
@@ -175,13 +137,11 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
         if (exists > 0) {
             log.error("Task group with the same name already exists.");
-            putMsg(result, Status.TASK_GROUP_NAME_EXSIT);
-            return result;
+            throw new ServiceException(Status.TASK_GROUP_NAME_EXSIT);
         }
         if (taskGroup.getStatus() != Flag.YES) {
             log.warn("Task group has been closed, taskGroupId:{}.", id);
-            putMsg(result, Status.TASK_GROUP_STATUS_ERROR);
-            return result;
+            throw new ServiceException(Status.TASK_GROUP_STATUS_ERROR);
         }
         taskGroup.setGroupSize(groupSize);
         taskGroup.setDescription(description);
@@ -189,218 +149,115 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         if (StringUtils.isNotEmpty(name)) {
             taskGroup.setName(name);
         }
-        int i = taskGroupMapper.updateById(taskGroup);
-        if (i > 0) {
-            log.info("Update task group complete, taskGroupId:{}.", id);
-            result.put(Constants.DATA_LIST, taskGroup);
-            putMsg(result, Status.SUCCESS);
-        } else {
+        if (taskGroupMapper.updateById(taskGroup) <= 0) {
             log.error("Update task group error, taskGroupId:{}.", id);
-            putMsg(result, Status.UPDATE_TASK_GROUP_ERROR);
+            throw new ServiceException(Status.UPDATE_TASK_GROUP_ERROR);
         }
-        return result;
+        log.info("Update task group complete, taskGroupId:{}.", id);
+        return taskGroup;
     }
 
-    /**
-     * query all task group by user id
-     *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
-     * @return the result code and msg
-     */
     @Override
-    public Map<String, Object> queryAllTaskGroup(User loginUser, String name, Integer status, int pageNo,
+    public PageInfo<TaskGroup> queryAllTaskGroup(User loginUser, String name, Integer status, int pageNo,
                                                  int pageSize) {
         return this.doQuery(loginUser, pageNo, pageSize, loginUser.getId(), name, status);
     }
 
-    /**
-     * query all task group by status
-     *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
-     * @param status    status
-     * @return the result code and msg
-     */
     @Override
-    public Map<String, Object> queryTaskGroupByStatus(User loginUser, int pageNo, int pageSize, int status) {
+    public PageInfo<TaskGroup> queryTaskGroupByStatus(User loginUser, int pageNo, int pageSize, int status) {
         return this.doQuery(loginUser, pageNo, pageSize, loginUser.getId(), null, status);
     }
 
-    /**
-     * query all task group by name
-     *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
-     * @param projectCode project code
-     * @return the result code and msg
-     */
     @Override
-    public Map<String, Object> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode) {
-        Map<String, Object> result = new HashMap<>();
-        if (!hasProjectPerm(loginUser, projectCode, result, false)) {
-            return result;
-        }
+    public PageInfo<TaskGroup> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode) {
+        requireProjectPerm(loginUser, projectCode, false);
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroup> taskGroupPaging =
                 taskGroupMapper.queryTaskGroupPagingByProjectCode(page, projectCode);
 
-        return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
+        return buildPageInfo(pageNo, pageSize, taskGroupPaging);
     }
 
-    private Map<String, Object> getStringObjectMap(int pageNo, int pageSize, Map<String, Object> result,
-                                                   IPage<TaskGroup> taskGroupPaging) {
+    private PageInfo<TaskGroup> buildPageInfo(int pageNo, int pageSize, IPage<TaskGroup> taskGroupPaging) {
         PageInfo<TaskGroup> pageInfo = new PageInfo<>(pageNo, pageSize);
         int total = taskGroupPaging == null ? 0 : (int) taskGroupPaging.getTotal();
         List<TaskGroup> list = taskGroupPaging == null ? new ArrayList<TaskGroup>() : taskGroupPaging.getRecords();
         pageInfo.setTotal(total);
         pageInfo.setTotalList(list);
-
-        result.put(Constants.DATA_LIST, pageInfo);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return pageInfo;
     }
 
-    /**
-     * query all task group by id
-     *
-     * @param loginUser login user
-     * @param id        id
-     * @return the result code and msg
-     */
     @Override
-    public Map<String, Object> queryTaskGroupById(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>();
-        TaskGroup taskGroup = taskGroupMapper.selectById(id);
-        result.put(Constants.DATA_LIST, taskGroup);
-        putMsg(result, Status.SUCCESS);
-        return result;
+    public TaskGroup queryTaskGroupById(User loginUser, int id) {
+        return taskGroupMapper.selectById(id);
     }
 
-    /**
-     * query
-     *
-     * @param pageNo   page no
-     * @param pageSize page size
-     * @param userId   user id
-     * @param name     name
-     * @param status   status
-     * @return the result code and msg
-     */
     @Override
-    public Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name,
+    public PageInfo<TaskGroup> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name,
                                        Integer status) {
-        Map<String, Object> result = new HashMap<>();
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroup> taskGroupPaging =
                 taskGroupMapper.queryTaskGroupPaging(page, name, status);
 
-        return getStringObjectMap(pageNo, pageSize, result, taskGroupPaging);
+        return buildPageInfo(pageNo, pageSize, taskGroupPaging);
     }
 
-    /**
-     * close a task group
-     *
-     * @param loginUser login user
-     * @param id        task group id
-     * @return the result code and msg
-     */
     @Override
-    public Map<String, Object> closeTaskGroup(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>();
-
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
-                ApiFuncIdentificationConstant.TASK_GROUP_CLOSE);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
+    public void closeTaskGroup(User loginUser, int id) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
+                ApiFuncIdentificationConstant.TASK_GROUP_CLOSE)) {
+            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION);
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.NO) {
             log.info("Task group has been closed, taskGroupId:{}.", id);
-            putMsg(result, Status.TASK_GROUP_STATUS_CLOSED);
-            return result;
+            throw new ServiceException(Status.TASK_GROUP_STATUS_CLOSED);
         }
         taskGroup.setStatus(Flag.NO);
-        int update = taskGroupMapper.updateById(taskGroup);
-        if (update > 0)
+        if (taskGroupMapper.updateById(taskGroup) > 0) {
             log.info("Task group close complete, taskGroupId:{}.", id);
-        else
+        } else {
             log.error("Task group close error, taskGroupId:{}.", id);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        }
     }
 
-    /**
-     * start a task group
-     *
-     * @param loginUser login user
-     * @param id        task group id
-     * @return the result code and msg
-     */
     @Override
-    public Map<String, Object> startTaskGroup(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>();
-
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
-                ApiFuncIdentificationConstant.TASK_GROUP_CLOSE);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
+    public void startTaskGroup(User loginUser, int id) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
+                ApiFuncIdentificationConstant.TASK_GROUP_CLOSE)) {
+            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION);
         }
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.YES) {
             log.info("Task group has been started, taskGroupId:{}.", id);
-            putMsg(result, Status.TASK_GROUP_STATUS_OPENED);
-            return result;
+            throw new ServiceException(Status.TASK_GROUP_STATUS_OPENED);
         }
         taskGroup.setStatus(Flag.YES);
         taskGroup.setUpdateTime(new Date(System.currentTimeMillis()));
-        int update = taskGroupMapper.updateById(taskGroup);
-        if (update > 0)
+        if (taskGroupMapper.updateById(taskGroup) > 0) {
             log.info("Task group start complete, taskGroupId:{}.", id);
-        else
+        } else {
             log.error("Task group start error, taskGroupId:{}.", id);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * wake a task manually
-     *
-     * @param loginUser
-     * @param queueId   task group queue id
-     * @return result
-     */
-    @Override
-    public Map<String, Object> forceStartTask(User loginUser, int queueId) {
-        Map<String, Object> result = new HashMap<>();
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
-                ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_START);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
         }
-        return executorService.forceStartTaskInstance(loginUser, queueId);
     }
 
     @Override
-    public Map<String, Object> modifyPriority(User loginUser, Integer queueId, Integer priority) {
-        Map<String, Object> result = new HashMap<>();
+    public void forceStartTask(User loginUser, int queueId) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
+                ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_START)) {
+            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION);
+        }
+        executorService.forceStartTaskInstance(loginUser, queueId);
+    }
 
-        boolean canOperatorPermissions = canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
-                ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_PRIORITY);
-        if (!canOperatorPermissions) {
-            putMsg(result, Status.NO_CURRENT_OPERATING_PERMISSION);
-            return result;
+    @Override
+    public void modifyPriority(User loginUser, Integer queueId, Integer priority) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
+                ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_PRIORITY)) {
+            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION);
         }
         taskGroupQueueService.modifyPriority(queueId, priority);
         log.info("Modify task group queue priority complete, queueId:{}, priority:{}.", queueId, priority);
-        putMsg(result, Status.SUCCESS);
-        return result;
     }
 
     @Override
@@ -416,37 +273,30 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         taskGroupMapper.deleteBatchIds(taskGroupIds);
     }
 
-    private boolean hasProjectPerm(User loginUser, long projectCode, Map<String, Object> result,
-                                   boolean writePermission) {
+    private void requireProjectPerm(User loginUser, long projectCode, boolean writePermission) {
+        if (loginUser.getUserType() == UserType.ADMIN_USER) {
+            return;
+        }
         Project project = projectMapper.queryByCode(projectCode);
         if (project == null) {
-            log.warn("Project does not exist");
-            putMsg(result, Status.PROJECT_NOT_FOUND, "");
+            log.warn("Project does not exist, projectCode:{}.", projectCode);
+            throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
-
-        if (loginUser.getUserType() == UserType.ADMIN_USER) {
-            return true;
-        }
-
         if (project.getUserId().equals(loginUser.getId())) {
-            return true;
+            return;
         }
-
         ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
         if (projectUser == null) {
             log.warn("User {} does not have operation permission for project {}", loginUser.getUserName(),
                     project.getCode());
-            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
-            return false;
+            throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(),
+                    project.getCode());
         }
         if (writePermission && projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
             log.warn("User {} does not have write permission for project {}", loginUser.getUserName(),
                     project.getCode());
-            putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
-            return false;
+            throw new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(),
+                    project.getCode());
         }
-
-        return true;
     }
-
 }
