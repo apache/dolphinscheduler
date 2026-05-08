@@ -32,7 +32,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import java.util.Map;
+import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -126,9 +127,9 @@ public class WorkerGroupController extends BaseController {
     @GetMapping(value = "/all")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_GROUP_FAIL)
-    public Result queryAllWorkerGroups(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = workerGroupService.queryAllGroup(loginUser);
-        return returnDataList(result);
+    public Result<List<String>> queryAllWorkerGroups(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        List<String> workerGroupNames = workerGroupService.queryAllGroup(loginUser);
+        return Result.success(workerGroupNames);
     }
 
     /**
@@ -146,10 +147,10 @@ public class WorkerGroupController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_WORKER_GROUP_FAIL)
     @OperatorLog(auditType = AuditType.WORKER_GROUP_DELETE)
-    public Result deleteWorkerGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @PathVariable("id") Integer id) {
-        Map<String, Object> result = workerGroupService.deleteWorkerGroupById(loginUser, id);
-        return returnDataList(result);
+    public Result<Void> deleteWorkerGroupById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                              @PathVariable("id") Integer id) {
+        workerGroupService.deleteWorkerGroupById(loginUser, id);
+        return Result.success();
     }
 
     /**
@@ -162,8 +163,8 @@ public class WorkerGroupController extends BaseController {
     @GetMapping(value = "/worker-address-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKER_ADDRESS_LIST_FAIL)
-    public Result queryWorkerAddressList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = workerGroupService.getWorkerAddressList();
-        return returnDataList(result);
+    public Result<Set<String>> queryWorkerAddressList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        Set<String> workerAddressList = workerGroupService.getWorkerAddressList();
+        return Result.success(workerAddressList);
     }
 }
