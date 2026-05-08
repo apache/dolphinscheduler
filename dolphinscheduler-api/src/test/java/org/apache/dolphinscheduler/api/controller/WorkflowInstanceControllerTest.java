@@ -24,15 +24,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -81,12 +84,10 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryTaskListByWorkflowInstanceId() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.PROJECT_NOT_FOUND);
         Mockito
                 .when(workflowInstanceService.queryTaskListByWorkflowInstanceId(Mockito.any(), Mockito.anyLong(),
                         Mockito.any()))
-                .thenReturn(mockResult);
+                .thenThrow(new ServiceException(Status.PROJECT_NOT_FOUND));
 
         MvcResult mvcResult = mockMvc
                 .perform(get("/projects/{projectCode}/workflow-instances/{id}/tasks", "1113", "123")
@@ -102,8 +103,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testUpdateWorkflowInstance() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        WorkflowDefinition mockResult = new WorkflowDefinition();
         Mockito.when(workflowInstanceService
                 .updateWorkflowInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
@@ -139,11 +139,9 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryWorkflowInstanceById() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
         Mockito.when(
                 workflowInstanceService.queryWorkflowInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
-                .thenReturn(mockResult);
+                .thenReturn(new WorkflowInstance());
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/workflow-instances/{id}", "1113", "123")
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
@@ -157,10 +155,8 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQuerySubWorkflowInstanceByTaskId() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.TASK_INSTANCE_NOT_EXISTS);
         Mockito.when(workflowInstanceService.querySubWorkflowInstanceByTaskId(Mockito.any(), Mockito.anyLong(),
-                Mockito.anyInt())).thenReturn(mockResult);
+                Mockito.anyInt())).thenThrow(new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS));
 
         MvcResult mvcResult = mockMvc
                 .perform(get("/projects/{projectCode}/workflow-instances/query-sub-by-parent", "1113")
@@ -177,11 +173,9 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryParentInstanceBySubId() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.WORKFLOW_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE);
         Mockito.when(
                 workflowInstanceService.queryParentInstanceBySubId(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
-                .thenReturn(mockResult);
+                .thenThrow(new ServiceException(Status.WORKFLOW_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE));
 
         MvcResult mvcResult = mockMvc
                 .perform(get("/projects/{projectCode}/workflow-instances/query-parent-by-sub", "1113")
@@ -199,8 +193,8 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testViewVariables() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
+        WorkflowInstanceVariablesDTO mockResult =
+                new WorkflowInstanceVariablesDTO(Collections.emptyList(), Collections.emptyMap());
         Mockito.when(workflowInstanceService.viewVariables(Mockito.any(), Mockito.eq(1113L), Mockito.eq(123)))
                 .thenReturn(mockResult);
         MvcResult mvcResult = mockMvc
@@ -216,8 +210,6 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testDeleteWorkflowInstanceById() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
         Mockito.doNothing().when(workflowInstanceService).deleteWorkflowInstanceById(Mockito.any(), Mockito.anyInt());
 
         MvcResult mvcResult = mockMvc.perform(delete("/projects/{projectCode}/workflow-instances/{id}", "1113", "123")
@@ -233,9 +225,6 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testBatchDeleteWorkflowInstanceByIds() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.WORKFLOW_INSTANCE_NOT_EXIST);
-
         Mockito.doNothing().when(workflowInstanceService).deleteWorkflowInstanceById(Mockito.any(), Mockito.anyInt());
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/workflow-instances/batch-delete", "1113")
                 .header(SESSION_ID, sessionId)
@@ -251,12 +240,9 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void queryWorkflowInstancesByTriggerCode() throws Exception {
-        Map<String, Object> mockResult = new HashMap<>();
-        mockResult.put(Constants.STATUS, Status.SUCCESS);
-
         Mockito.when(workflowInstanceService
                 .queryByTriggerCode(Mockito.any(), Mockito.anyLong(), Mockito.anyLong()))
-                .thenReturn(mockResult);
+                .thenReturn(new ArrayList<>());
 
         MvcResult mvcResult = mockMvc.perform(get("/projects/1113/workflow-instances/trigger")
                 .header("sessionId", sessionId)

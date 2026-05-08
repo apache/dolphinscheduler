@@ -18,13 +18,16 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
+import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -33,11 +36,11 @@ public interface WorkflowInstanceService {
     /**
      * return top n SUCCESS workflow instance order by running time which started between startTime and endTime
      */
-    Map<String, Object> queryTopNLongestRunningWorkflowInstance(User loginUser,
-                                                                long projectCode,
-                                                                int size,
-                                                                String startTime,
-                                                                String endTime);
+    List<WorkflowInstance> queryTopNLongestRunningWorkflowInstance(User loginUser,
+                                                                   long projectCode,
+                                                                   int size,
+                                                                   String startTime,
+                                                                   String endTime);
 
     /**
      * query workflow instance by id
@@ -47,9 +50,9 @@ public interface WorkflowInstanceService {
      * @param workflowInstanceId   workflow instance id
      * @return workflow instance detail
      */
-    Map<String, Object> queryWorkflowInstanceById(User loginUser,
-                                                  long projectCode,
-                                                  Integer workflowInstanceId);
+    WorkflowInstance queryWorkflowInstanceById(User loginUser,
+                                               long projectCode,
+                                               Integer workflowInstanceId);
 
     /**
      * paging query workflow instance list, filtering according to project, workflow definition, time range, keyword, workflow status
@@ -87,11 +90,10 @@ public interface WorkflowInstanceService {
      * @param projectCode project code
      * @param workflowInstanceId   workflow instance id
      * @return task list for the workflow instance
-     * @throws IOException io exception
      */
-    Map<String, Object> queryTaskListByWorkflowInstanceId(User loginUser,
-                                                          long projectCode,
-                                                          Integer workflowInstanceId) throws IOException;
+    WorkflowInstanceTaskListDTO queryTaskListByWorkflowInstanceId(User loginUser,
+                                                                  long projectCode,
+                                                                  Integer workflowInstanceId);
 
     /**
      * query sub workflow instance detail info by task id
@@ -99,11 +101,11 @@ public interface WorkflowInstanceService {
      * @param loginUser   login user
      * @param projectCode project code
      * @param taskId      task id
-     * @return sub workflow instance detail
+     * @return single-entry map keyed by {@code subWorkflowInstanceId}
      */
-    Map<String, Object> querySubWorkflowInstanceByTaskId(User loginUser,
-                                                         long projectCode,
-                                                         Integer taskId);
+    Map<String, Integer> querySubWorkflowInstanceByTaskId(User loginUser,
+                                                          long projectCode,
+                                                          Integer taskId);
 
     List<DynamicSubWorkflowDto> queryDynamicSubWorkflowInstances(User loginUser,
                                                                  Integer taskId);
@@ -121,18 +123,18 @@ public interface WorkflowInstanceService {
      * @param globalParams       global params
      * @param locations          locations for nodes
      * @param timeout            timeout
-     * @return update result code
+     * @return updated workflow definition
      */
-    Map<String, Object> updateWorkflowInstance(User loginUser,
-                                               long projectCode,
-                                               Integer workflowInstanceId,
-                                               String taskRelationJson,
-                                               String taskDefinitionJson,
-                                               String scheduleTime,
-                                               Boolean syncDefine,
-                                               String globalParams,
-                                               String locations,
-                                               int timeout);
+    WorkflowDefinition updateWorkflowInstance(User loginUser,
+                                              long projectCode,
+                                              Integer workflowInstanceId,
+                                              String taskRelationJson,
+                                              String taskDefinitionJson,
+                                              String scheduleTime,
+                                              Boolean syncDefine,
+                                              String globalParams,
+                                              String locations,
+                                              int timeout);
 
     /**
      * query parent workflow instance detail info by sub workflow instance id
@@ -140,18 +142,17 @@ public interface WorkflowInstanceService {
      * @param loginUser   login user
      * @param projectCode project code
      * @param subId       sub workflow id
-     * @return parent instance detail
+     * @return single-entry map keyed by {@code parentWorkflowInstance}
      */
-    Map<String, Object> queryParentInstanceBySubId(User loginUser,
-                                                   long projectCode,
-                                                   Integer subId);
+    Map<String, Integer> queryParentInstanceBySubId(User loginUser,
+                                                    long projectCode,
+                                                    Integer subId);
 
     /**
      * delete workflow instance by id, at the same time，delete task instance and their mapping relation data
      *
      * @param loginUser         login user
      * @param workflowInstanceId workflow instance id
-     * @return delete result code
      */
     void deleteWorkflowInstanceById(User loginUser,
                                     Integer workflowInstanceId);
@@ -164,7 +165,7 @@ public interface WorkflowInstanceService {
      * @param workflowInstanceId workflow instance id
      * @return variables data
      */
-    Map<String, Object> viewVariables(User loginUser, long projectCode, Integer workflowInstanceId);
+    WorkflowInstanceVariablesDTO viewVariables(User loginUser, long projectCode, Integer workflowInstanceId);
 
     /**
      * encapsulation gantt structure
@@ -175,7 +176,7 @@ public interface WorkflowInstanceService {
      * @return gantt tree data
      * @throws Exception exception when json parse
      */
-    Map<String, Object> viewGantt(User loginUser, long projectCode, Integer workflowInstanceId) throws Exception;
+    GanttDto viewGantt(User loginUser, long projectCode, Integer workflowInstanceId) throws Exception;
 
     /**
      * query workflow instance by workflowDefinitionCode and stateArray
@@ -210,14 +211,14 @@ public interface WorkflowInstanceService {
                                                          int size);
 
     /**
-     * query workflow instance list bt trigger code
+     * query workflow instance list by trigger code
      *
-     * @param loginUser
-     * @param projectCode
-     * @param triggerCode
-     * @return
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @param triggerCode trigger code (nullable)
+     * @return workflow instances triggered by the given trigger code
      */
-    Map<String, Object> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode);
+    List<WorkflowInstance> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode);
 
     void deleteWorkflowInstanceByWorkflowDefinitionCode(long workflowDefinitionCode);
 

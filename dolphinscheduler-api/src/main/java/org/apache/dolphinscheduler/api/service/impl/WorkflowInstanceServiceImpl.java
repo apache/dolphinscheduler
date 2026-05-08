@@ -20,11 +20,9 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
 import static org.apache.dolphinscheduler.api.enums.Status.WORKFLOW_INSTANCE_NOT_EXIST;
 import static org.apache.dolphinscheduler.api.enums.Status.WORKFLOW_INSTANCE_STATE_OPERATION_ERROR;
-import static org.apache.dolphinscheduler.common.constants.Constants.DATA_LIST;
-import static org.apache.dolphinscheduler.common.constants.Constants.GLOBAL_PARAMS;
 import static org.apache.dolphinscheduler.common.constants.Constants.LOCAL_PARAMS;
-import static org.apache.dolphinscheduler.common.constants.Constants.TASK_LIST;
-import static org.apache.dolphinscheduler.common.constants.Constants.WORKFLOW_INSTANCE_STATE;
+import static org.apache.dolphinscheduler.common.constants.Constants.PARENT_WORKFLOW_INSTANCE;
+import static org.apache.dolphinscheduler.common.constants.Constants.SUBWORKFLOW_INSTANCE_ID;
 import static org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
@@ -32,6 +30,8 @@ import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -177,62 +177,41 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     @Autowired
     private TaskInstanceContextDao taskInstanceContextDao;
 
-    /**
-     * return top n SUCCESS workflow instance order by running time which started between startTime and endTime
-     */
     @Override
-    public Map<String, Object> queryTopNLongestRunningWorkflowInstance(User loginUser, long projectCode, int size,
-                                                                       String startTime, String endTime) {
+    public List<WorkflowInstance> queryTopNLongestRunningWorkflowInstance(User loginUser, long projectCode, int size,
+                                                                          String startTime, String endTime) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
 
-        Map<String, Object> result = new HashMap<>();
         if (0 > size) {
-            putMsg(result, Status.NEGTIVE_SIZE_NUMBER_ERROR, size);
-            return result;
+            throw new ServiceException(Status.NEGTIVE_SIZE_NUMBER_ERROR, size);
         }
         if (Objects.isNull(startTime)) {
-            putMsg(result, Status.DATA_IS_NULL, Constants.START_TIME);
-            return result;
+            throw new ServiceException(Status.DATA_IS_NULL, Constants.START_TIME);
         }
         Date start = DateUtils.stringToDate(startTime);
         if (Objects.isNull(endTime)) {
-            putMsg(result, Status.DATA_IS_NULL, Constants.END_TIME);
-            return result;
+            throw new ServiceException(Status.DATA_IS_NULL, Constants.END_TIME);
         }
         Date end = DateUtils.stringToDate(endTime);
         if (start == null || end == null) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
-            return result;
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.START_END_DATE);
         }
         if (start.getTime() > end.getTime()) {
-            putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR, startTime, endTime);
-            return result;
+            throw new ServiceException(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR, startTime, endTime);
         }
 
-        List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryTopNWorkflowInstance(size, start, end,
-                WorkflowExecutionStatus.SUCCESS, projectCode);
-        result.put(DATA_LIST, workflowInstances);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return workflowInstanceMapper.queryTopNWorkflowInstance(size, start, end, WorkflowExecutionStatus.SUCCESS,
+                projectCode);
     }
 
-    /**
-     * query workflow instance by id
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param workflowInstanceId   workflow instance id
-     * @return workflow instance detail
-     */
     @Override
-    public Map<String, Object> queryWorkflowInstanceById(User loginUser, long projectCode, Integer workflowInstanceId) {
+    public WorkflowInstance queryWorkflowInstanceById(User loginUser, long projectCode, Integer workflowInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
 
-        Map<String, Object> result = new HashMap<>();
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
 
@@ -242,33 +221,13 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode: {}.", projectCode);
-            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowInstanceId);
-        } else {
-            workflowInstance.setLocations(workflowDefinition.getLocations());
-            workflowInstance.setDagData(processService.genDagData(workflowDefinition));
-            result.put(DATA_LIST, workflowInstance);
-            putMsg(result, Status.SUCCESS);
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowInstanceId);
         }
-
-        return result;
+        workflowInstance.setLocations(workflowDefinition.getLocations());
+        workflowInstance.setDagData(processService.genDagData(workflowDefinition));
+        return workflowInstance;
     }
 
-    /**
-     * paging query workflow instance list, filtering according to project, workflow definition, time range, keyword, workflow status
-     *
-     * @param loginUser         login user
-     * @param projectCode       project code
-     * @param workflowDefinitionCode workflow definition code
-     * @param pageNo            page number
-     * @param pageSize          page size
-     * @param searchVal         search value
-     * @param stateType         state type
-     * @param host              host
-     * @param startDate         start time
-     * @param endDate           end time
-     * @param otherParamsJson   otherParamsJson handle other params
-     * @return workflow instance list
-     */
     @Override
     public Result<PageInfo<WorkflowInstance>> queryWorkflowInstanceList(User loginUser,
                                                                         long projectCode,
@@ -336,22 +295,13 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         return result;
     }
 
-    /**
-     * query task list by workflow instance id
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param workflowInstanceId   workflow instance id
-     * @return task list for the workflow instance
-     */
     @Override
-    public Map<String, Object> queryTaskListByWorkflowInstanceId(User loginUser, long projectCode,
-                                                                 Integer workflowInstanceId) {
+    public WorkflowInstanceTaskListDTO queryTaskListByWorkflowInstanceId(User loginUser, long projectCode,
+                                                                         Integer workflowInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
 
-        Map<String, Object> result = new HashMap<>();
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
         WorkflowDefinition workflowDefinition =
@@ -359,21 +309,14 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (workflowDefinition != null && projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
                     workflowInstanceId);
-            putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
-            return result;
+            throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
         List<TaskInstance> taskInstanceList =
                 taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstanceId);
         List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 setTaskInstanceDependentResult(taskInstanceList);
-
-        Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put(WORKFLOW_INSTANCE_STATE, workflowInstance.getState().toString());
-        resultMap.put(TASK_LIST, taskInstanceDependentDetailsList);
-        result.put(DATA_LIST, resultMap);
-
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return new WorkflowInstanceTaskListDTO(workflowInstance.getState().toString(),
+                taskInstanceDependentDetailsList);
     }
 
     private List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
@@ -404,15 +347,12 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     @Override
     public List<DynamicSubWorkflowDto> queryDynamicSubWorkflowInstances(User loginUser, Integer taskId) {
         TaskInstance taskInstance = taskInstanceDao.queryById(taskId);
-        Map<String, Object> result = new HashMap<>();
         if (taskInstance == null) {
-            putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskInstance.getTaskCode());
         if (taskDefinition == null) {
-            putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
 
@@ -424,7 +364,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         List<WorkflowInstance> allSubWorkflows = workflowInstanceDao.queryByIds(allSubWorkflowInstanceId);
 
         if (allSubWorkflows == null || allSubWorkflows.isEmpty()) {
-            putMsg(result, Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, taskId);
             throw new ServiceException(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, taskId);
         }
         Long subWorkflowCode = allSubWorkflows.get(0).getWorkflowDefinitionCode();
@@ -432,7 +371,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         WorkflowDefinition subWorkflowDefinition =
                 processService.findWorkflowDefinition(subWorkflowCode, subWorkflowVersion);
         if (subWorkflowDefinition == null) {
-            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, subWorkflowCode);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, subWorkflowCode);
         }
 
@@ -457,39 +395,27 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         return allDynamicSubWorkflowDtos;
     }
 
-    /**
-     * query sub workflow instance detail info by task id
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param taskId      task id
-     * @return sub workflow instance detail
-     */
     @Override
-    public Map<String, Object> querySubWorkflowInstanceByTaskId(User loginUser, long projectCode, Integer taskId) {
+    public Map<String, Integer> querySubWorkflowInstanceByTaskId(User loginUser, long projectCode, Integer taskId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
 
-        Map<String, Object> result = new HashMap<>();
         TaskInstance taskInstance = taskInstanceDao.queryById(taskId);
         if (taskInstance == null) {
             log.error("Task instance does not exist, projectCode:{}, taskInstanceId{}.", projectCode, taskId);
-            putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
-            return result;
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskInstance.getTaskCode());
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
             log.error("Task definition does not exist, projectCode:{}, taskDefinitionCode:{}.", projectCode,
                     taskInstance.getTaskCode());
-            putMsg(result, Status.TASK_INSTANCE_NOT_EXISTS, taskId);
-            return result;
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
 
         if (!TaskTypeUtils.isSubWorkflowTask(taskInstance.getTaskType())) {
-            putMsg(result, Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE, taskInstance.getName());
-            return result;
+            throw new ServiceException(Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE, taskInstance.getName());
         }
 
         WorkflowInstance subWorkflowInstance = processService.findSubWorkflowInstance(
@@ -497,43 +423,22 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (subWorkflowInstance == null) {
             log.error("Sub workflow instance does not exist, projectCode:{}, taskInstanceId:{}.", projectCode,
                     taskInstance.getId());
-            putMsg(result, Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, taskId);
-            return result;
+            throw new ServiceException(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, taskId);
         }
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put(Constants.SUBWORKFLOW_INSTANCE_ID, subWorkflowInstance.getId());
-        result.put(DATA_LIST, dataMap);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return Collections.singletonMap(SUBWORKFLOW_INSTANCE_ID, subWorkflowInstance.getId());
     }
 
-    /**
-     * update workflow instance
-     *
-     * @param loginUser          login user
-     * @param projectCode        project code
-     * @param taskRelationJson   workflow task relation json
-     * @param taskDefinitionJson taskDefinitionJson
-     * @param workflowInstanceId  workflow instance id
-     * @param scheduleTime       schedule time
-     * @param syncDefine         sync define
-     * @param globalParams       global params
-     * @param locations          locations for nodes
-     * @param timeout            timeout
-     * @return update result code
-     */
     @Transactional
     @Override
-    public Map<String, Object> updateWorkflowInstance(User loginUser, long projectCode, Integer workflowInstanceId,
-                                                      String taskRelationJson,
-                                                      String taskDefinitionJson, String scheduleTime,
-                                                      Boolean syncDefine,
-                                                      String globalParams,
-                                                      String locations, int timeout) {
+    public WorkflowDefinition updateWorkflowInstance(User loginUser, long projectCode, Integer workflowInstanceId,
+                                                     String taskRelationJson,
+                                                     String taskDefinitionJson, String scheduleTime,
+                                                     Boolean syncDefine,
+                                                     String globalParams,
+                                                     String locations, int timeout) {
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
                 ApiFuncIdentificationConstant.INSTANCE_UPDATE);
-        Map<String, Object> result = new HashMap<>();
         // check workflow instance exists
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
@@ -543,16 +448,14 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (workflowDefinition0 != null && projectCode != workflowDefinition0.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
                     workflowInstance.getWorkflowDefinitionCode());
-            putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
-            return result;
+            throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
         // check workflow instance status
         if (!workflowInstance.getState().isFinalState()) {
             log.warn("workflow Instance state is {} so can not update workflow instance, workflowInstanceId:{}.",
                     workflowInstance.getState().name(), workflowInstanceId);
-            putMsg(result, WORKFLOW_INSTANCE_STATE_OPERATION_ERROR,
+            throw new ServiceException(WORKFLOW_INSTANCE_STATE_OPERATION_ERROR,
                     workflowInstance.getName(), workflowInstance.getState().toString(), "update");
-            return result;
         }
 
         String timezoneId;
@@ -567,21 +470,18 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         if (taskDefinitionLogs.isEmpty()) {
             log.warn("Parameter taskDefinitionJson is empty");
-            putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJson);
-            return result;
+            throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionJson);
         }
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (!checkTaskParameters(taskDefinitionLog.getTaskType(), taskDefinitionLog.getTaskParams())) {
                 log.error("Task parameters are invalid,  taskDefinitionName:{}.", taskDefinitionLog.getName());
-                putMsg(result, Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
-                return result;
+                throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
             }
         }
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs, syncDefine);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             log.error("Update task definition error, projectCode:{}, workflowInstanceId:{}", projectCode,
                     workflowInstanceId);
-            putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
         WorkflowDefinition workflowDefinition =
@@ -589,9 +489,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         List<WorkflowTaskRelationLog> taskRelationList =
                 JSONUtils.toList(taskRelationJson, WorkflowTaskRelationLog.class);
         // check workflow json is valid
-        result = workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
+        Map<String, Object> checkResult =
+                workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs);
+        Status checkStatus = (Status) checkResult.get(Constants.STATUS);
+        if (checkStatus != Status.SUCCESS) {
+            throw new ServiceException(checkStatus.getCode(), (String) checkResult.get(Constants.MSG));
         }
 
         workflowDefinition.set(projectCode, workflowDefinition.getName(), workflowDefinition.getDescription(),
@@ -601,11 +503,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (insertVersion == 0) {
             log.error("Update workflow definition error, projectCode:{}, workflowDefinitionName:{}.", projectCode,
                     workflowDefinition.getName());
-            putMsg(result, Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
-        } else
-            log.info("Update workflow definition complete, projectCode:{}, workflowDefinitionName:{}.", projectCode,
-                    workflowDefinition.getName());
+        }
+        log.info("Update workflow definition complete, projectCode:{}, workflowDefinitionName:{}.", projectCode,
+                workflowDefinition.getName());
 
         // save workflow lineage
         if (syncDefine) {
@@ -615,33 +516,27 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         int insertResult = processService.saveTaskRelation(loginUser, workflowDefinition.getProjectCode(),
                 workflowDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, syncDefine);
-        if (insertResult == Constants.EXIT_CODE_SUCCESS) {
-            log.info(
-                    "Update task relations complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
-                    projectCode, workflowDefinition.getCode(), insertVersion);
-            putMsg(result, Status.SUCCESS);
-            result.put(DATA_LIST, workflowDefinition);
-        } else {
+        if (insertResult != Constants.EXIT_CODE_SUCCESS) {
             log.info(
                     "Update task relations error, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
                     projectCode, workflowDefinition.getCode(), insertVersion);
-            putMsg(result, Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
         }
+        log.info(
+                "Update task relations complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}.",
+                projectCode, workflowDefinition.getCode(), insertVersion);
         workflowInstance.setWorkflowDefinitionVersion(insertVersion);
         boolean update = workflowInstanceDao.updateById(workflowInstance);
         if (!update) {
             log.error(
                     "Update workflow instance version error, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}",
                     projectCode, workflowDefinition.getCode(), insertVersion);
-            putMsg(result, Status.UPDATE_WORKFLOW_INSTANCE_ERROR);
             throw new ServiceException(Status.UPDATE_WORKFLOW_INSTANCE_ERROR);
         }
         log.info(
                 "Update workflow instance complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}, workflowInstanceId:{}",
                 projectCode, workflowDefinition.getCode(), insertVersion, workflowInstanceId);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return workflowDefinition;
     }
 
     /**
@@ -663,52 +558,30 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         workflowInstance.setGlobalParams(globalParams);
     }
 
-    /**
-     * query parent workflow instance detail info by sub workflow instance id
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param subId       sub workflow id
-     * @return parent instance detail
-     */
     @Override
-    public Map<String, Object> queryParentInstanceBySubId(User loginUser, long projectCode, Integer subId) {
+    public Map<String, Integer> queryParentInstanceBySubId(User loginUser, long projectCode, Integer subId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
 
-        Map<String, Object> result = new HashMap<>();
         WorkflowInstance subInstance = processService.findWorkflowInstanceDetailById(subId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, subId));
         if (subInstance.getIsSubWorkflow() == Flag.NO) {
             log.warn(
                     "workflow instance is not sub workflow instance type, workflowInstanceId:{}, workflowInstanceName:{}.",
                     subId, subInstance.getName());
-            putMsg(result, Status.WORKFLOW_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE, subInstance.getName());
-            return result;
+            throw new ServiceException(Status.WORKFLOW_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE, subInstance.getName());
         }
 
         WorkflowInstance parentWorkflowInstance = processService.findParentWorkflowInstance(subId);
         if (parentWorkflowInstance == null) {
             log.error("Parent workflow instance does not exist, projectCode:{}, subWorkflowInstanceId:{}.",
                     projectCode, subId);
-            putMsg(result, Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST);
-            return result;
+            throw new ServiceException(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST);
         }
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put(Constants.PARENT_WORKFLOW_INSTANCE, parentWorkflowInstance.getId());
-        result.put(DATA_LIST, dataMap);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return Collections.singletonMap(PARENT_WORKFLOW_INSTANCE, parentWorkflowInstance.getId());
     }
 
-    /**
-     * delete workflow instance by id, at the same time，delete task instance and their mapping relation data
-     *
-     * @param loginUser         login user
-     * @param workflowInstanceId workflow instance id
-     * @return delete result code
-     */
     @Override
     @Transactional
     public void deleteWorkflowInstanceById(User loginUser, Integer workflowInstanceId) {
@@ -731,27 +604,17 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         deleteWorkflowInstanceById(workflowInstanceId);
     }
 
-    /**
-     * view workflow instance variables
-     *
-     * @param loginUser         login user
-     * @param projectCode       project code
-     * @param workflowInstanceId workflow instance id
-     * @return variables data
-     */
     @Override
-    public Map<String, Object> viewVariables(User loginUser, long projectCode, Integer workflowInstanceId) {
+    public WorkflowInstanceVariablesDTO viewVariables(User loginUser, long projectCode, Integer workflowInstanceId) {
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
-        Map<String, Object> result = new HashMap<>();
 
         WorkflowInstance workflowInstance = workflowInstanceMapper.queryDetailById(workflowInstanceId);
 
         if (workflowInstance == null) {
             log.error("workflow instance does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
                     workflowInstanceId);
-            putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
-            return result;
+            throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
 
         WorkflowDefinition workflowDefinition =
@@ -759,8 +622,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (workflowDefinition != null && projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
                     workflowInstance.getWorkflowDefinitionCode());
-            putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
-            return result;
+            throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
 
         String timezone = null;
@@ -779,13 +641,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         // localUserDefParams
         Map<String, Map<String, Object>> localUserDefParams = processLocalParams(workflowInstance, parameterMap);
 
-        Map<String, Object> resultMap = new HashMap<>();
-        resultMap.put(GLOBAL_PARAMS, finalGlobalParams);
-        resultMap.put(LOCAL_PARAMS, localUserDefParams);
-
-        result.put(DATA_LIST, resultMap);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return new WorkflowInstanceVariablesDTO(finalGlobalParams, localUserDefParams);
     }
 
     /**
@@ -854,28 +710,16 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         return localUserDefParams;
     }
 
-    /**
-     * encapsulation gantt structure
-     *
-     * @param loginUser         login user
-     * @param projectCode       project code
-     * @param workflowInstanceId workflow instance id
-     * @return gantt tree data
-     * @throws Exception exception when json parse
-     */
     @Override
-    public Map<String, Object> viewGantt(User loginUser, long projectCode,
-                                         Integer workflowInstanceId) throws Exception {
+    public GanttDto viewGantt(User loginUser, long projectCode, Integer workflowInstanceId) throws Exception {
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
-        Map<String, Object> result = new HashMap<>();
         WorkflowInstance workflowInstance = workflowInstanceMapper.queryDetailById(workflowInstanceId);
 
         if (workflowInstance == null) {
             log.error("workflow instance does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
                     workflowInstanceId);
-            putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
-            return result;
+            throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
 
         WorkflowDefinition workflowDefinition = workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(
@@ -884,8 +728,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
                     workflowInstance.getWorkflowDefinitionCode());
-            putMsg(result, WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
-            return result;
+            throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
         GanttDto ganttDto = new GanttDto();
         DAG<Long, TaskNode, TaskNodeRelation> dag = processService.genDagGraph(workflowDefinition);
@@ -924,19 +767,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             }
         }
         ganttDto.setTasks(taskList);
-
-        result.put(DATA_LIST, ganttDto);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return ganttDto;
     }
 
-    /**
-     * query workflow instance by workflowDefinitionCode and stateArray
-     *
-     * @param workflowDefinitionCode workflowDefinitionCode
-     * @param states                states array
-     * @return workflow instance list
-     */
     @Override
     public List<WorkflowInstance> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode, int[] states) {
         return workflowInstanceMapper.queryByWorkflowDefinitionCodeAndStatus(workflowDefinitionCode, states);
@@ -949,44 +782,22 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 states);
     }
 
-    /**
-     * query workflow instance by workflowDefinitionCode
-     *
-     * @param workflowDefinitionCode workflowDefinitionCode
-     * @param size                  size
-     * @return workflow instance list
-     */
     @Override
     public List<WorkflowInstance> queryByWorkflowDefinitionCode(Long workflowDefinitionCode, int size) {
         return workflowInstanceMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode, size);
     }
 
-    /**
-     * query workflow instance list bt trigger code
-     *
-     * @param loginUser
-     * @param projectCode
-     * @param triggerCode
-     * @return
-     */
     @Override
-    public Map<String, Object> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode) {
+    public List<WorkflowInstance> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode) {
 
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
 
-        Map<String, Object> result = new HashMap<>();
         if (triggerCode == null) {
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return Collections.emptyList();
         }
-
-        List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryByTriggerCode(
-                triggerCode);
-        result.put(DATA_LIST, workflowInstances);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return workflowInstanceMapper.queryByTriggerCode(triggerCode);
     }
 
     @Override
