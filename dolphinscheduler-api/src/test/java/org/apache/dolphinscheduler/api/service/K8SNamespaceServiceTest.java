@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.impl.K8SNamespaceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
@@ -37,7 +36,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -91,19 +89,17 @@ public class K8SNamespaceServiceTest {
     @Test
     public void createK8sNamespace() {
         // namespace is null
-        Map<String, Object> result =
-                k8sNamespaceService.registerK8sNamespace(getLoginUser(), null, clusterCode);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> k8sNamespaceService.registerK8sNamespace(getLoginUser(), null, clusterCode));
         // k8s is null
-        result = k8sNamespaceService.registerK8sNamespace(getLoginUser(), namespace, null);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> k8sNamespaceService.registerK8sNamespace(getLoginUser(), namespace, null));
         // correct
         Mockito.when(clusterMapper.queryByClusterCode(Mockito.anyLong())).thenReturn(getCluster());
-        result = k8sNamespaceService.registerK8sNamespace(getLoginUser(), namespace, clusterCode);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        K8sNamespace created = k8sNamespaceService.registerK8sNamespace(getLoginUser(), namespace, clusterCode);
+        Assertions.assertNotNull(created);
+        Assertions.assertEquals(namespace, created.getNamespace());
+        Assertions.assertEquals(clusterCode, created.getClusterCode());
     }
 
     @Test
@@ -137,9 +133,7 @@ public class K8SNamespaceServiceTest {
         Mockito.when(k8sNamespaceMapper.deleteById(Mockito.<Serializable>any())).thenReturn(1);
         Mockito.when(k8sNamespaceMapper.selectById(1)).thenReturn(getNamespace());
 
-        Map<String, Object> result = k8sNamespaceService.deleteNamespaceById(getLoginUser(), 1);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertDoesNotThrow(() -> k8sNamespaceService.deleteNamespaceById(getLoginUser(), 1));
     }
 
     @Test
@@ -150,9 +144,7 @@ public class K8SNamespaceServiceTest {
 
         // test admin user
         loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2);
-        logger.info(result.toString());
-        List<K8sNamespace> namespaces = (List<K8sNamespace>) result.get(Constants.DATA_LIST);
+        List<K8sNamespace> namespaces = k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(namespaces));
 
         // test non-admin user
@@ -170,9 +162,7 @@ public class K8SNamespaceServiceTest {
         // test admin user
         User loginUser = new User();
         loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 2);
-        logger.info(result.toString());
-        List<K8sNamespace> namespaces = (List<K8sNamespace>) result.get(Constants.DATA_LIST);
+        List<K8sNamespace> namespaces = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 2);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(namespaces));
 
         // test non-admin user
