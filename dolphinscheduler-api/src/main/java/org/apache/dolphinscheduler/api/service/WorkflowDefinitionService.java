@@ -17,9 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowDefinitionVariablesDTO;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
+import org.apache.dolphinscheduler.dao.entity.DagData;
+import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -28,66 +33,39 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.node.ArrayNode;
+
 public interface WorkflowDefinitionService {
 
     /**
      * create workflow definition
-     *
-     * @param loginUser          login user
-     * @param projectCode        project code
-     * @param name               workflow definition name
-     * @param description        description
-     * @param globalParams       global params
-     * @param locations          locations for nodes
-     * @param timeout            timeout
-     * @param taskRelationJson   relation json for nodes
-     * @param taskDefinitionJson taskDefinitionJson
-     * @param otherParamsJson    otherParamsJson handle other params
-     * @return create result code
      */
-    Map<String, Object> createWorkflowDefinition(User loginUser,
-                                                 long projectCode,
-                                                 String name,
-                                                 String description,
-                                                 String globalParams,
-                                                 String locations,
-                                                 int timeout,
-                                                 String taskRelationJson,
-                                                 String taskDefinitionJson,
-                                                 String otherParamsJson,
-                                                 WorkflowExecutionTypeEnum executionType);
+    WorkflowDefinition createWorkflowDefinition(User loginUser,
+                                                long projectCode,
+                                                String name,
+                                                String description,
+                                                String globalParams,
+                                                String locations,
+                                                int timeout,
+                                                String taskRelationJson,
+                                                String taskDefinitionJson,
+                                                String otherParamsJson,
+                                                WorkflowExecutionTypeEnum executionType);
 
     /**
-     * query workflow definition list
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @return definition list
+     * query workflow definition list (full DAG data)
      */
-    Map<String, Object> queryWorkflowDefinitionList(User loginUser,
-                                                    long projectCode);
+    List<DagData> queryWorkflowDefinitionList(User loginUser,
+                                              long projectCode);
 
     /**
-     * query workflow definition simple list
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @return definition simple list
+     * query workflow definition simple list (id / code / name / projectCode)
      */
-    Map<String, Object> queryWorkflowDefinitionSimpleList(User loginUser,
-                                                          long projectCode);
+    ArrayNode queryWorkflowDefinitionSimpleList(User loginUser,
+                                                long projectCode);
 
     /**
      * query workflow definition list paging
-     *
-     * @param loginUser       login user
-     * @param projectCode     project code
-     * @param searchVal       search value
-     * @param otherParamsJson otherParamsJson handle other params
-     * @param pageNo          page number
-     * @param pageSize        page size
-     * @param userId          user id
-     * @return workflow definition page
      */
     PageInfo<WorkflowDefinition> queryWorkflowDefinitionListPaging(User loginUser,
                                                                    long projectCode,
@@ -99,16 +77,10 @@ public interface WorkflowDefinitionService {
 
     /**
      * query detail of workflow definition
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param code        workflow definition code
-     * @return workflow definition detail
      */
-
-    Map<String, Object> queryWorkflowDefinitionByCode(User loginUser,
-                                                      long projectCode,
-                                                      long code);
+    DagData queryWorkflowDefinitionByCode(User loginUser,
+                                          long projectCode,
+                                          long code);
 
     Optional<WorkflowDefinition> queryWorkflowDefinition(long workflowDefinitionCode, int workflowDefinitionVersion);
 
@@ -116,190 +88,112 @@ public interface WorkflowDefinitionService {
                                                                        int workflowDefinitionVersion);
 
     /**
-     * query detail of workflow definition
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param name        workflow definition name
-     * @return workflow definition detail
+     * query detail of workflow definition by name
      */
-
-    Map<String, Object> queryWorkflowDefinitionByName(User loginUser,
-                                                      long projectCode,
-                                                      String name);
+    DagData queryWorkflowDefinitionByName(User loginUser,
+                                          long projectCode,
+                                          String name);
 
     /**
      * batch copy workflow definition
-     *
-     * @param loginUser         loginUser
-     * @param projectCode       projectCode
-     * @param codes             workflowDefinitionCodes
-     * @param targetProjectCode targetProjectCode
      */
-    Map<String, Object> batchCopyWorkflowDefinition(User loginUser,
-                                                    long projectCode,
-                                                    String codes,
-                                                    long targetProjectCode);
+    void batchCopyWorkflowDefinition(User loginUser,
+                                     long projectCode,
+                                     String codes,
+                                     long targetProjectCode);
 
     /**
      * batch move workflow definition
-     *
-     * @param loginUser         loginUser
-     * @param projectCode       projectCode
-     * @param codes             workflowDefinitionCodes
-     * @param targetProjectCode targetProjectCode
      */
-    Map<String, Object> batchMoveWorkflowDefinition(User loginUser,
-                                                    long projectCode,
-                                                    String codes,
-                                                    long targetProjectCode);
+    void batchMoveWorkflowDefinition(User loginUser,
+                                     long projectCode,
+                                     String codes,
+                                     long targetProjectCode);
 
     /**
      * update workflow definition, with whole workflow definition object including task definition, task relation and location.
-     *
-     * @param loginUser          login user
-     * @param projectCode        project code
-     * @param name               workflow definition name
-     * @param code               workflow definition code
-     * @param description        description
-     * @param globalParams       global params
-     * @param locations          locations for nodes
-     * @param timeout            timeout
-     * @param taskRelationJson   relation json for nodes
-     * @param taskDefinitionJson taskDefinitionJson
-     * @return update result code
      */
-    Map<String, Object> updateWorkflowDefinition(User loginUser,
-                                                 long projectCode,
-                                                 String name,
-                                                 long code,
-                                                 String description,
-                                                 String globalParams,
-                                                 String locations,
-                                                 int timeout,
-                                                 String taskRelationJson,
-                                                 String taskDefinitionJson,
-                                                 WorkflowExecutionTypeEnum executionType);
+    WorkflowDefinition updateWorkflowDefinition(User loginUser,
+                                                long projectCode,
+                                                String name,
+                                                long code,
+                                                String description,
+                                                String globalParams,
+                                                String locations,
+                                                int timeout,
+                                                String taskRelationJson,
+                                                String taskDefinitionJson,
+                                                WorkflowExecutionTypeEnum executionType);
 
     /**
-     * verify workflow definition name unique
-     *
-     * @param loginUser             login user
-     * @param projectCode           project code
-     * @param name                  name
-     * @param workflowDefinitionCode workflowDefinitionCode
-     * @return true if workflow definition name not exists, otherwise false
+     * verify workflow definition name unique. Throws {@link org.apache.dolphinscheduler.api.exceptions.ServiceException}
+     * with {@code WORKFLOW_DEFINITION_NAME_EXIST} when the name is already taken.
      */
-    Map<String, Object> verifyWorkflowDefinitionName(User loginUser,
-                                                     long projectCode,
-                                                     String name,
-                                                     long workflowDefinitionCode);
+    void verifyWorkflowDefinitionName(User loginUser,
+                                      long projectCode,
+                                      String name,
+                                      long workflowDefinitionCode);
 
     /**
-     * batch delete workflow definition by code
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param codes       workflow definition codes
-     * @return delete result code
+     * batch delete workflow definition by codes
      */
-    Map<String, Object> batchDeleteWorkflowDefinitionByCodes(User loginUser,
-                                                             long projectCode,
-                                                             String codes);
+    void batchDeleteWorkflowDefinitionByCodes(User loginUser,
+                                              long projectCode,
+                                              String codes);
 
     void deleteWorkflowDefinitionByCode(User loginUser, long workflowDefinitionCode);
 
     /**
-     * check the workflow task relation json
-     *
-     * @param workflowTaskRelationJson workflow task relation json
-     * @return check result code
+     * check the workflow task relation json (no return value: throws on validation failures)
      */
-    Map<String, Object> checkWorkflowNodeList(String workflowTaskRelationJson,
-                                              List<TaskDefinitionLog> taskDefinitionLogs);
+    void checkWorkflowNodeList(String workflowTaskRelationJson,
+                               List<TaskDefinitionLog> taskDefinitionLogs);
 
     /**
      * get task node details based on workflow definition
-     *
-     * @param loginUser   loginUser
-     * @param projectCode project code
-     * @param code        workflowDefinition code
-     * @return task node list
      */
-    Map<String, Object> getTaskNodeListByDefinitionCode(User loginUser,
-                                                        long projectCode,
-                                                        long code);
+    List<TaskDefinition> getTaskNodeListByDefinitionCode(User loginUser,
+                                                         long projectCode,
+                                                         long code);
 
     /**
-     * get task node details map based on workflow definition
-     *
-     * @param loginUser   loginUser
-     * @param projectCode project code
-     * @param codes       define code list
-     * @return task node list
+     * get task node details map based on workflow definition codes (workflow code -> task definition list)
      */
-    Map<String, Object> getNodeListMapByDefinitionCodes(User loginUser,
-                                                        long projectCode,
-                                                        String codes);
+    Map<Long, List<TaskDefinition>> getNodeListMapByDefinitionCodes(User loginUser,
+                                                                    long projectCode,
+                                                                    String codes);
 
     /**
      * query workflow definition all by project code
-     *
-     * @param projectCode project code
-     * @return workflow definitions in the project
      */
-    Map<String, Object> queryAllWorkflowDefinitionByProjectCode(User loginUser, long projectCode);
+    List<DagData> queryAllWorkflowDefinitionByProjectCode(User loginUser, long projectCode);
 
     /**
-     * query workflow definition list by project code
-     *
-     * @param projectCode project code
-     * @return workflow definitions in the project
+     * query workflow definition list by project code (simplified records used for dependent task picker)
      */
-    Map<String, Object> queryWorkflowDefinitionListByProjectCode(long projectCode);
+    List<DependentSimplifyDefinition> queryWorkflowDefinitionListByProjectCode(long projectCode);
 
     /**
-     * query workflow definition list by project code
-     *
-     * @param projectCode           project code
-     * @param workflowDefinitionCode workflow definition code
-     * @return workflow definitions in the project
+     * query task definition list (simplified records) by workflow definition code
      */
-    Map<String, Object> queryTaskDefinitionListByWorkflowDefinitionCode(long projectCode, Long workflowDefinitionCode);
+    List<DependentSimplifyDefinition> queryTaskDefinitionListByWorkflowDefinitionCode(long projectCode,
+                                                                                      Long workflowDefinitionCode);
 
     /**
      * Encapsulates the TreeView structure
-     *
-     * @param projectCode project code
-     * @param code        workflow definition code
-     * @param limit       limit
-     * @return tree view json data
      */
-    Map<String, Object> viewTree(User loginUser, long projectCode, long code, Integer limit);
+    TreeViewDto viewTree(User loginUser, long projectCode, long code, Integer limit);
 
     /**
      * switch the defined workflow definition version
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param code        workflow definition code
-     * @param version     the version user want to switch
-     * @return switch workflow definition version result code
      */
-    Map<String, Object> switchWorkflowDefinitionVersion(User loginUser,
-                                                        long projectCode,
-                                                        long code,
-                                                        int version);
+    void switchWorkflowDefinitionVersion(User loginUser,
+                                         long projectCode,
+                                         long code,
+                                         int version);
 
     /**
      * query the pagination versions info by one certain workflow definition code
-     *
-     * @param loginUser   login user info to check auth
-     * @param projectCode project code
-     * @param pageNo      page number
-     * @param pageSize    page size
-     * @param code        workflow definition code
-     * @return the pagination workflow definition versions info of the certain workflow definition
      */
     Result queryWorkflowDefinitionVersions(User loginUser,
                                            long projectCode,
@@ -309,11 +203,6 @@ public interface WorkflowDefinitionService {
 
     /**
      * delete one certain workflow definition by version number and workflow definition code
-     *
-     * @param loginUser                 login user info to check auth
-     * @param projectCode               project code
-     * @param workflowDefinitionCode    workflow definition code
-     * @param workflowDefinitionVersion version number
      */
     void deleteWorkflowDefinitionVersion(User loginUser,
                                          long projectCode,
@@ -331,14 +220,9 @@ public interface WorkflowDefinitionService {
     void offlineWorkflowDefinition(User loginUser, Long projectCode, Long workflowDefinitionCode);
 
     /**
-     * view workflow variables
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param code        workflow definition code
-     * @return variables data
+     * view workflow variables (globalParams + localParams)
      */
-    Map<String, Object> viewVariables(User loginUser, long projectCode, long code);
+    WorkflowDefinitionVariablesDTO viewVariables(User loginUser, long projectCode, long code);
 
     void saveWorkflowLineage(long projectCode,
                              long workflowDefinitionCode,

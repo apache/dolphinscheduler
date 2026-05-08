@@ -82,7 +82,6 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -539,8 +538,6 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        result.put(Constants.STATUS, Status.SUCCESS);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
@@ -589,7 +586,7 @@ public class WorkflowInstanceServiceTest {
                 .thenReturn(1);
 
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
-        when(workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs)).thenReturn(result);
+        Mockito.doNothing().when(workflowDefinitionService).checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs);
 
         try (
                 MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
