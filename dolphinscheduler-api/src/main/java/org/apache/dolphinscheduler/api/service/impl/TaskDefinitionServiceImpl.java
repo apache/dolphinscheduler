@@ -134,12 +134,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                          String taskName) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
 
+        Map<String, Object> result = new HashMap<>();
         TaskDefinition taskDefinition =
                 taskDefinitionMapper.queryByName(project.getCode(), workflowDefinitionCode, taskName);
         if (taskDefinition == null) {
@@ -526,11 +523,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> switchVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_SWITCH_TO_THIS_VERSION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_SWITCH_TO_THIS_VERSION);
+
+        Map<String, Object> result = new HashMap<>();
         if (processService.isTaskOnline(taskCode)) {
             log.warn(
                     "Task definition version can not be switched due to workflow definition is {}, taskDefinitionCode:{}.",
@@ -584,13 +579,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> checkResult =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_VERSION_VIEW);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            putMsg(result, resultStatus);
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_VERSION_VIEW);
+
         PageInfo<TaskDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<TaskDefinitionLog> page = new Page<>(pageNo, pageSize);
         IPage<TaskDefinitionLog> taskDefinitionVersionsPaging =
@@ -645,12 +635,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public Map<String, Object> queryTaskDefinitionDetail(User loginUser, long projectCode, long taskCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
 
+        Map<String, Object> result = new HashMap<>();
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
             log.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
@@ -705,11 +692,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                      ReleaseState releaseState) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        Status resultStatus = (Status) result.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
+
+        Map<String, Object> result = new HashMap<>();
         if (null == releaseState) {
             putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);
             return result;

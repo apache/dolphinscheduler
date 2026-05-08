@@ -54,19 +54,6 @@ public interface ProjectService {
      */
     Map<String, Object> queryByName(User loginUser, String projectName);
 
-    /**
-     * check project and authorization
-     *
-     * @param loginUser login user
-     * @param project project
-     * @param projectCode project code
-     * @param perm String
-     * @return true if the login user have permission to see the project
-     * @deprecated use {@link #checkProjectAndAuthThrowException(User, Long, String)} instead
-     */
-    @Deprecated
-    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode, String perm);
-
     void checkProjectAndAuthThrowException(User loginUser, Project project, String permission) throws ServiceException;
 
     void checkProjectAndAuthThrowException(User loginUser, Long projectCode, String permission) throws ServiceException;
@@ -194,20 +181,6 @@ public interface ProjectService {
      * @return project list
      */
     Result queryProjectCreatedAndAuthorizedByUser(User loginUser);
-
-    /**
-     * check project and authorization
-     *
-     * @param result result
-     * @param loginUser login user
-     * @param project project
-     * @param projectCode project code
-     * @param perm String
-     * @return true if the login user have permission to see the project
-     * @deprecated use {@link #checkProjectAndAuthThrowException(User, Long, String)} instead
-     */
-    @Deprecated
-    void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode, String perm);
 
     /**
      * the project list in dependent node's permissions should not be restricted

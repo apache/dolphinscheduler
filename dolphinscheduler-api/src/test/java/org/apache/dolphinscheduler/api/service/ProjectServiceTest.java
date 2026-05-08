@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -130,20 +131,19 @@ public class ProjectServiceTest {
 
     @Test
     public void testCheckProjectAndAuth() {
-        long projectCode = 1L;
         User loginUser = getLoginUser();
 
         // PROJECT_NOT_EXIST
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, null, projectCode, PROJECT);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.PROJECT_NOT_EXIST, result.get(Constants.STATUS));
+        ServiceException notExistEx = Assertions.assertThrows(ServiceException.class,
+                () -> projectService.checkProjectAndAuthThrowException(loginUser, (Project) null, PROJECT));
+        Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), notExistEx.getCode());
 
         // USER_NO_OPERATION_PROJECT_PERM
         Project project = getProject();
         project.setUserId(2);
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM, result.get(Constants.STATUS));
+        ServiceException noPermEx = Assertions.assertThrows(ServiceException.class,
+                () -> projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), noPermEx.getCode());
 
         // success
         project.setUserId(1);
@@ -153,9 +153,8 @@ public class ProjectServiceTest {
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{project.getId()},
                 0, baseServiceLogger)).thenReturn(true);
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, PROJECT);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertDoesNotThrow(
+                () -> projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT));
     }
 
     @Test

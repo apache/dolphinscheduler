@@ -457,11 +457,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public Map<String, Object> queryWorkflowDefinitionList(User loginUser, long projectCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+
+        Map<String, Object> result = new HashMap<>();
         List<WorkflowDefinition> resourceList = workflowDefinitionMapper.queryAllDefinitionList(projectCode);
         List<DagData> dagDataList = resourceList.stream().map(processService::genDagData).collect(Collectors.toList());
         result.put(Constants.DATA_LIST, dagDataList);
@@ -480,11 +478,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public Map<String, Object> queryWorkflowDefinitionSimpleList(User loginUser, long projectCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+
+        Map<String, Object> result = new HashMap<>();
         List<WorkflowDefinition> workflowDefinitions = workflowDefinitionMapper.queryAllDefinitionList(projectCode);
         ArrayNode arrayNode = JSONUtils.createArrayNode();
         for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
@@ -568,12 +564,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public Map<String, Object> queryWorkflowDefinitionByCode(User loginUser, long projectCode, long code) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
+        Map<String, Object> result = new HashMap<>();
         WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
@@ -609,11 +602,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public Map<String, Object> queryWorkflowDefinitionByName(User loginUser, long projectCode, String name) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+
+        Map<String, Object> result = new HashMap<>();
         WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByDefineName(projectCode, name);
 
         if (workflowDefinition == null) {
@@ -836,11 +827,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                             long workflowDefinitionCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_CREATE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_CREATE);
+
+        Map<String, Object> result = new HashMap<>();
         WorkflowDefinition workflowDefinition =
                 workflowDefinitionMapper.verifyByDefineName(project.getCode(), name.trim());
         if (workflowDefinition == null) {
@@ -1050,10 +1039,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public Map<String, Object> getTaskNodeListByDefinitionCode(User loginUser, long projectCode, long code) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
+
+        Map<String, Object> result = new HashMap<>();
         WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
@@ -1079,11 +1067,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public Map<String, Object> getNodeListMapByDefinitionCodes(User loginUser, long projectCode, String codes) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
+        Map<String, Object> result = new HashMap<>();
         Set<Long> defineCodeSet = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
                 .collect(Collectors.toSet());
         List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionMapper.queryByCodes(defineCodeSet);
@@ -1131,11 +1117,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public Map<String, Object> queryAllWorkflowDefinitionByProjectCode(User loginUser, long projectCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+
+        Map<String, Object> result = new HashMap<>();
         List<WorkflowDefinition> workflowDefinitions = workflowDefinitionMapper.queryAllDefinitionList(projectCode);
         List<DagData> dagDataList =
                 workflowDefinitions.stream().map(processService::genDagData).collect(Collectors.toList());
@@ -1208,10 +1192,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Map<String, Object> result = new HashMap<>();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        result = projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_TREE_VIEW);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_TREE_VIEW);
+
         WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
         if (null == workflowDefinition || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, code:{}.", code);
@@ -1377,9 +1359,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                            String codes,
                                                            long targetProjectCode) {
         Map<String, Object> result = checkParams(loginUser, projectCode, codes, targetProjectCode, WORKFLOW_BATCH_COPY);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
         List<String> failedWorkflowList = new ArrayList<>();
         doBatchOperateWorkflowDefinition(loginUser, targetProjectCode, failedWorkflowList, codes, result, true);
         checkBatchOperateResult(projectCode, targetProjectCode, result, failedWorkflowList, true);
@@ -1403,9 +1382,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                            long targetProjectCode) {
         Map<String, Object> result =
                 checkParams(loginUser, projectCode, codes, targetProjectCode, TASK_DEFINITION_MOVE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
         if (projectCode == targetProjectCode) {
             log.warn("Project code is same as target project code, projectCode:{}.", projectCode);
             return result;
@@ -1423,26 +1399,20 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                             long targetProjectCode, String perm) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, perm);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, perm);
 
         if (StringUtils.isEmpty(workflowDefinitionCodes)) {
             log.error("Parameter workflowDefinitionCodes is empty, projectCode is {}.", projectCode);
-            putMsg(result, Status.WORKFLOW_DEFINITION_CODES_IS_EMPTY, workflowDefinitionCodes);
-            return result;
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_CODES_IS_EMPTY);
         }
 
         if (projectCode != targetProjectCode) {
             Project targetProject = projectMapper.queryByCode(targetProjectCode);
             // check user access for project
-            Map<String, Object> targetResult =
-                    projectService.checkProjectAndAuth(loginUser, targetProject, targetProjectCode, perm);
-            if (targetResult.get(Constants.STATUS) != Status.SUCCESS) {
-                return targetResult;
-            }
+            projectService.checkProjectAndAuthThrowException(loginUser, targetProject, perm);
         }
+        Map<String, Object> result = new HashMap<>();
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
@@ -1701,12 +1671,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                                int version) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_SWITCH_TO_THIS_VERSION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_SWITCH_TO_THIS_VERSION);
 
+        Map<String, Object> result = new HashMap<>();
         WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
         if (Objects.isNull(workflowDefinition) || projectCode != workflowDefinition.getProjectCode()) {
             log.error(
@@ -1824,13 +1791,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> checkResult =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, VERSION_LIST);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            putMsg(result, resultStatus);
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, VERSION_LIST);
+
         PageInfo<WorkflowDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<WorkflowDefinitionLog> page = new Page<>(pageNo, pageSize);
         IPage<WorkflowDefinitionLog> workflowDefinitionLogIPage =
@@ -1939,12 +1901,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Project project = projectMapper.queryByCode(projectCode);
 
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
+        Map<String, Object> result = new HashMap<>();
         WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
 
         if (Objects.isNull(workflowDefinition) || projectCode != workflowDefinition.getProjectCode()) {

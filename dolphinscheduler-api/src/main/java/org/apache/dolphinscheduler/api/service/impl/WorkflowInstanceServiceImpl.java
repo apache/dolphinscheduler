@@ -185,13 +185,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                                                                        String startTime, String endTime) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        WORKFLOW_INSTANCE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
 
+        Map<String, Object> result = new HashMap<>();
         if (0 > size) {
             putMsg(result, Status.NEGTIVE_SIZE_NUMBER_ERROR, size);
             return result;
@@ -234,12 +230,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     public Map<String, Object> queryWorkflowInstanceById(User loginUser, long projectCode, Integer workflowInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        WORKFLOW_INSTANCE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+
+        Map<String, Object> result = new HashMap<>();
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
 
@@ -356,12 +349,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                                                                  Integer workflowInstanceId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        WORKFLOW_INSTANCE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+
+        Map<String, Object> result = new HashMap<>();
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
         WorkflowDefinition workflowDefinition =
@@ -479,13 +469,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     public Map<String, Object> querySubWorkflowInstanceByTaskId(User loginUser, long projectCode, Integer taskId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        WORKFLOW_INSTANCE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
 
+        Map<String, Object> result = new HashMap<>();
         TaskInstance taskInstance = taskInstanceDao.queryById(taskId);
         if (taskInstance == null) {
             log.error("Task instance does not exist, projectCode:{}, taskInstanceId{}.", projectCode, taskId);
@@ -689,13 +675,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     public Map<String, Object> queryParentInstanceBySubId(User loginUser, long projectCode, Integer subId) {
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode,
-                        WORKFLOW_INSTANCE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
 
+        Map<String, Object> result = new HashMap<>();
         WorkflowInstance subInstance = processService.findWorkflowInstanceDetailById(subId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, subId));
         if (subInstance.getIsSubWorkflow() == Flag.NO) {
@@ -992,9 +974,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         Project project = projectMapper.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE);
-        if (result.get(Constants.STATUS) != Status.SUCCESS || triggerCode == null) {
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+
+        Map<String, Object> result = new HashMap<>();
+        if (triggerCode == null) {
+            putMsg(result, Status.SUCCESS);
             return result;
         }
 

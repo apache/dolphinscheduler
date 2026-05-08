@@ -192,34 +192,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         return result;
     }
 
-    /**
-     * check project and authorization
-     *
-     * @param loginUser   login user
-     * @param project     project
-     * @param projectCode project code
-     * @return true if the login user have permission to see the project
-     */
-    @Deprecated
-    @Override
-    public Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode,
-                                                   String permission) {
-        Map<String, Object> result = new HashMap<>();
-        if (project == null) {
-            log.error("Project does not exist, projectCode:{}.", projectCode);
-            putMsg(result, Status.PROJECT_NOT_EXIST);
-        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
-                permission)) {
-            // check read permission
-            log.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
-                    permission, loginUser.getUserName(), projectCode);
-            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectCode);
-        } else {
-            putMsg(result, Status.SUCCESS);
-        }
-        return result;
-    }
-
     public void checkProjectAndAuthThrowException(@NonNull User loginUser, @Nullable Project project,
                                                   String permission) {
         // todo: throw a permission exception
@@ -478,12 +450,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return result;
         }
 
-        checkProjectAndAuth(result, loginUser, project, project == null ? 0L : project.getCode(), PROJECT_DELETE);
-        if (result.getCode() != Status.SUCCESS.getCode()) {
-            return result;
-        }
-
-        assert project != null;
+        checkProjectAndAuthThrowException(loginUser, project, PROJECT_DELETE);
 
         List<WorkflowDefinition> workflowDefinitionList =
                 workflowDefinitionMapper.queryAllDefinitionList(project.getCode());
@@ -506,23 +473,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.DELETE_PROJECT_ERROR);
         }
         return result;
-    }
-
-    /**
-     * get check result
-     *
-     * @param loginUser login user
-     * @param project   project
-     * @return check result
-     */
-    private Map<String, Object> getCheckResult(User loginUser, Project project, String perm) {
-        Map<String, Object> checkResult =
-                checkProjectAndAuth(loginUser, project, project == null ? 0L : project.getCode(), perm);
-        Status status = (Status) checkResult.get(Constants.STATUS);
-        if (status != Status.SUCCESS) {
-            return checkResult;
-        }
-        return null;
     }
 
     /**
@@ -809,31 +759,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
         return result;
-    }
-
-    /**
-     * check project and authorization
-     *
-     * @param result      result
-     * @param loginUser   login user
-     * @param project     project
-     * @param projectCode project code
-     * @return true if the login user have permission to see the project
-     */
-    @Deprecated
-    @Override
-    public void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode,
-                                    String permission) {
-        if (project == null) {
-            log.error("Project does not exist, project code:{}.", projectCode);
-            putMsg(result, Status.PROJECT_NOT_EXIST);
-        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
-                permission)) {
-            // check read permission
-            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), projectCode);
-        } else {
-            putMsg(result, Status.SUCCESS);
-        }
     }
 
     /**

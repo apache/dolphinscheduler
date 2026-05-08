@@ -129,15 +129,16 @@ jobs:
           restore-keys: ${{ runner.os }}-maven-
 
       # Install the target module and its upstream dependencies into the local
-      # Maven repository without running tests. The following unit-test step
-      # resolves these artifacts from the same runner's ~/.m2/repository.
+      # Maven repository without running tests. Use skipTests instead of
+      # maven.test.skip so packaging still sees provided-scope dependencies and
+      # attaches any test/provided artifacts required by downstream modules.
       - name: Install Dependencies (${{ matrix.module }})
         run: |
           export MAVEN_OPTS="-Xmx14g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
           ./mvnw install -B \
-            -pl "${{ matrix.module }}" \
+            -pl "dolphinscheduler-bom,${{ matrix.module }}" \
             -am \
-            -Dmaven.test.skip=true \
+            -DskipTests=true \
             -Dspotless.skip=true \
             -DskipUT=true \
             -Djacoco.skip=true \
