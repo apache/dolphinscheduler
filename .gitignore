@@ -59,3 +59,4 @@ ds_schema_check_test
 # Agent
 docs/superpowers/
 .claude/worktrees
+CLAUDE.local.md
