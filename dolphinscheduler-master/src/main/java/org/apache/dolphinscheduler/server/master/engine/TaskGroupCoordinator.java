@@ -103,7 +103,16 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     private void doStart() {
         // Sleep 1 minutes here to make sure the previous task group slot has been released.
         // This step is not necessary, since the wakeup operation is idempotent, but we can avoid confusion warning.
-        ThreadUtils.sleep(TimeUnit.MINUTES.toMillis(1));
+        try {
+            Thread.sleep(TimeUnit.MINUTES.toMillis(1));
+        } catch (InterruptedException e) {
+            if (!flag) {
+                Thread.currentThread().interrupt();
+                log.debug("TaskGroupCoordinator doStart interrupted during initial sleep, stopping");
+                return;
+            }
+            log.warn("TaskGroupCoordinator doStart sleep interrupted unexpectedly", e);
+        }
 
         while (flag) {
             try {
@@ -120,7 +129,16 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 log.error("TaskGroupCoordinator error", e);
             } finally {
                 // sleep 5s
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5);
+                try {
+                    Thread.sleep(Constants.SLEEP_TIME_MILLIS * 5L);
+                } catch (InterruptedException e) {
+                    if (!flag) {
+                        Thread.currentThread().interrupt();
+                        log.debug("TaskGroupCoordinator sleep interrupted during shutdown");
+                        break;
+                    }
+                    log.warn("TaskGroupCoordinator sleep interrupted unexpectedly", e);
+                }
             }
         }
     }

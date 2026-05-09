@@ -41,6 +41,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.collect.Lists;
@@ -205,13 +206,41 @@ public class JdbcRegistryDataManager
                         .createTime(new Date())
                         .lastUpdateTime(new Date())
                         .build();
-                jdbcRegistryDataRepository.insert(jdbcRegistryDataDTO);
-                JdbcRegistryDataChangeEventDTO registryDataChangeEvent = JdbcRegistryDataChangeEventDTO.builder()
-                        .jdbcRegistryData(jdbcRegistryDataDTO)
-                        .eventType(JdbcRegistryDataChangeEventDTO.EventType.ADD)
-                        .createTime(new Date())
-                        .build();
-                jdbcRegistryDataChangeEventRepository.insert(registryDataChangeEvent);
+                try {
+                    jdbcRegistryDataRepository.insert(jdbcRegistryDataDTO);
+                    JdbcRegistryDataChangeEventDTO registryDataChangeEvent = JdbcRegistryDataChangeEventDTO.builder()
+                            .jdbcRegistryData(jdbcRegistryDataDTO)
+                            .eventType(JdbcRegistryDataChangeEventDTO.EventType.ADD)
+                            .createTime(new Date())
+                            .build();
+                    jdbcRegistryDataChangeEventRepository.insert(registryDataChangeEvent);
+                } catch (DuplicateKeyException ex) {
+                    Optional<JdbcRegistryDataDTO> existing = jdbcRegistryDataRepository.selectByKey(key);
+                    if (!existing.isPresent()) {
+                        throw ex;
+                    }
+                    JdbcRegistryDataDTO jdbcRegistryData = existing.get();
+                    if (!dataType.name().equals(jdbcRegistryData.getDataType())) {
+                        throw new UnsupportedOperationException("The data type: " + jdbcRegistryData.getDataType()
+                                + " of the key: " + key + " cannot be updated");
+                    }
+                    if (DataType.EPHEMERAL.name().equals(jdbcRegistryData.getDataType())
+                            && !jdbcRegistryData.getClientId().equals(clientId)) {
+                        throw new UnsupportedOperationException(
+                                "The EPHEMERAL data: " + key + " can only be updated by its owner: "
+                                        + jdbcRegistryData.getClientId() + " but not: " + clientId);
+                    }
+                    jdbcRegistryData.setDataValue(value);
+                    jdbcRegistryData.setLastUpdateTime(new Date());
+                    jdbcRegistryDataRepository.updateById(jdbcRegistryData);
+
+                    JdbcRegistryDataChangeEventDTO registryDataChangeEvent = JdbcRegistryDataChangeEventDTO.builder()
+                            .jdbcRegistryData(jdbcRegistryData)
+                            .eventType(JdbcRegistryDataChangeEventDTO.EventType.UPDATE)
+                            .createTime(new Date())
+                            .build();
+                    jdbcRegistryDataChangeEventRepository.insert(registryDataChangeEvent);
+                }
             }
             return null;
         });
