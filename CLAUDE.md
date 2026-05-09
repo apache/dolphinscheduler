@@ -146,7 +146,7 @@ A **user** hits the UI, which calls the API server. The API server writes to the
 
 ## Project-wide conventions
 
-- **Formatting**: `./mvnw spotless:apply`. CI will fail PRs that aren't formatted. Java imports are ordered; license headers are enforced.
+- **Formatting**: Run `./mvnw spotless:apply` before every commit/push. Spotless covers Java sources, `pom.xml`, and Markdown files (yes, including the docs); CI runs `./mvnw spotless:check` and will fail PRs that aren't formatted. Java imports are ordered; license headers are enforced.
 - **Commit style**: `[Type-ISSUE_ID][Scope] Subject`, e.g. `[Fix-18168][Worker] ...`. All types except `Chore` require an issue ID. See [commit-message.md](docs/docs/en/contribute/join/commit-message.md) for the full convention.
 - **Branching**: `dev` is the main integration branch (not `main`/`master`).
 - **PRs must link a GitHub issue** and keep their scope tight — one module / one concern.
