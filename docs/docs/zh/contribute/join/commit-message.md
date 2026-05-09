@@ -16,14 +16,14 @@ Header 必填，body 和 footer 可选。Subject 建议控制在 72 字符内，
 
 ### Type（必填）
 
-| Type | 使用场景 | 是否必须带 Issue ID |
-|------|----------|---------------------|
-| `Feature` | 用户可见的新功能 | 是 |
-| `Improvement` | 已有功能的增强（重构、性能、体验优化） | 是 |
-| `Fix` | Bug 修复 | 是 |
-| `Doc` | 仅文档变动 | 是 |
-| `DSIP` | 实现某个 [DSIP](https://github.com/apache/dolphinscheduler/issues?q=label%3ADSIP) 提案的变更 | 是（对应 DSIP issue） |
-| `Chore` | 构建、CI、测试脚手架、依赖升级、零碎清理 | 否 |
+|     Type      |                                        使用场景                                         |  是否必须带 Issue ID  |
+|---------------|-------------------------------------------------------------------------------------|------------------|
+| `Feature`     | 用户可见的新功能                                                                            | 是                |
+| `Improvement` | 已有功能的增强（重构、性能、体验优化）                                                                 | 是                |
+| `Fix`         | Bug 修复                                                                              | 是                |
+| `Doc`         | 仅文档变动                                                                               | 是                |
+| `DSIP`        | 实现某个 [DSIP](https://github.com/apache/dolphinscheduler/issues?q=label%3ADSIP) 提案的变更 | 是（对应 DSIP issue） |
+| `Chore`       | 构建、CI、测试脚手架、依赖升级、零碎清理                                                               | 否                |
 
 除 `Chore` 外的所有 type **都必须带上 Issue ID**。如果没有现成 Issue，请先创建一个；否则把它归类为 `Chore`。
 
@@ -88,3 +88,4 @@ Closes #17900
 - [Pull Request 须知](./pull-request.md)
 - [Apache Geode 提交消息格式](https://cwiki.apache.org/confluence/display/GEODE/Commit+Message+Format)
 - [On commit messages —— Peter Hutterer](http://who-t.blogspot.com/2009/12/on-commit-messages.html)
+
