@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
@@ -47,7 +46,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -205,38 +203,28 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * query all environment
      *
      * @param loginUser
-     * @return all environment list
      */
     @Override
-    public Map<String, Object> queryAllEnvironmentList(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public List<EnvironmentDto> queryAllEnvironmentList(User loginUser) {
         Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT,
                 loginUser.getId(), log);
         if (ids.isEmpty()) {
-            result.put(Constants.DATA_LIST, Collections.emptyList());
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return Collections.emptyList();
         }
         List<Environment> environmentList = environmentMapper.selectBatchIds(ids);
-        if (CollectionUtils.isNotEmpty(environmentList)) {
-            Map<Long, List<String>> relationMap = relationMapper.selectList(null).stream()
-                    .collect(Collectors.groupingBy(EnvironmentWorkerGroupRelation::getEnvironmentCode,
-                            Collectors.mapping(EnvironmentWorkerGroupRelation::getWorkerGroup, Collectors.toList())));
-
-            List<EnvironmentDto> dtoList = environmentList.stream().map(environment -> {
-                EnvironmentDto dto = new EnvironmentDto();
-                BeanUtils.copyProperties(environment, dto);
-                List<String> workerGroups = relationMap.getOrDefault(environment.getCode(), new ArrayList<String>());
-                dto.setWorkerGroups(workerGroups);
-                return dto;
-            }).collect(Collectors.toList());
-            result.put(Constants.DATA_LIST, dtoList);
-        } else {
-            result.put(Constants.DATA_LIST, new ArrayList<>());
+        if (CollectionUtils.isEmpty(environmentList)) {
+            return Collections.emptyList();
         }
+        Map<Long, List<String>> relationMap = relationMapper.selectList(null).stream()
+                .collect(Collectors.groupingBy(EnvironmentWorkerGroupRelation::getEnvironmentCode,
+                        Collectors.mapping(EnvironmentWorkerGroupRelation::getWorkerGroup, Collectors.toList())));
 
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return environmentList.stream().map(environment -> {
+            EnvironmentDto dto = new EnvironmentDto();
+            BeanUtils.copyProperties(environment, dto);
+            dto.setWorkerGroups(relationMap.getOrDefault(environment.getCode(), new ArrayList<>()));
+            return dto;
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -245,25 +233,19 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param code environment code
      */
     @Override
-    public Map<String, Object> queryEnvironmentByCode(Long code) {
-        Map<String, Object> result = new HashMap<>();
-
+    public EnvironmentDto queryEnvironmentByCode(Long code) {
         Environment env = environmentMapper.queryByEnvironmentCode(code);
-
         if (env == null) {
-            putMsg(result, Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, code);
-        } else {
-            List<String> workerGroups = relationMapper.queryByEnvironmentCode(env.getCode()).stream()
-                    .map(item -> item.getWorkerGroup())
-                    .collect(Collectors.toList());
-
-            EnvironmentDto dto = new EnvironmentDto();
-            BeanUtils.copyProperties(env, dto);
-            dto.setWorkerGroups(workerGroups);
-            result.put(Constants.DATA_LIST, dto);
-            putMsg(result, Status.SUCCESS);
+            throw new ServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, code);
         }
-        return result;
+        List<String> workerGroups = relationMapper.queryByEnvironmentCode(env.getCode()).stream()
+                .map(EnvironmentWorkerGroupRelation::getWorkerGroup)
+                .collect(Collectors.toList());
+
+        EnvironmentDto dto = new EnvironmentDto();
+        BeanUtils.copyProperties(env, dto);
+        dto.setWorkerGroups(workerGroups);
+        return dto;
     }
 
     /**
@@ -272,24 +254,19 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param name environment name
      */
     @Override
-    public Map<String, Object> queryEnvironmentByName(String name) {
-        Map<String, Object> result = new HashMap<>();
-
+    public EnvironmentDto queryEnvironmentByName(String name) {
         Environment env = environmentMapper.queryByEnvironmentName(name);
         if (env == null) {
-            putMsg(result, Status.QUERY_ENVIRONMENT_BY_NAME_ERROR, name);
-        } else {
-            List<String> workerGroups = relationMapper.queryByEnvironmentCode(env.getCode()).stream()
-                    .map(item -> item.getWorkerGroup())
-                    .collect(Collectors.toList());
-
-            EnvironmentDto dto = new EnvironmentDto();
-            BeanUtils.copyProperties(env, dto);
-            dto.setWorkerGroups(workerGroups);
-            result.put(Constants.DATA_LIST, dto);
-            putMsg(result, Status.SUCCESS);
+            throw new ServiceException(Status.QUERY_ENVIRONMENT_BY_NAME_ERROR, name);
         }
-        return result;
+        List<String> workerGroups = relationMapper.queryByEnvironmentCode(env.getCode()).stream()
+                .map(EnvironmentWorkerGroupRelation::getWorkerGroup)
+                .collect(Collectors.toList());
+
+        EnvironmentDto dto = new EnvironmentDto();
+        BeanUtils.copyProperties(env, dto);
+        dto.setWorkerGroups(workerGroups);
+        return dto;
     }
 
     /**
@@ -300,11 +277,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      */
     @Transactional
     @Override
-    public Map<String, Object> deleteEnvironmentByCode(User loginUser, Long code) {
-        Map<String, Object> result = new HashMap<>();
+    public void deleteEnvironmentByCode(User loginUser, Long code) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ENVIRONMENT, ENVIRONMENT_DELETE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         Long relatedTaskNumber = taskDefinitionMapper
@@ -313,22 +288,18 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         if (relatedTaskNumber > 0) {
             log.warn("Delete environment failed because {} tasks is using it, environmentCode:{}.",
                     relatedTaskNumber, code);
-            putMsg(result, Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS);
-            return result;
+            throw new ServiceException(Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS);
         }
 
         int delete = environmentMapper.deleteByCode(code);
-        if (delete > 0) {
-            relationMapper.delete(new QueryWrapper<EnvironmentWorkerGroupRelation>()
-                    .lambda()
-                    .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode, code));
-            log.info("Environment and relations delete complete, environmentCode:{}.", code);
-            putMsg(result, Status.SUCCESS);
-        } else {
+        if (delete <= 0) {
             log.error("Environment delete error, environmentCode:{}.", code);
-            putMsg(result, Status.DELETE_ENVIRONMENT_ERROR);
+            throw new ServiceException(Status.DELETE_ENVIRONMENT_ERROR);
         }
-        return result;
+        relationMapper.delete(new QueryWrapper<EnvironmentWorkerGroupRelation>()
+                .lambda()
+                .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode, code));
+        log.info("Environment and relations delete complete, environmentCode:{}.", code);
     }
 
     /**
@@ -418,27 +389,19 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * verify environment name
      *
      * @param environmentName environment name
-     * @return true if the environment name not exists, otherwise return false
      */
     @Override
-    public Map<String, Object> verifyEnvironment(String environmentName) {
-        Map<String, Object> result = new HashMap<>();
-
+    public void verifyEnvironment(String environmentName) {
         if (StringUtils.isEmpty(environmentName)) {
             log.warn("parameter environment name is empty.");
-            putMsg(result, Status.ENVIRONMENT_NAME_IS_NULL);
-            return result;
+            throw new ServiceException(Status.ENVIRONMENT_NAME_IS_NULL);
         }
 
         Environment environment = environmentMapper.queryByEnvironmentName(environmentName);
         if (environment != null) {
             log.warn("Environment with the same name already exist, name:{}.", environment.getName());
-            putMsg(result, Status.ENVIRONMENT_NAME_EXISTS, environmentName);
-            return result;
+            throw new ServiceException(Status.ENVIRONMENT_NAME_EXISTS, environmentName);
         }
-
-        result.put(Constants.STATUS, Status.SUCCESS);
-        return result;
     }
 
     private void checkUsedEnvironmentWorkerGroupRelation(Set<String> deleteKeySet,
