@@ -27,12 +27,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.utils.ServiceTestUtil;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
@@ -49,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.assertj.core.util.Lists;
@@ -75,7 +74,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class EnvironmentServiceTest {
 
-    public static final Logger logger = LoggerFactory.getLogger(EnvironmentServiceTest.class);
     private static final Logger baseServiceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
     private static final Logger environmentServiceLogger = LoggerFactory.getLogger(EnvironmentServiceImpl.class);
 
@@ -200,8 +198,8 @@ public class EnvironmentServiceTest {
     public void testQueryAllEnvironmentList() {
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT,
                 1, environmentServiceLogger)).thenReturn(Collections.emptySet());
-        Map<String, Object> result = environmentService.queryAllEnvironmentList(getAdminUser());
-        assertEquals(0, ((List<Environment>) result.get(Constants.DATA_LIST)).size());
+        List<EnvironmentDto> emptyResult = environmentService.queryAllEnvironmentList(getAdminUser());
+        assertEquals(0, emptyResult.size());
 
         Set<Integer> ids = new HashSet<>();
         ids.add(1);
@@ -209,18 +207,12 @@ public class EnvironmentServiceTest {
                 1, environmentServiceLogger)).thenReturn(ids);
         when(environmentMapper.selectBatchIds(ids)).thenReturn(Lists.newArrayList(getEnvironment()));
 
-        result = environmentService.queryAllEnvironmentList(getAdminUser());
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-
-        List<Environment> list = (List<Environment>) (result.get(Constants.DATA_LIST));
-        Assertions.assertEquals(1, list.size());
+        List<EnvironmentDto> oneResult = environmentService.queryAllEnvironmentList(getAdminUser());
+        assertEquals(1, oneResult.size());
 
         when(environmentMapper.selectBatchIds(ids)).thenReturn(Collections.emptyList());
-        result = environmentService.queryAllEnvironmentList(getAdminUser());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        list = (List<Environment>) (result.get(Constants.DATA_LIST));
-        Assertions.assertEquals(0, list.size());
+        List<EnvironmentDto> noneResult = environmentService.queryAllEnvironmentList(getAdminUser());
+        assertEquals(0, noneResult.size());
     }
 
     @Test
@@ -258,67 +250,59 @@ public class EnvironmentServiceTest {
     @Test
     public void testQueryEnvironmentByName() {
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(null);
-        Map<String, Object> result = environmentService.queryEnvironmentByName(environmentName);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.QUERY_ENVIRONMENT_BY_NAME_ERROR, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.QUERY_ENVIRONMENT_BY_NAME_ERROR,
+                () -> environmentService.queryEnvironmentByName(environmentName));
 
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
-        result = environmentService.queryEnvironmentByName(environmentName);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        EnvironmentDto dto = environmentService.queryEnvironmentByName(environmentName);
+        Assertions.assertEquals(environmentName, dto.getName());
+        Assertions.assertNotNull(dto.getWorkerGroups());
     }
 
     @Test
     public void testQueryEnvironmentByCode() {
         when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(null);
-        Map<String, Object> result = environmentService.queryEnvironmentByCode(1L);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR,
+                () -> environmentService.queryEnvironmentByCode(1L));
 
         when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(getEnvironment());
-        result = environmentService.queryEnvironmentByCode(1L);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        EnvironmentDto dto = environmentService.queryEnvironmentByCode(1L);
+        Assertions.assertEquals(1L, dto.getCode());
+        Assertions.assertNotNull(dto.getWorkerGroups());
     }
 
     @Test
     public void testDeleteEnvironmentByCode() {
-        User loginUser = getGeneralUser();
+        User generalUser = getGeneralUser();
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
-                loginUser.getId(), ENVIRONMENT_DELETE, baseServiceLogger)).thenReturn(true);
+                generalUser.getId(), ENVIRONMENT_DELETE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
                 0, baseServiceLogger)).thenReturn(true);
-        Map<String, Object> result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> environmentService.deleteEnvironmentByCode(generalUser, 1L));
 
-        loginUser = getAdminUser();
+        User adminUser = getAdminUser();
         when(taskDefinitionMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
-        result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS,
+                () -> environmentService.deleteEnvironmentByCode(adminUser, 1L));
 
         when(taskDefinitionMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
         when(environmentMapper.deleteByCode(1L)).thenReturn(1);
-        result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        assertDoesNotThrow(() -> environmentService.deleteEnvironmentByCode(adminUser, 1L));
 
         when(environmentMapper.deleteByCode(1L)).thenReturn(-1);
-        result = environmentService.deleteEnvironmentByCode(loginUser, 1L);
-        Assertions.assertEquals(Status.DELETE_ENVIRONMENT_ERROR, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.DELETE_ENVIRONMENT_ERROR,
+                () -> environmentService.deleteEnvironmentByCode(adminUser, 1L));
     }
 
     @Test
     public void testVerifyEnvironment() {
-        Map<String, Object> result = environmentService.verifyEnvironment("");
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_NAME_IS_NULL, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.ENVIRONMENT_NAME_IS_NULL,
+                () -> environmentService.verifyEnvironment(""));
 
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
-        result = environmentService.verifyEnvironment(environmentName);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.ENVIRONMENT_NAME_EXISTS, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.ENVIRONMENT_NAME_EXISTS,
+                () -> environmentService.verifyEnvironment(environmentName));
 
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(null);
         assertDoesNotThrow(() -> environmentService.verifyEnvironment(environmentName));
