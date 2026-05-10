@@ -606,9 +606,11 @@ public class CuringParamsServiceImplTest {
 
         Assertions.assertNotNull(propertyMap);
 
-        // Assert: p1 should be injected from varPool
+        // Assert: p1 should be injected from varPool and announced as IN direction
         Assertions.assertTrue(propertyMap.containsKey("p1"), "p1 should be injected from varPool");
         Assertions.assertEquals("111", propertyMap.get("p1").getValue());
+        Assertions.assertEquals(Direct.IN, propertyMap.get("p1").getDirect(),
+                "injected varPool param should be announced as IN direction");
 
         // Assert: p2 should exist and its value should be resolved from ${p1} to 111
         Assertions.assertTrue(propertyMap.containsKey("p2"));

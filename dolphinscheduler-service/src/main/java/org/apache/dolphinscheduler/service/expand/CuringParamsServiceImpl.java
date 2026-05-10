@@ -212,8 +212,13 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                     // Existing IN parameter: override its value
                     targetParam.setValue(varPool.getValue());
                 } else if (targetParam == null) {
-                    // Parameter not in map: inject it for placeholder resolution
-                    prepareParamsMap.put(varPool.getProp(), varPool);
+                    // Parameter not in map: announce as IN parameter from varPool for placeholder resolution
+                    Property newParam = new Property();
+                    newParam.setProp(varPool.getProp());
+                    newParam.setValue(varPool.getValue());
+                    newParam.setType(varPool.getType());
+                    newParam.setDirect(Direct.IN);
+                    prepareParamsMap.put(varPool.getProp(), newParam);
                 }
             }
         }
