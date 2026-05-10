@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -204,9 +203,8 @@ public class WorkerGroupServiceTest {
 
     @Test
     public void testQueryAllGroup() {
-        Map<String, Object> result = workerGroupService.queryAllGroup(getLoginUser());
-        List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
-        Assertions.assertEquals(workerGroups.size(), 0);
+        List<String> workerGroups = workerGroupService.queryAllGroup(getLoginUser());
+        Assertions.assertEquals(0, workerGroups.size());
     }
 
     @Test
@@ -218,9 +216,8 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         when(workerGroupDao.queryById(1)).thenReturn(null);
 
-        Map<String, Object> notExistResult = workerGroupService.deleteWorkerGroupById(loginUser, 1);
-        Assertions.assertEquals(Status.DELETE_WORKER_GROUP_NOT_EXIST.getCode(),
-                ((Status) notExistResult.get(Constants.STATUS)).getCode());
+        assertThrowsServiceException(Status.DELETE_WORKER_GROUP_NOT_EXIST,
+                () -> workerGroupService.deleteWorkerGroupById(loginUser, 1));
     }
 
     @Test
@@ -240,9 +237,8 @@ public class WorkerGroupServiceTest {
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES))
                         .thenReturn(workflowInstances);
 
-        Map<String, Object> deleteFailed = workerGroupService.deleteWorkerGroupById(loginUser, 1);
-        Assertions.assertEquals(Status.DELETE_WORKER_GROUP_BY_ID_FAIL.getCode(),
-                ((Status) deleteFailed.get(Constants.STATUS)).getCode());
+        assertThrowsServiceException(Status.DELETE_WORKER_GROUP_BY_ID_FAIL,
+                () -> workerGroupService.deleteWorkerGroupById(loginUser, 1));
     }
 
     @Test
@@ -257,24 +253,16 @@ public class WorkerGroupServiceTest {
         when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES)).thenReturn(null);
 
-        when(workerGroupDao.deleteById(1)).thenReturn(true);
-
-        when(environmentWorkerGroupRelationMapper.queryByWorkerGroupName(workerGroup.getName()))
-                .thenReturn(null);
-
         when(taskDefinitionMapper.selectList(Mockito.any())).thenReturn(null);
 
         when(scheduleMapper.selectList(Mockito.any())).thenReturn(null);
 
-        Map<String, Object> successResult = workerGroupService.deleteWorkerGroupById(loginUser, 1);
-        Assertions.assertEquals(Status.SUCCESS.getCode(),
-                ((Status) successResult.get(Constants.STATUS)).getCode());
+        assertDoesNotThrow(() -> workerGroupService.deleteWorkerGroupById(loginUser, 1));
     }
 
     @Test
     public void testQueryAllGroupWithDefault() {
-        Map<String, Object> result = workerGroupService.queryAllGroup(getLoginUser());
-        List<String> workerGroups = (List<String>) result.get(Constants.DATA_LIST);
+        List<String> workerGroups = workerGroupService.queryAllGroup(getLoginUser());
         Assertions.assertEquals(0, workerGroups.size());
     }
 
