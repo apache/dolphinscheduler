@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -107,12 +106,11 @@ public class K8sNamespaceController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_K8S_NAMESPACE_ERROR)
     @OperatorLog(auditType = AuditType.K8S_NAMESPACE_CREATE)
-    public Result createNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                  @RequestParam(value = "namespace") String namespace,
-                                  @RequestParam(value = "clusterCode") Long clusterCode) {
-        Map<String, Object> result =
-                k8sNamespaceService.registerK8sNamespace(loginUser, namespace, clusterCode);
-        return returnDataList(result);
+    public Result<K8sNamespace> createNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @RequestParam(value = "namespace") String namespace,
+                                                @RequestParam(value = "clusterCode") Long clusterCode) {
+        K8sNamespace k8sNamespace = k8sNamespaceService.registerK8sNamespace(loginUser, namespace, clusterCode);
+        return Result.success(k8sNamespace);
     }
 
     /**
@@ -153,10 +151,10 @@ public class K8sNamespaceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_K8S_NAMESPACE_BY_ID_ERROR)
     @OperatorLog(auditType = AuditType.K8S_NAMESPACE_DELETE)
-    public Result delNamespaceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                   @RequestParam(value = "id") int id) {
-        Map<String, Object> result = k8sNamespaceService.deleteNamespaceById(loginUser, id);
-        return returnDataList(result);
+    public Result<Void> delNamespaceById(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @RequestParam(value = "id") int id) {
+        k8sNamespaceService.deleteNamespaceById(loginUser, id);
+        return Result.success();
     }
 
     /**
@@ -173,10 +171,10 @@ public class K8sNamespaceController extends BaseController {
     @GetMapping(value = "/unauth-namespace")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_UNAUTHORIZED_NAMESPACE_ERROR)
-    public Result queryUnauthorizedNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                             @RequestParam("userId") Integer userId) {
-        Map<String, Object> result = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, userId);
-        return returnDataList(result);
+    public Result<List<K8sNamespace>> queryUnauthorizedNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                 @RequestParam("userId") Integer userId) {
+        List<K8sNamespace> namespaces = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, userId);
+        return Result.success(namespaces);
     }
 
     /**
@@ -193,10 +191,10 @@ public class K8sNamespaceController extends BaseController {
     @GetMapping(value = "/authed-namespace")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_AUTHORIZED_NAMESPACE_ERROR)
-    public Result queryAuthorizedNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @RequestParam("userId") Integer userId) {
-        Map<String, Object> result = k8sNamespaceService.queryAuthorizedNamespace(loginUser, userId);
-        return returnDataList(result);
+    public Result<List<K8sNamespace>> queryAuthorizedNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                               @RequestParam("userId") Integer userId) {
+        List<K8sNamespace> namespaces = k8sNamespaceService.queryAuthorizedNamespace(loginUser, userId);
+        return Result.success(namespaces);
     }
 
     /**

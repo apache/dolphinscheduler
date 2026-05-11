@@ -217,7 +217,6 @@ public final class JdbcRegistry implements Registry {
     public void close() {
         log.info("Closing JdbcRegistry...");
         // remove the current Ephemeral node, if can connect to jdbc
-        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().shutdownNow();
         try (final JdbcRegistryClient closed1 = jdbcRegistryClient) {
             // ignore
         } catch (Exception e) {

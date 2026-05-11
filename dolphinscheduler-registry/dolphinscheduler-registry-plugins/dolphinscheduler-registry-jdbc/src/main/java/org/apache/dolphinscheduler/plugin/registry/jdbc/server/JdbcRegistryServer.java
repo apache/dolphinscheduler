@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.plugin.registry.jdbc.server;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryThreadFactory;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.client.IJdbcRegistryClient;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.client.JdbcRegistryClientIdentify;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -78,6 +79,8 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     private final Map<JdbcRegistryClientIdentify, JdbcRegistryClientHeartbeatDTO> jdbcRegistryClientDTOMap =
             new ConcurrentHashMap<>();
 
+    private final ScheduledExecutorService schedulerThreadExecutor;
+
     private Long lastSuccessHeartbeat;
 
     public JdbcRegistryServer(JdbcRegistryDataRepository jdbcRegistryDataRepository,
@@ -89,9 +92,12 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         this.jdbcRegistryLockRepository = checkNotNull(jdbcRegistryLockRepository);
         this.jdbcRegistryClientRepository = checkNotNull(jdbcRegistryClientRepository);
         this.jdbcRegistryProperties = checkNotNull(jdbcRegistryProperties);
+        this.schedulerThreadExecutor = ThreadUtils.newDaemonScheduledExecutorService(
+                "ds-jdbc-registry-default-scheduler-thread-%d",
+                Runtime.getRuntime().availableProcessors());
         this.jdbcRegistryDataManager = new JdbcRegistryDataManager(
                 jdbcRegistryProperties, jdbcRegistryDataRepository, jdbcRegistryDataChangeEventRepository,
-                transactionTemplate);
+                transactionTemplate, schedulerThreadExecutor);
         this.jdbcRegistryLockManager = new JdbcRegistryLockManager(
                 jdbcRegistryProperties, jdbcRegistryLockRepository);
         this.jdbcRegistryServerState = JdbcRegistryServerState.INIT;
@@ -107,7 +113,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         // Start the Purge thread
         // The Purge thread will clear the invalidated data
         purgeInvalidJdbcRegistryMetadata();
-        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(
+        schedulerThreadExecutor.scheduleWithFixedDelay(
                 this::purgeInvalidJdbcRegistryMetadata,
                 jdbcRegistryProperties.getSessionTimeout().toMillis(),
                 jdbcRegistryProperties.getSessionTimeout().toMillis(),
@@ -115,7 +121,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         jdbcRegistryDataManager.start();
         jdbcRegistryServerState = JdbcRegistryServerState.STARTED;
         doTriggerOnConnectedListener();
-        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(
+        schedulerThreadExecutor.scheduleWithFixedDelay(
                 this::refreshClientsHeartbeat,
                 0,
                 jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
@@ -250,7 +256,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     @Override
     public void close() {
         jdbcRegistryServerState = JdbcRegistryServerState.STOPPED;
-        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().shutdown();
+        schedulerThreadExecutor.shutdown();
         List<Long> clientIds = jdbcRegistryClients.stream()
                 .map(IJdbcRegistryClient::getJdbcRegistryClientIdentify)
                 .map(JdbcRegistryClientIdentify::getClientId)

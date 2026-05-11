@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -185,14 +184,17 @@ public class ProjectWorkerGroupRelationServiceTest {
 
     @Test
     public void testQueryAssignedWorkerGroupsByProject() {
-        // no permission
+        // no permission - hasProjectAndPerm should populate the status into the result map and return false
         Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.anyMap(), Mockito.any()))
-                .thenReturn(false);
-
-        Map<String, Object> result =
-                projectWorkerGroupRelationService.queryAssignedWorkerGroupsByProject(getGeneralUser(), projectCode);
-
-        Assertions.assertTrue(result.isEmpty());
+                .thenAnswer(invocation -> {
+                    Map<String, Object> permResult = invocation.getArgument(2);
+                    permResult.put(Constants.STATUS, Status.USER_NO_OPERATION_PROJECT_PERM);
+                    permResult.put(Constants.MSG, Status.USER_NO_OPERATION_PROJECT_PERM.getMsg());
+                    return false;
+                });
+        AssertionsHelper.assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                () -> projectWorkerGroupRelationService.queryAssignedWorkerGroupsByProject(getGeneralUser(),
+                        projectCode));
 
         // success
         Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.anyMap(), Mockito.any()))
@@ -210,12 +212,12 @@ public class ProjectWorkerGroupRelationServiceTest {
         Mockito.when(scheduleMapper.querySchedulerListByProjectName(Mockito.any()))
                 .thenReturn(Lists.newArrayList());
 
-        result = projectWorkerGroupRelationService.queryAssignedWorkerGroupsByProject(getGeneralUser(), projectCode);
+        List<ProjectWorkerGroup> projectWorkerGroups =
+                projectWorkerGroupRelationService.queryAssignedWorkerGroupsByProject(getGeneralUser(), projectCode);
 
-        ProjectWorkerGroup[] actualValue =
-                ((List<ProjectWorkerGroup>) result.get(Constants.DATA_LIST)).toArray(new ProjectWorkerGroup[0]);
-        System.out.println(Arrays.toString(actualValue));
-        Assertions.assertEquals(actualValue[0].getWorkerGroup(), getProjectWorkerGroup().getWorkerGroup());
+        Assertions.assertEquals(1, projectWorkerGroups.size());
+        Assertions.assertEquals(getProjectWorkerGroup().getWorkerGroup(),
+                projectWorkerGroups.get(0).getWorkerGroup());
     }
 
     private List<String> getWorkerGroups() {

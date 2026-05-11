@@ -35,8 +35,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -105,38 +105,32 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @param loginUser    login user
      * @param namespace    namespace
      * @param clusterCode  k8s not null
-     * @return
      */
     @Override
-    public Map<String, Object> registerK8sNamespace(User loginUser, String namespace, Long clusterCode) {
-        Map<String, Object> result = new HashMap<>();
+    public K8sNamespace registerK8sNamespace(User loginUser, String namespace, Long clusterCode) {
         if (isNotAdmin(loginUser)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         if (StringUtils.isEmpty(namespace)) {
             log.warn("Parameter namespace is empty.");
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.NAMESPACE);
-            return result;
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.NAMESPACE);
         }
 
         if (clusterCode == null) {
             log.warn("Parameter clusterCode is null.");
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.CLUSTER);
-            return result;
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.CLUSTER);
         }
 
         if (checkNamespaceExistInDb(namespace, clusterCode)) {
             log.warn("K8S namespace already exists.");
-            putMsg(result, Status.K8S_NAMESPACE_EXIST, namespace, clusterCode);
-            return result;
+            throw new ServiceException(Status.K8S_NAMESPACE_EXIST, namespace, clusterCode);
         }
 
         Cluster cluster = clusterMapper.queryByClusterCode(clusterCode);
         if (cluster == null) {
             log.error("Cluster does not exist, clusterCode:{}", clusterCode);
-            putMsg(result, Status.CLUSTER_NOT_EXISTS, namespace, clusterCode);
-            return result;
+            throw new ServiceException(Status.CLUSTER_NOT_EXISTS, namespace, clusterCode);
         }
 
         long code = CodeGenerateUtils.genCode();
@@ -157,17 +151,13 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
                 k8sClientService.upsertNamespaceAndResourceToK8s(k8sNamespaceObj);
             } catch (Exception e) {
                 log.error("Namespace create to k8s error", e);
-                putMsg(result, Status.K8S_CLIENT_OPS_ERROR, e.getMessage());
-                return result;
+                throw new ServiceException(Status.K8S_CLIENT_OPS_ERROR, e.getMessage());
             }
         }
 
         k8sNamespaceMapper.insert(k8sNamespaceObj);
         log.info("K8s namespace create complete, namespace:{}.", k8sNamespaceObj.getNamespace());
-        result.put(Constants.DATA_LIST, k8sNamespaceObj);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
+        return k8sNamespaceObj;
     }
 
     /**
@@ -207,11 +197,9 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      *
      * @param loginUser login user
      * @param id        namespace id
-     * @return
      */
     @Override
-    public Map<String, Object> deleteNamespaceById(User loginUser, int id) {
-        Map<String, Object> result = new HashMap<>();
+    public void deleteNamespaceById(User loginUser, int id) {
         if (isNotAdmin(loginUser)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
@@ -219,14 +207,11 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         K8sNamespace k8sNamespaceObj = k8sNamespaceMapper.selectById(id);
         if (k8sNamespaceObj == null) {
             log.error("K8s namespace does not exist, namespaceId:{}.", id);
-            putMsg(result, Status.K8S_NAMESPACE_NOT_EXIST, id);
-            return result;
+            throw new ServiceException(Status.K8S_NAMESPACE_NOT_EXIST, id);
         }
 
         k8sNamespaceMapper.deleteById(id);
         log.info("K8s namespace delete complete, namespace:{}.", k8sNamespaceObj.getNamespace());
-        putMsg(result, Status.SUCCESS);
-        return result;
     }
 
     /**
@@ -247,23 +232,18 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @return the namespaces which user have not permission to see
      */
     @Override
-    public Map<String, Object> queryUnauthorizedNamespace(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>();
+    public List<K8sNamespace> queryUnauthorizedNamespace(User loginUser, Integer userId) {
         if (loginUser.getId() != userId && isNotAdmin(loginUser)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         // query all namespace list, this auth does not like project
         List<K8sNamespace> namespaceList = k8sNamespaceMapper.selectList(null);
-        List<K8sNamespace> resultList = new ArrayList<>();
-        Set<K8sNamespace> namespaceSet;
-        if (namespaceList != null && !namespaceList.isEmpty()) {
-            namespaceSet = new HashSet<>(namespaceList);
-            List<K8sNamespace> authedProjectList = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
-            resultList = getUnauthorizedNamespaces(namespaceSet, authedProjectList);
+        if (namespaceList == null || namespaceList.isEmpty()) {
+            return Collections.emptyList();
         }
-        result.put(Constants.DATA_LIST, resultList);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        Set<K8sNamespace> namespaceSet = new HashSet<>(namespaceList);
+        List<K8sNamespace> authedProjectList = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
+        return getUnauthorizedNamespaces(namespaceSet, authedProjectList);
     }
 
     /**
@@ -274,18 +254,11 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @return namespaces which the user have permission to see
      */
     @Override
-    public Map<String, Object> queryAuthorizedNamespace(User loginUser, Integer userId) {
-        Map<String, Object> result = new HashMap<>();
-
+    public List<K8sNamespace> queryAuthorizedNamespace(User loginUser, Integer userId) {
         if (loginUser.getId() != userId && isNotAdmin(loginUser)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-
-        List<K8sNamespace> namespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
-        result.put(Constants.DATA_LIST, namespaces);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
+        return k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
     }
 
     /**

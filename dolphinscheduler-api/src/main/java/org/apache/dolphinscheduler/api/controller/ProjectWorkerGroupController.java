@@ -19,13 +19,16 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR;
 
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -98,7 +101,13 @@ public class ProjectWorkerGroupController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     public Map<String, Object> queryAssignedWorkerGroups(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        return projectWorkerGroupRelationService.queryAssignedWorkerGroupsByProject(loginUser, projectCode);
+        List<ProjectWorkerGroup> projectWorkerGroups =
+                projectWorkerGroupRelationService.queryAssignedWorkerGroupsByProject(loginUser, projectCode);
+        Map<String, Object> result = new HashMap<>();
+        result.put(Constants.STATUS, Status.SUCCESS);
+        result.put(Constants.MSG, Status.SUCCESS.getMsg());
+        result.put(Constants.DATA_LIST, projectWorkerGroups);
+        return result;
     }
 
 }

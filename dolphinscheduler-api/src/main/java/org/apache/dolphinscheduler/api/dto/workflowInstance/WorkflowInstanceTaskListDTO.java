@@ -15,20 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.service;
+package org.apache.dolphinscheduler.api.dto.workflowInstance;
 
-import org.apache.dolphinscheduler.api.dto.ProductInfoDto;
-import org.apache.dolphinscheduler.common.enums.PluginType;
-import org.apache.dolphinscheduler.dao.entity.PluginDefine;
+import org.apache.dolphinscheduler.dao.entity.AbstractTaskInstanceContext;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentDetails;
 
 import java.util.List;
 
-public interface UiPluginService {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    List<PluginDefine> queryUiPluginsByType(PluginType pluginType);
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkflowInstanceTaskListDTO {
 
-    PluginDefine queryUiPluginDetailById(int id);
+    private String workflowInstanceState;
 
-    ProductInfoDto queryProductInfo();
-
+    private List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskList;
 }

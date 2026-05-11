@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowReques
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowRequestTransformer;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -380,8 +379,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     @Override
-    public Map<String, Object> forceStartTaskInstance(User loginUser, int queueId) {
-        Map<String, Object> result = new HashMap<>();
+    public void forceStartTaskInstance(User loginUser, int queueId) {
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
         // check workflow instance exist
         workflowInstanceDao.queryOptionalById(taskGroupQueue.getWorkflowInstanceId())
@@ -395,9 +393,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         taskGroupQueue.setForceStart(Flag.YES.getCode());
         taskGroupQueue.setUpdateTime(new Date());
         taskGroupQueueMapper.updateById(taskGroupQueue);
-
-        result.put(Constants.STATUS, Status.SUCCESS);
-        return result;
     }
 
     @Override

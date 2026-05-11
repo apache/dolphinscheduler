@@ -46,9 +46,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -302,17 +300,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * query tenant by tenant code
      *
      * @param tenantCode tenant code
-     * @return tenant detail information
+     * @return tenant if exists, otherwise {@code null}
      */
     @Override
-    public Map<String, Object> queryByTenantCode(String tenantCode) {
-        Map<String, Object> result = new HashMap<>();
-        Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-        if (tenant != null) {
-            result.put(Constants.DATA_LIST, tenant);
-            putMsg(result, Status.SUCCESS);
-        }
-        return result;
+    public Tenant queryByTenantCode(String tenantCode) {
+        return tenantMapper.queryByTenantCode(tenantCode);
     }
 
     /**

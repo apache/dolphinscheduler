@@ -15,21 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.registry.jdbc;
+package org.apache.dolphinscheduler.api.dto.workflow;
 
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.List;
+import java.util.Map;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
-public class JdbcRegistryThreadFactory {
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkflowDefinitionVariablesDTO {
 
-    public static ScheduledExecutorService getDefaultSchedulerThreadExecutor() {
-        final String threadNameFormat = "ds-jdbc-registry-default-scheduler-thread-%d";
-        final int threadSize = Runtime.getRuntime().availableProcessors();
-        return ThreadUtils.newDaemonScheduledExecutorService(threadNameFormat, threadSize);
-    }
+    private List<Property> globalParams;
 
+    private Map<String, Map<String, Object>> localParams;
 }

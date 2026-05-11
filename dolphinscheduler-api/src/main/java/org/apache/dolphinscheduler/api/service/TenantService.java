@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
-import java.util.Map;
 
 public interface TenantService {
 
@@ -98,9 +97,9 @@ public interface TenantService {
      * query tenant by tenant code
      *
      * @param tenantCode tenant code
-     * @return tenant list
+     * @return tenant if exists, otherwise {@code null}
      */
-    Map<String, Object> queryByTenantCode(String tenantCode);
+    Tenant queryByTenantCode(String tenantCode);
 
     /**
      * Make sure tenant with given name exists, and create the tenant if not exists
