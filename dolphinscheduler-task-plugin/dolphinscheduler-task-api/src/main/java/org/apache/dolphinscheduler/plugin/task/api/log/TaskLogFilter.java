@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.log;
 
-import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -34,13 +33,17 @@ import ch.qos.logback.core.spi.FilterReply;
  * This class is used to filter the log of the task instance.
  */
 @Slf4j
+@Getter
+@Setter
 public class TaskLogFilter extends Filter<ILoggingEvent> {
+
+    private String key;
 
     @Override
     public FilterReply decide(ILoggingEvent event) {
-        String taskInstanceLogPath = MDC.get(LogUtils.TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
-        // If the taskInstanceLogPath is empty, it means that the log is not related to a task instance.
-        if (StringUtils.isEmpty(taskInstanceLogPath)) {
+        String taskLogPath = event.getMDCPropertyMap().get(key);
+        // If the taskLogPath is empty, it means that the log is not related to the current log file.
+        if (StringUtils.isEmpty(taskLogPath)) {
             return FilterReply.DENY;
         }
 

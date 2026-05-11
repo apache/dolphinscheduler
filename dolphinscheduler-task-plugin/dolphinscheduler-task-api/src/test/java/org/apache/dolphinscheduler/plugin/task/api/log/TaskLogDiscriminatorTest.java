@@ -17,28 +17,27 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.log;
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Collections;
+
+import org.junit.jupiter.api.Test;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.sift.AbstractDiscriminator;
 
-@Slf4j
-@Getter
-@Setter
-public class TaskLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
+class TaskLogDiscriminatorTest {
 
-    private String key;
+    @Test
+    void shouldGetDiscriminatingValueByConfiguredMdcKey() {
+        TaskLogDiscriminator discriminator = new TaskLogDiscriminator();
+        discriminator.setKey("taskOutputLogFullPath");
 
-    private String logBase;
+        ILoggingEvent event = mock(ILoggingEvent.class);
+        when(event.getMDCPropertyMap())
+                .thenReturn(Collections.singletonMap("taskOutputLogFullPath", "/tmp/task-output.log"));
 
-    @Override
-    public String getDiscriminatingValue(ILoggingEvent event) {
-        String taskLogPath = event.getMDCPropertyMap().get(key);
-        if (taskLogPath == null) {
-            log.error("The task log path in MDC key {} is null, please check the logback configuration, log: {}",
-                    key, event);
-        }
-        return taskLogPath;
+        assertEquals("/tmp/task-output.log", discriminator.getDiscriminatingValue(event));
     }
 }

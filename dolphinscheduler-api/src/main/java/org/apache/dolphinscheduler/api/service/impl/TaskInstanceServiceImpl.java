@@ -45,6 +45,8 @@ import org.apache.dolphinscheduler.extract.worker.IStreamingTaskInstanceOperator
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTriggerSavepointRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskInstanceTriggerSavepointResponse;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskLogFileProvider;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskLogFileType;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillRequest;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillResponse;
@@ -293,13 +295,18 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             return;
         }
         for (TaskInstance taskInstance : needToDeleteTaskInstances) {
-            if (StringUtils.isNotBlank(taskInstance.getLogPath())) {
+            if (StringUtils.isNotBlank(taskInstance.getTaskLogsRootPath())) {
                 try {
                     // Remove task instance log failed will not affect the deletion of task instance
-                    Clients
+                    ILogService logService = Clients
                             .withService(ILogService.class)
-                            .withHost(taskInstance.getHost())
-                            .removeTaskInstanceLog(taskInstance.getLogPath());
+                            .withHost(taskInstance.getHost());
+                    logService.removeTaskInstanceLog(
+                            TaskLogFileProvider.getFilePath(taskInstance.getTaskLogsRootPath(),
+                                    TaskLogFileType.TASK_LOG));
+                    logService.removeTaskInstanceLog(
+                            TaskLogFileProvider.getFilePath(taskInstance.getTaskLogsRootPath(),
+                                    TaskLogFileType.TASK_OUTPUT));
                 } catch (Exception ex) {
                     log.error("Remove task instance log error", ex);
                 }

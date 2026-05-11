@@ -19,11 +19,12 @@ import { useI18n } from 'vue-i18n'
 import { h, reactive, ref } from 'vue'
 import {
   downloadLog,
+  downloadOutput,
   queryTaskListPaging,
   savePoint,
   streamTaskStop
 } from '@/service/modules/task-instances'
-import { NButton, NIcon, NSpace, NTooltip, NSpin } from 'naive-ui'
+import { NButton, NDropdown, NIcon, NSpace, NTooltip, NSpin } from 'naive-ui'
 import {
   AlignLeftOutlined,
   DownloadOutlined,
@@ -63,10 +64,13 @@ export function useTable() {
     workflowDefinitionName: null,
     totalPage: 1,
     showModalRef: false,
+    showOutputModalRef: false,
     row: {},
     loadingRef: false,
     logRef: '',
+    outputRef: '',
     logLoadingRef: true,
+    outputLoadingRef: true,
     skipLineNum: 0,
     limit: 1000
   })
@@ -146,6 +150,17 @@ export function useTable() {
         key: 'operation',
         ...COLUMN_WIDTH_CONFIG['operation'](5),
         render(row: any) {
+          const logOptions = [
+            {
+              label: t('project.task.log'),
+              key: 'log'
+            },
+            {
+              label: t('project.task.output'),
+              key: 'output'
+            }
+          ]
+
           return h(NSpace, null, {
             default: () => [
               h(
@@ -197,49 +212,80 @@ export function useTable() {
                 }
               ),
               h(
-                NTooltip,
-                {},
+                NDropdown,
                 {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'info',
-                        size: 'small',
-                        disabled: !row.host,
-                        onClick: () => handleLog(row)
-                      },
-                      {
-                        icon: () =>
-                          h(NIcon, null, {
-                            default: () => h(AlignLeftOutlined)
-                          })
-                      }
-                    ),
-                  default: () => t('project.task.view_log')
-                }
+                  trigger: 'click',
+                  options: logOptions,
+                  disabled: !row.host,
+                  onSelect: (key: string) => {
+                    if (key === 'log') {
+                      handleLog(row)
+                      return
+                    }
+                    handleOutput(row)
+                  }
+                },
+                () =>
+                  h(
+                    NTooltip,
+                    {},
+                    {
+                      trigger: () =>
+                        h(
+                          NButton,
+                          {
+                            circle: true,
+                            type: 'info',
+                            size: 'small',
+                            disabled: !row.host
+                          },
+                          {
+                            icon: () =>
+                              h(NIcon, null, {
+                                default: () => h(AlignLeftOutlined)
+                              })
+                          }
+                        ),
+                      default: () => t('project.task.view_log')
+                    }
+                  )
               ),
               h(
-                NTooltip,
-                {},
+                NDropdown,
                 {
-                  trigger: () =>
-                    h(
-                      NButton,
-                      {
-                        circle: true,
-                        type: 'info',
-                        size: 'small',
-                        onClick: () => downloadLog(row.id)
-                      },
-                      {
-                        icon: () =>
-                          h(NIcon, null, { default: () => h(DownloadOutlined) })
-                      }
-                    ),
-                  default: () => t('project.task.download_log')
-                }
+                  trigger: 'click',
+                  options: logOptions,
+                  disabled: !row.host,
+                  onSelect: (key: string) => {
+                    if (key === 'log') {
+                      downloadLog(row.id)
+                      return
+                    }
+                    downloadOutput(row.id)
+                  }
+                },
+                () =>
+                  h(
+                    NTooltip,
+                    {},
+                    {
+                      trigger: () =>
+                        h(
+                          NButton,
+                          {
+                            circle: true,
+                            type: 'info',
+                            size: 'small',
+                            disabled: !row.host
+                          },
+                          {
+                            icon: () =>
+                              h(NIcon, null, { default: () => h(DownloadOutlined) })
+                          }
+                        ),
+                      default: () => t('project.task.download_log')
+                    }
+                  )
               ),
               h(
                 NTooltip,
@@ -277,6 +323,11 @@ export function useTable() {
 
   const handleLog = (row: any) => {
     variables.showModalRef = true
+    variables.row = row
+  }
+
+  const handleOutput = (row: any) => {
+    variables.showOutputModalRef = true
     variables.row = row
   }
 

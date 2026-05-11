@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFil
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskLogFileProvider;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,8 +42,8 @@ public class LocalLogClient {
      * @param taskInstance The task instance object, containing information needed to retrieve the log.
      * @return The complete log file download response of the task instance, including log content and metadata.
      */
-    public TaskInstanceLogFileDownloadResponse getWholeLog(TaskInstance taskInstance) {
-        return getLocalWholeLog(taskInstance);
+    public TaskInstanceLogFileDownloadResponse getLog(TaskInstance taskInstance, TaskLogType taskLogType) {
+        return getLocalWholeLog(taskInstance, taskLogType);
     }
 
     /**
@@ -55,23 +56,27 @@ public class LocalLogClient {
      * @param limit The maximum number of lines to read, indicating the maximum number of lines to retrieve in this query.
      * @return The partial log query response, including log content within the specified range and metadata.
      */
-    public TaskInstanceLogPageQueryResponse getPartLog(TaskInstance taskInstance, int skipLineNum, int limit) {
-        return getLocalPartLog(taskInstance, skipLineNum, limit);
+    public TaskInstanceLogPageQueryResponse getLog(TaskInstance taskInstance, int skipLineNum, int limit,
+                                                   TaskLogType taskLogType) {
+        return getLocalPartLog(taskInstance, skipLineNum, limit, taskLogType);
     }
 
-    private TaskInstanceLogFileDownloadResponse getLocalWholeLog(TaskInstance taskInstance) {
+    private TaskInstanceLogFileDownloadResponse getLocalWholeLog(TaskInstance taskInstance, TaskLogType taskLogType) {
         TaskInstanceLogFileDownloadRequest request = new TaskInstanceLogFileDownloadRequest(
                 taskInstance.getId(),
-                taskInstance.getLogPath());
+                TaskLogFileProvider.getFilePath(taskInstance.getTaskLogsRootPath(),
+                        TaskLogFileTypeMapping.toTaskLogFileType(taskLogType)));
         return getProxyLogService(taskInstance).getTaskInstanceWholeLogFileBytes(request);
     }
 
     private TaskInstanceLogPageQueryResponse getLocalPartLog(TaskInstance taskInstance, int skipLineNum,
-                                                             int limit) {
+                                                             int limit, TaskLogType taskLogType) {
+        String logFilePath = TaskLogFileProvider.getFilePath(taskInstance.getTaskLogsRootPath(),
+                TaskLogFileTypeMapping.toTaskLogFileType(taskLogType));
         TaskInstanceLogPageQueryRequest request = TaskInstanceLogPageQueryRequest
                 .builder()
                 .taskInstanceId(taskInstance.getId())
-                .taskInstanceLogAbsolutePath(taskInstance.getLogPath())
+                .taskInstanceLogAbsolutePath(logFilePath)
                 .skipLineNum(skipLineNum)
                 .limit(limit)
                 .build();

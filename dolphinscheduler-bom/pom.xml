@@ -1029,6 +1029,12 @@
                 <groupId>com.dolphindb</groupId>
                 <artifactId>jdbc</artifactId>
                 <version>${dolphindb-jdbc.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-simple</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.executor.logging;
 
 import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskLogFileProvider;
 
 import org.springframework.stereotype.Component;
 
@@ -32,8 +33,8 @@ public class RemoteLogClient {
      * @param taskInstance The task instance object, containing information such as the task ID and log path.
      * @return Returns the log content in byte array format.
      */
-    public byte[] getWholeLog(TaskInstance taskInstance) {
-        return LogUtils.getFileContentBytesFromRemote(taskInstance.getLogPath());
+    public byte[] getLogBytes(TaskInstance taskInstance, TaskLogType taskLogType) {
+        return getWholeLog(taskInstance, taskLogType);
     }
 
     /**
@@ -45,10 +46,24 @@ public class RemoteLogClient {
      * @param limit The maximum number of lines to read.
      * @return Returns the specified part of the log content in string format.
      */
-    public String getPartLog(TaskInstance taskInstance, int skipLineNum, int limit) {
+
+    public String getLogString(TaskInstance taskInstance, int skipLineNum, int limit, TaskLogType taskLogType) {
+        return getPartLog(taskInstance, skipLineNum, limit, taskLogType);
+    }
+
+    private byte[] getWholeLog(TaskInstance taskInstance, TaskLogType taskLogType) {
+        return LogUtils
+                .getFileContentBytesFromRemote(TaskLogFileProvider.getFilePath(taskInstance.getTaskLogsRootPath(),
+                        TaskLogFileTypeMapping.toTaskLogFileType(taskLogType)));
+    }
+
+    private String getPartLog(TaskInstance taskInstance, int skipLineNum, int limit, TaskLogType taskLogType) {
         // todo We can optimize requests by the actual range, reducing disk usage and network traffic.
         return LogUtils.rollViewLogLines(
-                LogUtils.readPartFileContentFromRemote(taskInstance.getLogPath(), skipLineNum, limit));
+                LogUtils.readPartFileContentFromRemote(
+                        TaskLogFileProvider.getFilePath(taskInstance.getTaskLogsRootPath(),
+                                TaskLogFileTypeMapping.toTaskLogFileType(taskLogType)),
+                        skipLineNum, limit));
     }
 
 }

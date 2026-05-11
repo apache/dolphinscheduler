@@ -15,14 +15,23 @@
  * limitations under the License.
  */
 
-interface IdReq {
-  taskInstanceId: number
-}
+package org.apache.dolphinscheduler.api.executor.logging;
 
-interface LogReq extends IdReq {
-  limit: number
-  skipLineNum: number
-  logType: 'LOG' | 'OUTPUT'
-}
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskLogFileType;
 
-export { IdReq, LogReq }
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class TaskLogFileTypeMapping {
+
+    public static TaskLogFileType toTaskLogFileType(TaskLogType taskLogType) {
+        switch (taskLogType) {
+            case LOG:
+                return TaskLogFileType.TASK_LOG;
+            case OUTPUT:
+                return TaskLogFileType.TASK_OUTPUT;
+            default:
+                throw new IllegalArgumentException("Unsupported task log type: " + taskLogType);
+        }
+    }
+}

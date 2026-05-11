@@ -60,7 +60,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setFirstSubmitTime(DateUtils.dateToTimeStamp(taskInstance.getFirstSubmitTime()));
         taskExecutionContext.setStartTime(DateUtils.dateToTimeStamp(taskInstance.getStartTime()));
         taskExecutionContext.setTaskType(taskInstance.getTaskType());
-        taskExecutionContext.setLogPath(taskInstance.getLogPath());
+        taskExecutionContext.setTaskLogsRootPath(taskInstance.getTaskLogsRootPath());
         taskExecutionContext.setWorkerGroup(taskInstance.getWorkerGroup());
         taskExecutionContext.setHost(taskInstance.getHost());
         taskExecutionContext.setDryRun(taskInstance.getDryRun());

@@ -54,7 +54,7 @@ public class FailoverTaskInstanceFactory extends AbstractTaskInstanceFactory<Fai
         taskInstance.setHost(null);
         taskInstance.setVarPool(null);
         taskInstance.setSubmitTime(new Date());
-        taskInstance.setLogPath(null);
+        taskInstance.setTaskLogsRootPath(null);
         taskInstance.setExecutePath(null);
         taskInstanceDao.insert(taskInstance);
 

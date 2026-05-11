@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.executor.logging.TaskLogType;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -32,7 +33,8 @@ public interface LoggerService {
      * @param limit limit
      * @return log string data
      */
-    Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit);
+    Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit,
+                                     TaskLogType taskLogType);
 
     /**
      * get log size
@@ -41,27 +43,6 @@ public interface LoggerService {
      * @param taskInstId task instance id
      * @return log byte array
      */
-    byte[] getLogBytes(User loginUser, int taskInstId);
+    byte[] getLogBytes(User loginUser, int taskInstId, TaskLogType taskLogType);
 
-    /**
-     * query log
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param taskInstId  task instance id
-     * @param skipLineNum skip line number
-     * @param limit       limit
-     * @return log string data
-     */
-    String queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit);
-
-    /**
-     * get log bytes
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param taskInstId  task instance id
-     * @return log byte array
-     */
-    byte[] getLogBytes(User loginUser, long projectCode, int taskInstId);
 }

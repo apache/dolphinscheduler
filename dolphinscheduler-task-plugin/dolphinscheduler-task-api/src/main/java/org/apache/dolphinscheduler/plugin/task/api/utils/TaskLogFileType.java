@@ -15,14 +15,18 @@
  * limitations under the License.
  */
 
-interface IdReq {
-  taskInstanceId: number
-}
+package org.apache.dolphinscheduler.plugin.task.api.utils;
 
-interface LogReq extends IdReq {
-  limit: number
-  skipLineNum: number
-  logType: 'LOG' | 'OUTPUT'
-}
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-export { IdReq, LogReq }
+@Getter
+@RequiredArgsConstructor
+public enum TaskLogFileType {
+
+    TASK_LOG("task.log"),
+    TASK_OUTPUT("task.out"),
+    STDERR_LOG("stderr.log");
+
+    private final String fileName;
+}

@@ -51,7 +51,7 @@ public class FailedRecoverTaskInstanceFactory
         taskInstance.setHost(null);
         taskInstance.setVarPool(null);
         taskInstance.setSubmitTime(new Date());
-        taskInstance.setLogPath(null);
+        taskInstance.setTaskLogsRootPath(null);
         taskInstance.setExecutePath(null);
         taskInstanceDao.insert(taskInstance);
 

@@ -15,14 +15,9 @@
  * limitations under the License.
  */
 
-interface IdReq {
-  taskInstanceId: number
-}
+package org.apache.dolphinscheduler.api.executor.logging;
 
-interface LogReq extends IdReq {
-  limit: number
-  skipLineNum: number
-  logType: 'LOG' | 'OUTPUT'
+public enum TaskLogType {
+    LOG,
+    OUTPUT
 }
-
-export { IdReq, LogReq }

@@ -59,7 +59,7 @@ public class FirstRunTaskInstanceFactory extends AbstractTaskInstanceFactory<Fir
         taskInstance.setEndTime(null);
         taskInstance.setHost(null);
         taskInstance.setExecutePath(null);
-        taskInstance.setLogPath(null);
+        taskInstance.setTaskLogsRootPath(null);
         taskInstance.setRetryTimes(0);
         taskInstance.setAlertFlag(Flag.NO);
         taskInstance.setFlag(Flag.YES);

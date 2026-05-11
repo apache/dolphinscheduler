@@ -56,6 +56,10 @@ const props = {
   showDownloadLog: {
     type: Boolean as PropType<boolean>,
     default: false
+  },
+  title: {
+    type: String as PropType<string>,
+    default: ''
   }
 }
 
@@ -126,7 +130,7 @@ export default defineComponent({
     return (
       <Modal
         class='logModalRef'
-        title={t('project.task.view_log')}
+        title={this.title || t('project.task.view_log')}
         show={this.showModalRef}
         cancelShow={false}
         onConfirm={this.confirmModal}

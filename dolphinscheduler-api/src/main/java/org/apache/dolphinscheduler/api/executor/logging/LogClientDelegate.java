@@ -50,19 +50,21 @@ public class LogClientDelegate {
      * @param limit The maximum number of log lines to retrieve.
      * @return A string containing the specified portion of the log.
      */
-    public String getPartLogString(TaskInstance taskInstance, int skipLineNum, int limit) {
+
+    public String getLogString(TaskInstance taskInstance, int skipLineNum, int limit, TaskLogType taskLogType) {
         checkArgs(taskInstance);
         if (checkNodeExists(taskInstance)) {
-            TaskInstanceLogPageQueryResponse response = localLogClient.getPartLog(taskInstance, skipLineNum, limit);
+            TaskInstanceLogPageQueryResponse response = localLogClient.getLog(taskInstance, skipLineNum, limit,
+                    taskLogType);
             if (response.getCode() == LogResponseStatus.SUCCESS) {
                 return response.getLogContent();
             } else {
                 log.warn("get part log string is not success for task instance {}; reason :{}",
                         taskInstance.getId(), response.getMessage());
-                return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit);
+                return remoteLogClient.getLogString(taskInstance, skipLineNum, limit, taskLogType);
             }
         } else {
-            return remoteLogClient.getPartLog(taskInstance, skipLineNum, limit);
+            return remoteLogClient.getLogString(taskInstance, skipLineNum, limit, taskLogType);
         }
     }
 
@@ -73,19 +75,19 @@ public class LogClientDelegate {
      * @param taskInstance The task instance object, containing information needed for log retrieval.
      * @return A byte array containing the complete log content.
      */
-    public byte[] getWholeLogBytes(TaskInstance taskInstance) {
+    public byte[] getLogBytes(TaskInstance taskInstance, TaskLogType taskLogType) {
         checkArgs(taskInstance);
         if (checkNodeExists(taskInstance)) {
-            TaskInstanceLogFileDownloadResponse response = localLogClient.getWholeLog(taskInstance);
+            TaskInstanceLogFileDownloadResponse response = localLogClient.getLog(taskInstance, taskLogType);
             if (response.getCode() == LogResponseStatus.SUCCESS) {
                 return response.getLogBytes();
             } else {
                 log.warn("get whole log bytes is not success for task instance {}; reason :{}", taskInstance.getId(),
                         response.getMessage());
-                return remoteLogClient.getWholeLog(taskInstance);
+                return remoteLogClient.getLogBytes(taskInstance, taskLogType);
             }
         } else {
-            return remoteLogClient.getWholeLog(taskInstance);
+            return remoteLogClient.getLogBytes(taskInstance, taskLogType);
         }
     }
 

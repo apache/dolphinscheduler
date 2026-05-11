@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskOutputLogWriter;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -67,6 +68,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Slf4j
@@ -280,11 +282,8 @@ public class SqlTask extends AbstractTask {
             int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
                     : TaskConstants.DEFAULT_DISPLAY_ROWS;
             displayRows = Math.min(displayRows, resultJSONArray.size());
-            log.info("display sql result {} rows as follows:", displayRows);
-            for (int i = 0; i < displayRows; i++) {
-                String row = JSONUtils.toJsonString(resultJSONArray.get(i));
-                log.info("row {} : {}", i + 1, row);
-            }
+
+            logSqlResultPreview(columnLabels, resultJSONArray, displayRows);
         }
 
         String result = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
@@ -317,6 +316,39 @@ public class SqlTask extends AbstractTask {
         }
         resultJSONArray.add(emptyOfColValues);
         return resultJSONArray;
+    }
+
+    private void logSqlResultPreview(String[] columnLabels, ArrayNode resultJSONArray, int displayRows) {
+        doLogSqlResultPreview(columnLabels, resultJSONArray, displayRows);
+    }
+
+    private void doLogSqlResultPreview(String[] columnLabels, ArrayNode resultJSONArray, int displayRows) {
+        logSqlResultLine(String.join("\t", columnLabels));
+        for (int i = 0; i < displayRows; i++) {
+            ObjectNode rowNode = (ObjectNode) resultJSONArray.get(i);
+            List<String> rowValues = new ArrayList<>(columnLabels.length);
+            for (String columnLabel : columnLabels) {
+                rowValues.add(formatSqlResultValue(rowNode.get(columnLabel)));
+            }
+            logSqlResultLine(String.join("\t", rowValues));
+        }
+    }
+
+    private void logSqlResultLine(String line) {
+        TaskOutputLogWriter.writeTaskOutput(taskExecutionContext, line);
+    }
+
+    private String formatSqlResultValue(com.fasterxml.jackson.databind.JsonNode valueNode) {
+        if (valueNode == null || valueNode.isNull()) {
+            return "NULL";
+        }
+        if (valueNode.getNodeType() == JsonNodeType.STRING) {
+            return valueNode.asText();
+        }
+        if (valueNode.isValueNode()) {
+            return valueNode.asText();
+        }
+        return JSONUtils.toJsonString(valueNode);
     }
 
     /**

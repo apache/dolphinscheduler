@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskOutputLogWriter;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -126,6 +127,7 @@ public class HttpTask extends AbstractTask {
 
         // default success log
         log.info("http request success, url: {}, statusCode: {}, body: {}", httpParameters.getUrl(), statusCode, body);
+        TaskOutputLogWriter.writeTaskOutput(taskExecutionContext, body);
         exitStatusCode = TaskConstants.EXIT_CODE_SUCCESS;
     }
 

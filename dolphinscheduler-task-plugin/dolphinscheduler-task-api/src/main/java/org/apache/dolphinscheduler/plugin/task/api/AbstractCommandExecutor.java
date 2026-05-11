@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilde
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskOutputLogWriter;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -193,7 +194,10 @@ public abstract class AbstractCommandExecutor {
         final CompletableFuture<Void> collectPodLogFuture = CompletableFuture.runAsync(() -> {
             // wait for launching (driver) pod
             ThreadUtils.sleep(SLEEP_TIME_MILLIS * 5L);
+            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
             try (
+                    LogUtils.MDCAutoClosableContext ignored =
+                            LogUtils.withTaskOutputLogPathMDC(taskRequest.getTaskOutputLogPath());
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
                             taskRequest.getTaskAppId(), "")) {
                 if (watcher == null) {
@@ -202,13 +206,15 @@ public abstract class AbstractCommandExecutor {
                     String line;
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                         while ((line = reader.readLine()) != null) {
-                            log.info("[K8S-pod-log-{}]: {}", taskRequest.getTaskName(), line);
+                            TaskOutputLogWriter.writeTaskOutput(taskRequest, line);
                         }
                     }
                 }
             } catch (Exception e) {
                 log.error("Collect pod log error", e);
                 throw new RuntimeException(e);
+            } finally {
+                LogUtils.removeTaskInstanceLogFullPathMDC();
             }
         }, collectPodLogExecutorService);
 
@@ -224,15 +230,18 @@ public abstract class AbstractCommandExecutor {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
-                String line;
-                while ((line = inReader.readLine()) != null) {
-                    log.info(" -> {}", line);
-                    taskOutputParameterParser.appendParseLog(line);
+                try (
+                        LogUtils.MDCAutoClosableContext ignored =
+                                LogUtils.withTaskOutputLogPathMDC(taskRequest.getTaskOutputLogPath())) {
+                    for (String line : (Iterable<String>) inReader.lines()::iterator) {
+                        TaskOutputLogWriter.writeTaskOutput(taskRequest, line);
+                        taskOutputParameterParser.appendParseLog(line);
+                    }
+                } finally {
+                    LogUtils.removeTaskInstanceLogFullPathMDC();
                 }
             } catch (Exception e) {
                 log.error("Parse var pool error", e);
-            } finally {
-                LogUtils.removeTaskInstanceLogFullPathMDC();
             }
             taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
         }, collectProcessLogService);

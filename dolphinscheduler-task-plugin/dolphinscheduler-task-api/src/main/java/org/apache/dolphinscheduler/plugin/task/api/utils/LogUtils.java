@@ -59,6 +59,8 @@ public class LogUtils {
 
     private static final Path TASK_INSTANCE_LOG_BASE_PATH = getTaskInstanceLogBasePath();
     public static final String TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY = "taskInstanceLogFullPath";
+    public static final String TASK_OUTPUT_LOG_FULL_PATH_MDC_KEY = "taskOutputLogFullPath";
+    public static final String TASK_OUTPUT_LOGGER_NAME = "TaskOutput";
 
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
@@ -86,13 +88,13 @@ public class LogUtils {
      * @param taskExecutionContext task execution context.
      * @return task instance log full path.
      */
-    public static String getTaskInstanceLogFullPath(TaskExecutionContext taskExecutionContext) {
+    public static String getTaskInstanceLogFullPath(TaskExecutionContext taskExecutionContext, String logType) {
         return getTaskInstanceLogFullPath(
                 DateUtils.timeStampToDate(taskExecutionContext.getFirstSubmitTime()),
                 taskExecutionContext.getWorkflowDefinitionCode(),
                 taskExecutionContext.getWorkflowDefinitionVersion(),
                 taskExecutionContext.getWorkflowInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+                taskExecutionContext.getTaskInstanceId(), logType);
     }
 
     /**
@@ -110,7 +112,8 @@ public class LogUtils {
                                                     Long workflowDefinitionCode,
                                                     int workflowDefinitionVersion,
                                                     int workflowInstanceId,
-                                                    int taskInstanceId) {
+                                                    int taskInstanceId,
+                                                    String logType) {
         if (TASK_INSTANCE_LOG_BASE_PATH == null) {
             throw new IllegalArgumentException(
                     "Cannot find the task instance log base path, please check your logback.xml file");
@@ -119,7 +122,7 @@ public class LogUtils {
                 String.valueOf(workflowDefinitionCode),
                 String.valueOf(workflowDefinitionVersion),
                 String.valueOf(workflowInstanceId),
-                String.format("%s.log", taskInstanceId)).toString();
+                String.format("%s.%s", taskInstanceId, logType)).toString();
         return TASK_INSTANCE_LOG_BASE_PATH
                 .resolve(DateUtils.format(taskFirstSubmitTime, DateConstants.YYYYMMDD, null))
                 .resolve(taskLogFileName)
@@ -187,6 +190,10 @@ public class LogUtils {
         return MDC.get(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
     }
 
+    public static String getTaskOutputLogFullPathMdc() {
+        return MDC.get(TASK_OUTPUT_LOG_FULL_PATH_MDC_KEY);
+    }
+
     public static void setTaskInstanceLogFullPathMDC(String taskInstanceLogFullPath) {
         if (taskInstanceLogFullPath == null) {
             log.warn("taskInstanceLogFullPath is null");
@@ -197,6 +204,37 @@ public class LogUtils {
 
     public static void removeTaskInstanceLogFullPathMDC() {
         MDC.remove(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
+    }
+
+    public static void setTaskOutputLogFullPathMDC(String taskOutputLogFullPath) {
+        if (taskOutputLogFullPath == null) {
+            log.warn("taskOutputLogFullPath is null");
+            return;
+        }
+        MDC.put(TASK_OUTPUT_LOG_FULL_PATH_MDC_KEY, taskOutputLogFullPath);
+    }
+
+    public static void removeTaskOutputLogFullPathMDC() {
+        MDC.remove(TASK_OUTPUT_LOG_FULL_PATH_MDC_KEY);
+    }
+
+    public static MDCAutoClosableContext withTaskOutputLogPathMDC(String taskOutputLogFullPath) {
+        final String originalTaskOutputLogFullPath = getTaskOutputLogFullPathMdc();
+        if (taskOutputLogFullPath == null) {
+            removeTaskOutputLogFullPathMDC();
+        } else {
+            setTaskOutputLogFullPathMDC(taskOutputLogFullPath);
+        }
+        return new MDCAutoClosableContext(
+                () -> restoreMDC(TASK_OUTPUT_LOG_FULL_PATH_MDC_KEY, originalTaskOutputLogFullPath));
+    }
+
+    private static void restoreMDC(String key, String value) {
+        if (value == null) {
+            MDC.remove(key);
+            return;
+        }
+        MDC.put(key, value);
     }
 
     public static void setWorkflowAndTaskInstanceIDMDC(Integer workflowInstanceId,

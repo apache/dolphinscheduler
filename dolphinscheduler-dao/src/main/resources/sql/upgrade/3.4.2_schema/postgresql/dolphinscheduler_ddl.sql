@@ -13,16 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-interface IdReq {
-  taskInstanceId: number
-}
-
-interface LogReq extends IdReq {
-  limit: number
-  skipLineNum: number
-  logType: 'LOG' | 'OUTPUT'
-}
-
-export { IdReq, LogReq }
+ALTER TABLE t_ds_task_instance
+ADD COLUMN IF NOT EXISTS task_logs_root_path varchar(1024) DEFAULT NULL;

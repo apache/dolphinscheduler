@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.worker.executor;
 
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
-import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskLogFileProvider;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutorFactory;
@@ -48,7 +48,7 @@ public class PhysicalTaskExecutorFactory implements ITaskExecutorFactory {
 
     @Override
     public ITaskExecutor createTaskExecutor(final TaskExecutionContext taskExecutionContext) {
-        assemblyTaskLogPath(taskExecutionContext);
+        assemblyTaskLogsRootPath(taskExecutionContext);
 
         final PhysicalTaskExecutorBuilder physicalTaskExecutorBuilder = PhysicalTaskExecutorBuilder.builder()
                 .taskExecutionContext(taskExecutionContext)
@@ -59,8 +59,8 @@ public class PhysicalTaskExecutorFactory implements ITaskExecutorFactory {
         return new PhysicalTaskExecutor(physicalTaskExecutorBuilder);
     }
 
-    private void assemblyTaskLogPath(final TaskExecutionContext taskExecutionContext) {
-        taskExecutionContext.setLogPath(LogUtils.getTaskInstanceLogFullPath(taskExecutionContext));
+    private void assemblyTaskLogsRootPath(final TaskExecutionContext taskExecutionContext) {
+        taskExecutionContext.setTaskLogsRootPath(TaskLogFileProvider.getTaskLogsRootPath(taskExecutionContext));
     }
 
 }

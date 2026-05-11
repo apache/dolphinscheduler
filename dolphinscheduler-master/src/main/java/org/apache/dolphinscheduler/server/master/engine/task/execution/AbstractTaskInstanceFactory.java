@@ -44,7 +44,7 @@ public abstract class AbstractTaskInstanceFactory<BUILDER extends ITaskInstanceF
         result.setEndTime(originTaskInstance.getEndTime());
         result.setHost(originTaskInstance.getHost());
         result.setExecutePath(originTaskInstance.getExecutePath());
-        result.setLogPath(originTaskInstance.getLogPath());
+        result.setTaskLogsRootPath(originTaskInstance.getTaskLogsRootPath());
         result.setRetryTimes(originTaskInstance.getRetryTimes());
         result.setAlertFlag(originTaskInstance.getAlertFlag());
         result.setPid(originTaskInstance.getPid());

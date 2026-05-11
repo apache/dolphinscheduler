@@ -914,7 +914,7 @@ CREATE TABLE t_ds_task_instance
     end_time                datetime     DEFAULT NULL,
     host                    varchar(135) DEFAULT NULL,
     execute_path            varchar(200) DEFAULT NULL,
-    log_path                longtext DEFAULT NULL,
+    task_logs_root_path     varchar(1024) DEFAULT NULL,
     alert_flag              tinyint(4) DEFAULT NULL,
     retry_times             int(4) DEFAULT '0',
     pid                     int(4) DEFAULT NULL,
