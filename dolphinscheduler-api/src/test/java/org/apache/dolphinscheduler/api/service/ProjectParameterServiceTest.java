@@ -20,14 +20,16 @@ package org.apache.dolphinscheduler.api.service;
 import static org.apache.dolphinscheduler.api.utils.ServiceTestUtil.getGeneralUser;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.AssertionsHelper;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectParameterServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -76,16 +78,13 @@ public class ProjectParameterServiceTest {
         User loginUser = getGeneralUser();
 
         // PERMISSION DENIED
-        when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(false);
-        Result result = projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value",
-                DataType.VARCHAR.name());
-        assertNull(result.getData());
-        assertNull(result.getCode());
-        assertNull(result.getMsg());
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
+        assertThrows(ServiceException.class,
+                () -> projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value",
+                        DataType.VARCHAR.name()));
 
-        when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(true);
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
 
         // CODE GENERATION ERROR
         try (MockedStatic<CodeGenerateUtils> ignored = Mockito.mockStatic(CodeGenerateUtils.class)) {
@@ -99,7 +98,7 @@ public class ProjectParameterServiceTest {
         // PROJECT_PARAMETER_ALREADY_EXISTS
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         when(projectParameterMapper.selectOne(Mockito.any())).thenReturn(getProjectParameter());
-        result = projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value",
+        Result result = projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value",
                 DataType.VARCHAR.name());
         assertEquals(Status.PROJECT_PARAMETER_ALREADY_EXISTS.getCode(), result.getCode());
 
@@ -125,20 +124,17 @@ public class ProjectParameterServiceTest {
         User loginUser = getGeneralUser();
 
         // NO PERMISSION
-        when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(false);
-        Result result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value",
-                DataType.VARCHAR.name());
-        assertNull(result.getData());
-        assertNull(result.getCode());
-        assertNull(result.getMsg());
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
+        assertThrows(ServiceException.class,
+                () -> projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value",
+                        DataType.VARCHAR.name()));
 
         // PROJECT_PARAMETER_NOT_EXISTS
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(true);
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(null);
-        result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value",
+        Result result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value",
                 DataType.VARCHAR.name());
         assertEquals(Status.PROJECT_PARAMETER_NOT_EXISTS.getCode(), result.getCode());
 
@@ -172,19 +168,16 @@ public class ProjectParameterServiceTest {
         User loginUser = getGeneralUser();
 
         // NO PERMISSION
-        when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(false);
-        Result result = projectParameterService.deleteProjectParametersByCode(loginUser, projectCode, 1);
-        assertNull(result.getData());
-        assertNull(result.getCode());
-        assertNull(result.getMsg());
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
+        assertThrows(ServiceException.class,
+                () -> projectParameterService.deleteProjectParametersByCode(loginUser, projectCode, 1));
 
         // PROJECT_PARAMETER_NOT_EXISTS
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(true);
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(null);
-        result = projectParameterService.deleteProjectParametersByCode(loginUser, projectCode, 1);
+        Result result = projectParameterService.deleteProjectParametersByCode(loginUser, projectCode, 1);
         assertEquals(Status.PROJECT_PARAMETER_NOT_EXISTS.getCode(), result.getCode());
 
         // DATABASE OPERATION ERROR
@@ -204,21 +197,17 @@ public class ProjectParameterServiceTest {
         User loginUser = getGeneralUser();
 
         // NO PERMISSION
-        when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class),
-                Mockito.any()))
-                        .thenReturn(false);
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectAndAuthThrowException(any(), Mockito.<Project>any(), any());
 
-        Result result = projectParameterService.queryProjectParameterByCode(loginUser, projectCode, 1);
-        assertNull(result.getData());
-        assertNull(result.getCode());
-        assertNull(result.getMsg());
+        assertThrows(ServiceException.class,
+                () -> projectParameterService.queryProjectParameterByCode(loginUser, projectCode, 1));
 
         // PROJECT_PARAMETER_NOT_EXISTS
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class),
-                Mockito.any())).thenReturn(true);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(any(), Mockito.<Project>any(), any());
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(null);
-        result = projectParameterService.queryProjectParameterByCode(loginUser, projectCode, 1);
+        Result result = projectParameterService.queryProjectParameterByCode(loginUser, projectCode, 1);
         assertEquals(Status.PROJECT_PARAMETER_NOT_EXISTS.getCode(), result.getCode());
 
         // SUCCESS
@@ -234,27 +223,23 @@ public class ProjectParameterServiceTest {
         Integer pageNo = 1;
 
         // NO PERMISSION
-        when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class),
-                Mockito.any()))
-                        .thenReturn(false);
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectAndAuthThrowException(any(), Mockito.<Project>any(), any());
 
-        Result result =
-                projectParameterService.queryProjectParameterListPaging(loginUser, projectCode, pageSize, pageNo, null,
-                        DataType.VARCHAR.name());
-        assertNull(result.getData());
-        assertNull(result.getCode());
-        assertNull(result.getMsg());
+        assertThrows(ServiceException.class,
+                () -> projectParameterService.queryProjectParameterListPaging(loginUser, projectCode, pageSize, pageNo,
+                        null, DataType.VARCHAR.name()));
 
         // SUCCESS
-        when(projectService.hasProjectAndPerm(any(), any(), any(Result.class), any()))
-                .thenReturn(true);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(any(), Mockito.<Project>any(), any());
 
         Page<ProjectParameter> page = new Page<>(pageNo, pageSize);
         page.setRecords(Collections.singletonList(getProjectParameter()));
 
         when(projectParameterMapper.queryProjectParameterListPaging(any(), anyLong(), any(), any(), any()))
                 .thenReturn(page);
-        result = projectParameterService.queryProjectParameterListPaging(loginUser, projectCode, pageSize, pageNo,
+        Result result = projectParameterService.queryProjectParameterListPaging(loginUser, projectCode, pageSize,
+                pageNo,
                 null, null);
         assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }

@@ -145,20 +145,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         return taskDefinition;
     }
 
-    /**
-     * Resolve project + write permission; throws ServiceException with the
-     * status that {@link ProjectService#hasProjectAndWritePerm(User, Project, Map)}
-     * would otherwise have written into the legacy result map.
-     */
-    private void requireProjectAndWritePerm(User loginUser, Project project) {
-        Map<String, Object> permCheck = new HashMap<>();
-        if (!projectService.hasProjectAndWritePerm(loginUser, project, permCheck)) {
-            Status status = (Status) permCheck.get(Constants.STATUS);
-            String msg = (String) permCheck.get(Constants.MSG);
-            throw new ServiceException(status.getCode(), msg);
-        }
-    }
-
     public void updateDag(User loginUser, long workflowDefinitionCode,
                           List<WorkflowTaskRelation> workflowTaskRelationList,
                           List<TaskDefinitionLog> taskDefinitionLogs) {
@@ -224,7 +210,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check if user have write perm for project
-        requireProjectAndWritePerm(loginUser, project);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null) {
@@ -591,7 +577,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public void deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectMapper.queryByCode(projectCode);
         // check if user have write perm for project
-        requireProjectAndWritePerm(loginUser, project);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {

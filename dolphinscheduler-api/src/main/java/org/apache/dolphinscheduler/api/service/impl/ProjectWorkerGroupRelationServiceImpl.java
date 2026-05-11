@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -39,10 +38,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -196,14 +193,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
     public List<ProjectWorkerGroup> queryAssignedWorkerGroupsByProject(User loginUser, Long projectCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check project auth
-        Map<String, Object> permResult = new HashMap<>();
-        if (!projectService.hasProjectAndPerm(loginUser, project, permResult, null)) {
-            Status status = (Status) permResult.get(Constants.STATUS);
-            if (status == null) {
-                throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM);
-            }
-            throw new ServiceException(status.getCode(), (String) permResult.get(Constants.MSG));
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
         Set<String> assignedWorkerGroups = getAllUsedWorkerGroups(project);
 

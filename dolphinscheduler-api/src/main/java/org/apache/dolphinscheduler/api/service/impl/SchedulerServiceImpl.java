@@ -281,10 +281,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectMapper.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, PROJECT);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
 
         if (workflowDefinitionCode != 0) {
             WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);

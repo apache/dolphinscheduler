@@ -20,12 +20,8 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -58,17 +54,6 @@ public class BaseServiceTest {
 
     @Test
     public void testPutMsg() {
-
-        Map<String, Object> result = new HashMap<>();
-        baseService.putMsg(result, Status.SUCCESS);
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
-        // has params
-        baseService.putMsg(result, Status.PROJECT_NOT_FOUND, "test");
-
-    }
-
-    @Test
-    public void testPutMsgTwo() {
 
         Result result = new Result();
         baseService.putMsg(result, Status.SUCCESS);
