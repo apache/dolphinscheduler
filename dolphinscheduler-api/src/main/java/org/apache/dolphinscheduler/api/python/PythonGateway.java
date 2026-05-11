@@ -263,15 +263,10 @@ public class PythonGateway {
                     null, timeout, taskRelationJson, taskDefinitionJson,
                     executionTypeEnum);
         } else {
-            Map<String, Object> result = workflowDefinitionService.createWorkflowDefinition(user, projectCode, name,
+            workflowDefinition = workflowDefinitionService.createWorkflowDefinition(user, projectCode, name,
                     description, globalParams,
                     null, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                log.error(result.get(Constants.MSG).toString());
-                throw new ServiceException(result.get(Constants.MSG).toString());
-            }
-            workflowDefinition = (WorkflowDefinition) result.get(Constants.DATA_LIST);
             workflowDefinitionCode = workflowDefinition.getCode();
         }
 
@@ -297,21 +292,16 @@ public class PythonGateway {
      * @param workflowName workflow name
      */
     private WorkflowDefinition getWorkflow(User user, long projectCode, String workflowName) {
-        Map<String, Object> verifyWorkflowDefinitionExists =
-                workflowDefinitionService.verifyWorkflowDefinitionName(user, projectCode, workflowName, 0);
-        Status verifyStatus = (Status) verifyWorkflowDefinitionExists.get(Constants.STATUS);
-
-        WorkflowDefinition workflowDefinition = null;
-        if (verifyStatus == Status.WORKFLOW_DEFINITION_NAME_EXIST) {
-            workflowDefinition = workflowDefinitionMapper.queryByDefineName(projectCode, workflowName);
-        } else if (verifyStatus != Status.SUCCESS) {
-            String msg =
-                    "Verify workflow exists status is invalid, neither SUCCESS or WORKFLOW_NAME_EXIST.";
-            log.error(msg);
-            throw new RuntimeException(msg);
+        try {
+            workflowDefinitionService.verifyWorkflowDefinitionName(user, projectCode, workflowName, 0);
+            // name available -> workflow does not exist yet
+            return null;
+        } catch (ServiceException e) {
+            if (e.getCode() == Status.WORKFLOW_DEFINITION_NAME_EXIST.getCode()) {
+                return workflowDefinitionMapper.queryByDefineName(projectCode, workflowName);
+            }
+            throw e;
         }
-
-        return workflowDefinition;
     }
 
     /**

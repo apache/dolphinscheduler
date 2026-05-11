@@ -488,13 +488,8 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 workflowDefinitionMapper.queryByCode(workflowInstance.getWorkflowDefinitionCode());
         List<WorkflowTaskRelationLog> taskRelationList =
                 JSONUtils.toList(taskRelationJson, WorkflowTaskRelationLog.class);
-        // check workflow json is valid
-        Map<String, Object> checkResult =
-                workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs);
-        Status checkStatus = (Status) checkResult.get(Constants.STATUS);
-        if (checkStatus != Status.SUCCESS) {
-            throw new ServiceException(checkStatus.getCode(), (String) checkResult.get(Constants.MSG));
-        }
+        // check workflow json is valid (throws ServiceException on validation failures)
+        workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs);
 
         workflowDefinition.set(projectCode, workflowDefinition.getName(), workflowDefinition.getDescription(),
                 globalParams, locations, timeout);

@@ -37,7 +37,8 @@ import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_WORKFLOW_DEFIN
 
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
-import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowDefinitionVariablesDTO;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -45,10 +46,14 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
+import org.apache.dolphinscheduler.dao.entity.DagData;
+import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
+import java.util.List;
 import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
@@ -65,6 +70,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -107,21 +114,21 @@ public class WorkflowDefinitionController extends BaseController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(CREATE_WORKFLOW_DEFINITION_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_CREATE)
-    public Result createWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @RequestParam(value = "name", required = true) String name,
-                                           @RequestParam(value = "description", required = false) String description,
-                                           @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
-                                           @RequestParam(value = "locations", required = false) String locations,
-                                           @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
-                                           @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
-                                           @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
-                                           @RequestParam(value = "executionType", defaultValue = "PARALLEL") WorkflowExecutionTypeEnum executionType) {
-        Map<String, Object> result = workflowDefinitionService.createWorkflowDefinition(loginUser, projectCode, name,
-                description, globalParams,
+    public Result<WorkflowDefinition> createWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                               @RequestParam(value = "name", required = true) String name,
+                                                               @RequestParam(value = "description", required = false) String description,
+                                                               @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
+                                                               @RequestParam(value = "locations", required = false) String locations,
+                                                               @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
+                                                               @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
+                                                               @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
+                                                               @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
+                                                               @RequestParam(value = "executionType", defaultValue = "PARALLEL") WorkflowExecutionTypeEnum executionType) {
+        WorkflowDefinition workflowDefinition = workflowDefinitionService.createWorkflowDefinition(loginUser,
+                projectCode, name, description, globalParams,
                 locations, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
-        return returnDataList(result);
+        return Result.success(workflowDefinition);
     }
 
     /**
@@ -142,13 +149,12 @@ public class WorkflowDefinitionController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_COPY_WORKFLOW_DEFINITION_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_COPY)
-    public Result copyWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                         @RequestParam(value = "codes", required = true) String codes,
-                                         @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
-        return returnDataList(
-                workflowDefinitionService.batchCopyWorkflowDefinition(loginUser, projectCode, codes,
-                        targetProjectCode));
+    public Result<Void> copyWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                               @RequestParam(value = "codes", required = true) String codes,
+                                               @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
+        workflowDefinitionService.batchCopyWorkflowDefinition(loginUser, projectCode, codes, targetProjectCode);
+        return Result.success();
     }
 
     /**
@@ -168,13 +174,12 @@ public class WorkflowDefinitionController extends BaseController {
     @PostMapping(value = "/batch-move")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_MOVE_WORKFLOW_DEFINITION_ERROR)
-    public Result moveWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                         @RequestParam(value = "codes", required = true) String codes,
-                                         @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
-        return returnDataList(
-                workflowDefinitionService.batchMoveWorkflowDefinition(loginUser, projectCode, codes,
-                        targetProjectCode));
+    public Result<Void> moveWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                               @RequestParam(value = "codes", required = true) String codes,
+                                               @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
+        workflowDefinitionService.batchMoveWorkflowDefinition(loginUser, projectCode, codes, targetProjectCode);
+        return Result.success();
     }
 
     /**
@@ -193,14 +198,12 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_WORKFLOW_DEFINITION_NAME_UNIQUE_ERROR)
-    public Result verifyWorkflowDefinitionName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                               @RequestParam(value = "name", required = true) String name,
-                                               @RequestParam(value = "workflowDefinitionCode", required = false, defaultValue = "0") long workflowDefinitionCode) {
-        Map<String, Object> result =
-                workflowDefinitionService.verifyWorkflowDefinitionName(loginUser, projectCode, name,
-                        workflowDefinitionCode);
-        return returnDataList(result);
+    public Result<Void> verifyWorkflowDefinitionName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                     @RequestParam(value = "name", required = true) String name,
+                                                     @RequestParam(value = "workflowDefinitionCode", required = false, defaultValue = "0") long workflowDefinitionCode) {
+        workflowDefinitionService.verifyWorkflowDefinitionName(loginUser, projectCode, name, workflowDefinitionCode);
+        return Result.success();
     }
 
     /**
@@ -230,32 +233,28 @@ public class WorkflowDefinitionController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UPDATE_WORKFLOW_DEFINITION_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_UPDATE)
-    public Result updateWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                           @RequestParam(value = "name", required = true) String name,
-                                           @PathVariable(value = "code", required = true) long code,
-                                           @RequestParam(value = "description", required = false) String description,
-                                           @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
-                                           @RequestParam(value = "locations", required = false) String locations,
-                                           @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
-                                           @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
-                                           @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
-                                           @RequestParam(value = "executionType", defaultValue = "PARALLEL") WorkflowExecutionTypeEnum executionType,
-                                           @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
+    public Result<WorkflowDefinition> updateWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                               @RequestParam(value = "name", required = true) String name,
+                                                               @PathVariable(value = "code", required = true) long code,
+                                                               @RequestParam(value = "description", required = false) String description,
+                                                               @RequestParam(value = "globalParams", required = false, defaultValue = "[]") String globalParams,
+                                                               @RequestParam(value = "locations", required = false) String locations,
+                                                               @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout,
+                                                               @RequestParam(value = "taskRelationJson", required = true) String taskRelationJson,
+                                                               @RequestParam(value = "taskDefinitionJson", required = true) String taskDefinitionJson,
+                                                               @RequestParam(value = "executionType", defaultValue = "PARALLEL") WorkflowExecutionTypeEnum executionType,
+                                                               @RequestParam(value = "releaseState", required = false, defaultValue = "OFFLINE") ReleaseState releaseState) {
 
-        Map<String, Object> result = workflowDefinitionService.updateWorkflowDefinition(loginUser, projectCode, name,
-                code, description, globalParams,
+        WorkflowDefinition workflowDefinition = workflowDefinitionService.updateWorkflowDefinition(loginUser,
+                projectCode, name, code, description, globalParams,
                 locations, timeout, taskRelationJson, taskDefinitionJson, executionType);
-        // If the update fails, the result will be returned directly
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return returnDataList(result);
-        }
 
         // Judge whether to go online after editing,0 means offline, 1 means online
         if (releaseState == ReleaseState.ONLINE) {
             workflowDefinitionService.onlineWorkflowDefinition(loginUser, projectCode, code);
         }
-        return returnDataList(result);
+        return Result.success(workflowDefinition);
     }
 
     /**
@@ -306,13 +305,12 @@ public class WorkflowDefinitionController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SWITCH_WORKFLOW_DEFINITION_VERSION_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_SWITCH_VERSION)
-    public Result switchWorkflowDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                  @PathVariable(value = "code") long code,
-                                                  @PathVariable(value = "version") int version) {
-        Map<String, Object> result =
-                workflowDefinitionService.switchWorkflowDefinitionVersion(loginUser, projectCode, code, version);
-        return returnDataList(result);
+    public Result<Void> switchWorkflowDefinitionVersion(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                        @PathVariable(value = "code") long code,
+                                                        @PathVariable(value = "version") int version) {
+        workflowDefinitionService.switchWorkflowDefinitionVersion(loginUser, projectCode, code, version);
+        return Result.success();
     }
 
     /**
@@ -384,12 +382,11 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/{code}")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DETAIL_OF_WORKFLOW_DEFINITION_ERROR)
-    public Result queryWorkflowDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                @PathVariable(value = "code", required = true) long code) {
-        Map<String, Object> result =
-                workflowDefinitionService.queryWorkflowDefinitionByCode(loginUser, projectCode, code);
-        return returnDataList(result);
+    public Result<DagData> queryWorkflowDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                         @PathVariable(value = "code", required = true) long code) {
+        DagData dagData = workflowDefinitionService.queryWorkflowDefinitionByCode(loginUser, projectCode, code);
+        return Result.success(dagData);
     }
 
     /**
@@ -407,12 +404,11 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/query-by-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_DETAIL_OF_WORKFLOW_DEFINITION_ERROR)
-    public Result<WorkflowDefinition> queryWorkflowDefinitionByName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                    @RequestParam("name") String name) {
-        Map<String, Object> result =
-                workflowDefinitionService.queryWorkflowDefinitionByName(loginUser, projectCode, name);
-        return returnDataList(result);
+    public Result<DagData> queryWorkflowDefinitionByName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                         @RequestParam("name") String name) {
+        DagData dagData = workflowDefinitionService.queryWorkflowDefinitionByName(loginUser, projectCode, name);
+        return Result.success(dagData);
     }
 
     /**
@@ -426,10 +422,9 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKFLOW_DEFINITION_LIST)
-    public Result queryWorkflowDefinitionList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        Map<String, Object> result = workflowDefinitionService.queryWorkflowDefinitionList(loginUser, projectCode);
-        return returnDataList(result);
+    public Result<List<DagData>> queryWorkflowDefinitionList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        return Result.success(workflowDefinitionService.queryWorkflowDefinitionList(loginUser, projectCode));
     }
 
     /**
@@ -443,11 +438,9 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/simple-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKFLOW_DEFINITION_LIST)
-    public Result queryWorkflowDefinitionSimpleList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        Map<String, Object> result =
-                workflowDefinitionService.queryWorkflowDefinitionSimpleList(loginUser, projectCode);
-        return returnDataList(result);
+    public Result<ArrayNode> queryWorkflowDefinitionSimpleList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        return Result.success(workflowDefinitionService.queryWorkflowDefinitionSimpleList(loginUser, projectCode));
     }
 
     /**
@@ -508,12 +501,11 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/view-tree")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(ENCAPSULATION_TREEVIEW_STRUCTURE_ERROR)
-    public Result viewTree(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                           @PathVariable("code") long code,
-                           @RequestParam("limit") Integer limit) {
-        Map<String, Object> result = workflowDefinitionService.viewTree(loginUser, projectCode, code, limit);
-        return returnDataList(result);
+    public Result<TreeViewDto> viewTree(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                        @PathVariable("code") long code,
+                                        @RequestParam("limit") Integer limit) {
+        return Result.success(workflowDefinitionService.viewTree(loginUser, projectCode, code, limit));
     }
 
     /**
@@ -531,12 +523,11 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/tasks")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_WORKFLOW_DEFINITION_CODE_ERROR)
-    public Result getNodeListByDefinitionCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @PathVariable("code") long code) {
-        Map<String, Object> result =
-                workflowDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, code);
-        return returnDataList(result);
+    public Result<List<TaskDefinition>> getNodeListByDefinitionCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                    @PathVariable("code") long code) {
+        return Result.success(
+                workflowDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, code));
     }
 
     /**
@@ -554,12 +545,11 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/batch-query-tasks")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_WORKFLOW_DEFINITION_CODE_ERROR)
-    public Result getNodeListMapByDefinitionCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                  @RequestParam("codes") String codes) {
-        Map<String, Object> result =
-                workflowDefinitionService.getNodeListMapByDefinitionCodes(loginUser, projectCode, codes);
-        return returnDataList(result);
+    public Result<Map<Long, List<TaskDefinition>>> getNodeListMapByDefinitionCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                                   @RequestParam("codes") String codes) {
+        return Result.success(
+                workflowDefinitionService.getNodeListMapByDefinitionCodes(loginUser, projectCode, codes));
     }
 
     /**
@@ -576,10 +566,9 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/query-workflow-definition-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_WORKFLOW_DEFINITION_CODE_ERROR)
-    public Result getWorkflowListByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        Map<String, Object> result = workflowDefinitionService.queryWorkflowDefinitionListByProjectCode(projectCode);
-        return returnDataList(result);
+    public Result<List<DependentSimplifyDefinition>> getWorkflowListByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        return Result.success(workflowDefinitionService.queryWorkflowDefinitionListByProjectCode(projectCode));
     }
 
     /**
@@ -597,12 +586,11 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/query-task-definition-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(GET_TASKS_LIST_BY_WORKFLOW_DEFINITION_CODE_ERROR)
-    public Result getTaskListByWorkflowDefinitionCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                      @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                      @RequestParam(value = "workflowDefinitionCode") Long workflowDefinitionCode) {
-        Map<String, Object> result = workflowDefinitionService
-                .queryTaskDefinitionListByWorkflowDefinitionCode(projectCode, workflowDefinitionCode);
-        return returnDataList(result);
+    public Result<List<DependentSimplifyDefinition>> getTaskListByWorkflowDefinitionCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                                         @RequestParam(value = "workflowDefinitionCode") Long workflowDefinitionCode) {
+        return Result.success(workflowDefinitionService
+                .queryTaskDefinitionListByWorkflowDefinitionCode(projectCode, workflowDefinitionCode));
     }
 
     @Operation(summary = "deleteByWorkflowDefinitionCode", description = "DELETE_WORKFLOW_DEFINITION_BY_ID_NOTES")
@@ -613,11 +601,11 @@ public class WorkflowDefinitionController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_WORKFLOW_DEFINE_BY_CODE_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_DELETE)
-    public Result deleteWorkflowDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                 @PathVariable("code") long code) {
+    public Result<Void> deleteWorkflowDefinitionByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                       @PathVariable("code") long code) {
         workflowDefinitionService.deleteWorkflowDefinitionByCode(loginUser, code);
-        return new Result(Status.SUCCESS);
+        return Result.success();
     }
 
     /**
@@ -636,13 +624,11 @@ public class WorkflowDefinitionController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_DELETE_WORKFLOW_DEFINE_BY_CODES_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_BATCH_DELETE)
-    public Result batchDeleteWorkflowDefinitionByCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                       @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                       @RequestParam("codes") String codes) {
-
-        Map<String, Object> result =
-                workflowDefinitionService.batchDeleteWorkflowDefinitionByCodes(loginUser, projectCode, codes);
-        return returnDataList(result);
+    public Result<Void> batchDeleteWorkflowDefinitionByCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                             @RequestParam("codes") String codes) {
+        workflowDefinitionService.batchDeleteWorkflowDefinitionByCodes(loginUser, projectCode, codes);
+        return Result.success();
     }
 
     /**
@@ -656,11 +642,10 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/all")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKFLOW_DEFINITION_LIST)
-    public Result queryAllWorkflowDefinitionByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        Map<String, Object> result =
-                workflowDefinitionService.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
-        return returnDataList(result);
+    public Result<List<DagData>> queryAllWorkflowDefinitionByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
+        return Result.success(
+                workflowDefinitionService.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode));
     }
 
     /**
@@ -677,11 +662,10 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/view-variables")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKFLOW_DEFINITION_ALL_VARIABLES_ERROR)
-    public Result viewVariables(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                @PathVariable("code") Long code) {
-        Map<String, Object> result = workflowDefinitionService.viewVariables(loginUser, projectCode, code);
-        return returnDataList(result);
+    public Result<WorkflowDefinitionVariablesDTO> viewVariables(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                @PathVariable("code") Long code) {
+        return Result.success(workflowDefinitionService.viewVariables(loginUser, projectCode, code));
     }
 
 }
