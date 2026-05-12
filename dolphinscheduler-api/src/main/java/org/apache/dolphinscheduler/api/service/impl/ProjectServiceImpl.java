@@ -47,7 +47,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -166,35 +165,22 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result queryByCode(User loginUser, long projectCode) {
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result, PROJECT);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
-        if (project != null) {
-            result.setData(project);
-            putMsg(result, Status.SUCCESS);
-        }
+        checkProjectAndAuthThrowException(loginUser, project, PROJECT);
+        result.setData(project);
+        putMsg(result, Status.SUCCESS);
         return result;
     }
 
     @Override
-    public Map<String, Object> queryByName(User loginUser, String projectName) {
-        Map<String, Object> result = new HashMap<>();
+    public Project queryByName(User loginUser, String projectName) {
         Project project = projectMapper.queryByName(projectName);
-        boolean hasProjectAndPerm = hasProjectAndPerm(loginUser, project, result, PROJECT);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
-        if (project != null) {
-            result.put(Constants.DATA_LIST, project);
-            putMsg(result, Status.SUCCESS);
-        }
-        return result;
+        checkProjectAndAuthThrowException(loginUser, project, PROJECT);
+        return project;
     }
 
+    @Override
     public void checkProjectAndAuthThrowException(@NonNull User loginUser, @Nullable Project project,
                                                   String permission) {
-        // todo: throw a permission exception
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_EXIST);
         }
@@ -211,77 +197,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
         Project project = projectMapper.queryByCode(projectCode);
         checkProjectAndAuthThrowException(loginUser, project, permission);
-    }
-
-    @Override
-    public boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result, String permission) {
-        boolean checkResult = false;
-        if (project == null) {
-            log.error("Project does not exist.");
-            putMsg(result, Status.PROJECT_NOT_FOUND, "");
-        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
-                permission)) {
-            log.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
-                    permission, loginUser.getUserName(), project.getCode());
-            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getCode());
-        } else {
-            checkResult = true;
-        }
-        return checkResult;
-    }
-
-    @Override
-    public boolean hasProjectAndWritePerm(User loginUser, Project project, Result result) {
-        boolean checkResult = false;
-        if (project == null) {
-            log.error("Project does not exist.");
-            putMsg(result, Status.PROJECT_NOT_FOUND, "");
-        } else {
-            // case 1: user is admin
-            if (loginUser.getUserType() == UserType.ADMIN_USER) {
-                return true;
-            }
-            // case 2: user is project owner
-            if (project.getUserId().equals(loginUser.getId())) {
-                return true;
-            }
-            // case 3: check user permission level
-            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
-                putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
-                checkResult = false;
-            } else {
-                checkResult = true;
-            }
-        }
-        return checkResult;
-    }
-
-    @Override
-    public boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result) {
-        boolean checkResult = false;
-        if (project == null) {
-            log.error("Project does not exist.");
-            putMsg(result, Status.PROJECT_NOT_FOUND, "");
-        } else {
-            // case 1: user is admin
-            if (loginUser.getUserType() == UserType.ADMIN_USER) {
-                return true;
-            }
-            // case 2: user is project owner
-            if (project.getUserId().equals(loginUser.getId())) {
-                return true;
-            }
-            // case 3: check user permission level
-            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
-            if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
-                putMsg(result, Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
-                checkResult = false;
-            } else {
-                checkResult = true;
-            }
-        }
-        return checkResult;
     }
 
     @Override
@@ -308,23 +223,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
             throw new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
         }
-    }
-
-    @Override
-    public boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission) {
-        boolean checkResult = false;
-        if (project == null) {
-            log.error("Project does not exist.");
-            putMsg(result, Status.PROJECT_NOT_FOUND, "");
-        } else if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS,
-                permission)) {
-            log.error("User does not have {} permission to operate project, userName:{}, projectCode:{}.",
-                    permission, loginUser.getUserName(), project.getCode());
-            putMsg(result, Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(), project.getName());
-        } else {
-            checkResult = true;
-        }
-        return checkResult;
     }
 
     /**
@@ -445,11 +343,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
         Project project = projectMapper.queryByCode(projectCode);
 
-        boolean hasProjectAndWritePerm = hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return result;
-        }
-
+        checkHasProjectWritePermissionThrowException(loginUser, project);
         checkProjectAndAuthThrowException(loginUser, project, PROJECT_DELETE);
 
         List<WorkflowDefinition> workflowDefinitionList =
@@ -494,10 +388,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
 
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndWritePerm = hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return result;
-        }
+        checkHasProjectWritePermissionThrowException(loginUser, project);
         Project tempProject = projectMapper.queryByName(projectName);
         if (tempProject != null && tempProject.getCode() != project.getCode()) {
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
@@ -652,10 +543,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         // 1. check read permission
         Project project = this.projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = this.hasProjectAndPerm(loginUser, project, result, PROJECT);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        this.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
 
         // 2. query authorized user list
         List<User> users = this.userMapper.queryAuthedUserListByProjectId(project.getId());
@@ -664,21 +552,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         return result;
     }
 
-    /**
-     * query authorized project
-     *
-     * @param loginUser login user
-     * @return projects which the user have permission to see, Except for items created by this user
-     */
     @Override
-    public Map<String, Object> queryProjectCreatedByUser(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
-
-        List<Project> projects = projectMapper.queryProjectCreatedByUser(loginUser.getId());
-        result.put(Constants.DATA_LIST, projects);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
+    public List<Project> queryProjectCreatedByUser(User loginUser) {
+        return projectMapper.queryProjectCreatedByUser(loginUser.getId());
     }
 
     /**

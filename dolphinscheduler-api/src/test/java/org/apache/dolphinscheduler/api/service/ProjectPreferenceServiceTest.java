@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectPreferenceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -61,24 +62,22 @@ public class ProjectPreferenceServiceTest {
         User loginUser = getGeneralUser();
 
         // no permission
-        Mockito.when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(false);
-        Result result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value");
-        Assertions.assertNull(result.getCode());
-        Assertions.assertNull(result.getData());
-        Assertions.assertNull(result.getMsg());
+        Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(Mockito.any(), Mockito.any());
+        Assertions.assertThrows(ServiceException.class,
+                () -> projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value"));
 
         // when preference exists in project
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(null);
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
 
         // success
-        Mockito.when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(true);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(Mockito.any(),
+                Mockito.any());
 
         Mockito.when(projectPreferenceMapper.insert(Mockito.any())).thenReturn(1);
 
-        result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value");
+        Result result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value");
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
 
         // database operatation fail
@@ -105,20 +104,19 @@ public class ProjectPreferenceServiceTest {
         User loginUser = getGeneralUser();
 
         // no permission
-        Mockito.when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(false);
-        Result result = projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode);
-        Assertions.assertNull(result.getCode());
-        Assertions.assertNull(result.getData());
-        Assertions.assertNull(result.getMsg());
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectAndAuthThrowException(Mockito.any(), Mockito.<Project>any(),
+                        Mockito.any());
+        Assertions.assertThrows(ServiceException.class,
+                () -> projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode));
 
         // PROJECT_PARAMETER_NOT_EXISTS
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class),
-                Mockito.any())).thenReturn(true);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(Mockito.any(),
+                Mockito.<Project>any(), Mockito.any());
 
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(null);
-        result = projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode);
+        Result result = projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
 
         // SUCCESS
@@ -132,21 +130,19 @@ public class ProjectPreferenceServiceTest {
         User loginUser = getGeneralUser();
 
         // no permission
-        Mockito.when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(false);
-        Result result = projectPreferenceService.enableProjectPreference(loginUser, projectCode, 1);
-        Assertions.assertNull(result.getCode());
-        Assertions.assertNull(result.getData());
-        Assertions.assertNull(result.getMsg());
+        Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(Mockito.any(), Mockito.any());
+        Assertions.assertThrows(ServiceException.class,
+                () -> projectPreferenceService.enableProjectPreference(loginUser, projectCode, 1));
 
         Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        Mockito.when(projectService.hasProjectAndWritePerm(Mockito.any(), Mockito.any(), Mockito.any(Result.class)))
-                .thenReturn(true);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(Mockito.any(),
+                Mockito.any());
 
         // success
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(getProjectPreference());
         Mockito.when(projectPreferenceMapper.updateById(Mockito.any())).thenReturn(1);
-        result = projectPreferenceService.enableProjectPreference(loginUser, projectCode, 2);
+        Result result = projectPreferenceService.enableProjectPreference(loginUser, projectCode, 2);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
 
         // db operation fail

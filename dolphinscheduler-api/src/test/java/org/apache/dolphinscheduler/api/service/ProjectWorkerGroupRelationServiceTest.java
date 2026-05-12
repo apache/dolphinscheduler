@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.api.AssertionsHelper;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.ProjectWorkerGroupRelationServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -40,7 +39,6 @@ import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -184,21 +182,18 @@ public class ProjectWorkerGroupRelationServiceTest {
 
     @Test
     public void testQueryAssignedWorkerGroupsByProject() {
-        // no permission - hasProjectAndPerm should populate the status into the result map and return false
-        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.anyMap(), Mockito.any()))
-                .thenAnswer(invocation -> {
-                    Map<String, Object> permResult = invocation.getArgument(2);
-                    permResult.put(Constants.STATUS, Status.USER_NO_OPERATION_PROJECT_PERM);
-                    permResult.put(Constants.MSG, Status.USER_NO_OPERATION_PROJECT_PERM.getMsg());
-                    return false;
-                });
+        // no permission - checkProjectAndAuthThrowException throws ServiceException
+        Mockito.doThrow(new org.apache.dolphinscheduler.api.exceptions.ServiceException(
+                Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectAndAuthThrowException(Mockito.any(), Mockito.<Project>any(),
+                        Mockito.any());
         AssertionsHelper.assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
                 () -> projectWorkerGroupRelationService.queryAssignedWorkerGroupsByProject(getGeneralUser(),
                         projectCode));
 
         // success
-        Mockito.when(projectService.hasProjectAndPerm(Mockito.any(), Mockito.any(), Mockito.anyMap(), Mockito.any()))
-                .thenReturn(true);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(Mockito.any(),
+                Mockito.<Project>any(), Mockito.any());
 
         Mockito.when(projectMapper.queryByCode(projectCode))
                 .thenReturn(getProject());

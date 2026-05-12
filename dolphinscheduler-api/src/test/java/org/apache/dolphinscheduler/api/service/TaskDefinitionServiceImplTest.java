@@ -175,7 +175,7 @@ public class TaskDefinitionServiceImplTest {
     public void deleteByCodeAndVersion() {
         Project project = getProject();
         when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(project);
-        when(projectService.hasProjectAndWritePerm(eq(user), eq(project), any(Map.class))).thenReturn(true);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
 
         // cross-project privilege escalation: taskCode belongs to another project - must be rejected
         TaskDefinition otherProjectTask = new TaskDefinition();
@@ -349,7 +349,8 @@ public class TaskDefinitionServiceImplTest {
 
             user.setUserType(UserType.ADMIN_USER);
             when(projectMapper.queryByCode(PROJECT_CODE)).thenReturn(getProject());
-            when(projectService.hasProjectAndWritePerm(eq(user), eq(getProject()), any(Map.class))).thenReturn(true);
+            Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user),
+                    eq(getProject()));
             when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
             when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
             when(taskDefinitionMapper.updateById(Mockito.any())).thenReturn(1);

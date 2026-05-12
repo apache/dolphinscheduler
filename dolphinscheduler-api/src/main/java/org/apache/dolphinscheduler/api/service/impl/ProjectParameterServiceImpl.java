@@ -73,10 +73,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         // check if user have write perm for project
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return result;
-        }
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         // check if project parameter name exists
         ProjectParameter projectParameter = projectParameterMapper.selectOne(new QueryWrapper<ProjectParameter>()
@@ -123,10 +120,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         // check if user have write perm for project
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return result;
-        }
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         ProjectParameter projectParameter = projectParameterMapper.queryByCode(code);
         // check project parameter exists
@@ -172,10 +166,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         // check if user have write perm for project
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return result;
-        }
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         ProjectParameter projectParameter = projectParameterMapper.queryByCode(code);
         // check project parameter exists
@@ -237,10 +228,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         Result result = new Result();
 
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, PROJECT);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
 
         PageInfo<ProjectParameter> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<ProjectParameter> page = new Page<>(pageNo, pageSize);
@@ -263,10 +251,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         Result result = new Result();
 
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, PROJECT);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
 
         ProjectParameter projectParameter = projectParameterMapper.queryByCode(code);
         if (projectParameter == null || projectCode != projectParameter.getProjectCode()) {

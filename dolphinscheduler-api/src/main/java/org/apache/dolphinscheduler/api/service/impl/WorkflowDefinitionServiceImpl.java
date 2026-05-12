@@ -243,7 +243,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Project project = projectMapper.queryByCode(projectCode);
 
         // check if user have write perm for project
-        requireProjectAndWritePerm(loginUser, project);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         if (checkDescriptionLength(description)) {
             log.warn("Parameter description is too long.");
@@ -309,17 +309,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         saveWorkflowLineage(workflowDefinition.getProjectCode(), workflowDefinition.getCode(),
                 insertVersion, taskDefinitionLogs);
         return workflowDefinition;
-    }
-
-    private void requireProjectAndWritePerm(User loginUser, Project project) {
-        Map<String, Object> permResult = new HashMap<>();
-        if (!projectService.hasProjectAndWritePerm(loginUser, project, permResult)) {
-            Status status = (Status) permResult.get(Constants.STATUS);
-            if (status == null) {
-                throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM);
-            }
-            throw new ServiceException(status.getCode(), (String) permResult.get(Constants.MSG));
-        }
     }
 
     @Override
@@ -631,7 +620,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                        WorkflowExecutionTypeEnum executionType) {
         Project project = projectMapper.queryByCode(projectCode);
         // check if user have write perm for project
-        requireProjectAndWritePerm(loginUser, project);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         if (checkDescriptionLength(description)) {
             log.warn("Parameter description is too long.");

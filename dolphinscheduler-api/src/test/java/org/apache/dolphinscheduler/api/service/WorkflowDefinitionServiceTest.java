@@ -815,11 +815,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testUpdateWorkflowDefinition() {
-        Map<String, Object> result = new HashMap<>();
-
         Project project = getProject(projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        when(projectService.hasProjectAndWritePerm(user, project, result)).thenReturn(true);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
 
         try {
             workflowDefinitionService.updateWorkflowDefinition(user, projectCode, "test", 1,
@@ -834,7 +832,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     public void testCreateWorkflowDefinitionShouldSyncVersionToResponse() {
         Project project = getProject(projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.hasProjectAndWritePerm(eq(user), eq(project), any(Map.class))).thenReturn(true);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
         when(workflowDefinitionMapper.verifyByDefineName(projectCode, name)).thenReturn(null);
         when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
         when(processService.saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE))).thenReturn(1);
@@ -857,7 +855,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
         workflowDefinition.setName("origin-name");
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.hasProjectAndWritePerm(eq(user), eq(project), any(Map.class))).thenReturn(true);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
         when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
         when(workflowDefinitionMapper.queryByCode(processDefinitionCode)).thenReturn(workflowDefinition);
         when(workflowDefinitionMapper.verifyByDefineName(projectCode, name)).thenReturn(null);

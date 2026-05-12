@@ -415,7 +415,7 @@ public class PythonGateway {
 
     public Project queryProjectByName(String userName, String projectName) {
         User user = usersService.queryUser(userName);
-        return (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
+        return projectService.queryByName(user, projectName);
     }
 
     public void updateProject(String userName, Long projectCode, String projectName, String desc) {
@@ -522,7 +522,7 @@ public class PythonGateway {
         Map<String, Object> result = new HashMap<>();
 
         User user = usersService.queryUser(userName);
-        Project project = (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
+        Project project = projectService.queryByName(user, projectName);
         long projectCode = project.getCode();
         WorkflowDefinition workflowDefinition = getWorkflow(user, projectCode, workflowName);
         // get workflow info

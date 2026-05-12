@@ -61,10 +61,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
 
         // check if the user has the writing permission for project
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return result;
-        }
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         ProjectPreference projectPreference = projectPreferenceMapper
                 .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
@@ -110,10 +107,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
         Result result = new Result();
 
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, PROJECT);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
 
         ProjectPreference projectPreference = projectPreferenceMapper
                 .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
@@ -131,10 +125,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
 
         // check if the user has the writing permission for project
         Project project = projectMapper.queryByCode(projectCode);
-        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return result;
-        }
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         ProjectPreference projectPreference = projectPreferenceMapper
                 .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
