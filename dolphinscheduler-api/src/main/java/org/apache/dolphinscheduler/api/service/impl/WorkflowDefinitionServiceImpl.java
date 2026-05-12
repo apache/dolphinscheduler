@@ -77,7 +77,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
@@ -87,6 +86,7 @@ import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
@@ -172,7 +172,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Autowired
     private ProcessService processService;
@@ -873,11 +873,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         workflowDefinitionUsedInOtherTaskValid(workflowDefinition);
 
         // get the timing according to the workflow definition
-        Schedule scheduleObj = scheduleMapper.queryByWorkflowDefinitionCode(code);
+        Schedule scheduleObj = scheduleDao.queryByWorkflowDefinitionCode(code);
         if (scheduleObj != null) {
             if (scheduleObj.getReleaseState() == ReleaseState.OFFLINE) {
-                int delete = scheduleMapper.deleteById(scheduleObj.getId());
-                if (delete == 0) {
+                boolean delete = scheduleDao.deleteById(scheduleObj.getId());
+                if (!delete) {
                     throw new ServiceException(Status.DELETE_SCHEDULE_BY_ID_ERROR);
                 }
             }
@@ -1381,7 +1381,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     workflowDefinition.setLocations(JSONUtils.toJsonString(jsonNodes));
                 }
                 // copy timing configuration
-                Schedule scheduleObj = scheduleMapper.queryByWorkflowDefinitionCode(oldWorkflowDefinitionCode);
+                Schedule scheduleObj = scheduleDao.queryByWorkflowDefinitionCode(oldWorkflowDefinitionCode);
                 if (scheduleObj != null) {
                     scheduleObj.setId(null);
                     scheduleObj.setUserId(loginUser.getId());
@@ -1389,7 +1389,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     scheduleObj.setReleaseState(ReleaseState.OFFLINE);
                     scheduleObj.setCreateTime(date);
                     scheduleObj.setUpdateTime(date);
-                    int insertResult = scheduleMapper.insert(scheduleObj);
+                    int insertResult = scheduleDao.insert(scheduleObj);
                     if (insertResult != 1) {
                         log.error("Schedule create error, workflowDefinitionCode:{}.", workflowDefinition.getCode());
                         throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
