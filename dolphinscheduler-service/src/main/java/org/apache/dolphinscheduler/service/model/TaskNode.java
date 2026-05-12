@@ -148,6 +148,13 @@ public class TaskNode {
         this.depList = JSONUtils.toList(preTasks, Long.class);
     }
 
+    public void setDepList(List<Long> depList) {
+        if (depList != null) {
+            this.depList = depList;
+            this.preTasks = JSONUtils.toJsonString(depList);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
