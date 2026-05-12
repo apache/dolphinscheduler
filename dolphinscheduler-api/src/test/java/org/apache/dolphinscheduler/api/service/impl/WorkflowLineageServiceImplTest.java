@@ -29,7 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 
 import java.util.Arrays;
@@ -54,7 +54,7 @@ class WorkflowLineageServiceImplTest {
     private WorkflowTaskLineageDao workflowTaskLineageDao;
 
     @Mock
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
@@ -62,7 +62,7 @@ class WorkflowLineageServiceImplTest {
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(workflowLineageService, "workflowTaskLineageDao", workflowTaskLineageDao);
-        ReflectionTestUtils.setField(workflowLineageService, "workflowDefinitionMapper", workflowDefinitionMapper);
+        ReflectionTestUtils.setField(workflowLineageService, "workflowDefinitionDao", workflowDefinitionDao);
         ReflectionTestUtils.setField(workflowLineageService, "taskDefinitionMapper", taskDefinitionMapper);
     }
 
@@ -77,7 +77,7 @@ class WorkflowLineageServiceImplTest {
                 workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowCode);
 
         assertThat(result).isEmpty();
-        verifyNoInteractions(workflowDefinitionMapper, taskDefinitionMapper);
+        verifyNoInteractions(workflowDefinitionDao, taskDefinitionMapper);
     }
 
     @Test
@@ -108,7 +108,7 @@ class WorkflowLineageServiceImplTest {
         workflowDefinition201.setCode(201L);
         workflowDefinition201.setVersion(4);
 
-        when(workflowDefinitionMapper.queryByCodes(Arrays.asList(200L, 201L)))
+        when(workflowDefinitionDao.queryByCodes(Arrays.asList(200L, 201L)))
                 .thenReturn(Arrays.asList(workflowDefinition200, workflowDefinition201));
 
         TaskDefinition taskDefinition = new TaskDefinition();
@@ -158,7 +158,7 @@ class WorkflowLineageServiceImplTest {
         when(workflowTaskLineageDao
                 .queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, root, Constants.DEPENDENT_ALL_TASK))
                         .thenReturn(Collections.singletonList(edge));
-        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(child)))
+        when(workflowDefinitionDao.queryByCodes(Collections.singletonList(child)))
                 .thenReturn(Collections.singletonList(WorkflowDefinition.builder().code(child).version(1).build()));
 
         List<WorkflowDefinition> result =
@@ -195,9 +195,9 @@ class WorkflowLineageServiceImplTest {
 
         WorkflowDefinition workflowB = WorkflowDefinition.builder().code(codeB).version(1).build();
         WorkflowDefinition workflowC = WorkflowDefinition.builder().code(codeC).version(1).build();
-        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(codeB)))
+        when(workflowDefinitionDao.queryByCodes(Collections.singletonList(codeB)))
                 .thenReturn(Collections.singletonList(workflowB));
-        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(codeC)))
+        when(workflowDefinitionDao.queryByCodes(Collections.singletonList(codeC)))
                 .thenReturn(Collections.singletonList(workflowC));
 
         List<WorkflowDefinition> result =
@@ -223,7 +223,7 @@ class WorkflowLineageServiceImplTest {
         WorkflowDefinition workflowB = new WorkflowDefinition();
         workflowB.setCode(codeB);
         workflowB.setReleaseState(ReleaseState.OFFLINE);
-        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(codeB)))
+        when(workflowDefinitionDao.queryByCodes(Collections.singletonList(codeB)))
                 .thenReturn(Collections.singletonList(workflowB));
 
         List<WorkflowDefinition> result =

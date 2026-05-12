@@ -32,9 +32,9 @@ import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -61,13 +61,13 @@ public class WorkflowTaskLineageServiceTest {
     private WorkflowTaskLineageDao workflowTaskLineageDao;
 
     @Mock
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Mock
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     /**
      * get mock Project
@@ -88,7 +88,7 @@ public class WorkflowTaskLineageServiceTest {
     public void testQueryWorkFlowLineageByName() {
         Project project = getProject("test");
         String name = "test";
-        when(projectMapper.queryByCode(1L)).thenReturn(project);
+        when(projectDao.queryByCode(1L)).thenReturn(project);
         when(workflowTaskLineageDao.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(getWorkFlowLineages());
         List<WorkFlowRelationDetail> workFlowLineages = workflowLineageService.queryWorkFlowLineageByName(1L, name);
@@ -116,7 +116,7 @@ public class WorkflowTaskLineageServiceTest {
         workFlowRelationDetail.setWorkFlowName("testProcessDefinitionName");
         workFlowRelationDetailList.add(workFlowRelationDetail);
 
-        when(projectMapper.queryByCode(1L)).thenReturn(project);
+        when(projectDao.queryByCode(1L)).thenReturn(project);
         when(workflowTaskLineageDao.queryByProjectCode(project.getCode())).thenReturn(workflowTaskLineages);
         when(workflowTaskLineageDao.queryWorkFlowLineageByCode(workflowTaskLineage.getWorkflowDefinitionCode()))
                 .thenReturn(workFlowRelationDetailList);
@@ -161,7 +161,7 @@ public class WorkflowTaskLineageServiceTest {
 
         when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, taskCode))
                 .thenReturn(dependentWorkflowList);
-        when(workflowDefinitionMapper.queryByCode(50L)).thenReturn(workflowDefinition);
+        when(workflowDefinitionDao.queryByCode(50L)).thenReturn(Optional.of(workflowDefinition));
         when(taskDefinitionMapper.queryByCode(999L)).thenReturn(null); // Task definition not found (dirty data)
 
         // Should return Optional.empty() because all records are orphaned
@@ -207,8 +207,8 @@ public class WorkflowTaskLineageServiceTest {
 
         when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, taskCode))
                 .thenReturn(dependentWorkflowList);
-        when(workflowDefinitionMapper.queryByCode(50L)).thenReturn(workflowDefinition1);
-        when(workflowDefinitionMapper.queryByCode(60L)).thenReturn(workflowDefinition2);
+        when(workflowDefinitionDao.queryByCode(50L)).thenReturn(Optional.of(workflowDefinition1));
+        when(workflowDefinitionDao.queryByCode(60L)).thenReturn(Optional.of(workflowDefinition2));
         when(taskDefinitionMapper.queryByCode(300L)).thenReturn(validTaskDefinition);
         when(taskDefinitionMapper.queryByCode(999L)).thenReturn(null); // Orphaned record
 
@@ -248,7 +248,7 @@ public class WorkflowTaskLineageServiceTest {
 
         when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, 0L))
                 .thenReturn(dependentWorkflowList);
-        when(workflowDefinitionMapper.queryByCode(50L)).thenReturn(workflowDefinition);
+        when(workflowDefinitionDao.queryByCode(50L)).thenReturn(Optional.of(workflowDefinition));
         when(taskDefinitionMapper.queryByCode(999L)).thenReturn(null); // Task definition not found
 
         // Should return Optional.empty() because all records are orphaned

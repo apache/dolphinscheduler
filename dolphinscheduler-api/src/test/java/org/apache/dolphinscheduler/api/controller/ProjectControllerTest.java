@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import java.text.MessageFormat;
 
@@ -52,7 +52,7 @@ public class ProjectControllerTest {
     private ProjectServiceImpl projectService;
 
     @Mock
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @BeforeEach
     public void before() {
@@ -81,7 +81,7 @@ public class ProjectControllerTest {
         Result result = new Result();
         putMsg(result, Status.SUCCESS);
         long projectCode = 1L;
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject());
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject());
         Mockito.when(projectService.queryByCode(user, projectCode)).thenReturn(result);
         Result response = projectController.queryProjectByCode(user, projectCode);
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());

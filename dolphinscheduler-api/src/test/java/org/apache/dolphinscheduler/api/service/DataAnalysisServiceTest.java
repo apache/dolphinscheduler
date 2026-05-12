@@ -46,10 +46,10 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.text.MessageFormat;
@@ -86,7 +86,7 @@ public class DataAnalysisServiceTest {
     private DataAnalysisServiceImpl dataAnalysisServiceImpl;
 
     @Mock
-    ProjectMapper projectMapper;
+    ProjectDao projectDao;
 
     @Mock
     ProjectService projectService;
@@ -95,7 +95,7 @@ public class DataAnalysisServiceTest {
     WorkflowInstanceMapper workflowInstanceMapper;
 
     @Mock
-    WorkflowDefinitionMapper workflowDefinitionMapper;
+    WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
     CommandMapper commandMapper;
@@ -127,13 +127,13 @@ public class DataAnalysisServiceTest {
         project.setName("test");
         resultMap = new HashMap<>();
 
-        when(projectMapper.queryByCode(1L)).thenReturn(project);
+        when(projectDao.queryByCode(1L)).thenReturn(project);
     }
 
     @AfterEach
     public void after() {
         user = null;
-        projectMapper = null;
+        projectDao = null;
         resultMap = null;
     }
 
@@ -306,8 +306,8 @@ public class DataAnalysisServiceTest {
                         .thenReturn(projectIds());
         PageInfo<Command> list2 = dataAnalysisServiceImpl.listPendingCommands(user, 1L, 1, 10);
         assertThat(list2.getTotal()).isEqualTo(0);
-        when(projectMapper.selectBatchIds(any())).thenReturn(Collections.singletonList(project));
-        when(workflowDefinitionMapper.queryDefinitionCodeListByProjectCodes(any()))
+        when(projectDao.queryByIds(any())).thenReturn(Collections.singletonList(project));
+        when(workflowDefinitionDao.queryDefinitionCodeListByProjectCodes(any()))
                 .thenReturn(Collections.singletonList(1L));
         when(commandMapper.queryCommandPageByIds(any(), any())).thenReturn(page);
         PageInfo<Command> list3 = dataAnalysisServiceImpl.listPendingCommands(user, 1L, 1, 10);
@@ -328,8 +328,8 @@ public class DataAnalysisServiceTest {
                         .thenReturn(projectIds());
         PageInfo<ErrorCommand> list2 = dataAnalysisServiceImpl.listErrorCommand(user, 1L, 1, 10);
         assertThat(list2.getTotal()).isEqualTo(0);
-        when(projectMapper.selectBatchIds(any())).thenReturn(Collections.singletonList(project));
-        when(workflowDefinitionMapper.queryDefinitionCodeListByProjectCodes(any()))
+        when(projectDao.queryByIds(any())).thenReturn(Collections.singletonList(project));
+        when(workflowDefinitionDao.queryDefinitionCodeListByProjectCodes(any()))
                 .thenReturn(Collections.singletonList(1L));
         when(errorCommandMapper.queryErrorCommandPageByIds(any(), any())).thenReturn(page);
         PageInfo<ErrorCommand> list3 = dataAnalysisServiceImpl.listErrorCommand(user, 1L, 1, 10);

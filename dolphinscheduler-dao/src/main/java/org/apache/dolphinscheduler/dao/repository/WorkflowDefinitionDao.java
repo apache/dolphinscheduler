@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
+import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
+import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,4 +49,19 @@ public interface WorkflowDefinitionDao extends IDao<WorkflowDefinition> {
     void deleteByWorkflowDefinitionCode(long workflowDefinitionCode);
 
     List<WorkflowDefinition> queryByCodes(Collection<Long> workflowDefinitionCodes);
+
+    WorkflowDefinition queryByDefineName(long projectCode, String workflowDefinitionName);
+
+    WorkflowDefinition verifyByDefineName(long projectCode, String workflowDefinitionName);
+
+    List<WorkflowDefinition> queryAllDefinitionList(long projectCode);
+
+    List<DependentSimplifyDefinition> queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes(long projectCode,
+                                                                                                 Collection<Long> codes);
+
+    List<WorkflowDefinitionCountDto> countDefinitionByProjectCodes(Collection<Long> projectCodes);
+
+    List<Long> queryDefinitionCodeListByProjectCodes(List<Long> projectCodes);
+
+    List<ProjectWorkflowDefinitionCount> queryProjectWorkflowDefinitionCountByProjectCodes(List<Long> projectCodes);
 }

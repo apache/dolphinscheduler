@@ -44,9 +44,9 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IMasterContainerService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -96,7 +96,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     /**
      * create or update a worker group
@@ -174,8 +174,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
         if (CollectionUtils.isNotEmpty(schedules)) {
             List<String> workflowDefinitionNames = schedules.stream().limit(3)
-                    .map(schedule -> workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode())
-                            .getName())
+                    .map(schedule -> workflowDefinitionDao.queryByCode(schedule.getWorkflowDefinitionCode())
+                            .orElse(null).getName())
                     .collect(Collectors.toList());
             throw new ServiceException(Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS, schedules.size(),
                     JSONUtils.toJsonString(workflowDefinitionNames));

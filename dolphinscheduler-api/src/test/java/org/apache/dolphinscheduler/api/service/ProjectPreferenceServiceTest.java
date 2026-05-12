@@ -26,8 +26,8 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectPreference;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectPreferenceMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,7 @@ public class ProjectPreferenceServiceTest {
     private ProjectPreferenceServiceImpl projectPreferenceService;
 
     @Mock
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Mock
     private ProjectPreferenceMapper projectPreferenceMapper;
@@ -69,7 +69,7 @@ public class ProjectPreferenceServiceTest {
 
         // when preference exists in project
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(null);
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
 
         // success
         Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(Mockito.any(),
@@ -111,7 +111,7 @@ public class ProjectPreferenceServiceTest {
                 () -> projectPreferenceService.queryProjectPreferenceByProjectCode(loginUser, projectCode));
 
         // PROJECT_PARAMETER_NOT_EXISTS
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(Mockito.any(),
                 Mockito.<Project>any(), Mockito.any());
 
@@ -135,7 +135,7 @@ public class ProjectPreferenceServiceTest {
         Assertions.assertThrows(ServiceException.class,
                 () -> projectPreferenceService.enableProjectPreference(loginUser, projectCode, 1));
 
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(Mockito.any(),
                 Mockito.any());
 

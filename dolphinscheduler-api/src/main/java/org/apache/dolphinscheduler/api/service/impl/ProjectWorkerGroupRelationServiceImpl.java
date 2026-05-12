@@ -26,8 +26,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectWorkerGroupDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
@@ -60,7 +60,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
     private ProjectWorkerGroupDao projectWorkerGroupDao;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
     private TaskDefinitionDao taskDefinitionDao;
@@ -91,7 +91,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
             return result;
         }
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         if (Objects.isNull(project)) {
             putMsg(result, Status.PROJECT_NOT_EXIST);
             return result;
@@ -191,7 +191,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
 
     @Override
     public List<ProjectWorkerGroup> queryAssignedWorkerGroupsByProject(User loginUser, Long projectCode) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check project auth
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 

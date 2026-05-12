@@ -40,8 +40,8 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 
 import java.text.MessageFormat;
@@ -72,7 +72,7 @@ public class LoggerServiceTest {
     private TaskInstanceDao taskInstanceDao;
 
     @Mock
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Mock
     private ProjectService projectService;
@@ -238,7 +238,7 @@ public class LoggerServiceTest {
     @Test
     public void testGetLogBytesInSpecifiedProject() {
         long projectCode = 1L;
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
 
         User loginUser = new User();
         loginUser.setId(-1);

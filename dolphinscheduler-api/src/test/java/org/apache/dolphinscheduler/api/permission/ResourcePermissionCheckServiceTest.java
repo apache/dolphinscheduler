@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import java.util.Arrays;
@@ -51,7 +51,7 @@ public class ResourcePermissionCheckServiceTest {
     private UserDao userDao;
 
     @Mock
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @InjectMocks
     ResourcePermissionCheckServiceImpl resourcePermissionCheckService;
@@ -59,7 +59,7 @@ public class ResourcePermissionCheckServiceTest {
     @BeforeEach
     public void setup() {
         ResourcePermissionCheckServiceImpl.RESOURCE_LIST_MAP.put(AuthorizationType.PROJECTS,
-                new ResourcePermissionCheckServiceImpl.ProjectsResourcePermissionCheck(projectMapper));
+                new ResourcePermissionCheckServiceImpl.ProjectsResourcePermissionCheck(projectDao));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class ResourcePermissionCheckServiceTest {
                 user.getId(), logger));
 
         List<Project> projects = Arrays.asList(getProject(1), getProject(2), getProject(3));
-        Mockito.when(projectMapper.listAuthorizedProjects(user.getId(), null)).thenReturn(projects);
+        Mockito.when(projectDao.listAuthorizedProjects(user.getId(), null)).thenReturn(projects);
 
         Assertions.assertTrue(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{}, user.getId(), logger));
@@ -107,14 +107,14 @@ public class ResourcePermissionCheckServiceTest {
         // GENERAL_USER
         List<Project> projects = Arrays.asList(getProject(1), getProject(2), getProject(3));
         Mockito.when(userDao.queryById(generalUser.getId())).thenReturn(generalUser);
-        Mockito.when(projectMapper.listAuthorizedProjects(generalUser.getId(), null)).thenReturn(projects);
+        Mockito.when(projectDao.listAuthorizedProjects(generalUser.getId(), null)).thenReturn(projects);
         Assertions.assertEquals(3, resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, generalUser.getId(), logger).size());
 
         // ADMIN_USER
         User adminUser = getAdminUser();
         Mockito.when(userDao.queryById(adminUser.getId())).thenReturn(adminUser);
-        Mockito.when(projectMapper.listAuthorizedProjects(0, null)).thenReturn(projects);
+        Mockito.when(projectDao.listAuthorizedProjects(0, null)).thenReturn(projects);
         Assertions.assertEquals(3, resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, adminUser.getId(), logger).size());
     }

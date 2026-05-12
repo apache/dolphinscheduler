@@ -41,10 +41,10 @@ import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +95,7 @@ public class UsersServiceTest {
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
 
     @Mock
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -348,12 +348,12 @@ public class UsersServiceTest {
                 () -> usersService.deleteUserById(loginUser, 3));
 
         // user is project owner
-        Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(Lists.newArrayList(new Project()));
+        Mockito.when(projectDao.queryProjectCreatedByUser(1)).thenReturn(Lists.newArrayList(new Project()));
         assertThrowsServiceException(Status.TRANSFORM_PROJECT_OWNERSHIP,
                 () -> usersService.deleteUserById(loginUser, 1));
 
         // success
-        Mockito.when(projectMapper.queryProjectCreatedByUser(1)).thenReturn(null);
+        Mockito.when(projectDao.queryProjectCreatedByUser(1)).thenReturn(null);
         assertDoesNotThrow(() -> usersService.deleteUserById(loginUser, 1));
     }
 
@@ -415,7 +415,7 @@ public class UsersServiceTest {
         final int authorizer = 100;
         Mockito.when(this.userMapper.selectById(authorizer)).thenReturn(this.getUser());
         Mockito.when(this.userMapper.selectById(projectCreator)).thenReturn(this.getUser());
-        Mockito.when(this.projectMapper.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(this.projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
 
         // ERROR: USER_NOT_EXIST
         User loginUser = new User();
@@ -463,7 +463,7 @@ public class UsersServiceTest {
         // success
         Project project = new Project();
         project.setId(0);
-        Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(project);
+        Mockito.when(this.projectDao.queryByCode(Mockito.anyLong())).thenReturn(project);
         assertDoesNotThrow(() -> usersService.revokeProject(loginUser, 1, projectCode));
     }
 
@@ -484,7 +484,7 @@ public class UsersServiceTest {
                 () -> usersService.revokeProjectById(loginUser, 2, projectId));
 
         // success
-        Mockito.when(this.projectMapper.queryByCode(Mockito.anyLong())).thenReturn(new Project());
+        Mockito.when(this.projectDao.queryByCode(Mockito.anyLong())).thenReturn(new Project());
         assertDoesNotThrow(() -> usersService.revokeProjectById(loginUser, 1, projectId));
     }
 

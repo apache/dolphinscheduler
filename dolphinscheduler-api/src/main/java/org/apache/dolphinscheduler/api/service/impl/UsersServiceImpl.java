@@ -43,10 +43,10 @@ import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -95,7 +95,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private AlertGroupMapper alertGroupMapper;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
@@ -438,7 +438,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             throw new ServiceException(Status.USER_NOT_EXIST, id);
         }
         // check if is a project owner
-        List<Project> projects = projectMapper.queryProjectCreatedByUser(id);
+        List<Project> projects = projectDao.queryProjectCreatedByUser(id);
         if (CollectionUtils.isNotEmpty(projects)) {
             String projectNames = projects.stream().map(Project::getName).collect(Collectors.joining(","));
             log.warn("Please transfer the project ownership before deleting the user, userId:{}, projects:{}.", id,
@@ -482,7 +482,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
             // 3. check if project is existed
-            Project project = this.projectMapper.queryDetailById(Integer.parseInt(projectId));
+            Project project = this.projectDao.queryDetailById(Integer.parseInt(projectId));
             if (project != null) {
                 // 4. delete the relationship between project and user
                 this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
@@ -590,7 +590,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 2. check if project is existed
-        Project project = this.projectMapper.queryByCode(projectCode);
+        Project project = this.projectDao.queryByCode(projectCode);
         if (project == null) {
             log.error("Project does not exist, projectCode:{}.", projectCode);
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
@@ -642,7 +642,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 3. check if project is existed
-        Project project = this.projectMapper.queryByCode(projectCode);
+        Project project = this.projectDao.queryByCode(projectCode);
         if (project == null) {
             log.error("Project does not exist, projectCode:{}.", projectCode);
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);

@@ -36,13 +36,13 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -70,7 +70,7 @@ import com.google.common.collect.Lists;
 public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
     private ProjectService projectService;
@@ -79,7 +79,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     private WorkflowInstanceMapper workflowInstanceMapper;
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Autowired
     private CommandMapper commandMapper;
@@ -151,7 +151,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     public WorkflowDefinitionCountVO getWorkflowDefinitionCountByProject(User loginUser, Long projectCode) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
         List<WorkflowDefinitionCountDto> workflowDefinitionCounts =
-                workflowDefinitionMapper.countDefinitionByProjectCodes(Lists.newArrayList(projectCode));
+                workflowDefinitionDao.countDefinitionByProjectCodes(Lists.newArrayList(projectCode));
         return WorkflowDefinitionCountVO.of(workflowDefinitionCounts);
     }
 
@@ -161,7 +161,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         if (CollectionUtils.isEmpty(projectCodes)) {
             return WorkflowDefinitionCountVO.empty();
         }
-        return WorkflowDefinitionCountVO.of(workflowDefinitionMapper.countDefinitionByProjectCodes(projectCodes));
+        return WorkflowDefinitionCountVO.of(workflowDefinitionDao.countDefinitionByProjectCodes(projectCodes));
     }
 
     @Override
@@ -250,7 +250,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         if (CollectionUtils.isEmpty(projectIds)) {
             return Collections.emptyList();
         }
-        List<Long> projectCodes = projectMapper.selectBatchIds(projectIds)
+        List<Long> projectCodes = projectDao.queryByIds(projectIds)
                 .stream()
                 .map(Project::getCode)
                 .collect(Collectors.toList());
@@ -263,7 +263,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             projectCodes = Collections.singletonList(projectCode);
         }
 
-        return workflowDefinitionMapper.queryDefinitionCodeListByProjectCodes(projectCodes);
+        return workflowDefinitionDao.queryDefinitionCodeListByProjectCodes(projectCodes);
     }
 
 }
