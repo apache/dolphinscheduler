@@ -42,9 +42,9 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,7 +75,7 @@ public class UsersServiceTest {
     private UsersServiceImpl usersService;
 
     @Mock
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Mock
     private AccessTokenMapper accessTokenMapper;
@@ -181,7 +181,7 @@ public class UsersServiceTest {
     public void testQueryUser() {
         String userName = "userTest0001";
         String userPassword = "userTest0001";
-        when(userMapper.queryUserByNamePassword(userName, EncryptionUtils.getMd5(userPassword)))
+        when(userDao.queryUserByNamePassword(userName, EncryptionUtils.getMd5(userPassword)))
                 .thenReturn(getGeneralUser());
         User queryUser = usersService.queryUser(userName, userPassword);
         Assertions.assertNotNull(queryUser);
@@ -195,7 +195,7 @@ public class UsersServiceTest {
         ids.add(1);
         List<User> userList = new ArrayList<>();
         userList.add(new User());
-        when(userMapper.selectByIds(ids)).thenReturn(userList);
+        when(userDao.queryByIds(ids)).thenReturn(userList);
         List<User> userList1 = usersService.queryUser(ids);
         Assertions.assertFalse(userList1.isEmpty());
     }
@@ -237,7 +237,7 @@ public class UsersServiceTest {
         // success
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
                 serviceLogger)).thenReturn(true);
-        when(userMapper.queryEnabledUsers()).thenReturn(getUserList());
+        when(userDao.queryEnabledUsers()).thenReturn(getUserList());
         List<User> users = usersService.queryUserList(user);
         Assertions.assertFalse(users.isEmpty());
     }
@@ -247,7 +247,7 @@ public class UsersServiceTest {
         User user = new User();
         IPage<User> page = new Page<>(1, 10);
         page.setRecords(getUserList());
-        when(userMapper.queryUserPaging(any(Page.class), eq("userTest"))).thenReturn(page);
+        when(userDao.queryUserPaging(any(Page.class), eq("userTest"))).thenReturn(page);
 
         // no operate
         Result result = usersService.queryUserList(user, "userTest", 1, 10);
@@ -280,8 +280,8 @@ public class UsersServiceTest {
                         "Asia/Shanghai"));
 
         // success
-        when(userMapper.selectById(any())).thenReturn(getUser());
-        when(userMapper.updateById(any())).thenReturn(1);
+        when(userDao.queryById(any())).thenReturn(getUser());
+        when(userDao.updateById(any())).thenReturn(true);
         assertDoesNotThrow(() -> usersService.updateUser(getLoginUser(),
                 1,
                 userName,
@@ -294,8 +294,8 @@ public class UsersServiceTest {
                 "Asia/Shanghai"));
 
         // non-admin should not modify tenantId and queue
-        when(userMapper.selectById(2)).thenReturn(getNonAdminUser());
-        User user = userMapper.selectById(2);
+        when(userDao.queryById(2)).thenReturn(getNonAdminUser());
+        User user = userDao.queryById(2);
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> usersService.updateUser(user,
                 2,
                 userName,
@@ -320,13 +320,13 @@ public class UsersServiceTest {
         // update failure (0 rows affected) -> UPDATE_USER_ERROR
         User failingUser = new User();
         failingUser.setId(1);
-        Mockito.when(userMapper.updateById(Mockito.any())).thenReturn(0);
+        Mockito.when(userDao.updateById(Mockito.any())).thenReturn(false);
         assertThrowsServiceException(Status.UPDATE_USER_ERROR, () -> usersService.updateUser(failingUser));
 
         // success path (1 row affected)
         User successUser = new User();
         successUser.setId(2);
-        Mockito.when(userMapper.updateById(Mockito.any())).thenReturn(1);
+        Mockito.when(userDao.updateById(Mockito.any())).thenReturn(true);
         User updated = usersService.updateUser(successUser);
         Assertions.assertNotNull(updated);
         Assertions.assertEquals(2, updated.getId());
@@ -336,9 +336,9 @@ public class UsersServiceTest {
     @Test
     public void testDeleteUserById() {
         User loginUser = new User();
-        when(userMapper.queryTenantCodeByUserId(1)).thenReturn(getUser());
-        when(userMapper.selectById(1)).thenReturn(getUser());
-        when(userMapper.deleteById(1)).thenReturn(1);
+        when(userDao.queryTenantCodeByUserId(1)).thenReturn(getUser());
+        when(userDao.queryById(1)).thenReturn(getUser());
+        when(userDao.deleteById(1)).thenReturn(true);
         // no operate
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
                 () -> usersService.deleteUserById(loginUser, 3));
@@ -367,18 +367,18 @@ public class UsersServiceTest {
         // user not exist
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-        when(userMapper.selectById(userId)).thenReturn(null);
+        when(userDao.queryById(userId)).thenReturn(null);
         assertThrowsServiceException(Status.USER_NOT_EXIST,
                 () -> usersService.grantProject(loginUser, userId, projectIds));
 
         // SUCCESS
-        when(userMapper.selectById(userId)).thenReturn(getUser());
+        when(userDao.queryById(userId)).thenReturn(getUser());
         assertDoesNotThrow(() -> usersService.grantProject(loginUser, userId, projectIds));
 
         // ERROR: NO_CURRENT_OPERATING_PERMISSION
         loginUser.setId(3);
         loginUser.setUserType(UserType.GENERAL_USER);
-        when(userMapper.selectById(3)).thenReturn(loginUser);
+        when(userDao.queryById(3)).thenReturn(loginUser);
         assertThrowsServiceException(Status.NO_CURRENT_OPERATING_PERMISSION,
                 () -> usersService.grantProject(loginUser, userId, projectIds));
     }
@@ -392,18 +392,18 @@ public class UsersServiceTest {
         // user not exist
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-        when(userMapper.selectById(userId)).thenReturn(null);
+        when(userDao.queryById(userId)).thenReturn(null);
         assertThrowsServiceException(Status.USER_NOT_EXIST,
                 () -> usersService.grantProjectWithReadPerm(loginUser, userId, projectIds));
 
         // SUCCESS
-        when(userMapper.selectById(userId)).thenReturn(getUser());
+        when(userDao.queryById(userId)).thenReturn(getUser());
         assertDoesNotThrow(() -> usersService.grantProjectWithReadPerm(loginUser, userId, projectIds));
 
         // ERROR: NO_CURRENT_OPERATING_PERMISSION
         loginUser.setId(3);
         loginUser.setUserType(UserType.GENERAL_USER);
-        when(userMapper.selectById(3)).thenReturn(loginUser);
+        when(userDao.queryById(3)).thenReturn(loginUser);
         assertThrowsServiceException(Status.NO_CURRENT_OPERATING_PERMISSION,
                 () -> usersService.grantProjectWithReadPerm(loginUser, userId, projectIds));
     }
@@ -414,8 +414,8 @@ public class UsersServiceTest {
         final long projectCode = 1L;
         final int projectCreator = 1;
         final int authorizer = 100;
-        Mockito.when(this.userMapper.selectById(authorizer)).thenReturn(this.getUser());
-        Mockito.when(this.userMapper.selectById(projectCreator)).thenReturn(this.getUser());
+        Mockito.when(this.userDao.queryById(authorizer)).thenReturn(this.getUser());
+        Mockito.when(this.userDao.queryById(projectCreator)).thenReturn(this.getUser());
         Mockito.when(this.projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
 
         // ERROR: USER_NOT_EXIST
@@ -446,7 +446,7 @@ public class UsersServiceTest {
 
     @Test
     public void testRevokeProject() {
-        Mockito.when(this.userMapper.selectById(1)).thenReturn(this.getUser());
+        Mockito.when(this.userDao.queryById(1)).thenReturn(this.getUser());
 
         final long projectCode = 3682329499136L;
 
@@ -470,7 +470,7 @@ public class UsersServiceTest {
 
     @Test
     public void testRevokeProjectById() {
-        Mockito.when(this.userMapper.selectById(1)).thenReturn(this.getUser());
+        Mockito.when(this.userDao.queryById(1)).thenReturn(this.getUser());
 
         String projectId = "100000";
 
@@ -492,7 +492,7 @@ public class UsersServiceTest {
     @Test
     public void testGrantNamespaces() {
         String namespaceIds = "100000,120000";
-        when(userMapper.selectById(1)).thenReturn(getUser());
+        when(userDao.queryById(1)).thenReturn(getUser());
         User loginUser = new User();
 
         // user not exist
@@ -513,12 +513,12 @@ public class UsersServiceTest {
         // user not exist
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
-        when(userMapper.selectById(userId)).thenReturn(null);
+        when(userDao.queryById(userId)).thenReturn(null);
         assertThrowsServiceException(Status.USER_NOT_EXIST,
                 () -> usersService.grantDataSource(loginUser, userId, datasourceIds));
 
         // test admin user
-        when(userMapper.selectById(userId)).thenReturn(getUser());
+        when(userDao.queryById(userId)).thenReturn(getUser());
         when(datasourceUserMapper.deleteByUserId(Mockito.anyInt())).thenReturn(1);
         assertDoesNotThrow(() -> usersService.grantDataSource(loginUser, userId, datasourceIds));
 
@@ -548,7 +548,7 @@ public class UsersServiceTest {
         // get general user
         loginUser.setUserType(null);
         loginUser.setId(1);
-        when(userMapper.queryDetailsById(1)).thenReturn(getGeneralUser());
+        when(userDao.queryDetailsById(1)).thenReturn(getGeneralUser());
         when(alertGroupMapper.queryByUserId(1)).thenReturn(getAlertGroups());
         User generalInfo = usersService.getUserInfo(loginUser);
         Assertions.assertEquals("userTest0001", generalInfo.getUserName());
@@ -562,7 +562,7 @@ public class UsersServiceTest {
                 () -> usersService.queryAllGeneralUsers(loginUser));
         // success
         loginUser.setUserType(UserType.ADMIN_USER);
-        when(userMapper.queryAllGeneralUser()).thenReturn(getUserList());
+        when(userDao.queryAllGeneralUser()).thenReturn(getUserList());
         List<User> users = usersService.queryAllGeneralUsers(loginUser);
         Assertions.assertFalse(users.isEmpty());
     }
@@ -573,7 +573,7 @@ public class UsersServiceTest {
         Result result = usersService.verifyUserName("admin89899");
         Assertions.assertEquals(Status.SUCCESS.getMsg(), result.getMsg());
         // exist user
-        when(userMapper.queryByUserNameAccurately("userTest0001")).thenReturn(getUser());
+        when(userDao.queryByUserNameAccurately("userTest0001")).thenReturn(getUser());
         result = usersService.verifyUserName("userTest0001");
         Assertions.assertEquals(Status.USER_NAME_EXIST.getMsg(), result.getMsg());
     }
@@ -581,8 +581,8 @@ public class UsersServiceTest {
     @Test
     public void testUnauthorizedUser() {
         User loginUser = new User();
-        when(userMapper.selectList(null)).thenReturn(getUserList());
-        when(userMapper.queryUserListByAlertGroupId(2)).thenReturn(getUserList());
+        when(userDao.queryAll()).thenReturn(getUserList());
+        when(userDao.queryUserListByAlertGroupId(2)).thenReturn(getUserList());
         // no operate
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
                 () -> usersService.unauthorizedUser(loginUser, 2));
@@ -595,7 +595,7 @@ public class UsersServiceTest {
     @Test
     public void testAuthorizedUser() {
         User loginUser = new User();
-        when(userMapper.queryUserListByAlertGroupId(2)).thenReturn(getUserList());
+        when(userDao.queryUserListByAlertGroupId(2)).thenReturn(getUserList());
         // no operate
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
                 () -> usersService.authorizedUser(loginUser, 2));
@@ -675,12 +675,12 @@ public class UsersServiceTest {
         // user state error
         userName = "userTest0001";
         final String existingName = userName;
-        when(userMapper.queryByUserNameAccurately(existingName)).thenReturn(getUser());
+        when(userDao.queryByUserNameAccurately(existingName)).thenReturn(getUser());
         assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
                 () -> usersService.activateUser(user, existingName));
 
         // success
-        when(userMapper.queryByUserNameAccurately(existingName)).thenReturn(getDisabledUser());
+        when(userDao.queryByUserNameAccurately(existingName)).thenReturn(getDisabledUser());
         User activated = usersService.activateUser(user, existingName);
         Assertions.assertNotNull(activated);
     }
@@ -701,8 +701,8 @@ public class UsersServiceTest {
 
         // batch activate user names
         user.setUserType(UserType.ADMIN_USER);
-        when(userMapper.queryByUserNameAccurately("userTest0001")).thenReturn(getUser());
-        when(userMapper.queryByUserNameAccurately("userTest0002")).thenReturn(getDisabledUser());
+        when(userDao.queryByUserNameAccurately("userTest0001")).thenReturn(getUser());
+        when(userDao.queryByUserNameAccurately("userTest0002")).thenReturn(getDisabledUser());
         Map<String, Object> result = usersService.batchActivateUser(user, userNames);
         Map<String, Object> successData = (Map<String, Object>) result.get("success");
         int totalSuccess = (Integer) successData.get("sum");
@@ -725,17 +725,17 @@ public class UsersServiceTest {
         int stat = 1;
 
         // User exists
-        when(userMapper.existUser(userName)).thenReturn(true);
-        when(userMapper.selectById(getUser().getId())).thenReturn(getUser());
-        when(userMapper.queryDetailsById(getUser().getId())).thenReturn(getUser());
-        when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
-        when(userMapper.updateById(any())).thenReturn(1);
+        when(userDao.existUser(userName)).thenReturn(true);
+        when(userDao.queryById(getUser().getId())).thenReturn(getUser());
+        when(userDao.queryDetailsById(getUser().getId())).thenReturn(getUser());
+        when(userDao.queryByUserNameAccurately(userName)).thenReturn(getUser());
+        when(userDao.updateById(any())).thenReturn(true);
         when(tenantDao.queryByCode(tenantCode)).thenReturn(Optional.of(getTenant()));
         user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
         Assertions.assertEquals(getUser(), user);
 
         // User not exists
-        Mockito.when(userMapper.existUser(userName)).thenReturn(false);
+        Mockito.when(userDao.existUser(userName)).thenReturn(false);
         Mockito.when(tenantDao.queryByCode(tenantCode)).thenReturn(Optional.of(getTenant()));
         user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
         Assertions.assertNotNull(user);

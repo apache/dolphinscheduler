@@ -32,8 +32,8 @@ import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,7 +60,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     private QueueMapper queueMapper;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Autowired
     private TenantDao tenantDao;
@@ -197,7 +197,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         if (checkIfQueueIsInUsing(existsQueue.getQueueName(), updateQueue.getQueueName())) {
             // update user related old queue
             Integer relatedUserNums =
-                    userMapper.updateUserQueue(existsQueue.getQueueName(), updateQueue.getQueueName());
+                    userDao.updateUserQueue(existsQueue.getQueueName(), updateQueue.getQueueName());
             log.info("Old queue have related {} users, exec update user success.", relatedUserNums);
         }
 
@@ -232,7 +232,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_TENANTS, tenantList.size());
         }
 
-        List<User> userList = userMapper.queryUserListByQueue(queue.getQueueName());
+        List<User> userList = userDao.queryUserListByQueue(queue.getQueueName());
         if (CollectionUtils.isNotEmpty(userList)) {
             log.warn("Delete queue failed, because there are {} users using it.", userList.size());
             throw new ServiceException(Status.DELETE_QUEUE_BY_ID_FAIL_USERS, userList.size());
@@ -290,7 +290,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if need to update user
      */
     private boolean checkIfQueueIsInUsing(String oldQueue, String newQueue) {
-        return !oldQueue.equals(newQueue) && userMapper.existUser(oldQueue) == Boolean.TRUE;
+        return !oldQueue.equals(newQueue) && userDao.existUser(oldQueue) == Boolean.TRUE;
     }
 
     /**

@@ -62,7 +62,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
@@ -71,6 +70,7 @@ import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
@@ -198,7 +198,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private GlobalParamsValidator globalParamsValidator;
 
     @Mock
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     protected User user;
     protected Exception exception;
@@ -357,7 +357,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 eq(projectCode))).thenReturn(pageListingResult);
         String user1 = "user1";
         String user2 = "user2";
-        when(userMapper.queryUserWithWorkflowDefinitionCode(processDefinitionCodes))
+        when(userDao.queryUserWithWorkflowDefinitionCode(processDefinitionCodes))
                 .thenReturn(Arrays.asList(
                         UserWithWorkflowDefinitionCode.builder()
                                 .workflowDefinitionCode(processDefinitionCode1)

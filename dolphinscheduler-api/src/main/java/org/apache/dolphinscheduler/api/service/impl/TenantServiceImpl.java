@@ -36,10 +36,10 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -73,7 +73,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     private ScheduleDao scheduleDao;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Autowired
     private QueueService queueService;
@@ -235,7 +235,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, schedules.size());
         }
 
-        List<User> userList = userMapper.queryUserListByTenant(tenant.getId());
+        List<User> userList = userDao.queryUserListByTenant(tenant.getId());
         if (CollectionUtils.isNotEmpty(userList)) {
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_USERS, userList.size());
         }

@@ -79,7 +79,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
@@ -88,6 +87,7 @@ import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
@@ -153,7 +153,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private ProjectService projectService;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Autowired
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
@@ -508,7 +508,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 schedulerService.queryScheduleByWorkflowDefinitionCodes(workflowDefinitionCodes)
                         .stream()
                         .collect(Collectors.toMap(Schedule::getWorkflowDefinitionCode, Function.identity()));
-        List<UserWithWorkflowDefinitionCode> userWithCodes = userMapper.queryUserWithWorkflowDefinitionCode(
+        List<UserWithWorkflowDefinitionCode> userWithCodes = userDao.queryUserWithWorkflowDefinitionCode(
                 workflowDefinitionCodes);
         for (WorkflowDefinition pd : workflowDefinitions) {
             userWithCodes.stream()

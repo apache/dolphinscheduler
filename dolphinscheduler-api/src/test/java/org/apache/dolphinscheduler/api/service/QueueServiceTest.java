@@ -35,7 +35,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -76,7 +76,7 @@ public class QueueServiceTest {
     private QueueMapper queueMapper;
 
     @Mock
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -181,7 +181,7 @@ public class QueueServiceTest {
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // success
-        when(userMapper.existUser(Mockito.anyString())).thenReturn(false);
+        when(userDao.existUser(Mockito.anyString())).thenReturn(false);
         assertDoesNotThrow(() -> queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, NOT_EXISTS));
         Queue queue = queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, NOT_EXISTS);
         Assertions.assertNull(queue.getCreateTime());

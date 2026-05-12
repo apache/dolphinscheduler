@@ -37,8 +37,8 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -90,7 +90,7 @@ public class ProjectServiceTest {
     private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -276,12 +276,12 @@ public class ProjectServiceTest {
         Assertions.assertEquals(Status.PROJECT_ALREADY_EXISTS.getCode(), result.getCode().intValue());
 
         // USER_NOT_EXIST
-        Mockito.when(userMapper.selectById(Mockito.any())).thenReturn(null);
+        Mockito.when(userDao.queryById(Mockito.any())).thenReturn(null);
         result = projectService.update(loginUser, 2L, "test", "desc");
         Assertions.assertEquals(Status.USER_NOT_EXIST.getCode(), result.getCode().intValue());
 
         // success
-        Mockito.when(userMapper.selectById(Mockito.any())).thenReturn(new User());
+        Mockito.when(userDao.queryById(Mockito.any())).thenReturn(new User());
         project.setUserId(1);
         Mockito.when(projectDao.updateById(Mockito.any(Project.class))).thenReturn(true);
         result = projectService.update(loginUser, 2L, "test", "desc");
@@ -334,7 +334,7 @@ public class ProjectServiceTest {
                 .thenReturn(true);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
                 0, baseServiceLogger)).thenReturn(true);
-        Mockito.when(this.userMapper.queryAuthedUserListByProjectId(1)).thenReturn(this.getUserList());
+        Mockito.when(this.userDao.queryAuthedUserListByProjectId(1)).thenReturn(this.getUserList());
         Result result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
         logger.info("SUCCESS 1: {}", result.toString());
         List<User> users = (List<User>) result.getData();
