@@ -32,8 +32,8 @@ import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 
@@ -64,7 +64,7 @@ public class WorkflowTaskLineageServiceTest {
     private ProjectDao projectDao;
 
     @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Mock
     private WorkflowDefinitionDao workflowDefinitionDao;
@@ -162,7 +162,7 @@ public class WorkflowTaskLineageServiceTest {
         when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, taskCode))
                 .thenReturn(dependentWorkflowList);
         when(workflowDefinitionDao.queryByCode(50L)).thenReturn(Optional.of(workflowDefinition));
-        when(taskDefinitionMapper.queryByCode(999L)).thenReturn(null); // Task definition not found (dirty data)
+        when(taskDefinitionDao.queryByCode(999L)).thenReturn(null); // Task definition not found (dirty data)
 
         // Should return Optional.empty() because all records are orphaned
         Optional<String> result =
@@ -209,13 +209,13 @@ public class WorkflowTaskLineageServiceTest {
                 .thenReturn(dependentWorkflowList);
         when(workflowDefinitionDao.queryByCode(50L)).thenReturn(Optional.of(workflowDefinition1));
         when(workflowDefinitionDao.queryByCode(60L)).thenReturn(Optional.of(workflowDefinition2));
-        when(taskDefinitionMapper.queryByCode(300L)).thenReturn(validTaskDefinition);
-        when(taskDefinitionMapper.queryByCode(999L)).thenReturn(null); // Orphaned record
+        when(taskDefinitionDao.queryByCode(300L)).thenReturn(validTaskDefinition);
+        when(taskDefinitionDao.queryByCode(999L)).thenReturn(null); // Orphaned record
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setCode(taskCode);
         taskDefinition.setName("TestTask");
-        when(taskDefinitionMapper.queryByCode(taskCode)).thenReturn(taskDefinition);
+        when(taskDefinitionDao.queryByCode(taskCode)).thenReturn(taskDefinition);
 
         // Should return a message with only the valid record, skipping the orphaned one
         Optional<String> result =
@@ -249,7 +249,7 @@ public class WorkflowTaskLineageServiceTest {
         when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, 0L))
                 .thenReturn(dependentWorkflowList);
         when(workflowDefinitionDao.queryByCode(50L)).thenReturn(Optional.of(workflowDefinition));
-        when(taskDefinitionMapper.queryByCode(999L)).thenReturn(null); // Task definition not found
+        when(taskDefinitionDao.queryByCode(999L)).thenReturn(null); // Task definition not found
 
         // Should return Optional.empty() because all records are orphaned
         Optional<String> result =

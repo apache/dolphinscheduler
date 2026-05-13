@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 
@@ -57,13 +57,13 @@ class WorkflowLineageServiceImplTest {
     private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(workflowLineageService, "workflowTaskLineageDao", workflowTaskLineageDao);
         ReflectionTestUtils.setField(workflowLineageService, "workflowDefinitionDao", workflowDefinitionDao);
-        ReflectionTestUtils.setField(workflowLineageService, "taskDefinitionMapper", taskDefinitionMapper);
+        ReflectionTestUtils.setField(workflowLineageService, "taskDefinitionDao", taskDefinitionDao);
     }
 
     @Test
@@ -77,7 +77,7 @@ class WorkflowLineageServiceImplTest {
                 workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowCode);
 
         assertThat(result).isEmpty();
-        verifyNoInteractions(workflowDefinitionDao, taskDefinitionMapper);
+        verifyNoInteractions(workflowDefinitionDao, taskDefinitionDao);
     }
 
     @Test
@@ -116,7 +116,7 @@ class WorkflowLineageServiceImplTest {
         taskDefinition.setTaskParams("task-params");
         taskDefinition.setWorkerGroup("test-group");
 
-        when(taskDefinitionMapper.queryByCodeList(Collections.singletonList(300L)))
+        when(taskDefinitionDao.queryByCodes(Collections.singletonList(300L)))
                 .thenReturn(Collections.singletonList(taskDefinition));
 
         List<DependentWorkflowDefinition> result =
@@ -142,7 +142,7 @@ class WorkflowLineageServiceImplTest {
         assertThat(workflowDependent.getWorkerGroup()).isNull();
         assertThat(workflowDependent.getWorkflowDefinitionVersion()).isEqualTo(4);
 
-        verify(taskDefinitionMapper).queryByCodeList(Collections.singletonList(300L));
+        verify(taskDefinitionDao).queryByCodes(Collections.singletonList(300L));
     }
 
     @Test

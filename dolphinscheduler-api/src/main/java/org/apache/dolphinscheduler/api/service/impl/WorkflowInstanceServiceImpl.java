@@ -66,9 +66,9 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
@@ -155,7 +155,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     UsersService usersService;
 
     @Autowired
-    TaskDefinitionMapper taskDefinitionMapper;
+    TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
     private RelationSubWorkflowMapper relationSubWorkflowMapper;
@@ -343,7 +343,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
 
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskInstance.getTaskCode());
+        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskInstance.getTaskCode());
         if (taskDefinition == null) {
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
@@ -399,7 +399,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
         }
 
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskInstance.getTaskCode());
+        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskInstance.getTaskCode());
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
             log.error("Task definition does not exist, projectCode:{}, taskDefinitionCode:{}.", projectCode,
                     taskInstance.getTaskCode());
