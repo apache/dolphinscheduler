@@ -38,10 +38,10 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -87,7 +87,7 @@ public class TenantServiceTest {
     private ScheduleDao scheduleDao;
 
     @Mock
-    private WorkflowInstanceMapper workflowInstanceMapper;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
     private UserDao userDao;
@@ -188,7 +188,7 @@ public class TenantServiceTest {
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);
         when(tenantDao.queryDetailById(1)).thenReturn(getTenant());
-        when(workflowInstanceMapper.queryByTenantCodeAndStatus(tenantCode,
+        when(workflowInstanceDao.queryByTenantCodeAndStatus(tenantCode,
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES))
                         .thenReturn(getInstanceList());
         when(scheduleDao.queryScheduleListByTenant(tenantCode)).thenReturn(getScheduleList());
@@ -202,7 +202,7 @@ public class TenantServiceTest {
                 () -> tenantService.deleteTenantById(getLoginUser(), 1));
 
         // DELETE_TENANT_BY_ID_FAIL_DEFINES
-        when(workflowInstanceMapper.queryByTenantCodeAndStatus(any(), any())).thenReturn(Collections.emptyList());
+        when(workflowInstanceDao.queryByTenantCodeAndStatus(any(), any())).thenReturn(Collections.emptyList());
         when(tenantDao.queryDetailById(2)).thenReturn(getTenant(2));
         assertThrowsServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES,
                 () -> tenantService.deleteTenantById(getLoginUser(), 2));
