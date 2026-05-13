@@ -15,29 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit.operator.impl;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
-import org.apache.dolphinscheduler.dao.entity.Cluster;
-import org.apache.dolphinscheduler.dao.repository.ClusterDao;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-@Service
-public class ClusterAuditOperatorImpl extends BaseAuditOperator {
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
-    @Autowired
-    private ClusterDao clusterDao;
+public interface K8sNamespaceDao extends IDao<K8sNamespace> {
 
-    @Override
-    public String getObjectNameFromIdentity(Object identity) {
-        Long objId = toLong(identity);
-        if (objId == -1) {
-            return "";
-        }
+    IPage<K8sNamespace> queryK8sNamespacePaging(IPage<K8sNamespace> page, String searchVal);
 
-        Cluster obj = clusterDao.queryByClusterCode(objId);
-        return obj == null ? "" : obj.getName();
-    }
+    boolean existNamespace(String namespace, Long clusterCode);
+
+    List<K8sNamespace> queryNamespaceExceptUserId(int userId);
+
+    List<K8sNamespace> queryAuthedNamespaceListByUserId(Integer userId);
+
+    K8sNamespace queryByNamespaceCode(Long namespaceCode);
+
+    long countByClusterCode(Long clusterCode);
 }
