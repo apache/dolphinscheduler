@@ -50,9 +50,9 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
@@ -132,7 +132,7 @@ public class PythonGateway {
     private ScheduleDao scheduleDao;
 
     @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private DataSourceDao dataSourceDao;
 
     @Autowired
     private ApiConfig apiConfig;
@@ -484,7 +484,7 @@ public class PythonGateway {
      */
     public DataSource getDatasource(String datasourceName, String type) {
 
-        List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
+        List<DataSource> dataSourceList = dataSourceDao.queryDataSourceByName(datasourceName);
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             String msg = String.format("Can not find any datasource by name %s", datasourceName);
             log.error(msg);

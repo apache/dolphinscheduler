@@ -15,29 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit.operator.impl;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
+import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+public interface DataSourceUserDao extends IDao<DatasourceUser> {
 
-@Service
-public class DatasourceAuditOperatorImpl extends BaseAuditOperator {
+    void deleteByUserId(int userId);
 
-    @Autowired
-    private DataSourceDao dataSourceDao;
-
-    @Override
-    public String getObjectNameFromIdentity(Object identity) {
-        Long objId = toLong(identity);
-        if (objId == -1) {
-            return "";
-        }
-
-        DataSource obj = dataSourceDao.queryById(objId);
-        return obj == null ? "" : obj.getName();
-    }
+    void deleteByDatasourceId(int datasourceId);
 }
