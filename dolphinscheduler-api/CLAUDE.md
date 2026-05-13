@@ -49,8 +49,50 @@ REST API server. Entry point for the UI and external clients (curl, Python SDK).
 
 ## Tests
 
-- Unit tests in `src/test/java`.
-- **Integration tests live in `dolphinscheduler-api-test`** (separate module, Docker Compose + Testcontainers).
+Unit tests live in `src/test/java`. **Integration tests live in `dolphinscheduler-api-test`** (separate module, Docker Compose + Testcontainers).
+
+### Running unit tests from the command line
+
+The CI flow (`.github/workflows/unit-test.yml`) runs in two phases. Mirror it locally:
+
+**One-time setup** — install BOM + upstream deps to local m2:
+
+```bash
+export MAVEN_OPTS="-Xmx4g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
+./mvnw install -B \
+  -pl "dolphinscheduler-bom,dolphinscheduler-api" \
+  -am -DskipTests=true -Dspotless.skip=true -DskipUT=true \
+  -Djacoco.skip=true -Danalyze.skip=true
+```
+
+**Run tests** — use `verify` (NOT `test`), no `-am`, no `clean`:
+
+```bash
+./mvnw verify -B -pl "dolphinscheduler-api" \
+  -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false -Danalyze.skip=true \
+  -Dsurefire.printSummary=true -Dsurefire.useFile=false \
+  -Dsurefire.reportFormat=plain -Dsurefire.redirectTestOutputToFile=false \
+  -Dsurefire.failIfNoSpecifiedTests=false \
+  -Dtest='EnvironmentServiceTest#testVerifyEnvironment'
+```
+
+Drop the `-Dtest=...` filter to run the whole module.
+
+### Why the unusual flags
+
+- **`verify` not `test`** — root pom uses `jacoco-maven-plugin` in offline-instrument + restore-instrumented-classes mode. Only the `verify` lifecycle runs the `restore` goal, so `test` alone leaves `target/classes` instrumented and the next build fails with "Cannot process instrumented class".
+- **`dolphinscheduler-bom` must be in the install `-pl`** — without it, the installed pom lacks effective dependencyManagement and downstream compile/test classpaths drop transitive deps like `commons-collections4` and `oshi-core`.
+- **`-DskipTests=true` (not `-Dmaven.test.skip=true`) during install** — `maven.test.skip` skips test-source attach which breaks downstream modules that depend on the test-jar.
+- **No `-am` on the test run** — `-am` re-instruments upstream modules with jacoco and triggers the same "Cannot process instrumented class" failure.
+- **No `clean` between `install` and `verify`** — clean wipes `target/classes` and the next compile re-resolves transitive deps from the (still installed) pom; some resolutions fail with `[WARNING] The POM for ... is invalid` and the build can't see `commons-collections4` etc.
+
+### If things go sideways
+
+- `Cannot process instrumented class` — re-run with `-Djacoco.skip=true`, or wipe `target/` for the affected module and re-run.
+- `NoClassDefFoundError: oshi/SystemInfo` or `commons-collections4/CollectionUtils` at test runtime — the bom didn't get installed; redo the setup step including `dolphinscheduler-bom` in `-pl`.
+- `class file contains wrong class` — local `~/.m2/.../dolphinscheduler-*-dev-SNAPSHOT.jar` is stale/corrupt. Delete the offending `dev-SNAPSHOT` directory under `~/.m2/repository/org/apache/dolphinscheduler/` and re-run install.
+
+Surefire XML reports land at `target/surefire-reports/TEST-<class>.xml` for the per-test counts.
 
 ## Related modules
 

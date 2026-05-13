@@ -255,6 +255,18 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     {
+      type: 'input-number',
+      field: 'batchSize',
+      name: t('project.node.datax_writer_batch_size'),
+      span: otherStatementSpan,
+      props: {
+        min: 0,
+        step: 1024,
+        placeholder: t('project.node.datax_writer_batch_size_tips')
+      },
+      value: null
+    },
+    {
       type: 'select',
       field: 'jobSpeedByte',
       name: t('project.node.datax_job_speed_byte'),

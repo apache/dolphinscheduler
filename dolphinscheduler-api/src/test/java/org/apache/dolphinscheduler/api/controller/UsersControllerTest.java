@@ -56,7 +56,7 @@ public class UsersControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/users/create")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 

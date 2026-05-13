@@ -629,6 +629,8 @@ export default {
     datax_target_database_pre_sql: '目标库前置SQL',
     datax_target_database_post_sql: '目标库后置SQL',
     datax_non_query_sql_tips: '请输入非查询SQL语句',
+    datax_writer_batch_size: 'Writer 批量大小',
+    datax_writer_batch_size_tips: '0 或留空为默认值 2048',
     datax_job_speed_byte: '限流(字节数)',
     datax_job_speed_byte_info: '(KB，0代表不限制)',
     datax_job_speed_record: '限流(记录数)',

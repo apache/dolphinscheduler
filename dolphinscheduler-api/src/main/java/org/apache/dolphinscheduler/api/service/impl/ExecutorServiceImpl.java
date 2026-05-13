@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowReques
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowRequestTransformer;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -126,7 +125,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     @Transactional
     public Integer triggerWorkflowDefinition(final WorkflowTriggerRequest triggerRequest) {
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(
+                triggerRequest.getLoginUser(),
+                triggerRequest.getProjectCode(),
+                ApiFuncIdentificationConstant.RERUN);
         final TriggerWorkflowDTO triggerWorkflowDTO = triggerWorkflowRequestTransformer.transform(triggerRequest);
+        // verify the workflow definition belongs to the URL's project
+        if (triggerWorkflowDTO.getWorkflowDefinition() == null
+                || triggerWorkflowDTO.getWorkflowDefinition().getProjectCode() != triggerRequest.getProjectCode()) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                    String.valueOf(triggerRequest.getWorkflowDefinitionCode()));
+        }
         // todo: use validator chain
         triggerWorkflowDTOValidator.validate(triggerWorkflowDTO);
         return executorClient.triggerWorkflowDefinition().execute(triggerWorkflowDTO);
@@ -135,8 +145,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     @Transactional
     public List<Integer> backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest) {
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(
+                workflowBackFillRequest.getLoginUser(),
+                workflowBackFillRequest.getProjectCode(),
+                ApiFuncIdentificationConstant.RERUN);
         final BackfillWorkflowDTO backfillWorkflowDTO =
                 backfillWorkflowRequestTransformer.transform(workflowBackFillRequest);
+        // verify the workflow definition belongs to the URL's project
+        if (backfillWorkflowDTO.getWorkflowDefinition() == null
+                || backfillWorkflowDTO.getWorkflowDefinition().getProjectCode() != workflowBackFillRequest
+                        .getProjectCode()) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                    String.valueOf(workflowBackFillRequest.getWorkflowDefinitionCode()));
+        }
         backfillWorkflowDTOValidator.validate(backfillWorkflowDTO);
         return executorClient.backfillWorkflowDefinition().execute(backfillWorkflowDTO);
     }
@@ -357,8 +379,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     @Override
-    public Map<String, Object> forceStartTaskInstance(User loginUser, int queueId) {
-        Map<String, Object> result = new HashMap<>();
+    public void forceStartTaskInstance(User loginUser, int queueId) {
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
         // check workflow instance exist
         workflowInstanceDao.queryOptionalById(taskGroupQueue.getWorkflowInstanceId())
@@ -372,9 +393,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         taskGroupQueue.setForceStart(Flag.YES.getCode());
         taskGroupQueue.setUpdateTime(new Date());
         taskGroupQueueMapper.updateById(taskGroupQueue);
-
-        result.put(Constants.STATUS, Status.SUCCESS);
-        return result;
     }
 
     @Override

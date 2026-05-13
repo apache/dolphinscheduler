@@ -17,15 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.EnvironmentWorkerGroupRelationService;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -33,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
- * task definition service impl
+ * environment worker group relation service impl
  */
 @Service
 @Slf4j
@@ -50,13 +46,8 @@ public class EnvironmentWorkerGroupRelationServiceImpl extends BaseServiceImpl
      * @param environmentCode environment code
      */
     @Override
-    public Map<String, Object> queryEnvironmentWorkerGroupRelation(Long environmentCode) {
-        Map<String, Object> result = new HashMap<>();
-        List<EnvironmentWorkerGroupRelation> relations =
-                environmentWorkerGroupRelationMapper.queryByEnvironmentCode(environmentCode);
-        result.put(Constants.DATA_LIST, relations);
-        putMsg(result, Status.SUCCESS);
-        return result;
+    public List<EnvironmentWorkerGroupRelation> queryEnvironmentWorkerGroupRelation(Long environmentCode) {
+        return environmentWorkerGroupRelationMapper.queryByEnvironmentCode(environmentCode);
     }
 
     /**
@@ -65,13 +56,7 @@ public class EnvironmentWorkerGroupRelationServiceImpl extends BaseServiceImpl
      * @return all relation list
      */
     @Override
-    public Map<String, Object> queryAllEnvironmentWorkerGroupRelationList() {
-        Map<String, Object> result = new HashMap<>();
-
-        List<EnvironmentWorkerGroupRelation> relations = environmentWorkerGroupRelationMapper.selectList(null);
-
-        result.put(Constants.DATA_LIST, relations);
-        putMsg(result, Status.SUCCESS);
-        return result;
+    public List<EnvironmentWorkerGroupRelation> queryAllEnvironmentWorkerGroupRelationList() {
+        return environmentWorkerGroupRelationMapper.selectList(null);
     }
 }

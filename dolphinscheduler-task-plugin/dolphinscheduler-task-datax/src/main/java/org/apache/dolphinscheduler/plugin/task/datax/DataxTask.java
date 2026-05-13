@@ -282,6 +282,10 @@ public class DataxTask extends AbstractTask {
             }
         }
 
+        if (dataXParameters.getBatchSize() > 0) {
+            writerParam.put("batchSize", dataXParameters.getBatchSize());
+        }
+
         ObjectNode writer = JSONUtils.createObjectNode();
         writer.put("name", DataxUtils.getWriterPluginName(dataxTaskExecutionContext.getTargetType()));
         writer.set("parameter", writerParam);

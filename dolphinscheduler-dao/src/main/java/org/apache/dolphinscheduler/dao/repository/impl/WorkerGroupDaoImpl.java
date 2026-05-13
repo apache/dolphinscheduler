@@ -37,6 +37,12 @@ public class WorkerGroupDaoImpl extends BaseDao<WorkerGroup, WorkerGroupMapper> 
     }
 
     @Override
+    public boolean deleteByWorkerGroupName(String workerGroupName) {
+        int deleted = mybatisMapper.deleteByWorkerGroupName(workerGroupName);
+        return deleted > 0;
+    }
+
+    @Override
     public List<String> queryAllWorkerGroupNames() {
         return mybatisMapper.queryAllWorkerGroup().stream()
                 .map(WorkerGroup::getName)

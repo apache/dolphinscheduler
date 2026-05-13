@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
@@ -29,9 +28,11 @@ import org.apache.dolphinscheduler.api.dto.ProductInfoDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.UiPluginService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.PluginType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.PluginDefine;
+
+import java.util.Collections;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,16 +43,10 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.google.common.collect.ImmutableMap;
-
 public class UiPluginControllerTest extends AbstractControllerTest {
 
     private static final PluginType pluginType = PluginType.ALERT;
     private static final int pluginId = 1;
-    private static final Result expectResponseContent = JSONUtils.parseObject(
-            "{\"code\":0,\"msg\":\"success\",\"data\":\"Test Data\",\"success\":true,\"failed\":false}", Result.class);
-    private static final ImmutableMap<String, Object> uiPluginServiceResult =
-            ImmutableMap.of(Constants.STATUS, Status.SUCCESS, Constants.DATA_LIST, "Test Data");
 
     @MockBean(name = "uiPluginService")
     private UiPluginService uiPluginService;
@@ -59,7 +54,7 @@ public class UiPluginControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryUiPluginsByType() throws Exception {
         when(uiPluginService.queryUiPluginsByType(any(PluginType.class)))
-                .thenReturn(uiPluginServiceResult);
+                .thenReturn(Collections.singletonList(new PluginDefine("test", "alert", "[]")));
 
         final MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pluginType", String.valueOf(pluginType));
@@ -71,15 +66,14 @@ public class UiPluginControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        final Result actualResponseContent =
-                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test
     public void testQueryUiPluginDetailById() throws Exception {
         when(uiPluginService.queryUiPluginDetailById(anyInt()))
-                .thenReturn(uiPluginServiceResult);
+                .thenReturn(new PluginDefine("test", "alert", "[]"));
 
         final MvcResult mvcResult = mockMvc.perform(get("/ui-plugins/{id}", pluginId)
                 .header(SESSION_ID, sessionId))
@@ -87,9 +81,8 @@ public class UiPluginControllerTest extends AbstractControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        final Result actualResponseContent =
-                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        assertThat(actualResponseContent.toString()).isEqualTo(expectResponseContent.toString());
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 
     @Test

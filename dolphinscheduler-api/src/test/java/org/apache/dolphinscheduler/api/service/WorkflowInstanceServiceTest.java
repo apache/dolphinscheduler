@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_DELETE;
+import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_UPDATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,6 +26,8 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
@@ -42,6 +44,7 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -56,6 +59,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
@@ -63,6 +67,7 @@ import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -70,14 +75,13 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
-import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -145,6 +149,21 @@ public class WorkflowInstanceServiceTest {
     @Mock
     private TaskInstanceContextDao taskInstanceContextDao;
 
+    @Mock
+    TaskInstanceMapper taskInstanceMapper;
+
+    @Mock
+    CuringParamsService curingGlobalParamsService;
+
+    @Mock
+    TaskInstanceService taskInstanceService;
+
+    @Mock
+    WorkflowInstanceMapDao workflowInstanceMapDao;
+
+    @Mock
+    AlertDao alertDao;
+
     private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
             + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
             + "\"preTaskVersion\":1,\"postTaskCode\":123451234,\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"}]";
@@ -176,8 +195,6 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         doThrow(new ServiceException())
@@ -208,7 +225,6 @@ public class WorkflowInstanceServiceTest {
         pageReturn.setRecords(workflowInstanceList);
 
         // data parameter check
-        putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(Mockito.any(),
                 Mockito.any(Project.class),
@@ -233,8 +249,6 @@ public class WorkflowInstanceServiceTest {
                 10));
 
         // project auth success
-        putMsg(result, Status.SUCCESS, projectCode);
-
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
@@ -293,21 +307,24 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 666L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object> projectAuthFailMap =
-                workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, projectAuthFailMap.get(Constants.STATUS));
-        // project auth success
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(workflowInstanceMapper.queryByTriggerCode(projectCode)).thenReturn(new ArrayList());
-        projectAuthFailMap =
-                workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
-        Assertions.assertEquals(Status.SUCCESS, projectAuthFailMap.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
+                () -> workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L));
+
+        // project auth success, trigger code null returns empty list
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
+                WORKFLOW_INSTANCE);
+        List<WorkflowInstance> nullTriggerRes =
+                workflowInstanceService.queryByTriggerCode(loginUser, projectCode, null);
+        Assertions.assertTrue(nullTriggerRes.isEmpty());
+
+        when(workflowInstanceMapper.queryByTriggerCode(999L)).thenReturn(new ArrayList<>());
+        List<WorkflowInstance> emptyRes = workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
+        Assertions.assertTrue(emptyRes.isEmpty());
     }
 
     @Test
@@ -315,41 +332,30 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>(5);
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
         int size = 10;
         String startTime = "2020-01-01 00:00:00";
         String endTime = "2020-08-02 00:00:00";
-        Date start = DateUtils.stringToDate(startTime);
-        Date end = DateUtils.stringToDate(endTime);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object> projectAuthFailRes = workflowInstanceService
-                .queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, size, startTime, endTime);
-
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, projectAuthFailRes.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+        assertThrowsServiceException(Status.PROJECT_NOT_FOUND, () -> workflowInstanceService
+                .queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, size, startTime, endTime));
 
         // project auth success
-        putMsg(result, Status.SUCCESS, projectCode);
-        WorkflowInstance workflowInstance = getProcessInstance();
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        projectAuthFailRes = workflowInstanceService
-                .queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, -1, startTime, endTime);
-        Assertions.assertEquals(Status.NEGTIVE_SIZE_NUMBER_ERROR, projectAuthFailRes.get(Constants.STATUS));
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
+                WORKFLOW_INSTANCE);
+        assertThrowsServiceException(Status.NEGTIVE_SIZE_NUMBER_ERROR, () -> workflowInstanceService
+                .queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, -1, startTime, endTime));
 
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
-        when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
-        when(usersService.queryUser(workflowInstance.getExecutorId())).thenReturn(loginUser);
-        Map<String, Object> successRes = workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser,
+        when(workflowInstanceMapper.queryTopNWorkflowInstance(Mockito.eq(size), Mockito.any(), Mockito.any(),
+                Mockito.eq(WorkflowExecutionStatus.SUCCESS), Mockito.eq(projectCode)))
+                        .thenReturn(new ArrayList<>());
+        List<WorkflowInstance> successRes = workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser,
                 projectCode, size, startTime, endTime);
 
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Assertions.assertNotNull(successRes);
     }
 
     @Test
@@ -357,33 +363,25 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>(5);
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
         int size = 10;
         String startTime = "2020-01-01 00:00:00";
         String endTime = "2020-08-02 00:00:00";
 
-        putMsg(result, Status.SUCCESS, projectCode);
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object> startTimeBiggerFailRes = workflowInstanceService
-                .queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, size, endTime, startTime);
-        Assertions.assertEquals(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR,
-                startTimeBiggerFailRes.get(Constants.STATUS));
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
+                WORKFLOW_INSTANCE);
 
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object> dataNullFailRes = workflowInstanceService
-                .queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, size, null, endTime);
-        Assertions.assertEquals(Status.DATA_IS_NULL, dataNullFailRes.get(Constants.STATUS));
+        assertThrowsServiceException(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR,
+                () -> workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, size,
+                        endTime, startTime));
 
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        dataNullFailRes = workflowInstanceService
-                .queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, size, startTime, null);
-        Assertions.assertEquals(Status.DATA_IS_NULL, dataNullFailRes.get(Constants.STATUS));
+        assertThrowsServiceException(Status.DATA_IS_NULL,
+                () -> workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, size,
+                        null, endTime));
+
+        assertThrowsServiceException(Status.DATA_IS_NULL,
+                () -> workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, size,
+                        startTime, null));
     }
 
     @Test
@@ -391,64 +389,58 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object> projectAuthFailRes =
-                workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, projectAuthFailRes.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
+                () -> workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1));
 
         // project auth success
         WorkflowInstance workflowInstance = getProcessInstance();
-        putMsg(result, Status.SUCCESS, projectCode);
         WorkflowDefinition workflowDefinition = getProcessDefinition();
         workflowDefinition.setProjectCode(projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
+                WORKFLOW_INSTANCE);
         when(processService.findWorkflowInstanceDetailById(workflowInstance.getId()))
                 .thenReturn(Optional.of(workflowInstance));
         when(processService.findWorkflowDefinition(workflowInstance.getWorkflowDefinitionCode(),
                 workflowInstance.getWorkflowDefinitionVersion())).thenReturn(workflowDefinition);
-        Map<String, Object> successRes = workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        WorkflowInstance successRes = workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
+        Assertions.assertNotNull(successRes);
 
         // worker group null
-        Map<String, Object> workerNullRes =
-                workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.SUCCESS, workerNullRes.get(Constants.STATUS));
+        WorkflowInstance workerNullRes = workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
+        Assertions.assertNotNull(workerNullRes);
 
         // worker group exist
         WorkerGroup workerGroup = getWorkGroup();
-        Map<String, Object> workerExistRes =
-                workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.SUCCESS, workerExistRes.get(Constants.STATUS));
+        WorkflowInstance workerExistRes = workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
+        Assertions.assertNotNull(workerExistRes);
 
         when(processService.findWorkflowDefinition(workflowInstance.getWorkflowDefinitionCode(),
-                workflowInstance.getWorkflowDefinitionVersion())).thenReturn(null);;
-        workerExistRes = workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST, workerExistRes.get(Constants.STATUS));
+                workflowInstance.getWorkflowDefinitionVersion())).thenReturn(null);
+        assertThrowsServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                () -> workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1));
     }
 
     @Test
-    public void testQueryTaskListByWorkflowInstanceId() throws IOException {
+    public void testQueryTaskListByWorkflowInstanceId() {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object> projectAuthFailRes =
-                workflowInstanceService.queryTaskListByWorkflowInstanceId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, projectAuthFailRes.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
+                () -> workflowInstanceService.queryTaskListByWorkflowInstanceId(loginUser, projectCode, 1));
 
         // project auth success
-        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
+                WORKFLOW_INSTANCE);
         WorkflowInstance workflowInstance = getProcessInstance();
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
         TaskInstance taskInstance = new TaskInstance();
@@ -456,7 +448,6 @@ public class WorkflowInstanceServiceTest {
         taskInstance.setTaskType("SHELL");
         List<TaskInstance> taskInstanceList = new ArrayList<>();
         taskInstanceList.add(taskInstance);
-        List<DependentResultTaskInstanceContext> dependentResultTaskInstanceContextList = new ArrayList<>();
         TaskInstanceContext taskInstanceContext = new TaskInstanceContext();
         taskInstanceContext.setTaskInstanceId(0);
         taskInstanceContext.setContextType(ContextType.DEPENDENT_RESULT_CONTEXT);
@@ -472,8 +463,6 @@ public class WorkflowInstanceServiceTest {
         Result res = new Result();
         res.setCode(Status.SUCCESS.ordinal());
         res.setData("xxx");
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
         when(processService.findWorkflowInstanceDetailById(workflowInstance.getId()))
                 .thenReturn(Optional.of(workflowInstance));
         when(taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId()))
@@ -482,9 +471,10 @@ public class WorkflowInstanceServiceTest {
         when(taskInstanceContextDao.batchQueryByTaskInstanceIdsAndContextType(taskInstanceIdList,
                 ContextType.DEPENDENT_RESULT_CONTEXT))
                         .thenReturn(Lists.asList(taskInstanceContext, new TaskInstanceContext[0]));
-        Map<String, Object> successRes =
+        WorkflowInstanceTaskListDTO successRes =
                 workflowInstanceService.queryTaskListByWorkflowInstanceId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Assertions.assertEquals(WorkflowExecutionStatus.SUCCESS.toString(), successRes.getWorkflowInstanceState());
+        Assertions.assertEquals(1, successRes.getTaskList().size());
     }
 
     @Test
@@ -492,42 +482,35 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object> projectAuthFailRes =
-                workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, projectAuthFailRes.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
+                () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
 
         // task null
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
+                WORKFLOW_INSTANCE);
         when(taskInstanceDao.queryById(1)).thenReturn(null);
-        Map<String, Object> taskNullRes =
-                workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS, taskNullRes.get(Constants.STATUS));
+        assertThrowsServiceException(Status.TASK_INSTANCE_NOT_EXISTS,
+                () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
 
         // task not sub process
         TaskInstance taskInstance = getTaskInstance();
         taskInstance.setTaskType("HTTP");
         taskInstance.setWorkflowInstanceId(1);
-        putMsg(result, Status.SUCCESS, projectCode);
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
         when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
-        Map<String, Object> notSubprocessRes =
-                workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE, notSubprocessRes.get(Constants.STATUS));
+        assertThrowsServiceException(Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE,
+                () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
 
-        putMsg(result, Status.SUCCESS, projectCode);
         taskDefinition.setProjectCode(0L);
-        notSubprocessRes = workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.TASK_INSTANCE_NOT_EXISTS, notSubprocessRes.get(Constants.STATUS));
+        assertThrowsServiceException(Status.TASK_INSTANCE_NOT_EXISTS,
+                () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
 
         taskDefinition.setProjectCode(projectCode);
         when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
@@ -535,21 +518,19 @@ public class WorkflowInstanceServiceTest {
         TaskInstance subTask = getTaskInstance();
         subTask.setTaskType("SUB_WORKFLOW");
         subTask.setWorkflowInstanceId(1);
-        putMsg(result, Status.SUCCESS, projectCode);
         when(taskInstanceDao.queryById(subTask.getId())).thenReturn(subTask);
         when(processService.findSubWorkflowInstance(subTask.getWorkflowInstanceId(), subTask.getId())).thenReturn(null);
-        Map<String, Object> subprocessNotExistRes =
-                workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, subprocessNotExistRes.get(Constants.STATUS));
+        assertThrowsServiceException(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST,
+                () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
 
         // sub process exist
         WorkflowInstance workflowInstance = getProcessInstance();
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findSubWorkflowInstance(taskInstance.getWorkflowInstanceId(), taskInstance.getId()))
                 .thenReturn(workflowInstance);
-        Map<String, Object> subprocessExistRes =
+        Map<String, Integer> subprocessExistRes =
                 workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.SUCCESS, subprocessExistRes.get(Constants.STATUS));
+        Assertions.assertEquals(workflowInstance.getId(),
+                subprocessExistRes.get(Constants.SUBWORKFLOW_INSTANCE_ID));
     }
 
     @Test
@@ -557,39 +538,33 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, projectCode))
                 .when(projectService)
                 .checkProjectAndAuthThrowException(loginUser, projectCode, INSTANCE_UPDATE);
-        Assertions.assertThrows(ServiceException.class,
+        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
                 () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
                         shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0));
 
         // process instance null
-        putMsg(result, Status.SUCCESS, projectCode);
         WorkflowInstance workflowInstance = getProcessInstance();
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
         doNothing()
                 .when(projectService)
                 .checkProjectAndAuthThrowException(loginUser, projectCode, INSTANCE_UPDATE);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.empty());
-        assertThrows(ServiceException.class, () -> {
-            workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
-                    shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0);
-        });
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
+                () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                        shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0));
+
         // process instance not finish
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.ofNullable(workflowInstance));
         workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        putMsg(result, Status.SUCCESS, projectCode);
-        Map<String, Object> processInstanceNotFinishRes =
-                workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
-                        shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0);
-        Assertions.assertEquals(Status.WORKFLOW_INSTANCE_STATE_OPERATION_ERROR,
-                processInstanceNotFinishRes.get(Constants.STATUS));
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_STATE_OPERATION_ERROR,
+                () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                        shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0));
 
         // process instance finish
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
@@ -611,8 +586,7 @@ public class WorkflowInstanceServiceTest {
                 .thenReturn(1);
 
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
-        when(workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs)).thenReturn(result);
-        putMsg(result, Status.SUCCESS, projectCode);
+        Mockito.doNothing().when(workflowDefinitionService).checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs);
 
         try (
                 MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
@@ -620,10 +594,10 @@ public class WorkflowInstanceServiceTest {
             taskPluginManagerMockedStatic
                     .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
                     .thenReturn(true);
-            Map<String, Object> processInstanceFinishRes =
+            WorkflowDefinition processInstanceFinishRes =
                     workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
                             taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0);
-            Assertions.assertEquals(Status.SUCCESS, processInstanceFinishRes.get(Constants.STATUS));
+            Assertions.assertNotNull(processInstanceFinishRes);
 
             final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                     .commandParams(Lists.newArrayList(Property.builder()
@@ -635,20 +609,19 @@ public class WorkflowInstanceServiceTest {
                     .timeZone("Asia/Shanghai")
                     .build();
             workflowInstance.setCommandParam(JSONUtils.toJsonString(runWorkflowCommandParam));
-            Map<String, Object> processInstanceFinishRes2 =
+            WorkflowDefinition processInstanceFinishRes2 =
                     workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
                             taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0);
-            Assertions.assertEquals(Status.SUCCESS, processInstanceFinishRes2.get(Constants.STATUS));
+            Assertions.assertNotNull(processInstanceFinishRes2);
 
             // success
             when(workflowDefinitionMapper.queryByCode(46L)).thenReturn(workflowDefinition);
-            putMsg(result, Status.SUCCESS, projectCode);
 
             when(processService.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.FALSE, Boolean.FALSE))
                     .thenReturn(1);
-            Map<String, Object> successRes = workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+            WorkflowDefinition successRes = workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
                     taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", Boolean.FALSE, "", "", 0);
-            Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+            Assertions.assertNotNull(successRes);
         }
     }
 
@@ -657,48 +630,38 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
-        Map<String, Object> projectAuthFailRes =
-                workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND, projectAuthFailRes.get(Constants.STATUS));
+        Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
+                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
+                () -> workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1));
 
         // process instance null
-        putMsg(result, Status.SUCCESS, projectCode);
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_INSTANCE)).thenReturn(result);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
+                WORKFLOW_INSTANCE);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.empty());
-        assertThrows(ServiceException.class, () -> {
-            workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
-        });
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
+                () -> workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1));
 
         // not sub process
         WorkflowInstance workflowInstance = getProcessInstance();
         workflowInstance.setIsSubWorkflow(Flag.NO);
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.ofNullable(workflowInstance));
-        Map<String, Object> notSubProcessRes =
-                workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.WORKFLOW_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE,
-                notSubProcessRes.get(Constants.STATUS));
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE,
+                () -> workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1));
 
         // sub process
         workflowInstance.setIsSubWorkflow(Flag.YES);
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findParentWorkflowInstance(1)).thenReturn(null);
-        Map<String, Object> subProcessNullRes =
-                workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, subProcessNullRes.get(Constants.STATUS));
+        assertThrowsServiceException(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST,
+                () -> workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1));
 
         // success
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findParentWorkflowInstance(1)).thenReturn(workflowInstance);
-        Map<String, Object> successRes = workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Map<String, Integer> successRes = workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1);
+        Assertions.assertEquals(workflowInstance.getId(), successRes.get(Constants.PARENT_WORKFLOW_INSTANCE));
     }
 
     @Test
@@ -706,13 +669,9 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
-        Map<String, Object> result = new HashMap<>();
-        putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
-        // project auth fail
+        // workflow instance not exist
         when(projectMapper.queryByCode(projectCode)).thenReturn(project);
-        when(projectService.checkProjectAndAuth(loginUser, project, projectCode, INSTANCE_DELETE)).thenReturn(result);
-
         assertThrows(ServiceException.class,
                 () -> workflowInstanceService.deleteWorkflowInstanceById(loginUser, 1));
 
@@ -720,7 +679,6 @@ public class WorkflowInstanceServiceTest {
         WorkflowInstance workflowInstance = getProcessInstance();
         workflowInstance.setIsSubWorkflow(Flag.NO);
         workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        putMsg(result, Status.SUCCESS, projectCode);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.ofNullable(workflowInstance));
         when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(Mockito.anyLong(), Mockito.anyInt()))
                 .thenReturn(new WorkflowDefinitionLog());
@@ -753,23 +711,128 @@ public class WorkflowInstanceServiceTest {
 
     @Test
     public void testViewVariables() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
         // process instance not null
         WorkflowInstance workflowInstance = getProcessInstance();
         workflowInstance.setCommandType(CommandType.SCHEDULER);
         workflowInstance.setScheduleTime(new Date());
         workflowInstance.setGlobalParams("");
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
-        Map<String, Object> successRes = workflowInstanceService.viewVariables(1L, 1);
-
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        WorkflowInstanceVariablesDTO successRes = workflowInstanceService.viewVariables(loginUser, projectCode, 1);
+        Assertions.assertNotNull(successRes);
 
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(null);
-        Map<String, Object> processNotExist = workflowInstanceService.viewVariables(1L, 1);
-        Assertions.assertEquals(Status.WORKFLOW_INSTANCE_NOT_EXIST, processNotExist.get(Constants.STATUS));
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
+                () -> workflowInstanceService.viewVariables(loginUser, projectCode, 1));
+
+        // project auth fail
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                loginUser.getUserName(), projectCode))
+                        .when(projectService)
+                        .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                () -> workflowInstanceService.viewVariables(loginUser, projectCode, 1));
+    }
+
+    @Test
+    public void testViewVariables_WithTimePlaceholders() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
+        String globalParamsJson = "[{\"prop\":\"biz_date\",\"value\":\"$[yyyyMMdd]\",\"type\":\"VARCHAR\"}," +
+                "{\"prop\":\"env\",\"value\":\"${ENV_TYPE}\",\"type\":\"VARCHAR\"}]";
+
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setId(1);
+        workflowInstance.setCommandType(CommandType.SCHEDULER);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2026, Calendar.MARCH, 13, 10, 0, 0);
+        workflowInstance.setScheduleTime(calendar.getTime());
+        workflowInstance.setGlobalParams(globalParamsJson);
+        workflowInstance.setWorkflowDefinitionCode(100L);
+
+        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
+
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(100L);
+        workflowDefinition.setProjectCode(1L);
+        when(workflowDefinitionMapper.queryByCode(100L)).thenReturn(workflowDefinition);
+
+        WorkflowInstanceVariablesDTO result = workflowInstanceService.viewVariables(loginUser, projectCode, 1);
+
+        List<Property> globalParams = result.getGlobalParams();
+        Assertions.assertNotNull(globalParams);
+        Assertions.assertEquals(2, globalParams.size());
+
+        Property dateParam = globalParams.stream()
+                .filter(p -> "biz_date".equals(p.getProp()))
+                .findFirst()
+                .orElse(null);
+        Assertions.assertNotNull(dateParam);
+        Assertions.assertEquals("20260313", dateParam.getValue(),
+                "Time placeholder $[yyyyMMdd] should be replaced with schedule time");
+
+        Property envParam = globalParams.stream()
+                .filter(p -> "env".equals(p.getProp()))
+                .findFirst()
+                .orElse(null);
+        Assertions.assertNotNull(envParam);
+    }
+
+    @Test
+    public void testViewVariables_InstanceNotFound() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
+        when(workflowInstanceMapper.queryDetailById(999)).thenReturn(null);
+
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
+                () -> workflowInstanceService.viewVariables(loginUser, projectCode, 999));
+    }
+
+    @Test
+    public void testViewVariables_EmptyGlobalParams() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setId(2);
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
+        workflowInstance.setScheduleTime(new Date());
+        workflowInstance.setGlobalParams("");
+        workflowInstance.setWorkflowDefinitionCode(101L);
+
+        when(workflowInstanceMapper.queryDetailById(2)).thenReturn(workflowInstance);
+
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(101L);
+        workflowDefinition.setProjectCode(1L);
+        when(workflowDefinitionMapper.queryByCode(101L)).thenReturn(workflowDefinition);
+
+        WorkflowInstanceVariablesDTO result = workflowInstanceService.viewVariables(loginUser, projectCode, 2);
+
+        List<Property> globalParams = result.getGlobalParams();
+        Assertions.assertTrue(globalParams.isEmpty(), "Global params list should be empty when input is empty string");
     }
 
     @Test
     public void testViewGantt() throws Exception {
+        long projectCode = 0L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
         WorkflowInstance workflowInstance = getProcessInstance();
         TaskInstance taskInstance = getTaskInstance();
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
@@ -787,16 +850,28 @@ public class WorkflowInstanceServiceTest {
         when(processService.genDagGraph(Mockito.any(WorkflowDefinition.class)))
                 .thenReturn(graph);
 
-        Map<String, Object> successRes = workflowInstanceService.viewGantt(0L, 1);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Assertions.assertNotNull(workflowInstanceService.viewGantt(loginUser, projectCode, 1));
 
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(null);
-        Map<String, Object> processNotExist = workflowInstanceService.viewVariables(1L, 1);
-        Assertions.assertEquals(Status.WORKFLOW_INSTANCE_NOT_EXIST, processNotExist.get(Constants.STATUS));
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
+                () -> workflowInstanceService.viewGantt(loginUser, projectCode, 1));
+
+        // project auth fail
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                loginUser.getUserName(), projectCode))
+                        .when(projectService)
+                        .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                () -> workflowInstanceService.viewGantt(loginUser, projectCode, 1));
     }
 
     @Test
     public void testViewVariablesWithStartingParam() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .commandParams(Lists.newArrayList(Property.builder()
                         .prop("name")
@@ -812,8 +887,7 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setCommandParam(JSONUtils.toJsonString(runWorkflowCommandParam));
 
         when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
-        Map<String, Object> successRes = workflowInstanceService.viewVariables(1L, 1);
-        Assertions.assertEquals(Status.SUCCESS, successRes.get(Constants.STATUS));
+        Assertions.assertNotNull(workflowInstanceService.viewVariables(loginUser, projectCode, 1));
 
         final RunWorkflowCommandParam commandParamWithEmptyTimeZone = RunWorkflowCommandParam.builder()
                 .commandParams(Lists.newArrayList(Property.builder()
@@ -826,9 +900,7 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setCommandType(CommandType.SCHEDULER);
         workflowInstance.setScheduleTime(new Date());
         workflowInstance.setCommandParam(JSONUtils.toJsonString(commandParamWithEmptyTimeZone));
-        Map<String, Object> successRes2 = workflowInstanceService.viewVariables(1L, 1);
-        Assertions.assertEquals(Status.SUCCESS, successRes2.get(Constants.STATUS));
-
+        Assertions.assertNotNull(workflowInstanceService.viewVariables(loginUser, projectCode, 1));
     }
 
     /**
@@ -922,14 +994,5 @@ public class WorkflowInstanceServiceTest {
         taskInstance.setEndTime(new Date());
         taskInstance.setExecutorId(-1);
         return taskInstance;
-    }
-
-    private void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
-        result.put(Constants.STATUS, status);
-        if (statusParams != null && statusParams.length > 0) {
-            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
-        } else {
-            result.put(Constants.MSG, status.getMsg());
-        }
     }
 }

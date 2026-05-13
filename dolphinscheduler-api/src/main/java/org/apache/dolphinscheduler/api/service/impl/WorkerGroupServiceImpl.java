@@ -58,7 +58,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -114,7 +113,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                                        String name,
                                        String addrList,
                                        String description) {
-        Map<String, Object> result = new HashMap<>();
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_CREATE)) {
             // todo: add permission exception
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
@@ -140,10 +138,6 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 if (workerGroup == null) {
                     throw new ServiceException(Status.WORKER_GROUP_NOT_EXIST, id);
                 }
-                // todo: Can we update the worker name?
-                if (!workerGroup.getName().equals(name)) {
-                    checkWorkerGroupDependencies(workerGroup, result);
-                }
                 workerGroup.setName(name);
                 workerGroup.setAddrList(addrList);
                 workerGroup.setUpdateTime(now);
@@ -159,23 +153,19 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     }
 
     /**
-     * check if the worker group has any dependent tasks,schedulers or environments.
-     *
-     * @param workerGroup worker group
-     * @return boolean
+     * check if the worker group has any dependent tasks, schedulers or environments;
+     * throws ServiceException with the matching status if any dependency is found.
      */
-    private boolean checkWorkerGroupDependencies(WorkerGroup workerGroup, Map<String, Object> result) {
+    private void checkWorkerGroupDependencies(WorkerGroup workerGroup) {
         // check if the worker group has any dependent tasks
         List<TaskDefinition> taskDefinitions = taskDefinitionMapper.selectList(
                 new QueryWrapper<TaskDefinition>().lambda().eq(TaskDefinition::getWorkerGroup, workerGroup.getName()));
 
         if (CollectionUtils.isNotEmpty(taskDefinitions)) {
-            List<String> taskNames = taskDefinitions.stream().limit(3).map(taskDefinition -> taskDefinition.getName())
+            List<String> taskNames = taskDefinitions.stream().limit(3).map(TaskDefinition::getName)
                     .collect(Collectors.toList());
-
-            putMsg(result, Status.WORKER_GROUP_DEPENDENT_TASK_EXISTS, taskDefinitions.size(),
+            throw new ServiceException(Status.WORKER_GROUP_DEPENDENT_TASK_EXISTS, taskDefinitions.size(),
                     JSONUtils.toJsonString(taskNames));
-            return true;
         }
 
         // check if the worker group has any dependent schedulers
@@ -187,10 +177,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                     .map(schedule -> workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode())
                             .getName())
                     .collect(Collectors.toList());
-
-            putMsg(result, Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS, schedules.size(),
+            throw new ServiceException(Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS, schedules.size(),
                     JSONUtils.toJsonString(workflowDefinitionNames));
-            return true;
         }
 
         // check if the worker group has any dependent environments
@@ -199,11 +187,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                         .lambda().eq(EnvironmentWorkerGroupRelation::getWorkerGroup, workerGroup.getName()));
 
         if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelations)) {
-            putMsg(result, Status.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS, environmentWorkerGroupRelations.size());
-            return true;
+            throw new ServiceException(Status.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS,
+                    environmentWorkerGroupRelations.size());
         }
-
-        return false;
     }
 
     private void checkWorkerGroupAddrList(String workerGroupAddress) {
@@ -282,12 +268,11 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     /**
      * query all worker group
      *
-     * @param loginUser
-     * @return all worker group list
+     * @param loginUser login user
+     * @return distinct worker group names available to the user
      */
     @Override
-    public Map<String, Object> queryAllGroup(User loginUser) {
-        Map<String, Object> result = new HashMap<>();
+    public List<String> queryAllGroup(User loginUser) {
         List<WorkerGroupPageDetail> workerGroups;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             workerGroups = getUiWorkerGroupPageDetails(null);
@@ -303,9 +288,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 .map(WorkerGroup::getName)
                 .collect(Collectors.toList());
         availableWorkerGroupList.addAll(configWorkerGroupNames);
-        result.put(Constants.DATA_LIST, availableWorkerGroupList.stream().distinct().collect(Collectors.toList()));
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return availableWorkerGroupList.stream().distinct().collect(Collectors.toList());
     }
 
     private List<WorkerGroupPageDetail> getUiWorkerGroupPageDetails(List<Integer> ids) {
@@ -328,21 +311,17 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * delete worker group by id
      *
      * @param id worker group id
-     * @return delete result code
      */
     @Override
     @Transactional
-    public Map<String, Object> deleteWorkerGroupById(User loginUser, Integer id) {
-        Map<String, Object> result = new HashMap<>();
+    public void deleteWorkerGroupById(User loginUser, Integer id) {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.WORKER_GROUP, WORKER_GROUP_DELETE)) {
-            putMsg(result, Status.USER_NO_OPERATION_PERM);
-            return result;
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         WorkerGroup workerGroup = workerGroupDao.queryById(id);
         if (workerGroup == null) {
             log.error("Worker group does not exist, workerGroupId:{}.", id);
-            putMsg(result, Status.DELETE_WORKER_GROUP_NOT_EXIST);
-            return result;
+            throw new ServiceException(Status.DELETE_WORKER_GROUP_NOT_EXIST);
         }
         List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryByWorkerGroupNameAndStatus(
                 workerGroup.getName(),
@@ -353,34 +332,25 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             log.warn(
                     "Delete worker group failed because there are {} workflowInstances are using it, workflowInstanceIds:{}.",
                     workflowInstances.size(), workflowInstanceIds);
-            putMsg(result, Status.DELETE_WORKER_GROUP_BY_ID_FAIL, workflowInstances.size());
-            return result;
+            throw new ServiceException(Status.DELETE_WORKER_GROUP_BY_ID_FAIL, workflowInstances.size());
         }
 
-        if (checkWorkerGroupDependencies(workerGroup, result)) {
-            return result;
-        }
+        checkWorkerGroupDependencies(workerGroup);
 
         workerGroupDao.deleteById(id);
         boardCastToMasterThatWorkerGroupChanged();
 
         log.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());
-        putMsg(result, Status.SUCCESS);
-        return result;
     }
 
     /**
      * query all worker address list
      *
-     * @return all worker address list
+     * @return all worker address set
      */
     @Override
-    public Map<String, Object> getWorkerAddressList() {
-        Map<String, Object> result = new HashMap<>();
-        Set<String> serverNodeList = registryClient.getServerNodeSet(RegistryNodeType.WORKER);
-        result.put(Constants.DATA_LIST, serverNodeList);
-        putMsg(result, Status.SUCCESS);
-        return result;
+    public Set<String> getWorkerAddressList() {
+        return registryClient.getServerNodeSet(RegistryNodeType.WORKER);
     }
 
     @Override

@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -39,10 +38,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -193,31 +190,22 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
     }
 
     @Override
-    public Map<String, Object> queryAssignedWorkerGroupsByProject(User loginUser, Long projectCode) {
-        Map<String, Object> result = new HashMap<>();
-
+    public List<ProjectWorkerGroup> queryAssignedWorkerGroupsByProject(User loginUser, Long projectCode) {
         Project project = projectMapper.queryByCode(projectCode);
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
         Set<String> assignedWorkerGroups = getAllUsedWorkerGroups(project);
 
         projectWorkerGroupDao.queryByProjectCode(projectCode)
                 .forEach(projectWorkerGroup -> assignedWorkerGroups.add(projectWorkerGroup.getWorkerGroup()));
 
-        List<ProjectWorkerGroup> projectWorkerGroups = assignedWorkerGroups.stream().map(workerGroup -> {
+        return assignedWorkerGroups.stream().map(workerGroup -> {
             ProjectWorkerGroup projectWorkerGroup = new ProjectWorkerGroup();
             projectWorkerGroup.setProjectCode(projectCode);
             projectWorkerGroup.setWorkerGroup(workerGroup);
             return projectWorkerGroup;
         }).distinct().collect(Collectors.toList());
-
-        result.put(Constants.DATA_LIST, projectWorkerGroups);
-        putMsg(result, Status.SUCCESS);
-        return result;
     }
 
     private Set<String> getAllUsedWorkerGroups(Project project) {

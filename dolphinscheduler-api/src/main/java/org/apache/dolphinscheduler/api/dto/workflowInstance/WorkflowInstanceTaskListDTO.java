@@ -15,15 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.exception;
+package org.apache.dolphinscheduler.api.dto.workflowInstance;
 
-public class WorkflowCreateException extends MasterException {
+import org.apache.dolphinscheduler.dao.entity.AbstractTaskInstanceContext;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentDetails;
 
-    public WorkflowCreateException(String message) {
-        super(message);
-    }
+import java.util.List;
 
-    public WorkflowCreateException(String message, Throwable throwable) {
-        super(message, throwable);
-    }
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkflowInstanceTaskListDTO {
+
+    private String workflowInstanceState;
+
+    private List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskList;
 }

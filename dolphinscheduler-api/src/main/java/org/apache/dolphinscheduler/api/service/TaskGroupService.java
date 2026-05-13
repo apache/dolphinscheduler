@@ -17,117 +17,63 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
-
-import java.util.Map;
 
 public interface TaskGroupService {
 
     /**
      * create a Task group
-     *
-     * @param loginUser   login user
-     * @param name        task group name
-     * @param description task group description
-     * @param groupSize   task group total size
-     * @return the result code and msg
      */
-    Map<String, Object> createTaskGroup(User loginUser, Long projectCode, String name,
-                                        String description, int groupSize);
+    TaskGroup createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize);
 
     /**
      * update the task group
-     *
-     * @param loginUser   login user
-     * @param name        task group name
-     * @param description task group description
-     * @param groupSize   task group total size
-     * @return the result code and msg
      */
-    Map<String, Object> updateTaskGroup(User loginUser, int id, String name,
-                                        String description, int groupSize);
+    TaskGroup updateTaskGroup(User loginUser, int id, String name, String description, int groupSize);
 
     /**
      * query all task group by user id
-     *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
-     * @return the result code and msg
      */
-    Map<String, Object> queryAllTaskGroup(User loginUser, String name, Integer status, int pageNo, int pageSize);
+    PageInfo<TaskGroup> queryAllTaskGroup(User loginUser, String name, Integer status, int pageNo, int pageSize);
 
     /**
      * query all task group by status
-     *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
-     * @param status    status
-     * @return the result code and msg
      */
-    Map<String, Object> queryTaskGroupByStatus(User loginUser, int pageNo, int pageSize, int status);
+    PageInfo<TaskGroup> queryTaskGroupByStatus(User loginUser, int pageNo, int pageSize, int status);
 
     /**
-     * query all task group by name
-     *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
-     * @param projectCode  project code
-     * @return the result code and msg
+     * query all task group by project code
      */
-    Map<String, Object> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode);
+    PageInfo<TaskGroup> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode);
 
     /**
-     * query all task group by id
-     *
-     * @param loginUser login user
-     * @param id        id
-     * @return the result code and msg
+     * query task group by id (returns null if not found)
      */
-    Map<String, Object> queryTaskGroupById(User loginUser, int id);
+    TaskGroup queryTaskGroupById(User loginUser, int id);
 
     /**
-     * query
-     *
-     * @param loginUser login user
-     * @param pageNo    page no
-     * @param pageSize  page size
-     * @param userId    user id
-     * @param name      name
-     * @param status    status
-     * @return the result code and msg
+     * paginated query of task groups
      */
-    Map<String, Object> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name, Integer status);
+    PageInfo<TaskGroup> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name, Integer status);
 
     /**
      * close a task group
-     *
-     * @param loginUser login user
-     * @param id        task group id
-     * @return the result code and msg
      */
-    Map<String, Object> closeTaskGroup(User loginUser, int id);
+    void closeTaskGroup(User loginUser, int id);
 
     /**
      * start a task group
-     *
-     * @param loginUser login user
-     * @param id        task group id
-     * @return the result code and msg
      */
-    Map<String, Object> startTaskGroup(User loginUser, int id);
+    void startTaskGroup(User loginUser, int id);
 
     /**
      * wake a task manually
-     *
-     * @param taskId task id
-     * @return result
      */
-    Map<String, Object> forceStartTask(User loginUser, int taskId);
+    void forceStartTask(User loginUser, int taskId);
 
-    Map<String, Object> modifyPriority(User loginUser, Integer queueId, Integer priority);
+    void modifyPriority(User loginUser, Integer queueId, Integer priority);
 
     void deleteTaskGroupByProjectCode(long projectCode);
 }

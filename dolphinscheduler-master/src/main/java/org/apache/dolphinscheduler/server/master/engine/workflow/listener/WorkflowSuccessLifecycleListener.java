@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerRequest;
@@ -47,9 +46,6 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
 
     @Autowired
     private WorkflowBackfillTrigger workflowBackfillTrigger;
-
-    @Autowired
-    private CommandDao commandDao;
 
     @Override
     public void notifyWorkflowLifecycleEvent(final IWorkflowExecution workflowExecution,

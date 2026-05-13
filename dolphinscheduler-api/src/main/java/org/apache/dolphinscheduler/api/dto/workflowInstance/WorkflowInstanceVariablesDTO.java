@@ -15,18 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.exceptions;
+package org.apache.dolphinscheduler.api.dto.workflowInstance;
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
-public class WorkflowExecutionGraphInitializeFailureException extends RuntimeException {
+import java.util.List;
+import java.util.Map;
 
-    public WorkflowExecutionGraphInitializeFailureException(String message) {
-        super(message);
-    }
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    public static WorkflowExecutionGraphInitializeFailureException bootstrapTaskStateNotValid(TaskInstance taskInstance) {
-        return new WorkflowExecutionGraphInitializeFailureException(
-                "The task: " + taskInstance.getName() + " state: " + taskInstance.getState() + " is not valid");
-    }
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class WorkflowInstanceVariablesDTO {
+
+    private List<Property> globalParams;
+
+    private Map<String, Map<String, Object>> localParams;
 }

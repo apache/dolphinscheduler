@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.method.HandlerMethod;
 
 public class ApiExceptionHandlerTest {
@@ -38,8 +39,8 @@ public class ApiExceptionHandlerTest {
         Method method =
                 controller.getClass().getMethod("createToken", User.class, int.class, String.class, String.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
-        Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assertions.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(), result.getCode().intValue());
+        ResponseEntity<Result<Object>> response = handler.exceptionHandler(new RuntimeException("test exception"), hm);
+        Assertions.assertEquals(Status.CREATE_ACCESS_TOKEN_ERROR.getCode(), response.getBody().getCode().intValue());
     }
 
     @Test
@@ -49,7 +50,8 @@ public class ApiExceptionHandlerTest {
         Method method =
                 controller.getClass().getMethod("queryAllWorkflowDefinitionByProjectCode", User.class, long.class);
         HandlerMethod hm = new HandlerMethod(controller, method);
-        Result result = handler.exceptionHandler(new RuntimeException("test exception"), hm);
-        Assertions.assertEquals(Status.QUERY_WORKFLOW_DEFINITION_LIST.getCode(), result.getCode().intValue());
+        ResponseEntity<Result<Object>> response = handler.exceptionHandler(new RuntimeException("test exception"), hm);
+        Assertions.assertEquals(Status.QUERY_WORKFLOW_DEFINITION_LIST.getCode(),
+                response.getBody().getCode().intValue());
     }
 }

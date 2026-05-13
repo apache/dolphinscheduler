@@ -41,6 +41,8 @@ public class WorkflowBackFillRequest {
 
     private User loginUser;
 
+    private long projectCode;
+
     private long workflowDefinitionCode;
 
     private String startNodes;
