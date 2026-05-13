@@ -39,9 +39,9 @@ import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
@@ -355,10 +355,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class TenantResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final TenantMapper tenantMapper;
+        private final TenantDao tenantDao;
 
-        public TenantResourcePermissionCheck(TenantMapper tenantMapper) {
-            this.tenantMapper = tenantMapper;
+        public TenantResourcePermissionCheck(TenantDao tenantDao) {
+            this.tenantDao = tenantDao;
         }
 
         @Override
@@ -373,7 +373,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            List<Tenant> tenantList = tenantMapper.queryAll();
+            List<Tenant> tenantList = tenantDao.queryAll();
             return tenantList.stream().map(Tenant::getId).collect(Collectors.toSet());
         }
     }

@@ -32,8 +32,8 @@ import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +63,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
     private UserMapper userMapper;
 
     @Autowired
-    private TenantMapper tenantMapper;
+    private TenantDao tenantDao;
 
     /**
      * Check the queue new object valid or not
@@ -226,7 +226,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             throw new ServiceException(Status.QUEUE_NOT_EXIST);
         }
 
-        List<Tenant> tenantList = tenantMapper.queryTenantListByQueueId(queue.getId());
+        List<Tenant> tenantList = tenantDao.queryTenantListByQueueId(queue.getId());
         if (CollectionUtils.isNotEmpty(tenantList)) {
             log.warn("Delete queue failed, because there are {} tenants using it.", tenantList.size());
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_TENANTS, tenantList.size());

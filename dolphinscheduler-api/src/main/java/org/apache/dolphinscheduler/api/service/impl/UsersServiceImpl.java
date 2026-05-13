@@ -44,9 +44,9 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -83,7 +83,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private UserMapper userMapper;
 
     @Autowired
-    private TenantMapper tenantMapper;
+    private TenantDao tenantDao;
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
@@ -764,7 +764,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
         }
 
-        Tenant tenant = tenantMapper.selectById(user.getTenantId());
+        Tenant tenant = tenantDao.queryById(user.getTenantId());
         if (tenant != null) {
             user.setTenantCode(tenant.getTenantCode());
         }
@@ -884,7 +884,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return true if tenant exists, otherwise return false
      */
     private boolean checkTenantExists(int tenantId) {
-        return tenantMapper.queryById(tenantId) != null;
+        return tenantDao.queryDetailById(tenantId) != null;
     }
 
     /**
@@ -1036,7 +1036,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                       int state) {
         User user = userMapper.queryByUserNameAccurately(userName);
         if (Objects.isNull(user)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            Tenant tenant = tenantDao.queryByCode(tenantCode).orElse(null);
             user = createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
             return user;
         }

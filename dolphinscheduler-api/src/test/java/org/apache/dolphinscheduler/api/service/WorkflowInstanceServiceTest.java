@@ -58,12 +58,12 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
@@ -140,7 +140,7 @@ public class WorkflowInstanceServiceTest {
     UsersService usersService;
 
     @Mock
-    TenantMapper tenantMapper;
+    TenantDao tenantDao;
 
     @Mock
     TaskDefinitionMapper taskDefinitionMapper;
@@ -574,7 +574,7 @@ public class WorkflowInstanceServiceTest {
         workflowDefinition.setProjectCode(projectCode);
         Tenant tenant = getTenant();
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
-        when(tenantMapper.queryByTenantCode("root")).thenReturn(tenant);
+        when(tenantDao.queryByCode("root")).thenReturn(Optional.of(tenant));
         when(processService.getTenantForWorkflow(Mockito.anyString(), Mockito.anyInt()))
                 .thenReturn(tenant.getTenantCode());
         when(workflowInstanceDao.updateById(workflowInstance)).thenReturn(true);

@@ -42,13 +42,14 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -80,7 +81,7 @@ public class UsersServiceTest {
     private AccessTokenMapper accessTokenMapper;
 
     @Mock
-    private TenantMapper tenantMapper;
+    private TenantDao tenantDao;
 
     @Mock
     private ProjectUserMapper projectUserMapper;
@@ -170,7 +171,7 @@ public class UsersServiceTest {
                         state));
 
         // success
-        Mockito.when(tenantMapper.queryById(1)).thenReturn(getTenant());
+        Mockito.when(tenantDao.queryDetailById(1)).thenReturn(getTenant());
         User created =
                 usersService.createUser(loginUser, userNameOk, passwordOk, emailOk, 1, phoneOk, queueName, state);
         Assertions.assertNotNull(created);
@@ -729,13 +730,13 @@ public class UsersServiceTest {
         when(userMapper.queryDetailsById(getUser().getId())).thenReturn(getUser());
         when(userMapper.queryByUserNameAccurately(userName)).thenReturn(getUser());
         when(userMapper.updateById(any())).thenReturn(1);
-        when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
+        when(tenantDao.queryByCode(tenantCode)).thenReturn(Optional.of(getTenant()));
         user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
         Assertions.assertEquals(getUser(), user);
 
         // User not exists
         Mockito.when(userMapper.existUser(userName)).thenReturn(false);
-        Mockito.when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
+        Mockito.when(tenantDao.queryByCode(tenantCode)).thenReturn(Optional.of(getTenant()));
         user = usersService.createUserIfNotExists(userName, userPassword, email, phone, tenantCode, queueName, stat);
         Assertions.assertNotNull(user);
     }
