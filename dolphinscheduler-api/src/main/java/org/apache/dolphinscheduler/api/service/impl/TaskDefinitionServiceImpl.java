@@ -51,10 +51,10 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -104,7 +104,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Autowired
-    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
+    private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Autowired
     private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;
@@ -270,7 +270,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 "Update task definition and definitionLog complete, projectCode:{}, taskDefinitionCode:{}, newTaskVersion:{}.",
                 projectCode, taskCode, taskDefinitionToUpdate.getVersion());
         // update workflow task relation
-        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationMapper
+        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationDao
                 .queryWorkflowTaskRelationByTaskCodeAndTaskVersion(taskDefinitionToUpdate.getCode(),
                         taskDefinition.getVersion());
         if (CollectionUtils.isNotEmpty(workflowTaskRelations)) {
@@ -290,9 +290,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                         workflowTaskRelation.setPostTaskVersion(version);
                     }
                     workflowTaskRelation.setWorkflowDefinitionVersion(workflowDefinitionVersion);
-                    int updateWorkflowDefinitionVersionCount =
-                            workflowTaskRelationMapper.updateWorkflowTaskRelationTaskVersion(workflowTaskRelation);
-                    if (updateWorkflowDefinitionVersionCount != 1) {
+                    if (!workflowTaskRelationDao.updateWorkflowTaskRelationTaskVersion(workflowTaskRelation)) {
                         log.error("batch update workflow task relation error, projectCode:{}, taskDefinitionCode:{}.",
                                 projectCode, taskCode);
                         throw new ServiceException(Status.WORKFLOW_TASK_RELATION_BATCH_UPDATE_ERROR);
@@ -344,7 +342,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         TaskDefinitionLog taskDefinitionToUpdate =
                 updateTask(loginUser, projectCode, taskCode, taskDefinitionJsonObj);
         List<WorkflowTaskRelation> upstreamTaskRelations =
-                workflowTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
+                workflowTaskRelationDao.queryUpstreamByCode(projectCode, taskCode);
         Set<Long> upstreamCodeSet =
                 upstreamTaskRelations.stream().map(WorkflowTaskRelation::getPreTaskCode).collect(Collectors.toSet());
         Set<Long> upstreamTaskCodes = Collections.emptySet();
@@ -374,7 +372,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (MapUtils.isNotEmpty(queryUpStreamTaskCodeMap)) {
             WorkflowTaskRelation taskRelation = upstreamTaskRelations.get(0);
             List<WorkflowTaskRelation> workflowTaskRelations =
-                    workflowTaskRelationMapper.queryByWorkflowDefinitionCode(taskRelation.getWorkflowDefinitionCode());
+                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(taskRelation.getWorkflowDefinitionCode());
 
             // set upstream code list
             updateUpstreamTask(new HashSet<>(queryUpStreamTaskCodeMap.keySet()),
@@ -413,7 +411,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private void updateUpstreamTask(Set<Long> allPreTaskCodeSet, long taskCode, long projectCode,
                                     long workflowDefinitionCode, User loginUser) {
         // query all workflow task relation
-        List<WorkflowTaskRelation> hadWorkflowTaskRelationList = workflowTaskRelationMapper
+        List<WorkflowTaskRelation> hadWorkflowTaskRelationList = workflowTaskRelationDao
                 .queryUpstreamByCode(projectCode, taskCode);
         // remove pre
         Set<Long> removePreTaskSet = new HashSet<>();
@@ -470,11 +468,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         int log = 0;
         // insert workflow task relation table data
         if (CollectionUtils.isNotEmpty(addPreTaskList)) {
-            insert = workflowTaskRelationMapper.batchInsert(addPreTaskList);
+            insert = workflowTaskRelationDao.batchInsert(addPreTaskList);
         }
         if (CollectionUtils.isNotEmpty(removePreTaskList)) {
             for (WorkflowTaskRelation workflowTaskRelation : removePreTaskList) {
-                remove += workflowTaskRelationMapper.updateById(workflowTaskRelation);
+                remove += workflowTaskRelationDao.updateById(workflowTaskRelation) ? 1 : 0;
             }
         }
         if (CollectionUtils.isNotEmpty(workflowTaskRelationLogList)) {
@@ -533,14 +531,14 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             throw new ServiceException(Status.SWITCH_TASK_DEFINITION_VERSION_ERROR);
         }
         List<WorkflowTaskRelation> taskRelationList =
-                workflowTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
+                workflowTaskRelationDao.queryUpstreamByCode(projectCode, taskCode);
         if (CollectionUtils.isNotEmpty(taskRelationList)) {
             log.info(
                     "Task definition has upstream tasks, start handle them after switch task, taskDefinitionCode:{}.",
                     taskCode);
             long workflowDefinitionCode = taskRelationList.get(0).getWorkflowDefinitionCode();
             List<WorkflowTaskRelation> workflowTaskRelations =
-                    workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
+                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
             updateDag(loginUser, workflowDefinitionCode, workflowTaskRelations,
                     Lists.newArrayList(taskDefinitionUpdate));
         } else {
@@ -613,7 +611,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             log.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
         }
-        List<WorkflowTaskRelation> taskRelationList = workflowTaskRelationMapper
+        List<WorkflowTaskRelation> taskRelationList = workflowTaskRelationDao
                 .queryByCode(projectCode, 0, 0, taskCode);
         if (CollectionUtils.isNotEmpty(taskRelationList)) {
             taskRelationList = taskRelationList.stream()

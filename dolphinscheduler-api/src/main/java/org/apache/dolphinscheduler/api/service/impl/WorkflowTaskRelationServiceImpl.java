@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.service.WorkflowTaskRelationService;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 
 import java.util.List;
 
@@ -33,18 +33,18 @@ import org.springframework.stereotype.Service;
 public class WorkflowTaskRelationServiceImpl extends BaseServiceImpl implements WorkflowTaskRelationService {
 
     @Autowired
-    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
+    private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Override
     public List<WorkflowTaskRelation> queryByWorkflowDefinitionCode(long workflowDefinitionCode,
                                                                     int workflowDefinitionVersion) {
-        return workflowTaskRelationMapper.queryWorkflowTaskRelationsByWorkflowDefinitionCode(workflowDefinitionCode,
+        return workflowTaskRelationDao.queryWorkflowTaskRelationsByWorkflowDefinitionCode(workflowDefinitionCode,
                 workflowDefinitionVersion);
     }
 
     @Override
     public void deleteByWorkflowDefinitionCode(long workflowDefinitionCode, int workflowDefinitionVersion) {
-        workflowTaskRelationMapper.deleteByWorkflowDefinitionCodeAndVersion(workflowDefinitionCode,
+        workflowTaskRelationDao.deleteByWorkflowDefinitionCodeAndVersion(workflowDefinitionCode,
                 workflowDefinitionVersion);
     }
 

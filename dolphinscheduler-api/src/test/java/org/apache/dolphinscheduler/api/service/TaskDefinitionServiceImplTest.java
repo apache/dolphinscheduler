@@ -53,6 +53,7 @@ import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -109,6 +110,9 @@ public class TaskDefinitionServiceImplTest {
 
     @Mock
     private WorkflowTaskRelationMapper workflowTaskRelationMapper;
+
+    @Mock
+    private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Mock
     private WorkflowDefinitionMapper workflowDefinitionMapper;
@@ -364,12 +368,12 @@ public class TaskDefinitionServiceImplTest {
             when(taskDefinitionMapper.queryByCodeList(Mockito.anySet()))
                     .thenReturn(Arrays.asList(taskDefinition, taskDefinitionSecond));
 
-            when(workflowTaskRelationMapper.queryUpstreamByCode(PROJECT_CODE, TASK_CODE))
+            when(workflowTaskRelationDao.queryUpstreamByCode(PROJECT_CODE, TASK_CODE))
                     .thenReturn(getProcessTaskRelationListV2());
             when(workflowDefinitionDao.queryByCode(PROCESS_DEFINITION_CODE))
                     .thenReturn(Optional.of(getProcessDefinition()));
-            when(workflowTaskRelationMapper.batchInsert(Mockito.anyList())).thenReturn(1);
-            when(workflowTaskRelationMapper.updateById(Mockito.any())).thenReturn(1);
+            when(workflowTaskRelationDao.batchInsert(Mockito.anyList())).thenReturn(1);
+            when(workflowTaskRelationDao.updateById(Mockito.any())).thenReturn(true);
             when(workflowTaskRelationLogDao.batchInsert(Mockito.anyList())).thenReturn(2);
             // success
             Long updatedTaskCode = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE,
