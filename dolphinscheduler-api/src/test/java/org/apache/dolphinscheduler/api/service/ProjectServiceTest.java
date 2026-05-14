@@ -36,8 +36,8 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
@@ -81,7 +81,7 @@ public class ProjectServiceTest {
     private ProjectDao projectDao;
 
     @Mock
-    private ProjectUserMapper projectUserMapper;
+    private ProjectUserDao projectUserDao;
 
     @Mock
     private TaskGroupService taskGroupService;

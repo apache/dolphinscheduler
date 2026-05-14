@@ -40,9 +40,9 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
@@ -84,7 +84,7 @@ public class UsersServiceTest {
     private TenantDao tenantDao;
 
     @Mock
-    private ProjectUserMapper projectUserMapper;
+    private ProjectUserDao projectUserDao;
 
     @Mock
     private AlertGroupMapper alertGroupMapper;

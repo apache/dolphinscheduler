@@ -42,9 +42,9 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
@@ -86,7 +86,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private TenantDao tenantDao;
 
     @Autowired
-    private ProjectUserMapper projectUserMapper;
+    private ProjectUserDao projectUserDao;
 
     @Autowired
     private DataSourceUserDao datasourceUserDao;
@@ -485,7 +485,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             Project project = this.projectDao.queryDetailById(Integer.parseInt(projectId));
             if (project != null) {
                 // 4. delete the relationship between project and user
-                this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
+                this.projectUserDao.deleteProjectRelation(project.getId(), user.getId());
             }
         });
     }
@@ -515,9 +515,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return;
         }
         Arrays.stream(projectIds.split(Constants.COMMA)).distinct().forEach(projectId -> {
-            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            ProjectUser projectUserOld = projectUserDao.queryProjectRelation(Integer.parseInt(projectId), userId);
             if (projectUserOld != null) {
-                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+                projectUserDao.deleteProjectRelation(Integer.parseInt(projectId), userId);
             }
             Date now = new Date();
             ProjectUser projectUser = new ProjectUser();
@@ -526,7 +526,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser.setPerm(Constants.READ_PERMISSION);
             projectUser.setCreateTime(now);
             projectUser.setUpdateTime(now);
-            projectUserMapper.insert(projectUser);
+            projectUserDao.insert(projectUser);
         });
     }
 
@@ -557,9 +557,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return;
         }
         Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
-            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            ProjectUser projectUserOld = projectUserDao.queryProjectRelation(Integer.parseInt(projectId), userId);
             if (projectUserOld != null) {
-                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+                projectUserDao.deleteProjectRelation(Integer.parseInt(projectId), userId);
             }
             Date now = new Date();
             ProjectUser projectUser = new ProjectUser();
@@ -568,7 +568,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             projectUser.setCreateTime(now);
             projectUser.setUpdateTime(now);
-            projectUserMapper.insert(projectUser);
+            projectUserDao.insert(projectUser);
         });
     }
 
@@ -604,7 +604,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 4. maintain the relationship between project and user if not exists
-        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), userId);
+        ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), userId);
         if (projectUser == null) {
             Date today = new Date();
             projectUser = new ProjectUser();
@@ -613,7 +613,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             projectUser.setCreateTime(today);
             projectUser.setUpdateTime(today);
-            this.projectUserMapper.insert(projectUser);
+            this.projectUserDao.insert(projectUser);
         }
         log.info("User is granted permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
     }
@@ -649,7 +649,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 4. delete th relationship between project and user
-        this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
+        this.projectUserDao.deleteProjectRelation(project.getId(), user.getId());
         log.info("User is revoked permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
     }
 
