@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 public class ProjectAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Override
     protected String getObjectNameFromIdentity(Object identity) {
@@ -40,7 +40,7 @@ public class ProjectAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        Project obj = projectMapper.queryByCode(objId);
+        Project obj = projectDao.queryByCode(objId);
         return obj == null ? "" : obj.getName();
     }
 }

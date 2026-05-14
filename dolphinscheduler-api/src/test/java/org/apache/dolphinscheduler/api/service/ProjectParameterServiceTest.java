@@ -37,8 +37,8 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 
 import java.util.Collections;
@@ -63,7 +63,7 @@ public class ProjectParameterServiceTest {
     private ProjectParameterServiceImpl projectParameterService;
 
     @Mock
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Mock
     private ProjectParameterMapper projectParameterMapper;
@@ -96,7 +96,7 @@ public class ProjectParameterServiceTest {
         }
 
         // PROJECT_PARAMETER_ALREADY_EXISTS
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         when(projectParameterMapper.selectOne(Mockito.any())).thenReturn(getProjectParameter());
         Result result = projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value",
                 DataType.VARCHAR.name());
@@ -131,7 +131,7 @@ public class ProjectParameterServiceTest {
                         DataType.VARCHAR.name()));
 
         // PROJECT_PARAMETER_NOT_EXISTS
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         doNothing().when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(null);
         Result result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value",
@@ -174,7 +174,7 @@ public class ProjectParameterServiceTest {
                 () -> projectParameterService.deleteProjectParametersByCode(loginUser, projectCode, 1));
 
         // PROJECT_PARAMETER_NOT_EXISTS
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         doNothing().when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(null);
         Result result = projectParameterService.deleteProjectParametersByCode(loginUser, projectCode, 1);
@@ -204,7 +204,7 @@ public class ProjectParameterServiceTest {
                 () -> projectParameterService.queryProjectParameterByCode(loginUser, projectCode, 1));
 
         // PROJECT_PARAMETER_NOT_EXISTS
-        when(projectMapper.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         doNothing().when(projectService).checkProjectAndAuthThrowException(any(), Mockito.<Project>any(), any());
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(null);
         Result result = projectParameterService.queryProjectParameterByCode(loginUser, projectCode, 1);

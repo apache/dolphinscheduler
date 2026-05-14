@@ -32,8 +32,8 @@ import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +57,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     private TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
     private ProjectService projectService;
@@ -112,7 +112,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
             throw new ServiceException("task instance is null or host is null");
         }
-        Project project = projectMapper.queryProjectByTaskInstanceId(taskInstId);
+        Project project = projectDao.queryProjectByTaskInstanceId(taskInstId);
         projectService.checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
         return getLogBytes(taskInstance);
     }

@@ -17,9 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
+import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
+import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
@@ -78,5 +81,41 @@ public class WorkflowDefinitionDaoImpl extends BaseDao<WorkflowDefinition, Workf
             return Collections.emptyList();
         }
         return mybatisMapper.queryByCodes(workflowDefinitionCodes);
+    }
+
+    @Override
+    public WorkflowDefinition queryByDefineName(long projectCode, String workflowDefinitionName) {
+        return mybatisMapper.queryByDefineName(projectCode, workflowDefinitionName);
+    }
+
+    @Override
+    public WorkflowDefinition verifyByDefineName(long projectCode, String workflowDefinitionName) {
+        return mybatisMapper.verifyByDefineName(projectCode, workflowDefinitionName);
+    }
+
+    @Override
+    public List<WorkflowDefinition> queryAllDefinitionList(long projectCode) {
+        return mybatisMapper.queryAllDefinitionList(projectCode);
+    }
+
+    @Override
+    public List<DependentSimplifyDefinition> queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes(long projectCode,
+                                                                                                        Collection<Long> codes) {
+        return mybatisMapper.queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes(projectCode, codes);
+    }
+
+    @Override
+    public List<WorkflowDefinitionCountDto> countDefinitionByProjectCodes(Collection<Long> projectCodes) {
+        return mybatisMapper.countDefinitionByProjectCodes(projectCodes);
+    }
+
+    @Override
+    public List<Long> queryDefinitionCodeListByProjectCodes(List<Long> projectCodes) {
+        return mybatisMapper.queryDefinitionCodeListByProjectCodes(projectCodes);
+    }
+
+    @Override
+    public List<ProjectWorkflowDefinitionCount> queryProjectWorkflowDefinitionCountByProjectCodes(List<Long> projectCodes) {
+        return mybatisMapper.queryProjectWorkflowDefinitionCountByProjectCodes(projectCodes);
     }
 }

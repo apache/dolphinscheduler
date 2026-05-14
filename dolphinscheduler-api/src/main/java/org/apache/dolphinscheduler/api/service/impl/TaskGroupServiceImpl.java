@@ -32,9 +32,9 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -62,7 +62,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     private TaskGroupMapper taskGroupMapper;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
@@ -277,7 +277,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
             return;
         }
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         if (project == null) {
             log.warn("Project does not exist, projectCode:{}.", projectCode);
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);

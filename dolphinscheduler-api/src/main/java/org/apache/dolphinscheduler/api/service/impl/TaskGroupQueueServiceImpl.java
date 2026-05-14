@@ -23,8 +23,8 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -47,7 +47,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     TaskGroupQueueMapper taskGroupQueueMapper;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     /**
      * query tasks in task group queue by group id
@@ -72,7 +72,7 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
         if (projectIds.isEmpty()) {
             return pageInfo;
         }
-        List<Project> projects = projectMapper.selectBatchIds(projectIds);
+        List<Project> projects = projectDao.queryByIds(projectIds);
         Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueueByTaskGroupIdPaging(
                 page,

@@ -48,13 +48,13 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -89,7 +89,7 @@ import com.google.common.collect.Lists;
 public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDefinitionService {
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
     private ProjectService projectService;
@@ -113,7 +113,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private WorkflowTaskRelationService workflowTaskRelationService;
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Autowired
     private ProcessService processService;
@@ -132,7 +132,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Override
     public TaskDefinition queryTaskDefinitionByName(User loginUser, long projectCode, long workflowDefinitionCode,
                                                     String taskName) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
 
@@ -148,7 +148,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public void updateDag(User loginUser, long workflowDefinitionCode,
                           List<WorkflowTaskRelation> workflowTaskRelationList,
                           List<TaskDefinitionLog> taskDefinitionLogs) {
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         if (workflowDefinition == null) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", workflowDefinitionCode);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST);
@@ -193,7 +193,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (taskDefinition == null) {
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCode);
         }
-        Project project = projectMapper.queryByCode(taskDefinition.getProjectCode());
+        Project project = projectDao.queryByCode(taskDefinition.getProjectCode());
         projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
         return taskDefinition;
     }
@@ -207,7 +207,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      */
     private TaskDefinitionLog updateTask(User loginUser, long projectCode, long taskCode,
                                          String taskDefinitionJsonObj) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         // check if user have write perm for project
         projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
@@ -308,18 +308,19 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                         throw new ServiceException(Status.CREATE_WORKFLOW_TASK_RELATION_LOG_ERROR);
                     }
                 }
-                WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+                WorkflowDefinition workflowDefinition =
+                        workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
                 workflowDefinition.setVersion(workflowDefinitionVersion);
                 workflowDefinition.setUpdateTime(now);
                 workflowDefinition.setUserId(loginUser.getId());
                 // update workflow definition
-                int updateWorkflowDefinitionCount = workflowDefinitionMapper.updateById(workflowDefinition);
+                boolean updateWorkflowDefinitionSuccess = workflowDefinitionDao.updateById(workflowDefinition);
                 WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
                 workflowDefinitionLog.setOperateTime(now);
                 workflowDefinitionLog.setId(null);
                 workflowDefinitionLog.setOperator(loginUser.getId());
                 int insertWorkflowDefinitionLogCount = workflowDefinitionLogMapper.insert(workflowDefinitionLog);
-                if ((updateWorkflowDefinitionCount & insertWorkflowDefinitionLogCount) != 1) {
+                if (!updateWorkflowDefinitionSuccess || insertWorkflowDefinitionLogCount != 1) {
                     throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
                 }
             }
@@ -452,7 +453,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Map<Long, TaskDefinition> taskCodeMap = taskDefinitionList.stream().collect(Collectors
                 .toMap(TaskDefinition::getCode, Function.identity(), (a, b) -> a));
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         TaskDefinition taskDefinition = taskCodeMap.get(taskCode);
 
         for (Long preTaskCode : addPreTaskSet) {
@@ -506,7 +507,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Transactional
     @Override
     public void switchVersion(User loginUser, long projectCode, long taskCode, int version) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_SWITCH_TO_THIS_VERSION);
 
@@ -556,7 +557,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                               int pageNo,
                                               int pageSize) {
         Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_VERSION_VIEW);
 
@@ -575,7 +576,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     @Override
     public void deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check if user have write perm for project
         projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
@@ -603,7 +604,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     @Override
     public TaskDefinitionVO queryTaskDefinitionDetail(User loginUser, long projectCode, long taskCode) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
 
@@ -647,7 +648,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Transactional
     @Override
     public void releaseTaskDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
