@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
+import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
@@ -57,7 +57,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
     @Autowired
-    private QueueMapper queueMapper;
+    private QueueDao queueDao;
 
     @Autowired
     private UserDao userDao;
@@ -124,7 +124,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             ids = ids.isEmpty() ? new HashSet<>() : ids;
             ids.add(Constants.DEFAULT_QUEUE_ID);
         }
-        return queueMapper.selectBatchIds(ids);
+        return queueDao.queryByIds(ids);
     }
 
     /**
@@ -145,7 +145,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             return pageInfo;
         }
         Page<Queue> page = new Page<>(pageNo, pageSize);
-        IPage<Queue> queueList = queueMapper.queryQueuePaging(page, new ArrayList<>(ids), searchVal);
+        IPage<Queue> queueList = queueDao.queryQueuePaging(page, new ArrayList<>(ids), searchVal);
         Integer count = (int) queueList.getTotal();
         pageInfo.setTotal(count);
         pageInfo.setTotalList(queueList.getRecords());
@@ -168,7 +168,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         Queue queueObj = new Queue(queueName, queue);
         validQueue(queueObj);
-        queueMapper.insert(queueObj);
+        queueDao.insert(queueObj);
 
         return queueObj;
     }
@@ -190,7 +190,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
 
         Queue updateQueue = new Queue(id, queueName, queue);
         updateQueue.setCreateTime(null);
-        Queue existsQueue = queueMapper.selectById(id);
+        Queue existsQueue = queueDao.queryById(id);
         updateQueueValid(existsQueue, updateQueue);
 
         // check old queue using by any user
@@ -201,7 +201,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             log.info("Old queue have related {} users, exec update user success.", relatedUserNums);
         }
 
-        queueMapper.updateById(updateQueue);
+        queueDao.updateById(updateQueue);
         return updateQueue;
     }
 
@@ -220,7 +220,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        Queue queue = queueMapper.selectById(id);
+        Queue queue = queueDao.queryById(id);
         if (Objects.isNull(queue)) {
             log.error("Queue does not exist");
             throw new ServiceException(Status.QUEUE_NOT_EXIST);
@@ -238,8 +238,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
             throw new ServiceException(Status.DELETE_QUEUE_BY_ID_FAIL_USERS, userList.size());
         }
 
-        int delete = queueMapper.deleteById(id);
-        if (delete <= 0) {
+        if (!queueDao.deleteById(id)) {
             throw new ServiceException(Status.DELETE_QUEUE_BY_ID_ERROR);
         }
 
@@ -267,7 +266,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue not exists, otherwise return false
      */
     private boolean checkQueueExist(String queue) {
-        return queueMapper.existQueue(queue, null) == Boolean.TRUE;
+        return queueDao.existQueue(queue, null);
     }
 
     /**
@@ -278,7 +277,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue name not exists, otherwise return false
      */
     private boolean checkQueueNameExist(String queueName) {
-        return queueMapper.existQueue(null, queueName) == Boolean.TRUE;
+        return queueDao.existQueue(null, queueName);
     }
 
     /**
@@ -304,14 +303,14 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      */
     @Override
     public Queue createQueueIfNotExists(String queue, String queueName) {
-        Queue existsQueue = queueMapper.queryQueueName(queue, queueName);
+        Queue existsQueue = queueDao.queryQueueName(queue, queueName);
         if (!Objects.isNull(existsQueue)) {
             log.info("Queue exists, so return it, queueName:{}.", queueName);
             return existsQueue;
         }
         Queue queueObj = new Queue(queueName, queue);
         validQueue(queueObj);
-        queueMapper.insert(queueObj);
+        queueDao.insert(queueObj);
         log.info("Queue create complete, queueName:{}.", queueObj.getQueueName());
         return queueObj;
     }
