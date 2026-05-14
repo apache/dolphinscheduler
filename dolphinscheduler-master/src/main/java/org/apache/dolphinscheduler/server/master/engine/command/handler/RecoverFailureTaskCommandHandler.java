@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecu
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionBuilder;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskInstanceFactories;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
-import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -96,12 +95,6 @@ public class RecoverFailureTaskCommandHandler extends AbstractCommandHandler {
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
         workflowInstance.setCommandType(command.getCommandType());
         workflowInstance.setHost(masterConfig.getMasterAddress());
-        workflowInstance.setLogPath(WorkflowLogUtils.getWorkflowInstanceLogFullPath(
-                workflowInstance.getStartTime(),
-                workflowInstance.getWorkflowDefinitionCode(),
-                workflowInstance.getWorkflowDefinitionVersion(),
-                workflowInstance.getId()));
-
         workflowInstanceDao.updateById(workflowInstance);
 
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);

@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext;
-import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -46,12 +45,6 @@ public class RecoverSerialWaitCommandHandler extends AbstractCommandHandler {
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find WorkflowInstance:" + workflowInstanceId));
         workflowInstance.setStateWithDesc(WorkflowExecutionStatus.RUNNING_EXECUTION, command.getCommandType().name());
         workflowInstance.setHost(masterConfig.getMasterAddress());
-        workflowInstance.setLogPath(WorkflowLogUtils.getWorkflowInstanceLogFullPath(
-                workflowInstance.getRestartTime(),
-                workflowInstance.getWorkflowDefinitionCode(),
-                workflowInstance.getWorkflowDefinitionVersion(),
-                workflowInstance.getId()));
-
         workflowInstanceDao.updateById(workflowInstance);
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
     }

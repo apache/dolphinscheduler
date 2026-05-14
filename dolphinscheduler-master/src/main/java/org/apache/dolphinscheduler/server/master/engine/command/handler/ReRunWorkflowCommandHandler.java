@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
-import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -75,12 +74,6 @@ public class ReRunWorkflowCommandHandler extends RunWorkflowCommandHandler {
         workflowInstance.setHost(masterConfig.getMasterAddress());
         workflowInstance.setEndTime(null);
         workflowInstance.setRunTimes(workflowInstance.getRunTimes() + 1);
-        workflowInstance.setLogPath(WorkflowLogUtils.getWorkflowInstanceLogFullPath(
-                workflowInstance.getRestartTime(),
-                workflowInstance.getWorkflowDefinitionCode(),
-                workflowInstance.getWorkflowDefinitionVersion(),
-                workflowInstance.getId()));
-
         workflowInstanceDao.updateById(workflowInstance);
 
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);

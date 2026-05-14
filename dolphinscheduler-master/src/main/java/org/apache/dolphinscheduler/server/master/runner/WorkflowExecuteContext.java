@@ -55,8 +55,6 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
 
     private final List<IWorkflowLifecycleListener> workflowInstanceLifecycleListeners;
 
-    private String logPath;
-
     public static WorkflowExecuteContextBuilder builder() {
         return new WorkflowExecuteContextBuilder();
     }
@@ -81,8 +79,6 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
 
         private Project project;
 
-        private String logPath;
-
         public WorkflowExecuteContextBuilder withCommand(Command command) {
             this.command = command;
             return this;
@@ -97,8 +93,7 @@ public class WorkflowExecuteContext implements IWorkflowExecuteContext {
                     workflowGraph,
                     workflowExecutionGraph,
                     workflowEventBus,
-                    Optional.ofNullable(workflowInstanceLifecycleListeners).orElse(Collections.emptyList()),
-                    logPath);
+                    Optional.ofNullable(workflowInstanceLifecycleListeners).orElse(Collections.emptyList()));
         }
     }
 

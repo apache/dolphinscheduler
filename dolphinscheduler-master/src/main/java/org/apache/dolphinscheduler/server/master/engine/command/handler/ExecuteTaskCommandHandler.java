@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopol
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
-import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -87,12 +86,6 @@ public class ExecuteTaskCommandHandler extends AbstractCommandHandler {
             workflowInstance.setTaskDependType(command.getTaskDependType());
         }
         workflowInstance.setHost(masterConfig.getMasterAddress());
-        workflowInstance.setLogPath(WorkflowLogUtils.getWorkflowInstanceLogFullPath(
-                workflowInstance.getRestartTime(),
-                workflowInstance.getWorkflowDefinitionCode(),
-                workflowInstance.getWorkflowDefinitionVersion(),
-                workflowInstance.getId()));
-
         workflowInstanceDao.updateById(workflowInstance);
         workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
     }
