@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
+import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import java.util.List;
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 public class TokenAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private AccessTokenMapper accessTokenMapper;
+    private AccessTokenDao accessTokenDao;
 
     @Autowired
     private UserDao userDao;
@@ -60,7 +60,7 @@ public class TokenAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        AccessToken obj = accessTokenMapper.selectById(objId);
+        AccessToken obj = accessTokenDao.queryById(objId);
         return obj == null ? "" : obj.getUserName();
     }
 }

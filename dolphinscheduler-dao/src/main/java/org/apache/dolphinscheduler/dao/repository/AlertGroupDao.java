@@ -15,29 +15,26 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit.operator.impl;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-@Service
-public class AlertGroupAuditOperatorImpl extends BaseAuditOperator {
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-    @Autowired
-    private AlertGroupDao alertGroupDao;
+public interface AlertGroupDao extends IDao<AlertGroup> {
 
-    @Override
-    public String getObjectNameFromIdentity(Object identity) {
-        Long objId = toLong(identity);
-        if (objId == -1) {
-            return "";
-        }
+    IPage<AlertGroup> queryAlertGroupPage(Page<AlertGroup> page, String groupName);
 
-        AlertGroup obj = alertGroupDao.queryById(objId);
-        return obj == null ? "" : obj.getGroupName();
-    }
+    IPage<AlertGroup> queryAlertGroupPageByIds(Page<AlertGroup> page, List<Integer> ids, String searchVal);
+
+    List<AlertGroup> queryAllGroupList();
+
+    List<AlertGroup> queryByUserId(int userId);
+
+    List<String> queryInstanceIdsList();
+
+    boolean existGroupName(String groupName);
 }

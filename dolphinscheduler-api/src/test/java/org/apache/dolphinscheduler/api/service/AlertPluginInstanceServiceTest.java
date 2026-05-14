@@ -37,9 +37,9 @@ import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -80,7 +80,7 @@ public class AlertPluginInstanceServiceTest {
     private PluginDefineMapper pluginDefineMapper;
 
     @Mock
-    private AlertGroupMapper alertGroupMapper;
+    private AlertGroupDao alertGroupDao;
 
     @Mock
     private RegistryClient registryClient;
@@ -232,7 +232,7 @@ public class AlertPluginInstanceServiceTest {
                 () -> alertPluginInstanceService.deleteById(noPermUser, 1));
 
         List<String> ids = Arrays.asList("11,2,3", "5,96", null, "98,1");
-        when(alertGroupMapper.queryInstanceIdsList()).thenReturn(ids);
+        when(alertGroupDao.queryInstanceIdsList()).thenReturn(ids);
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 1, ALERT_PLUGIN_DELETE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
@@ -247,7 +247,7 @@ public class AlertPluginInstanceServiceTest {
         assertThrowsServiceException(Status.DELETE_ALERT_PLUGIN_INSTANCE_ERROR_HAS_ALERT_GROUP_ASSOCIATED,
                 () -> alertPluginInstanceService.deleteById(user, 5));
 
-        when(alertGroupMapper.queryInstanceIdsList()).thenReturn(Collections.emptyList());
+        when(alertGroupDao.queryInstanceIdsList()).thenReturn(Collections.emptyList());
         Assertions.assertDoesNotThrow(() -> alertPluginInstanceService.deleteById(user, 9));
     }
 
