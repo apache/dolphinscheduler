@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.task.DependentLogicTaskChanne
 import org.apache.dolphinscheduler.plugin.task.api.task.SubWorkflowLogicTaskChannelFactory;
 import org.apache.dolphinscheduler.plugin.task.api.task.SwitchLogicTaskChannelFactory;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -37,6 +38,15 @@ class TaskPluginManagerTest {
             SwitchLogicTaskChannelFactory.NAME})
     void testGetTaskChannel_logicTaskChannel(String type) {
         assertThat(TaskPluginManager.getTaskChannel(type)).isNotNull();
+    }
+
+    @Test
+    void shouldNotLoadLogicFakeTaskChannel() {
+        IllegalArgumentException exception = org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalArgumentException.class,
+                () -> TaskPluginManager.getTaskChannel("LogicFakeTask"));
+
+        assertThat(exception).hasMessageThat().contains("Cannot find TaskChannel");
     }
 
 }

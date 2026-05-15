@@ -15,10 +15,8 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.engine.executor.plugin.fake;
+package org.apache.dolphinscheduler.server.master.integration.fake;
 
-import org.apache.dolphinscheduler.plugin.task.api.task.LogicFakeTaskChannelFactory;
-import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ILogicTaskPluginFactory;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 
@@ -29,12 +27,6 @@ import com.google.common.annotations.VisibleForTesting;
 @Component
 @VisibleForTesting
 public class LogicFakeTaskPluginFactory implements ILogicTaskPluginFactory<LogicFakeTask> {
-
-    private final IWorkflowRepository workflowRepository;
-
-    public LogicFakeTaskPluginFactory(final IWorkflowRepository workflowRepository) {
-        this.workflowRepository = workflowRepository;
-    }
 
     @Override
     public LogicFakeTask createLogicTask(final ITaskExecutor taskExecutor) {
