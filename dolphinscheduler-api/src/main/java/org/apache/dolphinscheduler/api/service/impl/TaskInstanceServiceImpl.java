@@ -34,8 +34,8 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
@@ -70,7 +70,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInstanceService {
 
     @Autowired
-    ProjectMapper projectMapper;
+    ProjectDao projectDao;
 
     @Autowired
     ProjectService projectService;
@@ -238,7 +238,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     public Result taskSavePoint(User loginUser, long projectCode, Integer taskInstanceId) {
         Result result = new Result();
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, FORCED_SUCCESS);
 
@@ -262,7 +262,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     public Result stopTask(User loginUser, long projectCode, Integer taskInstanceId) {
         Result result = new Result();
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, FORCED_SUCCESS);
 

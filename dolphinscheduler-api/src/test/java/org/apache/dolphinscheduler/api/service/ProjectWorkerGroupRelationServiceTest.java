@@ -30,8 +30,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectWorkerGroupDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
@@ -64,7 +64,7 @@ public class ProjectWorkerGroupRelationServiceTest {
     private WorkerGroupService workerGroupService;
 
     @Mock
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Mock
     private ProjectWorkerGroupDao projectWorkerGroupDao;
@@ -99,7 +99,7 @@ public class ProjectWorkerGroupRelationServiceTest {
         Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), result.getCode());
 
         // project not exists
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(null);
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(null);
         result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
                 getWorkerGroups());
         Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), result.getCode());
@@ -109,7 +109,7 @@ public class ProjectWorkerGroupRelationServiceTest {
         workerGroup.setName("test");
         WorkerGroupPageDetail workerGroupPageDetail = new WorkerGroupPageDetail();
         workerGroupPageDetail.setName("test1");
-        Mockito.when(projectMapper.queryByCode(Mockito.anyLong())).thenReturn(getProject());
+        Mockito.when(projectDao.queryByCode(Mockito.anyLong())).thenReturn(getProject());
         Mockito.when(workerGroupDao.queryAllWorkerGroup()).thenReturn(Collections.singletonList(workerGroup));
         Mockito.when(workerGroupService.getConfigWorkerGroupPageDetail())
                 .thenReturn(Collections.singletonList(workerGroupPageDetail));
@@ -195,7 +195,7 @@ public class ProjectWorkerGroupRelationServiceTest {
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(Mockito.any(),
                 Mockito.<Project>any(), Mockito.any());
 
-        Mockito.when(projectMapper.queryByCode(projectCode))
+        Mockito.when(projectDao.queryByCode(projectCode))
                 .thenReturn(getProject());
 
         Mockito.when(projectWorkerGroupDao.queryByProjectCode(Mockito.any()))

@@ -77,17 +77,16 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
@@ -148,7 +147,7 @@ import com.google.common.collect.Lists;
 public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements WorkflowDefinitionService {
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
     private ProjectService projectService;
@@ -158,9 +157,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
     @Autowired
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
-
-    @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
 
     @Autowired
     private WorkflowDefinitionDao workflowDefinitionDao;
@@ -240,7 +236,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                        String taskDefinitionJson,
                                                        String otherParamsJson,
                                                        WorkflowExecutionTypeEnum executionType) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         // check if user have write perm for project
         projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
@@ -250,7 +246,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         // check whether the new workflow definition name exist
-        WorkflowDefinition definition = workflowDefinitionMapper.verifyByDefineName(project.getCode(), name);
+        WorkflowDefinition definition = workflowDefinitionDao.verifyByDefineName(project.getCode(), name);
         if (definition != null) {
             log.warn("workflow definition with the same name {} already exists, workflowDefinitionCode:{}.",
                     definition.getName(), definition.getCode());
@@ -444,11 +440,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      */
     @Override
     public List<DagData> queryWorkflowDefinitionList(User loginUser, long projectCode) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
-        List<WorkflowDefinition> resourceList = workflowDefinitionMapper.queryAllDefinitionList(projectCode);
+        List<WorkflowDefinition> resourceList = workflowDefinitionDao.queryAllDefinitionList(projectCode);
         return resourceList.stream().map(processService::genDagData).collect(Collectors.toList());
     }
 
@@ -461,11 +457,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      */
     @Override
     public ArrayNode queryWorkflowDefinitionSimpleList(User loginUser, long projectCode) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
-        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionMapper.queryAllDefinitionList(projectCode);
+        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionDao.queryAllDefinitionList(projectCode);
         ArrayNode arrayNode = JSONUtils.createArrayNode();
         for (WorkflowDefinition workflowDefinition : workflowDefinitions) {
             ObjectNode workflowDefinitionNode = JSONUtils.createObjectNode();
@@ -544,11 +540,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      */
     @Override
     public DagData queryWorkflowDefinitionByCode(User loginUser, long projectCode, long code) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
@@ -577,11 +573,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
     @Override
     public DagData queryWorkflowDefinitionByName(User loginUser, long projectCode, String name) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByDefineName(projectCode, name);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByDefineName(projectCode, name);
 
         if (workflowDefinition == null) {
             log.error("workflow definition does not exist, projectCode:{}.", projectCode);
@@ -618,7 +614,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                        String taskRelationJson,
                                                        String taskDefinitionJson,
                                                        WorkflowExecutionTypeEnum executionType) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check if user have write perm for project
         projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
@@ -632,7 +628,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
         // check workflow definition exists
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
@@ -646,7 +642,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         if (!name.equals(workflowDefinition.getName())) {
             // check whether the new workflow define name exist
-            WorkflowDefinition definition = workflowDefinitionMapper.verifyByDefineName(project.getCode(), name);
+            WorkflowDefinition definition = workflowDefinitionDao.verifyByDefineName(project.getCode(), name);
             if (definition != null) {
                 log.warn("workflow definition with the same name already exists, workflowDefinitionCode:{}.",
                         definition.getCode());
@@ -778,12 +774,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Override
     public void verifyWorkflowDefinitionName(User loginUser, long projectCode, String name,
                                              long workflowDefinitionCode) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_CREATE);
 
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.verifyByDefineName(project.getCode(), name.trim());
+                workflowDefinitionDao.verifyByDefineName(project.getCode(), name.trim());
         if (workflowDefinition == null) {
             return;
         }
@@ -805,7 +801,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         Set<Long> definitionCodes = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
                 .collect(Collectors.toSet());
-        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionMapper.queryByCodes(definitionCodes);
+        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionDao.queryByCodes(definitionCodes);
         Set<Long> queryCodes =
                 workflowDefinitionList.stream().map(WorkflowDefinition::getCode).collect(Collectors.toSet());
         // definitionCodes - queryCodes
@@ -865,7 +861,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code)));
 
-        Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
+        Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION_DELETE);
 
@@ -976,11 +972,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      */
     @Override
     public List<TaskDefinition> getTaskNodeListByDefinitionCode(User loginUser, long projectCode, long code) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
@@ -1000,19 +996,19 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Override
     public Map<Long, List<TaskDefinition>> getNodeListMapByDefinitionCodes(User loginUser, long projectCode,
                                                                            String codes) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
         Set<Long> defineCodeSet = Lists.newArrayList(codes.split(Constants.COMMA)).stream().map(Long::parseLong)
                 .collect(Collectors.toSet());
-        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionMapper.queryByCodes(defineCodeSet);
+        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionDao.queryByCodes(defineCodeSet);
         if (CollectionUtils.isEmpty(workflowDefinitionList)) {
             log.error("workflow definitions do not exist, codes:{}.", defineCodeSet);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, codes);
         }
         HashMap<Long, Project> userProjects = new HashMap<>(Constants.DEFAULT_HASH_MAP_SIZE);
-        projectMapper.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())
+        projectDao.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())
                 .forEach(userProject -> userProjects.put(userProject.getCode(), userProject));
 
         // check workflowDefinition exist in project
@@ -1039,11 +1035,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      */
     @Override
     public List<DagData> queryAllWorkflowDefinitionByProjectCode(User loginUser, long projectCode) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
-        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionMapper.queryAllDefinitionList(projectCode);
+        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionDao.queryAllDefinitionList(projectCode);
         return workflowDefinitions.stream().map(processService::genDagData).collect(Collectors.toList());
     }
 
@@ -1055,7 +1051,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      */
     @Override
     public List<DependentSimplifyDefinition> queryWorkflowDefinitionListByProjectCode(long projectCode) {
-        return workflowDefinitionMapper.queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes(projectCode, null);
+        return workflowDefinitionDao.queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes(projectCode, null);
     }
 
     /**
@@ -1070,7 +1066,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                                                              Long workflowDefinitionCode) {
         Set<Long> definitionCodesSet = new HashSet<>();
         definitionCodesSet.add(workflowDefinitionCode);
-        List<DependentSimplifyDefinition> workflowDefinitions = workflowDefinitionMapper
+        List<DependentSimplifyDefinition> workflowDefinitions = workflowDefinitionDao
                 .queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes(projectCode, definitionCodesSet);
 
         // query task definition log
@@ -1098,11 +1094,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      */
     @Override
     public TreeViewDto viewTree(User loginUser, long projectCode, long code, Integer limit) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_TREE_VIEW);
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
         if (null == workflowDefinition || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, code:{}.", code);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
@@ -1297,7 +1293,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                              long projectCode,
                              String workflowDefinitionCodes,
                              long targetProjectCode, String perm) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, perm);
 
@@ -1307,7 +1303,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         if (projectCode != targetProjectCode) {
-            Project targetProject = projectMapper.queryByCode(targetProjectCode);
+            Project targetProject = projectDao.queryByCode(targetProjectCode);
             // check user access for project
             projectService.checkProjectAndAuthThrowException(loginUser, targetProject, perm);
         }
@@ -1320,7 +1316,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                     boolean isCopy) {
         Set<Long> definitionCodes = Arrays.stream(workflowDefinitionCodes.split(Constants.COMMA)).map(Long::parseLong)
                 .collect(Collectors.toSet());
-        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionMapper.queryByCodes(definitionCodes);
+        List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionDao.queryByCodes(definitionCodes);
         Set<Long> queryCodes =
                 workflowDefinitionList.stream().map(WorkflowDefinition::getCode).collect(Collectors.toSet());
         // definitionCodes - queryCodes
@@ -1559,11 +1555,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Transactional
     public void switchWorkflowDefinitionVersion(User loginUser, long projectCode, long code,
                                                 int version) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_SWITCH_TO_THIS_VERSION);
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
         if (Objects.isNull(workflowDefinition) || projectCode != workflowDefinition.getProjectCode()) {
             log.error(
                     "Switch workflow definition error because it does not exist, projectCode:{}, workflowDefinitionCode:{}.",
@@ -1672,7 +1668,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public Result queryWorkflowDefinitionVersions(User loginUser, long projectCode, int pageNo, int pageSize,
                                                   long code) {
         Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, VERSION_LIST);
 
@@ -1705,7 +1701,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                 int version) {
         projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, code);
         }
@@ -1781,12 +1777,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Override
     public WorkflowDefinitionVariablesDTO viewVariables(User loginUser, long projectCode, long code) {
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(code);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
 
         if (Objects.isNull(workflowDefinition) || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,

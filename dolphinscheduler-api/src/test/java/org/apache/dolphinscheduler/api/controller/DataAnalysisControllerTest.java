@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import java.util.Date;
 
@@ -48,7 +48,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
     private static final Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     private int createProject() {
         Project project = new Project();
@@ -56,7 +56,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         project.setName("ut project");
         project.setUserId(1);
         project.setCreateTime(new Date());
-        projectMapper.insert(project);
+        projectDao.insert(project);
         return project.getId();
     }
 
@@ -80,7 +80,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         assertThat(result.getCode())
                 .isNotNull()
                 .isEqualTo(Status.SUCCESS.getCode());
-        projectMapper.deleteById(projectId);
+        projectDao.deleteById(projectId);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         assertThat(result.getCode())
                 .isEqualTo(Status.SUCCESS.getCode());
 
-        projectMapper.deleteById(projectId);
+        projectDao.deleteById(projectId);
     }
 
     @Test

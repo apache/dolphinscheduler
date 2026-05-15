@@ -27,8 +27,8 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectPreference;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectPreferenceMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import java.util.Date;
 import java.util.Objects;
@@ -53,14 +53,14 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
     private ProjectService projectService;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Override
     public Result updateProjectPreference(User loginUser, long projectCode, String preferences) {
         Result result = new Result();
 
         // check if the user has the writing permission for project
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         ProjectPreference projectPreference = projectPreferenceMapper
@@ -106,7 +106,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
     public Result queryProjectPreferenceByProjectCode(User loginUser, long projectCode) {
         Result result = new Result();
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
 
         ProjectPreference projectPreference = projectPreferenceMapper
@@ -124,7 +124,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
         Result result = new Result();
 
         // check if the user has the writing permission for project
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         ProjectPreference projectPreference = projectPreferenceMapper

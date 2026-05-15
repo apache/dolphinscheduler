@@ -25,9 +25,11 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,10 +53,10 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private ScheduleMapper scheduleMapper;
 
     @Mock
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Mock
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
     private ProjectService projectService;
@@ -112,9 +114,9 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
                 ((ServiceException) exception).getCode());
 
         // error project permissions
-        Mockito.when(workflowDefinitionMapper.queryByCode(processDefinitionCode))
-                .thenReturn(this.getProcessDefinition());
-        Mockito.when(projectMapper.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(this.getProcessDefinition()));
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
         Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
                 .checkProjectAndAuthThrowException(user, this.getProject(), null);
         exception = Assertions.assertThrows(ServiceException.class,

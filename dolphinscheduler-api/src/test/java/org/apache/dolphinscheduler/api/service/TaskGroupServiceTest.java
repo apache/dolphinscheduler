@@ -31,8 +31,8 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +63,7 @@ public class TaskGroupServiceTest {
     private TaskGroupMapper taskGroupMapper;
 
     @Mock
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     private String taskGroupName = "TaskGroupServiceTest";
 
@@ -140,7 +140,7 @@ public class TaskGroupServiceTest {
                 loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_CREATE, serviceLogger)).thenReturn(true);
         Mockito.when(taskGroupMapper.insert(Mockito.any(TaskGroup.class))).thenReturn(1);
         Mockito.when(taskGroupMapper.queryByName(loginUser.getId(), taskGroupName)).thenReturn(null);
-        Mockito.when(projectMapper.queryByCode(taskGroup.getProjectCode())).thenReturn(getProject());
+        Mockito.when(projectDao.queryByCode(taskGroup.getProjectCode())).thenReturn(getProject());
         TaskGroup created = taskGroupService.createTaskGroup(loginUser, 0L, taskGroupName, taskGroupDesc, 100);
         Assertions.assertNotNull(created);
         Assertions.assertEquals(taskGroupName, created.getName());
@@ -187,7 +187,7 @@ public class TaskGroupServiceTest {
                 0, serviceLogger)).thenReturn(true);
         Mockito.when(taskGroupMapper.selectById(1)).thenReturn(taskGroup);
         Mockito.when(taskGroupMapper.updateById(taskGroup)).thenReturn(1);
-        Mockito.when(projectMapper.queryByCode(taskGroup.getProjectCode())).thenReturn(getProject());
+        Mockito.when(projectDao.queryByCode(taskGroup.getProjectCode())).thenReturn(getProject());
         TaskGroup updated = taskGroupService.updateTaskGroup(loginUser, 1, "newName", "desc", 100);
         Assertions.assertNotNull(updated);
         Assertions.assertEquals("newName", updated.getName());

@@ -40,8 +40,8 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -75,7 +75,7 @@ public class TaskInstanceServiceTest {
     private TaskInstanceServiceImpl taskInstanceService;
 
     @Mock
-    ProjectMapper projectMapper;
+    ProjectDao projectDao;
 
     @Mock
     ProjectServiceImpl projectService;
@@ -124,7 +124,7 @@ public class TaskInstanceServiceTest {
                 20));
 
         // data parameter check
-        when(projectMapper.queryByCode(projectCode)).thenReturn(project);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, TASK_INSTANCE);
         Assertions.assertThrows(ServiceException.class, () -> taskInstanceService.queryTaskListPaging(loginUser,
                 projectCode,

@@ -42,9 +42,9 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -86,10 +86,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     private ScheduleMapper scheduleMapper;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Autowired
     private SchedulerApi schedulerApi;
@@ -126,13 +126,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                    String tenantCode,
                                    Long environmentCode) {
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         // check project auth
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
         // check workflow define release state
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         executorService.checkWorkflowDefinitionValid(projectCode, workflowDefinition, workflowDefinitionCode,
                 workflowDefinition.getVersion());
 
@@ -190,7 +190,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
          * updateWorkflowInstance receivers and cc by workflow definition id
          */
         workflowDefinition.setWarningGroupId(warningGroupId);
-        workflowDefinitionMapper.updateById(workflowDefinition);
+        workflowDefinitionDao.updateById(workflowDefinition);
 
         log.info("Schedule create complete, projectCode:{}, workflowDefinitionCode:{}, scheduleId:{}.",
                 projectCode, workflowDefinitionCode, scheduleObj.getId());
@@ -198,11 +198,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     protected void projectPermCheckByWorkflowCode(User loginUser, long workflowDefinitionCode) {
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         if (workflowDefinition == null) {
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode);
         }
-        Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
+        Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
         // check project auth
         this.projectService.checkProjectAndAuthThrowException(loginUser, project, null);
     }
@@ -236,7 +236,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                    String tenantCode,
                                    Long environmentCode) {
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         // check project auth
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
@@ -250,7 +250,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode());
+                workflowDefinitionDao.queryByCode(schedule.getWorkflowDefinitionCode()).orElse(null);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.",
                     schedule.getWorkflowDefinitionCode());
@@ -278,13 +278,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                 Integer pageNo, Integer pageSize) {
         Result result = new Result();
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         // check project auth
         projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
 
         if (workflowDefinitionCode != 0) {
-            WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+            WorkflowDefinition workflowDefinition =
+                    workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
             if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
                 log.error("workflow definition does not exist, workflowDefinitionCode:{}.", workflowDefinitionCode);
                 putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(workflowDefinitionCode));
@@ -327,7 +328,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      */
     @Override
     public List<ScheduleVO> queryScheduleList(User loginUser, long projectCode) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         // check project auth
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
@@ -426,7 +427,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                            String workerGroup,
                                                            String tenantCode,
                                                            long environmentCode) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
@@ -438,7 +439,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             throw new ServiceException(Status.SCHEDULE_CRON_NOT_EXISTS, workflowDefinitionCode);
         }
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", workflowDefinitionCode);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
@@ -473,7 +474,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return;
         }
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode());
+                workflowDefinitionDao.queryByCode(schedule.getWorkflowDefinitionCode()).orElse(null);
         if (!ReleaseState.ONLINE.equals(workflowDefinition.getReleaseState())) {
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_RELEASE, workflowDefinition.getName());
         }
@@ -482,7 +483,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         schedule.setUpdateTime(new Date());
         scheduleMapper.updateById(schedule);
 
-        Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
+        Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
         schedulerApi.insertOrUpdateScheduleTask(project.getId(), schedule);
     }
 
@@ -513,8 +514,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         schedule.setReleaseState(ReleaseState.OFFLINE);
         scheduleMapper.updateById(schedule);
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode());
-        Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
+                workflowDefinitionDao.queryByCode(schedule.getWorkflowDefinitionCode()).orElse(null);
+        Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
         schedulerApi.deleteScheduleTask(project.getId(), schedule.getId());
     }
 
@@ -577,7 +578,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         workflowDefinition.setWarningGroupId(warningGroupId);
 
-        workflowDefinitionMapper.updateById(workflowDefinition);
+        workflowDefinitionDao.updateById(workflowDefinition);
 
         log.info("Schedule update complete, projectCode:{}, workflowDefinitionCode:{}, scheduleId:{}.",
                 workflowDefinition.getProjectCode(), workflowDefinition.getCode(), schedule.getId());

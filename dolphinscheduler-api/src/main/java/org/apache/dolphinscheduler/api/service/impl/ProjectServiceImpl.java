@@ -36,10 +36,10 @@ import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -76,13 +76,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     private TaskGroupService taskGroupService;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Autowired
     private UserMapper userMapper;
@@ -109,7 +109,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return result;
         }
 
-        Project project = projectMapper.queryByName(name);
+        Project project = projectDao.queryByName(name);
         if (project != null) {
             log.warn("Project {} already exists.", project.getName());
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, name);
@@ -129,7 +129,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 .updateTime(now)
                 .build();
 
-        if (projectMapper.insert(project) > 0) {
+        if (projectDao.insert(project) > 0) {
             log.info("Project is created and id is :{}", project.getId());
             result.setData(project);
             putMsg(result, Status.SUCCESS);
@@ -164,7 +164,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Result queryByCode(User loginUser, long projectCode) {
         Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         checkProjectAndAuthThrowException(loginUser, project, PROJECT);
         result.setData(project);
         putMsg(result, Status.SUCCESS);
@@ -173,7 +173,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     @Override
     public Project queryByName(User loginUser, String projectName) {
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectDao.queryByName(projectName);
         checkProjectAndAuthThrowException(loginUser, project, PROJECT);
         return project;
     }
@@ -195,13 +195,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (projectCode == null) {
             throw new ServiceException(Status.PROJECT_NOT_EXIST);
         }
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         checkProjectAndAuthThrowException(loginUser, project, permission);
     }
 
     @Override
     public void checkHasProjectWritePermissionThrowException(User loginUser, long projectCode) {
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         checkHasProjectWritePermissionThrowException(loginUser, project);
     }
 
@@ -247,7 +247,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return result;
         }
         IPage<Project> projectIPage =
-                projectMapper.queryProjectListPaging(page, new ArrayList<>(projectIds), searchVal);
+                projectDao.queryProjectListPaging(page, new ArrayList<>(projectIds), searchVal);
 
         List<Project> projectList = projectIPage.getRecords();
         if (loginUser.getUserType() != UserType.ADMIN_USER) {
@@ -264,7 +264,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 .map(Project::getUserId).distinct().collect(Collectors.toList()));
         Map<Integer, String> userMap = userList.stream().collect(Collectors.toMap(User::getId, User::getUserName));
         List<Long> projectCodes = projectList.stream().map(Project::getCode).distinct().collect(Collectors.toList());
-        Map<Long, Integer> projectWorkflowDefinitionCountMap = workflowDefinitionMapper
+        Map<Long, Integer> projectWorkflowDefinitionCountMap = workflowDefinitionDao
                 .queryProjectWorkflowDefinitionCountByProjectCodes(projectCodes)
                 .stream()
                 .collect(Collectors.toMap(ProjectWorkflowDefinitionCount::getProjectCode,
@@ -306,7 +306,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return result;
         }
         IPage<Project> projectIPage =
-                projectMapper.queryProjectListPaging(page, new ArrayList<>(allProjectIds), searchVal);
+                projectDao.queryProjectListPaging(page, new ArrayList<>(allProjectIds), searchVal);
 
         List<Project> projectList = projectIPage.getRecords();
 
@@ -341,13 +341,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Result deleteProject(User loginUser, Long projectCode) {
         Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         checkHasProjectWritePermissionThrowException(loginUser, project);
         checkProjectAndAuthThrowException(loginUser, project, PROJECT_DELETE);
 
         List<WorkflowDefinition> workflowDefinitionList =
-                workflowDefinitionMapper.queryAllDefinitionList(project.getCode());
+                workflowDefinitionDao.queryAllDefinitionList(project.getCode());
 
         if (!workflowDefinitionList.isEmpty()) {
             log.warn("Please delete the workflow definitions in project first! project code:{}.", projectCode);
@@ -357,8 +357,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         // delete the task group
         taskGroupService.deleteTaskGroupByProjectCode(project.getCode());
 
-        int delete = projectMapper.deleteById(project.getId());
-        if (delete > 0) {
+        boolean delete = projectDao.deleteById(project.getId());
+        if (delete) {
             log.info("Project is deleted and id is :{}.", project.getId());
             result.setData(Boolean.TRUE);
             putMsg(result, Status.SUCCESS);
@@ -387,9 +387,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return result;
         }
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         checkHasProjectWritePermissionThrowException(loginUser, project);
-        Project tempProject = projectMapper.queryByName(projectName);
+        Project tempProject = projectDao.queryByName(projectName);
         if (tempProject != null && tempProject.getCode() != project.getCode()) {
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
             return result;
@@ -404,8 +404,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         project.setDescription(desc);
         project.setUpdateTime(new Date());
         project.setUserId(user.getId());
-        int update = projectMapper.updateById(project);
-        if (update > 0) {
+        boolean update = projectDao.updateById(project);
+        if (update) {
             log.info("Project is updated and id is :{}", project.getId());
             result.setData(project);
             putMsg(result, Status.SUCCESS);
@@ -428,7 +428,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         Set<Integer> projectIds = resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
-        List<Project> projectList = projectMapper.listAuthorizedProjects(
+        List<Project> projectList = projectDao.listAuthorizedProjects(
                 loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),
                 new ArrayList<>(projectIds));
 
@@ -437,7 +437,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Set<Project> projectSet;
         if (projectList != null && !projectList.isEmpty()) {
             projectSet = new HashSet<>(projectList);
-            authedProjectList = projectMapper.queryAuthedProjectListByUserId(userId);
+            authedProjectList = projectDao.queryAuthedProjectListByUserId(userId);
             unauthorizedProjectsList = getUnauthorizedProjects(projectSet, authedProjectList);
         }
 
@@ -476,7 +476,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        List<Project> projectList = projectMapper.listAuthorizedProjects(
+        List<Project> projectList = projectDao.listAuthorizedProjects(
                 loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),
                 new ArrayList<>(projectIds));
 
@@ -485,7 +485,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (projectList != null && !projectList.isEmpty()) {
             projectSet = new HashSet<>(projectList);
 
-            List<Project> authedProjectList = projectMapper.queryAuthedProjectListByUserId(userId);
+            List<Project> authedProjectList = projectDao.queryAuthedProjectListByUserId(userId);
 
             resultList = getUnauthorizedProjects(projectSet, authedProjectList);
         }
@@ -523,7 +523,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result queryAuthorizedProject(User loginUser, Integer userId) {
         Result result = new Result();
 
-        List<Project> projects = projectMapper.queryAuthedProjectListByUserId(userId);
+        List<Project> projects = projectDao.queryAuthedProjectListByUserId(userId);
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
 
@@ -542,7 +542,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
 
         // 1. check read permission
-        Project project = this.projectMapper.queryByCode(projectCode);
+        Project project = this.projectDao.queryByCode(projectCode);
         this.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
 
         // 2. query authorized user list
@@ -554,7 +554,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     @Override
     public List<Project> queryProjectCreatedByUser(User loginUser) {
-        return projectMapper.queryProjectCreatedByUser(loginUser.getId());
+        return projectDao.queryProjectCreatedByUser(loginUser.getId());
     }
 
     /**
@@ -574,7 +574,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        List<Project> projects = projectMapper.selectBatchIds(projectIds);
+        List<Project> projects = projectDao.queryByIds(projectIds);
 
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
@@ -630,7 +630,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result queryAllProjectList(User user) {
         Result result = new Result();
         List<Project> projects =
-                projectMapper.queryAllProject(user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId());
+                projectDao.queryAllProject(user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId());
 
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
@@ -646,7 +646,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result queryAllProjectListForDependent() {
         Result result = new Result<>();
         List<Project> projects =
-                projectMapper.queryAllProjectForDependent();
+                projectDao.queryAllProjectForDependent();
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -662,7 +662,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (CollectionUtils.isEmpty(projectIds)) {
             return Collections.emptyList();
         }
-        return projectMapper.selectBatchIds(projectIds)
+        return projectDao.queryByIds(projectIds)
                 .stream()
                 .map(Project::getCode)
                 .collect(Collectors.toList());

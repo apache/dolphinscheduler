@@ -38,10 +38,10 @@ import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
@@ -155,10 +155,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class ProjectsResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final ProjectMapper projectMapper;
+        private final ProjectDao projectDao;
 
-        public ProjectsResourcePermissionCheck(ProjectMapper projectMapper) {
-            this.projectMapper = projectMapper;
+        public ProjectsResourcePermissionCheck(ProjectDao projectDao) {
+            this.projectDao = projectDao;
         }
 
         @Override
@@ -174,7 +174,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            return projectMapper.listAuthorizedProjects(userId, null).stream().map(Project::getId).collect(toSet());
+            return projectDao.listAuthorizedProjects(userId, null).stream().map(Project::getId).collect(toSet());
         }
     }
 
