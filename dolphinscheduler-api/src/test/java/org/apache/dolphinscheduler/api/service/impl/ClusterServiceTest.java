@@ -29,8 +29,8 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
+import org.apache.dolphinscheduler.dao.repository.ClusterDao;
+import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -62,13 +62,13 @@ public class ClusterServiceTest {
     private ClusterServiceImpl clusterService;
 
     @Mock
-    private ClusterMapper clusterMapper;
+    private ClusterDao clusterDao;
 
     @Mock
     private K8sManager k8sManager;
 
     @Mock
-    private K8sNamespaceMapper k8sNamespaceMapper;
+    private K8sNamespaceDao k8sNamespaceDao;
 
     public static final String testUserName = "clusterServerTest";
 
@@ -98,11 +98,11 @@ public class ClusterServiceTest {
         assertThrowsServiceException(Status.CLUSTER_NAME_IS_NULL,
                 () -> clusterService.createCluster(loginUser, "", getConfig(), getDesc()));
 
-        when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
+        when(clusterDao.queryByClusterName(clusterName)).thenReturn(getCluster());
         assertThrowsServiceException(Status.CLUSTER_NAME_EXISTS,
                 () -> clusterService.createCluster(loginUser, clusterName, getConfig(), getDesc()));
 
-        when(clusterMapper.insert(Mockito.any(Cluster.class))).thenReturn(1);
+        when(clusterDao.insert(Mockito.any(Cluster.class))).thenReturn(1);
         Assertions.assertDoesNotThrow(
                 () -> clusterService.createCluster(loginUser, "testName", "testConfig", "testDesc"));
     }
@@ -128,12 +128,12 @@ public class ClusterServiceTest {
         assertThrowsServiceException(Status.CLUSTER_NOT_EXISTS,
                 () -> clusterService.updateClusterByCode(adminUser, 2L, clusterName, getConfig(), getDesc()));
 
-        when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
+        when(clusterDao.queryByClusterName(clusterName)).thenReturn(getCluster());
         assertThrowsServiceException(Status.CLUSTER_NAME_EXISTS,
                 () -> clusterService.updateClusterByCode(adminUser, 2L, clusterName, getConfig(), getDesc()));
 
-        when(clusterMapper.updateById(Mockito.any(Cluster.class))).thenReturn(1);
-        when(clusterMapper.queryByClusterCode(1L)).thenReturn(getCluster());
+        when(clusterDao.updateById(Mockito.any(Cluster.class))).thenReturn(true);
+        when(clusterDao.queryByClusterCode(1L)).thenReturn(getCluster());
         Cluster cluster = clusterService.updateClusterByCode(adminUser, 1L, "testName", getConfig(), "test");
         assertNotNull(cluster);
         assertNotNull(cluster.getUpdateTime());
@@ -141,7 +141,7 @@ public class ClusterServiceTest {
 
     @Test
     public void testQueryAllClusterList() {
-        when(clusterMapper.queryAllClusterList()).thenReturn(Lists.newArrayList(getCluster()));
+        when(clusterDao.queryAllClusterList()).thenReturn(Lists.newArrayList(getCluster()));
         List<ClusterDto> clusterDtos = clusterService.queryAllClusterList();
         Assertions.assertEquals(clusterDtos.size(), 1);
     }
@@ -151,7 +151,7 @@ public class ClusterServiceTest {
         IPage<Cluster> page = new Page<>(1, 10);
         page.setRecords(getList());
         page.setTotal(1L);
-        when(clusterMapper.queryClusterListPaging(Mockito.any(Page.class), Mockito.eq(clusterName))).thenReturn(page);
+        when(clusterDao.queryClusterListPaging(Mockito.any(Page.class), Mockito.eq(clusterName))).thenReturn(page);
 
         PageInfo<ClusterDto> clusterDtoPageInfo = clusterService.queryClusterListPaging(1, 10, clusterName);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(clusterDtoPageInfo.getTotalList()));
@@ -159,21 +159,21 @@ public class ClusterServiceTest {
 
     @Test
     public void testQueryClusterByName() {
-        when(clusterMapper.queryByClusterName(clusterName)).thenReturn(null);
+        when(clusterDao.queryByClusterName(clusterName)).thenReturn(null);
         assertThrowsServiceException(Status.QUERY_CLUSTER_BY_NAME_ERROR,
                 () -> clusterService.queryClusterByName(clusterName));
 
-        when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
+        when(clusterDao.queryByClusterName(clusterName)).thenReturn(getCluster());
         ClusterDto clusterDto = clusterService.queryClusterByName(clusterName);
         assertNotNull(clusterDto);
     }
 
     @Test
     public void testQueryClusterByCode() {
-        when(clusterMapper.queryByClusterCode(1L)).thenReturn(null);
+        when(clusterDao.queryByClusterCode(1L)).thenReturn(null);
         assertThrowsServiceException(Status.QUERY_CLUSTER_BY_CODE_ERROR, () -> clusterService.queryClusterByCode(1L));
 
-        when(clusterMapper.queryByClusterCode(1L)).thenReturn(getCluster());
+        when(clusterDao.queryByClusterCode(1L)).thenReturn(getCluster());
         ClusterDto clusterDto = clusterService.queryClusterByCode(1L);
         assertNotNull(clusterDto);
     }
@@ -186,10 +186,10 @@ public class ClusterServiceTest {
         });
 
         final User adminUser = getAdminUser();
-        when(clusterMapper.deleteByCode(1L)).thenReturn(1);
+        when(clusterDao.deleteByCode(1L)).thenReturn(true);
         assertDoesNotThrow(() -> clusterService.deleteClusterByCode(adminUser, 1L));
 
-        when(k8sNamespaceMapper.selectCount(Mockito.any())).thenReturn(1L);
+        when(k8sNamespaceDao.countByClusterCode(Mockito.anyLong())).thenReturn(1L);
         assertThrowsServiceException(Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS,
                 () -> clusterService.deleteClusterByCode(adminUser, 1L));
     }
@@ -198,7 +198,7 @@ public class ClusterServiceTest {
     public void testVerifyCluster() {
         assertThrowsServiceException(Status.CLUSTER_NAME_IS_NULL, () -> clusterService.verifyCluster(""));
 
-        when(clusterMapper.queryByClusterName(clusterName)).thenReturn(getCluster());
+        when(clusterDao.queryByClusterName(clusterName)).thenReturn(getCluster());
         assertThrowsServiceException(Status.CLUSTER_NAME_EXISTS, () -> clusterService.verifyCluster(clusterName));
     }
 

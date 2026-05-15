@@ -67,7 +67,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
@@ -149,9 +148,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
     @Autowired
     WorkflowDefinitionService workflowDefinitionService;
-
-    @Autowired
-    TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
     WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
@@ -680,7 +676,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         // Fetch valid task instances for the workflow
         List<TaskInstance> taskInstanceList =
-                taskInstanceMapper.findValidTaskListByWorkflowInstanceId(workflowInstance.getId(), Flag.YES);
+                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId());
 
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
@@ -734,7 +730,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         List<Task> taskList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(nodeList)) {
-            List<TaskInstance> taskInstances = taskInstanceMapper.queryByWorkflowInstanceIdsAndTaskCodes(
+            List<TaskInstance> taskInstances = taskInstanceDao.queryByWorkflowInstanceIdsAndTaskCodes(
                     Collections.singletonList(workflowInstanceId), nodeList);
             for (Long node : nodeList) {
                 TaskInstance taskInstance = null;

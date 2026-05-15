@@ -37,10 +37,10 @@ import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
 import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
@@ -207,10 +207,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class K8sNamespaceResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final K8sNamespaceMapper k8sNamespaceMapper;
+        private final K8sNamespaceDao k8sNamespaceDao;
 
-        public K8sNamespaceResourcePermissionCheck(K8sNamespaceMapper k8sNamespaceMapper) {
-            this.k8sNamespaceMapper = k8sNamespaceMapper;
+        public K8sNamespaceResourcePermissionCheck(K8sNamespaceDao k8sNamespaceDao) {
+            this.k8sNamespaceDao = k8sNamespaceDao;
         }
 
         @Override
@@ -225,7 +225,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            List<K8sNamespace> k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
+            List<K8sNamespace> k8sNamespaces = k8sNamespaceDao.queryAuthedNamespaceListByUserId(userId);
             return k8sNamespaces.stream().map(K8sNamespace::getId).collect(Collectors.toSet());
         }
     }

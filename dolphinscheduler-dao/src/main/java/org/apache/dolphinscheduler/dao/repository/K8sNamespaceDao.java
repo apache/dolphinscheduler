@@ -15,19 +15,25 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.task;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.LogicFakeTaskParameters;
+import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.util.List;
 
-@VisibleForTesting
-public class LogicFakeTaskChannel extends AbstractLogicTaskChannel {
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
-    @Override
-    public AbstractParameters parseParameters(String taskParams) {
-        return JSONUtils.parseObject(taskParams, LogicFakeTaskParameters.class);
-    }
+public interface K8sNamespaceDao extends IDao<K8sNamespace> {
+
+    IPage<K8sNamespace> queryK8sNamespacePaging(IPage<K8sNamespace> page, String searchVal);
+
+    boolean existNamespace(String namespace, Long clusterCode);
+
+    List<K8sNamespace> queryNamespaceExceptUserId(int userId);
+
+    List<K8sNamespace> queryAuthedNamespaceListByUserId(Integer userId);
+
+    K8sNamespace queryByNamespaceCode(Long namespaceCode);
+
+    long countByClusterCode(Long clusterCode);
 }

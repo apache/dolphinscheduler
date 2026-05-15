@@ -34,7 +34,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -77,9 +76,6 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
 
     @Autowired
     ProcessService processService;
-
-    @Autowired
-    TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
     TaskInstanceDao taskInstanceDao;
@@ -141,7 +137,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         IPage<TaskInstance> taskInstanceIPage;
         if (taskExecuteType == TaskExecuteType.STREAM) {
             // stream task without workflow instance
-            taskInstanceIPage = taskInstanceMapper.queryStreamTaskInstanceListPaging(
+            taskInstanceIPage = taskInstanceDao.queryStreamTaskInstanceListPaging(
                     page,
                     projectCode,
                     workflowDefinitionName,
@@ -155,7 +151,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                     start,
                     end);
         } else {
-            taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
+            taskInstanceIPage = taskInstanceDao.queryTaskInstanceListPaging(
                     page,
                     projectCode,
                     workflowInstanceId,
@@ -226,8 +222,8 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         // change the state of the task instance
         task.setState(TaskExecutionStatus.FORCED_SUCCESS);
         task.setEndTime(new Date());
-        int changedNum = taskInstanceMapper.updateById(task);
-        if (changedNum <= 0) {
+        boolean changed = taskInstanceDao.updateById(task);
+        if (!changed) {
             throw new ServiceException(Status.FORCE_TASK_SUCCESS_ERROR);
         }
         processService.forceWorkflowInstanceSuccessByTaskInstanceId(task);
@@ -242,7 +238,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, FORCED_SUCCESS);
 
-        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
+        TaskInstance taskInstance = taskInstanceDao.queryById(taskInstanceId);
         if (taskInstance == null) {
             log.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
                     taskInstanceId);
@@ -266,7 +262,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, FORCED_SUCCESS);
 
-        TaskInstance taskInstance = taskInstanceMapper.selectById(taskInstanceId);
+        TaskInstance taskInstance = taskInstanceDao.queryById(taskInstanceId);
         if (taskInstance == null) {
             log.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
                     taskInstanceId);

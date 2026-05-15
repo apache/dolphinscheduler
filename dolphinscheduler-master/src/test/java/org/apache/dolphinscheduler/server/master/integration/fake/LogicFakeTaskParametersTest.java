@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.parameters;
+package org.apache.dolphinscheduler.server.master.integration.fake;
 
 import static com.google.common.truth.Truth.assertThat;
 

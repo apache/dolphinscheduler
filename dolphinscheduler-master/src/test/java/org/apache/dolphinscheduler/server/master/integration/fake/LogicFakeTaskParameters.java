@@ -15,29 +15,32 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit.operator.impl;
+package org.apache.dolphinscheduler.server.master.integration.fake;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.StringUtils;
 
-@Service
-public class TaskInstancesAuditOperatorImpl extends BaseAuditOperator {
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
+import com.google.common.annotations.VisibleForTesting;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@VisibleForTesting
+public class LogicFakeTaskParameters extends AbstractParameters {
+
+    private String shellScript;
 
     @Override
-    protected String getObjectNameFromIdentity(Object identity) {
-        Long objId = toLong(identity);
-        if (objId == -1) {
-            return "";
+    public boolean checkParameters() {
+        if (StringUtils.isEmpty(shellScript)) {
+            throw new IllegalArgumentException("shellScript is null or empty");
         }
-
-        TaskInstance obj = taskInstanceDao.queryById(objId);
-        return obj == null ? "" : obj.getName();
+        return true;
     }
+
 }
