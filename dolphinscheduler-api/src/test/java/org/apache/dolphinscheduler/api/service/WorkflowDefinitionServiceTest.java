@@ -60,7 +60,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
@@ -70,6 +69,7 @@ import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
@@ -162,7 +162,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private ProjectServiceImpl projectService;
 
     @Mock
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Mock
     private SchedulerService schedulerService;
@@ -579,8 +579,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         // scheduler list elements > 1
         workflowDefinition.setReleaseState(ReleaseState.OFFLINE);
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
-        when(scheduleMapper.queryByWorkflowDefinitionCode(46L)).thenReturn(getSchedule());
-        when(scheduleMapper.deleteById(46)).thenReturn(1);
+        when(scheduleDao.queryByWorkflowDefinitionCode(46L)).thenReturn(getSchedule());
+        when(scheduleDao.deleteById(46)).thenReturn(true);
         when(workflowLineageService.taskDependentMsg(project.getCode(), workflowDefinition.getCode(), 0))
                 .thenReturn(Optional.empty());
         when(workflowLineageService.deleteWorkflowLineage(anyList())).thenReturn(1);
@@ -589,7 +589,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         // scheduler online
         Schedule schedule = getSchedule();
         schedule.setReleaseState(ReleaseState.ONLINE);
-        when(scheduleMapper.queryByWorkflowDefinitionCode(46L)).thenReturn(schedule);
+        when(scheduleDao.queryByWorkflowDefinitionCode(46L)).thenReturn(schedule);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> workflowDefinitionService.deleteWorkflowDefinitionByCode(user, 46L));
         Assertions.assertEquals(Status.SCHEDULE_STATE_ONLINE.getCode(), ((ServiceException) exception).getCode());
@@ -604,8 +604,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
         // delete success
         schedule.setReleaseState(ReleaseState.OFFLINE);
-        when(scheduleMapper.queryByWorkflowDefinitionCode(46L)).thenReturn(getSchedule());
-        when(scheduleMapper.deleteById(schedule.getId())).thenReturn(1);
+        when(scheduleDao.queryByWorkflowDefinitionCode(46L)).thenReturn(getSchedule());
+        when(scheduleDao.deleteById(schedule.getId())).thenReturn(true);
         when(workflowLineageService.taskDependentMsg(project.getCode(), workflowDefinition.getCode(), 0))
                 .thenReturn(Optional.empty());
         when(workflowLineageService.deleteWorkflowLineage(anyList())).thenReturn(1);
