@@ -208,4 +208,11 @@ public class TaskNode {
                 + '}';
     }
 
+    public Integer getCpuQuota() {
+        return cpuQuota == null ? -1 : cpuQuota;
+    }
+
+    public Integer getMemoryMax() {
+        return memoryMax == null ? -1 : memoryMax;
+    }
 }
