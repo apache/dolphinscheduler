@@ -36,9 +36,9 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -93,7 +93,7 @@ public class WorkerGroupServiceTest {
     private TaskDefinitionMapper taskDefinitionMapper;
 
     @Mock
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     private final String GROUP_NAME = "testWorkerGroup";
 
@@ -255,7 +255,7 @@ public class WorkerGroupServiceTest {
 
         when(taskDefinitionMapper.selectList(Mockito.any())).thenReturn(null);
 
-        when(scheduleMapper.selectList(Mockito.any())).thenReturn(null);
+        when(scheduleDao.queryScheduleByWorkerGroup(Mockito.any())).thenReturn(null);
 
         assertDoesNotThrow(() -> workerGroupService.deleteWorkerGroupById(loginUser, 1));
     }

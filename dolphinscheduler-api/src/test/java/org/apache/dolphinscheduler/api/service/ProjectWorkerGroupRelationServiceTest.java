@@ -30,9 +30,9 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectWorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
@@ -79,7 +79,7 @@ public class ProjectWorkerGroupRelationServiceTest {
     private TaskDefinitionDao taskDefinitionDao;
 
     @Mock
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     protected final static long projectCode = 1L;
 
@@ -204,7 +204,7 @@ public class ProjectWorkerGroupRelationServiceTest {
         Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(Mockito.anyLong()))
                 .thenReturn(new ArrayList<>());
 
-        Mockito.when(scheduleMapper.querySchedulerListByProjectName(Mockito.any()))
+        Mockito.when(scheduleDao.querySchedulerListByProjectName(Mockito.any()))
                 .thenReturn(Lists.newArrayList());
 
         List<ProjectWorkerGroup> projectWorkerGroups =

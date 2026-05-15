@@ -52,9 +52,9 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -129,7 +129,7 @@ public class PythonGateway {
     private SchedulerService schedulerService;
 
     @Autowired
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Autowired
     private DataSourceMapper dataSourceMapper;
@@ -326,7 +326,7 @@ public class PythonGateway {
                                         String workerGroup,
                                         String warningType,
                                         int warningGroupId) {
-        Schedule scheduleObj = scheduleMapper.queryByWorkflowDefinitionCode(workflowCode);
+        Schedule scheduleObj = scheduleDao.queryByWorkflowDefinitionCode(workflowCode);
         // create or update schedule
         int scheduleId;
         if (scheduleObj == null) {

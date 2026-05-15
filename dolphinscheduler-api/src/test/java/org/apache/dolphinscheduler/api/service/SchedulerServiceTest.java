@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import java.util.Optional;
@@ -50,7 +50,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private SchedulerServiceImpl schedulerService;
 
     @Mock
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Mock
     private ProjectDao projectDao;
@@ -91,7 +91,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
 
         // error schedule already online
         schedule.setReleaseState(ReleaseState.ONLINE);
-        Mockito.when(scheduleMapper.selectById(scheduleId)).thenReturn(schedule);
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
         Assertions.assertEquals(Status.SCHEDULE_STATE_ONLINE.getCode(), ((ServiceException) exception).getCode());
@@ -100,14 +100,14 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         // error user not own schedule
         int notOwnUserId = 2;
         schedule.setUserId(notOwnUserId);
-        Mockito.when(scheduleMapper.selectById(scheduleId)).thenReturn(schedule);
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
         Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getMsg(), exception.getMessage());
         schedule.setUserId(userId);
 
         // error process definition not exists
-        Mockito.when(scheduleMapper.selectById(scheduleId)).thenReturn(schedule);
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
         Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(),
@@ -126,13 +126,13 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
 
         // error delete mapper
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, this.getProject(), null);
-        Mockito.when(scheduleMapper.deleteById(scheduleId)).thenReturn(0);
+        Mockito.when(scheduleDao.deleteById(scheduleId)).thenReturn(false);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
         Assertions.assertEquals(Status.DELETE_SCHEDULE_BY_ID_ERROR.getCode(), ((ServiceException) exception).getCode());
 
         // success
-        Mockito.when(scheduleMapper.deleteById(scheduleId)).thenReturn(1);
+        Mockito.when(scheduleDao.deleteById(scheduleId)).thenReturn(true);
         Assertions.assertDoesNotThrow(() -> schedulerService.deleteSchedulesById(user, scheduleId));
     }
 

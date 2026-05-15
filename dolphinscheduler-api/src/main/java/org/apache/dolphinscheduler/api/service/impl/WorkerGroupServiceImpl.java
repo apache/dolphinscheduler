@@ -42,9 +42,9 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
@@ -90,7 +90,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
 
     @Autowired
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Autowired
     private TaskDefinitionMapper taskDefinitionMapper;
@@ -169,8 +169,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         }
 
         // check if the worker group has any dependent schedulers
-        List<Schedule> schedules = scheduleMapper
-                .selectList(new QueryWrapper<Schedule>().lambda().eq(Schedule::getWorkerGroup, workerGroup.getName()));
+        List<Schedule> schedules = scheduleDao.queryScheduleByWorkerGroup(workerGroup.getName());
 
         if (CollectionUtils.isNotEmpty(schedules)) {
             List<String> workflowDefinitionNames = schedules.stream().limit(3)
@@ -356,7 +355,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public Map<Long, String> queryWorkerGroupByWorkflowDefinitionCodes(List<Long> workflowDefinitionCodeList) {
         List<Schedule> workflowDefinitionScheduleList =
-                scheduleMapper.querySchedulesByWorkflowDefinitionCodes(workflowDefinitionCodeList);
+                scheduleDao.querySchedulesByWorkflowDefinitionCodes(workflowDefinitionCodeList);
         return workflowDefinitionScheduleList.stream().collect(Collectors.toMap(Schedule::getWorkflowDefinitionCode,
                 Schedule::getWorkerGroup));
     }
