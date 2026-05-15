@@ -46,9 +46,9 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
@@ -104,7 +104,7 @@ public class DataAnalysisServiceTest {
     ErrorCommandMapper errorCommandMapper;
 
     @Mock
-    TaskInstanceMapper taskInstanceMapper;
+    TaskInstanceDao taskInstanceDao;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -192,7 +192,7 @@ public class DataAnalysisServiceTest {
         user.setUserType(UserType.GENERAL_USER);
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1,
                 serviceLogger)).thenReturn(projectIds());
-        when(taskInstanceMapper.countTaskInstanceStateByProjectCodes(any(), any(), any()))
+        when(taskInstanceDao.countTaskInstanceStateByProjectCodes(any(), any(), any()))
                 .thenReturn(Collections.emptyList());
         assertDoesNotThrow(() -> dataAnalysisServiceImpl.getTaskInstanceStateCountByProject(user, 1L, null, null));
 
@@ -206,7 +206,7 @@ public class DataAnalysisServiceTest {
 
         // when instanceStateCounter return null, then return nothing
         user.setUserType(UserType.GENERAL_USER);
-        when(taskInstanceMapper.countTaskInstanceStateByProjectCodes(any(), any(), any()))
+        when(taskInstanceDao.countTaskInstanceStateByProjectCodes(any(), any(), any()))
                 .thenReturn(Collections.emptyList());
         TaskInstanceCountVO taskInstanceStateCountByProject =
                 dataAnalysisServiceImpl.getTaskInstanceStateCountByProject(user, 1L, null, null);

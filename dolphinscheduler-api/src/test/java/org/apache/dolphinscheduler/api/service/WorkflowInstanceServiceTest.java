@@ -58,7 +58,6 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
@@ -148,9 +147,6 @@ public class WorkflowInstanceServiceTest {
 
     @Mock
     private TaskInstanceContextDao taskInstanceContextDao;
-
-    @Mock
-    TaskInstanceMapper taskInstanceMapper;
 
     @Mock
     CuringParamsService curingGlobalParamsService;

@@ -36,12 +36,12 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -88,7 +88,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     private ErrorCommandMapper errorCommandMapper;
 
     @Autowired
-    private TaskInstanceMapper taskInstanceMapper;
+    private TaskInstanceDao taskInstanceDao;
 
     @Override
     public TaskInstanceCountVO getTaskInstanceStateCountByProject(User loginUser,
@@ -99,7 +99,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
         List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
-                taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
+                taskInstanceDao.countTaskInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
         return TaskInstanceCountVO.of(taskInstanceStatusCounts);
     }
 
@@ -114,7 +114,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
         List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
-                taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, projectCodes);
+                taskInstanceDao.countTaskInstanceStateByProjectCodes(start, end, projectCodes);
         return TaskInstanceCountVO.of(taskInstanceStatusCounts);
     }
 
