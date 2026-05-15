@@ -38,10 +38,10 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -83,7 +83,7 @@ public class TenantServiceTest {
     private TenantMapper tenantMapper;
 
     @Mock
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Mock
     private WorkflowInstanceMapper workflowInstanceMapper;
@@ -190,7 +190,7 @@ public class TenantServiceTest {
         when(workflowInstanceMapper.queryByTenantCodeAndStatus(tenantCode,
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES))
                         .thenReturn(getInstanceList());
-        when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(getScheduleList());
+        when(scheduleDao.queryScheduleListByTenant(tenantCode)).thenReturn(getScheduleList());
         when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
 
         // TENANT_NOT_EXIST
@@ -208,7 +208,7 @@ public class TenantServiceTest {
 
         // DELETE_TENANT_BY_ID_FAIL_USERS
         when(tenantMapper.queryById(3)).thenReturn(getTenant(3));
-        when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(Collections.emptyList());
+        when(scheduleDao.queryScheduleListByTenant(tenantCode)).thenReturn(Collections.emptyList());
         assertThrowsServiceException(Status.DELETE_TENANT_BY_ID_FAIL_USERS,
                 () -> tenantService.deleteTenantById(getLoginUser(), 3));
 

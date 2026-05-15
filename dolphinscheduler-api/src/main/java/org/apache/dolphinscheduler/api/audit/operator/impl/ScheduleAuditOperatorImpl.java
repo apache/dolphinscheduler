@@ -25,7 +25,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import java.util.List;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 public class ScheduleAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Autowired
     private WorkflowDefinitionDao workflowDefinitionDao;
@@ -49,7 +49,7 @@ public class ScheduleAuditOperatorImpl extends BaseAuditOperator {
             return;
         }
         int id = (int) paramsMap.get(paramNameArr[0]);
-        Schedule schedule = scheduleMapper.selectById(id);
+        Schedule schedule = scheduleDao.queryById(id);
         if (schedule != null) {
             paramsMap.put(AuditLogConstants.CODE, schedule.getWorkflowDefinitionCode());
             paramNameArr[0] = AuditLogConstants.CODE;

@@ -26,9 +26,9 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectWorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
@@ -66,7 +66,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
     private TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Autowired
     private ProjectService projectService;
@@ -218,7 +218,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
         });
 
         // query all worker groups that timings depend on
-        scheduleMapper.querySchedulerListByProjectName(project.getName())
+        scheduleDao.querySchedulerListByProjectName(project.getName())
                 .stream()
                 .filter(schedule -> StringUtils.isNotEmpty(schedule.getWorkerGroup()))
                 .forEach(schedule -> usedWorkerGroups.add(schedule.getWorkerGroup()));
