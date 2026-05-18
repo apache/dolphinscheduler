@@ -233,6 +233,60 @@ public class CuringParamsServiceImplTest {
     }
 
     @Test
+    public void testParamParsingPreparation_withLocalFileParams() {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setExecutePath("home/path/execute");
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setName("TaskName-1");
+        taskDefinition.setCode(1000001L);
+
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(2);
+        final BackfillWorkflowCommandParam backfillWorkflowCommandParam = BackfillWorkflowCommandParam.builder()
+                .timeZone("Asia/Shanghai")
+                .build();
+        workflowInstance.setHistoryCmd(CommandType.COMPLEMENT_DATA.toString());
+        workflowInstance.setCommandParam(JSONUtils.toJsonString(backfillWorkflowCommandParam));
+        workflowInstance.setGlobalParams("");
+
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setName("ProcessName-1");
+        workflowDefinition.setProjectName("ProjectName");
+        workflowDefinition.setProjectCode(3000001L);
+        workflowDefinition.setCode(200001L);
+
+        Project project = new Project();
+        project.setName("ProjectName");
+        project.setCode(3000001L);
+
+        workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
+        workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
+
+        String varPoolParams = "[{\"prop\":\"task1.file\",\"direct\":\"OUT\",\"type\":\"FILE\",\"value\":\"file\"}]";
+        taskInstance.setTaskCode(taskDefinition.getCode());
+        taskInstance.setTaskDefinitionVersion(taskDefinition.getVersion());
+        taskInstance.setProjectCode(workflowDefinition.getProjectCode());
+        taskInstance.setWorkflowInstanceId(workflowInstance.getId());
+        taskInstance.setVarPool(varPoolParams);
+
+        Property fileInParam = new Property("file_new", Direct.IN, DataType.FILE, "task1.file");
+        AbstractParameters parameters = Mockito.mock(AbstractParameters.class);
+        Mockito.when(parameters.getLocalParams()).thenReturn(Lists.newArrayList(fileInParam));
+
+        Mockito.when(projectParameterMapper.queryByProjectCode(Mockito.anyLong())).thenReturn(Collections.emptyList());
+
+        Map<String, Property> propertyMap =
+                curingParamsServiceImpl.paramParsingPreparation(taskInstance, parameters, workflowInstance,
+                        project.getName(), workflowDefinition.getName());
+        Assertions.assertNotNull(propertyMap);
+
+        Assertions.assertEquals("file", propertyMap.get("task1.file").getValue());
+        Assertions.assertEquals("file_new", propertyMap.get("task1.file").getProp());
+    }
+
+    @Test
     public void testParseGlobalParamsMap() throws Exception {
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setGlobalParams(

@@ -23,11 +23,14 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionContextUtils;
+import org.apache.dolphinscheduler.server.worker.utils.TaskFilesTransferUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TenantUtils;
 import org.apache.dolphinscheduler.task.executor.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
@@ -36,6 +39,7 @@ import org.apache.dolphinscheduler.task.executor.TaskExecutorStateMappings;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +73,22 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
         this.physicalTask.getParameters().setVarPool(new ArrayList<>());
         log.info("Set taskVarPool: {} successfully", taskExecutionContext.getVarPool());
+    }
+
+    @Override
+    public TaskExecutorState trackTaskExecutorState() {
+        TaskExecutorState state = super.trackTaskExecutorState();
+        if (TaskExecutorState.SUCCEEDED.equals(state)) {
+            uploadOutputFilesIfNeeded();
+        }
+        return state;
+    }
+
+    private void uploadOutputFilesIfNeeded() {
+        List<Property> uploadOutputFiles = TaskFilesTransferUtils.tryUploadOutputFiles(
+                taskExecutionContext,
+                storageOperator);
+        log.info("Upload output files successfully: {}", uploadOutputFiles);
     }
 
     @Override
@@ -130,12 +150,19 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
         TaskExecutionContextUtils.createTaskInstanceWorkingDirectory(taskExecutionContext);
         log.info("TaskInstance working directory: {} create successfully", taskExecutionContext.getExecutePath());
 
+        TaskChannel taskChannel = physicalTaskPluginFactory.getTaskChannel(this);
         final ResourceContext resourceContext = TaskExecutionContextUtils.downloadResourcesIfNeeded(
-                physicalTaskPluginFactory.getTaskChannel(this),
+                taskChannel,
                 storageOperator,
                 taskExecutionContext);
         taskExecutionContext.setResourceContext(resourceContext);
         log.info("Download resources successfully: {}", taskExecutionContext.getResourceContext());
+
+        List<Property> downloadUpstreamFiles = TaskFilesTransferUtils.tryDownloadUpstreamFiles(
+                taskChannel,
+                taskExecutionContext,
+                storageOperator);
+        log.info("Download upstream files successfully: {}", downloadUpstreamFiles);
 
         log.info(TaskLogMarkers.excludeInTaskLog(), "Initialized Task Context{}",
                 JSONUtils.toPrettyJsonString(taskExecutionContext));

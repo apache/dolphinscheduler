@@ -294,7 +294,15 @@ public class CuringParamsServiceImpl implements CuringParamsService {
         Map<String, Property> localParametersMaps = new LinkedHashMap<>();
         if (CollectionUtils.isNotEmpty(parameters.getLocalParams())) {
             parameters.getLocalParams()
-                    .forEach(localParam -> localParametersMaps.put(localParam.getProp(), localParam));
+                    .forEach(localParam -> {
+                        // If the parameter type is FILE and the direction is IN,
+                        // then use the parameter value as map key.
+                        if (DataType.FILE.equals(localParam.getType()) && Direct.IN.equals(localParam.getDirect())) {
+                            localParametersMaps.put(localParam.getValue(), localParam);
+                        } else {
+                            localParametersMaps.put(localParam.getProp(), localParam);
+                        }
+                    });
         }
         return localParametersMaps;
     }
