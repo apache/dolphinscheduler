@@ -39,9 +39,9 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
+import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -90,7 +90,7 @@ public class UsersServiceTest {
     private AlertGroupMapper alertGroupMapper;
 
     @Mock
-    private DataSourceUserMapper datasourceUserMapper;
+    private DataSourceUserDao datasourceUserDao;
 
     @Mock
     private K8sNamespaceUserMapper k8sNamespaceUserMapper;
@@ -519,7 +519,6 @@ public class UsersServiceTest {
 
         // test admin user
         when(userDao.queryById(userId)).thenReturn(getUser());
-        when(datasourceUserMapper.deleteByUserId(Mockito.anyInt())).thenReturn(1);
         assertDoesNotThrow(() -> usersService.grantDataSource(loginUser, userId, datasourceIds));
 
         // test non-admin user
