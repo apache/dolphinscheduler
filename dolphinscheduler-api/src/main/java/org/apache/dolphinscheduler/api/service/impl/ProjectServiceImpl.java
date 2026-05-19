@@ -36,9 +36,9 @@ import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -79,13 +79,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     private ProjectDao projectDao;
 
     @Autowired
-    private ProjectUserMapper projectUserMapper;
+    private ProjectUserDao projectUserDao;
 
     @Autowired
     private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     /**
      * create project
@@ -219,7 +219,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return;
         }
         // case 3: check user permission level
-        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
+        ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), loginUser.getId());
         if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
             throw new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
         }
@@ -260,7 +260,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.SUCCESS);
             return result;
         }
-        List<User> userList = userMapper.selectByIds(projectList.stream()
+        List<User> userList = userDao.queryByIds(projectList.stream()
                 .map(Project::getUserId).distinct().collect(Collectors.toList()));
         Map<Integer, String> userMap = userList.stream().collect(Collectors.toMap(User::getId, User::getUserName));
         List<Long> projectCodes = projectList.stream().map(Project::getCode).distinct().collect(Collectors.toList());
@@ -312,7 +312,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         for (Project project : projectList) {
             if (userProjectIds.contains(project.getId())) {
-                ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), userId);
+                ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), userId);
                 if (projectUser == null) {
                     // in this case, the user is the project owner, maybe it's better to set it to ALL_PERMISSION.
                     project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
@@ -394,7 +394,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
             return result;
         }
-        User user = userMapper.selectById(loginUser.getId());
+        User user = userDao.queryById(loginUser.getId());
         if (user == null) {
             log.error("user {} not exists", loginUser.getId());
             putMsg(result, Status.USER_NOT_EXIST, loginUser.getId());
@@ -546,7 +546,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         this.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
 
         // 2. query authorized user list
-        List<User> users = this.userMapper.queryAuthedUserListByProjectId(project.getId());
+        List<User> users = this.userDao.queryAuthedUserListByProjectId(project.getId());
         result.setData(users);
         this.putMsg(result, Status.SUCCESS);
         return result;
@@ -610,7 +610,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             return Constants.ALL_PERMISSIONS;
         }
 
-        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
+        ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), user.getId());
 
         if (projectUser == null) {
             return 0;

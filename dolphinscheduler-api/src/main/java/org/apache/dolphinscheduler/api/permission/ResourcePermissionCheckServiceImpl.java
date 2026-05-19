@@ -35,12 +35,12 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
-import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
@@ -126,10 +126,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class QueueResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final QueueMapper queueMapper;
+        private final QueueDao queueDao;
 
-        public QueueResourcePermissionCheck(QueueMapper queueMapper) {
-            this.queueMapper = queueMapper;
+        public QueueResourcePermissionCheck(QueueDao queueDao) {
+            this.queueDao = queueDao;
         }
 
         @Override
@@ -147,7 +147,7 @@ public class ResourcePermissionCheckServiceImpl
             if (userId != 0) {
                 return Collections.emptySet();
             }
-            List<Queue> queues = queueMapper.selectList(null);
+            List<Queue> queues = queueDao.queryAll();
             return queues.stream().map(Queue::getId).collect(toSet());
         }
     }
@@ -384,10 +384,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class DataSourceResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final DataSourceMapper dataSourceMapper;
+        private final DataSourceDao dataSourceDao;
 
-        public DataSourceResourcePermissionCheck(DataSourceMapper dataSourceMapper) {
-            this.dataSourceMapper = dataSourceMapper;
+        public DataSourceResourcePermissionCheck(DataSourceDao dataSourceDao) {
+            this.dataSourceDao = dataSourceDao;
         }
 
         @Override
@@ -402,7 +402,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            return dataSourceMapper.listAuthorizedDataSource(userId, null).stream().map(DataSource::getId)
+            return dataSourceDao.listAuthorizedDataSource(userId, null).stream().map(DataSource::getId)
                     .collect(toSet());
         }
     }

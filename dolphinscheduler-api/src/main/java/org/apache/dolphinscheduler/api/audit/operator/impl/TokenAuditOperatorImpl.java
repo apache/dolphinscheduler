@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import java.util.List;
 import java.util.Map;
@@ -39,13 +39,13 @@ public class TokenAuditOperatorImpl extends BaseAuditOperator {
     private AccessTokenMapper accessTokenMapper;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Override
     public void modifyAuditOperationType(AuditType auditType, Map<String, Object> paramsMap,
                                          List<AuditLog> auditLogList) {
         if (paramsMap.get(AuditLogConstants.USER_ID) != null) {
-            User user = userMapper.selectById(paramsMap.get(AuditLogConstants.USER_ID).toString());
+            User user = userDao.queryById(paramsMap.get(AuditLogConstants.USER_ID).toString());
             auditLogList.forEach(auditLog -> {
                 auditLog.setModelName(user.getUserName());
                 auditLog.setModelId(Long.valueOf(user.getId()));

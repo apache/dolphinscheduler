@@ -15,29 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit.operator.impl;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
-import org.apache.dolphinscheduler.dao.entity.DataSource;
-import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
+import org.apache.dolphinscheduler.dao.entity.Queue;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-@Service
-public class DatasourceAuditOperatorImpl extends BaseAuditOperator {
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
-    @Autowired
-    private DataSourceDao dataSourceDao;
+public interface QueueDao extends IDao<Queue> {
 
-    @Override
-    public String getObjectNameFromIdentity(Object identity) {
-        Long objId = toLong(identity);
-        if (objId == -1) {
-            return "";
-        }
+    IPage<Queue> queryQueuePaging(IPage<Queue> page, List<Integer> ids, String searchVal);
 
-        DataSource obj = dataSourceDao.queryById(objId);
-        return obj == null ? "" : obj.getName();
-    }
+    boolean existQueue(String queue, String queueName);
+
+    Queue queryQueueName(String queue, String queueName);
 }
