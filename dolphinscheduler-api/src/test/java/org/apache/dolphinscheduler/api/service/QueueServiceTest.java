@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
+import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -73,7 +73,7 @@ public class QueueServiceTest {
     private QueueServiceImpl queueService;
 
     @Mock
-    private QueueMapper queueMapper;
+    private QueueDao queueDao;
 
     @Mock
     private UserDao userDao;
@@ -101,7 +101,7 @@ public class QueueServiceTest {
         ids.add(1);
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
                 getLoginUser().getId(), queueServiceImplLogger)).thenReturn(ids);
-        when(queueMapper.selectBatchIds(Mockito.anySet())).thenReturn(getQueueList());
+        when(queueDao.queryByIds(Mockito.anySet())).thenReturn(getQueueList());
         assertDoesNotThrow(() -> queueService.queryList(getLoginUser()));
 
     }
@@ -116,7 +116,7 @@ public class QueueServiceTest {
         ids.add(1);
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
                 getLoginUser().getId(), queueServiceImplLogger)).thenReturn(ids);
-        when(queueMapper.queryQueuePaging(Mockito.any(Page.class), Mockito.anyList(), Mockito.eq(QUEUE_NAME)))
+        when(queueDao.queryQueuePaging(Mockito.any(Page.class), Mockito.anyList(), Mockito.eq(QUEUE_NAME)))
                 .thenReturn(page);
         PageInfo<Queue> queuePageInfo = queueService.queryList(getLoginUser(), QUEUE_NAME, 1, 10);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(queuePageInfo.getTotalList()));
@@ -147,9 +147,9 @@ public class QueueServiceTest {
 
     @Test
     public void testUpdateQueue() {
-        when(queueMapper.selectById(1)).thenReturn(getQUEUE());
-        when(queueMapper.existQueue(EXISTS, null)).thenReturn(true);
-        when(queueMapper.existQueue(null, EXISTS)).thenReturn(true);
+        when(queueDao.queryById(1)).thenReturn(getQUEUE());
+        when(queueDao.existQueue(EXISTS, null)).thenReturn(true);
+        when(queueDao.existQueue(null, EXISTS)).thenReturn(true);
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.QUEUE,
                 getLoginUser().getId(), YARN_QUEUE_UPDATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.QUEUE, new Object[]{0}, 0,
@@ -187,11 +187,11 @@ public class QueueServiceTest {
         Assertions.assertNull(queue.getCreateTime());
 
         // success update with same queue name
-        when(queueMapper.existQueue(NOT_EXISTS_FINAL, null)).thenReturn(false);
+        when(queueDao.existQueue(NOT_EXISTS_FINAL, null)).thenReturn(false);
         assertDoesNotThrow(() -> queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS_FINAL, NOT_EXISTS));
 
         // success update with same queue value
-        when(queueMapper.existQueue(null, NOT_EXISTS_FINAL)).thenReturn(false);
+        when(queueDao.existQueue(null, NOT_EXISTS_FINAL)).thenReturn(false);
         assertDoesNotThrow(() -> queueService.updateQueue(getLoginUser(), 1, NOT_EXISTS, NOT_EXISTS_FINAL));
     }
 
@@ -209,13 +209,13 @@ public class QueueServiceTest {
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // exist queueName
-        when(queueMapper.existQueue(EXISTS, null)).thenReturn(true);
+        when(queueDao.existQueue(EXISTS, null)).thenReturn(true);
         exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(EXISTS, QUEUE_NAME));
         formatter = MessageFormat.format(Status.QUEUE_VALUE_EXIST.getMsg(), EXISTS);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // exist queue
-        when(queueMapper.existQueue(null, EXISTS)).thenReturn(true);
+        when(queueDao.existQueue(null, EXISTS)).thenReturn(true);
         exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(QUEUE, EXISTS));
         formatter = MessageFormat.format(Status.QUEUE_NAME_EXIST.getMsg(), EXISTS);
         Assertions.assertEquals(formatter, exception.getMessage());
@@ -229,12 +229,12 @@ public class QueueServiceTest {
         Queue queue;
 
         // queue exists
-        when(queueMapper.queryQueueName(QUEUE, QUEUE_NAME)).thenReturn(getQUEUE());
+        when(queueDao.queryQueueName(QUEUE, QUEUE_NAME)).thenReturn(getQUEUE());
         queue = queueService.createQueueIfNotExists(QUEUE, QUEUE_NAME);
         Assertions.assertEquals(getQUEUE(), queue);
 
         // queue not exists
-        when(queueMapper.queryQueueName(QUEUE, QUEUE_NAME)).thenReturn(null);
+        when(queueDao.queryQueueName(QUEUE, QUEUE_NAME)).thenReturn(null);
         queue = queueService.createQueueIfNotExists(QUEUE, QUEUE_NAME);
         Assertions.assertEquals(new Queue(QUEUE_NAME, QUEUE), queue);
     }
