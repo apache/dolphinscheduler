@@ -67,9 +67,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -136,9 +134,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     private TaskInstanceService taskInstanceService;
 
     @Autowired
-    WorkflowInstanceMapper workflowInstanceMapper;
-
-    @Autowired
     WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
@@ -149,9 +144,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
     @Autowired
     WorkflowDefinitionService workflowDefinitionService;
-
-    @Autowired
-    TaskInstanceMapper taskInstanceMapper;
 
     @Autowired
     WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
@@ -202,7 +194,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             throw new ServiceException(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR, startTime, endTime);
         }
 
-        return workflowInstanceMapper.queryTopNWorkflowInstance(size, start, end, WorkflowExecutionStatus.SUCCESS,
+        return workflowInstanceDao.queryTopNWorkflowInstance(size, start, end, WorkflowExecutionStatus.SUCCESS,
                 projectCode);
     }
 
@@ -258,7 +250,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         Page<WorkflowInstance> page = new Page<>(pageNo, pageSize);
         PageInfo<WorkflowInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
 
-        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceMapper.queryWorkflowInstanceListPaging(
+        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceDao.queryWorkflowInstanceListPaging(
                 page,
                 projectCode,
                 workflowDefinitionCode,
@@ -604,7 +596,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
 
-        WorkflowInstance workflowInstance = workflowInstanceMapper.queryDetailById(workflowInstanceId);
+        WorkflowInstance workflowInstance = workflowInstanceDao.queryDetailById(workflowInstanceId);
 
         if (workflowInstance == null) {
             log.error("workflow instance does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
@@ -680,7 +672,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         // Fetch valid task instances for the workflow
         List<TaskInstance> taskInstanceList =
-                taskInstanceMapper.findValidTaskListByWorkflowInstanceId(workflowInstance.getId(), Flag.YES);
+                taskInstanceDao.queryValidTaskListByWorkflowInstanceId(workflowInstance.getId());
 
         for (TaskInstance taskInstance : taskInstanceList) {
             TaskDefinitionLog taskDefinitionLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
@@ -709,7 +701,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     public GanttDto viewGantt(User loginUser, long projectCode, Integer workflowInstanceId) throws Exception {
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
-        WorkflowInstance workflowInstance = workflowInstanceMapper.queryDetailById(workflowInstanceId);
+        WorkflowInstance workflowInstance = workflowInstanceDao.queryDetailById(workflowInstanceId);
 
         if (workflowInstance == null) {
             log.error("workflow instance does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
@@ -734,7 +726,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         List<Task> taskList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(nodeList)) {
-            List<TaskInstance> taskInstances = taskInstanceMapper.queryByWorkflowInstanceIdsAndTaskCodes(
+            List<TaskInstance> taskInstances = taskInstanceDao.queryByWorkflowInstanceIdsAndTaskCodes(
                     Collections.singletonList(workflowInstanceId), nodeList);
             for (Long node : nodeList) {
                 TaskInstance taskInstance = null;
@@ -767,7 +759,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
     @Override
     public List<WorkflowInstance> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode, int[] states) {
-        return workflowInstanceMapper.queryByWorkflowDefinitionCodeAndStatus(workflowDefinitionCode, states);
+        return workflowInstanceDao.queryByWorkflowDefinitionCodeAndStatus(workflowDefinitionCode, states);
     }
 
     @Override
@@ -779,7 +771,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
     @Override
     public List<WorkflowInstance> queryByWorkflowDefinitionCode(Long workflowDefinitionCode, int size) {
-        return workflowInstanceMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode, size);
+        return workflowInstanceDao.queryByWorkflowDefinitionCode(workflowDefinitionCode, size);
     }
 
     @Override
@@ -792,14 +784,14 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (triggerCode == null) {
             return Collections.emptyList();
         }
-        return workflowInstanceMapper.queryByTriggerCode(triggerCode);
+        return workflowInstanceDao.queryByTriggerCode(triggerCode);
     }
 
     @Override
     public void deleteWorkflowInstanceByWorkflowDefinitionCode(long workflowDefinitionCode) {
         while (true) {
             List<WorkflowInstance> workflowInstances =
-                    workflowInstanceMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode, 100);
+                    workflowInstanceDao.queryByWorkflowDefinitionCode(workflowDefinitionCode, 100);
             if (CollectionUtils.isEmpty(workflowInstances)) {
                 break;
             }

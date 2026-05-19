@@ -15,29 +15,23 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit.operator.impl;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.repository.TenantDao;
+import org.apache.dolphinscheduler.dao.entity.Cluster;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-@Service
-public class TenantAuditOperatorImpl extends BaseAuditOperator {
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
-    @Autowired
-    private TenantDao tenantDao;
+public interface ClusterDao extends IDao<Cluster> {
 
-    @Override
-    public String getObjectNameFromIdentity(Object identity) {
-        Long objId = toLong(identity);
-        if (objId == -1) {
-            return "";
-        }
+    Cluster queryByClusterName(String name);
 
-        Tenant obj = tenantDao.queryById(objId);
-        return obj == null ? "" : obj.getTenantCode();
-    }
+    Cluster queryByClusterCode(Long clusterCode);
+
+    List<Cluster> queryAllClusterList();
+
+    IPage<Cluster> queryClusterListPaging(IPage<Cluster> page, String searchName);
+
+    boolean deleteByCode(Long code);
 }

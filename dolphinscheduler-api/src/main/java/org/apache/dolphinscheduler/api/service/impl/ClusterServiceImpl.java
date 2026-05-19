@@ -27,10 +27,9 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
+import org.apache.dolphinscheduler.dao.repository.ClusterDao;
+import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -48,7 +47,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -60,13 +58,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class ClusterServiceImpl extends BaseServiceImpl implements ClusterService {
 
     @Autowired
-    private ClusterMapper clusterMapper;
+    private ClusterDao clusterDao;
 
     @Autowired
     private K8sManager k8sManager;
 
     @Autowired
-    private K8sNamespaceMapper k8sNamespaceMapper;
+    private K8sNamespaceDao k8sNamespaceDao;
 
     /**
      * create cluster
@@ -85,7 +83,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         checkParams(name, config);
 
-        Cluster clusterExistByName = clusterMapper.queryByClusterName(name);
+        Cluster clusterExistByName = clusterDao.queryByClusterName(name);
         if (clusterExistByName != null) {
             throw new ServiceException(Status.CLUSTER_NAME_EXISTS, name);
         }
@@ -99,7 +97,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         cluster.setUpdateTime(new Date());
         cluster.setCode(CodeGenerateUtils.genCode());
 
-        if (clusterMapper.insert(cluster) > 0) {
+        if (clusterDao.insert(cluster) > 0) {
             return cluster.getCode();
         }
         throw new ServiceException(Status.CREATE_CLUSTER_ERROR);
@@ -118,7 +116,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         Page<Cluster> page = new Page<>(pageNo, pageSize);
 
-        IPage<Cluster> clusterIPage = clusterMapper.queryClusterListPaging(page, searchVal);
+        IPage<Cluster> clusterIPage = clusterDao.queryClusterListPaging(page, searchVal);
 
         PageInfo<ClusterDto> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) clusterIPage.getTotal());
@@ -142,7 +140,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
      */
     @Override
     public List<ClusterDto> queryAllClusterList() {
-        List<Cluster> clusterList = clusterMapper.queryAllClusterList();
+        List<Cluster> clusterList = clusterDao.queryAllClusterList();
         if (CollectionUtils.isEmpty(clusterList)) {
             return Collections.emptyList();
         }
@@ -164,7 +162,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     @Override
     public ClusterDto queryClusterByCode(Long code) {
 
-        Cluster cluster = clusterMapper.queryByClusterCode(code);
+        Cluster cluster = clusterDao.queryByClusterCode(code);
 
         if (cluster == null) {
             throw new ServiceException(Status.QUERY_CLUSTER_BY_CODE_ERROR, code);
@@ -182,7 +180,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     @Override
     public ClusterDto queryClusterByName(String name) {
 
-        Cluster cluster = clusterMapper.queryByClusterName(name);
+        Cluster cluster = clusterDao.queryByClusterName(name);
         if (cluster == null) {
             throw new ServiceException(Status.QUERY_CLUSTER_BY_NAME_ERROR, name);
         }
@@ -203,15 +201,13 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        Long relatedNamespaceNumber = k8sNamespaceMapper
-                .selectCount(new QueryWrapper<K8sNamespace>().lambda().eq(K8sNamespace::getClusterCode, code));
+        long relatedNamespaceNumber = k8sNamespaceDao.countByClusterCode(code);
 
         if (relatedNamespaceNumber > 0) {
             throw new ServiceException(Status.DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS);
         }
 
-        int delete = clusterMapper.deleteByCode(code);
-        if (delete > 0) {
+        if (clusterDao.deleteByCode(code)) {
             return;
         }
         throw new ServiceException(Status.DELETE_CLUSTER_ERROR);
@@ -242,12 +238,12 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
 
         checkParams(name, config);
 
-        Cluster clusterExistByName = clusterMapper.queryByClusterName(name);
+        Cluster clusterExistByName = clusterDao.queryByClusterName(name);
         if (clusterExistByName != null && !clusterExistByName.getCode().equals(code)) {
             throw new ServiceException(Status.CLUSTER_NAME_EXISTS, name);
         }
 
-        Cluster clusterExist = clusterMapper.queryByClusterCode(code);
+        Cluster clusterExist = clusterDao.queryByClusterCode(code);
         if (clusterExist == null) {
             throw new ServiceException(Status.CLUSTER_NOT_EXISTS, name);
         }
@@ -267,7 +263,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
         clusterExist.setName(name);
         clusterExist.setDescription(desc);
         clusterExist.setUpdateTime(DateUtils.getCurrentDate());
-        clusterMapper.updateById(clusterExist);
+        clusterDao.updateById(clusterExist);
         return clusterExist;
     }
 
@@ -284,7 +280,7 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
             throw new ServiceException(Status.CLUSTER_NAME_IS_NULL);
         }
 
-        Cluster cluster = clusterMapper.queryByClusterName(clusterName);
+        Cluster cluster = clusterDao.queryByClusterName(clusterName);
         if (cluster != null) {
             throw new ServiceException(Status.CLUSTER_NAME_EXISTS);
         }

@@ -17,22 +17,30 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.dao.entity.Tenant;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-public interface TenantDao extends IDao<Tenant> {
+public interface DataSourceDao extends IDao<DataSource> {
 
-    Optional<Tenant> queryByCode(String tenantCode);
+    List<DataSource> queryDataSourceByType(int userId, Integer type);
 
-    Tenant queryDetailById(int tenantId);
+    IPage<DataSource> queryDataSourcePaging(IPage<DataSource> page, int userId, String name);
 
-    List<Tenant> queryTenantListByQueueId(Integer queueId);
+    List<DataSource> queryDataSourceByName(String name);
 
-    IPage<Tenant> queryTenantPaging(IPage<Tenant> page, List<Integer> ids, String searchVal);
+    List<DataSource> queryAuthedDatasource(int userId);
 
-    boolean existTenant(String tenantCode);
+    List<DataSource> queryDatasourceExceptUserId(int userId);
+
+    <T> List<DataSource> listAuthorizedDataSource(int userId, T[] dataSourceIds);
+
+    IPage<DataSource> queryDataSourcePagingByIds(Page<DataSource> dataSourcePage,
+                                                 List<Integer> dataSourceIds,
+                                                 String name);
+
+    List<DataSource> queryByUserId(int userId);
 }

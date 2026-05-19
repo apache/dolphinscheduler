@@ -15,19 +15,27 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.task;
+package org.apache.dolphinscheduler.server.master.integration.fake;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.LogicFakeTaskParameters;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
+import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
 
+import com.google.auto.service.AutoService;
 import com.google.common.annotations.VisibleForTesting;
 
 @VisibleForTesting
-public class LogicFakeTaskChannel extends AbstractLogicTaskChannel {
+@AutoService(TaskChannelFactory.class)
+public class LogicFakeTaskChannelFactory implements TaskChannelFactory {
+
+    public static final String NAME = "LogicFakeTask";
 
     @Override
-    public AbstractParameters parseParameters(String taskParams) {
-        return JSONUtils.parseObject(taskParams, LogicFakeTaskParameters.class);
+    public TaskChannel create() {
+        return new LogicFakeTaskChannel();
+    }
+
+    @Override
+    public String getName() {
+        return NAME;
     }
 }

@@ -35,13 +35,13 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
-import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
+import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.QueueDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
@@ -126,10 +126,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class QueueResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final QueueMapper queueMapper;
+        private final QueueDao queueDao;
 
-        public QueueResourcePermissionCheck(QueueMapper queueMapper) {
-            this.queueMapper = queueMapper;
+        public QueueResourcePermissionCheck(QueueDao queueDao) {
+            this.queueDao = queueDao;
         }
 
         @Override
@@ -147,7 +147,7 @@ public class ResourcePermissionCheckServiceImpl
             if (userId != 0) {
                 return Collections.emptySet();
             }
-            List<Queue> queues = queueMapper.selectList(null);
+            List<Queue> queues = queueDao.queryAll();
             return queues.stream().map(Queue::getId).collect(toSet());
         }
     }
@@ -207,10 +207,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class K8sNamespaceResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final K8sNamespaceMapper k8sNamespaceMapper;
+        private final K8sNamespaceDao k8sNamespaceDao;
 
-        public K8sNamespaceResourcePermissionCheck(K8sNamespaceMapper k8sNamespaceMapper) {
-            this.k8sNamespaceMapper = k8sNamespaceMapper;
+        public K8sNamespaceResourcePermissionCheck(K8sNamespaceDao k8sNamespaceDao) {
+            this.k8sNamespaceDao = k8sNamespaceDao;
         }
 
         @Override
@@ -225,7 +225,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            List<K8sNamespace> k8sNamespaces = k8sNamespaceMapper.queryAuthedNamespaceListByUserId(userId);
+            List<K8sNamespace> k8sNamespaces = k8sNamespaceDao.queryAuthedNamespaceListByUserId(userId);
             return k8sNamespaces.stream().map(K8sNamespace::getId).collect(Collectors.toSet());
         }
     }
@@ -355,10 +355,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class TenantResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final TenantMapper tenantMapper;
+        private final TenantDao tenantDao;
 
-        public TenantResourcePermissionCheck(TenantMapper tenantMapper) {
-            this.tenantMapper = tenantMapper;
+        public TenantResourcePermissionCheck(TenantDao tenantDao) {
+            this.tenantDao = tenantDao;
         }
 
         @Override
@@ -373,7 +373,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            List<Tenant> tenantList = tenantMapper.queryAll();
+            List<Tenant> tenantList = tenantDao.queryAll();
             return tenantList.stream().map(Tenant::getId).collect(Collectors.toSet());
         }
     }
@@ -384,10 +384,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class DataSourceResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final DataSourceMapper dataSourceMapper;
+        private final DataSourceDao dataSourceDao;
 
-        public DataSourceResourcePermissionCheck(DataSourceMapper dataSourceMapper) {
-            this.dataSourceMapper = dataSourceMapper;
+        public DataSourceResourcePermissionCheck(DataSourceDao dataSourceDao) {
+            this.dataSourceDao = dataSourceDao;
         }
 
         @Override
@@ -402,7 +402,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            return dataSourceMapper.listAuthorizedDataSource(userId, null).stream().map(DataSource::getId)
+            return dataSourceDao.listAuthorizedDataSource(userId, null).stream().map(DataSource::getId)
                     .collect(toSet());
         }
     }

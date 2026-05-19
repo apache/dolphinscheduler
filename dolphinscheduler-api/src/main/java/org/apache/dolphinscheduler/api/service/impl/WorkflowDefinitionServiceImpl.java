@@ -79,17 +79,17 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
@@ -153,7 +153,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private ProjectService projectService;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Autowired
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
@@ -169,7 +169,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private WorkflowInstanceService workflowInstanceService;
 
     @Autowired
-    private TaskInstanceMapper taskInstanceMapper;
+    private TaskInstanceDao taskInstanceDao;
 
     @Autowired
     private ScheduleDao scheduleDao;
@@ -181,7 +181,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Autowired
-    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
+    private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Autowired
     private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
@@ -508,7 +508,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 schedulerService.queryScheduleByWorkflowDefinitionCodes(workflowDefinitionCodes)
                         .stream()
                         .collect(Collectors.toMap(Schedule::getWorkflowDefinitionCode, Function.identity()));
-        List<UserWithWorkflowDefinitionCode> userWithCodes = userMapper.queryUserWithWorkflowDefinitionCode(
+        List<UserWithWorkflowDefinitionCode> userWithCodes = userDao.queryUserWithWorkflowDefinitionCode(
                 workflowDefinitionCodes);
         for (WorkflowDefinition pd : workflowDefinitions) {
             userWithCodes.stream()
@@ -668,7 +668,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private void taskUsedInOtherTaskValid(WorkflowDefinition workflowDefinition,
                                           List<WorkflowTaskRelationLog> taskRelationList) {
         List<WorkflowTaskRelation> oldWorkflowTaskRelationList =
-                workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
+                workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
         Set<WorkflowTaskRelationLog> oldWorkflowTaskRelationSet =
                 oldWorkflowTaskRelationList.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toSet());
         StringBuilder sb = new StringBuilder();
@@ -1168,7 +1168,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 for (int i = limit - 1; i >= 0; i--) {
                     WorkflowInstance workflowInstance = workflowInstanceList.get(i);
                     TaskInstance taskInstance =
-                            taskInstanceMapper.queryByInstanceIdAndCode(workflowInstance.getId(), nodeCode);
+                            taskInstanceDao.queryByWorkflowInstanceIdAndTaskCode(workflowInstance.getId(), nodeCode);
                     if (taskInstance == null) {
                         treeViewDto.getInstances().add(new Instance(-1, "not running", 0, "null"));
                     } else {
@@ -1325,7 +1325,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         diffCode.forEach(code -> failedWorkflowList.add(code + "[null]"));
         for (WorkflowDefinition workflowDefinition : workflowDefinitionList) {
             List<WorkflowTaskRelation> workflowTaskRelations =
-                    workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
+                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
             List<WorkflowTaskRelationLog> taskRelationList =
                     workflowTaskRelations.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
             workflowDefinition.setProjectCode(targetProjectCode);
@@ -1586,7 +1586,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.SWITCH_WORKFLOW_DEFINITION_VERSION_ERROR);
         }
 
-        List<WorkflowTaskRelation> workflowTaskRelationList = workflowTaskRelationMapper
+        List<WorkflowTaskRelation> workflowTaskRelationList = workflowTaskRelationDao
                 .queryWorkflowTaskRelationsByWorkflowDefinitionCode(workflowDefinitionLog.getCode(),
                         workflowDefinitionLog.getVersion());
         List<TaskCodeVersionDto> taskDefinitionList = getTaskCodeVersionDtos(workflowTaskRelationList);
@@ -1806,7 +1806,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         Set<Long> taskCodeSet = new TreeSet<>();
 
-        workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinition.getCode())
+        workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode())
                 .forEach(processTaskRelation -> {
                     if (processTaskRelation.getPreTaskCode() > 0) {
                         taskCodeSet.add(processTaskRelation.getPreTaskCode());
@@ -1836,7 +1836,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private void checkWorkflowDefinitionIsValidated(Long workflowDefinitionCode) {
         // todo: build dag check if the dag is validated
         List<WorkflowTaskRelation> workflowTaskRelations =
-                workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
+                workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         if (CollectionUtils.isEmpty(workflowTaskRelations)) {
             throw new ServiceException(Status.WORKFLOW_DAG_IS_EMPTY);
         }

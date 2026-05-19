@@ -62,17 +62,17 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskModel;
@@ -150,7 +150,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Mock
-    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
+    private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Mock
     private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
@@ -174,7 +174,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private WorkflowInstanceService workflowInstanceService;
 
     @Mock
-    private TaskInstanceMapper taskInstanceMapper;
+    private TaskInstanceDao taskInstanceDao;
 
     @Mock
     private TaskDefinitionLogDao taskDefinitionLogDao;
@@ -198,7 +198,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private GlobalParamsValidator globalParamsValidator;
 
     @Mock
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     protected User user;
     protected Exception exception;
@@ -289,7 +289,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Mockito.doNothing().when(projectService)
                 .checkProjectAndAuthThrowException(user, project, WORKFLOW_BATCH_COPY);
         when(workflowDefinitionDao.queryByCodes(definitionCodes)).thenReturn(workflowDefinitionList);
-        when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(Long.parseLong(codes)))
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(Long.parseLong(codes)))
                 .thenReturn(workflowTaskRelations);
         when(taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations)).thenReturn(taskDefinitionLogs);
         when(processService.saveTaskDefine(user, projectCode, taskDefinitionLogs, true)).thenReturn(1);
@@ -357,7 +357,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 eq(projectCode))).thenReturn(pageListingResult);
         String user1 = "user1";
         String user2 = "user2";
-        when(userMapper.queryUserWithWorkflowDefinitionCode(processDefinitionCodes))
+        when(userDao.queryUserWithWorkflowDefinitionCode(processDefinitionCodes))
                 .thenReturn(Arrays.asList(
                         UserWithWorkflowDefinitionCode.builder()
                                 .workflowDefinitionCode(processDefinitionCode1)
@@ -524,7 +524,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         }
         when(workflowDefinitionDao.queryByCodes(definitionCodes)).thenReturn(workflowDefinitionList);
         when(processService.saveWorkflowDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
-        when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(processDefinitionCode))
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
                 .thenReturn(getProcessTaskRelation());
 
         Assertions.assertDoesNotThrow(() -> workflowDefinitionService.batchMoveWorkflowDefinition(
@@ -858,7 +858,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(processService.saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE))).thenReturn(1);
         when(processService.saveWorkflowDefine(any(User.class), any(WorkflowDefinition.class), eq(Boolean.TRUE),
                 eq(Boolean.TRUE))).thenReturn(2);
-        when(workflowTaskRelationMapper.queryByWorkflowDefinitionCode(processDefinitionCode))
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
                 .thenReturn(Collections.emptyList());
         when(processService.saveTaskRelation(eq(user), eq(projectCode), eq(processDefinitionCode), eq(2), anyList(),
                 anyList(), eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);

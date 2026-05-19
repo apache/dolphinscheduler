@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.entity.Queue;
+import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
-import org.apache.dolphinscheduler.dao.repository.TenantDao;
+import org.apache.dolphinscheduler.dao.repository.QueueDao;
 
 import java.util.List;
-import java.util.Optional;
 
 import lombok.NonNull;
 
@@ -32,34 +31,24 @@ import org.springframework.stereotype.Repository;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 @Repository
-public class TenantDaoImpl extends BaseDao<Tenant, TenantMapper> implements TenantDao {
+public class QueueDaoImpl extends BaseDao<Queue, QueueMapper> implements QueueDao {
 
-    public TenantDaoImpl(@NonNull TenantMapper tenantMapper) {
-        super(tenantMapper);
+    public QueueDaoImpl(@NonNull QueueMapper queueMapper) {
+        super(queueMapper);
     }
 
     @Override
-    public Optional<Tenant> queryByCode(String tenantCode) {
-        return Optional.ofNullable(mybatisMapper.queryByTenantCode(tenantCode));
+    public IPage<Queue> queryQueuePaging(IPage<Queue> page, List<Integer> ids, String searchVal) {
+        return mybatisMapper.queryQueuePaging(page, ids, searchVal);
     }
 
     @Override
-    public Tenant queryDetailById(int tenantId) {
-        return mybatisMapper.queryById(tenantId);
+    public boolean existQueue(String queue, String queueName) {
+        return Boolean.TRUE.equals(mybatisMapper.existQueue(queue, queueName));
     }
 
     @Override
-    public List<Tenant> queryTenantListByQueueId(Integer queueId) {
-        return mybatisMapper.queryTenantListByQueueId(queueId);
-    }
-
-    @Override
-    public IPage<Tenant> queryTenantPaging(IPage<Tenant> page, List<Integer> ids, String searchVal) {
-        return mybatisMapper.queryTenantPaging(page, ids, searchVal);
-    }
-
-    @Override
-    public boolean existTenant(String tenantCode) {
-        return Boolean.TRUE.equals(mybatisMapper.existTenant(tenantCode));
+    public Queue queryQueueName(String queue, String queueName) {
+        return mybatisMapper.queryQueueName(queue, queueName);
     }
 }

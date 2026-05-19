@@ -26,7 +26,7 @@ import org.apache.dolphinscheduler.api.security.Authenticator;
 import org.apache.dolphinscheduler.common.enums.ProfileType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import java.util.Date;
 
@@ -60,8 +60,8 @@ public class LoginHandlerInterceptorTest {
     LoginHandlerInterceptor interceptor;
     @MockBean(name = "authenticator")
     private Authenticator authenticator;
-    @MockBean(name = "userMapper")
-    private UserMapper userMapper;
+    @MockBean(name = "userDao")
+    private UserDao userDao;
 
     @Test
     public void testPreHandle() {
@@ -82,7 +82,7 @@ public class LoginHandlerInterceptorTest {
         // test token
         String token = "123456";
         when(request.getHeader("token")).thenReturn(token);
-        when(userMapper.queryUserByToken(eq(token), any(Date.class))).thenReturn(mockUser);
+        when(userDao.queryUserByToken(eq(token), any(Date.class))).thenReturn(mockUser);
         Assertions.assertTrue(interceptor.preHandle(request, response, null));
 
         // test disable user

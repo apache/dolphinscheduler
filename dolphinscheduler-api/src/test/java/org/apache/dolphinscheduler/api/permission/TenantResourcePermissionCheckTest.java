@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class TenantResourcePermissionCheckTest {
     private ResourcePermissionCheckServiceImpl.TenantResourcePermissionCheck tenantResourcePermissionCheck;
 
     @Mock
-    private TenantMapper tenantMapper;
+    private TenantDao tenantDao;
 
     @Test
     public void testPermissionCheck() {
@@ -69,7 +69,7 @@ public class TenantResourcePermissionCheckTest {
         ids.add(tenant.getId());
         List<Tenant> tenants = Arrays.asList(tenant);
 
-        Mockito.when(tenantMapper.queryAll()).thenReturn(tenants);
+        Mockito.when(tenantDao.queryAll()).thenReturn(tenants);
 
         Assertions.assertEquals(ids, tenantResourcePermissionCheck.listAuthorizedResourceIds(user.getId(), logger));
     }

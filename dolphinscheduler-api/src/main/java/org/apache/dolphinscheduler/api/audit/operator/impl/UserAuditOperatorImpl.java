@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class UserAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Override
     public String getObjectNameFromIdentity(Object identity) {
@@ -37,7 +37,7 @@ public class UserAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        User obj = userMapper.selectById(objId);
+        User obj = userDao.queryById(objId);
         return obj == null ? "" : obj.getUserName();
     }
 }

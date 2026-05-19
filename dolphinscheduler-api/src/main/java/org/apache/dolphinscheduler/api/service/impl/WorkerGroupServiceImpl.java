@@ -43,10 +43,10 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IMasterContainerService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -81,7 +81,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private WorkerGroupDao workerGroupDao;
 
     @Autowired
-    private WorkflowInstanceMapper workflowInstanceMapper;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private RegistryClient registryClient;
@@ -322,7 +322,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             log.error("Worker group does not exist, workerGroupId:{}.", id);
             throw new ServiceException(Status.DELETE_WORKER_GROUP_NOT_EXIST);
         }
-        List<WorkflowInstance> workflowInstances = workflowInstanceMapper.queryByWorkerGroupNameAndStatus(
+        List<WorkflowInstance> workflowInstances = workflowInstanceDao.queryByWorkerGroupNameAndStatus(
                 workerGroup.getName(),
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES);
         if (CollectionUtils.isNotEmpty(workflowInstances)) {

@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
-import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
+import org.apache.dolphinscheduler.dao.repository.ClusterDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class ClusterAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private ClusterMapper clusterMapper;
+    private ClusterDao clusterDao;
 
     @Override
     public String getObjectNameFromIdentity(Object identity) {
@@ -37,7 +37,7 @@ public class ClusterAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        Cluster obj = clusterMapper.queryByClusterCode(objId);
+        Cluster obj = clusterDao.queryByClusterCode(objId);
         return obj == null ? "" : obj.getName();
     }
 }

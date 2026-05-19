@@ -58,13 +58,11 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
@@ -123,9 +121,6 @@ public class WorkflowInstanceServiceTest {
     WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
-    WorkflowInstanceMapper workflowInstanceMapper;
-
-    @Mock
     WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Mock
@@ -141,16 +136,13 @@ public class WorkflowInstanceServiceTest {
     UsersService usersService;
 
     @Mock
-    TenantMapper tenantMapper;
+    TenantDao tenantDao;
 
     @Mock
     TaskDefinitionMapper taskDefinitionMapper;
 
     @Mock
     private TaskInstanceContextDao taskInstanceContextDao;
-
-    @Mock
-    TaskInstanceMapper taskInstanceMapper;
 
     @Mock
     CuringParamsService curingGlobalParamsService;
@@ -230,7 +222,7 @@ public class WorkflowInstanceServiceTest {
                 Mockito.any(Project.class),
                 Mockito.any());
         when(workflowDefinitionDao.queryById(Mockito.any())).thenReturn(getProcessDefinition());
-        when(workflowInstanceMapper.queryWorkflowInstanceListPaging(Mockito.any(Page.class), Mockito.any(),
+        when(workflowInstanceDao.queryWorkflowInstanceListPaging(Mockito.any(Page.class), Mockito.any(),
                 Mockito.any(),
                 Mockito.any(), Mockito.any(), Mockito.any(),
                 eq("192.168.xx.xx"), Mockito.any(), Mockito.any())).thenReturn(pageReturn);
@@ -252,7 +244,7 @@ public class WorkflowInstanceServiceTest {
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
-        when(workflowInstanceMapper.queryWorkflowInstanceListPaging(
+        when(workflowInstanceDao.queryWorkflowInstanceListPaging(
                 Mockito.any(Page.class),
                 eq(project.getCode()),
                 eq(1L),
@@ -272,7 +264,7 @@ public class WorkflowInstanceServiceTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
 
         // data parameter empty
-        when(workflowInstanceMapper.queryWorkflowInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()),
+        when(workflowInstanceDao.queryWorkflowInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()),
                 eq(1L), eq(""), eq(""), Mockito.any(),
                 eq("192.168.xx.xx"), eq(null), eq(null))).thenReturn(pageReturn);
         successRes = workflowInstanceService.queryWorkflowInstanceList(loginUser, projectCode, 1, "",
@@ -291,7 +283,7 @@ public class WorkflowInstanceServiceTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) executorExistRes.getCode());
 
         // executor name empty
-        when(workflowInstanceMapper.queryWorkflowInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()),
+        when(workflowInstanceDao.queryWorkflowInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()),
                 eq(1L), eq(""), eq("admin"), Mockito.any(),
                 eq("192.168.xx.xx"), eq(start), eq(end))).thenReturn(pageReturn);
         Result executorEmptyRes =
@@ -322,7 +314,7 @@ public class WorkflowInstanceServiceTest {
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, null);
         Assertions.assertTrue(nullTriggerRes.isEmpty());
 
-        when(workflowInstanceMapper.queryByTriggerCode(999L)).thenReturn(new ArrayList<>());
+        when(workflowInstanceDao.queryByTriggerCode(999L)).thenReturn(new ArrayList<>());
         List<WorkflowInstance> emptyRes = workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
         Assertions.assertTrue(emptyRes.isEmpty());
     }
@@ -349,7 +341,7 @@ public class WorkflowInstanceServiceTest {
         assertThrowsServiceException(Status.NEGTIVE_SIZE_NUMBER_ERROR, () -> workflowInstanceService
                 .queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, -1, startTime, endTime));
 
-        when(workflowInstanceMapper.queryTopNWorkflowInstance(Mockito.eq(size), Mockito.any(), Mockito.any(),
+        when(workflowInstanceDao.queryTopNWorkflowInstance(Mockito.eq(size), Mockito.any(), Mockito.any(),
                 Mockito.eq(WorkflowExecutionStatus.SUCCESS), Mockito.eq(projectCode)))
                         .thenReturn(new ArrayList<>());
         List<WorkflowInstance> successRes = workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser,
@@ -578,7 +570,7 @@ public class WorkflowInstanceServiceTest {
         workflowDefinition.setProjectCode(projectCode);
         Tenant tenant = getTenant();
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
-        when(tenantMapper.queryByTenantCode("root")).thenReturn(tenant);
+        when(tenantDao.queryByCode("root")).thenReturn(Optional.of(tenant));
         when(processService.getTenantForWorkflow(Mockito.anyString(), Mockito.anyInt()))
                 .thenReturn(tenant.getTenantCode());
         when(workflowInstanceDao.updateById(workflowInstance)).thenReturn(true);
@@ -721,11 +713,11 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setCommandType(CommandType.SCHEDULER);
         workflowInstance.setScheduleTime(new Date());
         workflowInstance.setGlobalParams("");
-        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
+        when(workflowInstanceDao.queryDetailById(1)).thenReturn(workflowInstance);
         WorkflowInstanceVariablesDTO successRes = workflowInstanceService.viewVariables(loginUser, projectCode, 1);
         Assertions.assertNotNull(successRes);
 
-        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(null);
+        when(workflowInstanceDao.queryDetailById(1)).thenReturn(null);
         assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
                 () -> workflowInstanceService.viewVariables(loginUser, projectCode, 1));
 
@@ -758,7 +750,7 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setGlobalParams(globalParamsJson);
         workflowInstance.setWorkflowDefinitionCode(100L);
 
-        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
+        when(workflowInstanceDao.queryDetailById(1)).thenReturn(workflowInstance);
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(100L);
@@ -793,7 +785,7 @@ public class WorkflowInstanceServiceTest {
         doNothing().when(projectService)
                 .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
 
-        when(workflowInstanceMapper.queryDetailById(999)).thenReturn(null);
+        when(workflowInstanceDao.queryDetailById(999)).thenReturn(null);
 
         assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
                 () -> workflowInstanceService.viewVariables(loginUser, projectCode, 999));
@@ -813,7 +805,7 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setGlobalParams("");
         workflowInstance.setWorkflowDefinitionCode(101L);
 
-        when(workflowInstanceMapper.queryDetailById(2)).thenReturn(workflowInstance);
+        when(workflowInstanceDao.queryDetailById(2)).thenReturn(workflowInstance);
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(101L);
@@ -837,11 +829,11 @@ public class WorkflowInstanceServiceTest {
         TaskInstance taskInstance = getTaskInstance();
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
         taskInstance.setStartTime(new Date());
-        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
+        when(workflowInstanceDao.queryDetailById(1)).thenReturn(workflowInstance);
         when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                 workflowInstance.getWorkflowDefinitionCode(),
                 workflowInstance.getWorkflowDefinitionVersion())).thenReturn(new WorkflowDefinitionLog());
-        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
+        when(workflowInstanceDao.queryDetailById(1)).thenReturn(workflowInstance);
         DAG<Long, TaskNode, TaskNodeRelation> graph = new DAG<>();
         for (long i = 1; i <= 7; ++i) {
             graph.addNode(i, new TaskNode());
@@ -852,7 +844,7 @@ public class WorkflowInstanceServiceTest {
 
         Assertions.assertNotNull(workflowInstanceService.viewGantt(loginUser, projectCode, 1));
 
-        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(null);
+        when(workflowInstanceDao.queryDetailById(1)).thenReturn(null);
         assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
                 () -> workflowInstanceService.viewGantt(loginUser, projectCode, 1));
 
@@ -886,7 +878,7 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setScheduleTime(new Date());
         workflowInstance.setCommandParam(JSONUtils.toJsonString(runWorkflowCommandParam));
 
-        when(workflowInstanceMapper.queryDetailById(1)).thenReturn(workflowInstance);
+        when(workflowInstanceDao.queryDetailById(1)).thenReturn(workflowInstance);
         Assertions.assertNotNull(workflowInstanceService.viewVariables(loginUser, projectCode, 1));
 
         final RunWorkflowCommandParam commandParamWithEmptyTimeZone = RunWorkflowCommandParam.builder()

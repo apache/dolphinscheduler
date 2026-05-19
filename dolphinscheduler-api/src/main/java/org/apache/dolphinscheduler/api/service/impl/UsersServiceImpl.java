@@ -41,12 +41,12 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -80,16 +80,16 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private AccessTokenMapper accessTokenMapper;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Autowired
-    private TenantMapper tenantMapper;
+    private TenantDao tenantDao;
 
     @Autowired
-    private ProjectUserMapper projectUserMapper;
+    private ProjectUserDao projectUserDao;
 
     @Autowired
-    private DataSourceUserMapper datasourceUserMapper;
+    private DataSourceUserDao datasourceUserDao;
 
     @Autowired
     private AlertGroupMapper alertGroupMapper;
@@ -174,7 +174,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setQueue(queue);
 
         // save user
-        userMapper.insert(user);
+        userDao.insert(user);
         return user;
     }
 
@@ -198,7 +198,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setState(Flag.YES.getCode());
 
         // save user
-        userMapper.insert(user);
+        userDao.insert(user);
         return user;
     }
 
@@ -210,7 +210,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      */
     @Override
     public User getUserByUserName(String userName) {
-        return userMapper.queryByUserNameAccurately(userName);
+        return userDao.queryByUserNameAccurately(userName);
     }
 
     /**
@@ -221,7 +221,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      */
     @Override
     public User queryUser(int id) {
-        return userMapper.selectById(id);
+        return userDao.queryById(id);
     }
 
     @Override
@@ -229,7 +229,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (CollectionUtils.isEmpty(ids)) {
             return new ArrayList<>();
         }
-        return userMapper.selectByIds(ids);
+        return userDao.queryByIds(ids);
     }
 
     /**
@@ -240,7 +240,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      */
     @Override
     public User queryUser(String name) {
-        return userMapper.queryByUserNameAccurately(name);
+        return userDao.queryByUserNameAccurately(name);
     }
 
     /**
@@ -253,7 +253,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public User queryUser(String name, String password) {
         String md5 = EncryptionUtils.getMd5(password);
-        return userMapper.queryUserByNamePassword(name, md5);
+        return userDao.queryUserByNamePassword(name, md5);
     }
 
     /**
@@ -300,7 +300,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         Page<User> page = new Page<>(pageNo, pageSize);
 
-        IPage<User> scheduleList = userMapper.queryUserPaging(page, searchVal);
+        IPage<User> scheduleList = userDao.queryUserPaging(page, searchVal);
 
         PageInfo<User> pageInfo = new PageInfo<>(pageNo, pageSize);
         pageInfo.setTotal((int) scheduleList.getTotal());
@@ -319,9 +319,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
         // Ensure the update time is set
         user.setUpdateTime(new Date());
-        int updatedRows = userMapper.updateById(user);
+        boolean updated = userDao.updateById(user);
 
-        if (updatedRows == 0) {
+        if (!updated) {
             throw new ServiceException(Status.UPDATE_USER_ERROR);
         }
         return user;
@@ -343,7 +343,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (!canOperator(loginUser, userId)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        User user = userMapper.selectById(userId);
+        User user = userDao.queryById(userId);
         if (user == null) {
             throw new ServiceException(Status.USER_NOT_EXIST, userId);
         }
@@ -365,7 +365,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
 
             // todo: use the db unique index
-            User tempUser = userMapper.queryByUserNameAccurately(userName);
+            User tempUser = userDao.queryByUserNameAccurately(userName);
             if (tempUser != null && !userId.equals(tempUser.getId())) {
                 throw new ServiceException(Status.USER_NAME_EXIST);
             }
@@ -408,7 +408,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         user.setUpdateTime(new Date());
         user.setTenantId(tenantId);
         // updateWorkflowInstance user
-        if (userMapper.updateById(user) <= 0) {
+        if (!userDao.updateById(user)) {
             throw new ServiceException(Status.UPDATE_USER_ERROR);
         }
         return user;
@@ -432,7 +432,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM, id);
         }
         // check exist
-        User tempUser = userMapper.selectById(id);
+        User tempUser = userDao.queryById(id);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", id);
             throw new ServiceException(Status.USER_NOT_EXIST, id);
@@ -446,12 +446,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             throw new ServiceException(Status.TRANSFORM_PROJECT_OWNERSHIP, projectNames);
         }
         // delete user
-        userMapper.queryTenantCodeByUserId(id);
+        userDao.queryTenantCodeByUserId(id);
 
         accessTokenMapper.deleteAccessTokenByUserId(id);
         sessionService.expireSession(id);
 
-        if (userMapper.deleteById(id) <= 0) {
+        if (!userDao.deleteById(id)) {
             log.error("User delete error, userId:{}.", id);
             throw new ServiceException(Status.DELETE_USER_BY_ID_ERROR);
         }
@@ -475,7 +475,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 2. check if user is existed
-        User user = this.userMapper.selectById(userId);
+        User user = this.userDao.queryById(userId);
         if (user == null) {
             throw new ServiceException(Status.USER_NOT_EXIST, userId);
         }
@@ -485,7 +485,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             Project project = this.projectDao.queryDetailById(Integer.parseInt(projectId));
             if (project != null) {
                 // 4. delete the relationship between project and user
-                this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
+                this.projectUserDao.deleteProjectRelation(project.getId(), user.getId());
             }
         });
     }
@@ -506,7 +506,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // check exist
-        User tempUser = userMapper.selectById(userId);
+        User tempUser = userDao.queryById(userId);
         if (tempUser == null) {
             throw new ServiceException(Status.USER_NOT_EXIST, userId);
         }
@@ -515,9 +515,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return;
         }
         Arrays.stream(projectIds.split(Constants.COMMA)).distinct().forEach(projectId -> {
-            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            ProjectUser projectUserOld = projectUserDao.queryProjectRelation(Integer.parseInt(projectId), userId);
             if (projectUserOld != null) {
-                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+                projectUserDao.deleteProjectRelation(Integer.parseInt(projectId), userId);
             }
             Date now = new Date();
             ProjectUser projectUser = new ProjectUser();
@@ -526,7 +526,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser.setPerm(Constants.READ_PERMISSION);
             projectUser.setCreateTime(now);
             projectUser.setUpdateTime(now);
-            projectUserMapper.insert(projectUser);
+            projectUserDao.insert(projectUser);
         });
     }
 
@@ -542,7 +542,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Transactional
     public void grantProject(User loginUser, int userId, String projectIds) {
         // check exist
-        User tempUser = userMapper.selectById(userId);
+        User tempUser = userDao.queryById(userId);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", userId);
             throw new ServiceException(Status.USER_NOT_EXIST, userId);
@@ -557,9 +557,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             return;
         }
         Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
-            ProjectUser projectUserOld = projectUserMapper.queryProjectRelation(Integer.parseInt(projectId), userId);
+            ProjectUser projectUserOld = projectUserDao.queryProjectRelation(Integer.parseInt(projectId), userId);
             if (projectUserOld != null) {
-                projectUserMapper.deleteProjectRelation(Integer.parseInt(projectId), userId);
+                projectUserDao.deleteProjectRelation(Integer.parseInt(projectId), userId);
             }
             Date now = new Date();
             ProjectUser projectUser = new ProjectUser();
@@ -568,7 +568,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             projectUser.setCreateTime(now);
             projectUser.setUpdateTime(now);
-            projectUserMapper.insert(projectUser);
+            projectUserDao.insert(projectUser);
         });
     }
 
@@ -583,7 +583,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     public void grantProjectByCode(final User loginUser, final int userId, final long projectCode) {
         // 1. check if user is existed
-        User tempUser = this.userMapper.selectById(userId);
+        User tempUser = this.userDao.queryById(userId);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", userId);
             throw new ServiceException(Status.USER_NOT_EXIST, userId);
@@ -604,7 +604,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 4. maintain the relationship between project and user if not exists
-        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), userId);
+        ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), userId);
         if (projectUser == null) {
             Date today = new Date();
             projectUser = new ProjectUser();
@@ -613,7 +613,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             projectUser.setCreateTime(today);
             projectUser.setUpdateTime(today);
-            this.projectUserMapper.insert(projectUser);
+            this.projectUserDao.insert(projectUser);
         }
         log.info("User is granted permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
     }
@@ -635,7 +635,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 2. check if user is existed
-        User user = this.userMapper.selectById(userId);
+        User user = this.userDao.queryById(userId);
         if (user == null) {
             log.error("User does not exist, userId:{}.", userId);
             throw new ServiceException(Status.USER_NOT_EXIST, userId);
@@ -649,7 +649,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // 4. delete th relationship between project and user
-        this.projectUserMapper.deleteProjectRelation(project.getId(), user.getId());
+        this.projectUserDao.deleteProjectRelation(project.getId(), user.getId());
         log.info("User is revoked permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
     }
 
@@ -671,7 +671,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         // check exist
-        User tempUser = userMapper.selectById(userId);
+        User tempUser = userDao.queryById(userId);
         if (tempUser == null) {
             log.error("User does not exist, userId:{}.", userId);
             throw new ServiceException(Status.USER_NOT_EXIST, userId);
@@ -711,12 +711,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             log.warn("Only admin can grant datasource.");
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        User user = userMapper.selectById(userId);
+        User user = userDao.queryById(userId);
         if (user == null) {
             throw new ServiceException(Status.USER_NOT_EXIST, userId);
         }
 
-        datasourceUserMapper.deleteByUserId(userId);
+        datasourceUserDao.deleteByUserId(userId);
 
         if (StringUtils.isEmpty(datasourceIds)) {
             return;
@@ -733,7 +733,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             datasourceUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
             datasourceUser.setCreateTime(now);
             datasourceUser.setUpdateTime(now);
-            datasourceUserMapper.insert(datasourceUser);
+            datasourceUserDao.insert(datasourceUser);
         }
     }
 
@@ -749,7 +749,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
             user = loginUser;
         } else {
-            user = userMapper.queryDetailsById(loginUser.getId());
+            user = userDao.queryDetailsById(loginUser.getId());
 
             List<AlertGroup> alertGroups = alertGroupMapper.queryByUserId(loginUser.getId());
 
@@ -764,7 +764,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
         }
 
-        Tenant tenant = tenantMapper.selectById(user.getTenantId());
+        Tenant tenant = tenantDao.queryById(user.getTenantId());
         if (tenant != null) {
             user.setTenantCode(tenant.getTenantCode());
         }
@@ -792,7 +792,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             log.warn("Only admin can query all general users.");
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        return userMapper.queryAllGeneralUser();
+        return userDao.queryAllGeneralUser();
     }
 
     /**
@@ -807,7 +807,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.ACCESS_TOKEN, USER_MANAGER)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        return userMapper.queryEnabledUsers();
+        return userDao.queryEnabledUsers();
     }
 
     /**
@@ -820,7 +820,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     public Result<Object> verifyUserName(String userName) {
 
         Result<Object> result = new Result<>();
-        User user = userMapper.queryByUserNameAccurately(userName);
+        User user = userDao.queryByUserNameAccurately(userName);
         if (user != null) {
             putMsg(result, Status.USER_NAME_EXIST);
         } else {
@@ -845,13 +845,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        List<User> userList = userMapper.selectList(null);
+        List<User> userList = userDao.queryAll();
         List<User> resultUsers = new ArrayList<>();
         Set<User> userSet;
         if (userList != null && !userList.isEmpty()) {
             userSet = new HashSet<>(userList);
 
-            List<User> authedUserList = userMapper.queryUserListByAlertGroupId(alertgroupId);
+            List<User> authedUserList = userDao.queryUserListByAlertGroupId(alertgroupId);
 
             if (authedUserList != null && !authedUserList.isEmpty()) {
                 Set<User> authedUserSet = new HashSet<>(authedUserList);
@@ -876,7 +876,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             log.warn("Only admin can authorize user.");
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        return userMapper.queryUserListByAlertGroupId(alertGroupId);
+        return userDao.queryUserListByAlertGroupId(alertGroupId);
     }
 
     /**
@@ -884,7 +884,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      * @return true if tenant exists, otherwise return false
      */
     private boolean checkTenantExists(int tenantId) {
-        return tenantMapper.queryById(tenantId) != null;
+        return tenantDao.queryDetailById(tenantId) != null;
     }
 
     /**
@@ -952,7 +952,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
         }
 
-        User user = userMapper.queryByUserNameAccurately(userName);
+        User user = userDao.queryByUserNameAccurately(userName);
 
         if (user == null) {
             throw new ServiceException(Status.USER_NOT_EXIST, userName);
@@ -964,9 +964,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         user.setState(Flag.YES.ordinal());
         user.setUpdateTime(new Date());
-        userMapper.updateById(user);
+        userDao.updateById(user);
 
-        return userMapper.queryByUserNameAccurately(userName);
+        return userDao.queryByUserNameAccurately(userName);
     }
 
     /**
@@ -1034,15 +1034,15 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                                       String tenantCode,
                                       String queue,
                                       int state) {
-        User user = userMapper.queryByUserNameAccurately(userName);
+        User user = userDao.queryByUserNameAccurately(userName);
         if (Objects.isNull(user)) {
-            Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
+            Tenant tenant = tenantDao.queryByCode(tenantCode).orElse(null);
             user = createUser(userName, userPassword, email, tenant.getId(), phone, queue, state);
             return user;
         }
 
         updateUser(user, user.getId(), userName, userPassword, email, user.getTenantId(), phone, queue, state, null);
-        user = userMapper.queryDetailsById(user.getId());
+        user = userDao.queryDetailsById(user.getId());
         return user;
     }
 }

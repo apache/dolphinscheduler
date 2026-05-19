@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.dao.repository.impl;
 
-import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.entity.Cluster;
+import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
-import org.apache.dolphinscheduler.dao.repository.TenantDao;
+import org.apache.dolphinscheduler.dao.repository.ClusterDao;
 
 import java.util.List;
-import java.util.Optional;
 
 import lombok.NonNull;
 
@@ -32,34 +31,34 @@ import org.springframework.stereotype.Repository;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 @Repository
-public class TenantDaoImpl extends BaseDao<Tenant, TenantMapper> implements TenantDao {
+public class ClusterDaoImpl extends BaseDao<Cluster, ClusterMapper> implements ClusterDao {
 
-    public TenantDaoImpl(@NonNull TenantMapper tenantMapper) {
-        super(tenantMapper);
+    public ClusterDaoImpl(@NonNull ClusterMapper clusterMapper) {
+        super(clusterMapper);
     }
 
     @Override
-    public Optional<Tenant> queryByCode(String tenantCode) {
-        return Optional.ofNullable(mybatisMapper.queryByTenantCode(tenantCode));
+    public Cluster queryByClusterName(String name) {
+        return mybatisMapper.queryByClusterName(name);
     }
 
     @Override
-    public Tenant queryDetailById(int tenantId) {
-        return mybatisMapper.queryById(tenantId);
+    public Cluster queryByClusterCode(Long clusterCode) {
+        return mybatisMapper.queryByClusterCode(clusterCode);
     }
 
     @Override
-    public List<Tenant> queryTenantListByQueueId(Integer queueId) {
-        return mybatisMapper.queryTenantListByQueueId(queueId);
+    public List<Cluster> queryAllClusterList() {
+        return mybatisMapper.queryAllClusterList();
     }
 
     @Override
-    public IPage<Tenant> queryTenantPaging(IPage<Tenant> page, List<Integer> ids, String searchVal) {
-        return mybatisMapper.queryTenantPaging(page, ids, searchVal);
+    public IPage<Cluster> queryClusterListPaging(IPage<Cluster> page, String searchName) {
+        return mybatisMapper.queryClusterListPaging(page, searchName);
     }
 
     @Override
-    public boolean existTenant(String tenantCode) {
-        return Boolean.TRUE.equals(mybatisMapper.existTenant(tenantCode));
+    public boolean deleteByCode(Long code) {
+        return mybatisMapper.deleteByCode(code) > 0;
     }
 }

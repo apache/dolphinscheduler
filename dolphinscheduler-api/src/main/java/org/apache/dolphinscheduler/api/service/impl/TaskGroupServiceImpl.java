@@ -32,9 +32,9 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -65,7 +65,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     private ProjectDao projectDao;
 
     @Autowired
-    private ProjectUserMapper projectUserMapper;
+    private ProjectUserDao projectUserDao;
 
     @Autowired
     private TaskGroupQueueService taskGroupQueueService;
@@ -285,7 +285,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         if (project.getUserId().equals(loginUser.getId())) {
             return;
         }
-        ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), loginUser.getId());
+        ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), loginUser.getId());
         if (projectUser == null) {
             log.warn("User {} does not have operation permission for project {}", loginUser.getUserName(),
                     project.getCode());
