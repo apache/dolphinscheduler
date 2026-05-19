@@ -37,9 +37,9 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -78,7 +78,7 @@ public class WorkerGroupServiceTest {
     private WorkerGroupDao workerGroupDao;
 
     @Mock
-    private WorkflowInstanceMapper workflowInstanceMapper;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
     private RegistryClient registryClient;
@@ -233,7 +233,7 @@ public class WorkerGroupServiceTest {
         workflowInstance.setId(1);
         List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
         workflowInstances.add(workflowInstance);
-        when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
+        when(workflowInstanceDao.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES))
                         .thenReturn(workflowInstances);
 
@@ -250,7 +250,7 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         WorkerGroup workerGroup = getWorkerGroup(1);
         when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
-        when(workflowInstanceMapper.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
+        when(workflowInstanceDao.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES)).thenReturn(null);
 
         when(taskDefinitionMapper.selectList(Mockito.any())).thenReturn(null);
