@@ -18,12 +18,17 @@
 package org.apache.dolphinscheduler.api.executor.logging;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogFileDownloadRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogFileDownloadResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogPageQueryRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogPageQueryResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -83,6 +88,42 @@ public class LocalLogClient {
                 .withService(ILogService.class)
                 .withHost(taskInstance.getHost());
         log.debug("Created log service for host: {}", taskInstance.getHost());
+        return logService;
+    }
+
+    public WorkflowInstanceLogPageQueryResponse getWorkflowPartLog(WorkflowInstance workflowInstance, int skipLineNum,
+                                                                   int limit) {
+        return getLocalWorkflowPartLog(workflowInstance, skipLineNum, limit);
+    }
+
+    public WorkflowInstanceLogFileDownloadResponse getWorkflowWholeLog(WorkflowInstance workflowInstance) {
+        return getLocalWorkflowWholeLog(workflowInstance);
+    }
+
+    private WorkflowInstanceLogFileDownloadResponse getLocalWorkflowWholeLog(WorkflowInstance workflowInstance) {
+        WorkflowInstanceLogFileDownloadRequest request = new WorkflowInstanceLogFileDownloadRequest(
+                workflowInstance.getId(),
+                workflowInstance.getLogPath());
+        return getProxyWorkflowLogService(workflowInstance).getWorkflowInstanceWholeLogFileBytes(request);
+    }
+
+    private WorkflowInstanceLogPageQueryResponse getLocalWorkflowPartLog(WorkflowInstance workflowInstance,
+                                                                         int skipLineNum, int limit) {
+        WorkflowInstanceLogPageQueryRequest request = WorkflowInstanceLogPageQueryRequest
+                .builder()
+                .workflowInstanceId(workflowInstance.getId())
+                .workflowInstanceLogAbsolutePath(workflowInstance.getLogPath())
+                .skipLineNum(skipLineNum)
+                .limit(limit)
+                .build();
+        return getProxyWorkflowLogService(workflowInstance).pageQueryWorkflowInstanceLog(request);
+    }
+
+    private ILogService getProxyWorkflowLogService(WorkflowInstance workflowInstance) {
+        ILogService logService = Clients
+                .withService(ILogService.class)
+                .withHost(workflowInstance.getHost());
+        log.debug("Created log service for host: {}", workflowInstance.getHost());
         return logService;
     }
 }
