@@ -58,6 +58,12 @@ public class JdbcRegistryClientRepository {
         return jdbcRegistryClientHeartbeatMapper.updateById(jdbcRegistryClientHeartbeat) == 1;
     }
 
+    public void upsert(JdbcRegistryClientHeartbeatDTO clientHeartbeatDTO) {
+        JdbcRegistryClientHeartbeat clientHeartbeat =
+                JdbcRegistryClientHeartbeatDTO.toJdbcRegistryClientHeartbeat(clientHeartbeatDTO);
+        jdbcRegistryClientHeartbeatMapper.upsert(clientHeartbeat);
+    }
+
     public void insert(JdbcRegistryClientHeartbeatDTO jdbcRegistryClient) {
         checkNotNull(jdbcRegistryClient.getId());
         JdbcRegistryClientHeartbeat jdbcRegistryClientHeartbeat =

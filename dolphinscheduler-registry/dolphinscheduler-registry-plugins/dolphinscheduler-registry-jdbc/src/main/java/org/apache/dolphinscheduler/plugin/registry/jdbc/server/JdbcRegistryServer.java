@@ -340,7 +340,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 }
                 JdbcRegistryClientHeartbeatDTO clone = jdbcRegistryClientHeartbeatDTO.clone();
                 clone.setLastHeartbeatTime(now);
-                jdbcRegistryClientRepository.updateById(jdbcRegistryClientHeartbeatDTO);
+                jdbcRegistryClientRepository.upsert(jdbcRegistryClientHeartbeatDTO);
                 jdbcRegistryClientHeartbeatDTO.setLastHeartbeatTime(clone.getLastHeartbeatTime());
             }
             if (jdbcRegistryServerState == JdbcRegistryServerState.SUSPENDED) {
