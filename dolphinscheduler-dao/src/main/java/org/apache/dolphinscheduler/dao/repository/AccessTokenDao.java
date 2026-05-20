@@ -15,29 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.audit.operator.impl;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
-import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
+import org.apache.dolphinscheduler.dao.entity.AccessToken;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import java.util.List;
 
-@Service
-public class AlertGroupAuditOperatorImpl extends BaseAuditOperator {
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-    @Autowired
-    private AlertGroupDao alertGroupDao;
+public interface AccessTokenDao extends IDao<AccessToken> {
 
-    @Override
-    public String getObjectNameFromIdentity(Object identity) {
-        Long objId = toLong(identity);
-        if (objId == -1) {
-            return "";
-        }
+    IPage<AccessToken> queryAccessTokenPage(Page<AccessToken> page, String userName, int userId);
 
-        AlertGroup obj = alertGroupDao.queryById(objId);
-        return obj == null ? "" : obj.getGroupName();
-    }
+    List<AccessToken> queryAccessTokenByUser(int userId);
+
+    void deleteByUserId(int userId);
+
+    List<AccessToken> listAuthorizedAccessToken(int userId, List<Integer> accessTokensIds);
 }

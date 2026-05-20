@@ -32,8 +32,8 @@ import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 
 import org.apache.commons.lang3.StringUtils;
@@ -63,7 +63,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     private ProjectService projectService;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
     private LogClientDelegate logClientDelegate;
@@ -138,7 +138,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND);
         }
 
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
+        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(task.getTaskCode());
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
             throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND, taskInstId);
         }
@@ -164,7 +164,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             throw new ServiceException("task instance is null or host is null");
         }
 
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(task.getTaskCode());
+        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(task.getTaskCode());
         if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
             throw new ServiceException("task instance does not exist in project");
         }

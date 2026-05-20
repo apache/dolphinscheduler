@@ -37,7 +37,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -76,7 +76,7 @@ public class AlertGroupServiceTest {
     private AlertGroupServiceImpl alertGroupService;
 
     @Mock
-    private AlertGroupMapper alertGroupMapper;
+    private AlertGroupDao alertGroupDao;
 
     private String groupName = "AlertGroupServiceTest";
 
@@ -87,7 +87,7 @@ public class AlertGroupServiceTest {
     public void testQueryAlertGroup() {
         User user = getLoginUser();
 
-        when(alertGroupMapper.queryAllGroupList()).thenReturn(getList());
+        when(alertGroupDao.queryAllGroupList()).thenReturn(getList());
         List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(user);
         Assertions.assertEquals(1, alertGroups.size());
 
@@ -126,12 +126,12 @@ public class AlertGroupServiceTest {
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{999}, 1,
                 baseServiceLogger))
                         .thenReturn(true);
-        when(alertGroupMapper.selectById(999)).thenReturn(null);
+        when(alertGroupDao.queryById(999)).thenReturn(null);
 
         assertThrowsServiceException(Status.ALERT_GROUP_NOT_EXIST,
                 () -> alertGroupService.queryAlertGroupById(user, 999));
 
-        when(alertGroupMapper.selectById(999)).thenReturn(getEntity());
+        when(alertGroupDao.queryById(999)).thenReturn(getEntity());
         assertDoesNotThrow(() -> alertGroupService.queryAlertGroupById(user, 999));
     }
 
@@ -140,7 +140,7 @@ public class AlertGroupServiceTest {
         IPage<AlertGroup> page = new Page<>(1, 10);
         page.setTotal(1L);
         page.setRecords(getList());
-        when(alertGroupMapper.queryAlertGroupPage(any(Page.class), eq(groupName))).thenReturn(page);
+        when(alertGroupDao.queryAlertGroupPage(any(Page.class), eq(groupName))).thenReturn(page);
         User user = new User();
         // no operate
         user.setUserType(UserType.GENERAL_USER);
@@ -162,7 +162,7 @@ public class AlertGroupServiceTest {
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, user.getId(),
                 alertGroupServiceLogger))
                         .thenReturn(Collections.singleton(1));
-        when(alertGroupMapper.queryAlertGroupPageByIds(any(Page.class), any(List.class), eq(groupName)))
+        when(alertGroupDao.queryAlertGroupPageByIds(any(Page.class), any(List.class), eq(groupName)))
                 .thenReturn(page);
 
         alertGroupService.listPaging(user, groupName, 1, 10).getTotal();
@@ -171,7 +171,7 @@ public class AlertGroupServiceTest {
     @Test
     public void testCreateAlertgroup() {
 
-        when(alertGroupMapper.insert(any(AlertGroup.class))).thenReturn(2);
+        when(alertGroupDao.insert(any(AlertGroup.class))).thenReturn(2);
         User user = new User();
         user.setId(0);
         // no operate
@@ -192,11 +192,11 @@ public class AlertGroupServiceTest {
         AlertGroup alertGroup = alertGroupService.createAlertGroup(user, groupName, groupName, null);
         assertNotNull(alertGroup);
 
-        when(alertGroupMapper.insert(any(AlertGroup.class))).thenReturn(-1);
+        when(alertGroupDao.insert(any(AlertGroup.class))).thenReturn(-1);
         assertThrowsServiceException(Status.CREATE_ALERT_GROUP_ERROR,
                 () -> alertGroupService.createAlertGroup(user, groupName, groupName, null));
 
-        when(alertGroupMapper.insert(any(AlertGroup.class))).thenThrow(DuplicateKeyException.class);
+        when(alertGroupDao.insert(any(AlertGroup.class))).thenThrow(DuplicateKeyException.class);
         assertThrowsServiceException(Status.ALERT_GROUP_EXIST,
                 () -> alertGroupService.createAlertGroup(user, groupName, groupName, null));
     }
@@ -204,7 +204,7 @@ public class AlertGroupServiceTest {
     @Test
     public void testCreateAlertgroupDuplicate() {
 
-        when(alertGroupMapper.insert(any(AlertGroup.class))).thenThrow(new DuplicateKeyException("group name exist"));
+        when(alertGroupDao.insert(any(AlertGroup.class))).thenThrow(new DuplicateKeyException("group name exist"));
         User user = new User();
         user.setUserType(UserType.ADMIN_USER);
         user.setId(0);
@@ -241,7 +241,7 @@ public class AlertGroupServiceTest {
         // success
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{2},
                 user.getId(), baseServiceLogger)).thenReturn(true);
-        when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
+        when(alertGroupDao.queryById(2)).thenReturn(getEntity());
         assertDoesNotThrow(() -> alertGroupService.updateAlertGroupById(user, 2, groupName, groupName, null));
     }
 
@@ -254,8 +254,8 @@ public class AlertGroupServiceTest {
                 user.getId(), ALERT_GROUP_UPDATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP,
                 new Object[]{2}, user.getId(), baseServiceLogger)).thenReturn(true);
-        when(alertGroupMapper.selectById(2)).thenReturn(getEntity());
-        when(alertGroupMapper.updateById(Mockito.any()))
+        when(alertGroupDao.queryById(2)).thenReturn(getEntity());
+        when(alertGroupDao.updateById(Mockito.any()))
                 .thenThrow(new DuplicateKeyException("group name exist"));
         assertThrowsServiceException(Status.ALERT_GROUP_EXIST,
                 () -> alertGroupService.updateAlertGroupById(user, 2, groupName, groupName, null));
@@ -290,7 +290,7 @@ public class AlertGroupServiceTest {
         // success
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_GROUP, new Object[]{4}, 0,
                 baseServiceLogger)).thenReturn(true);
-        when(alertGroupMapper.selectById(4)).thenReturn(getEntity());
+        when(alertGroupDao.queryById(4)).thenReturn(getEntity());
         assertDoesNotThrow(() -> alertGroupService.deleteAlertGroupById(user, 4));
     }
 
@@ -299,7 +299,7 @@ public class AlertGroupServiceTest {
         // group name not exist
         boolean result = alertGroupService.existGroupName(groupName);
         Assertions.assertFalse(result);
-        when(alertGroupMapper.existGroupName(groupName)).thenReturn(true);
+        when(alertGroupDao.existGroupName(groupName)).thenReturn(true);
 
         // group name exist
         result = alertGroupService.existGroupName(groupName);

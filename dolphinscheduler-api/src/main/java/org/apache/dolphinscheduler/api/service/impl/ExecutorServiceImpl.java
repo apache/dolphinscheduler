@@ -51,8 +51,8 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
@@ -99,7 +99,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
     private WorkflowTaskRelationDao workflowTaskRelationDao;
@@ -203,7 +203,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
         Set<Long> relationCodes =
                 workflowTaskRelations.stream().map(WorkflowTaskRelation::getPostTaskCode).collect(Collectors.toSet());
-        List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(relationCodes);
+        List<TaskDefinition> taskDefinitions = taskDefinitionDao.queryByCodes(relationCodes);
 
         // find out the workflow definition code
         Set<Long> workflowDefinitionCodeSet = new HashSet<>();

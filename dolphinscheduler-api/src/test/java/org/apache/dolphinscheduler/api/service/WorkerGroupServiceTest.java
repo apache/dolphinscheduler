@@ -36,8 +36,8 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -90,7 +90,7 @@ public class WorkerGroupServiceTest {
     private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
 
     @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Mock
     private ScheduleDao scheduleDao;
@@ -253,7 +253,7 @@ public class WorkerGroupServiceTest {
         when(workflowInstanceDao.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES)).thenReturn(null);
 
-        when(taskDefinitionMapper.selectList(Mockito.any())).thenReturn(null);
+        when(taskDefinitionDao.queryByWorkerGroup(Mockito.any())).thenReturn(null);
 
         when(scheduleDao.queryScheduleByWorkerGroup(Mockito.any())).thenReturn(null);
 

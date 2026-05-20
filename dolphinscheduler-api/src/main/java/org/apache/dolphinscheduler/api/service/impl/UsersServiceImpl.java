@@ -39,9 +39,9 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
+import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
+import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
@@ -77,7 +77,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Autowired
-    private AccessTokenMapper accessTokenMapper;
+    private AccessTokenDao accessTokenDao;
 
     @Autowired
     private UserDao userDao;
@@ -92,7 +92,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private DataSourceUserDao datasourceUserDao;
 
     @Autowired
-    private AlertGroupMapper alertGroupMapper;
+    private AlertGroupDao alertGroupDao;
 
     @Autowired
     private ProjectDao projectDao;
@@ -448,7 +448,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         // delete user
         userDao.queryTenantCodeByUserId(id);
 
-        accessTokenMapper.deleteAccessTokenByUserId(id);
+        accessTokenDao.deleteByUserId(id);
         sessionService.expireSession(id);
 
         if (!userDao.deleteById(id)) {
@@ -751,7 +751,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         } else {
             user = userDao.queryDetailsById(loginUser.getId());
 
-            List<AlertGroup> alertGroups = alertGroupMapper.queryByUserId(loginUser.getId());
+            List<AlertGroup> alertGroups = alertGroupDao.queryByUserId(loginUser.getId());
 
             StringBuilder sb = new StringBuilder();
 

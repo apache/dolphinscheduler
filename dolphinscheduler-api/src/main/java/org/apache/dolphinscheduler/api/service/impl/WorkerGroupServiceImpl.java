@@ -42,8 +42,8 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -93,7 +93,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private ScheduleDao scheduleDao;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
     private WorkflowDefinitionDao workflowDefinitionDao;
@@ -158,8 +158,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     private void checkWorkerGroupDependencies(WorkerGroup workerGroup) {
         // check if the worker group has any dependent tasks
-        List<TaskDefinition> taskDefinitions = taskDefinitionMapper.selectList(
-                new QueryWrapper<TaskDefinition>().lambda().eq(TaskDefinition::getWorkerGroup, workerGroup.getName()));
+        List<TaskDefinition> taskDefinitions = taskDefinitionDao.queryByWorkerGroup(workerGroup.getName());
 
         if (CollectionUtils.isNotEmpty(taskDefinitions)) {
             List<String> taskNames = taskDefinitions.stream().limit(3).map(TaskDefinition::getName)
