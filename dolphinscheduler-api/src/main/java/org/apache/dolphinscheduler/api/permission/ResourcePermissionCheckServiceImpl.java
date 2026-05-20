@@ -32,11 +32,11 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
+import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
@@ -326,10 +326,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class AlertGroupResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final AlertGroupMapper alertGroupMapper;
+        private final AlertGroupDao alertGroupDao;
 
-        public AlertGroupResourcePermissionCheck(AlertGroupMapper alertGroupMapper) {
-            this.alertGroupMapper = alertGroupMapper;
+        public AlertGroupResourcePermissionCheck(AlertGroupDao alertGroupDao) {
+            this.alertGroupDao = alertGroupDao;
         }
 
         @Override
@@ -344,7 +344,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            List<AlertGroup> alertGroupList = alertGroupMapper.queryAllGroupList();
+            List<AlertGroup> alertGroupList = alertGroupDao.queryAllGroupList();
             return alertGroupList.stream().map(AlertGroup::getId).collect(toSet());
         }
     }
@@ -413,10 +413,10 @@ public class ResourcePermissionCheckServiceImpl
     @Component
     public static class AccessTokenResourcePermissionCheck implements ResourceAcquisitionAndPermissionCheck<Integer> {
 
-        private final AccessTokenMapper accessTokenMapper;
+        private final AccessTokenDao accessTokenDao;
 
-        public AccessTokenResourcePermissionCheck(AccessTokenMapper accessTokenMapper) {
-            this.accessTokenMapper = accessTokenMapper;
+        public AccessTokenResourcePermissionCheck(AccessTokenDao accessTokenDao) {
+            this.accessTokenDao = accessTokenDao;
         }
 
         @Override
@@ -431,7 +431,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            return accessTokenMapper.listAuthorizedAccessToken(userId, null).stream().map(AccessToken::getId)
+            return accessTokenDao.listAuthorizedAccessToken(userId, null).stream().map(AccessToken::getId)
                     .collect(toSet());
         }
     }

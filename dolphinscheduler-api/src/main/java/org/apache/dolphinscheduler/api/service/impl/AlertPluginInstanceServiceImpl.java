@@ -33,9 +33,9 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.AlertPluginInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper;
+import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 import org.apache.dolphinscheduler.extract.alert.IAlertOperator;
 import org.apache.dolphinscheduler.extract.alert.request.AlertSendResponse;
 import org.apache.dolphinscheduler.extract.alert.request.AlertTestSendRequest;
@@ -78,7 +78,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     private PluginDefineMapper pluginDefineMapper;
 
     @Autowired
-    private AlertGroupMapper alertGroupMapper;
+    private AlertGroupDao alertGroupDao;
 
     @Autowired
     private RegistryClient registryClient;
@@ -271,7 +271,7 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     }
 
     private boolean checkHasAssociatedAlertGroup(String id) {
-        List<String> idsList = alertGroupMapper.queryInstanceIdsList();
+        List<String> idsList = alertGroupDao.queryInstanceIdsList();
         if (CollectionUtils.isEmpty(idsList)) {
             return false;
         }

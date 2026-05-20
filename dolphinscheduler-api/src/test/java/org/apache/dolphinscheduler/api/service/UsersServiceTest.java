@@ -37,9 +37,9 @@ import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
 import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
+import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
+import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
@@ -78,7 +78,7 @@ public class UsersServiceTest {
     private UserDao userDao;
 
     @Mock
-    private AccessTokenMapper accessTokenMapper;
+    private AccessTokenDao accessTokenDao;
 
     @Mock
     private TenantDao tenantDao;
@@ -87,7 +87,7 @@ public class UsersServiceTest {
     private ProjectUserDao projectUserDao;
 
     @Mock
-    private AlertGroupMapper alertGroupMapper;
+    private AlertGroupDao alertGroupDao;
 
     @Mock
     private DataSourceUserDao datasourceUserDao;
@@ -548,7 +548,7 @@ public class UsersServiceTest {
         loginUser.setUserType(null);
         loginUser.setId(1);
         when(userDao.queryDetailsById(1)).thenReturn(getGeneralUser());
-        when(alertGroupMapper.queryByUserId(1)).thenReturn(getAlertGroups());
+        when(alertGroupDao.queryByUserId(1)).thenReturn(getAlertGroups());
         User generalInfo = usersService.getUserInfo(loginUser);
         Assertions.assertEquals("userTest0001", generalInfo.getUserName());
     }
