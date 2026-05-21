@@ -27,6 +27,7 @@ import {
 } from 'naive-ui'
 import { useTable } from './use-table'
 import Card from '@/components/card'
+import LogModal from '@/components/log-modal'
 import WorkflowInstanceCondition from './components/workflow-instance-condition'
 import type { IWorkflowInstanceSearch } from './types'
 import totalCount from '@/utils/tableTotalCount'
@@ -35,8 +36,15 @@ export default defineComponent({
   name: 'WorkflowInstanceList',
   setup() {
     let setIntervalP: number
-    const { variables, createColumns, getTableData, batchDeleteInstance } =
-      useTable()
+    const {
+      variables,
+      createColumns,
+      getTableData,
+      batchDeleteInstance,
+      viewLog,
+      downloadLog,
+      fetchLog
+    } = useTable()
 
     const requestData = () => {
       getTableData()
@@ -64,6 +72,17 @@ export default defineComponent({
       batchDeleteInstance()
     }
 
+    const onConfirmModal = () => {
+      variables.showLogModalRef = false
+    }
+
+    const refreshLogs = () => {
+      variables.logRef = ''
+      variables.limit = 1000
+      variables.skipLineNum = 0
+      fetchLog(variables.currentLogRow)
+    }
+
     onMounted(() => {
       createColumns(variables)
       requestData()
@@ -82,11 +101,33 @@ export default defineComponent({
       clearInterval(setIntervalP)
     })
 
+    watch(
+      () => variables.showLogModalRef,
+      () => {
+        if (variables.showLogModalRef) {
+          variables.logRef = ''
+          variables.limit = 1000
+          variables.skipLineNum = 0
+          fetchLog(variables.currentLogRow)
+        } else {
+          variables.logRef = ''
+          variables.logLoadingRef = true
+          variables.currentLogRow = null
+          variables.skipLineNum = 0
+          variables.limit = 1000
+        }
+      }
+    )
+
     return {
       requestData,
       handleSearch,
       handleChangePageSize,
       handleBatchDelete,
+      onConfirmModal,
+      refreshLogs,
+      viewLog,
+      downloadLog,
       ...toRefs(variables)
     }
   },
@@ -150,6 +191,16 @@ export default defineComponent({
             }}
           </NTooltip>
         </Card>
+        <LogModal
+          showModalRef={this.showLogModalRef}
+          logRef={this.logRef}
+          row={this.currentLogRow}
+          logLoadingRef={this.logLoadingRef}
+          showDownloadLog={true}
+          onConfirmModal={this.onConfirmModal}
+          onRefreshLogs={this.refreshLogs}
+          onDownloadLogs={this.downloadLog}
+        />
       </NSpace>
     )
   }

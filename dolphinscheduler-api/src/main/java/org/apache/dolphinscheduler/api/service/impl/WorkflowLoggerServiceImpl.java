@@ -74,7 +74,7 @@ public class WorkflowLoggerServiceImpl extends BaseServiceImpl implements Workfl
         }
         projectService.checkProjectAndAuthThrowException(loginUser, workflowInstance.getProjectCode(), VIEW_LOG);
         String log = queryWorkflowLog(workflowInstance, skipLineNum, limit);
-        int lineNum = log.split("\r\n").length;
+        int lineNum = log.split("\\r\\n").length;
         return Result.success(new ResponseWorkflowLog(lineNum, log));
     }
 

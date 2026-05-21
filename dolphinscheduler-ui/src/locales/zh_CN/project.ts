@@ -179,6 +179,8 @@ export default {
     recovery_failed: '重跑失败任务',
     gantt: '甘特图',
     name: '名称',
+    auto_refresh: '自动刷新',
+    no_log_content: '暂无日志内容',
     all_status: '全部状态',
     submit_success: '提交成功',
     running: '正在运行',

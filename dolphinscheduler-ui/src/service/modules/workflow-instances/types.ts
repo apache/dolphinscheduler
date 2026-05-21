@@ -97,6 +97,7 @@ interface IWorkflowInstance {
   dryRun: number
   executorName: string
   host: string
+  logPath?: string
   count?: number
   disabled?: boolean
   buttonType?: string

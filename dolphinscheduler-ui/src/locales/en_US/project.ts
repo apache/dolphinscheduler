@@ -181,6 +181,8 @@ export default {
     recovery_failed: 'Recovery Failed',
     gantt: 'Gantt',
     name: 'Name',
+    auto_refresh: 'Auto Refresh',
+    no_log_content: 'No log content',
     all_status: 'AllStatus',
     submit_success: 'Submitted successfully',
     running: 'Running',
