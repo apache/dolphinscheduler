@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.plugin.registry.jdbc.mapper;
 
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryClientHeartbeat;
 
-import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -30,11 +29,4 @@ public interface JdbcRegistryClientHeartbeatMapper extends BaseMapper<JdbcRegist
 
     @Select("select * from t_ds_jdbc_registry_client_heartbeat")
     List<JdbcRegistryClientHeartbeat> selectAll();
-
-    @Insert("INSERT INTO t_ds_jdbc_registry_client_heartbeat(id, client_name, last_heartbeat_time, connection_config, create_time) "
-            +
-            "VALUES(#{id}, #{clientName}, #{lastHeartbeatTime}, #{connectionConfig}, NOW()) " +
-            "ON DUPLICATE KEY UPDATE " +
-            "last_heartbeat_time = #{lastHeartbeatTime}")
-    void upsert(JdbcRegistryClientHeartbeat clientHeartbeat);
 }
