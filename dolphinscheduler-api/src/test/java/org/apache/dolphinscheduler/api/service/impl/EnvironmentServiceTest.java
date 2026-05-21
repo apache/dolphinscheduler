@@ -41,7 +41,7 @@ import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -66,7 +66,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
@@ -87,7 +86,7 @@ public class EnvironmentServiceTest {
     private EnvironmentWorkerGroupRelationMapper relationMapper;
 
     @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -282,11 +281,11 @@ public class EnvironmentServiceTest {
                 () -> environmentService.deleteEnvironmentByCode(generalUser, 1L));
 
         User adminUser = getAdminUser();
-        when(taskDefinitionMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(1L);
+        when(taskDefinitionDao.countByEnvironmentCode(1L)).thenReturn(1L);
         assertThrowsServiceException(Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS,
                 () -> environmentService.deleteEnvironmentByCode(adminUser, 1L));
 
-        when(taskDefinitionMapper.selectCount(any(LambdaQueryWrapper.class))).thenReturn(0L);
+        when(taskDefinitionDao.countByEnvironmentCode(1L)).thenReturn(0L);
         when(environmentMapper.deleteByCode(1L)).thenReturn(1);
         assertDoesNotThrow(() -> environmentService.deleteEnvironmentByCode(adminUser, 1L));
 

@@ -52,6 +52,7 @@ import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
@@ -86,6 +87,9 @@ public class TaskDefinitionServiceImplTest {
 
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
+
+    @Mock
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
@@ -152,7 +156,7 @@ public class TaskDefinitionServiceImplTest {
         Mockito.doNothing().when(projectService)
                 .checkProjectAndAuthThrowException(user, project, TASK_DEFINITION);
 
-        when(taskDefinitionMapper.queryByName(project.getCode(), PROCESS_DEFINITION_CODE, taskName))
+        when(taskDefinitionDao.queryByName(project.getCode(), PROCESS_DEFINITION_CODE, taskName))
                 .thenReturn(new TaskDefinition());
 
         TaskDefinition taskDefinition = taskDefinitionService
@@ -172,9 +176,9 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(new TaskDefinitionLog());
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
-        when(taskDefinitionMapper.queryByCode(TASK_CODE))
+        when(taskDefinitionDao.queryByCode(TASK_CODE))
                 .thenReturn(taskDefinition);
-        when(taskDefinitionMapper.updateById(any(TaskDefinitionLog.class))).thenReturn(1);
+        when(taskDefinitionDao.updateById(any(TaskDefinitionLog.class))).thenReturn(true);
 
         Assertions.assertDoesNotThrow(
                 () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
@@ -191,7 +195,7 @@ public class TaskDefinitionServiceImplTest {
         otherProjectTask.setProjectCode(PROJECT_CODE + 1);
         otherProjectTask.setCode(TASK_CODE);
         otherProjectTask.setVersion(VERSION + 1);
-        when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(otherProjectTask);
+        when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(otherProjectTask);
         assertThrowsServiceException(Status.TASK_DEFINE_NOT_EXIST,
                 () -> taskDefinitionService.deleteByCodeAndVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
         Mockito.verify(taskDefinitionLogMapper, Mockito.never()).deleteByCodeAndVersion(TASK_CODE, VERSION);
@@ -201,7 +205,7 @@ public class TaskDefinitionServiceImplTest {
         taskDefinition.setProjectCode(PROJECT_CODE);
         taskDefinition.setCode(TASK_CODE);
         taskDefinition.setVersion(VERSION + 1);
-        when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
         when(taskDefinitionLogMapper.deleteByCodeAndVersion(TASK_CODE, VERSION)).thenReturn(1);
         Assertions.assertDoesNotThrow(
                 () -> taskDefinitionService.deleteByCodeAndVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
@@ -266,7 +270,7 @@ public class TaskDefinitionServiceImplTest {
                 "{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 1\",\"conditionResult\":{\"successNode\":[\"\"],\"failedNode\":[\"\"]},\"dependence\":{}}";
         taskDefinition.setTaskParams(params);
         taskDefinition.setTaskType("SHELL");
-        when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
         TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog(taskDefinition);
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, taskDefinition.getVersion()))
                 .thenReturn(taskDefinitionLog);
@@ -328,7 +332,7 @@ public class TaskDefinitionServiceImplTest {
         assertEquals(Status.TASK_DEFINE_NOT_EXIST.getCode(), ((ServiceException) exception).getCode());
 
         // error task definition not exists
-        when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(getTaskDefinition());
+        when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(getTaskDefinition());
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(getProject());
         doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
                 .checkProjectAndAuthThrowException(user, getProject(), TASK_DEFINITION);
@@ -360,12 +364,12 @@ public class TaskDefinitionServiceImplTest {
             when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(getProject());
             Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user),
                     eq(getProject()));
-            when(taskDefinitionMapper.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+            when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
             when(taskDefinitionLogMapper.queryMaxVersionForDefinition(TASK_CODE)).thenReturn(1);
-            when(taskDefinitionMapper.updateById(Mockito.any())).thenReturn(1);
+            when(taskDefinitionDao.updateById(Mockito.any())).thenReturn(true);
             when(taskDefinitionLogMapper.insert(Mockito.any())).thenReturn(1);
 
-            when(taskDefinitionMapper.queryByCodeList(Mockito.anySet()))
+            when(taskDefinitionDao.queryByCodes(Mockito.anySet()))
                     .thenReturn(Arrays.asList(taskDefinition, taskDefinitionSecond));
 
             when(workflowTaskRelationDao.queryUpstreamByCode(PROJECT_CODE, TASK_CODE))
