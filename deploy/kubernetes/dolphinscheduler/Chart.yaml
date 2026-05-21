@@ -51,8 +51,8 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   condition: zookeeper.enabled
 - name: mysql
-  version: 9.4.1
-  repository: https://raw.githubusercontent.com/bitnami/charts/archive-full-index/bitnami
+  version: 14.0.3
+  repository: https://charts.bitnami.com/bitnami
   condition: mysql.enabled
 - name: minio
   version: 11.10.26
