@@ -138,7 +138,7 @@ public class ExecutorController extends BaseController {
                                                            @RequestParam(value = "warningGroupId", required = false) Integer warningGroupId,
                                                            @RequestParam(value = "runMode", required = false) RunMode runMode,
                                                            @RequestParam(value = "workflowInstancePriority", required = false) Priority workflowInstancePriority,
-                                                           @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                                           @RequestParam(value = \"workerGroup\", required = false, defaultValue = \"\") String workerGroup,
                                                            @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
                                                            @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                                            @RequestParam(value = "startParams", required = false) String startParams,
@@ -257,7 +257,7 @@ public class ExecutorController extends BaseController {
                                                                  @RequestParam(value = "warningGroupId", required = false) Integer warningGroupId,
                                                                  @RequestParam(value = "runMode", required = false) RunMode runMode,
                                                                  @RequestParam(value = "workflowInstancePriority", required = false) Priority workflowInstancePriority,
-                                                                 @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                                                 @RequestParam(value = \"workerGroup\", required = false, defaultValue = \"\") String workerGroup,
                                                                  @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
                                                                  @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                                                  @RequestParam(value = "startParams", required = false) String startParams,
@@ -391,7 +391,7 @@ public class ExecutorController extends BaseController {
                                                    @Parameter(name = "code", description = "TASK_CODE", required = true) @PathVariable long code,
                                                    @RequestParam(value = "version", required = true) int version,
                                                    @RequestParam(value = "warningGroupId", required = false, defaultValue = "0") Integer warningGroupId,
-                                                   @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
+                                                   @RequestParam(value = \"workerGroup\", required = false, defaultValue = \"\") String workerGroup,
                                                    @RequestParam(value = "tenantCode", required = false, defaultValue = "default") String tenantCode,
                                                    @RequestParam(value = "environmentCode", required = false, defaultValue = "-1") Long environmentCode,
                                                    @RequestParam(value = "startParams", required = false) String startParams,
@@ -441,3 +441,4 @@ public class ExecutorController extends BaseController {
     }
 
 }
+
