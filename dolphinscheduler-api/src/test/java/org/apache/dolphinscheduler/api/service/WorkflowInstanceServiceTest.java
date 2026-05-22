@@ -57,9 +57,9 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
@@ -139,7 +139,7 @@ public class WorkflowInstanceServiceTest {
     TenantDao tenantDao;
 
     @Mock
-    TaskDefinitionMapper taskDefinitionMapper;
+    TaskDefinitionDao taskDefinitionDao;
 
     @Mock
     private TaskInstanceContextDao taskInstanceContextDao;
@@ -496,7 +496,7 @@ public class WorkflowInstanceServiceTest {
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(projectCode);
-        when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
+        when(taskDefinitionDao.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         assertThrowsServiceException(Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE,
                 () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
 
@@ -505,7 +505,7 @@ public class WorkflowInstanceServiceTest {
                 () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
 
         taskDefinition.setProjectCode(projectCode);
-        when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
+        when(taskDefinitionDao.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         // sub process not exist
         TaskInstance subTask = getTaskInstance();
         subTask.setTaskType("SUB_WORKFLOW");

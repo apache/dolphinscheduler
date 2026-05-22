@@ -37,7 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
@@ -80,7 +80,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     private EnvironmentWorkerGroupRelationMapper relationMapper;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     /**
      * create environment
@@ -282,8 +282,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        Long relatedTaskNumber = taskDefinitionMapper
-                .selectCount(new QueryWrapper<TaskDefinition>().lambda().eq(TaskDefinition::getEnvironmentCode, code));
+        long relatedTaskNumber = taskDefinitionDao.countByEnvironmentCode(code);
 
         if (relatedTaskNumber > 0) {
             log.warn("Delete environment failed because {} tasks is using it, environmentCode:{}.",
@@ -407,10 +406,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     private void checkUsedEnvironmentWorkerGroupRelation(Set<String> deleteKeySet,
                                                          String environmentName, Long environmentCode) {
         for (String workerGroup : deleteKeySet) {
-            List<TaskDefinition> taskDefinitionList = taskDefinitionMapper
-                    .selectList(new QueryWrapper<TaskDefinition>().lambda()
-                            .eq(TaskDefinition::getEnvironmentCode, environmentCode)
-                            .eq(TaskDefinition::getWorkerGroup, workerGroup));
+            List<TaskDefinition> taskDefinitionList =
+                    taskDefinitionDao.queryByEnvironmentCodeAndWorkerGroup(environmentCode, workerGroup);
 
             if (Objects.nonNull(taskDefinitionList) && taskDefinitionList.size() != 0) {
                 Set<String> collect =

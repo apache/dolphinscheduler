@@ -78,12 +78,12 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -197,7 +197,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private TaskDefinitionLogService taskDefinitionLogService;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Lazy
     @Autowired
@@ -1816,7 +1816,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     }
                 });
 
-        taskDefinitionMapper.queryByCodeList(taskCodeSet)
+        taskDefinitionDao.queryByCodes(taskCodeSet)
                 .stream().forEach(taskDefinition -> {
                     Map<String, Object> localParamsMap = new HashMap<>();
                     String localParams = JSONUtils.getNodeString(taskDefinition.getTaskParams(), LOCAL_PARAMS);

@@ -40,8 +40,8 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 
 import java.text.MessageFormat;
@@ -78,7 +78,7 @@ public class LoggerServiceTest {
     private ProjectService projectService;
 
     @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Mock
     private LogClientDelegate logClientDelegate;
@@ -211,7 +211,7 @@ public class LoggerServiceTest {
         taskInstance.setLogPath("/temp/log");
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, VIEW_LOG);
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
-        when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
+        when(taskDefinitionDao.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         assertDoesNotThrow(() -> loggerService.queryLog(loginUser, projectCode, 1, 1, 1));
 
         taskDefinition.setProjectCode(10);
@@ -261,7 +261,7 @@ public class LoggerServiceTest {
                 Status.INTERNAL_SERVER_ERROR_ARGS, () -> loggerService.getLogBytes(loginUser, projectCode, 1));
 
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
-        when(taskDefinitionMapper.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
+        when(taskDefinitionDao.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         when(logClientDelegate.getWholeLogBytes(any())).thenReturn(new byte[0]);
         assertDoesNotThrow(() -> loggerService.getLogBytes(loginUser, projectCode, 1));
 
