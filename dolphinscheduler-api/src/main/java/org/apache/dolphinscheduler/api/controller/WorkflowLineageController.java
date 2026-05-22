@@ -75,7 +75,7 @@ public class WorkflowLineageController extends BaseController {
                                                                            @RequestParam(value = "workflowDefinitionName", required = false) String workflowDefinitionName) {
         workflowDefinitionName = ParameterUtils.handleEscapes(workflowDefinitionName);
         List<WorkFlowRelationDetail> workFlowLineages =
-                workflowLineageService.queryWorkFlowLineageByName(projectCode, workflowDefinitionName);
+                workflowLineageService.queryWorkFlowLineageByName(loginUser, projectCode, workflowDefinitionName);
         return Result.success(workFlowLineages);
     }
 
@@ -86,7 +86,8 @@ public class WorkflowLineageController extends BaseController {
     public Result<Map<String, Object>> queryWorkFlowLineageByCode(@Parameter(hidden = true) @RequestAttribute(value = SESSION_USER) User loginUser,
                                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                   @PathVariable(value = "workFlowCode") long workFlowCode) {
-        WorkFlowLineage workFlowLineage = workflowLineageService.queryWorkFlowLineageByCode(projectCode, workFlowCode);
+        WorkFlowLineage workFlowLineage =
+                workflowLineageService.queryWorkFlowLineageByCode(loginUser, projectCode, workFlowCode);
         Map<String, Object> result = new HashMap<>();
         result.put(Constants.DATA_LIST, workFlowLineage);
         return Result.success(result);
@@ -100,7 +101,7 @@ public class WorkflowLineageController extends BaseController {
                                                             @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
         try {
             Map<String, Object> result = new HashMap<>();
-            WorkFlowLineage workFlowLineage = workflowLineageService.queryWorkFlowLineage(projectCode);
+            WorkFlowLineage workFlowLineage = workflowLineageService.queryWorkFlowLineage(loginUser, projectCode);
             result.put(Constants.DATA_LIST, workFlowLineage);
             return Result.success(result);
         } catch (Exception e) {
@@ -133,7 +134,7 @@ public class WorkflowLineageController extends BaseController {
                                                            @RequestParam(value = "taskCode") long taskCode) {
         Result<Map<String, Object>> result = new Result<>();
         Optional<String> taskDepMsg =
-                workflowLineageService.taskDependentMsg(projectCode, workflowDefinitionCode, taskCode);
+                workflowLineageService.taskDependentMsg(loginUser, projectCode, workflowDefinitionCode, taskCode);
         if (taskDepMsg.isPresent()) {
             throw new ServiceException(taskDepMsg.get());
         }
@@ -158,7 +159,8 @@ public class WorkflowLineageController extends BaseController {
                                                            @RequestParam(value = "taskCode", required = false) Long taskCode) {
         Map<String, Object> result = new HashMap<>();
         List<DependentLineageTask> dependentLineageTaskList =
-                workflowLineageService.queryDependentWorkflowDefinitions(projectCode, workFlowCode, taskCode);
+                workflowLineageService.queryDependentWorkflowDefinitions(loginUser, projectCode, workFlowCode,
+                        taskCode);
         result.put(Constants.DATA_LIST, dependentLineageTaskList);
         return Result.success(result);
     }

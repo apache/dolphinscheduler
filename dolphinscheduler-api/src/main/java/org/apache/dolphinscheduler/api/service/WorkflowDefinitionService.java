@@ -171,12 +171,12 @@ public interface WorkflowDefinitionService {
     /**
      * query workflow definition list by project code (simplified records used for dependent task picker)
      */
-    List<DependentSimplifyDefinition> queryWorkflowDefinitionListByProjectCode(long projectCode);
+    List<DependentSimplifyDefinition> queryWorkflowDefinitionListByProjectCode(User loginUser, long projectCode);
 
     /**
      * query task definition list (simplified records) by workflow definition code
      */
-    List<DependentSimplifyDefinition> queryTaskDefinitionListByWorkflowDefinitionCode(long projectCode,
+    List<DependentSimplifyDefinition> queryTaskDefinitionListByWorkflowDefinitionCode(User loginUser, long projectCode,
                                                                                       Long workflowDefinitionCode);
 
     /**

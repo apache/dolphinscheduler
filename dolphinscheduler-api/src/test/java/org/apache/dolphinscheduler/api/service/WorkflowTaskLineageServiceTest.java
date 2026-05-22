@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowLineageServiceImpl;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
@@ -69,6 +70,9 @@ public class WorkflowTaskLineageServiceTest {
     @Mock
     private WorkflowDefinitionDao workflowDefinitionDao;
 
+    @Mock
+    private ProjectService projectService;
+
     /**
      * get mock Project
      *
@@ -84,15 +88,39 @@ public class WorkflowTaskLineageServiceTest {
         return project;
     }
 
+    private User getLoginUser() {
+        User user = new User();
+        user.setId(1);
+        user.setUserName("admin");
+        return user;
+    }
+
     @Test
     public void testQueryWorkFlowLineageByName() {
         Project project = getProject("test");
+        User loginUser = getLoginUser();
         String name = "test";
         when(projectDao.queryByCode(1L)).thenReturn(project);
         when(workflowTaskLineageDao.queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(getWorkFlowLineages());
-        List<WorkFlowRelationDetail> workFlowLineages = workflowLineageService.queryWorkFlowLineageByName(1L, name);
+        List<WorkFlowRelationDetail> workFlowLineages =
+                workflowLineageService.queryWorkFlowLineageByName(loginUser, 1L, name);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(workFlowLineages));
+    }
+
+    @Test
+    public void testQueryWorkFlowLineageByNameWithoutProjectPerm() {
+        Project project = getProject("test");
+        User loginUser = getLoginUser();
+        when(projectDao.queryByCode(1L)).thenReturn(project);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(),
+                project.getCode())).when(projectService)
+                .checkProjectAndAuthThrowException(Mockito.eq(loginUser), Mockito.eq(project), Mockito.anyString());
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowLineageService.queryWorkFlowLineageByName(loginUser, 1L, "test"));
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), exception.getCode());
+        Mockito.verify(workflowTaskLineageDao, Mockito.never())
+                .queryWorkFlowLineageByName(Mockito.anyLong(), Mockito.any());
     }
 
     @Test
@@ -116,12 +144,13 @@ public class WorkflowTaskLineageServiceTest {
         workFlowRelationDetail.setWorkFlowName("testProcessDefinitionName");
         workFlowRelationDetailList.add(workFlowRelationDetail);
 
+        User loginUser = getLoginUser();
         when(projectDao.queryByCode(1L)).thenReturn(project);
         when(workflowTaskLineageDao.queryByProjectCode(project.getCode())).thenReturn(workflowTaskLineages);
         when(workflowTaskLineageDao.queryWorkFlowLineageByCode(workflowTaskLineage.getWorkflowDefinitionCode()))
                 .thenReturn(workFlowRelationDetailList);
 
-        WorkFlowLineage workFlowLineage = workflowLineageService.queryWorkFlowLineage(1L);
+        WorkFlowLineage workFlowLineage = workflowLineageService.queryWorkFlowLineage(loginUser, 1L);
 
         List<WorkFlowRelationDetail> workFlowLineageList =
                 workFlowLineage.getWorkFlowRelationDetailList();
@@ -146,6 +175,7 @@ public class WorkflowTaskLineageServiceTest {
         long projectCode = 1L;
         long workflowDefinitionCode = 100L;
         long taskCode = 200L;
+        User loginUser = getLoginUser();
 
         // Create orphaned lineage record (taskDefinitionCode exists but taskDefinition is null)
         List<WorkflowTaskLineage> dependentWorkflowList = new ArrayList<>();
@@ -159,6 +189,7 @@ public class WorkflowTaskLineageServiceTest {
         workflowDefinition.setCode(50L);
         workflowDefinition.setName("TestWorkflow");
 
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject("test"));
         when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, taskCode))
                 .thenReturn(dependentWorkflowList);
         when(workflowDefinitionDao.queryByCode(50L)).thenReturn(Optional.of(workflowDefinition));
@@ -166,7 +197,7 @@ public class WorkflowTaskLineageServiceTest {
 
         // Should return Optional.empty() because all records are orphaned
         Optional<String> result =
-                workflowLineageService.taskDependentMsg(projectCode, workflowDefinitionCode, taskCode);
+                workflowLineageService.taskDependentMsg(loginUser, projectCode, workflowDefinitionCode, taskCode);
         Assertions.assertFalse(result.isPresent());
     }
 
@@ -176,6 +207,7 @@ public class WorkflowTaskLineageServiceTest {
         long projectCode = 1L;
         long workflowDefinitionCode = 100L;
         long taskCode = 200L;
+        User loginUser = getLoginUser();
 
         List<WorkflowTaskLineage> dependentWorkflowList = new ArrayList<>();
 
@@ -205,6 +237,7 @@ public class WorkflowTaskLineageServiceTest {
         validTaskDefinition.setCode(300L);
         validTaskDefinition.setName("ValidTask");
 
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject("test"));
         when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, taskCode))
                 .thenReturn(dependentWorkflowList);
         when(workflowDefinitionDao.queryByCode(50L)).thenReturn(Optional.of(workflowDefinition1));
@@ -219,7 +252,7 @@ public class WorkflowTaskLineageServiceTest {
 
         // Should return a message with only the valid record, skipping the orphaned one
         Optional<String> result =
-                workflowLineageService.taskDependentMsg(projectCode, workflowDefinitionCode, taskCode);
+                workflowLineageService.taskDependentMsg(loginUser, projectCode, workflowDefinitionCode, taskCode);
         Assertions.assertTrue(result.isPresent());
         String message = result.get();
         Assertions.assertTrue(message.contains("ValidWorkflow"));
@@ -234,6 +267,7 @@ public class WorkflowTaskLineageServiceTest {
         long projectCode = 1L;
         long workflowDefinitionCode = 100L;
         long taskCode = 0L; // No specific task code
+        User loginUser = getLoginUser();
 
         List<WorkflowTaskLineage> dependentWorkflowList = new ArrayList<>();
         WorkflowTaskLineage orphanedLineage = new WorkflowTaskLineage();
@@ -246,6 +280,7 @@ public class WorkflowTaskLineageServiceTest {
         workflowDefinition.setCode(50L);
         workflowDefinition.setName("TestWorkflow");
 
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject("test"));
         when(workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode, 0L))
                 .thenReturn(dependentWorkflowList);
         when(workflowDefinitionDao.queryByCode(50L)).thenReturn(Optional.of(workflowDefinition));
@@ -253,7 +288,7 @@ public class WorkflowTaskLineageServiceTest {
 
         // Should return Optional.empty() because all records are orphaned
         Optional<String> result =
-                workflowLineageService.taskDependentMsg(projectCode, workflowDefinitionCode, taskCode);
+                workflowLineageService.taskDependentMsg(loginUser, projectCode, workflowDefinitionCode, taskCode);
         Assertions.assertFalse(result.isPresent());
     }
 
