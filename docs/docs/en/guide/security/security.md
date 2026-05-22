@@ -29,7 +29,7 @@ Administrator login, default username/password: admin/dolphinscheduler123
 
 The tenant code is used by the Worker as the execution identity, for example the Linux user that runs a task process. It is an execution resource boundary in DolphinScheduler. Fine-grained permissions for external systems such as databases, object stores, data catalogs, or lakehouse tables should be validated and enforced by those external systems.
 
-Do not treat the tenant code alone as a user-level data permission principal for external systems. If a task needs short-lived external credentials, bind those credentials to auditable task context such as the project, workflow, task instance, datasource, tenant, and worker group, and avoid storing long-lived credentials in task definitions.
+Do not treat the tenant code alone as a user-level data permission principal for external systems. If a task needs short-lived external credentials, bind those credentials to auditable task context such as the project, workflow, task instance, data source, tenant, and worker group, and avoid storing long-lived credentials in task definitions.
 
 ## Create Normal User
 
@@ -194,4 +194,3 @@ Create a task node in the workflow definition, select the worker group and the e
 - After creation and authorization, you can select it from the namespace drop down list when edit k8s task, If the k8s cluster name is `ds_null_k8s` means test mode which will not operate the cluster actually.
 
 ![create-environment](../../../../img/new_ui/dev/security/create-namespace.png)
-

@@ -22,7 +22,7 @@ Some task plugins need to access external systems using short-lived credentials.
 
 Recommended practice:
 
-- Use the task execution context, such as project, workflow, task instance, datasource, tenant, and worker group, when requesting runtime credentials from an external authorization service.
+- Use the task execution context, such as project, workflow, task instance, data source, tenant, and worker group, when requesting runtime credentials from an external authorization service.
 - Pass short-lived credentials to the task process through environment variables or temporary files with restricted file permissions.
 - Mask sensitive values before logging command lines, environment variables, or generated configuration files.
 - Remove temporary credential files after task completion or cancellation.
