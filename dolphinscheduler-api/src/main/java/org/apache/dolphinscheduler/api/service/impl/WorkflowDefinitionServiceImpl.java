@@ -665,7 +665,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * @param workflowDefinition WorkflowDefinition you change task definition and task relation
      * @param taskRelationList  All the latest task relation list from workflow definition
      */
-    private void taskUsedInOtherTaskValid(WorkflowDefinition workflowDefinition,
+    private void taskUsedInOtherTaskValid(User loginUser, WorkflowDefinition workflowDefinition,
                                           List<WorkflowTaskRelationLog> taskRelationList) {
         List<WorkflowTaskRelation> oldWorkflowTaskRelationList =
                 workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
@@ -677,7 +677,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     .anyMatch(relation -> oldWorkflowTaskRelation.getPostTaskCode() == relation.getPostTaskCode());
             if (!oldTaskExists) {
                 Optional<String> taskDepMsg = workflowLineageService.taskDependentMsg(
-                        workflowDefinition.getProjectCode(), oldWorkflowTaskRelation.getWorkflowDefinitionCode(),
+                        loginUser, workflowDefinition.getProjectCode(),
+                        oldWorkflowTaskRelation.getWorkflowDefinitionCode(),
                         oldWorkflowTaskRelation.getPostTaskCode());
                 taskDepMsg.ifPresent(sb::append);
             }
@@ -745,7 +746,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 workflowDefinition.getCode(), insertVersion);
         workflowDefinition.setVersion(insertVersion);
 
-        taskUsedInOtherTaskValid(workflowDefinition, taskRelationList);
+        taskUsedInOtherTaskValid(loginUser, workflowDefinition, taskRelationList);
         int insertResult = processService.saveTaskRelation(loginUser, workflowDefinition.getProjectCode(),
                 workflowDefinition.getCode(), insertVersion, taskRelationList, taskDefinitionLogs, Boolean.TRUE);
         if (insertResult != Constants.EXIT_CODE_SUCCESS) {
@@ -833,7 +834,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      *
      * @param workflowDefinition WorkflowDefinition you change task definition and task relation
      */
-    private void workflowDefinitionUsedInOtherTaskValid(WorkflowDefinition workflowDefinition) {
+    private void workflowDefinitionUsedInOtherTaskValid(User loginUser, WorkflowDefinition workflowDefinition) {
         // check workflow definition is already online
         if (workflowDefinition.getReleaseState() == ReleaseState.ONLINE) {
             throw new ServiceException(Status.WORKFLOW_DEFINE_STATE_ONLINE, workflowDefinition.getName());
@@ -847,8 +848,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         // check workflow used by other task, including sub workflow and dependent task type
-        Optional<String> taskDepMsg = workflowLineageService.taskDependentMsg(workflowDefinition.getProjectCode(),
-                workflowDefinition.getCode(), 0);
+        Optional<String> taskDepMsg = workflowLineageService.taskDependentMsg(loginUser,
+                workflowDefinition.getProjectCode(), workflowDefinition.getCode(), 0);
 
         if (taskDepMsg.isPresent()) {
             String errorMeg = "workflow definition cannot be deleted because it has dependent, " + taskDepMsg.get();
@@ -870,7 +871,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        workflowDefinitionUsedInOtherTaskValid(workflowDefinition);
+        workflowDefinitionUsedInOtherTaskValid(loginUser, workflowDefinition);
 
         // get the timing according to the workflow definition
         Schedule scheduleObj = scheduleDao.queryByWorkflowDefinitionCode(code);
@@ -1050,7 +1051,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * @return workflow definition list in the project
      */
     @Override
-    public List<DependentSimplifyDefinition> queryWorkflowDefinitionListByProjectCode(long projectCode) {
+    public List<DependentSimplifyDefinition> queryWorkflowDefinitionListByProjectCode(User loginUser,
+                                                                                      long projectCode) {
+        Project project = projectDao.queryByCode(projectCode);
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
         return workflowDefinitionDao.queryDefinitionListByProjectCodeAndWorkflowDefinitionCodes(projectCode, null);
     }
 
@@ -1062,8 +1066,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * @return task definition list in the workflow definition
      */
     @Override
-    public List<DependentSimplifyDefinition> queryTaskDefinitionListByWorkflowDefinitionCode(long projectCode,
+    public List<DependentSimplifyDefinition> queryTaskDefinitionListByWorkflowDefinitionCode(User loginUser,
+                                                                                             long projectCode,
                                                                                              Long workflowDefinitionCode) {
+        Project project = projectDao.queryByCode(projectCode);
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
         Set<Long> definitionCodesSet = new HashSet<>();
         definitionCodesSet.add(workflowDefinitionCode);
         List<DependentSimplifyDefinition> workflowDefinitions = workflowDefinitionDao
