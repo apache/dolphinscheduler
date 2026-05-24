@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
+
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -26,6 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.DependentLineageTask;
 import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
@@ -75,21 +79,28 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
     @Autowired
     private WorkflowDefinitionDao workflowDefinitionDao;
 
+    @Autowired
+    private ProjectService projectService;
+
     @Override
-    public List<WorkFlowRelationDetail> queryWorkFlowLineageByName(long projectCode, String workflowDefinitionName) {
+    public List<WorkFlowRelationDetail> queryWorkFlowLineageByName(User loginUser, long projectCode,
+                                                                   String workflowDefinitionName) {
         Project project = projectDao.queryByCode(projectCode);
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
         return workflowTaskLineageDao.queryWorkFlowLineageByName(projectCode, workflowDefinitionName);
     }
 
     @Override
-    public WorkFlowLineage queryWorkFlowLineageByCode(long projectCode, long workflowDefinitionCode) {
+    public WorkFlowLineage queryWorkFlowLineageByCode(User loginUser, long projectCode,
+                                                      long workflowDefinitionCode) {
         Project project = projectDao.queryByCode(projectCode);
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
         List<WorkflowTaskLineage> upstreamWorkflowTaskLineageList =
                 workflowTaskLineageDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         List<WorkflowTaskLineage> downstreamWorkflowTaskLineageList =
@@ -117,11 +128,12 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
     }
 
     @Override
-    public WorkFlowLineage queryWorkFlowLineage(long projectCode) {
+    public WorkFlowLineage queryWorkFlowLineage(User loginUser, long projectCode) {
         Project project = projectDao.queryByCode(projectCode);
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
         List<WorkflowTaskLineage> workflowTaskLineageList = workflowTaskLineageDao.queryByProjectCode(projectCode);
         List<WorkFlowRelation> workFlowRelationList = getWorkFlowRelations(workflowTaskLineageList);
         List<WorkFlowRelationDetail> workFlowRelationDetailList =
@@ -174,7 +186,13 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
      * @return Optional of formatter message
      */
     @Override
-    public Optional<String> taskDependentMsg(long projectCode, long workflowDefinitionCode, long taskCode) {
+    public Optional<String> taskDependentMsg(User loginUser, long projectCode, long workflowDefinitionCode,
+                                             long taskCode) {
+        Project project = projectDao.queryByCode(projectCode);
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
+        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
         long queryTaskCode = 0;
         if (taskCode != 0) {
             queryTaskCode = taskCode;
@@ -285,12 +303,14 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
     }
 
     @Override
-    public List<DependentLineageTask> queryDependentWorkflowDefinitions(long projectCode, long workflowDefinitionCode,
+    public List<DependentLineageTask> queryDependentWorkflowDefinitions(User loginUser, long projectCode,
+                                                                        long workflowDefinitionCode,
                                                                         Long taskCode) {
         Project project = projectDao.queryByCode(projectCode);
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
         List<DependentLineageTask> dependentLineageTaskList = new ArrayList<>();
         List<WorkflowTaskLineage> workflowTaskLineageList =
                 workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode,
