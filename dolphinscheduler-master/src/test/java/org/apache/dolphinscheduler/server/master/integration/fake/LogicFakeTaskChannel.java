@@ -15,30 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.parameters;
+package org.apache.dolphinscheduler.server.master.integration.fake;
 
-import org.apache.commons.lang3.StringUtils;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.task.AbstractLogicTaskChannel;
 
 import com.google.common.annotations.VisibleForTesting;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @VisibleForTesting
-public class LogicFakeTaskParameters extends AbstractParameters {
-
-    private String shellScript;
+public class LogicFakeTaskChannel extends AbstractLogicTaskChannel {
 
     @Override
-    public boolean checkParameters() {
-        if (StringUtils.isEmpty(shellScript)) {
-            throw new IllegalArgumentException("shellScript is null or empty");
-        }
-        return true;
+    public AbstractParameters parseParameters(String taskParams) {
+        return JSONUtils.parseObject(taskParams, LogicFakeTaskParameters.class);
     }
-
 }

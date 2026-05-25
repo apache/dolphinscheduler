@@ -40,7 +40,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -82,9 +81,6 @@ public class TaskInstanceServiceTest {
 
     @Mock
     ProcessService processService;
-
-    @Mock
-    TaskInstanceMapper taskInstanceMapper;
 
     @Mock
     UsersService usersService;
@@ -156,7 +152,7 @@ public class TaskInstanceServiceTest {
         doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, TASK_INSTANCE);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
-        when(taskInstanceMapper.queryTaskInstanceListPaging(
+        when(taskInstanceDao.queryTaskInstanceListPaging(
                 Mockito.any(),
                 Mockito.any(),
                 Mockito.any(),
@@ -194,7 +190,7 @@ public class TaskInstanceServiceTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) successRes.getCode());
 
         // executor name empty
-        when(taskInstanceMapper.queryTaskInstanceListPaging(
+        when(taskInstanceDao.queryTaskInstanceListPaging(
                 Mockito.any(Page.class), eq(project.getCode()), eq(1),
                 eq(""), eq(""), eq(""), eq(null),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), eq(start), eq(end)))
@@ -215,7 +211,7 @@ public class TaskInstanceServiceTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) executorNullRes.getCode());
 
         // start/end date null
-        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
+        when(taskInstanceDao.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
                 eq(""), eq(""), eq(""), eq(null),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
                         .thenReturn(pageReturn);
@@ -224,7 +220,7 @@ public class TaskInstanceServiceTest {
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) executorNullDateRes.getCode());
 
         // start date error format
-        when(taskInstanceMapper.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
+        when(taskInstanceDao.queryTaskInstanceListPaging(Mockito.any(Page.class), eq(project.getCode()), eq(1),
                 eq(""), eq(""), eq(""), eq(null),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
                         .thenReturn(pageReturn);

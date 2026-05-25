@@ -50,11 +50,11 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -123,7 +123,7 @@ public class PythonGateway {
     private ProjectDao projectDao;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
     private SchedulerService schedulerService;
@@ -132,13 +132,13 @@ public class PythonGateway {
     private ScheduleDao scheduleDao;
 
     @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private DataSourceDao dataSourceDao;
 
     @Autowired
     private ApiConfig apiConfig;
 
     @Autowired
-    private ProjectUserMapper projectUserMapper;
+    private ProjectUserDao projectUserDao;
 
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
@@ -192,7 +192,7 @@ public class PythonGateway {
         }
 
         TaskDefinition taskDefinition =
-                taskDefinitionMapper.queryByName(project.getCode(), workflowDefinition.getCode(), taskName);
+                taskDefinitionDao.queryByName(project.getCode(), workflowDefinition.getCode(), taskName);
         if (taskDefinition == null) {
             result.put("code", CodeGenerateUtils.genCode());
             result.put("version", 0L);
@@ -391,7 +391,7 @@ public class PythonGateway {
         projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
         projectUser.setCreateTime(now);
         projectUser.setUpdateTime(now);
-        return projectUserMapper.insert(projectUser);
+        return projectUserDao.insert(projectUser);
     }
 
     /*
@@ -406,7 +406,7 @@ public class PythonGateway {
         if (project == null) {
             projectService.createProject(user, name, desc);
         } else if (project.getUserId() != user.getId()) {
-            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
+            ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), user.getId());
             if (projectUser == null) {
                 grantProjectToUser(project, user);
             }
@@ -484,7 +484,7 @@ public class PythonGateway {
      */
     public DataSource getDatasource(String datasourceName, String type) {
 
-        List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
+        List<DataSource> dataSourceList = dataSourceDao.queryDataSourceByName(datasourceName);
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             String msg = String.format("Can not find any datasource by name %s", datasourceName);
             log.error(msg);
@@ -572,7 +572,7 @@ public class PythonGateway {
 
         if (taskName != null) {
             TaskDefinition taskDefinition =
-                    taskDefinitionMapper.queryByName(projectCode, workflowDefinition.getCode(), taskName);
+                    taskDefinitionDao.queryByName(projectCode, workflowDefinition.getCode(), taskName);
             result.put("taskDefinitionCode", taskDefinition.getCode());
         }
         return result;

@@ -15,27 +15,13 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.task;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannel;
-import org.apache.dolphinscheduler.plugin.task.api.TaskChannelFactory;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 
-import com.google.auto.service.AutoService;
-import com.google.common.annotations.VisibleForTesting;
+public interface ProjectUserDao extends IDao<ProjectUser> {
 
-@VisibleForTesting
-@AutoService(TaskChannelFactory.class)
-public class LogicFakeTaskChannelFactory implements TaskChannelFactory {
+    ProjectUser queryProjectRelation(int projectId, int userId);
 
-    public static final String NAME = "LogicFakeTask";
-
-    @Override
-    public TaskChannel create() {
-        return new LogicFakeTaskChannel();
-    }
-
-    @Override
-    public String getName() {
-        return NAME;
-    }
+    void deleteProjectRelation(int projectId, int userId);
 }

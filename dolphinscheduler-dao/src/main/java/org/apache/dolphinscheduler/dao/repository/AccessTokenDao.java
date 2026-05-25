@@ -15,19 +15,22 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.task.api.task;
+package org.apache.dolphinscheduler.dao.repository;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
-import org.apache.dolphinscheduler.plugin.task.api.parameters.LogicFakeTaskParameters;
+import org.apache.dolphinscheduler.dao.entity.AccessToken;
 
-import com.google.common.annotations.VisibleForTesting;
+import java.util.List;
 
-@VisibleForTesting
-public class LogicFakeTaskChannel extends AbstractLogicTaskChannel {
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-    @Override
-    public AbstractParameters parseParameters(String taskParams) {
-        return JSONUtils.parseObject(taskParams, LogicFakeTaskParameters.class);
-    }
+public interface AccessTokenDao extends IDao<AccessToken> {
+
+    IPage<AccessToken> queryAccessTokenPage(Page<AccessToken> page, String userName, int userId);
+
+    List<AccessToken> queryAccessTokenByUser(int userId);
+
+    void deleteByUserId(int userId);
+
+    List<AccessToken> listAuthorizedAccessToken(int userId, List<Integer> accessTokensIds);
 }

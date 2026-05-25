@@ -18,6 +18,43 @@
 package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
+
+import java.util.Date;
+import java.util.List;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface UserDao extends IDao<User> {
+
+    List<User> queryAllGeneralUser();
+
+    User queryByUserNameAccurately(String userName);
+
+    User queryUserByNamePassword(String userName, String password);
+
+    IPage<User> queryUserPaging(Page<User> page, String userName);
+
+    User queryDetailsById(int userId);
+
+    List<User> queryUserListByAlertGroupId(int alertGroupId);
+
+    List<User> queryUserListByTenant(int tenantId);
+
+    User queryTenantCodeByUserId(int userId);
+
+    User queryUserByToken(String token, Date now);
+
+    List<User> queryUserListByQueue(String queueName);
+
+    Boolean existUser(String queue);
+
+    Integer updateUserQueue(String oldQueue, String newQueue);
+
+    List<User> queryAuthedUserListByProjectId(int projectId);
+
+    List<User> queryEnabledUsers();
+
+    List<UserWithWorkflowDefinitionCode> queryUserWithWorkflowDefinitionCode(List<Long> workflowDefinitionCodes);
 }

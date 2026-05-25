@@ -22,8 +22,8 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -55,7 +55,7 @@ public class PythonGatewayTest {
     private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Mock
     private ResourcesService resourcesService;
@@ -70,7 +70,7 @@ public class PythonGatewayTest {
                 .thenReturn(workflowDefinition);
 
         TaskDefinition taskDefinition = getTestTaskDefinition();
-        Mockito.when(taskDefinitionMapper.queryByName(project.getCode(), workflowDefinition.getCode(),
+        Mockito.when(taskDefinitionDao.queryByName(project.getCode(), workflowDefinition.getCode(),
                 taskDefinition.getName())).thenReturn(taskDefinition);
 
         Map<String, Long> result = pythonGateway.getCodeAndVersion(project.getName(), workflowDefinition.getName(),
@@ -88,7 +88,7 @@ public class PythonGatewayTest {
                 .thenReturn(workflowDefinition);
 
         TaskDefinition taskDefinition = getTestTaskDefinition();
-        Mockito.when(taskDefinitionMapper.queryByName(project.getCode(), workflowDefinition.getCode(),
+        Mockito.when(taskDefinitionDao.queryByName(project.getCode(), workflowDefinition.getCode(),
                 taskDefinition.getName())).thenReturn(taskDefinition);
 
         Map<String, Object> result = pythonGateway.getDependentInfo(project.getName(), workflowDefinition.getName(),
