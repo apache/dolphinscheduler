@@ -581,7 +581,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
         when(scheduleDao.queryByWorkflowDefinitionCode(46L)).thenReturn(getSchedule());
         when(scheduleDao.deleteById(46)).thenReturn(true);
-        when(workflowLineageService.taskDependentMsg(project.getCode(), workflowDefinition.getCode(), 0))
+        when(workflowLineageService.taskDependentMsg(user, project.getCode(), workflowDefinition.getCode(), 0))
                 .thenReturn(Optional.empty());
         when(workflowLineageService.deleteWorkflowLineage(anyList())).thenReturn(1);
         workflowDefinitionService.deleteWorkflowDefinitionByCode(user, 46L);
@@ -597,7 +597,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         // process used by other task, sub process
         user.setUserType(UserType.ADMIN_USER);
         TaskMainInfo taskMainInfo = getTaskMainInfo().get(0);
-        when(workflowLineageService.taskDependentMsg(project.getCode(), workflowDefinition.getCode(), 0))
+        when(workflowLineageService.taskDependentMsg(user, project.getCode(), workflowDefinition.getCode(), 0))
                 .thenReturn(Optional.of(taskMainInfo.getTaskName()));
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> workflowDefinitionService.deleteWorkflowDefinitionByCode(user, 46L));
@@ -606,7 +606,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         schedule.setReleaseState(ReleaseState.OFFLINE);
         when(scheduleDao.queryByWorkflowDefinitionCode(46L)).thenReturn(getSchedule());
         when(scheduleDao.deleteById(schedule.getId())).thenReturn(true);
-        when(workflowLineageService.taskDependentMsg(project.getCode(), workflowDefinition.getCode(), 0))
+        when(workflowLineageService.taskDependentMsg(user, project.getCode(), workflowDefinition.getCode(), 0))
                 .thenReturn(Optional.empty());
         when(workflowLineageService.deleteWorkflowLineage(anyList())).thenReturn(1);
         Assertions.assertDoesNotThrow(() -> workflowDefinitionService.deleteWorkflowDefinitionByCode(user, 46L));
@@ -661,7 +661,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         // delete success
         process.setReleaseState(ReleaseState.OFFLINE);
         when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(process));
-        when(workflowLineageService.taskDependentMsg(project.getCode(), process.getCode(), 0))
+        when(workflowLineageService.taskDependentMsg(user, project.getCode(), process.getCode(), 0))
                 .thenReturn(Optional.empty());
         Assertions.assertDoesNotThrow(
                 () -> workflowDefinitionService.batchDeleteWorkflowDefinitionByCodes(user, projectCode, singleCodes));
