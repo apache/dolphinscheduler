@@ -51,11 +51,11 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -99,10 +99,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
-    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
+    private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Autowired
     private TaskGroupQueueMapper taskGroupQueueMapper;
@@ -197,13 +197,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     public boolean checkSubWorkflowDefinitionValid(WorkflowDefinition workflowDefinition) {
         // query all sub workflows under the current workflow
         List<WorkflowTaskRelation> workflowTaskRelations =
-                workflowTaskRelationMapper.queryDownstreamByWorkflowDefinitionCode(workflowDefinition.getCode());
+                workflowTaskRelationDao.queryDownstreamByWorkflowDefinitionCode(workflowDefinition.getCode());
         if (workflowTaskRelations.isEmpty()) {
             return true;
         }
         Set<Long> relationCodes =
                 workflowTaskRelations.stream().map(WorkflowTaskRelation::getPostTaskCode).collect(Collectors.toSet());
-        List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(relationCodes);
+        List<TaskDefinition> taskDefinitions = taskDefinitionDao.queryByCodes(relationCodes);
 
         // find out the workflow definition code
         Set<Long> workflowDefinitionCodeSet = new HashSet<>();

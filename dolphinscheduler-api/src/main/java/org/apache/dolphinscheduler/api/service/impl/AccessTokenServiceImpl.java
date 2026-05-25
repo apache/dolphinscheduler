@@ -31,7 +31,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
+import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -51,7 +51,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTokenService {
 
     @Autowired
-    private AccessTokenMapper accessTokenMapper;
+    private AccessTokenDao accessTokenDao;
 
     /**
      * query access token list
@@ -71,7 +71,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         if (loginUser.getUserType() == UserType.ADMIN_USER) {
             userId = 0;
         }
-        IPage<AccessToken> accessTokenList = accessTokenMapper.selectAccessTokenPage(page, searchVal, userId);
+        IPage<AccessToken> accessTokenList = accessTokenDao.queryAccessTokenPage(page, searchVal, userId);
         pageInfo.setTotal((int) accessTokenList.getTotal());
         pageInfo.setTotalList(accessTokenList.getRecords());
         return pageInfo;
@@ -92,7 +92,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         }
         userId = loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : userId;
         // query access token for specified user
-        List<AccessToken> accessTokenList = this.accessTokenMapper.queryAccessTokenByUser(userId);
+        List<AccessToken> accessTokenList = this.accessTokenDao.queryAccessTokenByUser(userId);
         return accessTokenList;
     }
 
@@ -134,7 +134,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         accessToken.setCreateTime(new Date());
         accessToken.setUpdateTime(new Date());
 
-        int insert = accessTokenMapper.insert(accessToken);
+        int insert = accessTokenDao.insert(accessToken);
 
         if (insert > 0) {
             return accessToken;
@@ -168,7 +168,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        AccessToken accessToken = accessTokenMapper.selectById(id);
+        AccessToken accessToken = accessTokenDao.queryById(id);
         if (accessToken == null) {
             throw new ServiceException(Status.ACCESS_TOKEN_NOT_EXIST, id);
         }
@@ -177,7 +177,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         if (accessToken.getUserId() != loginUser.getId() && !loginUser.getUserType().equals(UserType.ADMIN_USER)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        accessTokenMapper.deleteById(id);
+        accessTokenDao.deleteById(id);
     }
 
     /**
@@ -198,7 +198,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         }
 
         // 2. check if token is existed
-        AccessToken accessToken = accessTokenMapper.selectById(id);
+        AccessToken accessToken = accessTokenDao.queryById(id);
         if (accessToken == null) {
             log.error("Access token does not exist, accessTokenId:{}.", id);
             throw new ServiceException(Status.ACCESS_TOKEN_NOT_EXIST, id);
@@ -219,8 +219,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
         accessToken.setToken(token);
         accessToken.setUpdateTime(new Date());
 
-        int i = accessTokenMapper.updateById(accessToken);
-        if (i <= 0) {
+        if (!accessTokenDao.updateById(accessToken)) {
             throw new ServiceException(Status.ACCESS_TOKEN_NOT_EXIST, id);
         }
         return accessToken;

@@ -73,7 +73,7 @@ public class WorkflowTaskLineageControllerTest {
     public void testQueryWorkFlowLineageByName() {
         long projectCode = 1L;
         String searchVal = "test";
-        Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(projectCode, searchVal))
+        Mockito.when(workFlowLineageService.queryWorkFlowLineageByName(user, projectCode, searchVal))
                 .thenReturn(Collections.emptyList());
         assertDoesNotThrow(() -> workflowLineageController.queryWorkFlowLineageByName(user, projectCode, searchVal));
     }

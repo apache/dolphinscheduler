@@ -46,10 +46,10 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.text.MessageFormat;
@@ -92,7 +92,7 @@ public class DataAnalysisServiceTest {
     ProjectService projectService;
 
     @Mock
-    WorkflowInstanceMapper workflowInstanceMapper;
+    WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
     WorkflowDefinitionDao workflowDefinitionDao;

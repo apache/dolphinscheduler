@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class TenantAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private TenantMapper tenantMapper;
+    private TenantDao tenantDao;
 
     @Override
     public String getObjectNameFromIdentity(Object identity) {
@@ -37,7 +37,7 @@ public class TenantAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        Tenant obj = tenantMapper.selectById(objId);
+        Tenant obj = tenantDao.queryById(objId);
         return obj == null ? "" : obj.getTenantCode();
     }
 }
