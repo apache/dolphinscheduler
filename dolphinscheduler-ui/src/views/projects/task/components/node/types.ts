@@ -511,7 +511,7 @@ interface INodeData
   timeout?: number
   timeoutFlag?: boolean
   timeoutNotifyStrategy?: string[]
-  workerGroup?: string
+  workerGroup?: string | null
   code?: number
   name?: string
   preTasks?: number[]

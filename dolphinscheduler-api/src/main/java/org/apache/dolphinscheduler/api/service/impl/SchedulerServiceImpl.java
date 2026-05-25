@@ -29,6 +29,8 @@ import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
+import org.apache.dolphinscheduler.api.validator.workflow.WorkerGroupValidationContext;
+import org.apache.dolphinscheduler.api.validator.workflow.WorkerGroupValidator;
 import org.apache.dolphinscheduler.api.vo.ScheduleVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -96,6 +98,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
     @Autowired
     private TenantExistValidator tenantExistValidator;
+
+    @Autowired
+    private WorkerGroupValidator workerGroupValidator;
 
     /**
      * save schedule
@@ -184,6 +189,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setWorkflowInstancePriority(workflowInstancePriority);
         scheduleObj.setWorkerGroup(workerGroup);
         scheduleObj.setEnvironmentCode(environmentCode);
+
+        // Validate workerGroup
+        WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
+                .workerGroup(workerGroup)
+                .projectCode(projectCode)
+                .build();
+        workerGroupValidator.validate(workerGroupContext);
+
         scheduleDao.insert(scheduleObj);
 
         /**
@@ -257,6 +270,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
                     String.valueOf(schedule.getWorkflowDefinitionCode()));
         }
+
+        // Validate workerGroup
+        WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
+                .workerGroup(workerGroup)
+                .projectCode(projectCode)
+                .build();
+        workerGroupValidator.validate(workerGroupContext);
 
         return updateSchedule(schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
                 failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode);

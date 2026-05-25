@@ -62,7 +62,7 @@ export const useForm = () => {
       complementDependentMode: 'OFF_MODE',
       runMode: 'RUN_MODE_SERIAL',
       workflowInstancePriority: 'MEDIUM',
-      workerGroup: 'default',
+      workerGroup: null,
       tenantCode: 'default',
       environmentCode: null,
       startParams: null,
@@ -140,7 +140,7 @@ export const useForm = () => {
       warningType: 'NONE',
       workflowInstancePriority: 'MEDIUM',
       warningGroupId: null as null | number,
-      workerGroup: 'default',
+      workerGroup: null,
       tenantCode: 'default',
       environmentCode: null as null | string
     },

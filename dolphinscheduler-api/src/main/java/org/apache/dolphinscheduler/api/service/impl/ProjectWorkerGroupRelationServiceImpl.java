@@ -208,6 +208,24 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
         }).distinct().collect(Collectors.toList());
     }
 
+    /**
+     * Get all assigned worker group names for a project (internal method, no auth check)
+     */
+    private Set<String> getAllAssignedWorkerGroupNames(Long projectCode) {
+        Project project = projectDao.queryByCode(projectCode);
+        Set<String> assignedWorkerGroups = new TreeSet<>();
+
+        if (project != null) {
+            assignedWorkerGroups.addAll(getAllUsedWorkerGroups(project));
+        }
+
+        Set<String> directlyAssignedGroups =
+                projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode);
+        assignedWorkerGroups.addAll(directlyAssignedGroups);
+
+        return assignedWorkerGroups;
+    }
+
     private Set<String> getAllUsedWorkerGroups(Project project) {
         Set<String> usedWorkerGroups = new TreeSet<>();
         // query all worker groups that tasks depend on
@@ -224,6 +242,29 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
                 .forEach(schedule -> usedWorkerGroups.add(schedule.getWorkerGroup()));
 
         return usedWorkerGroups;
+    }
+
+    @Override
+    public boolean isWorkerGroupAssignedToProject(Long projectCode, String workerGroup) {
+        if (StringUtils.isEmpty(workerGroup)) {
+            return true;
+        }
+        return getAllAssignedWorkerGroupNames(projectCode).contains(workerGroup);
+    }
+
+    @Override
+    public void validateWorkerGroupsAssignedToProject(Long projectCode, List<String> workerGroups) {
+        if (CollectionUtils.isEmpty(workerGroups)) {
+            return;
+        }
+
+        List<String> notAssignedWorkerGroups = workerGroups.stream()
+                .filter(workerGroup -> !isWorkerGroupAssignedToProject(projectCode, workerGroup))
+                .collect(Collectors.toList());
+
+        if (!notAssignedWorkerGroups.isEmpty()) {
+            throw new ServiceException(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT, notAssignedWorkerGroups.toString());
+        }
     }
 
 }
