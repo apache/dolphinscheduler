@@ -190,7 +190,7 @@ public class AlertPluginInstanceController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ALL_ALERT_PLUGIN_INSTANCE_ERROR)
     public Result<List<AlertPluginInstanceVO>> getAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        List<AlertPluginInstanceVO> alertPluginInstanceVOS = alertPluginInstanceService.queryAll();
+        List<AlertPluginInstanceVO> alertPluginInstanceVOS = alertPluginInstanceService.queryAll(loginUser);
         return Result.success(alertPluginInstanceVOS);
     }
 
@@ -210,7 +210,7 @@ public class AlertPluginInstanceController extends BaseController {
     public Result verifyGroupName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "alertInstanceName") String alertInstanceName) {
 
-        boolean exist = alertPluginInstanceService.checkExistPluginInstanceName(alertInstanceName);
+        boolean exist = alertPluginInstanceService.checkExistPluginInstanceName(loginUser, alertInstanceName);
         if (exist) {
             log.error("alert plugin instance {} has exist, can't create again.", alertInstanceName);
             return Result.error(Status.PLUGIN_INSTANCE_ALREADY_EXISTS);

@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
 import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -261,8 +260,8 @@ public class AlertPluginInstanceServiceTest {
         when(alertPluginInstanceMapper.updateById(Mockito.any())).thenReturn(0);
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, 1,
                 ALERT_PLUGIN_UPDATE, baseServiceLogger)).thenReturn(true);
-        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 0,
-                baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
+                null, 0, baseServiceLogger)).thenReturn(true);
         assertThrowsServiceException(Status.SAVE_ERROR,
                 () -> alertPluginInstanceService.updateById(user, 1, "testUpdate", uiParams));
 
@@ -281,8 +280,8 @@ public class AlertPluginInstanceServiceTest {
 
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
                 user.getId(), ALARM_INSTANCE_MANAGE, baseServiceLogger)).thenReturn(true);
-        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null, 0,
-                baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
+                null, 0, baseServiceLogger)).thenReturn(true);
         when(alertPluginInstanceMapper.selectById(1))
                 .thenReturn(getAlertPluginInstance(1, "test_get_instance"));
 
@@ -291,12 +290,29 @@ public class AlertPluginInstanceServiceTest {
 
     @Test
     public void testCheckExistPluginInstanceName() {
+        grantAlertPluginInstanceViewPermission(user);
         when(alertPluginInstanceMapper.existInstanceName(Mockito.any(String.class))).thenReturn(false);
-        Assertions.assertEquals(false, alertPluginInstanceService.checkExistPluginInstanceName("test"));
+        Assertions.assertEquals(false, alertPluginInstanceService.checkExistPluginInstanceName(user, "test"));
+    }
+
+    @Test
+    public void testCheckExistPluginInstanceNameWithoutPermission() {
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> alertPluginInstanceService.checkExistPluginInstanceName(noPermUser, "test"));
+        Mockito.verify(alertPluginInstanceMapper, Mockito.never()).existInstanceName(Mockito.anyString());
+    }
+
+    @Test
+    public void testCheckExistPluginInstanceNameWithOperationPermission() {
+        grantAlertPluginInstanceViewPermission(noPermUser);
+        when(alertPluginInstanceMapper.existInstanceName("test")).thenReturn(true);
+
+        Assertions.assertTrue(alertPluginInstanceService.checkExistPluginInstanceName(noPermUser, "test"));
     }
 
     @Test
     public void testListPaging() {
+        grantAlertPluginInstanceViewPermission(user);
         IPage<AlertPluginInstance> page = new Page<>();
         page.setRecords(Collections.singletonList(alertPluginInstance));
         page.setTotal(1);
@@ -308,14 +324,37 @@ public class AlertPluginInstanceServiceTest {
     }
 
     @Test
+    public void testListPagingWithoutPermission() {
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> alertPluginInstanceService.listPaging(noPermUser, "test", 1, 1));
+        Mockito.verify(alertPluginInstanceMapper, Mockito.never()).queryByInstanceNamePage(Mockito.any(Page.class),
+                Mockito.anyString());
+    }
+
+    @Test
+    public void testListPagingWithOperationPermission() {
+        grantAlertPluginInstanceViewPermission(noPermUser);
+
+        IPage<AlertPluginInstance> page = new Page<>();
+        page.setRecords(Collections.singletonList(alertPluginInstance));
+        page.setTotal(1);
+        page.setPages(1);
+        when(alertPluginInstanceMapper.queryByInstanceNamePage(Mockito.any(Page.class), Mockito.eq("test")))
+                .thenReturn(page);
+
+        Assertions.assertEquals(1, alertPluginInstanceService.listPaging(noPermUser, "test", 1, 1).getTotal());
+    }
+
+    @Test
     public void testQueryAll() {
+        grantAlertPluginInstanceViewPermission(user);
         when(alertPluginInstanceMapper.queryAllAlertPluginInstanceList()).thenReturn(Collections.emptyList());
-        Assertions.assertEquals(0, alertPluginInstanceService.queryAll().size());
+        Assertions.assertEquals(0, alertPluginInstanceService.queryAll(user).size());
 
         when(alertPluginInstanceMapper.queryAllAlertPluginInstanceList())
                 .thenReturn(Collections.singletonList(alertPluginInstance));
         when(pluginDefineMapper.queryAllPluginDefineList()).thenReturn(Collections.emptyList());
-        Assertions.assertEquals(0, alertPluginInstanceService.queryAll().size());
+        Assertions.assertEquals(0, alertPluginInstanceService.queryAll(user).size());
 
         AlertPluginInstance alertPluginInstance = getAlertPluginInstance(1, "test");
         PluginDefine pluginDefine = new PluginDefine("script", "script", uiParams);
@@ -324,7 +363,27 @@ public class AlertPluginInstanceServiceTest {
         List<AlertPluginInstance> pluginInstanceList = Collections.singletonList(alertPluginInstance);
         when(alertPluginInstanceMapper.queryAllAlertPluginInstanceList()).thenReturn(pluginInstanceList);
         when(pluginDefineMapper.queryAllPluginDefineList()).thenReturn(pluginDefines);
-        Assertions.assertDoesNotThrow(() -> alertPluginInstanceService.queryAll());
+        Assertions.assertDoesNotThrow(() -> alertPluginInstanceService.queryAll(user));
+    }
+
+    @Test
+    public void testQueryAllWithoutPermission() {
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> alertPluginInstanceService.queryAll(noPermUser));
+        Mockito.verify(alertPluginInstanceMapper, Mockito.never()).queryAllAlertPluginInstanceList();
+    }
+
+    @Test
+    public void testQueryAllWithOperationPermission() {
+        grantAlertPluginInstanceViewPermission(noPermUser);
+
+        PluginDefine pluginDefine = new PluginDefine("script", "script", uiParams);
+        pluginDefine.setId(1);
+        when(alertPluginInstanceMapper.queryAllAlertPluginInstanceList()).thenReturn(Collections.singletonList(
+                alertPluginInstance));
+        when(pluginDefineMapper.queryAllPluginDefineList()).thenReturn(Collections.singletonList(pluginDefine));
+
+        Assertions.assertEquals(1, alertPluginInstanceService.queryAll(noPermUser).size());
     }
 
     private AlertPluginInstance getAlertPluginInstance(int id, String instanceName) {
@@ -336,11 +395,12 @@ public class AlertPluginInstanceServiceTest {
         return alertPluginInstance;
     }
 
-    private AlertGroup getGlobalAlertGroup(String... alertPluginInstanceIds) {
-        AlertGroup globalAlertGroup = new AlertGroup();
-        globalAlertGroup.setId(2);
-        globalAlertGroup.setAlertInstanceIds(String.join(",", alertPluginInstanceIds));
-
-        return globalAlertGroup;
+    private void grantAlertPluginInstanceViewPermission(User loginUser) {
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
+                loginUser.getId(), ALARM_INSTANCE_MANAGE, baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE, null,
+                loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), baseServiceLogger))
+                        .thenReturn(true);
     }
+
 }

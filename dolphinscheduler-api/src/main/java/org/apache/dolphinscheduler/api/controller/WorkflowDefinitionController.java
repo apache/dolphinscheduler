@@ -568,7 +568,8 @@ public class WorkflowDefinitionController extends BaseController {
     @ApiException(GET_TASKS_LIST_BY_WORKFLOW_DEFINITION_CODE_ERROR)
     public Result<List<DependentSimplifyDefinition>> getWorkflowListByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        return Result.success(workflowDefinitionService.queryWorkflowDefinitionListByProjectCode(projectCode));
+        return Result.success(
+                workflowDefinitionService.queryWorkflowDefinitionListByProjectCode(loginUser, projectCode));
     }
 
     /**
@@ -590,7 +591,7 @@ public class WorkflowDefinitionController extends BaseController {
                                                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                                          @RequestParam(value = "workflowDefinitionCode") Long workflowDefinitionCode) {
         return Result.success(workflowDefinitionService
-                .queryTaskDefinitionListByWorkflowDefinitionCode(projectCode, workflowDefinitionCode));
+                .queryTaskDefinitionListByWorkflowDefinitionCode(loginUser, projectCode, workflowDefinitionCode));
     }
 
     @Operation(summary = "deleteByWorkflowDefinitionCode", description = "DELETE_WORKFLOW_DEFINITION_BY_ID_NOTES")

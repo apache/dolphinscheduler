@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_INSTANCE_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ALERT_PLUGIN_UPDATE;
 
-import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.AlertPluginInstanceService;
@@ -181,26 +181,28 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
      */
     @Override
     public AlertPluginInstance getById(User loginUser, int id) {
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE,
-                ApiFuncIdentificationConstant.ALARM_INSTANCE_MANAGE)) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALARM_INSTANCE_MANAGE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
         return alertPluginInstanceMapper.selectById(id);
     }
 
     @Override
-    public List<AlertPluginInstanceVO> queryAll() {
+    public List<AlertPluginInstanceVO> queryAll(User loginUser) {
+        checkAlertPluginInstanceViewPermission(loginUser);
         List<AlertPluginInstance> alertPluginInstances = alertPluginInstanceMapper.queryAllAlertPluginInstanceList();
         return buildPluginInstanceVOList(alertPluginInstances);
     }
 
     @Override
-    public boolean checkExistPluginInstanceName(String pluginInstanceName) {
+    public boolean checkExistPluginInstanceName(User loginUser, String pluginInstanceName) {
+        checkAlertPluginInstanceViewPermission(loginUser);
         return alertPluginInstanceMapper.existInstanceName(pluginInstanceName) == Boolean.TRUE;
     }
 
     @Override
     public PageInfo<AlertPluginInstanceVO> listPaging(User loginUser, String searchVal, int pageNo, int pageSize) {
+        checkAlertPluginInstanceViewPermission(loginUser);
 
         IPage<AlertPluginInstance> alertPluginInstanceIPage =
                 alertPluginInstanceMapper.queryByInstanceNamePage(new Page<>(pageNo, pageSize), searchVal);
@@ -209,6 +211,12 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
         pageInfo.setTotal((int) alertPluginInstanceIPage.getTotal());
         pageInfo.setTotalList(buildPluginInstanceVOList(alertPluginInstanceIPage.getRecords()));
         return pageInfo;
+    }
+
+    private void checkAlertPluginInstanceViewPermission(User loginUser) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALARM_INSTANCE_MANAGE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
     }
 
     private List<AlertPluginInstanceVO> buildPluginInstanceVOList(List<AlertPluginInstance> alertPluginInstances) {
