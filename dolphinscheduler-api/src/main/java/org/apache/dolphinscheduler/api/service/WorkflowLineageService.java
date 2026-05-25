@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.dao.entity.DependentLineageTask;
 import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -29,11 +30,12 @@ import java.util.Optional;
 
 public interface WorkflowLineageService {
 
-    List<WorkFlowRelationDetail> queryWorkFlowLineageByName(long projectCode, String workflowDefinitionName);
+    List<WorkFlowRelationDetail> queryWorkFlowLineageByName(User loginUser, long projectCode,
+                                                            String workflowDefinitionName);
 
-    WorkFlowLineage queryWorkFlowLineageByCode(long projectCode, long workflowDefinitionCode);
+    WorkFlowLineage queryWorkFlowLineageByCode(User loginUser, long projectCode, long workflowDefinitionCode);
 
-    WorkFlowLineage queryWorkFlowLineage(long projectCode);
+    WorkFlowLineage queryWorkFlowLineage(User loginUser, long projectCode);
 
     /**
      * Query downstream tasks depend on a workflow definition or a task
@@ -70,9 +72,10 @@ public interface WorkflowLineageService {
      * @param taskCode              Task code want to query tasks dependence
      * @return dependent workflow definition
      */
-    Optional<String> taskDependentMsg(long projectCode, long workflowDefinitionCode, long taskCode);
+    Optional<String> taskDependentMsg(User loginUser, long projectCode, long workflowDefinitionCode, long taskCode);
 
-    List<DependentLineageTask> queryDependentWorkflowDefinitions(long projectCode, long workflowDefinitionCode,
+    List<DependentLineageTask> queryDependentWorkflowDefinitions(User loginUser, long projectCode,
+                                                                 long workflowDefinitionCode,
                                                                  Long taskCode);
 
     /**
