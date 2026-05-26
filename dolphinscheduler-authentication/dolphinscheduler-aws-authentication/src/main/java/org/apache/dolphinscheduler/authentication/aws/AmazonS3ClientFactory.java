@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.authentication.aws;
 
-import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.utils.StringUtils;
 
 import java.util.Map;
 
