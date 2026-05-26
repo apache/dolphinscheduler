@@ -26,7 +26,7 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 @UtilityClass
 public class AmazonS3ClientFactory {
@@ -37,7 +37,7 @@ public class AmazonS3ClientFactory {
         String endpoint = awsProperties.get(AwsConfigurationKeys.AWS_ENDPOINT);
 
         if (endpoint != null && !endpoint.isEmpty()) {
-            if (StringUtils.isNullOrEmpty(region)) {
+            if (StringUtils.isEmpty(region)) {
                 throw new IllegalArgumentException("The aws.s3.region cannot be empty");
             }
             return AmazonS3ClientBuilder
