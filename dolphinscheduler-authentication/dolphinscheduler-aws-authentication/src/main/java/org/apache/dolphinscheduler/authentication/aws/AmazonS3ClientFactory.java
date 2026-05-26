@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.authentication.aws;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Map;
 
 import lombok.experimental.UtilityClass;
@@ -26,7 +28,6 @@ import com.amazonaws.client.builder.AwsClientBuilder;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import org.apache.commons.lang3.StringUtils;
 
 @UtilityClass
 public class AmazonS3ClientFactory {
