@@ -21,7 +21,12 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,10 +49,50 @@ public class WorkerGroupValidator implements IValidator<WorkerGroupValidationCon
         String workerGroup = context.getWorkerGroup();
         long projectCode = context.getProjectCode();
 
-        if (StringUtils.isNotEmpty(workerGroup)
+        if (StringUtils.isNotBlank(workerGroup)
                 && !projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, workerGroup)) {
             log.warn("Worker group {} is not assigned to project {}", workerGroup, projectCode);
             throw new ServiceException(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT, workerGroup);
+        }
+    }
+
+    /**
+     * Validate a list of workerGroups are assigned to the project
+     * This method queries the assigned workerGroups once and then checks all workerGroups against it
+     *
+     * @param workerGroups the list of workerGroups to validate
+     * @param projectCode the project code
+     */
+    public void validate(final List<String> workerGroups, final long projectCode) {
+        if (CollectionUtils.isEmpty(workerGroups)) {
+            return;
+        }
+
+        List<String> validWorkerGroups = workerGroups.stream()
+                .filter(StringUtils::isNotBlank)
+                .distinct()
+                .collect(Collectors.toList());
+
+        if (CollectionUtils.isEmpty(validWorkerGroups)) {
+            return;
+        }
+
+        Set<String> assignedWorkerGroupNames = projectWorkerGroupRelationService
+                .getAllAssignedWorkerGroupNames(projectCode);
+
+        if (assignedWorkerGroupNames == null) {
+            assignedWorkerGroupNames = new java.util.HashSet<>();
+        }
+
+        Set<String> finalAssignedWorkerGroupNames = assignedWorkerGroupNames;
+        List<String> unassignedWorkerGroups = validWorkerGroups.stream()
+                .filter(wg -> !finalAssignedWorkerGroupNames.contains(wg))
+                .collect(Collectors.toList());
+
+        if (!unassignedWorkerGroups.isEmpty()) {
+            log.warn("Worker groups {} are not assigned to project {}", unassignedWorkerGroups, projectCode);
+            throw new ServiceException(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT,
+                    String.join(",", unassignedWorkerGroups));
         }
     }
 }

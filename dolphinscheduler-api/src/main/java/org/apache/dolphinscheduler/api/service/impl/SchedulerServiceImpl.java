@@ -188,7 +188,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
         scheduleObj.setWorkflowInstancePriority(workflowInstancePriority);
 
-        // Validate workerGroup
         WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
                 .workerGroup(workerGroup)
                 .projectCode(projectCode)
@@ -582,7 +581,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             schedule.setFailureStrategy(failureStrategy);
         }
 
-        // Validate workerGroup
         WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
                 .workerGroup(workerGroup)
                 .projectCode(workflowDefinition.getProjectCode())

@@ -208,10 +208,8 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
         }).distinct().collect(Collectors.toList());
     }
 
-    /**
-     * Get all assigned worker group names for a project (internal method, no auth check)
-     */
-    private Set<String> getAllAssignedWorkerGroupNames(Long projectCode) {
+    @Override
+    public Set<String> getAllAssignedWorkerGroupNames(Long projectCode) {
         Project project = projectDao.queryByCode(projectCode);
         Set<String> assignedWorkerGroups = new TreeSet<>();
 
@@ -250,21 +248,6 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
             return true;
         }
         return getAllAssignedWorkerGroupNames(projectCode).contains(workerGroup);
-    }
-
-    @Override
-    public void validateWorkerGroupsAssignedToProject(Long projectCode, List<String> workerGroups) {
-        if (CollectionUtils.isEmpty(workerGroups)) {
-            return;
-        }
-
-        List<String> notAssignedWorkerGroups = workerGroups.stream()
-                .filter(workerGroup -> !isWorkerGroupAssignedToProject(projectCode, workerGroup))
-                .collect(Collectors.toList());
-
-        if (!notAssignedWorkerGroups.isEmpty()) {
-            throw new ServiceException(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT, notAssignedWorkerGroups.toString());
-        }
     }
 
 }

@@ -15,21 +15,36 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.validator;
+package org.apache.dolphinscheduler.api.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class WorkerGroupValidationContext {
+public class ProjectPreferencesDTO {
+
+    private String taskPriority;
 
     private String workerGroup;
 
-    private long projectCode;
+    private Long environmentCode;
 
+    private Integer failRetryTimes;
+
+    private Integer failRetryInterval;
+
+    private Integer cpuQuota;
+
+    private Integer memoryMax;
+
+    private Boolean timeoutFlag;
+
+    private String[] timeoutNotifyStrategy;
+
+    private Integer timeout;
+
+    private String warningType;
+
+    private String tenantCode;
+
+    private Integer warningGroupId;
 }

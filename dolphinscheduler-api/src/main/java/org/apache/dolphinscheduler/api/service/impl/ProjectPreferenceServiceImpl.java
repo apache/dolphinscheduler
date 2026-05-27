@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
 
+import org.apache.dolphinscheduler.api.dto.ProjectPreferencesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectPreferenceService;
@@ -37,7 +38,6 @@ import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
-import java.util.Map;
 import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.core.type.TypeReference;
 
 @Service
 @Slf4j
@@ -78,30 +77,24 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
                 .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
                         projectCode));
 
-        // Validate workerGroup is assigned to project
         if (StringUtils.isNotEmpty(preferences)) {
             try {
-                Map<String, Object> preferenceMap =
-                        JSONUtils.parseObject(preferences, new TypeReference<Map<String, Object>>() {
-                        });
-                if (preferenceMap != null) {
-                    Object workerGroupObj = preferenceMap.get("workerGroup");
-                    if (workerGroupObj != null) {
-                        String workerGroup = String.valueOf(workerGroupObj);
-                        WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
-                                .workerGroup(workerGroup)
-                                .projectCode(projectCode)
-                                .build();
-                        try {
-                            workerGroupValidator.validate(workerGroupContext);
-                        } catch (ServiceException e) {
-                            putMsg(result, Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT, workerGroup);
-                            return result;
-                        }
+                ProjectPreferencesDTO preferencesDTO = JSONUtils.parseObject(preferences, ProjectPreferencesDTO.class);
+                if (preferencesDTO != null && StringUtils.isNotEmpty(preferencesDTO.getWorkerGroup())) {
+                    WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
+                            .workerGroup(preferencesDTO.getWorkerGroup())
+                            .projectCode(projectCode)
+                            .build();
+                    try {
+                        workerGroupValidator.validate(workerGroupContext);
+                    } catch (ServiceException e) {
+                        putMsg(result, Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT, preferencesDTO.getWorkerGroup());
+                        return result;
                     }
                 }
             } catch (Exception e) {
                 log.warn("Failed to parse preferences JSON: {}", preferences, e);
+                throw new ServiceException(Status.UPDATE_PROJECT_PREFERENCE_ERROR);
             }
         }
 

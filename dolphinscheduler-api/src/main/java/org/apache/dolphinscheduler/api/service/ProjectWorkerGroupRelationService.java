@@ -17,12 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ProjectWorkerGroupRelationService {
 
@@ -54,12 +54,12 @@ public interface ProjectWorkerGroupRelationService {
     boolean isWorkerGroupAssignedToProject(Long projectCode, String workerGroup);
 
     /**
-     * validate worker groups are all assigned to project
+     * get all assigned worker group names for a project
+     * This includes both directly assigned worker groups and worker groups used by tasks/schedules
      *
      * @param projectCode project code
-     * @param workerGroups worker group names to validate
-     * @throws ServiceException if any worker group is not assigned
+     * @return set of all assigned worker group names
      */
-    void validateWorkerGroupsAssignedToProject(Long projectCode, List<String> workerGroups);
+    Set<String> getAllAssignedWorkerGroupNames(Long projectCode);
 
 }

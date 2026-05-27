@@ -41,7 +41,6 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowDefinitionVariablesD
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
@@ -52,6 +51,7 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -211,7 +211,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private GlobalParamsValidator globalParamsValidator;
 
     @Autowired
-    private ProjectWorkerGroupRelationService projectWorkerGroupRelationService;
+    private WorkerGroupValidator workerGroupValidator;
 
     /**
      * create workflow definition
@@ -399,11 +399,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         List<String> workerGroups = taskDefinitionLogs.stream()
                 .map(TaskDefinitionLog::getWorkerGroup)
-                .filter(StringUtils::isNotEmpty)
-                .distinct()
                 .collect(Collectors.toList());
 
-        projectWorkerGroupRelationService.validateWorkerGroupsAssignedToProject(projectCode, workerGroups);
+        workerGroupValidator.validate(workerGroups, projectCode);
     }
 
     private List<WorkflowTaskRelationLog> generateTaskRelationList(String taskRelationJson,
@@ -1665,7 +1663,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      *
      * @param srcProjectCode    srcProjectCode
      * @param targetProjectCode targetProjectCode
-     * @param result            result
      * @param failedWorkflowList failedWorkflowList
      * @param isCopy            isCopy
      */

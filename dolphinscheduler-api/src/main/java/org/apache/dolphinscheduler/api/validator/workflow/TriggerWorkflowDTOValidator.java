@@ -63,7 +63,6 @@ public class TriggerWorkflowDTOValidator implements IValidator<TriggerWorkflowDT
 
         startParamListValidator.validate(triggerWorkflowDTO.getStartParamList());
 
-        // Validate workerGroup using WorkerGroupValidator
         WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
                 .workerGroup(triggerWorkflowDTO.getWorkerGroup())
                 .projectCode(triggerWorkflowDTO.getWorkflowDefinition().getProjectCode())

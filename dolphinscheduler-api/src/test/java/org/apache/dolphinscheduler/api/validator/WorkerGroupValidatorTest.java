@@ -24,6 +24,12 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -145,5 +151,84 @@ class WorkerGroupValidatorTest {
 
         assertThatThrownBy(() -> workerGroupValidator.validate(context))
                 .isInstanceOf(ServiceException.class);
+    }
+
+    @Test
+    void testBatchValidate_nullList() {
+        assertThatCode(() -> workerGroupValidator.validate((List<String>) null, PROJECT_CODE))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testBatchValidate_emptyList() {
+        assertThatCode(() -> workerGroupValidator.validate(Collections.emptyList(), PROJECT_CODE))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testBatchValidate_listWithOnlyEmptyStrings() {
+        List<String> workerGroups = Arrays.asList("", "  ", null);
+        assertThatCode(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testBatchValidate_allValidWorkerGroups() {
+        List<String> workerGroups = Arrays.asList("default", "group-a", "group-b");
+        Set<String> assignedGroups = new HashSet<>(Arrays.asList("default", "group-a", "group-b"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        assertThatCode(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testBatchValidate_someInvalidWorkerGroups() {
+        List<String> workerGroups = Arrays.asList("default", "invalid-group");
+        Set<String> assignedGroups = new HashSet<>(Collections.singletonList("default"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        assertThatThrownBy(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .isInstanceOf(ServiceException.class)
+                .hasMessageContaining("invalid-group");
+    }
+
+    @Test
+    void testBatchValidate_allInvalidWorkerGroups() {
+        List<String> workerGroups = Arrays.asList("invalid-1", "invalid-2");
+        Set<String> assignedGroups = new HashSet<>();
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        assertThatThrownBy(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .isInstanceOf(ServiceException.class)
+                .hasMessageContaining("invalid-1")
+                .hasMessageContaining("invalid-2");
+    }
+
+    @Test
+    void testBatchValidate_withDuplicates() {
+        List<String> workerGroups = Arrays.asList("default", "default", "group-a");
+        Set<String> assignedGroups = new HashSet<>(Arrays.asList("default", "group-a"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        // Should not throw because duplicates are filtered out
+        assertThatCode(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testBatchValidate_withEmptyStrings() {
+        List<String> workerGroups = Arrays.asList("default", "", "group-a");
+        Set<String> assignedGroups = new HashSet<>(Arrays.asList("default", "group-a"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        // Should not throw because empty strings are filtered out
+        assertThatCode(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .doesNotThrowAnyException();
     }
 }
