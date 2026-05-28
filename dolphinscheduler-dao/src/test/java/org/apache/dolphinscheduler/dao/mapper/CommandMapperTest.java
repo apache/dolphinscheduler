@@ -294,7 +294,7 @@ public class CommandMapperTest extends BaseDaoTest {
         command.setCommandParam("test command param");
         command.setTaskDependType(TaskDependType.TASK_ONLY);
         command.setFailureStrategy(FailureStrategy.CONTINUE);
-        command.setWarningType(WarningType.ALL);
+        command.setWarningType(WarningType.FAILURE);
         command.setWarningGroupId(1);
         command.setScheduleTime(DateUtils.stringToDate("2019-12-29 12:10:00"));
         command.setWorkflowInstancePriority(Priority.MEDIUM);

@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.io.File;
@@ -150,7 +149,7 @@ public class DependentTaskAPITest {
         String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
         log.info("use current time {} as scheduleTime", scheduleTime);
         HttpResponse startWorkflowResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
-                upstreamWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+                upstreamWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, null);
         Assertions.assertTrue(startWorkflowResponse.getBody().getSuccess());
 
         List<Integer> workflowInstanceIds = (List<Integer>) startWorkflowResponse.getBody().getData();
@@ -214,7 +213,7 @@ public class DependentTaskAPITest {
         String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
         log.info("use current time {} as scheduleTime", scheduleTime);
         HttpResponse startWorkflowResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
-                dependentWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+                dependentWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, null);
         Assertions.assertTrue(startWorkflowResponse.getBody().getSuccess());
 
         List<Integer> workflowInstanceIds = (List<Integer>) startWorkflowResponse.getBody().getData();
@@ -299,7 +298,7 @@ public class DependentTaskAPITest {
         String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
         log.info("use current time {} as scheduleTime", scheduleTime);
         HttpResponse startWorkflowResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
-                failedDependentWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+                failedDependentWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, null);
         Assertions.assertTrue(startWorkflowResponse.getBody().getSuccess());
 
         List<Integer> workflowInstanceIds = (List<Integer>) startWorkflowResponse.getBody().getData();

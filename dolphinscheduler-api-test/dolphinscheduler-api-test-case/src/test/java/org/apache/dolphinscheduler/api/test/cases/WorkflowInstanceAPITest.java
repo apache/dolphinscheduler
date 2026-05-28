@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.io.File;
@@ -144,7 +143,7 @@ public class WorkflowInstanceAPITest {
             String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
             log.info("use current time {} as scheduleTime", scheduleTime);
             HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
-                    workflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+                    workflowDefinitionCode, scheduleTime, FailureStrategy.END, null);
             assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
             final List<Integer> workflowInstanceIds = (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
 

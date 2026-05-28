@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.scheduler.quartz;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.utils.WarningTypeUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
@@ -29,6 +31,7 @@ import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowScheduleTriggerRequest;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
@@ -103,6 +106,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
             return;
         }
 
+        final List<WarningType> warningTypes = WarningTypeUtils.parseFromString(schedule.getWarningType());
         final WorkflowScheduleTriggerRequest scheduleTriggerRequest = WorkflowScheduleTriggerRequest.builder()
                 .userId(schedule.getUserId())
                 .scheduleTIme(scheduledFireTime)
@@ -111,7 +115,7 @@ public class ProcessScheduleTask extends QuartzJobBean {
                 .workflowVersion(workflowDefinition.getVersion())
                 .failureStrategy(schedule.getFailureStrategy())
                 .taskDependType(TaskDependType.TASK_POST)
-                .warningType(schedule.getWarningType())
+                .warningTypes(warningTypes)
                 .warningGroupId(schedule.getWarningGroupId())
                 .workflowInstancePriority(schedule.getWorkflowInstancePriority())
                 .workerGroup(WorkerGroupUtils.getWorkerGroupOrDefault(schedule.getWorkerGroup()))

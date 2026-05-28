@@ -28,7 +28,8 @@ import org.apache.dolphinscheduler.spi.params.PluginParamsTransfer;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
-import org.apache.dolphinscheduler.spi.params.radio.RadioParam;
+import org.apache.dolphinscheduler.spi.params.select.SelectParam;
+import org.apache.dolphinscheduler.spi.params.select.SelectParamProps;
 import org.apache.dolphinscheduler.spi.plugin.PrioritySPIFactory;
 
 import java.util.ArrayList;
@@ -97,14 +98,18 @@ public final class AlertPluginManager {
     }
 
     private PluginParams getWarningTypeParams() {
-        return RadioParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
-                .addParamsOptions(
+        SelectParamProps props = new SelectParamProps();
+        props.setMultiple(true);
+
+        return SelectParam.newBuilder(AlertConstants.NAME_WARNING_TYPE, AlertConstants.WARNING_TYPE)
+                .addOptions(
                         new ParamsOptions(WarningType.SUCCESS.getDescp(), WarningType.SUCCESS.getDescp(), false))
-                .addParamsOptions(
+                .addOptions(
                         new ParamsOptions(WarningType.FAILURE.getDescp(), WarningType.FAILURE.getDescp(), false))
-                .addParamsOptions(new ParamsOptions(WarningType.ALL.getDescp(), WarningType.ALL.getDescp(), false))
-                .setValue(WarningType.ALL.getDescp())
-                .addValidate(Validate.newBuilder().setRequired(true).build())
+                .addOptions(
+                        new ParamsOptions(WarningType.TIMEOUT.getDescp(), WarningType.TIMEOUT.getDescp(), false))
+                .addValidate(Validate.newBuilder().setRequired(false).build())
+                .setProps(props)
                 .build();
     }
 }

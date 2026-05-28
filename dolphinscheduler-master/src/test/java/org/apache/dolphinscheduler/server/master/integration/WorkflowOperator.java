@@ -41,6 +41,9 @@ import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowM
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerResponse;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 
+import java.util.ArrayList;
+import java.util.Collections;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -69,7 +72,9 @@ public class WorkflowOperator {
                 .taskDependType(workflowTriggerDTO.getTaskDependType())
                 .failureStrategy(workflowTriggerDTO.getFailureStrategy())
                 .warningGroupId(workflowTriggerDTO.getWarningGroupId())
-                .warningType(workflowTriggerDTO.getWarningType())
+                .warningTypes(workflowTriggerDTO.getWarningType() != null
+                        ? Collections.singletonList(workflowTriggerDTO.getWarningType())
+                        : new ArrayList<>())
                 .build();
 
         final WorkflowManualTriggerResponse manualTriggerWorkflowResponse =
@@ -165,7 +170,7 @@ public class WorkflowOperator {
         private FailureStrategy failureStrategy = FailureStrategy.CONTINUE;
 
         @Builder.Default
-        private WarningType warningType = WarningType.NONE;
+        private WarningType warningType = null;
 
         @Builder.Default
         private Integer warningGroupId = null;

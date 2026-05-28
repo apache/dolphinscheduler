@@ -13,31 +13,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-import { useI18n } from 'vue-i18n'
-import type { IJsonItem } from '../../task/components/node/types'
-import { warningTypeList } from '@/common/common'
+ALTER TABLE t_ds_schedule ALTER COLUMN warning_type TYPE VARCHAR(64);
+ALTER TABLE t_ds_schedule ALTER COLUMN warning_type DROP NOT NULL;
+ALTER TABLE t_ds_schedule ALTER COLUMN warning_type SET DEFAULT NULL;
 
-export function useWarningType(): IJsonItem {
-  const { t } = useI18n()
+COMMENT ON COLUMN t_ds_schedule.warning_type IS 'Warning type: comma-separated codes like 1,2,3 (1=SUCCESS,2=FAILURE,3=TIMEOUT)';
 
-  const options = [] as any
+ALTER TABLE t_ds_process_instance ALTER COLUMN warning_type TYPE VARCHAR(64);
+ALTER TABLE t_ds_process_instance ALTER COLUMN warning_type SET DEFAULT NULL;
 
-  const initOptions = () => {
-    warningTypeList.forEach((item) => {
-      options.push({ label: t(item.code), value: item.id })
-    })
-  }
+ALTER TABLE t_ds_command ALTER COLUMN warning_type TYPE VARCHAR(64);
+ALTER TABLE t_ds_command ALTER COLUMN warning_type SET DEFAULT NULL;
 
-  initOptions()
+ALTER TABLE t_ds_error_command ALTER COLUMN warning_type TYPE VARCHAR(64);
+ALTER TABLE t_ds_error_command ALTER COLUMN warning_type SET DEFAULT NULL;
 
-  return {
-    type: 'checkbox',
-    field: 'warningType',
-    name: t('project.workflow.notification_strategy'),
-    span: 12,
-    options,
-    value: []
-  }
-}

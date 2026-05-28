@@ -240,7 +240,7 @@ public class AlertDao {
 
     private void saveTimeoutAlert(Alert alert, String content, int alertGroupId) {
         alert.setAlertGroupId(alertGroupId);
-        alert.setWarningType(WarningType.FAILURE);
+        alert.setWarningType(WarningType.TIMEOUT);
         alert.setContent(content);
         alert.setCreateTime(new Date());
         alert.setUpdateTime(new Date());

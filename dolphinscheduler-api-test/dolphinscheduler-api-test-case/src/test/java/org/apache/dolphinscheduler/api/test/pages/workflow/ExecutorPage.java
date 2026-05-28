@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.HashMap;
@@ -43,7 +42,7 @@ public class ExecutorPage {
                                               long workflowDefinitionCode,
                                               String scheduleTime,
                                               FailureStrategy failureStrategy,
-                                              WarningType warningType) {
+                                              String warningType) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("workflowDefinitionCode", workflowDefinitionCode);

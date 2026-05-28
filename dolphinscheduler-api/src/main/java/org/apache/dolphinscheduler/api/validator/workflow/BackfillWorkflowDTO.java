@@ -56,7 +56,7 @@ public class BackfillWorkflowDTO {
 
     private CommandType execType;
 
-    private WarningType warningType;
+    private List<WarningType> warningTypes;
 
     private Integer warningGroupId;
 

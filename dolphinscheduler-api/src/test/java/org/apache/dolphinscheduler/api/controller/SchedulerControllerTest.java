@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -71,7 +70,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("workflowDefinitionCode", "40");
         paramsMap.add("schedule",
                 "{'startTime':'2019-12-16 00:00:00','endTime':'2019-12-17 00:00:00','crontab':'0 0 6 * * ? *'}");
-        paramsMap.add("warningType", String.valueOf(WarningType.NONE));
+        paramsMap.add("warningType", "1,2");
         paramsMap.add("warningGroupId", "1");
         paramsMap.add("failureStrategy", String.valueOf(FailureStrategy.CONTINUE));
         paramsMap.add("receivers", "");
@@ -81,7 +80,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("workflowInstancePriority", String.valueOf(Priority.HIGH));
 
         Mockito.when(schedulerService.insertSchedule(isA(User.class), isA(Long.class), isA(Long.class),
-                isA(String.class), isA(WarningType.class), isA(int.class), isA(FailureStrategy.class),
+                isA(String.class), isA(String.class), isA(int.class), isA(FailureStrategy.class),
                 isA(Priority.class), isA(String.class), isA(String.class), isA(Long.class))).thenReturn(scheduleObj);
 
         MvcResult mvcResult = mockMvc.perform(post("/projects/{projectCode}/schedules/", 123)
@@ -102,7 +101,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("id", "37");
         paramsMap.add("schedule",
                 "{'startTime':'2019-12-16 00:00:00','endTime':'2019-12-17 00:00:00','crontab':'0 0 7 * * ? *'}");
-        paramsMap.add("warningType", String.valueOf(WarningType.NONE));
+        paramsMap.add("warningType", "1,2");
         paramsMap.add("warningGroupId", "1");
         paramsMap.add("failureStrategy", String.valueOf(FailureStrategy.CONTINUE));
         paramsMap.add("receivers", "");
@@ -112,7 +111,7 @@ public class SchedulerControllerTest extends AbstractControllerTest {
         paramsMap.add("workflowInstancePriority", String.valueOf(Priority.HIGH));
 
         Mockito.when(schedulerService.updateSchedule(isA(User.class), isA(Long.class), isA(Integer.class),
-                isA(String.class), isA(WarningType.class), isA(Integer.class), isA(FailureStrategy.class),
+                isA(String.class), isA(String.class), isA(Integer.class), isA(FailureStrategy.class),
                 isA(Priority.class), isA(String.class), isA(String.class), isA(Long.class))).thenReturn(scheduleObj);
 
         MvcResult mvcResult = mockMvc.perform(put("/projects/{projectCode}/schedules/{id}", 123, 37)

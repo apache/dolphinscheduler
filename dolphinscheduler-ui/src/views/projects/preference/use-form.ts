@@ -67,7 +67,8 @@ export function useForm() {
       memoryMax: -1,
       timeoutFlag: false,
       timeoutNotifyStrategy: ['WARN'],
-      timeout: 30
+      timeout: 30,
+      warningType: []
     } as INodeData
   })
 
@@ -90,8 +91,12 @@ export function useForm() {
   })
 
   const handleUpdate = () => {
+    const warningType = data.model.warningType && data.model.warningType.length > 0
+      ? data.model.warningType.join(',')
+      : null
+    const submitData = { ...data.model, warningType }
     const requestData = {
-      projectPreferences: JSON.stringify(data.model)
+      projectPreferences: JSON.stringify(submitData)
     } as UpdateProjectPreferenceReq
     updateProjectPreference(requestData, projectCode).then(() => {
       window.$message.success(t('project.preference.success'))

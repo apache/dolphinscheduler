@@ -54,7 +54,7 @@ public class WorkflowManualTriggerRequest {
     private TaskDependType taskDependType = TaskDependType.TASK_POST;
 
     @Builder.Default
-    private WarningType warningType = WarningType.NONE;
+    private List<WarningType> warningTypes = new ArrayList<>();
 
     private Integer warningGroupId;
 

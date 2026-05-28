@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.lifecycle.handler;
 
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
@@ -46,12 +47,14 @@ public class WorkflowTimeoutLifecycleEventHandler
                        final IWorkflowExecution workflowExecution,
                        final WorkflowTimeoutLifecycleEvent workflowTimeoutLifecycleEvent) {
         final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
-        final boolean shouldSendAlert = workflowInstance.getWarningGroupId() != null;
+        final boolean shouldSendAlert = workflowInstance.getWarningGroupId() != null
+                && workflowInstance.hasWarningType(WarningType.TIMEOUT);
 
         if (shouldSendAlert) {
             doWorkflowTimeoutAlert(workflowExecution);
         } else {
-            log.info("Skipped sending timeout alert for workflow {} because warningGroupId is null.",
+            log.info(
+                    "Skipped sending timeout alert for workflow {} because warningGroupId is null or no TIMEOUT warning type configured.",
                     workflowInstance.getName());
         }
 

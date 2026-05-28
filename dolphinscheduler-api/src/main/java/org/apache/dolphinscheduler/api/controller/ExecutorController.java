@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -108,7 +107,7 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "startNodeList", description = "START_NODE_LIST", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskDependType", description = "TASK_DEPEND_TYPE", schema = @Schema(implementation = TaskDependType.class)),
             @Parameter(name = "execType", description = "COMMAND_TYPE", schema = @Schema(implementation = CommandType.class)),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningType", description = "WARNING_TYPE"),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "runMode", description = "RUN_MODE", schema = @Schema(implementation = RunMode.class)),
             @Parameter(name = "workflowInstancePriority", description = "WORKFLOW_INSTANCE_PRIORITY", required = true, schema = @Schema(implementation = Priority.class)),
@@ -134,7 +133,7 @@ public class ExecutorController extends BaseController {
                                                            @RequestParam(value = "startNodeList", required = false) String startNodeList,
                                                            @RequestParam(value = "taskDependType", required = false, defaultValue = "TASK_POST") TaskDependType taskDependType,
                                                            @RequestParam(value = "execType", required = false, defaultValue = "START_PROCESS") CommandType execType,
-                                                           @RequestParam(value = "warningType") WarningType warningType,
+                                                           @RequestParam(value = "warningType", required = false) String warningType,
                                                            @RequestParam(value = "warningGroupId", required = false) Integer warningGroupId,
                                                            @RequestParam(value = "runMode", required = false) RunMode runMode,
                                                            @RequestParam(value = "workflowInstancePriority", required = false) Priority workflowInstancePriority,
@@ -228,7 +227,7 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "startNodeList", description = "START_NODE_LIST", schema = @Schema(implementation = String.class)),
             @Parameter(name = "taskDependType", description = "TASK_DEPEND_TYPE", schema = @Schema(implementation = TaskDependType.class)),
             @Parameter(name = "execType", description = "COMMAND_TYPE", schema = @Schema(implementation = CommandType.class)),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningType", description = "WARNING_TYPE"),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "runMode", description = "RUN_MODE", schema = @Schema(implementation = RunMode.class)),
             @Parameter(name = "workflowInstancePriority", description = "WORKFLOW_INSTANCE_PRIORITY", required = true, schema = @Schema(implementation = Priority.class)),
@@ -253,7 +252,7 @@ public class ExecutorController extends BaseController {
                                                                  @RequestParam(value = "startNodeList", required = false) String startNodeList,
                                                                  @RequestParam(value = "taskDependType", required = false) TaskDependType taskDependType,
                                                                  @RequestParam(value = "execType", required = false) CommandType execType,
-                                                                 @RequestParam(value = "warningType") WarningType warningType,
+                                                                 @RequestParam(value = "warningType", required = false) String warningType,
                                                                  @RequestParam(value = "warningGroupId", required = false) Integer warningGroupId,
                                                                  @RequestParam(value = "runMode", required = false) RunMode runMode,
                                                                  @RequestParam(value = "workflowInstancePriority", required = false) Priority workflowInstancePriority,
@@ -374,7 +373,7 @@ public class ExecutorController extends BaseController {
             @Parameter(name = "version", description = "VERSION", schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", required = true, schema = @Schema(implementation = FailureStrategy.class)),
             @Parameter(name = "execType", description = "COMMAND_TYPE", schema = @Schema(implementation = CommandType.class)),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", required = true, schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningType", description = "WARNING_TYPE"),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
             @Parameter(name = "tenantCode", description = "TENANT_CODE", schema = @Schema(implementation = String.class, example = "default")),

@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.common.constants.SystemConstants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -69,7 +68,7 @@ public class WorkflowSchedulingTestCase extends AbstractMasterIntegrationTestCas
                 .timezoneId(SystemConstants.DEFAULT_TIME_ZONE.getID())
                 .crontab("0/5 * * * * ?")
                 .failureStrategy(FailureStrategy.CONTINUE)
-                .warningType(WarningType.NONE)
+                .warningType(null)
                 .createTime(new Date())
                 .updateTime(new Date())
                 .userId(1)

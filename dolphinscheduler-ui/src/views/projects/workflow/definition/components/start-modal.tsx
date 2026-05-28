@@ -96,20 +96,16 @@ export default defineComponent({
 
     const generalWarningTypeListOptions = () => [
       {
-        value: 'NONE',
-        label: t('project.workflow.none_send')
-      },
-      {
-        value: 'SUCCESS',
+        value: '1',
         label: t('project.workflow.success_send')
       },
       {
-        value: 'FAILURE',
+        value: '2',
         label: t('project.workflow.failure_send')
       },
       {
-        value: 'ALL',
-        label: t('project.workflow.all_send')
+        value: '3',
+        label: t('project.workflow.timeout_send')
       }
     ]
 
@@ -374,9 +370,11 @@ export default defineComponent({
             <NSelect
               options={this.generalWarningTypeListOptions()}
               v-model:value={this.startForm.warningType}
+              multiple
+              max-tag-count='responsive'
             />
           </NFormItem>
-          {this.startForm.warningType !== 'NONE' && (
+          {this.startForm.warningType && this.startForm.warningType.length > 0 && (
             <NFormItem
               label={t('project.workflow.alarm_group')}
               path='warningGroupId'

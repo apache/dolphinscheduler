@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.RunMode;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -68,7 +67,7 @@ public class WorkflowInstanceExecuteFunctionControllerTest extends AbstractContr
     final String startNodeList = "startNodeList";
     final TaskDependType taskDependType = TaskDependType.TASK_ONLY;
     final CommandType execType = CommandType.PAUSE;
-    final WarningType warningType = WarningType.NONE;
+    final String warningType = null;
     final int warningGroupId = 3;
     final RunMode runMode = RunMode.RUN_MODE_SERIAL;
     final ExecutionOrder executionOrder = ExecutionOrder.DESC_ORDER;

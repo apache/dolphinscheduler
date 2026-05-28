@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.ScheduleVO;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -48,7 +47,7 @@ public interface SchedulerService {
                             long projectCode,
                             long workflowDefinitionCode,
                             String schedule,
-                            WarningType warningType,
+                            String warningType,
                             int warningGroupId,
                             FailureStrategy failureStrategy,
                             Priority workflowInstancePriority,
@@ -75,7 +74,7 @@ public interface SchedulerService {
                             long projectCode,
                             Integer id,
                             String scheduleExpression,
-                            WarningType warningType,
+                            String warningType,
                             int warningGroupId,
                             FailureStrategy failureStrategy,
                             Priority workflowInstancePriority,
@@ -143,7 +142,7 @@ public interface SchedulerService {
                                                     long projectCode,
                                                     long workflowDefinitionCode,
                                                     String scheduleExpression,
-                                                    WarningType warningType,
+                                                    String warningType,
                                                     int warningGroupId,
                                                     FailureStrategy failureStrategy,
                                                     Priority workflowInstancePriority,

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
@@ -62,7 +63,8 @@ public class TaskTimeoutLifecycleEventHandler extends AbstractTaskLifecycleEvent
         }
 
         final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
-        final boolean shouldSendAlert = workflowInstance.getWarningGroupId() != null;
+        final boolean shouldSendAlert = workflowInstance.getWarningGroupId() != null
+                && workflowInstance.hasWarningType(WarningType.TIMEOUT);
 
         switch (timeoutNotifyStrategy) {
             case WARN:
@@ -70,7 +72,9 @@ public class TaskTimeoutLifecycleEventHandler extends AbstractTaskLifecycleEvent
                 if (shouldSendAlert) {
                     doTaskTimeoutAlert(taskExecution);
                 } else {
-                    log.info("Skipped sending timeout alert for task {} because warningGroupId is null.", taskName);
+                    log.info(
+                            "Skipped sending timeout alert for task {} because warningGroupId is null or no TIMEOUT warning type configured.",
+                            taskName);
                 }
                 break;
             case FAILED:
@@ -85,7 +89,9 @@ public class TaskTimeoutLifecycleEventHandler extends AbstractTaskLifecycleEvent
                 if (shouldSendAlert) {
                     doTaskTimeoutAlert(taskExecution);
                 } else {
-                    log.info("Skipped sending timeout alert for task {} because warningGroupId is null.", taskName);
+                    log.info(
+                            "Skipped sending timeout alert for task {} because warningGroupId is null or no TIMEOUT warning type configured.",
+                            taskName);
                 }
             default:
                 log.warn("The task {} TimeoutStrategy is invalided.", taskName);

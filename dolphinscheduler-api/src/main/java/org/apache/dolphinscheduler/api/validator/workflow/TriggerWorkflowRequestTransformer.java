@@ -21,9 +21,13 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.api.validator.ITransformer;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.utils.WarningTypeUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
+
+import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,13 +43,14 @@ public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowT
 
     @Override
     public TriggerWorkflowDTO transform(WorkflowTriggerRequest workflowTriggerRequest) {
+        List<WarningType> warningTypes = WarningTypeUtils.parseFromString(workflowTriggerRequest.getWarningType());
         TriggerWorkflowDTO triggerWorkflowDTO = TriggerWorkflowDTO.builder()
                 .loginUser(workflowTriggerRequest.getLoginUser())
                 .startNodes(WorkflowUtils.parseStartNodeList(workflowTriggerRequest.getStartNodes()))
                 .failureStrategy(workflowTriggerRequest.getFailureStrategy())
                 .taskDependType(workflowTriggerRequest.getTaskDependType())
                 .execType(workflowTriggerRequest.getExecType())
-                .warningType(workflowTriggerRequest.getWarningType())
+                .warningTypes(warningTypes)
                 .warningGroupId(workflowTriggerRequest.getWarningGroupId())
                 .workflowInstancePriority(workflowTriggerRequest.getWorkflowInstancePriority())
                 .workerGroup(workflowTriggerRequest.getWorkerGroup())

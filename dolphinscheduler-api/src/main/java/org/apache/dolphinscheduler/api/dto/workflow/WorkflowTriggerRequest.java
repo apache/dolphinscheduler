@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import lombok.AllArgsConstructor;
@@ -48,7 +47,7 @@ public class WorkflowTriggerRequest {
 
     private CommandType execType;
 
-    private WarningType warningType;
+    private String warningType;
 
     private Integer warningGroupId;
 

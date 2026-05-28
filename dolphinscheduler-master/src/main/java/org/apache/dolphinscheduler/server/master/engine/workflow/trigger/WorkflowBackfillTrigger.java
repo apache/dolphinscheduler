@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.trigger;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.WarningTypeUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowComman
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerResponse;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.Date;
@@ -71,7 +70,7 @@ public class WorkflowBackfillTrigger
         workflowInstance.setTaskDependType(backfillTriggerRequest.getTaskDependType());
         workflowInstance.setFailureStrategy(backfillTriggerRequest.getFailureStrategy());
         workflowInstance
-                .setWarningType(ObjectUtils.defaultIfNull(backfillTriggerRequest.getWarningType(), WarningType.NONE));
+                .setWarningType(WarningTypeUtils.convertToString(backfillTriggerRequest.getWarningTypes()));
         workflowInstance.setWarningGroupId(backfillTriggerRequest.getWarningGroupId());
         workflowInstance.setExecutorId(backfillTriggerRequest.getUserId());
         workflowInstance.setExecutorName(getExecutorUser(backfillTriggerRequest.getUserId()).getUserName());

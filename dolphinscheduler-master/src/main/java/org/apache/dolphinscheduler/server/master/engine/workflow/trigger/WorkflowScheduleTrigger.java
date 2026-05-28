@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.trigger;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.WarningTypeUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.extract.master.command.ScheduleWorkflowComman
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowScheduleTriggerRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowScheduleTriggerResponse;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import java.util.Date;
@@ -65,8 +64,7 @@ public class WorkflowScheduleTrigger
         workflowInstance.setName(String.join("-", workflowDefinition.getName(), DateUtils.getCurrentTimeStamp()));
         workflowInstance.setTaskDependType(scheduleTriggerRequest.getTaskDependType());
         workflowInstance.setFailureStrategy(scheduleTriggerRequest.getFailureStrategy());
-        workflowInstance
-                .setWarningType(ObjectUtils.defaultIfNull(scheduleTriggerRequest.getWarningType(), WarningType.NONE));
+        workflowInstance.setWarningType(WarningTypeUtils.convertToString(scheduleTriggerRequest.getWarningTypes()));
         workflowInstance.setWarningGroupId(scheduleTriggerRequest.getWarningGroupId());
         workflowInstance.setExecutorId(scheduleTriggerRequest.getUserId());
         workflowInstance.setExecutorName(getExecutorUser(scheduleTriggerRequest.getUserId()).getUserName());

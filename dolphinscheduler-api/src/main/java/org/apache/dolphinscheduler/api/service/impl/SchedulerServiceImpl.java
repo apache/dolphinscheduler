@@ -35,7 +35,6 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -118,7 +117,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                    long projectCode,
                                    long workflowDefinitionCode,
                                    String schedule,
-                                   WarningType warningType,
+                                   String warningType,
                                    int warningGroupId,
                                    FailureStrategy failureStrategy,
                                    Priority workflowInstancePriority,
@@ -173,7 +172,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
         scheduleObj.setCrontab(scheduleParam.getCrontab());
         scheduleObj.setTimezoneId(scheduleParam.getTimezoneId());
-        scheduleObj.setWarningType(warningType);
+        scheduleObj.setWarningType(StringUtils.isBlank(warningType) ? null : warningType);
         scheduleObj.setWarningGroupId(warningGroupId);
         scheduleObj.setFailureStrategy(failureStrategy);
         scheduleObj.setCreateTime(now);
@@ -228,7 +227,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                    long projectCode,
                                    Integer id,
                                    String scheduleExpression,
-                                   WarningType warningType,
+                                   String warningType,
                                    int warningGroupId,
                                    FailureStrategy failureStrategy,
                                    Priority workflowInstancePriority,
@@ -420,7 +419,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                            long projectCode,
                                                            long workflowDefinitionCode,
                                                            String scheduleExpression,
-                                                           WarningType warningType,
+                                                           String warningType,
                                                            int warningGroupId,
                                                            FailureStrategy failureStrategy,
                                                            Priority workflowInstancePriority,
@@ -520,7 +519,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     private Schedule updateSchedule(Schedule schedule, WorkflowDefinition workflowDefinition,
-                                    String scheduleExpression, WarningType warningType, int warningGroupId,
+                                    String scheduleExpression, String warningType, int warningGroupId,
                                     FailureStrategy failureStrategy, Priority workflowInstancePriority,
                                     String workerGroup, String tenantCode, long environmentCode) {
         if (schedule.getReleaseState() == ReleaseState.ONLINE) {
@@ -560,9 +559,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             schedule.setTimezoneId(scheduleParam.getTimezoneId());
         }
 
-        if (warningType != null) {
-            schedule.setWarningType(warningType);
-        }
+        schedule.setWarningType(StringUtils.isBlank(warningType) ? null : warningType);
 
         schedule.setWarningGroupId(warningGroupId);
 

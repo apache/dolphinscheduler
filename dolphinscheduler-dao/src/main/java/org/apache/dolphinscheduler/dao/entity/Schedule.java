@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.dao.entity;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 
 import java.util.Date;
 
@@ -69,7 +68,7 @@ public class Schedule {
 
     private FailureStrategy failureStrategy;
 
-    private WarningType warningType;
+    private String warningType;
 
     private Date createTime;
 

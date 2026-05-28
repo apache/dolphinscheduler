@@ -54,7 +54,7 @@ export const useForm = () => {
       scheduleTime: '',
       dataDateType: 1,
       failureStrategy: 'CONTINUE',
-      warningType: 'NONE',
+      warningType: [],
       warningGroupId: null,
       execType: 'START_PROCESS',
       startNodeList: '',
@@ -95,7 +95,7 @@ export const useForm = () => {
         trigger: ['blur'],
         validator() {
           if (
-            startState.startForm.warningType !== 'NONE' &&
+            startState.startForm.warningType && startState.startForm.warningType.length > 0 &&
             !startState.startForm.warningGroupId
           ) {
             return new Error(t('project.workflow.warning_group_tip'))
@@ -137,7 +137,7 @@ export const useForm = () => {
       crontab: '0 0 * * * ? *',
       timezoneId: Intl.DateTimeFormat().resolvedOptions().timeZone,
       failureStrategy: 'CONTINUE',
-      warningType: 'NONE',
+      warningType: [],
       workflowInstancePriority: 'MEDIUM',
       warningGroupId: null as null | number,
       workerGroup: 'default',
@@ -150,7 +150,7 @@ export const useForm = () => {
         trigger: ['blur'],
         validator() {
           if (
-            timingState.timingForm.warningType !== 'NONE' &&
+            timingState.timingForm.warningType && timingState.timingForm.warningType.length > 0 &&
             !timingState.timingForm.warningGroupId
           ) {
             return new Error(t('project.workflow.warning_group_tip'))

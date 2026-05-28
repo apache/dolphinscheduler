@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
@@ -110,7 +109,7 @@ public class WorkflowTaskLineageMapperTest extends BaseDaoTest {
         schedule.setCrontab("");
         schedule.setFailureStrategy(FailureStrategy.CONTINUE);
         schedule.setReleaseState(ReleaseState.OFFLINE);
-        schedule.setWarningType(WarningType.NONE);
+        schedule.setWarningType(null);
         schedule.setCreateTime(new Date());
         schedule.setUpdateTime(new Date());
         schedule.setWorkflowDefinitionCode(id);

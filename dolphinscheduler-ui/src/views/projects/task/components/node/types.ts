@@ -530,6 +530,7 @@ interface INodeData
   customConfig?: boolean
   mapping_columns?: object[]
   taskExecuteType?: TaskExecuteType
+  warningType?: string[] | null
 }
 
 interface ITaskData

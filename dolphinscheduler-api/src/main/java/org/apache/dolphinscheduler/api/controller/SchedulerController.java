@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.ScheduleVO;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -67,7 +66,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RequestMapping("/projects/{projectCode}/schedules")
 public class SchedulerController extends BaseController {
 
-    public static final String DEFAULT_WARNING_TYPE = "NONE";
     public static final String DEFAULT_NOTIFY_GROUP_ID = "1";
     public static final String DEFAULT_FAILURE_POLICY = "CONTINUE";
     public static final String DEFAULT_WORKFLOW_INSTANCE_PRIORITY = "MEDIUM";
@@ -94,7 +92,7 @@ public class SchedulerController extends BaseController {
     @Parameters({
             @Parameter(name = "workflowDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "100")),
             @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','timezoneId':'America/Phoenix','crontab':'0 0 3/6 * * ? *'}")),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningType", description = "WARNING_TYPE"),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema = @Schema(implementation = FailureStrategy.class)),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
@@ -110,7 +108,7 @@ public class SchedulerController extends BaseController {
                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @RequestParam(value = "workflowDefinitionCode") long workflowDefinitionCode,
                                            @RequestParam(value = "schedule") String schedule,
-                                           @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
+                                           @RequestParam(value = "warningType", required = false) String warningType,
                                            @RequestParam(value = "warningGroupId", required = false, defaultValue = DEFAULT_NOTIFY_GROUP_ID) int warningGroupId,
                                            @RequestParam(value = "failureStrategy", required = false, defaultValue = DEFAULT_FAILURE_POLICY) FailureStrategy failureStrategy,
                                            @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
@@ -151,7 +149,7 @@ public class SchedulerController extends BaseController {
     @Parameters({
             @Parameter(name = "id", description = "SCHEDULE_ID", required = true, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{\"startTime\":\"1996-08-08 00:00:00\",\"endTime\":\"2200-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}")),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningType", description = "WARNING_TYPE"),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema = @Schema(implementation = FailureStrategy.class)),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
@@ -167,7 +165,7 @@ public class SchedulerController extends BaseController {
                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                            @PathVariable(value = "id") Integer id,
                                            @RequestParam(value = "schedule") String schedule,
-                                           @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
+                                           @RequestParam(value = "warningType", required = false) String warningType,
                                            @RequestParam(value = "warningGroupId", required = false, defaultValue = DEFAULT_NOTIFY_GROUP_ID) int warningGroupId,
                                            @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                            @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,
@@ -318,7 +316,7 @@ public class SchedulerController extends BaseController {
     @Parameters({
             @Parameter(name = "workflowDefinitionCode", description = "WORKFLOW_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "12345678")),
             @Parameter(name = "schedule", description = "SCHEDULE", schema = @Schema(implementation = String.class, example = "{'startTime':'2019-06-10 00:00:00','endTime':'2019-06-13 00:00:00','crontab':'0 0 3/6 * * ? *'}")),
-            @Parameter(name = "warningType", description = "WARNING_TYPE", schema = @Schema(implementation = WarningType.class)),
+            @Parameter(name = "warningType", description = "WARNING_TYPE"),
             @Parameter(name = "warningGroupId", description = "WARNING_GROUP_ID", schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "failureStrategy", description = "FAILURE_STRATEGY", schema = @Schema(implementation = FailureStrategy.class)),
             @Parameter(name = "workerGroup", description = "WORKER_GROUP", schema = @Schema(implementation = String.class, example = "default")),
@@ -334,7 +332,7 @@ public class SchedulerController extends BaseController {
                                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                    @PathVariable(value = "code") long workflowDefinitionCode,
                                                                    @RequestParam(value = "schedule") String schedule,
-                                                                   @RequestParam(value = "warningType", required = false, defaultValue = DEFAULT_WARNING_TYPE) WarningType warningType,
+                                                                   @RequestParam(value = "warningType", required = false) String warningType,
                                                                    @RequestParam(value = "warningGroupId", required = false) int warningGroupId,
                                                                    @RequestParam(value = "failureStrategy", required = false, defaultValue = "END") FailureStrategy failureStrategy,
                                                                    @RequestParam(value = "workerGroup", required = false, defaultValue = "default") String workerGroup,

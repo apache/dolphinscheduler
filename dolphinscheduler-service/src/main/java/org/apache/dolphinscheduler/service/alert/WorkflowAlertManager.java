@@ -174,27 +174,14 @@ public class WorkflowAlertManager {
         if (Flag.YES == workflowInstance.getIsSubWorkflow()) {
             return false;
         }
-        boolean sendWarning = false;
-        WarningType warningType = workflowInstance.getWarningType();
-        switch (warningType) {
-            case ALL:
-                if (workflowInstance.getState().isFinalState()) {
-                    sendWarning = true;
-                }
-                break;
-            case SUCCESS:
-                if (workflowInstance.getState().isSuccess()) {
-                    sendWarning = true;
-                }
-                break;
-            case FAILURE:
-                if (workflowInstance.getState().isFailure()) {
-                    sendWarning = true;
-                }
-                break;
-            default:
+
+        if (workflowInstance.getState().isSuccess()) {
+            return workflowInstance.hasWarningType(WarningType.SUCCESS);
         }
-        return sendWarning;
+        if (workflowInstance.getState().isFailure()) {
+            return workflowInstance.hasWarningType(WarningType.FAILURE);
+        }
+        return false;
     }
 
     public void sendTaskTimeoutAlert(WorkflowInstance workflowInstance,

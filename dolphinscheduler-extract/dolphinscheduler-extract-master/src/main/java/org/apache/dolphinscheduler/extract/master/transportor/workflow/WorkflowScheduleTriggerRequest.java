@@ -23,7 +23,9 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -53,7 +55,7 @@ public class WorkflowScheduleTriggerRequest {
     private TaskDependType taskDependType = TaskDependType.TASK_POST;
 
     @Builder.Default
-    private WarningType warningType = WarningType.NONE;
+    private List<WarningType> warningTypes = new ArrayList<>();
 
     private Integer warningGroupId;
 

@@ -43,7 +43,7 @@ class ErrorCommandTest {
         command.setCommandParam("param");
         command.setTaskDependType(TaskDependType.TASK_POST);
         command.setFailureStrategy(FailureStrategy.CONTINUE);
-        command.setWarningType(WarningType.ALL);
+        command.setWarningType(WarningType.FAILURE);
         command.setWarningGroupId(1);
         command.setScheduleTime(new Date());
         command.setStartTime(new Date());

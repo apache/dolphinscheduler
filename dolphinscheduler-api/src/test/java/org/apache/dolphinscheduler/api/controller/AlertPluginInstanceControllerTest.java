@@ -53,7 +53,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
     private static final String instanceName = "instanceName";
     private static final String pluginInstanceParams = "pluginInstanceParams";
     private static final AlertPluginInstanceType pluginInstanceType = AlertPluginInstanceType.NORMAL;
-    private static final WarningType warningType = WarningType.ALL;
+    private static final WarningType warningType = WarningType.FAILURE;
     private static final Result expectResponseContent = JSONUtils.parseObject(
             "{\"code\":0,\"msg\":\"success\",\"data\":\"null\",\"success\":true,\"failed\":false}", Result.class);
 

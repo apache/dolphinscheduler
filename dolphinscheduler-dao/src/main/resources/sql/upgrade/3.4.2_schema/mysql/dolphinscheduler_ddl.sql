@@ -13,31 +13,12 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-import { useI18n } from 'vue-i18n'
-import type { IJsonItem } from '../../task/components/node/types'
-import { warningTypeList } from '@/common/common'
+ALTER TABLE t_ds_schedule MODIFY COLUMN warning_type VARCHAR(64) DEFAULT NULL COMMENT 'comma-separated codes like 1,2,3 (1=SUCCESS,2=FAILURE,3=TIMEOUT)';
 
-export function useWarningType(): IJsonItem {
-  const { t } = useI18n()
+ALTER TABLE t_ds_process_instance MODIFY COLUMN warning_type VARCHAR(64) DEFAULT NULL COMMENT 'comma-separated codes like 1,2,3 (1=SUCCESS,2=FAILURE,3=TIMEOUT)';
 
-  const options = [] as any
+ALTER TABLE t_ds_command MODIFY COLUMN warning_type VARCHAR(64) DEFAULT NULL COMMENT 'comma-separated codes like 1,2,3 (1=SUCCESS,2=FAILURE,3=TIMEOUT)';
 
-  const initOptions = () => {
-    warningTypeList.forEach((item) => {
-      options.push({ label: t(item.code), value: item.id })
-    })
-  }
-
-  initOptions()
-
-  return {
-    type: 'checkbox',
-    field: 'warningType',
-    name: t('project.workflow.notification_strategy'),
-    span: 12,
-    options,
-    value: []
-  }
-}
+ALTER TABLE t_ds_error_command MODIFY COLUMN warning_type VARCHAR(64) DEFAULT NULL COMMENT 'comma-separated codes like 1,2,3 (1=SUCCESS,2=FAILURE,3=TIMEOUT)';

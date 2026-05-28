@@ -21,8 +21,10 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowBackFillRequest;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.api.validator.ITransformer;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.WarningTypeUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
@@ -56,13 +58,15 @@ public class BackfillWorkflowRequestTransformer implements ITransformer<Workflow
 
         final BackfillWorkflowDTO.BackfillParamsDTO backfillParams =
                 transformBackfillParamsDTO(workflowBackFillRequest);
+        final List<WarningType> warningTypes =
+                WarningTypeUtils.parseFromString(workflowBackFillRequest.getWarningType());
         final BackfillWorkflowDTO backfillWorkflowDTO = BackfillWorkflowDTO.builder()
                 .loginUser(workflowBackFillRequest.getLoginUser())
                 .startNodes(WorkflowUtils.parseStartNodeList(workflowBackFillRequest.getStartNodes()))
                 .failureStrategy(workflowBackFillRequest.getFailureStrategy())
                 .taskDependType(workflowBackFillRequest.getTaskDependType())
                 .execType(workflowBackFillRequest.getExecType())
-                .warningType(workflowBackFillRequest.getWarningType())
+                .warningTypes(warningTypes)
                 .warningGroupId(workflowBackFillRequest.getWarningGroupId())
                 .runMode(workflowBackFillRequest.getBackfillRunMode())
                 .workflowInstancePriority(workflowBackFillRequest.getWorkflowInstancePriority())

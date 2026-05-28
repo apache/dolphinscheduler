@@ -39,7 +39,6 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -332,14 +331,14 @@ public class PythonGateway {
         if (scheduleObj == null) {
             workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
             Schedule createdSchedule = schedulerService.insertSchedule(user, projectCode, workflowCode,
-                    schedule, WarningType.valueOf(warningType),
+                    schedule, warningType,
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
                     DEFAULT_ENVIRONMENT_CODE);
             scheduleId = createdSchedule.getId();
         } else {
             scheduleId = scheduleObj.getId();
             workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowCode);
-            schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, WarningType.valueOf(warningType),
+            schedulerService.updateSchedule(user, projectCode, scheduleId, schedule, warningType,
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
                     DEFAULT_ENVIRONMENT_CODE);
         }
@@ -369,7 +368,7 @@ public class PythonGateway {
                 .projectCode(project.getCode())
                 .workflowDefinitionCode(workflowDefinition.getCode())
                 .workerGroup(workerGroup)
-                .warningType(WarningType.of(warningType))
+                .warningType(warningType)
                 .warningGroupId(warningGroupId)
                 .execType(CommandType.START_PROCESS)
                 .taskDependType(TaskDependType.TASK_POST)

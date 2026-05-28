@@ -34,15 +34,13 @@ import com.google.common.base.Functions;
 public enum WarningType {
 
     /**
-     * 0 do not send warning;
      * 1 send if workflow success;
      * 2 send if workflow failed;
-     * 3 send if workflow ends, whatever the result;
+     * 3 send if workflow timeout;
      */
-    NONE(0, "none"),
     SUCCESS(1, "success"),
     FAILURE(2, "failure"),
-    ALL(3, "all");
+    TIMEOUT(3, "timeout");
 
     WarningType(int code, String descp) {
         this.code = code;

@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.trigger;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.WarningTypeUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandPara
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerRequest;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowManualTriggerResponse;
 
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
@@ -70,7 +69,7 @@ public class WorkflowManualTrigger
         workflowInstance.setTaskDependType(workflowManualTriggerRequest.getTaskDependType());
         workflowInstance.setFailureStrategy(workflowManualTriggerRequest.getFailureStrategy());
         workflowInstance.setWarningType(
-                ObjectUtils.defaultIfNull(workflowManualTriggerRequest.getWarningType(), WarningType.NONE));
+                WarningTypeUtils.convertToString(workflowManualTriggerRequest.getWarningTypes()));
         workflowInstance.setWarningGroupId(workflowManualTriggerRequest.getWarningGroupId());
         workflowInstance.setExecutorId(workflowManualTriggerRequest.getUserId());
         workflowInstance.setExecutorName(getExecutorUser(workflowManualTriggerRequest.getUserId()).getUserName());
@@ -110,5 +109,4 @@ public class WorkflowManualTrigger
     protected WorkflowManualTriggerResponse onTriggerSuccess(WorkflowInstance workflowInstance) {
         return WorkflowManualTriggerResponse.success(workflowInstance.getId());
     }
-
 }

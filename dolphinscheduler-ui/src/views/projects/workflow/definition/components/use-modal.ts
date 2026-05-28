@@ -69,11 +69,16 @@ export function useModal(
     try {
       state.startForm.workflowDefinitionCode = code
       state.startForm.version = version
+      const warningType = state.startForm.warningType && state.startForm.warningType.length > 0
+        ? state.startForm.warningType.join(',')
+        : null
       const params = omit(state.startForm, [
         'startEndTime',
         'scheduleTime',
-        'dataDateType'
+        'dataDateType',
+        'warningType'
       ]) as WorkflowInstanceReq
+      params.warningType = warningType
       if (state.startForm.dataDateType === 1) {
         const start = format(
           new Date(state.startForm.startEndTime[0]),
@@ -175,6 +180,9 @@ export function useModal(
       'yyyy-MM-dd HH:mm:ss'
     )
 
+    const warningType = state.timingForm.warningType && state.timingForm.warningType.length > 0
+        ? state.timingForm.warningType.join(',')
+        : null
     const data = {
       schedule: JSON.stringify({
         startTime: start,
@@ -183,7 +191,7 @@ export function useModal(
         timezoneId: state.timingForm.timezoneId
       }),
       failureStrategy: state.timingForm.failureStrategy,
-      warningType: state.timingForm.warningType,
+      warningType: warningType,
       workflowInstancePriority: state.timingForm.workflowInstancePriority,
       warningGroupId: state.timingForm.warningGroupId
         ? state.timingForm.warningGroupId

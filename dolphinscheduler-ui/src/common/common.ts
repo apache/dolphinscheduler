@@ -385,20 +385,16 @@ export function uuid(prefix: string) {
 
 export const warningTypeList = [
   {
-    id: 'NONE',
-    code: 'project.workflow.none_send'
-  },
-  {
-    id: 'SUCCESS',
+    id: '1',
     code: 'project.workflow.success_send'
   },
   {
-    id: 'FAILURE',
+    id: '2',
     code: 'project.workflow.failure_send'
   },
   {
-    id: 'ALL',
-    code: 'project.workflow.all_send'
+    id: '3',
+    code: 'project.workflow.timeout_send'
   }
 ]
 

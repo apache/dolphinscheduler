@@ -29,7 +29,6 @@ import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.io.File;
@@ -135,7 +134,7 @@ public class EmrServerlessTaskAPITest {
         String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
         log.info("use current time {} as scheduleTime", scheduleTime);
         HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
-                workflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+                workflowDefinitionCode, scheduleTime, FailureStrategy.END, null);
         Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
 
         workflowInstanceIds = (List<Integer>) startWorkflowInstanceResponse.getBody().getData();
@@ -194,7 +193,7 @@ public class EmrServerlessTaskAPITest {
         Date date = new Date();
         String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
         HttpResponse startWorkflowInstanceResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
-                failedWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
+                failedWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, null);
         Assertions.assertTrue(startWorkflowInstanceResponse.getBody().getSuccess());
 
         List<Integer> failedWorkflowInstanceIds =

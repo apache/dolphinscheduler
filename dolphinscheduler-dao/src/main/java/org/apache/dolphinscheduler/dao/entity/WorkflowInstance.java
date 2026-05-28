@@ -26,10 +26,12 @@ import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.WarningTypeUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -95,7 +97,7 @@ public class WorkflowInstance {
 
     private FailureStrategy failureStrategy;
 
-    private WarningType warningType;
+    private String warningType;
 
     private Integer warningGroupId;
 
@@ -219,6 +221,32 @@ public class WorkflowInstance {
         }
         stateDescList.add(new StateDesc(new Date(), state, stateDesc));
         this.setStateHistory(JSONUtils.toJsonString(stateDescList));
+    }
+
+    /**
+     * check if the workflow instance has the specified warning type
+     *
+     * @param warningType the warning type to check
+     * @return true if the warning type is configured
+     */
+    public boolean hasWarningType(WarningType warningType) {
+        if (warningType == null || StringUtils.isBlank(this.warningType)) {
+            return false;
+        }
+        List<WarningType> warningTypes = WarningTypeUtils.parseFromString(this.warningType);
+        return warningTypes.contains(warningType);
+    }
+
+    /**
+     * get the warning types as a list
+     *
+     * @return list of warning types, empty list if not configured
+     */
+    public List<WarningType> getWarningTypes() {
+        if (StringUtils.isBlank(this.warningType)) {
+            return Collections.emptyList();
+        }
+        return WarningTypeUtils.parseFromString(this.warningType);
     }
 
     @Data

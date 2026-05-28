@@ -244,7 +244,7 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
                 .workflowDefinitionCode(subWorkflowDefinition.getCode())
                 .workflowDefinitionVersion(subWorkflowDefinition.getVersion())
                 .failureStrategy(workflowInstance.getFailureStrategy())
-                .warningType(workflowInstance.getWarningType())
+                .warningTypes(workflowInstance.getWarningTypes())
                 .warningGroupId(workflowInstance.getWarningGroupId())
                 .workflowInstancePriority(workflowInstance.getWorkflowInstancePriority())
                 .workerGroup(workflowInstance.getWorkerGroup())

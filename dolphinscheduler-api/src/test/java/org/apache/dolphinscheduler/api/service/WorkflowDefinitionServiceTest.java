@@ -46,7 +46,6 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -990,7 +989,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         schedule.setUserId(1);
         schedule.setReleaseState(ReleaseState.OFFLINE);
         schedule.setWorkflowInstancePriority(Priority.MEDIUM);
-        schedule.setWarningType(WarningType.NONE);
+        schedule.setWarningType(null);
         schedule.setWarningGroupId(1);
         schedule.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         return schedule;
