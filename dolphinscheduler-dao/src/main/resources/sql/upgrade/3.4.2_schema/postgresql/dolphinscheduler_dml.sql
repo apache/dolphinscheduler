@@ -18,20 +18,35 @@
 UPDATE t_ds_schedule SET warning_type = NULL WHERE warning_type = 0;
 UPDATE t_ds_schedule SET warning_type = '1' WHERE warning_type = 1;
 UPDATE t_ds_schedule SET warning_type = '2' WHERE warning_type = 2;
-UPDATE t_ds_schedule SET warning_type = '1,2' WHERE warning_type = 3;
+UPDATE t_ds_schedule SET warning_type = '1,2,3' WHERE warning_type = 3;
 
 UPDATE t_ds_process_instance SET warning_type = NULL WHERE warning_type = 0;
 UPDATE t_ds_process_instance SET warning_type = '1' WHERE warning_type = 1;
 UPDATE t_ds_process_instance SET warning_type = '2' WHERE warning_type = 2;
-UPDATE t_ds_process_instance SET warning_type = '1,2' WHERE warning_type = 3;
+UPDATE t_ds_process_instance SET warning_type = '1,2,3' WHERE warning_type = 3;
 
 UPDATE t_ds_command SET warning_type = NULL WHERE warning_type = 0;
 UPDATE t_ds_command SET warning_type = '1' WHERE warning_type = 1;
 UPDATE t_ds_command SET warning_type = '2' WHERE warning_type = 2;
-UPDATE t_ds_command SET warning_type = '1,2' WHERE warning_type = 3;
+UPDATE t_ds_command SET warning_type = '1,2,3' WHERE warning_type = 3;
 
 UPDATE t_ds_error_command SET warning_type = NULL WHERE warning_type = 0;
 UPDATE t_ds_error_command SET warning_type = '1' WHERE warning_type = 1;
 UPDATE t_ds_error_command SET warning_type = '2' WHERE warning_type = 2;
-UPDATE t_ds_error_command SET warning_type = '1,2' WHERE warning_type = 3;
+UPDATE t_ds_error_command SET warning_type = '1,2,3' WHERE warning_type = 3;
 
+UPDATE t_ds_project_preference
+SET preferences = preferences - 'warningType'
+WHERE preferences->>'warningType' = 'NONE';
+
+UPDATE t_ds_project_preference
+SET preferences = jsonb_set(preferences::jsonb, '{warningType}', '"1"')::json
+WHERE preferences->>'warningType' = 'SUCCESS';
+
+UPDATE t_ds_project_preference
+SET preferences = jsonb_set(preferences::jsonb, '{warningType}', '"2"')::json
+WHERE preferences->>'warningType' = 'FAILURE';
+
+UPDATE t_ds_project_preference
+SET preferences = jsonb_set(preferences::jsonb, '{warningType}', '"1,2,3"')::json
+WHERE preferences->>'warningType' = 'ALL';

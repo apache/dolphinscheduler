@@ -18,19 +18,35 @@
 UPDATE t_ds_schedule SET warning_type = NULL WHERE warning_type = 0;
 UPDATE t_ds_schedule SET warning_type = '1' WHERE warning_type = 1;
 UPDATE t_ds_schedule SET warning_type = '2' WHERE warning_type = 2;
-UPDATE t_ds_schedule SET warning_type = '1,2' WHERE warning_type = 3;
+UPDATE t_ds_schedule SET warning_type = '1,2,3' WHERE warning_type = 3;
 
 UPDATE t_ds_process_instance SET warning_type = NULL WHERE warning_type = 0;
 UPDATE t_ds_process_instance SET warning_type = '1' WHERE warning_type = 1;
 UPDATE t_ds_process_instance SET warning_type = '2' WHERE warning_type = 2;
-UPDATE t_ds_process_instance SET warning_type = '1,2' WHERE warning_type = 3;
+UPDATE t_ds_process_instance SET warning_type = '1,2,3' WHERE warning_type = 3;
 
 UPDATE t_ds_command SET warning_type = NULL WHERE warning_type = 0;
 UPDATE t_ds_command SET warning_type = '1' WHERE warning_type = 1;
 UPDATE t_ds_command SET warning_type = '2' WHERE warning_type = 2;
-UPDATE t_ds_command SET warning_type = '1,2' WHERE warning_type = 3;
+UPDATE t_ds_command SET warning_type = '1,2,3' WHERE warning_type = 3;
 
 UPDATE t_ds_error_command SET warning_type = NULL WHERE warning_type = 0;
 UPDATE t_ds_error_command SET warning_type = '1' WHERE warning_type = 1;
 UPDATE t_ds_error_command SET warning_type = '2' WHERE warning_type = 2;
-UPDATE t_ds_error_command SET warning_type = '1,2' WHERE warning_type = 3;
+UPDATE t_ds_error_command SET warning_type = '1,2,3' WHERE warning_type = 3;
+
+UPDATE t_ds_project_preference
+SET preferences = JSON_REMOVE(preferences, '$.warningType')
+WHERE JSON_UNQUOTE(JSON_EXTRACT(preferences, '$.warningType')) = 'NONE';
+
+UPDATE t_ds_project_preference
+SET preferences = JSON_SET(preferences, '$.warningType', '1')
+WHERE JSON_UNQUOTE(JSON_EXTRACT(preferences, '$.warningType')) = 'SUCCESS';
+
+UPDATE t_ds_project_preference
+SET preferences = JSON_SET(preferences, '$.warningType', '2')
+WHERE JSON_UNQUOTE(JSON_EXTRACT(preferences, '$.warningType')) = 'FAILURE';
+
+UPDATE t_ds_project_preference
+SET preferences = JSON_SET(preferences, '$.warningType', '1,2,3')
+WHERE JSON_UNQUOTE(JSON_EXTRACT(preferences, '$.warningType')) = 'ALL';
