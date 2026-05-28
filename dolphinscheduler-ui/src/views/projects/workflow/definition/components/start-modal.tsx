@@ -198,7 +198,13 @@ export default defineComponent({
         form.workflowInstancePriority = projectPreferences.value.taskPriority
       }
       if (projectPreferences.value?.warningType) {
-        form.warningType = projectPreferences.value.warningType
+        const wt = projectPreferences.value.warningType
+        form.warningType =
+          typeof wt === 'string'
+            ? wt.split(',').map((v: string) => v.trim()).filter((v: string) => v)
+            : Array.isArray(wt)
+              ? wt
+              : []
       }
       if (projectPreferences.value?.workerGroup) {
         if (

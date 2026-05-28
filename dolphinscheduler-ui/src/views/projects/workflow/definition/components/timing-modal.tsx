@@ -224,7 +224,13 @@ export default defineComponent({
           projectPreferences.value.taskPriority
       }
       if (projectPreferences.value?.warningType) {
-        timingForm.warningType = projectPreferences.value.warningType
+        const wt = projectPreferences.value.warningType
+        timingForm.warningType =
+          typeof wt === 'string'
+            ? wt.split(',').map((v: string) => v.trim()).filter((v: string) => v)
+            : Array.isArray(wt)
+              ? wt
+              : []
       }
       if (projectPreferences.value?.workerGroup) {
         if (

@@ -73,6 +73,15 @@ export function useForm() {
   })
 
   const setValues = (initialValues: { [field: string]: any }) => {
+    if (initialValues.warningType && typeof initialValues.warningType === 'string') {
+      initialValues.warningType = initialValues.warningType
+        .split(',')
+        .map((v: string) => v.trim())
+        .filter((v: string) => v)
+    }
+    if (!initialValues.warningType) {
+      initialValues.warningType = []
+    }
     Object.assign(data.model, initialValues)
   }
 
