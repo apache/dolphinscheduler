@@ -24,8 +24,8 @@ set -eo pipefail
 # get ds home
 DOLPHINSCHEDULER_HOME=$(cd $(dirname $0);cd ../;pwd)
 
-# plugins default version is dev-SNAPSHOT, you can also choose a custom version. eg: dev-SNAPSHOT: bash install-plugins.sh dev-SNAPSHOT
-version=dev-SNAPSHOT
+# plugins default version is 3.4.2, you can also choose a custom version. eg: 3.4.2: bash install-plugins.sh 3.4.2
+version=3.4.2
 
 if [ -n "$1" ]; then
   version="$1"
