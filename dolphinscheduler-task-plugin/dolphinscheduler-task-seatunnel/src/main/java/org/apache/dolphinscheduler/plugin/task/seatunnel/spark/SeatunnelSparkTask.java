@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.spark;
 
-import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.DEPLOY_MODE_OPTIONS;
 import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.MASTER_OPTIONS;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -51,19 +50,18 @@ public class SeatunnelSparkTask extends SeatunnelTask {
     @Override
     public List<String> buildOptions() throws Exception {
         List<String> args = super.buildOptions();
-        args.add(DEPLOY_MODE_OPTIONS);
-        args.add(seatunnelParameters.getDeployMode().getCommand());
-
-        MasterTypeEnum master = DeployModeEnum.local == seatunnelParameters.getDeployMode() ? MasterTypeEnum.LOCAL
-                : seatunnelParameters.getMaster();
-
-        args.add(MASTER_OPTIONS);
-        if (MasterTypeEnum.SPARK.equals(master) || MasterTypeEnum.MESOS.equals(master)) {
-            args.add(master.getCommand() + seatunnelParameters.getMasterUrl());
+        if (DeployModeEnum.local == seatunnelParameters.getDeployMode()) {
+            args.add(MASTER_OPTIONS);
+            args.add(MasterTypeEnum.LOCAL.getCommand());
         } else {
-            args.add(master.getCommand());
+            MasterTypeEnum master = seatunnelParameters.getMaster();
+            args.add(MASTER_OPTIONS);
+            if (MasterTypeEnum.SPARK.equals(master) || MasterTypeEnum.MESOS.equals(master)) {
+                args.add(master.getCommand() + seatunnelParameters.getMasterUrl());
+            } else {
+                args.add(master.getCommand());
+            }
         }
-
         return args;
     }
 }
