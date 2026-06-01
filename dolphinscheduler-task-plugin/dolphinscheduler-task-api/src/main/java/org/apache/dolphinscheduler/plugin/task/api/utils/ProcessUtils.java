@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DEFAULT_
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.shell.AbstractShell.ExitCodeException;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -47,6 +48,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
@@ -102,6 +104,18 @@ public final class ProcessUtils {
     private static final String SIGINT = "2";
     private static final String SIGTERM = "15";
     private static final String SIGKILL = "9";
+
+    private enum ProcessStatus {
+        ALIVE,
+        NOT_ALIVE,
+        NO_PERMISSION
+    }
+
+    private static final class AlivePidResult {
+
+        private final List<Integer> alivePidList = new ArrayList<>();
+        private final List<Integer> noPermissionPidList = new ArrayList<>();
+    }
 
     /**
      * Terminate the task process, support multi-level signal processing and fallback strategy
@@ -163,8 +177,14 @@ public final class ProcessUtils {
             return true;
         }
 
-        List<Integer> alivePidList = getAlivePidList(pidList, tenantCode);
+        AlivePidResult alivePidResult = getAlivePidResult(pidList, tenantCode);
+        List<Integer> alivePidList = alivePidResult.alivePidList;
         if (alivePidList.isEmpty()) {
+            if (!alivePidResult.noPermissionPidList.isEmpty()) {
+                log.warn("No killable process found, but some processes still exist without permission: {}",
+                        alivePidResult.noPermissionPidList);
+                return false;
+            }
             log.info("All processes already terminated.");
             return true;
         }
@@ -187,7 +207,7 @@ public final class ProcessUtils {
             long startTime = System.currentTimeMillis();
             while (!alivePidList.isEmpty() && (System.currentTimeMillis() - startTime < timeoutMillis)) {
                 // Remove if process is no longer alive
-                alivePidList.removeIf(pid -> !isProcessAlive(pid, tenantCode));
+                alivePidList.removeIf(pid -> checkProcessStatus(pid, tenantCode) == ProcessStatus.NOT_ALIVE);
                 if (!alivePidList.isEmpty()) {
                     // Wait for a short interval before checking process statuses again, to avoid excessive CPU usage
                     // from tight-loop polling.
@@ -214,37 +234,57 @@ public final class ProcessUtils {
     }
 
     /**
-     * Returns a list of process IDs that are still running.
+     * Returns process IDs grouped by their current process status.
      * This method filters the provided list of PIDs by checking whether each process is still active
      *
      * @param pidList   the list of process IDs to check
      * @param tenantCode the tenant identifier used for permission control or logging context
-     * @return a new list containing only the PIDs of processes that are still running;
-     *         returns an empty list if none are alive
+     * @return process IDs grouped by active and no-permission status
      */
-    private static List<Integer> getAlivePidList(List<Integer> pidList, String tenantCode) {
-        return pidList.stream()
-                .filter(pid -> isProcessAlive(pid, tenantCode))
-                .collect(Collectors.toList());
+    private static AlivePidResult getAlivePidResult(List<Integer> pidList, String tenantCode) {
+        AlivePidResult alivePidResult = new AlivePidResult();
+        for (Integer pid : pidList) {
+            ProcessStatus processStatus = checkProcessStatus(pid, tenantCode);
+            if (processStatus == ProcessStatus.ALIVE) {
+                alivePidResult.alivePidList.add(pid);
+            } else if (processStatus == ProcessStatus.NO_PERMISSION) {
+                alivePidResult.noPermissionPidList.add(pid);
+            }
+        }
+        return alivePidResult;
     }
 
     /**
      * Check if a process with the specified PID is alive.
      *
      * @param pid the process ID to check
-     * @return true if the process exists and is running, false otherwise
+     * @return the process status
      */
-    private static boolean isProcessAlive(int pid, String tenantCode) {
+    private static ProcessStatus checkProcessStatus(int pid, String tenantCode) {
         try {
             // Use kill -0 to check if the process exists; it does not actually send a signal
             String checkCmd = String.format("kill -0 %d", pid);
             checkCmd = OSUtils.getSudoCmd(tenantCode, checkCmd);
             OSUtils.exeCmd(checkCmd);
             // If the command executes successfully, the process exists
-            return true;
+            return ProcessStatus.ALIVE;
+        } catch (ExitCodeException e) {
+            if (e.getExitCode() == 0) {
+                return ProcessStatus.ALIVE;
+            }
+            String errorMessage = StringUtils.defaultString(e.getMessage()).toLowerCase(Locale.ROOT);
+            if (errorMessage.contains("operation not permitted")) {
+                log.warn("No permission to check process status, pid: {}", pid, e);
+                return ProcessStatus.NO_PERMISSION;
+            }
+            if (errorMessage.contains("no such process")) {
+                return ProcessStatus.NOT_ALIVE;
+            }
+            log.warn("Failed to check process status, pid: {}", pid, e);
+            return ProcessStatus.NOT_ALIVE;
         } catch (Exception e) {
             // If the command fails, the process does not exist
-            return false;
+            return ProcessStatus.NOT_ALIVE;
         }
     }
 

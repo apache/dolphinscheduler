@@ -301,6 +301,10 @@ public abstract class AbstractShell {
             this.exitCode = exitCode;
         }
 
+        public int getExitCode() {
+            return exitCode;
+        }
+
     }
 
     /**
