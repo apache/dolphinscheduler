@@ -132,7 +132,7 @@ const NodeDetailModal = defineComponent({
       if (!data?.id) {
         for (const item in projectPreferences.value) {
           if (projectPreferences.value[item] !== null && item in data) {
-            Object.assign(data, { item: projectPreferences.value[item] })
+            Object.assign(data, { [item]: projectPreferences.value[item] })
           }
         }
       }
