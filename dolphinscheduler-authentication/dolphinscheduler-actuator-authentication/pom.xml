@@ -21,7 +21,7 @@
     <parent>
         <groupId>org.apache.dolphinscheduler</groupId>
         <artifactId>dolphinscheduler-authentication</artifactId>
-        <version>dev-SNAPSHOT</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>dolphinscheduler-actuator-authentication</artifactId>
