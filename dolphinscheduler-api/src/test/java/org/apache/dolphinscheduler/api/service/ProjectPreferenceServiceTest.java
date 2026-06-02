@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectPreferenceServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidator;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectPreference;
@@ -55,17 +56,27 @@ public class ProjectPreferenceServiceTest {
     @Mock
     private ProjectServiceImpl projectService;
 
+    @Mock
+    private WorkerGroupValidator workerGroupValidator;
+
     protected final static long projectCode = 1L;
+    protected final static String VALID_PREFERENCES = "{\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\"}";
 
     @Test
     public void testUpdateProjectPreference() {
         User loginUser = getGeneralUser();
 
-        // no permission
+        // preferences: no valid json
         Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
                 .when(projectService).checkHasProjectWritePermissionThrowException(Mockito.any(), Mockito.any());
         Assertions.assertThrows(ServiceException.class,
                 () -> projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value"));
+
+        // no permission
+        Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(Mockito.any(), Mockito.any());
+        Assertions.assertThrows(ServiceException.class,
+                () -> projectPreferenceService.updateProjectPreference(loginUser, projectCode, VALID_PREFERENCES));
 
         // when preference exists in project
         Mockito.when(projectPreferenceMapper.selectOne(Mockito.any())).thenReturn(null);
@@ -77,12 +88,12 @@ public class ProjectPreferenceServiceTest {
 
         Mockito.when(projectPreferenceMapper.insert(Mockito.any())).thenReturn(1);
 
-        Result result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value");
+        Result result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, VALID_PREFERENCES);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
 
         // database operatation fail
         Mockito.when(projectPreferenceMapper.insert(Mockito.any())).thenReturn(-1);
-        result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value");
+        result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, VALID_PREFERENCES);
         Assertions.assertEquals(Status.CREATE_PROJECT_PREFERENCE_ERROR.getCode(), result.getCode());
 
         // when preference exists in project
@@ -90,12 +101,12 @@ public class ProjectPreferenceServiceTest {
 
         // success
         Mockito.when(projectPreferenceMapper.updateById(Mockito.any())).thenReturn(1);
-        result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value");
+        result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, VALID_PREFERENCES);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
 
         // database operation fail
         Mockito.when(projectPreferenceMapper.updateById(Mockito.any())).thenReturn(-1);
-        result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, "value");
+        result = projectPreferenceService.updateProjectPreference(loginUser, projectCode, VALID_PREFERENCES);
         Assertions.assertEquals(Status.UPDATE_PROJECT_PREFERENCE_ERROR.getCode(), result.getCode());
     }
 

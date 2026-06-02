@@ -50,7 +50,8 @@ public class ProjectPreferenceControllerTest {
         Mockito.when(projectPreferenceService.updateProjectPreference(Mockito.any(), Mockito.anyLong(),
                 Mockito.anyString())).thenReturn(getSuccessResult());
 
-        Result result = projectPreferenceController.updateProjectPreference(loginUser, 1, "value");
+        String validPreferences = "{\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\"}";
+        Result result = projectPreferenceController.updateProjectPreference(loginUser, 1, validPreferences);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
     }
 

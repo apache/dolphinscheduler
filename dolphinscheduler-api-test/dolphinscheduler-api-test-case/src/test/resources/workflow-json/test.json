@@ -19,7 +19,7 @@
       "timeout": 0,
       "timeoutFlag": "CLOSE",
       "timeoutNotifyStrategy": "",
-      "workerGroup": "default",
+      "workerGroup": "",
       "cpuQuota": -1,
       "memoryMax": -1,
       "taskExecuteType": "BATCH"
