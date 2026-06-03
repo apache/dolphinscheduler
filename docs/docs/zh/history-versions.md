@@ -4,6 +4,10 @@
 
 #### 以下是Apache DolphinScheduler每个稳定版本的设置说明。
 
+### Versions: 3.4.2
+
+#### Links： [3.4.2 Document](../3.4.2/user_doc/about/introduction.md)
+
 ### Versions: 3.4.1
 
 #### Links： [3.4.1 Document](../3.4.1/user_doc/about/introduction.md)
