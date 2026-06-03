@@ -190,44 +190,6 @@ public class UsersControllerTest extends AbstractControllerTest {
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 
-    // todo: there is a sql error, the table t_ds_relation_user_alertgroup has already been dropped
-    @Disabled
-    @Test
-    public void testAuthorizedUser() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("alertgroupId", "1");
-
-        MvcResult mvcResult = mockMvc.perform(get("/users/authed-user")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    // todo: t_ds_relation_user_alertgroup has already been dropped
-    @Disabled
-    @Test
-    public void testUnauthorizedUser() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("alertgroupId", "1");
-
-        MvcResult mvcResult = mockMvc.perform(get("/users/unauth-user")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
     @Test
     public void testVerifyUserName() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();

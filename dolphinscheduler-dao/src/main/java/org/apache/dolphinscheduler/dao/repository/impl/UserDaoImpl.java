@@ -66,11 +66,6 @@ public class UserDaoImpl extends BaseDao<User, UserMapper> implements UserDao {
     }
 
     @Override
-    public List<User> queryUserListByAlertGroupId(int alertGroupId) {
-        return mybatisMapper.queryUserListByAlertGroupId(alertGroupId);
-    }
-
-    @Override
     public List<User> queryUserListByTenant(int tenantId) {
         return mybatisMapper.queryUserListByTenant(tenantId);
     }
