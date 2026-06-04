@@ -28,7 +28,5 @@
   </component>
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/.github/actions/actions-workflow-metrics" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/.github/actions/paths-filter" vcs="Git" />
   </component>
 </project>
