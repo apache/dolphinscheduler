@@ -2,6 +2,7 @@
 
 DolphinScheduler has three parameter types:
 
+* [Built-in Parameter](built-in.md): parameters built into the system
 * [Project-level Parameter](project-parameter.md): parameters defined at the project management page.
 * [Global Parameter](global.md): parameters defined at the workflow define page.
 * [Startup Parameter](startup-parameter.md): parameters defined at the workflow launch page.
@@ -10,7 +11,7 @@ DolphinScheduler has three parameter types:
 
 The user can define part of the parameters when creating workflow definitions.
 
-As there are multiple sources of the parameter value, it will raise parameter priority issues when the parameter name is the same. The priority of DolphinScheduler parameters from high to low is: `Parameter Context > Startup Parameter > Local Parameter >  Global Parameter > Project-level Parameter`.
+As there are multiple sources of the parameter value, it will raise parameter priority issues when the parameter name is the same. The priority of DolphinScheduler parameters from high to low is: `Parameter Context > Startup Parameter > Local Parameter >  Global Parameter > Project-level Parameter > Built-in Parameter`.
 
 In the case of upstream tasks can pass parameters to the downstream, there may be multiple tasks upstream that pass the same parameter name:
 
@@ -29,16 +30,16 @@ The [useParam] node can use the parameters which are set in the [createParam] no
 
 ![priority-parameter02](../../../../img/new_ui/dev/parameter/priority_parameter02.png)
 
-The [createParam] node can use parameters directly. In addition, the node creates two parameters named "key" and "key1", and "key1" has the same name as the one passed by the upstream node and assign value "12". However, due to the priority rules, the value assignment will assign "12" and the value from the upstream node is discarded.
+The [useParam] node can use parameters directly. In addition, the [createParam] node creates two parameters named "key" and "key1", and "key" has the same name as the one passed by the upstream node and assign value "12". However, due to the priority rules, the value assignment will assign "1" and the value from local parameter inside this node is discarded.
 
 2: Use SQL nodes to explain another case.
 
 ![priority-parameter03](../../../../img/new_ui/dev/parameter/priority_parameter03.png)
 
-The following shows the definition of the [use_create] node:
+The following shows the definition of the [use_param] node:
 
 ![priority-parameter04](../../../../img/new_ui/dev/parameter/priority_parameter04.png)
 
 "status" is own parameter of the node set by the current node. However, the user also sets the "status" parameter (global parameter) when saving the process definition and assign its value to -1. Then the value of status will be 2, with higher priority when the SQL executes. The global parameter value is discarded.
 
-The "ID" here is the parameter set by the upstream node. The user sets the parameters of the same parameter name "ID" for the [createparam1] node and [createparam2] node. And the [use_create] node uses the value of [createParam1] which is finished first.
+The "ID" here is the parameter set by the upstream node. The user sets the parameters of the same parameter name "ID" for the [useParam1] node and [useParam2] node. And the [use_param] node uses the value of [useParam1] which is finished first.
