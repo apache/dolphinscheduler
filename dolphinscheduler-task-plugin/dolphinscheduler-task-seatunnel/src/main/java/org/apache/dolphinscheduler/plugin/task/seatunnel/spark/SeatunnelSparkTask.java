@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.seatunnel.spark;
 
-import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.DEPLOY_MODE_OPTIONS;
 import static org.apache.dolphinscheduler.plugin.task.seatunnel.Constants.MASTER_OPTIONS;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -51,7 +50,7 @@ public class SeatunnelSparkTask extends SeatunnelTask {
     @Override
     public List<String> buildOptions() throws Exception {
         List<String> args = super.buildOptions();
-        args.add(DEPLOY_MODE_OPTIONS);
+        args.add("--deploy-mode");
         args.add(seatunnelParameters.getDeployMode().getCommand());
 
         MasterTypeEnum master = DeployModeEnum.local == seatunnelParameters.getDeployMode() ? MasterTypeEnum.LOCAL
