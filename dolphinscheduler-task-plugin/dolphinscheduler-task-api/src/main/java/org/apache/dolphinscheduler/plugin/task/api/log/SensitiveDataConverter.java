@@ -21,7 +21,9 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,8 +36,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
  */
 public class SensitiveDataConverter extends MessageConverter {
 
-    private static Pattern multilinePattern;
+    private static volatile Pattern multilinePattern;
     private static final Set<String> maskPatterns = new HashSet<>();
+    private static final Map<String, Integer> dynamicMaskPatternRefCount = new HashMap<>();
 
     static {
         addMaskPattern(TaskConstants.DATASOURCE_PASSWORD_REGEX);
@@ -56,7 +59,31 @@ public class SensitiveDataConverter extends MessageConverter {
             return;
         }
         maskPatterns.add(maskPattern);
-        multilinePattern = Pattern.compile(String.join("|", maskPatterns), Pattern.MULTILINE);
+        refreshMultilinePattern();
+    }
+
+    public static synchronized void addDynamicMaskPattern(final String maskPattern) {
+        if (StringUtils.isEmpty(maskPattern)) {
+            return;
+        }
+        dynamicMaskPatternRefCount.put(maskPattern, dynamicMaskPatternRefCount.getOrDefault(maskPattern, 0) + 1);
+        refreshMultilinePattern();
+    }
+
+    public static synchronized void removeDynamicMaskPattern(final String maskPattern) {
+        if (StringUtils.isEmpty(maskPattern)) {
+            return;
+        }
+        Integer refCount = dynamicMaskPatternRefCount.get(maskPattern);
+        if (refCount == null) {
+            return;
+        }
+        if (refCount <= 1) {
+            dynamicMaskPatternRefCount.remove(maskPattern);
+        } else {
+            dynamicMaskPatternRefCount.put(maskPattern, refCount - 1);
+        }
+        refreshMultilinePattern();
     }
 
     public static String maskSensitiveData(final String logMsg) {
@@ -73,6 +100,12 @@ public class SensitiveDataConverter extends MessageConverter {
         matcher.appendTail(sb);
 
         return sb.toString();
+    }
+
+    private static void refreshMultilinePattern() {
+        Set<String> allMaskPatterns = new HashSet<>(maskPatterns);
+        allMaskPatterns.addAll(dynamicMaskPatternRefCount.keySet());
+        multilinePattern = Pattern.compile(String.join("|", allMaskPatterns), Pattern.MULTILINE);
     }
 
 }

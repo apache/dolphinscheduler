@@ -64,6 +64,7 @@ interface ILocalParam {
   direct?: string
   type?: string
   value?: string
+  sensitive?: boolean
 }
 
 interface ILabel {

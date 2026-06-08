@@ -33,6 +33,9 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -193,8 +196,10 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testViewVariables() throws Exception {
+        Property sensitiveParam = new Property("secret", Direct.IN, DataType.VARCHAR, "******");
+        sensitiveParam.setSensitive(true);
         WorkflowInstanceVariablesDTO mockResult =
-                new WorkflowInstanceVariablesDTO(Collections.emptyList(), Collections.emptyMap());
+                new WorkflowInstanceVariablesDTO(Collections.singletonList(sensitiveParam), Collections.emptyMap());
         Mockito.when(workflowInstanceService.viewVariables(Mockito.any(), Mockito.eq(1113L), Mockito.eq(123)))
                 .thenReturn(mockResult);
         MvcResult mvcResult = mockMvc
@@ -206,6 +211,9 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        String responseContent = mvcResult.getResponse().getContentAsString();
+        Assertions.assertTrue(responseContent.contains("\"value\":\"******\""));
+        Assertions.assertTrue(responseContent.contains("\"sensitive\":true"));
     }
 
     @Test

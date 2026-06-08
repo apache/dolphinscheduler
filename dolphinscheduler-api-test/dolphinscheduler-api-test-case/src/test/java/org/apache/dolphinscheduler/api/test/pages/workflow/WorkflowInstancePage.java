@@ -69,6 +69,31 @@ public class WorkflowInstancePage {
         return requestClient.get(url, headers, params);
     }
 
+    public HttpResponse queryTaskInstanceList(User loginUser, long projectCode, long workflowInstanceId) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginUser", loginUser);
+        params.put("workflowInstanceId", workflowInstanceId);
+        params.put("pageNo", 1);
+        params.put("pageSize", 10);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+        RequestClient requestClient = new RequestClient();
+        String url = String.format("/projects/%s/task-instances", projectCode);
+        return requestClient.get(url, headers, params);
+    }
+
+    public HttpResponse queryTaskLog(User loginUser, int taskInstanceId, int skipLineNum, int limit) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginUser", loginUser);
+        params.put("taskInstanceId", taskInstanceId);
+        params.put("skipLineNum", skipLineNum);
+        params.put("limit", limit);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+        RequestClient requestClient = new RequestClient();
+        return requestClient.get("/log/detail", headers, params);
+    }
+
     public HttpResponse queryWorkflowInstanceById(User loginUser, long projectCode, long workflowInstanceId) {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);

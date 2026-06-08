@@ -35,6 +35,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.dto.workflow.WorkflowDefinitionVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -51,9 +52,11 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -74,8 +77,11 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskModel;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
@@ -111,8 +117,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
@@ -208,6 +216,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     protected final static String name = "testProcessDefinitionName";
     protected final static String description = "this is a description";
     protected final static int timeout = 60;
+    private static final String SENSITIVE_DATA_MASK = "******";
 
     @BeforeEach
     public void before() {
@@ -846,6 +855,48 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public void testCreateWorkflowDefinitionShouldEncryptSensitiveParamsBeforeSaving() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
+        when(workflowDefinitionDao.verifyByDefineName(projectCode, name)).thenReturn(null);
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        when(processService.saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE))).thenReturn(1);
+        when(processService.saveWorkflowDefine(any(User.class), any(WorkflowDefinition.class), eq(Boolean.TRUE),
+                eq(Boolean.TRUE))).thenReturn(1);
+        when(processService.saveTaskRelation(eq(user), eq(projectCode), anyLong(), eq(1), anyList(), anyList(),
+                eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            workflowDefinitionService.createWorkflowDefinition(
+                    user, projectCode, name, description, sensitiveGlobalParams("global_secret"), "[]", timeout,
+                    taskRelationJson, sensitiveTaskDefinitionJson(123456789L, "local_secret"), null,
+                    WorkflowExecutionTypeEnum.PARALLEL);
+        }
+
+        ArgumentCaptor<WorkflowDefinition> workflowDefinitionCaptor = ArgumentCaptor.forClass(WorkflowDefinition.class);
+        verify(processService).saveWorkflowDefine(eq(user), workflowDefinitionCaptor.capture(), eq(Boolean.TRUE),
+                eq(Boolean.TRUE));
+        Property savedGlobalParam =
+                JSONUtils.toList(workflowDefinitionCaptor.getValue().getGlobalParams(), Property.class).get(0);
+        Assertions.assertTrue(savedGlobalParam.isSensitive());
+        Assertions.assertNotEquals("global_secret", savedGlobalParam.getValue());
+        assertDecodedValue("global_secret", savedGlobalParam.getValue());
+
+        ArgumentCaptor<List> taskDefinitionLogsCaptor = ArgumentCaptor.forClass(List.class);
+        verify(processService).saveTaskDefine(eq(user), eq(projectCode), taskDefinitionLogsCaptor.capture(),
+                eq(Boolean.TRUE));
+        TaskDefinitionLog taskDefinitionLog = (TaskDefinitionLog) taskDefinitionLogsCaptor.getValue().get(0);
+        Property savedLocalParam =
+                JSONUtils.toList(JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), Constants.LOCAL_PARAMS),
+                        Property.class).get(0);
+        Assertions.assertTrue(savedLocalParam.isSensitive());
+        Assertions.assertNotEquals("local_secret", savedLocalParam.getValue());
+        assertDecodedValue("local_secret", savedLocalParam.getValue());
+    }
+
+    @Test
     public void testUpdateWorkflowDefinitionShouldSyncVersionToResponse() {
         Project project = getProject(projectCode);
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
@@ -869,6 +920,59 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
         Assertions.assertNotNull(resultDefinition);
         Assertions.assertEquals(2, resultDefinition.getVersion());
+    }
+
+    @Test
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public void testUpdateWorkflowDefinitionShouldKeepOldSensitiveValueWhenPlaceholderSubmitted() {
+        Project project = getProject(projectCode);
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        workflowDefinition.setName(name);
+        TaskDefinition existingTaskDefinition = new TaskDefinition();
+        existingTaskDefinition.setCode(123456789L);
+
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
+        when(processService.saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE))).thenReturn(1);
+        when(processService.saveWorkflowDefine(any(User.class), any(WorkflowDefinition.class), eq(Boolean.TRUE),
+                eq(Boolean.TRUE))).thenReturn(2);
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(Collections.emptyList());
+        when(processService.saveTaskRelation(eq(user), eq(projectCode), eq(processDefinitionCode), eq(2), anyList(),
+                anyList(), eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            workflowDefinition
+                    .setGlobalParams(sensitiveGlobalParams(PasswordUtils.encodePassword("old_global_secret")));
+            existingTaskDefinition.setTaskParams(sensitiveTaskParams(PasswordUtils.encodePassword("old_local_secret")));
+            when(taskDefinitionDao.queryByCodes(Collections.singleton(123456789L)))
+                    .thenReturn(Collections.singletonList(existingTaskDefinition));
+
+            workflowDefinitionService.updateWorkflowDefinition(
+                    user, projectCode, name, processDefinitionCode, description,
+                    sensitiveGlobalParams(SENSITIVE_DATA_MASK), "[]", timeout, taskRelationJson,
+                    sensitiveTaskDefinitionJson(123456789L, SENSITIVE_DATA_MASK), WorkflowExecutionTypeEnum.PARALLEL);
+        }
+
+        ArgumentCaptor<WorkflowDefinition> workflowDefinitionCaptor = ArgumentCaptor.forClass(WorkflowDefinition.class);
+        verify(processService).saveWorkflowDefine(eq(user), workflowDefinitionCaptor.capture(), eq(Boolean.TRUE),
+                eq(Boolean.TRUE));
+        Property savedGlobalParam =
+                JSONUtils.toList(workflowDefinitionCaptor.getValue().getGlobalParams(), Property.class).get(0);
+        Assertions.assertNotEquals(SENSITIVE_DATA_MASK, savedGlobalParam.getValue());
+        assertDecodedValue("old_global_secret", savedGlobalParam.getValue());
+
+        ArgumentCaptor<List> taskDefinitionLogsCaptor = ArgumentCaptor.forClass(List.class);
+        verify(processService).saveTaskDefine(eq(user), eq(projectCode), taskDefinitionLogsCaptor.capture(),
+                eq(Boolean.TRUE));
+        TaskDefinitionLog taskDefinitionLog = (TaskDefinitionLog) taskDefinitionLogsCaptor.getValue().get(0);
+        Property savedLocalParam =
+                JSONUtils.toList(JSONUtils.getNodeString(taskDefinitionLog.getTaskParams(), Constants.LOCAL_PARAMS),
+                        Property.class).get(0);
+        Assertions.assertNotEquals(SENSITIVE_DATA_MASK, savedLocalParam.getValue());
+        assertDecodedValue("old_local_secret", savedLocalParam.getValue());
     }
 
     @Test
@@ -901,6 +1005,41 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ex.getCode());
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testViewVariablesShouldMaskSensitiveGlobalAndLocalParams() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
+
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation();
+        workflowTaskRelation.setPostTaskCode(123456789L);
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setCode(123456789L);
+        taskDefinition.setName("shell");
+        taskDefinition.setTaskType("SHELL");
+
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            workflowDefinition.setGlobalParams(sensitiveGlobalParams(PasswordUtils.encodePassword("global_secret")));
+            taskDefinition.setTaskParams(sensitiveTaskParams(PasswordUtils.encodePassword("local_secret")));
+        }
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(Collections.singletonList(workflowTaskRelation));
+        when(taskDefinitionDao.queryByCodes(Collections.singleton(123456789L)))
+                .thenReturn(Collections.singletonList(taskDefinition));
+
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            WorkflowDefinitionVariablesDTO result =
+                    workflowDefinitionService.viewVariables(user, projectCode, processDefinitionCode);
+
+            Assertions.assertEquals(SENSITIVE_DATA_MASK, result.getGlobalParams().get(0).getValue());
+            List<Property> localParams = (List<Property>) result.getLocalParams().get("shell").get("localParamsList");
+            Assertions.assertEquals(SENSITIVE_DATA_MASK, localParams.get(0).getValue());
+        }
+    }
+
     /**
      * get mock processDefinition
      *
@@ -916,6 +1055,45 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         workflowDefinition.setProjectCode(projectCode);
         workflowDefinition.setVersion(1);
         return workflowDefinition;
+    }
+
+    private MockedStatic<PropertyUtils> mockEncryptionEnabled() {
+        MockedStatic<PropertyUtils> propertyUtilsMockedStatic = Mockito.mockStatic(PropertyUtils.class);
+        propertyUtilsMockedStatic.when(() -> PropertyUtils.getBoolean(
+                DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, false)).thenReturn(Boolean.TRUE);
+        propertyUtilsMockedStatic.when(() -> PropertyUtils.getString(
+                DataSourceConstants.DATASOURCE_ENCRYPTION_SALT,
+                DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT))
+                .thenReturn(DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
+        return propertyUtilsMockedStatic;
+    }
+
+    private void assertDecodedValue(String expectedValue, String encryptedValue) {
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            Assertions.assertEquals(expectedValue, PasswordUtils.decodePassword(encryptedValue));
+        }
+    }
+
+    private String sensitiveGlobalParams(String value) {
+        return "[{\"prop\":\"secret_global\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"" + value
+                + "\",\"sensitive\":true}]";
+    }
+
+    private String sensitiveTaskDefinitionJson(long taskCode, String localParamValue) {
+        return "[{\"code\":" + taskCode
+                + ",\"name\":\"test1\",\"version\":1,\"description\":\"\",\"delayTime\":0,\"taskType\":\"SHELL\","
+                + "\"taskParams\":" + sensitiveTaskParams(localParamValue)
+                + ",\"flag\":\"YES\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":0,"
+                + "\"failRetryInterval\":1,\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":null,\"timeout\":0,"
+                + "\"environmentCode\":-1}]";
+    }
+
+    private String sensitiveTaskParams(String localParamValue) {
+        return "{\"resourceList\":[],\"localParams\":[{\"prop\":\"secret_local\",\"direct\":\"IN\","
+                + "\"type\":\"VARCHAR\",\"value\":\"" + localParamValue + "\",\"sensitive\":true}],"
+                + "\"rawScript\":\"echo ${secret_local}\",\"dependence\":{},"
+                + "\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{},"
+                + "\"switchResult\":{}}";
     }
 
     /**

@@ -33,6 +33,9 @@ import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -331,13 +334,20 @@ public class WorkflowDefinitionControllerTest {
     @Test
     public void testViewVariables() {
         long projectCode = 1L;
+        Property sensitiveParam = new Property("secret", Direct.IN, DataType.VARCHAR, "******");
+        sensitiveParam.setSensitive(true);
+        WorkflowDefinitionVariablesDTO variablesDTO =
+                new WorkflowDefinitionVariablesDTO(Collections.singletonList(sensitiveParam), Collections.emptyMap());
 
         Mockito.when(processDefinitionService.viewVariables(user, projectCode, 1L))
-                .thenReturn(new WorkflowDefinitionVariablesDTO());
+                .thenReturn(variablesDTO);
 
         Result result = workflowDefinitionController.viewVariables(user, projectCode, 1L);
 
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        WorkflowDefinitionVariablesDTO resultData = (WorkflowDefinitionVariablesDTO) result.getData();
+        Assertions.assertEquals("******", resultData.getGlobalParams().get(0).getValue());
+        Assertions.assertTrue(resultData.getGlobalParams().get(0).isSensitive());
     }
 
 }

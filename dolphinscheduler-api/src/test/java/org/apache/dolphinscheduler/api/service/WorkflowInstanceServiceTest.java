@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -57,6 +58,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
@@ -67,6 +69,8 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
@@ -124,6 +128,9 @@ public class WorkflowInstanceServiceTest {
     WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Mock
+    TaskDefinitionLogMapper taskDefinitionLogMapper;
+
+    @Mock
     WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
@@ -155,6 +162,8 @@ public class WorkflowInstanceServiceTest {
 
     @Mock
     AlertDao alertDao;
+
+    private static final String SENSITIVE_DATA_MASK = "******";
 
     private String shellJson = "[{\"name\":\"\",\"preTaskCode\":0,\"preTaskVersion\":0,\"postTaskCode\":123456789,"
             + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"},{\"name\":\"\",\"preTaskCode\":123456789,"
@@ -819,6 +828,50 @@ public class WorkflowInstanceServiceTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
+    public void testViewVariablesShouldMaskSensitiveGlobalAndLocalParams() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setId(3);
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
+        workflowInstance.setScheduleTime(new Date());
+        workflowInstance.setWorkflowDefinitionCode(46L);
+
+        WorkflowDefinition workflowDefinition = getProcessDefinition();
+        workflowDefinition.setProjectCode(projectCode);
+
+        TaskInstance taskInstance = getTaskInstance();
+        taskInstance.setTaskCode(123456789L);
+        taskInstance.setTaskDefinitionVersion(1);
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        taskDefinitionLog.setCode(123456789L);
+        taskDefinitionLog.setName("shell");
+        taskDefinitionLog.setTaskType("SHELL");
+
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            workflowInstance.setGlobalParams(sensitiveGlobalParams(PasswordUtils.encodePassword("global_secret")));
+            taskDefinitionLog.setTaskParams(sensitiveTaskParams(PasswordUtils.encodePassword("local_secret")));
+        }
+
+        when(workflowInstanceDao.queryDetailById(3)).thenReturn(workflowInstance);
+        when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
+        when(taskInstanceDao.queryValidTaskListByWorkflowInstanceId(3)).thenReturn(Lists.newArrayList(taskInstance));
+        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(123456789L, 1)).thenReturn(taskDefinitionLog);
+
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            WorkflowInstanceVariablesDTO result = workflowInstanceService.viewVariables(loginUser, projectCode, 3);
+
+            Assertions.assertEquals(SENSITIVE_DATA_MASK, result.getGlobalParams().get(0).getValue());
+            List<Property> localParams = (List<Property>) result.getLocalParams().get("shell").get("localParamsList");
+            Assertions.assertEquals(SENSITIVE_DATA_MASK, localParams.get(0).getValue());
+        }
+    }
+
+    @Test
     public void testViewGantt() throws Exception {
         long projectCode = 0L;
         User loginUser = getAdminUser();
@@ -953,6 +1006,30 @@ public class WorkflowInstanceServiceTest {
         workflowDefinition.setProjectCode(2L);
         workflowDefinition.setDescription("");
         return workflowDefinition;
+    }
+
+    private MockedStatic<PropertyUtils> mockEncryptionEnabled() {
+        MockedStatic<PropertyUtils> propertyUtilsMockedStatic = Mockito.mockStatic(PropertyUtils.class);
+        propertyUtilsMockedStatic.when(() -> PropertyUtils.getBoolean(
+                DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, false)).thenReturn(Boolean.TRUE);
+        propertyUtilsMockedStatic.when(() -> PropertyUtils.getString(
+                DataSourceConstants.DATASOURCE_ENCRYPTION_SALT,
+                DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT))
+                .thenReturn(DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
+        return propertyUtilsMockedStatic;
+    }
+
+    private String sensitiveGlobalParams(String value) {
+        return "[{\"prop\":\"secret_global\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"" + value
+                + "\",\"sensitive\":true}]";
+    }
+
+    private String sensitiveTaskParams(String localParamValue) {
+        return "{\"resourceList\":[],\"localParams\":[{\"prop\":\"secret_local\",\"direct\":\"IN\","
+                + "\"type\":\"VARCHAR\",\"value\":\"" + localParamValue + "\",\"sensitive\":true}],"
+                + "\"rawScript\":\"echo ${secret_local}\",\"dependence\":{},"
+                + "\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{},"
+                + "\"switchResult\":{}}";
     }
 
     private Tenant getTenant() {

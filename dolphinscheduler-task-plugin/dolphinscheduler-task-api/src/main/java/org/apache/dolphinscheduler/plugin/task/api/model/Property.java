@@ -51,4 +51,14 @@ public class Property implements Serializable {
 
     private String value;
 
+    @Builder.Default
+    private boolean sensitive = false;
+
+    public Property(String prop, Direct direct, DataType type, String value) {
+        this.prop = prop;
+        this.direct = direct;
+        this.type = type;
+        this.value = value;
+    }
+
 }

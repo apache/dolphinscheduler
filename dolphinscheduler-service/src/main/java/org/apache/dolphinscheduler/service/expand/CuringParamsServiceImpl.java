@@ -46,12 +46,14 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters
 import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -189,7 +191,10 @@ public class CuringParamsServiceImpl implements CuringParamsService {
 
         // 5. Command-line / complement parameters
         if (CollectionUtils.isNotEmpty(commandParam.getCommandParams())) {
-            Map<String, Property> commandParamsMap = commandParam.getCommandParams().stream()
+            Map<String, Property> commandParamsMap = PropertySensitiveUtils
+                    .mergeSensitiveValuePlaceholders(commandParam.getCommandParams(),
+                            new ArrayList<>(prepareParamsMap.values()))
+                    .stream()
                     .filter(prop -> StringUtils.isNotBlank(prop.getProp()))
                     .collect(Collectors.toMap(
                             Property::getProp,

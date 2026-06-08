@@ -46,14 +46,15 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
 
     @Override
     public TaskExecutorDispatchResponse dispatchTask(final TaskExecutorDispatchRequest taskExecutorDispatchRequest) {
-        log.info("Receive TaskExecutorDispatchResponse: {}", taskExecutorDispatchRequest);
         final TaskExecutionContext taskExecutionContext = taskExecutorDispatchRequest.getTaskExecutionContext();
+        final int taskInstanceId = taskExecutionContext.getTaskInstanceId();
+        log.info("Receive TaskExecutorDispatchResponse, taskInstanceId: {}", taskInstanceId);
         try {
             physicalTaskEngineDelegator.dispatchLogicTask(taskExecutionContext);
-            log.info("Handle TaskExecutorDispatchResponse: {} success", taskExecutorDispatchRequest);
+            log.info("Handle TaskExecutorDispatchResponse, taskInstanceId: {} success", taskInstanceId);
             return TaskExecutorDispatchResponse.success();
         } catch (Throwable throwable) {
-            log.error("Handle TaskExecutorDispatchResponse: {} failed", taskExecutorDispatchRequest, throwable);
+            log.error("Handle TaskExecutorDispatchResponse, taskInstanceId: {} failed", taskInstanceId, throwable);
             return TaskExecutorDispatchResponse.failed(ExceptionUtils.getMessage(throwable));
         }
     }

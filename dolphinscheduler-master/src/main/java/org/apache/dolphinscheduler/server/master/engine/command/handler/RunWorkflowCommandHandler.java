@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
@@ -35,6 +36,7 @@ import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopol
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
+import org.apache.dolphinscheduler.server.master.utils.MasterSensitivePropertyUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -131,9 +133,10 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
             globalParamsList.forEach(globalParam -> finalParams.put(globalParam.getProp(), globalParam));
         }
         if (CollectionUtils.isNotEmpty(commandParams)) {
-            commandParams.forEach(commandParam -> finalParams.put(commandParam.getProp(), commandParam));
+            PropertySensitiveUtils.mergeSensitiveValuePlaceholders(commandParams, globalParamsList)
+                    .forEach(commandParam -> finalParams.put(commandParam.getProp(), commandParam));
         }
-        return JSONUtils.toJsonString(finalParams.values());
+        return JSONUtils.toJsonString(MasterSensitivePropertyUtils.decryptSensitiveValues(finalParams.values()));
     }
 
     @Override

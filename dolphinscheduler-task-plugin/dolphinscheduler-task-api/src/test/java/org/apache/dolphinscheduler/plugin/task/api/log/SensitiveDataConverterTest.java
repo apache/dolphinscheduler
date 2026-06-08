@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.K8S_CONFIG_
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 
@@ -123,5 +124,40 @@ class SensitiveDataConverterTest {
         final String maskedLog = SensitiveDataConverter.maskSensitiveData(msg);
 
         assertEquals(maskMsg, maskedLog);
+    }
+
+    @Test
+    void testDynamicMaskPatternCanBeRemoved() {
+        String sensitiveValue = "task_sensitive_value_remove";
+        String maskPattern = Pattern.quote(sensitiveValue);
+
+        try {
+            SensitiveDataConverter.addDynamicMaskPattern(maskPattern);
+            assertEquals("password=******", SensitiveDataConverter.maskSensitiveData("password=" + sensitiveValue));
+        } finally {
+            SensitiveDataConverter.removeDynamicMaskPattern(maskPattern);
+        }
+
+        assertEquals("password=" + sensitiveValue,
+                SensitiveDataConverter.maskSensitiveData("password=" + sensitiveValue));
+    }
+
+    @Test
+    void testDynamicMaskPatternUsesReferenceCount() {
+        String sensitiveValue = "task_sensitive_value_ref_count";
+        String maskPattern = Pattern.quote(sensitiveValue);
+
+        try {
+            SensitiveDataConverter.addDynamicMaskPattern(maskPattern);
+            SensitiveDataConverter.addDynamicMaskPattern(maskPattern);
+
+            SensitiveDataConverter.removeDynamicMaskPattern(maskPattern);
+            assertEquals("password=******", SensitiveDataConverter.maskSensitiveData("password=" + sensitiveValue));
+        } finally {
+            SensitiveDataConverter.removeDynamicMaskPattern(maskPattern);
+        }
+
+        assertEquals("password=" + sensitiveValue,
+                SensitiveDataConverter.maskSensitiveData("password=" + sensitiveValue));
     }
 }

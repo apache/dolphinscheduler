@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.ProjectParameterMapper;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
+import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -230,6 +231,45 @@ public class CuringParamsServiceImplTest {
                 String.valueOf(taskDefinition.getCode()));
         Assertions.assertEquals(propertyMap.get(TaskConstants.PARAMETER_WORKFLOW_DEFINITION_CODE).getValue(),
                 String.valueOf(workflowDefinition.getCode()));
+    }
+
+    @Test
+    public void testParamParsingPreparationShouldKeepGlobalValueWhenSensitiveCommandParamIsPlaceholder() {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setExecutePath("home/path/execute");
+        taskInstance.setProjectCode(3000001L);
+        taskInstance.setWorkflowInstanceId(2);
+
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(2);
+        workflowInstance.setProjectCode(3000001L);
+        workflowInstance.setWorkflowDefinitionCode(200001L);
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
+        workflowInstance.setHistoryCmd(CommandType.START_PROCESS.toString());
+        workflowInstance.setScheduleTime(new Date());
+
+        Property globalParam = new Property("var", Direct.IN, DataType.VARCHAR, "321");
+        globalParam.setSensitive(true);
+        workflowInstance
+                .setGlobalParams(GlobalParameterUtils.serializeGlobalParameter(Lists.newArrayList(globalParam)));
+
+        Property commandParam = new Property("var", Direct.IN, DataType.VARCHAR, "******");
+        commandParam.setSensitive(true);
+        RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
+                .commandParams(Lists.newArrayList(commandParam))
+                .timeZone("Asia/Shanghai")
+                .build();
+        workflowInstance.setCommandParam(JSONUtils.toJsonString(runWorkflowCommandParam));
+
+        Mockito.when(projectParameterMapper.queryByProjectCode(Mockito.anyLong())).thenReturn(Collections.emptyList());
+
+        Map<String, Property> propertyMap =
+                curingParamsServiceImpl.paramParsingPreparation(taskInstance, new SubWorkflowParameters(),
+                        workflowInstance, "ProjectName", "ProcessName-1");
+
+        Assertions.assertEquals("321", propertyMap.get("var").getValue());
+        Assertions.assertTrue(propertyMap.get("var").isSensitive());
     }
 
     @Test

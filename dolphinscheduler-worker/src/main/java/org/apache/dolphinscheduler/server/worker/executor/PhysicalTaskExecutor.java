@@ -23,9 +23,12 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionContextUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TenantUtils;
@@ -35,7 +38,13 @@ import org.apache.dolphinscheduler.task.executor.TaskExecutorState;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorStateMappings;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorRuntimeContextChangedLifecycleEvent;
 
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -51,6 +60,8 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
     private AbstractTask physicalTask;
 
     private final PhysicalTaskPluginFactory physicalTaskPluginFactory;
+
+    private final List<String> dynamicMaskPatterns = new ArrayList<>();
 
     public PhysicalTaskExecutor(final PhysicalTaskExecutorBuilder physicalTaskExecutorBuilder) {
         super(physicalTaskExecutorBuilder.getTaskExecutionContext(),
@@ -109,6 +120,7 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
     @Override
     public void finalizeTask() {
         clearTaskInstanceWorkingDirectoryIfNeeded();
+        clearSensitiveDataMaskPatterns();
     }
 
     private void clearTaskInstanceWorkingDirectoryIfNeeded() {
@@ -120,6 +132,8 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     protected void initializeTaskContext() {
+        registerSensitiveDataMaskPatterns();
+
         super.initializeTaskContext();
 
         taskExecutionContext.setTaskAppId(String.valueOf(taskExecutionContext.getTaskInstanceId()));
@@ -140,6 +154,28 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
         log.info(TaskLogMarkers.excludeInTaskLog(), "Initialized Task Context{}",
                 JSONUtils.toPrettyJsonString(taskExecutionContext));
 
+    }
+
+    private void registerSensitiveDataMaskPatterns() {
+        Map<String, Property> prepareParamsMap = taskExecutionContext.getPrepareParamsMap();
+        if (MapUtils.isEmpty(prepareParamsMap)) {
+            return;
+        }
+        prepareParamsMap.values().stream()
+                .filter(PropertySensitiveUtils::isSensitive)
+                .map(Property::getValue)
+                .filter(StringUtils::isNotEmpty)
+                .filter(value -> !PropertySensitiveUtils.isSensitiveValuePlaceholder(value))
+                .map(Pattern::quote)
+                .forEach(maskPattern -> {
+                    SensitiveDataConverter.addDynamicMaskPattern(maskPattern);
+                    dynamicMaskPatterns.add(maskPattern);
+                });
+    }
+
+    private void clearSensitiveDataMaskPatterns() {
+        dynamicMaskPatterns.forEach(SensitiveDataConverter::removeDynamicMaskPattern);
+        dynamicMaskPatterns.clear();
     }
 
     @Override

@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecution
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionContextCreateRequest;
+import org.apache.dolphinscheduler.server.master.utils.MasterSensitivePropertyUtils;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -168,16 +169,18 @@ public class TaskExecutionContextFactory {
                                                    final WorkflowInstance workflowInstance,
                                                    final WorkflowDefinition workflowDefinition,
                                                    final Project project) {
+        taskInstance.setTaskParams(
+                MasterSensitivePropertyUtils.decryptLocalParamsInTaskParams(taskInstance.getTaskParams()));
         final AbstractParameters baseParam = TaskPluginManager.parseTaskParameters(
                 taskInstance.getTaskType(),
                 taskInstance.getTaskParams());
 
-        return curingParamsService.paramParsingPreparation(
+        return MasterSensitivePropertyUtils.decryptPrepareParams(curingParamsService.paramParsingPreparation(
                 taskInstance,
                 baseParam,
                 workflowInstance,
                 project.getName(),
-                workflowDefinition.getName());
+                workflowDefinition.getName()));
     }
 
     private Optional<String> getEnvironmentConfigFromDB(final TaskInstance taskInstance) {
