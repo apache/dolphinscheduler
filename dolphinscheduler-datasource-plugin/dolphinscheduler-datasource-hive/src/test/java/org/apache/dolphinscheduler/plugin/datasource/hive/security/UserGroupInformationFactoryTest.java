@@ -85,7 +85,7 @@ public class UserGroupInformationFactoryTest {
             try {
                 startLatch.await();
                 for (int i = 0; i < 500; i++) {
-                    for (int j = 0; i < 10; i++) {
+                    for (int j = 0; j < 10; j++) {
                         String user = "user_" + j;
                         UserGroupInformationFactory.logout(user);
                         UserGroupInformationFactory.login(user);
