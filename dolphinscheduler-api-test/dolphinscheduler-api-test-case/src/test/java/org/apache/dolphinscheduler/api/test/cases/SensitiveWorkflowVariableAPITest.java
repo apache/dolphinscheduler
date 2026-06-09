@@ -56,6 +56,8 @@ public class SensitiveWorkflowVariableAPITest {
     private static final String USERNAME = "admin";
     private static final String PASSWORD = "dolphinscheduler123";
     private static final String SECRET = "Ds_SeCrEt_2026_06_08_Case_A1";
+    private static final String GLOBAL_SECRET = "Ds_Global_2026_A1";
+    private static final String LOCAL_SECRET = "Ds_Local_2026_B2";
     private static final String SENSITIVE_DATA_MASK = "******";
 
     private static String sessionId;
@@ -209,6 +211,99 @@ public class SensitiveWorkflowVariableAPITest {
         assertTrue(plainLogContent.contains(SECRET), plainLogContent);
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testUpdateWorkflowWithPlaceholderKeepsSensitiveValues() {
+        String projectName = "sensitive-update-project-" + System.currentTimeMillis();
+        String workflowName = "sensitive-update-workflow-" + System.currentTimeMillis();
+        int expectedSecretLength = GLOBAL_SECRET.length() + LOCAL_SECRET.length();
+
+        HttpResponse createProjectResponse = projectPage.createProject(loginUser, projectName);
+        assertTrue(createProjectResponse.getBody().getSuccess());
+        long projectCode = ((Number) ((LinkedHashMap<String, Object>) createProjectResponse.getBody().getData())
+                .get("code")).longValue();
+
+        long taskCode = System.currentTimeMillis();
+        HttpResponse createWorkflowResponse = workflowDefinitionPage.createWorkflowDefinition(
+                loginUser,
+                projectCode,
+                sensitiveWorkflowWithLocalJson(taskCode, GLOBAL_SECRET, LOCAL_SECRET),
+                workflowName);
+        assertTrue(createWorkflowResponse.getBody().getSuccess());
+        long workflowDefinitionCode =
+                ((Number) ((LinkedHashMap<String, Object>) createWorkflowResponse.getBody().getData()).get("code"))
+                        .longValue();
+
+        HttpResponse queryBeforeUpdateResponse =
+                workflowDefinitionPage.queryWorkflowDefinitionByCode(loginUser, projectCode, workflowDefinitionCode);
+        assertTrue(queryBeforeUpdateResponse.getBody().getSuccess());
+        String beforeUpdateData = queryBeforeUpdateResponse.getBody().getData().toString();
+        assertTrue(beforeUpdateData.contains(SENSITIVE_DATA_MASK));
+        assertFalse(beforeUpdateData.contains(GLOBAL_SECRET));
+        assertFalse(beforeUpdateData.contains(LOCAL_SECRET));
+
+        HttpResponse updateWorkflowResponse = workflowDefinitionPage.updateWorkflowDefinition(
+                loginUser,
+                projectCode,
+                workflowDefinitionCode,
+                sensitiveWorkflowPlaceholderUpdateJson(taskCode),
+                workflowName);
+        assertTrue(updateWorkflowResponse.getBody().getSuccess(),
+                () -> "update failed: " + updateWorkflowResponse.getBody());
+
+        HttpResponse queryAfterUpdateResponse =
+                workflowDefinitionPage.queryWorkflowDefinitionByCode(loginUser, projectCode, workflowDefinitionCode);
+        assertTrue(queryAfterUpdateResponse.getBody().getSuccess());
+        String afterUpdateData = queryAfterUpdateResponse.getBody().getData().toString();
+        assertTrue(afterUpdateData.contains(SENSITIVE_DATA_MASK));
+        assertFalse(afterUpdateData.contains(GLOBAL_SECRET));
+        assertFalse(afterUpdateData.contains(LOCAL_SECRET));
+
+        HttpResponse releaseWorkflowResponse = workflowDefinitionPage.releaseWorkflowDefinition(
+                loginUser,
+                projectCode,
+                workflowDefinitionCode,
+                ReleaseState.ONLINE);
+        assertTrue(releaseWorkflowResponse.getBody().getSuccess());
+
+        HttpResponse startWorkflowResponse = executorPage.startWorkflowInstance(
+                loginUser,
+                projectCode,
+                workflowDefinitionCode,
+                scheduleTime(),
+                FailureStrategy.END,
+                WarningType.NONE);
+        assertTrue(startWorkflowResponse.getBody().getSuccess());
+        List<Integer> workflowInstanceIds = (List<Integer>) startWorkflowResponse.getBody().getData();
+        assertEquals(1, workflowInstanceIds.size());
+        int workflowInstanceId = workflowInstanceIds.get(0);
+
+        Awaitility.await()
+                .atMost(60, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    HttpResponse instanceResponse =
+                            workflowInstancePage.queryWorkflowInstanceById(loginUser, projectCode, workflowInstanceId);
+                    assertTrue(instanceResponse.getBody().getSuccess());
+                    Map<String, Object> workflowInstance = (Map<String, Object>) instanceResponse.getBody().getData();
+                    assertEquals("SUCCESS", workflowInstance.get("state"));
+                });
+
+        HttpResponse taskListResponse =
+                workflowInstancePage.queryTaskInstanceList(loginUser, projectCode, workflowInstanceId);
+        assertTrue(taskListResponse.getBody().getSuccess());
+        Map<String, Object> taskPage = (Map<String, Object>) taskListResponse.getBody().getData();
+        List<Map<String, Object>> taskInstances = (List<Map<String, Object>>) taskPage.get("totalList");
+        assertEquals(1, taskInstances.size());
+        int taskInstanceId = (int) taskInstances.get(0).get("id");
+
+        HttpResponse logResponse = workflowInstancePage.queryTaskLog(loginUser, taskInstanceId, 0, 1000);
+        assertTrue(logResponse.getBody().getSuccess());
+        String logContent = ((Map<String, Object>) logResponse.getBody().getData()).get("message").toString();
+        assertTrue(logContent.contains(" -> " + expectedSecretLength), logContent);
+        assertFalse(logContent.contains(GLOBAL_SECRET), logContent);
+        assertFalse(logContent.contains(LOCAL_SECRET), logContent);
+    }
+
     private String sensitiveWorkflowJson(long taskCode) {
         return "{"
                 + "\"taskDefinitionJson\":[{"
@@ -284,6 +379,90 @@ public class SensitiveWorkflowVariableAPITest {
                 + "\"executionType\":\"PARALLEL\","
                 + "\"description\":\"\","
                 + "\"globalParams\":[],"
+                + "\"timeout\":0"
+                + "}";
+    }
+
+    private String sensitiveWorkflowWithLocalJson(long taskCode, String globalSecret, String localSecret) {
+        return "{"
+                + "\"taskDefinitionJson\":[{"
+                + "\"code\":" + taskCode + ","
+                + "\"delayTime\":\"0\","
+                + "\"description\":\"\","
+                + "\"environmentCode\":-1,"
+                + "\"failRetryInterval\":\"1\","
+                + "\"failRetryTimes\":\"0\","
+                + "\"flag\":\"YES\","
+                + "\"name\":\"sensitive_shell\","
+                + "\"taskParams\":{\"localParams\":[{\"prop\":\"localVar\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
+                + "\"value\":\"" + localSecret + "\",\"sensitive\":true}],"
+                + "\"rawScript\":\"echo -n ${var}${localVar} | wc -c\","
+                + "\"resourceList\":[]},"
+                + "\"taskPriority\":\"MEDIUM\","
+                + "\"taskType\":\"SHELL\","
+                + "\"timeout\":0,"
+                + "\"timeoutFlag\":\"CLOSE\","
+                + "\"timeoutNotifyStrategy\":\"\","
+                + "\"workerGroup\":\"default\","
+                + "\"cpuQuota\":-1,"
+                + "\"memoryMax\":-1,"
+                + "\"taskExecuteType\":\"BATCH\""
+                + "}],"
+                + "\"taskRelationJson\":[{"
+                + "\"name\":\"\","
+                + "\"preTaskCode\":0,"
+                + "\"preTaskVersion\":0,"
+                + "\"postTaskCode\":" + taskCode + ","
+                + "\"postTaskVersion\":0,"
+                + "\"conditionType\":\"NONE\","
+                + "\"conditionParams\":{}"
+                + "}],"
+                + "\"executionType\":\"PARALLEL\","
+                + "\"description\":\"\","
+                + "\"globalParams\":[{\"prop\":\"var\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\""
+                + globalSecret + "\",\"sensitive\":true}],"
+                + "\"timeout\":0"
+                + "}";
+    }
+
+    private String sensitiveWorkflowPlaceholderUpdateJson(long taskCode) {
+        return "{"
+                + "\"taskDefinitionJson\":[{"
+                + "\"code\":" + taskCode + ","
+                + "\"delayTime\":\"0\","
+                + "\"description\":\"updated\","
+                + "\"environmentCode\":-1,"
+                + "\"failRetryInterval\":\"1\","
+                + "\"failRetryTimes\":\"0\","
+                + "\"flag\":\"YES\","
+                + "\"name\":\"sensitive_shell\","
+                + "\"taskParams\":{\"localParams\":[{\"prop\":\"localVar\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
+                + "\"value\":\"" + SENSITIVE_DATA_MASK + "\",\"sensitive\":true}],"
+                + "\"rawScript\":\"echo -n ${var}${localVar} | wc -c\","
+                + "\"resourceList\":[]},"
+                + "\"taskPriority\":\"MEDIUM\","
+                + "\"taskType\":\"SHELL\","
+                + "\"timeout\":0,"
+                + "\"timeoutFlag\":\"CLOSE\","
+                + "\"timeoutNotifyStrategy\":\"\","
+                + "\"workerGroup\":\"default\","
+                + "\"cpuQuota\":-1,"
+                + "\"memoryMax\":-1,"
+                + "\"taskExecuteType\":\"BATCH\""
+                + "}],"
+                + "\"taskRelationJson\":[{"
+                + "\"name\":\"\","
+                + "\"preTaskCode\":0,"
+                + "\"preTaskVersion\":0,"
+                + "\"postTaskCode\":" + taskCode + ","
+                + "\"postTaskVersion\":0,"
+                + "\"conditionType\":\"NONE\","
+                + "\"conditionParams\":{}"
+                + "}],"
+                + "\"executionType\":\"PARALLEL\","
+                + "\"description\":\"updated\","
+                + "\"globalParams\":[{\"prop\":\"var\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\""
+                + SENSITIVE_DATA_MASK + "\",\"sensitive\":true}],"
                 + "\"timeout\":0"
                 + "}";
     }

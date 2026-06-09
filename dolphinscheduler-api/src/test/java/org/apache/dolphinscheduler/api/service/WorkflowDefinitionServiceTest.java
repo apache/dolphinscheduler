@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -400,6 +401,42 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testQueryWorkflowDefinitionListPagingShouldMaskSensitiveGlobalParams() {
+        user.setId(1);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(user, projectCode, WORKFLOW_DEFINITION);
+
+        WorkflowDefinition workflowDefinition = WorkflowDefinition.builder()
+                .version(1)
+                .code(1L)
+                .build();
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            workflowDefinition.setGlobalParams(sensitiveGlobalParams(PasswordUtils.encodePassword("paging_secret")));
+        }
+
+        PageListingResult<WorkflowDefinition> pageListingResult = PageListingResult.<WorkflowDefinition>builder()
+                .records(Collections.singletonList(workflowDefinition))
+                .currentPage(1)
+                .pageSize(10)
+                .totalCount(1)
+                .build();
+        when(workflowDefinitionDao.listingWorkflowDefinition(eq(0), eq(10), eq(""), eq(1), eq(projectCode)))
+                .thenReturn(pageListingResult);
+        when(userDao.queryUserWithWorkflowDefinitionCode(Collections.singletonList(1L)))
+                .thenReturn(Collections.emptyList());
+        when(schedulerService.queryScheduleByWorkflowDefinitionCodes(Collections.singletonList(1L)))
+                .thenReturn(Collections.emptyList());
+
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            PageInfo<WorkflowDefinition> pageInfo = workflowDefinitionService.queryWorkflowDefinitionListPaging(
+                    user, projectCode, "", "", 1, 0, 10);
+
+            Assertions.assertEquals(SENSITIVE_DATA_MASK,
+                    pageInfo.getTotalList().get(0).getGlobalParamList().get(0).getValue());
+            Assertions.assertFalse(JSONUtils.toJsonString(pageInfo).contains("paging_secret"));
+        }
+    }
+
+    @Test
     public void testQueryWorkflowDefinitionByCode() {
         Project project = getProject(projectCode);
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
@@ -425,6 +462,38 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(getWorkflowDefinition()));
         DagData successRes = workflowDefinitionService.queryWorkflowDefinitionByCode(user, projectCode, 46L);
         Assertions.assertNotNull(successRes);
+    }
+
+    @Test
+    public void testQueryWorkflowDefinitionByCodeShouldMaskSensitiveParams() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION);
+
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setCode(123456789L);
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            workflowDefinition.setGlobalParams(sensitiveGlobalParams(PasswordUtils.encodePassword("global_secret")));
+            taskDefinition.setTaskParams(sensitiveTaskParams(PasswordUtils.encodePassword("local_secret")));
+        }
+        when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
+        DagData dagData = new DagData(workflowDefinition, Collections.emptyList(),
+                Collections.singletonList(taskDefinition));
+        when(processService.genDagData(any())).thenReturn(dagData);
+
+        try (MockedStatic<PropertyUtils> ignored = mockEncryptionEnabled()) {
+            DagData result = workflowDefinitionService.queryWorkflowDefinitionByCode(user, projectCode, 46L);
+
+            Assertions.assertEquals(SENSITIVE_DATA_MASK,
+                    result.getWorkflowDefinition().getGlobalParamList().get(0).getValue());
+            List<Property> localParams =
+                    SensitivePropertyUtils.getLocalParams(result.getTaskDefinitionList().get(0).getTaskParams());
+            Assertions.assertEquals(SENSITIVE_DATA_MASK, localParams.get(0).getValue());
+            Assertions.assertFalse(JSONUtils.toJsonString(result).contains("global_secret"));
+            Assertions.assertFalse(JSONUtils.toJsonString(result).contains("local_secret"));
+        }
     }
 
     @Test

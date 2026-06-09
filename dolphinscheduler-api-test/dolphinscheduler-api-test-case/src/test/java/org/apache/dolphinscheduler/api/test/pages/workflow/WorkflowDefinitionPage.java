@@ -136,6 +136,49 @@ public class WorkflowDefinitionPage {
         return requestClient.get(url, headers, params);
     }
 
+    public HttpResponse updateWorkflowDefinition(User loginUser,
+                                                 long projectCode,
+                                                 long workflowDefinitionCode,
+                                                 String jsonContent,
+                                                 String workflowDefinitionName) {
+        return updateWorkflowDefinition(loginUser, projectCode, workflowDefinitionCode, jsonContent,
+                workflowDefinitionName, null);
+    }
+
+    public HttpResponse updateWorkflowDefinition(User loginUser,
+                                                 long projectCode,
+                                                 long workflowDefinitionCode,
+                                                 String jsonContent,
+                                                 String workflowDefinitionName,
+                                                 ReleaseState releaseState) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginUser", loginUser);
+
+        Map<String, Object> fileContentMap = JSONUtils.parseObject(jsonContent, new TypeReference<>() {
+        });
+        if (fileContentMap == null) {
+            throw new RuntimeException("file content parse error");
+        }
+        fileContentMap.replaceAll((key, value) -> {
+            if (value instanceof List) {
+                return JSONUtils.toJsonString(value);
+            }
+            return value;
+        });
+        params.putAll(fileContentMap);
+        params.put("name", workflowDefinitionName);
+        params.put("code", workflowDefinitionCode);
+        if (releaseState != null) {
+            params.put("releaseState", releaseState);
+        }
+
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+        RequestClient requestClient = new RequestClient();
+        String url = String.format("/projects/%s/workflow-definition/%s", projectCode, workflowDefinitionCode);
+        return requestClient.put(url, headers, params);
+    }
+
     public HttpResponse releaseWorkflowDefinition(User loginUser, long projectCode, long code,
                                                   ReleaseState releaseState) {
         Map<String, Object> params = new HashMap<>();
