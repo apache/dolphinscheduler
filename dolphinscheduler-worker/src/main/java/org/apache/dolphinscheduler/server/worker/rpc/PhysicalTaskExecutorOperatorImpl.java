@@ -48,6 +48,7 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
     public TaskExecutorDispatchResponse dispatchTask(final TaskExecutorDispatchRequest taskExecutorDispatchRequest) {
         final TaskExecutionContext taskExecutionContext = taskExecutorDispatchRequest.getTaskExecutionContext();
         final int taskInstanceId = taskExecutionContext.getTaskInstanceId();
+        // Do not log the full dispatch request: prepareParamsMap may contain decrypted sensitive values.
         log.info("Receive TaskExecutorDispatchResponse, taskInstanceId: {}", taskInstanceId);
         try {
             physicalTaskEngineDelegator.dispatchLogicTask(taskExecutionContext);
