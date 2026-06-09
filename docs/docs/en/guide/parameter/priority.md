@@ -36,7 +36,7 @@ The [createParam] node creates an OUT parameter 'key1' with a value of '1'.
 
 The [useParam] node creates two parameters named 'key1' and 'key2'. The parameter 'key1' shares the same name as the one passed by the upstream node and is assigned a value of '11'. However, due to priority rules, this local value ('11') is discarded, and the final assigned value becomes '1', which is passed by the upstream node.
 
-2: Use SQL nodes to explain complex combined cases.
+2: Use Shell and SQL nodes to explain complex combined cases.
 
 ![priority-parameter04](../../../../img/new_ui/dev/parameter/priority_parameter04.png)
 
@@ -50,7 +50,7 @@ The following shows the definition of the [createParam2] node:
 
 ![priority-parameter06](../../../../img/new_ui/dev/parameter/priority_parameter06.png)
 
-The [createParam2] node creates an OUT parameter named 'id' and assigns it the value '22'.
+The [createParam2] node creates an OUT parameter named 'id' and assigns it the value '22'.  A "sleep 20" logic has been added to this node to ensure it completes after the [createParam1] node.
 
 ![priority-parameter07](../../../../img/new_ui/dev/parameter/priority_parameter07.png)
 

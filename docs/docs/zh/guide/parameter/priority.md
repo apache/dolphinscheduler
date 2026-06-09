@@ -34,7 +34,7 @@ DolphinScheduler 中所涉及的参数值的定义可能来自三种类型：
 
 节点【useParam】创建了两个分别名为 'key1' 和 'key2' 的参数。其中 'key1' 与上游节点传递的参数同名，并被赋值为 '11'。然而，根据优先级规则，该节点内部本地参数的值 '11' 会被丢弃，最终生效的赋值将是上游节点传递过来的值 '1'。
 
-2：我们再以 sql 节点来解释复杂的组合案例
+2：我们再以 shell 和 sql 节点来解释复杂的组合案例
 
 ![priority-parameter04](../../../../img/new_ui/dev/parameter/priority_parameter04.png)
 
@@ -48,7 +48,7 @@ DolphinScheduler 中所涉及的参数值的定义可能来自三种类型：
 
 ![priority-parameter06](../../../../img/new_ui/dev/parameter/priority_parameter06.png)
 
-节点【createParam2】创建了一个名为 'id' 的输出（OUT）参数，并将其赋值为 '22'。
+节点【createParam2】创建了一个名为 'id' 的输出（OUT）参数，并将其赋值为 '22'。该节点中加入了 sleep 20 的逻辑，以确保它在节点【createParam1】之后执行完成。
 
 ![priority-parameter07](../../../../img/new_ui/dev/parameter/priority_parameter07.png)
 
