@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
 import org.apache.dolphinscheduler.server.master.engine.command.ICommandHandler;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.CommandDuplicateHandleException;
+import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics;
 
 import java.util.List;
 
@@ -48,8 +49,11 @@ public class WorkflowExecutionFactory {
      */
     @Transactional
     public IWorkflowExecution createWorkflowExecuteRunnable(Command command) {
+        long startTime = System.currentTimeMillis();
         deleteCommandOrThrow(command);
-        return doCreateWorkflowExecution(command);
+        IWorkflowExecution workflowExecution = doCreateWorkflowExecution(command);
+        WorkflowInstanceMetrics.recordWorkflowInstanceGenerateTime(System.currentTimeMillis() - startTime);
+        return workflowExecution;
     }
 
     /**

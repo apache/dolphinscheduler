@@ -179,6 +179,9 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
             workflowInstanceDao.updateById(workflowInstance);
             log.info("Success set WorkflowExecuteRunnable: {} state from: {} to {}",
                     workflowInstance.getName(), originState.name(), targetState.name());
+            WorkflowInstanceMetrics.incWorkflowInstanceByStateAndWorkflowDefinitionCode(
+                    targetState,
+                    String.valueOf(workflowInstance.getWorkflowDefinitionCode()));
         } catch (Exception ex) {
             workflowInstance.setState(originState);
             throw ex;
