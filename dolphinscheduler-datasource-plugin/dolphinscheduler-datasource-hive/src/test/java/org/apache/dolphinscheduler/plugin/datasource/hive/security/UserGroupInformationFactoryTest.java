@@ -70,7 +70,8 @@ public class UserGroupInformationFactoryTest {
             try {
                 startLatch.await();
                 for (int round = 0; round < 10000; round++) {
-                    getUserGroupInformationMap().forEach((key, ugi) -> {});
+                    getUserGroupInformationMap().forEach((key, ugi) -> {
+                    });
                 }
             } catch (Exception e) {
                 errorCount.incrementAndGet();
