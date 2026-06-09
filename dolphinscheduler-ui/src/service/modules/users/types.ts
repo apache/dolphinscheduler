@@ -23,10 +23,6 @@ interface UserNamesReq {
   userNames?: string
 }
 
-interface AlertGroupIdReq {
-  alertgroupId: string
-}
-
 interface UserReq {
   email: string
   tenantId: number | null
@@ -118,7 +114,6 @@ interface UserListRes {
 export {
   UserNameReq,
   UserNamesReq,
-  AlertGroupIdReq,
   UserReq,
   IdReq,
   UserIdReq,

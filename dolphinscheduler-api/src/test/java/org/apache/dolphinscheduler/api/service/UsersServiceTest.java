@@ -578,33 +578,6 @@ public class UsersServiceTest {
     }
 
     @Test
-    public void testUnauthorizedUser() {
-        User loginUser = new User();
-        when(userDao.queryAll()).thenReturn(getUserList());
-        when(userDao.queryUserListByAlertGroupId(2)).thenReturn(getUserList());
-        // no operate
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> usersService.unauthorizedUser(loginUser, 2));
-        // success
-        loginUser.setUserType(UserType.ADMIN_USER);
-        List<User> users = usersService.unauthorizedUser(loginUser, 2);
-        Assertions.assertNotNull(users);
-    }
-
-    @Test
-    public void testAuthorizedUser() {
-        User loginUser = new User();
-        when(userDao.queryUserListByAlertGroupId(2)).thenReturn(getUserList());
-        // no operate
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> usersService.authorizedUser(loginUser, 2));
-        // success
-        loginUser.setUserType(UserType.ADMIN_USER);
-        List<User> users = usersService.authorizedUser(loginUser, 2);
-        Assertions.assertFalse(users.isEmpty());
-    }
-
-    @Test
     public void testRegisterUser() {
         String userName = "userTest0002~";
         String userPassword = "userTest";

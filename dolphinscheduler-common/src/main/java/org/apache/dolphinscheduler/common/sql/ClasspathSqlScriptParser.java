@@ -116,7 +116,7 @@ public class ClasspathSqlScriptParser implements SqlScriptParser {
                 // Skip the empty line, comment line
                 continue;
             }
-            if (line.startsWith("*/")) {
+            if (trimLine.startsWith("*/")) {
                 break;
             }
         }

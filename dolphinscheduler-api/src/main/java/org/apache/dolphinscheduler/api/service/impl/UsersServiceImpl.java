@@ -56,11 +56,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -828,55 +826,6 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         return result;
-    }
-
-    /**
-     * unauthorized user
-     *
-     * @param loginUser    login user
-     * @param alertgroupId alert group id
-     * @return unauthorize result code
-     */
-    @Override
-    public List<User> unauthorizedUser(User loginUser, Integer alertgroupId) {
-        // only admin can operate
-        if (!isAdmin(loginUser)) {
-            log.warn("Only admin can deauthorize user.");
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-
-        List<User> userList = userDao.queryAll();
-        List<User> resultUsers = new ArrayList<>();
-        Set<User> userSet;
-        if (userList != null && !userList.isEmpty()) {
-            userSet = new HashSet<>(userList);
-
-            List<User> authedUserList = userDao.queryUserListByAlertGroupId(alertgroupId);
-
-            if (authedUserList != null && !authedUserList.isEmpty()) {
-                Set<User> authedUserSet = new HashSet<>(authedUserList);
-                userSet.removeAll(authedUserSet);
-            }
-            resultUsers = new ArrayList<>(userSet);
-        }
-        return resultUsers;
-    }
-
-    /**
-     * authorized user
-     *
-     * @param loginUser    login user
-     * @param alertGroupId alert group id
-     * @return authorized result code
-     */
-    @Override
-    public List<User> authorizedUser(User loginUser, Integer alertGroupId) {
-        // only admin can operate
-        if (!isAdmin(loginUser)) {
-            log.warn("Only admin can authorize user.");
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-        return userDao.queryUserListByAlertGroupId(alertGroupId);
     }
 
     /**
