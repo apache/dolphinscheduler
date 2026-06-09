@@ -155,16 +155,6 @@ public interface UsersService {
     Result<Object> verifyUserName(String userName);
 
     /**
-     * users not yet authorized to the given alert group
-     */
-    List<User> unauthorizedUser(User loginUser, Integer alertGroupId);
-
-    /**
-     * users authorized to the given alert group
-     */
-    List<User> authorizedUser(User loginUser, Integer alertGroupId);
-
-    /**
      * registry user, default state is 0, default tenant_id is 1, no phone, no queue
      */
     User registerUser(String userName, String userPassword, String repeatPassword, String email);

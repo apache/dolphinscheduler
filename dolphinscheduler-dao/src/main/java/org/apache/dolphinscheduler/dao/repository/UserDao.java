@@ -38,8 +38,6 @@ public interface UserDao extends IDao<User> {
 
     User queryDetailsById(int userId);
 
-    List<User> queryUserListByAlertGroupId(int alertGroupId);
-
     List<User> queryUserListByTenant(int tenantId);
 
     User queryTenantCodeByUserId(int userId);
