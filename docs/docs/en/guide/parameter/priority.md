@@ -22,7 +22,7 @@ In the case of upstream tasks can pass parameters to the downstream, there may b
 
 The following are examples showing task parameters priority problems:
 
-1: Use shell nodes to explain the first case.
+1: Use Shell nodes to explain the first case.
 
 ![priority-parameter01](../../../../img/new_ui/dev/parameter/priority_parameter01.png)
 

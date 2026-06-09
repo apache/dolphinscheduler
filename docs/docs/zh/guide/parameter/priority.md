@@ -20,7 +20,7 @@ DolphinScheduler 中所涉及的参数值的定义可能来自三种类型：
 
 下面例子向你展示如何使用任务参数传递的优先级问题
 
-1：先以 shell 节点解释第一种情况
+1：先以 Shell 节点解释第一种情况
 
 ![priority-parameter01](../../../../img/new_ui/dev/parameter/priority_parameter01.png)
 
@@ -34,7 +34,7 @@ DolphinScheduler 中所涉及的参数值的定义可能来自三种类型：
 
 节点【useParam】创建了两个分别名为 'key1' 和 'key2' 的参数。其中 'key1' 与上游节点传递的参数同名，并被赋值为 '11'。然而，根据优先级规则，该节点内部本地参数的值 '11' 会被丢弃，最终生效的赋值将是上游节点传递过来的值 '1'。
 
-2：我们再以 shell 和 sql 节点来解释复杂的组合案例
+2：我们再以 Shell 和 SQL 节点来解释复杂的组合案例
 
 ![priority-parameter04](../../../../img/new_ui/dev/parameter/priority_parameter04.png)
 
@@ -48,7 +48,7 @@ DolphinScheduler 中所涉及的参数值的定义可能来自三种类型：
 
 ![priority-parameter06](../../../../img/new_ui/dev/parameter/priority_parameter06.png)
 
-节点【createParam2】创建了一个名为 'id' 的输出（OUT）参数，并将其赋值为 '22'。该节点中加入了 sleep 20 的逻辑，以确保它在节点【createParam1】之后执行完成。
+节点【createParam2】创建了一个名为 'id' 的输出（OUT）参数，并将其赋值为 '22'。该节点中加入了 "sleep 20" 的逻辑，以确保它在节点【createParam1】之后执行完成。
 
 ![priority-parameter07](../../../../img/new_ui/dev/parameter/priority_parameter07.png)
 
@@ -66,8 +66,8 @@ DolphinScheduler 中所涉及的参数值的定义可能来自三种类型：
 
 ![priority-parameter10](../../../../img/new_ui/dev/parameter/priority_parameter10.png)
 
-'id' 可以在任务启动页面上进行配置（启动参数），其值可被赋为 4。
+'id' 可以在任务启动页面上进行配置（启动参数），并将其赋值为 4。
 
 ![priority-parameter11](../../../../img/new_ui/dev/parameter/priority_parameter11.png)
 
-执行结果符合预期，其中参数上下文（Parameter Context）具有最高优先级。用户为节点【createParam1】和节点【createParam2】设置了同名参数 'id'，而节点【useParam】使用了后执行完成的节点【createParam2】的值。
+执行结果符合预期，其中参数上下文（Parameter Context）具有最高优先级。用户为节点【createParam1】和节点【createParam2】设置了同名参数 'id'，而节点【useParam】使用了后执行完成的节点【createParam2】的值 '22'。
