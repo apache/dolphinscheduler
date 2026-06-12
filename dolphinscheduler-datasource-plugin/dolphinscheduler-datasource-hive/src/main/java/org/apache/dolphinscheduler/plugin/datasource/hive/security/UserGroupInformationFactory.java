@@ -29,6 +29,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -39,7 +40,7 @@ public class UserGroupInformationFactory {
 
     private static final Map<String, Integer> currentLoginTimesMap = new HashMap<>();
 
-    private static final Map<String, UserGroupInformation> userGroupInformationMap = new HashMap<>();
+    private static final Map<String, UserGroupInformation> userGroupInformationMap = new ConcurrentHashMap<>();
 
     private static final ScheduledExecutorService kerberosRenewalService =
             ThreadUtils.newSingleDaemonScheduledExecutorService("Hive-Kerberos-Renewal-Thread-");
