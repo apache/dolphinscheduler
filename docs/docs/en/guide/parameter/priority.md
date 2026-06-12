@@ -1,6 +1,6 @@
 # Parameter Priority
 
-DolphinScheduler has three parameter types:
+DolphinScheduler has six parameter types:
 
 * [Built-in Parameter](built-in.md): parameters built into the system
 * [Project-level Parameter](project-parameter.md): parameters defined at the project management page.
