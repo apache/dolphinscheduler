@@ -143,6 +143,15 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
             taskExecution.getWorkflowEventBus().publish(TaskPausedLifecycleEvent.of(taskExecution));
             return;
         }
+        // Task not in dispatch queue, check if it's waiting for TaskGroup slot
+        if (taskGroupCoordinator.isTaskWaitingForTaskGroupSlot(taskExecution.getTaskInstance())) {
+            // Release the TaskGroupQueue first to prevent TaskGroupCoordinator
+            // from concurrently acquiring the slot and racing with this pause
+            taskGroupCoordinator.releaseTaskGroupSlot(taskExecution.getTaskInstance());
+            log.info("Task: {} is waiting for TaskGroup slot, pause it directly", taskExecution.getName());
+            taskExecution.getWorkflowEventBus().publish(TaskPausedLifecycleEvent.of(taskExecution));
+            return;
+        }
         log.info("The task[id={}] is submitted and already dispatched, cannot pause, will try to pause it after 5s",
                 taskExecution.getId());
         taskExecution.getWorkflowEventBus()
@@ -164,6 +173,15 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
         throwExceptionIfStateIsNotMatch(taskExecution);
         if (workerGroupDispatcherCoordinator.removeTask(taskExecution)) {
             log.info("Success kill task[id={}] before dispatch", taskExecution.getId());
+            taskExecution.getWorkflowEventBus().publish(TaskKilledLifecycleEvent.of(taskExecution));
+            return;
+        }
+        // Task not in dispatch queue, check if it's waiting for TaskGroup slot
+        if (taskGroupCoordinator.isTaskWaitingForTaskGroupSlot(taskExecution.getTaskInstance())) {
+            // Release the TaskGroupQueue first to prevent TaskGroupCoordinator
+            // from concurrently acquiring the slot and racing with this kill
+            taskGroupCoordinator.releaseTaskGroupSlot(taskExecution.getTaskInstance());
+            log.info("Task: {} is waiting for TaskGroup slot, kill it directly", taskExecution.getName());
             taskExecution.getWorkflowEventBus().publish(TaskKilledLifecycleEvent.of(taskExecution));
             return;
         }

@@ -92,6 +92,18 @@ public interface ITaskGroupCoordinator extends AutoCloseable {
     void releaseTaskGroupSlot(TaskInstance taskInstance);
 
     /**
+     * Check if the given task instance is currently waiting for a task group slot.
+     * <p>
+     * A task is waiting for a slot if it has an active TaskGroupQueue record with
+     * {@link TaskGroupQueueStatus#WAIT_QUEUE} status. This is a runtime state check,
+     * not a static configuration check like {@link #needAcquireTaskGroupSlot(TaskInstance)}.
+     *
+     * @param taskInstance the task instance
+     * @return true if the task is currently waiting for a task group slot
+     */
+    boolean isTaskWaitingForTaskGroupSlot(final TaskInstance taskInstance);
+
+    /**
      * Close the TaskGroupCoordinator, once closed, the coordinator will not work until you have started the coordinator again.
      */
     @Override

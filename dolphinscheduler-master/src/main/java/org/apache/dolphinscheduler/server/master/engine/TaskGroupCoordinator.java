@@ -318,6 +318,16 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     }
 
     @Override
+    public boolean isTaskWaitingForTaskGroupSlot(final TaskInstance taskInstance) {
+        if (!TaskGroupUtils.isUsingTaskGroup(taskInstance)) {
+            return false;
+        }
+        List<TaskGroupQueue> taskGroupQueues = taskGroupQueueDao.queryByTaskInstanceId(taskInstance.getId());
+        return taskGroupQueues.stream()
+                .anyMatch(q -> q.getStatus() == TaskGroupQueueStatus.WAIT_QUEUE);
+    }
+
+    @Override
     public boolean needAcquireTaskGroupSlot(final TaskInstance taskInstance) {
         if (taskInstance == null) {
             throw new IllegalArgumentException("The TaskInstance is null");
