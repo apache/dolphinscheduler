@@ -26,6 +26,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
@@ -147,6 +148,37 @@ class TaskGroupCoordinatorTest {
 
         taskInstance.setTaskGroupId(1);
         assertTrue(taskGroupCoordinator.needToReleaseTaskGroupSlot(taskInstance));
+    }
+
+    @Test
+    void isTaskWaitingForTaskGroupSlot() {
+        // Task not using task group -> false
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setTaskGroupId(0);
+        assertFalse(taskGroupCoordinator.isTaskWaitingForTaskGroupSlot(taskInstance));
+
+        // Task using task group but no TaskGroupQueue records -> false
+        taskInstance.setTaskGroupId(1);
+        taskInstance.setId(100);
+        when(taskGroupQueueDao.queryByTaskInstanceId(100)).thenReturn(Lists.newArrayList());
+        assertFalse(taskGroupCoordinator.isTaskWaitingForTaskGroupSlot(taskInstance));
+
+        // Task using task group with TaskGroupQueue but no WAIT_QUEUE status -> false
+        TaskGroupQueue acquireSuccessQueue = new TaskGroupQueue();
+        acquireSuccessQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
+        when(taskGroupQueueDao.queryByTaskInstanceId(100)).thenReturn(Lists.newArrayList(acquireSuccessQueue));
+        assertFalse(taskGroupCoordinator.isTaskWaitingForTaskGroupSlot(taskInstance));
+
+        // Task using task group with TaskGroupQueue in WAIT_QUEUE status -> true
+        TaskGroupQueue waitQueue = new TaskGroupQueue();
+        waitQueue.setStatus(TaskGroupQueueStatus.WAIT_QUEUE);
+        when(taskGroupQueueDao.queryByTaskInstanceId(100)).thenReturn(Lists.newArrayList(waitQueue));
+        assertTrue(taskGroupCoordinator.isTaskWaitingForTaskGroupSlot(taskInstance));
+
+        // Task using task group with mixed statuses including WAIT_QUEUE -> true
+        when(taskGroupQueueDao.queryByTaskInstanceId(100))
+                .thenReturn(Lists.newArrayList(acquireSuccessQueue, waitQueue));
+        assertTrue(taskGroupCoordinator.isTaskWaitingForTaskGroupSlot(taskInstance));
     }
 
     @Test
