@@ -20,7 +20,6 @@ kind: ConfigMap
 metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-worker
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-worker
     {{- include "dolphinscheduler.worker.labels" . | nindent 4 }}
 data:
 {{- range $path, $config := .Values.worker.customizedConfig }}
