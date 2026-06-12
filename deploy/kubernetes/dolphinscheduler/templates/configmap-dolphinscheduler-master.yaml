@@ -20,7 +20,6 @@ kind: ConfigMap
 metadata:
   name: {{ include "dolphinscheduler.fullname" . }}-master
   labels:
-    app.kubernetes.io/name: {{ include "dolphinscheduler.fullname" . }}-master
     {{- include "dolphinscheduler.master.labels" . | nindent 4 }}
 data:
 {{- range $path, $config := .Values.master.customizedConfig }}
