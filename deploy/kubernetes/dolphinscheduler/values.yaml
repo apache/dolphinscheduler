@@ -111,7 +111,7 @@ mysql:
   image:
     registry: docker.io
     repository: bitnamilegacy/mysql
-    tag: 8.0.31-debian-11-r0
+    tag: 8.0.33-debian-11-r30
 
 minio:
   # -- Deploy minio and configure it as the default storage for DolphinScheduler, note this is for demo only, not for production.
