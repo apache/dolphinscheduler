@@ -35,9 +35,11 @@ import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
@@ -81,6 +83,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
 
     @Autowired
     private TaskDefinitionDao taskDefinitionDao;
+
+    @Autowired
+    private WorkerGroupDao workerGroupDao;
 
     /**
      * create environment
@@ -129,6 +134,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
                         if (!StringUtils.isEmpty(workerGroup)) {
                             EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
                             relation.setEnvironmentCode(env.getCode());
+                            relation.setWorkerGroupId(getWorkerGroupId(workerGroup));
                             relation.setWorkerGroup(workerGroup);
                             relation.setOperator(loginUser.getId());
                             relation.setCreateTime(new Date());
@@ -374,6 +380,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             if (StringUtils.isNotEmpty(key)) {
                 EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
                 relation.setEnvironmentCode(code);
+                relation.setWorkerGroupId(getWorkerGroupId(key));
                 relation.setWorkerGroup(key);
                 relation.setUpdateTime(new Date());
                 relation.setCreateTime(new Date());
@@ -416,6 +423,14 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
                         environmentName, collect);
             }
         }
+    }
+
+    private Integer getWorkerGroupId(String workerGroupName) {
+        List<WorkerGroup> workerGroups = workerGroupDao.queryWorkerGroupByName(workerGroupName);
+        if (CollectionUtils.isEmpty(workerGroups)) {
+            return null;
+        }
+        return workerGroups.get(0).getId();
     }
 
     protected void checkParams(String name, String config, String workerGroups) {

@@ -1158,6 +1158,7 @@ CREATE TABLE t_ds_environment_worker_group_relation
 (
     id               int          NOT NULL AUTO_INCREMENT,
     environment_code bigint(20) NOT NULL,
+    worker_group_id  int                   DEFAULT NULL,
     worker_group     varchar(255) NOT NULL,
     operator         int                   DEFAULT NULL,
     create_time      timestamp    NOT NULL DEFAULT CURRENT_TIMESTAMP,

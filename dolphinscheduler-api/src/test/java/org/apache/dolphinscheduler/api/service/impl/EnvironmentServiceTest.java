@@ -39,9 +39,11 @@ import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -55,6 +57,7 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -87,6 +90,9 @@ public class EnvironmentServiceTest {
 
     @Mock
     private TaskDefinitionDao taskDefinitionDao;
+
+    @Mock
+    private WorkerGroupDao workerGroupDao;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -141,6 +147,26 @@ public class EnvironmentServiceTest {
     }
 
     @Test
+    public void testCreateEnvironmentWithWorkerGroupId() {
+        User adminUser = getAdminUser();
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
+                adminUser.getId(), ENVIRONMENT_CREATE, baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
+                0, baseServiceLogger)).thenReturn(true);
+        WorkerGroup workerGroup = getWorkerGroup(1, "default");
+        when(environmentMapper.insert(any(Environment.class))).thenReturn(1);
+        when(workerGroupDao.queryWorkerGroupByName("default")).thenReturn(Collections.singletonList(workerGroup));
+        when(relationMapper.insert(any(EnvironmentWorkerGroupRelation.class))).thenReturn(1);
+
+        environmentService.createEnvironment(adminUser, "testName", "test", "test", workerGroups);
+
+        ArgumentCaptor<EnvironmentWorkerGroupRelation> relationCaptor =
+                ArgumentCaptor.forClass(EnvironmentWorkerGroupRelation.class);
+        Mockito.verify(relationMapper).insert(relationCaptor.capture());
+        assertEquals(workerGroup.getId(), relationCaptor.getValue().getWorkerGroupId());
+    }
+
+    @Test
     public void testCheckParams() {
         assertThrowsServiceException(Status.ENVIRONMENT_WORKER_GROUPS_IS_INVALID,
                 () -> environmentService.checkParams(environmentName, getConfig(), "test"));
@@ -191,6 +217,27 @@ public class EnvironmentServiceTest {
                 .thenReturn(Collections.singletonList(getEnvironmentWorkerGroup()));
         assertDoesNotThrow(() -> environmentService.updateEnvironmentByCode(adminUser, 1L, "testName", "test", "test",
                 ""));
+    }
+
+    @Test
+    public void testUpdateEnvironmentByCodeWithWorkerGroupId() {
+        User adminUser = getAdminUser();
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
+                adminUser.getId(), ENVIRONMENT_UPDATE, baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
+                0, baseServiceLogger)).thenReturn(true);
+        WorkerGroup workerGroup = getWorkerGroup(1, "default");
+        when(environmentMapper.update(any(Environment.class), any(Wrapper.class))).thenReturn(1);
+        when(relationMapper.queryByEnvironmentCode(1L)).thenReturn(Collections.emptyList());
+        when(workerGroupDao.queryWorkerGroupByName("default")).thenReturn(Collections.singletonList(workerGroup));
+        when(relationMapper.insert(any(EnvironmentWorkerGroupRelation.class))).thenReturn(1);
+
+        environmentService.updateEnvironmentByCode(adminUser, 1L, "testName", "test", "test", workerGroups);
+
+        ArgumentCaptor<EnvironmentWorkerGroupRelation> relationCaptor =
+                ArgumentCaptor.forClass(EnvironmentWorkerGroupRelation.class);
+        Mockito.verify(relationMapper).insert(relationCaptor.capture());
+        assertEquals(workerGroup.getId(), relationCaptor.getValue().getWorkerGroupId());
     }
 
     @Test
@@ -323,6 +370,13 @@ public class EnvironmentServiceTest {
         relation.setEnvironmentCode(1L);
         relation.setWorkerGroup("new_worker_group");
         return relation;
+    }
+
+    private WorkerGroup getWorkerGroup(int id, String name) {
+        WorkerGroup workerGroup = new WorkerGroup();
+        workerGroup.setId(id);
+        workerGroup.setName(name);
+        return workerGroup;
     }
 
     /**

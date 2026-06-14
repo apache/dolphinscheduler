@@ -59,6 +59,7 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
         // insertOne
         EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
         relation.setEnvironmentCode(1L);
+        relation.setWorkerGroupId(1);
         relation.setWorkerGroup("default");
         relation.setOperator(1);
         relation.setUpdateTime(new Date());
@@ -76,6 +77,7 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
         // query
         List<EnvironmentWorkerGroupRelation> relations = environmentWorkerGroupRelationMapper.selectList(null);
         Assertions.assertEquals(relations.size(), 1);
+        Assertions.assertEquals(1, relations.get(0).getWorkerGroupId());
     }
 
     @Test

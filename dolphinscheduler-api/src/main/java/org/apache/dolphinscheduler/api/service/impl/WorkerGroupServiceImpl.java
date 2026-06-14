@@ -182,7 +182,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         // check if the worker group has any dependent environments
         List<EnvironmentWorkerGroupRelation> environmentWorkerGroupRelations =
                 environmentWorkerGroupRelationMapper.selectList(new QueryWrapper<EnvironmentWorkerGroupRelation>()
-                        .lambda().eq(EnvironmentWorkerGroupRelation::getWorkerGroup, workerGroup.getName()));
+                        .eq("worker_group_id", workerGroup.getId())
+                        .or(queryWrapper -> queryWrapper.isNull("worker_group_id")
+                                .eq("worker_group", workerGroup.getName())));
 
         if (CollectionUtils.isNotEmpty(environmentWorkerGroupRelations)) {
             throw new ServiceException(Status.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS,

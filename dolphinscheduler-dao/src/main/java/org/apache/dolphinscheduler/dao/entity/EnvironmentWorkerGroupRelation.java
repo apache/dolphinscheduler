@@ -37,6 +37,11 @@ public class EnvironmentWorkerGroupRelation {
     /**
      * worker group id
      */
+    private Integer workerGroupId;
+
+    /**
+     * worker group name
+     */
     private String workerGroup;
 
     /**

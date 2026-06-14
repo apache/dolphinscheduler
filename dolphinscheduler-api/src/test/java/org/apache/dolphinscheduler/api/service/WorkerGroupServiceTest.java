@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
@@ -44,6 +45,7 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -62,6 +64,8 @@ import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -256,6 +260,65 @@ public class WorkerGroupServiceTest {
         when(taskDefinitionDao.queryByWorkerGroup(Mockito.any())).thenReturn(null);
 
         when(scheduleDao.queryScheduleByWorkerGroup(Mockito.any())).thenReturn(null);
+
+        assertDoesNotThrow(() -> workerGroupService.deleteWorkerGroupById(loginUser, 1));
+    }
+
+    @Test
+    public void giveEnvironmentRelationMatchedByWorkerGroupId_whenDeleteWorkerGroupById_expectEnvironmentDependency() {
+        User loginUser = getLoginUser();
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
+                WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+                baseServiceLogger)).thenReturn(true);
+        WorkerGroup workerGroup = getWorkerGroup(1);
+        when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
+        when(workflowInstanceDao.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES)).thenReturn(null);
+        when(taskDefinitionDao.queryByWorkerGroup(Mockito.any())).thenReturn(null);
+        when(scheduleDao.queryScheduleByWorkerGroup(Mockito.any())).thenReturn(null);
+
+        EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
+        relation.setWorkerGroupId(workerGroup.getId());
+        relation.setWorkerGroup("stale-" + workerGroup.getName());
+        when(environmentWorkerGroupRelationMapper.selectList(Mockito.any())).thenAnswer(invocation -> {
+            Wrapper<EnvironmentWorkerGroupRelation> wrapper = invocation.getArgument(0);
+            String sqlSegment = wrapper.getSqlSegment();
+            if (sqlSegment.contains("worker_group_id") && sqlSegment.contains("worker_group")) {
+                return Collections.singletonList(relation);
+            }
+            return Collections.emptyList();
+        });
+
+        assertThrowsServiceException(Status.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS,
+                () -> workerGroupService.deleteWorkerGroupById(loginUser, 1));
+    }
+
+    @Test
+    public void giveEnvironmentRelationMatchedOnlyByLegacyNameWithDifferentWorkerGroupId_whenDeleteWorkerGroupById_expectSuccess() {
+        User loginUser = getLoginUser();
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
+                WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.WORKER_GROUP, null, 1,
+                baseServiceLogger)).thenReturn(true);
+        WorkerGroup workerGroup = getWorkerGroup(1);
+        when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
+        when(workflowInstanceDao.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES)).thenReturn(null);
+        when(taskDefinitionDao.queryByWorkerGroup(Mockito.any())).thenReturn(null);
+        when(scheduleDao.queryScheduleByWorkerGroup(Mockito.any())).thenReturn(null);
+
+        EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
+        relation.setWorkerGroupId(2);
+        relation.setWorkerGroup(workerGroup.getName());
+        when(environmentWorkerGroupRelationMapper.selectList(Mockito.any())).thenAnswer(invocation -> {
+            Wrapper<EnvironmentWorkerGroupRelation> wrapper = invocation.getArgument(0);
+            String sqlSegment = wrapper.getSqlSegment();
+            if (sqlSegment.contains("worker_group") && !sqlSegment.contains("worker_group_id IS NULL")) {
+                return Collections.singletonList(relation);
+            }
+            return Collections.emptyList();
+        });
 
         assertDoesNotThrow(() -> workerGroupService.deleteWorkerGroupById(loginUser, 1));
     }

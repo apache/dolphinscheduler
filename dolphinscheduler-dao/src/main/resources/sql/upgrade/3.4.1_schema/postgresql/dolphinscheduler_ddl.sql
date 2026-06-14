@@ -18,3 +18,11 @@
 CREATE SEQUENCE IF NOT EXISTS t_ds_task_instance_context_id_seq;
 ALTER TABLE t_ds_task_instance_context
 ALTER COLUMN id SET DEFAULT nextval('t_ds_task_instance_context_id_seq'::regclass);
+
+ALTER TABLE t_ds_environment_worker_group_relation ADD COLUMN IF NOT EXISTS worker_group_id int DEFAULT NULL;
+
+UPDATE t_ds_environment_worker_group_relation ewgr
+SET worker_group_id = wg.id
+FROM t_ds_worker_group wg
+WHERE ewgr.worker_group_id IS NULL
+  AND ewgr.worker_group = wg.name;
