@@ -20,8 +20,3 @@ MODIFY COLUMN `workflow_definition_code` BIGINT(20) NOT NULL COMMENT 'workflow d
 
 ALTER TABLE `t_ds_environment_worker_group_relation`
 ADD COLUMN `worker_group_id` int(11) DEFAULT NULL COMMENT 'worker group id';
-
-UPDATE `t_ds_environment_worker_group_relation` ewgr
-INNER JOIN `t_ds_worker_group` wg ON ewgr.`worker_group` = wg.`name`
-SET ewgr.`worker_group_id` = wg.`id`
-WHERE ewgr.`worker_group_id` IS NULL;

@@ -14,3 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+UPDATE `t_ds_environment_worker_group_relation` ewgr
+INNER JOIN `t_ds_worker_group` wg ON ewgr.`worker_group` = wg.`name`
+SET ewgr.`worker_group_id` = wg.`id`
+WHERE ewgr.`worker_group_id` IS NULL;

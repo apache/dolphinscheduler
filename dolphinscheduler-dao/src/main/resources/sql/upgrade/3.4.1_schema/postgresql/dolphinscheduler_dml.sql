@@ -14,3 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+UPDATE t_ds_environment_worker_group_relation ewgr
+SET worker_group_id = wg.id
+FROM t_ds_worker_group wg
+WHERE ewgr.worker_group_id IS NULL
+  AND ewgr.worker_group = wg.name;
