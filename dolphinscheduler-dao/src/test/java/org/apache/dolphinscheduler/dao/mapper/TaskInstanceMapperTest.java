@@ -86,6 +86,7 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         taskInstance.setFlag(Flag.YES);
         taskInstance.setName("us task");
         taskInstance.setState(TaskExecutionStatus.RUNNING_EXECUTION);
+        taskInstance.setSubmitTime(new Date());
         taskInstance.setStartTime(new Date());
         taskInstance.setEndTime(new Date());
         taskInstance.setWorkflowInstanceId(processInstanceId);
@@ -229,6 +230,49 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                         Lists.newArrayList(task.getProjectCode()));
 
         Assertions.assertEquals(1, taskInstanceStatusCountDtos.size());
+
+        taskInstanceMapper.deleteById(task.getId());
+    }
+
+    /**
+     * test that task instances with null start_time but valid submit_time are included in time range filter
+     */
+    @Test
+    public void testCountTaskInstanceStateByProjectCodes_withSubmitTimeFilter() {
+        // insert a task instance with submit_time set but start_time null (e.g. task not yet started)
+        TaskInstance task = new TaskInstance();
+        task.setFlag(Flag.YES);
+        task.setName("submitted task");
+        task.setState(TaskExecutionStatus.SUBMITTED_SUCCESS);
+        task.setStartTime(null);
+        task.setSubmitTime(new Date());
+        task.setWorkflowInstanceId(1);
+        task.setProjectCode(1L);
+        task.setTaskType("SHELL");
+        taskInstanceMapper.insert(task);
+
+        Date filterStart = new Date(System.currentTimeMillis() - 3600_000);
+        Date filterEnd = new Date(System.currentTimeMillis() + 3600_000);
+
+        // should find the task via submit_time filter
+        List<TaskInstanceStatusCountDto> results =
+                taskInstanceMapper.countTaskInstanceStateByProjectCodes(
+                        filterStart,
+                        filterEnd,
+                        Lists.newArrayList(task.getProjectCode()));
+
+        Assertions.assertEquals(1, results.size());
+        Assertions.assertEquals(TaskExecutionStatus.SUBMITTED_SUCCESS, results.get(0).getState());
+
+        // time range before submit_time should return empty
+        Date beforeSubmit = new Date(System.currentTimeMillis() - 7200_000);
+        List<TaskInstanceStatusCountDto> emptyResults =
+                taskInstanceMapper.countTaskInstanceStateByProjectCodes(
+                        beforeSubmit,
+                        filterStart,
+                        Lists.newArrayList(task.getProjectCode()));
+
+        Assertions.assertTrue(emptyResults.isEmpty());
 
         taskInstanceMapper.deleteById(task.getId());
     }
