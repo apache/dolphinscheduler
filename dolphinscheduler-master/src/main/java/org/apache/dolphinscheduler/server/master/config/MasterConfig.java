@@ -60,12 +60,6 @@ public class MasterConfig implements Validator {
      */
     private boolean killApplicationWhenTaskFailover = false;
 
-    /**
-     * @deprecated Use {@link #killApplicationWhenTaskFailover}.
-     */
-    @Deprecated
-    private boolean killApplicationWhenHandleFailover = false;
-
     private MasterServerLoadProtectionConfig serverLoadProtection = new MasterServerLoadProtectionConfig();
 
     private Duration workerGroupRefreshInterval = Duration.ofMinutes(5);
@@ -88,7 +82,7 @@ public class MasterConfig implements Validator {
     private TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
 
     public boolean isKillApplicationWhenTaskFailover() {
-        return killApplicationWhenTaskFailover || killApplicationWhenHandleFailover;
+        return killApplicationWhenTaskFailover;
     }
 
     @Override
