@@ -55,6 +55,17 @@ public class MasterConfig implements Validator {
      */
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
 
+    /**
+     * Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.
+     */
+    private boolean killApplicationWhenTaskFailover = false;
+
+    /**
+     * @deprecated Use {@link #killApplicationWhenTaskFailover}.
+     */
+    @Deprecated
+    private boolean killApplicationWhenHandleFailover = false;
+
     private MasterServerLoadProtectionConfig serverLoadProtection = new MasterServerLoadProtectionConfig();
 
     private Duration workerGroupRefreshInterval = Duration.ofMinutes(5);
@@ -75,6 +86,10 @@ public class MasterConfig implements Validator {
     private String masterRegistryPath;
 
     private TaskDispatchPolicy taskDispatchPolicy = new TaskDispatchPolicy();
+
+    public boolean isKillApplicationWhenTaskFailover() {
+        return killApplicationWhenTaskFailover || killApplicationWhenHandleFailover;
+    }
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -130,6 +145,7 @@ public class MasterConfig implements Validator {
                         "\n  workflow-event-bus-fire-thread-count -> " + workflowEventBusFireThreadCount +
                         "\n  logic-task-config -> " + logicTaskConfig +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
+                        "\n  kill-application-when-task-failover -> " + isKillApplicationWhenTaskFailover() +
                         "\n  server-load-protection -> " + serverLoadProtection +
                         "\n  master-address -> " + masterAddress +
                         "\n  master-registry-path: " + masterRegistryPath +
