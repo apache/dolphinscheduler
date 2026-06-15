@@ -58,7 +58,7 @@ public class MasterConfig implements Validator {
     /**
      * Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.
      */
-    private boolean killApplicationWhenTaskFailover = false;
+    private boolean killApplicationWhenTaskFailover = true;
 
     private MasterServerLoadProtectionConfig serverLoadProtection = new MasterServerLoadProtectionConfig();
 
