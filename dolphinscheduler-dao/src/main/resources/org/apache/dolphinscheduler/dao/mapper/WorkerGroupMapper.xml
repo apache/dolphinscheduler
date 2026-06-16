@@ -29,7 +29,7 @@
         where name = #{name}
     </select>
     <select id="queryWorkerGroupByNames" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
-        select *
+        select id, name, addr_list, create_time, update_time, description
         from t_ds_worker_group
         where name in
         <foreach collection="names" item="name" separator="," open="(" close=")">

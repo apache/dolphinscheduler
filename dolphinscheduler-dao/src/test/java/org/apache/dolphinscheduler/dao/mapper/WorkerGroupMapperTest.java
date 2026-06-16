@@ -94,9 +94,6 @@ public class WorkerGroupMapperTest extends BaseDaoTest {
         Assertions.assertEquals(0, workerGroups.size());
     }
 
-    /**
-     * test query worker groups by names
-     */
     @Test
     public void testQueryWorkerGroupByNames() {
         WorkerGroup workerGroup = insertOneWorkerGroup();
