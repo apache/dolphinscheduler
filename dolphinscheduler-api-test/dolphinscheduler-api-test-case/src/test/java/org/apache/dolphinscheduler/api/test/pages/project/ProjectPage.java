@@ -177,4 +177,17 @@ public final class ProjectPage {
         String url = String.format("/projects/%d", code);
         return requestClient.delete(url, headers, params);
     }
+
+    public HttpResponse assignWorkerGroups(User loginUser, long projectCode, String[] workerGroups) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("loginUser", loginUser);
+        params.put("workerGroups", workerGroups);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+
+        RequestClient requestClient = new RequestClient();
+        String url = String.format("/projects/%d/worker-group", projectCode);
+        return requestClient.post(url, headers, params);
+    }
+
 }
