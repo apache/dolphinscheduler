@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.dao.repository.ProjectWorkerGroupDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
@@ -244,7 +245,7 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
 
     @Override
     public boolean isWorkerGroupAssignedToProject(Long projectCode, String workerGroup) {
-        if (StringUtils.isEmpty(workerGroup)) {
+        if (WorkerGroupUtils.isWorkerGroupEmpty(workerGroup)) {
             return true;
         }
         return getAllAssignedWorkerGroupNames(projectCode).contains(workerGroup);
