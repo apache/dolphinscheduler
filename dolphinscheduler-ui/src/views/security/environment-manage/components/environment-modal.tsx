@@ -129,7 +129,7 @@ const EnvironmentModal = defineComponent({
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
           confirmDisabled={
-            !this.model.name || !this.model.config || !this.model.description
+            !this.model.name || !this.model.config
           }
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
