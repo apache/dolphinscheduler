@@ -270,7 +270,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | mysql.enabled | bool | `false` | If not exists external MySQL, by default, the DolphinScheduler will use a internal MySQL |
 | mysql.image.registry | string | `"docker.io"` |  |
 | mysql.image.repository | string | `"bitnamilegacy/mysql"` |  |
-| mysql.image.tag | string | `"8.0.31-debian-11-r0"` |  |
+| mysql.image.tag | string | `"8.0.33-debian-11-r30"` |  |
 | mysql.primary.persistence.enabled | bool | `false` | Set mysql.primary.persistence.enabled to true to mount a new volume for internal MySQL |
 | mysql.primary.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
 | mysql.primary.persistence.storageClass | string | `"-"` | MySQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
