@@ -143,7 +143,10 @@ const NodeDetailModal = defineComponent({
           'timeout'
         ]
         for (const item in projectPreferences.value) {
-          if (projectPreferences.value[item] !== null && allowedFields.includes(item)) {
+          if (
+            projectPreferences.value[item] !== null &&
+            allowedFields.includes(item)
+          ) {
             Object.assign(data, { [item]: projectPreferences.value[item] })
           }
         }
