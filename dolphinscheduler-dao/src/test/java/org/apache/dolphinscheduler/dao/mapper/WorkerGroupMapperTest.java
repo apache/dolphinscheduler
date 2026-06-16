@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -90,6 +91,21 @@ public class WorkerGroupMapperTest extends BaseDaoTest {
         Assertions.assertEquals(1, workerGroups.size());
 
         workerGroups = workerGroupMapper.queryWorkerGroupByName("server2");
+        Assertions.assertEquals(0, workerGroups.size());
+    }
+
+    /**
+     * test query worker groups by names
+     */
+    @Test
+    public void testQueryWorkerGroupByNames() {
+        WorkerGroup workerGroup = insertOneWorkerGroup();
+        List<WorkerGroup> workerGroups =
+                workerGroupMapper.queryWorkerGroupByNames(Collections.singleton(workerGroup.getName()));
+        Assertions.assertEquals(1, workerGroups.size());
+        Assertions.assertEquals(workerGroup.getName(), workerGroups.get(0).getName());
+
+        workerGroups = workerGroupMapper.queryWorkerGroupByNames(Collections.singleton("server2"));
         Assertions.assertEquals(0, workerGroups.size());
     }
 

@@ -22,6 +22,10 @@ import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -57,5 +61,13 @@ public class WorkerGroupDaoImpl extends BaseDao<WorkerGroup, WorkerGroupMapper> 
     @Override
     public List<WorkerGroup> queryWorkerGroupByName(String name) {
         return mybatisMapper.queryWorkerGroupByName(name);
+    }
+
+    @Override
+    public List<WorkerGroup> queryWorkerGroupByNames(Collection<String> names) {
+        if (CollectionUtils.isEmpty(names)) {
+            return Collections.emptyList();
+        }
+        return mybatisMapper.queryWorkerGroupByNames(names);
     }
 }

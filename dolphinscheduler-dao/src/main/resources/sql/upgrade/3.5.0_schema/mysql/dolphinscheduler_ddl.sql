@@ -14,3 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+ALTER TABLE `t_ds_environment_worker_group_relation`
+ADD COLUMN `worker_group_id` int(11) DEFAULT NULL COMMENT 'worker group id';

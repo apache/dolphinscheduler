@@ -28,6 +28,14 @@
         from t_ds_worker_group
         where name = #{name}
     </select>
+    <select id="queryWorkerGroupByNames" resultType="org.apache.dolphinscheduler.dao.entity.WorkerGroup">
+        select *
+        from t_ds_worker_group
+        where name in
+        <foreach collection="names" item="name" separator="," open="(" close=")">
+            #{name}
+        </foreach>
+    </select>
 
     <update id="updateAddrListByWorkerGroupName">
         update t_ds_worker_group

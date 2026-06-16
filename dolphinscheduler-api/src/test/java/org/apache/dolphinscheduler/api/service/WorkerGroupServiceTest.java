@@ -295,7 +295,7 @@ public class WorkerGroupServiceTest {
     }
 
     @Test
-    public void giveEnvironmentRelationMatchedOnlyByLegacyNameWithDifferentWorkerGroupId_whenDeleteWorkerGroupById_expectSuccess() {
+    public void giveEnvironmentRelationMatchedOnlyByWorkerGroupNameWithDifferentWorkerGroupId_whenDeleteWorkerGroupById_expectEnvironmentDependency() {
         User loginUser = getLoginUser();
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.WORKER_GROUP, 1,
                 WORKER_GROUP_DELETE, baseServiceLogger)).thenReturn(true);
@@ -314,13 +314,14 @@ public class WorkerGroupServiceTest {
         when(environmentWorkerGroupRelationMapper.selectList(Mockito.any())).thenAnswer(invocation -> {
             Wrapper<EnvironmentWorkerGroupRelation> wrapper = invocation.getArgument(0);
             String sqlSegment = wrapper.getSqlSegment();
-            if (sqlSegment.contains("worker_group") && !sqlSegment.contains("worker_group_id IS NULL")) {
-                return Collections.singletonList(relation);
-            }
-            return Collections.emptyList();
+            Assertions.assertTrue(sqlSegment.contains("worker_group_id"));
+            Assertions.assertTrue(sqlSegment.contains("worker_group =") || sqlSegment.contains("worker_group="));
+            Assertions.assertFalse(sqlSegment.contains("IS NULL"));
+            return Collections.singletonList(relation);
         });
 
-        assertDoesNotThrow(() -> workerGroupService.deleteWorkerGroupById(loginUser, 1));
+        assertThrowsServiceException(Status.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS,
+                () -> workerGroupService.deleteWorkerGroupById(loginUser, 1));
     }
 
     @Test
