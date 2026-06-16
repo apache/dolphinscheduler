@@ -56,10 +56,10 @@
             </foreach>
         </if>
         <if test="startTime != null">
-            and start_time <![CDATA[ > ]]> #{startTime}
+            and submit_time <![CDATA[ > ]]> #{startTime}
         </if>
         <if test="endTime != null">
-            and start_time <![CDATA[ <= ]]> #{endTime}
+            and submit_time <![CDATA[ <= ]]> #{endTime}
         </if>
         group by state
     </select>
