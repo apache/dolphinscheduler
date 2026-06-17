@@ -21,6 +21,7 @@ services:
   dolphinscheduler:
     image: apache/dolphinscheduler-standalone-server:ci
     environment:
+      MASTER_KILL_APPLICATION_WHEN_TASK_FAILOVER: 'true'
       WORKER_TENANT_AUTO_CREATE: "true"
     ports:
       - "12345:12345"
