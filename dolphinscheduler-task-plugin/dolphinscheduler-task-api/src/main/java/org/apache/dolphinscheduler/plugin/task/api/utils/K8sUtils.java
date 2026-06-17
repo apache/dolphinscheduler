@@ -29,8 +29,8 @@ import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import io.fabric8.kubernetes.client.Watch;
-import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 
 @Slf4j
 public class K8sUtils {
@@ -71,15 +71,18 @@ public class K8sUtils {
         }
     }
 
-    public Watch createBatchJobWatcher(String jobName, Watcher<Job> watcher) {
+    public SharedIndexInformer<Job> createBatchJobInformer(String jobName,
+                                                           String namespace,
+                                                           ResourceEventHandler<Job> handler) {
         try {
             return client.batch()
                     .v1()
                     .jobs()
+                    .inNamespace(namespace)
                     .withName(jobName)
-                    .watch(watcher);
+                    .inform(handler);
         } catch (Exception e) {
-            throw new TaskException("fail to register batch job watcher", e);
+            throw new TaskException("fail to register batch job informer", e);
         }
     }
 

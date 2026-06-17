@@ -17,29 +17,42 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.K8sUtils;
 
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.fabric8.kubernetes.api.model.NodeSelectorRequirement;
 import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.api.model.batch.v1.JobStatus;
+import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 
 public class K8sTaskExecutorTest {
-
-    private static final Logger logger = LoggerFactory.getLogger(K8sTaskExecutorTest.class);
 
     private K8sTaskExecutor k8sTaskExecutor = null;
     private K8sTaskMainParameters k8sTaskMainParameters = null;
@@ -51,8 +64,10 @@ public class K8sTaskExecutorTest {
     private final int taskInstanceId = 1000;
     private final String taskName = "k8s_task_test";
     private Job job;
+    private K8sUtils k8sUtils;
+
     @BeforeEach
-    public void before() {
+    public void before() throws Exception {
         TaskExecutionContext taskRequest = new TaskExecutionContext();
         taskRequest.setTaskInstanceId(taskInstanceId);
         taskRequest.setTaskName(taskName);
@@ -64,6 +79,8 @@ public class K8sTaskExecutorTest {
         requirement.setOperator("In");
         requirement.setValues(Arrays.asList("1234", "123456"));
         k8sTaskExecutor = new K8sTaskExecutor(taskRequest);
+        k8sUtils = mock(K8sUtils.class);
+        injectK8sUtils(k8sTaskExecutor, k8sUtils);
         k8sTaskMainParameters = new K8sTaskMainParameters();
         k8sTaskMainParameters.setImage(image);
         k8sTaskMainParameters.setImagePullPolicy(imagePullPolicy);
@@ -76,6 +93,121 @@ public class K8sTaskExecutorTest {
         k8sTaskExecutor.buildK8sJob(k8sTaskMainParameters);
         job = k8sTaskExecutor.getJob();
     }
+
+    private void injectK8sUtils(K8sTaskExecutor executor, K8sUtils mockK8sUtils) throws Exception {
+        Field field = executor.getClass().getSuperclass().getDeclaredField("k8sUtils");
+        field.setAccessible(true);
+        field.set(executor, mockK8sUtils);
+    }
+
+    private TaskExecutionContext getTaskRequest() throws Exception {
+        Field field = k8sTaskExecutor.getClass().getSuperclass().getDeclaredField("taskRequest");
+        field.setAccessible(true);
+        return (TaskExecutionContext) field.get(k8sTaskExecutor);
+    }
+
+    private WatcherHarness startBatchJobWatcher(TaskResponse taskResponse) throws InterruptedException {
+        WatcherHarness harness = new WatcherHarness();
+        harness.informer = mock(SharedIndexInformer.class);
+        CountDownLatch handlerReady = new CountDownLatch(1);
+        AtomicReference<ResourceEventHandler<Job>> handlerRef = new AtomicReference<>();
+        when(k8sUtils.createBatchJobInformer(eq(job.getMetadata().getName()), eq(namespace), any()))
+                .thenAnswer(invocation -> {
+                    handlerRef.set(invocation.getArgument(2));
+                    handlerReady.countDown();
+                    return harness.informer;
+                });
+        harness.thread = new Thread(() -> k8sTaskExecutor.registerBatchJobWatcher(job,
+                String.valueOf(taskInstanceId), taskResponse));
+        harness.thread.start();
+        Assertions.assertTrue(handlerReady.await(5, TimeUnit.SECONDS));
+        harness.handler = handlerRef.get();
+        return harness;
+    }
+
+    private void finishWatcher(WatcherHarness harness) throws InterruptedException {
+        harness.thread.join(5000);
+        verify(harness.informer).stop();
+    }
+
+    private Job jobWithStatus(Integer succeeded, Integer failed) {
+        JobStatus status = new JobStatus();
+        status.setSucceeded(succeeded);
+        status.setFailed(failed);
+        Job watchedJob = new Job();
+        watchedJob.setMetadata(job.getMetadata());
+        watchedJob.setStatus(status);
+        return watchedJob;
+    }
+
+    @Test
+    public void testRegisterBatchJobInformerOnUpdateSuccess() throws Exception {
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(taskResponse);
+        harness.handler.onUpdate(job, jobWithStatus(1, null));
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_SUCCESS, taskResponse.getExitStatusCode());
+    }
+
+    @Test
+    public void testRegisterBatchJobInformerOnUpdateFailed() throws Exception {
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(taskResponse);
+        harness.handler.onUpdate(job, jobWithStatus(null, 1));
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_FAILURE, taskResponse.getExitStatusCode());
+    }
+
+    @Test
+    public void testRegisterBatchJobInformerOnDelete() throws Exception {
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(taskResponse);
+        harness.handler.onDelete(job, false);
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_FAILURE, taskResponse.getExitStatusCode());
+    }
+
+    @Test
+    public void testRegisterBatchJobInformerIgnoreOnAdd() throws Exception {
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(taskResponse);
+        harness.handler.onAdd(jobWithStatus(1, null));
+        Assertions.assertTrue(harness.thread.isAlive());
+        harness.handler.onUpdate(job, jobWithStatus(1, null));
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_SUCCESS, taskResponse.getExitStatusCode());
+    }
+
+    @Test
+    public void testRegisterBatchJobInformerIgnoreRunningUpdate() throws Exception {
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(taskResponse);
+        harness.handler.onUpdate(job, jobWithStatus(null, null));
+        Assertions.assertTrue(harness.thread.isAlive());
+        harness.handler.onUpdate(job, jobWithStatus(1, null));
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_SUCCESS, taskResponse.getExitStatusCode());
+    }
+
+    @Test
+    public void testRegisterBatchJobInformerTimeout() throws Exception {
+        TaskExecutionContext taskRequest = getTaskRequest();
+        taskRequest.setTaskTimeoutStrategy(TaskTimeoutStrategy.FAILED);
+        taskRequest.setTaskTimeout(1);
+
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(taskResponse);
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_FAILURE, taskResponse.getExitStatusCode());
+    }
+
+    private static final class WatcherHarness {
+
+        private SharedIndexInformer<Job> informer;
+        private ResourceEventHandler<Job> handler;
+        private Thread thread;
+    }
+
     @Test
     public void testGetK8sJobStatusNormal() {
         JobStatus jobStatus = new JobStatus();
