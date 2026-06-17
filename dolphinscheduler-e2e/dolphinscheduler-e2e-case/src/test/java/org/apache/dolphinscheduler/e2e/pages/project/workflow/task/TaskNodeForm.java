@@ -185,6 +185,9 @@ public abstract class TaskNodeForm {
     public WorkflowForm submit() {
         buttonSubmit.click();
 
+        WebDriverWaitFactory.createWebDriverWait(parent().driver())
+                .until(ExpectedConditions.invisibilityOfElementLocated(By.className("n-modal-mask")));
+
         return parent();
     }
 }
