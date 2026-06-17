@@ -128,9 +128,7 @@ const EnvironmentModal = defineComponent({
           show={this.showModalRef}
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
-          confirmDisabled={
-            !this.model.name || !this.model.config || !this.model.description
-          }
+          confirmDisabled={!this.model.name || !this.model.config}
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
           confirmLoading={this.saving}
