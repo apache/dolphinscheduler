@@ -117,6 +117,7 @@ casdoor:
 master:
   listen-port: 5678
   max-heartbeat-interval: 10s
+  kill-application-when-task-failover: true
   server-load-protection:
     enabled: true
     max-system-cpu-usage-percentage-thresholds: 1
