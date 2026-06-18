@@ -44,6 +44,8 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
+import org.apache.ibatis.builder.MapperBuilderAssistant;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -53,6 +55,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -65,7 +68,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
 
+import com.baomidou.mybatisplus.core.MybatisConfiguration;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.metadata.TableInfoHelper;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -100,6 +105,14 @@ public class WorkerGroupServiceTest {
     private ScheduleDao scheduleDao;
 
     private final String GROUP_NAME = "testWorkerGroup";
+
+    @BeforeEach
+    public void setUp() {
+        if (TableInfoHelper.getTableInfo(EnvironmentWorkerGroupRelation.class) == null) {
+            TableInfoHelper.initTableInfo(new MapperBuilderAssistant(new MybatisConfiguration(), ""),
+                    EnvironmentWorkerGroupRelation.class);
+        }
+    }
 
     private User getLoginUser() {
         User loginUser = new User();

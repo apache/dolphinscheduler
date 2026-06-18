@@ -446,7 +446,8 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         List<WorkerGroup> workerGroups = workerGroupDao.queryWorkerGroupByNames(nonEmptyWorkerGroupNames);
         Map<String, WorkerGroup> workerGroupMap = CollectionUtils.emptyIfNull(workerGroups).stream()
                 .collect(Collectors.toMap(WorkerGroup::getName, workerGroup -> workerGroup));
-        Set<String> notExistWorkerGroups = SetUtils.difference(nonEmptyWorkerGroupNames, workerGroupMap.keySet()).toSet();
+        Set<String> notExistWorkerGroups =
+                SetUtils.difference(nonEmptyWorkerGroupNames, workerGroupMap.keySet()).toSet();
         if (CollectionUtils.isNotEmpty(notExistWorkerGroups)) {
             throw new ServiceException(Status.WORKER_GROUP_NOT_EXIST,
                     String.join(",", new TreeSet<>(notExistWorkerGroups)));
