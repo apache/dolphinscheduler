@@ -119,6 +119,28 @@ class MapComparatorTest {
     }
 
     @Test
+    void getKeysToUpdate_newValueIsNull() {
+        Map<String, String> map1 = new HashMap<>();
+        map1.put("key1", "map1_value1");
+        Map<String, String> map2 = new HashMap<>();
+        map2.put("key1", null);
+        MapComparator<String, String> mapComparator = new MapComparator<>(map1, map2);
+
+        assertThat(mapComparator.getKeysToUpdate()).containsExactly("key1");
+    }
+
+    @Test
+    void getKeysToUpdate_bothValuesAreNull() {
+        Map<String, String> map1 = new HashMap<>();
+        map1.put("key1", null);
+        Map<String, String> map2 = new HashMap<>();
+        map2.put("key1", null);
+        MapComparator<String, String> mapComparator = new MapComparator<>(map1, map2);
+
+        assertThat(mapComparator.getKeysToUpdate()).isEmpty();
+    }
+
+    @Test
     void getNewValuesToUpdate() {
         MapComparator<String, String> mapComparator = getMapComparator();
         assertThat(mapComparator.getNewValuesToUpdate())

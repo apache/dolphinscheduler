@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -101,7 +102,7 @@ public class MapComparator<K, V> {
         }
         Set<K> keysToUpdate = new HashSet<>(newMap.keySet());
         keysToUpdate.retainAll(oldMap.keySet());
-        keysToUpdate.removeIf(key -> newMap.get(key).equals(oldMap.get(key)));
+        keysToUpdate.removeIf(key -> Objects.equals(newMap.get(key), oldMap.get(key)));
 
         return keysToUpdate;
     }
