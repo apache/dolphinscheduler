@@ -766,10 +766,10 @@ public class ProcessServiceImpl implements ProcessService {
                             .map(TaskDefinitionLog::getCode).collect(Collectors.toList());
             if (CollectionUtils.isEqualCollection(instanceTaskCodeList,
                     definiteTaskCodeList)) {
-                List<Integer> failTaskList = validTaskList.stream()
+                List<Integer> failedTaskList = validTaskList.stream()
                         .filter(instance -> instance.getState().isFailure())
                         .map(TaskInstance::getId).collect(Collectors.toList());
-                if (CollectionUtils.isEmpty(failTaskList)) {
+                if (CollectionUtils.isEmpty(failedTaskList)) {
                     workflowInstance.setStateWithDesc(WorkflowExecutionStatus.SUCCESS, "success by task force success");
                     workflowInstanceDao.updateById(workflowInstance);
                     log.info("force workflow instance {} to success by task instance {}",
