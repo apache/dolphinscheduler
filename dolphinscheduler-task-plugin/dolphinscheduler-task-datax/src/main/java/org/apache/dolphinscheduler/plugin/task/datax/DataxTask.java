@@ -377,11 +377,16 @@ public class DataxTask extends AbstractTask {
         }
         StringBuilder customParameters = new StringBuilder("-p \"");
         for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
-            customParameters.append(String.format(CUSTOM_PARAM, entry.getKey(), entry.getValue().getValue()));
+            customParameters.append(
+                    String.format(CUSTOM_PARAM, entry.getKey(), escapeSingleQuotes(entry.getValue().getValue())));
         }
         customParameters.replace(4, 5, "");
         customParameters.append("\"");
         return customParameters;
+    }
+
+    private static String escapeSingleQuotes(String value) {
+        return value == null ? null : value.replace("'", "'\\''");
     }
 
     public String loadJvmEnv(DataxParameters dataXParameters) {
