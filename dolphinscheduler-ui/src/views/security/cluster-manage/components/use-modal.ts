@@ -49,12 +49,12 @@ export function useModal(
           }
         }
       },
-      description: {
+      k8s_config: {
         required: true,
         trigger: ['input', 'blur'],
         validator() {
-          if (variables.model.description === '') {
-            return new Error(t('security.cluster.cluster_description_tips'))
+          if (variables.model.k8s_config === '') {
+            return new Error(t('security.cluster.cluster_config_tips'))
           }
         }
       }
