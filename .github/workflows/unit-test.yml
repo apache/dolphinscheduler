@@ -198,12 +198,34 @@ jobs:
     if: ${{ needs.unit-test.result == 'success' }}
     timeout-minutes: 30
     steps:
+      - name: Validate SonarCloud Token
+        id: sonar-token
+        env:
+          BASE_REPOSITORY: ${{ github.repository }}
+          HEAD_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          if [[ -n "${SONAR_TOKEN}" ]]; then
+            exit 0
+          fi
+
+          if [[ "${{ github.event_name }}" == "pull_request" && "${HEAD_REPOSITORY}" != "${BASE_REPOSITORY}" ]]; then
+            echo "SonarCloud token is unavailable for forked pull requests; skipping analysis."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "SONAR_TOKEN secret is required for SonarCloud analysis."
+          exit 1
+
       - uses: actions/checkout@v6
+        if: steps.sonar-token.outputs.skip != 'true'
         with:
           submodules: true
           fetch-depth: 0
 
       - name: Download all jacoco exec files (Java 11)
+        if: steps.sonar-token.outputs.skip != 'true'
         uses: actions/download-artifact@v8
         with:
           pattern: jacoco-exec-java11-*
@@ -211,12 +233,14 @@ jobs:
           merge-multiple: true
 
       - name: Set up JDK 17 for SonarCloud
+        if: steps.sonar-token.outputs.skip != 'true'
         uses: actions/setup-java@v5
         with:
           java-version: 17
           distribution: 'adopt'
 
       - uses: actions/cache@v5
+        if: steps.sonar-token.outputs.skip != 'true'
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
@@ -227,6 +251,7 @@ jobs:
       # the command line; it must be declared in pom.xml <configuration>.
       # jacococli.jar merge accepts file paths directly, no XML config needed.
       - name: Download jacococli.jar
+        if: steps.sonar-token.outputs.skip != 'true'
         run: |
           JACOCO_VERSION=$(./mvnw help:evaluate -Dexpression=jacoco.version -q -DforceStdout 2>/dev/null || echo "0.8.14")
           echo "Using JaCoCo version: $JACOCO_VERSION"
@@ -238,6 +263,7 @@ jobs:
           find ~/.m2 -name "org.jacoco.cli-*-nodeps.jar" | head -1 | xargs -I{} cp {} /tmp/jacococli.jar || true
 
       - name: Merge JaCoCo exec files via jacococli
+        if: steps.sonar-token.outputs.skip != 'true'
         run: |
           # Collect all .exec files under the downloaded artifact directory
           EXEC_FILES=$(find all-jacoco-exec/ -name "*.exec" | tr '\n' ' ')
@@ -247,6 +273,7 @@ jobs:
             --destfile target/merged.exec
 
       - name: Generate merged JaCoCo XML report
+        if: steps.sonar-token.outputs.skip != 'true'
         run: |
           ./mvnw jacoco:report \
             -Djacoco.dataFile=target/merged.exec \
@@ -254,6 +281,9 @@ jobs:
             -Dmaven.test.skip=true
 
       - name: Run SonarCloud Analysis
+        if: steps.sonar-token.outputs.skip != 'true'
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
           ./mvnw --batch-mode verify sonar:sonar
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
@@ -263,7 +293,7 @@ jobs:
           -Dsonar.organization=apache
           -Dsonar.core.codeCoveragePlugin=jacoco
           -Dsonar.projectKey=apache-dolphinscheduler
-          -Dsonar.token=e4058004bc6be89decf558ac819aa1ecbee57682
+          -Dsonar.token="${SONAR_TOKEN}"
           -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
           -Dhttp.keepAlive=false
           -Dmaven.wagon.http.pool=false
