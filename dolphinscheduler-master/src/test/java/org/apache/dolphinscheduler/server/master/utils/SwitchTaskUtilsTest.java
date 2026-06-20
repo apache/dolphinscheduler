@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,6 +29,8 @@ import javax.script.ScriptException;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import delight.nashornsandbox.exceptions.ScriptCPUAbuseException;
 
 public class SwitchTaskUtilsTest {
 
@@ -81,6 +84,26 @@ public class SwitchTaskUtilsTest {
         SwitchTaskUtils.evaluate(SwitchTaskUtils.NASHORN_POLYFILL_ARRAY_PROTOTYPE_INCLUDES);
         result = SwitchTaskUtils.evaluate(content);
         Assertions.assertTrue(result);
+    }
+
+    @Test
+    public void testInfiniteLoopTimesOut() {
+        Assertions.assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+            Assertions.assertThrowsExactly(ScriptCPUAbuseException.class, () -> {
+                SwitchTaskUtils.evaluate("while (true) { }");
+            });
+        });
+    }
+
+    @Test
+    public void testExpensiveExpressionTimesOut() {
+        String content = "var total = 0; for (var i = 0; i < 2147483647; i++) { total += i; } total > 0";
+
+        Assertions.assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+            Assertions.assertThrowsExactly(ScriptCPUAbuseException.class, () -> {
+                SwitchTaskUtils.evaluate(content);
+            });
+        });
     }
 
 }

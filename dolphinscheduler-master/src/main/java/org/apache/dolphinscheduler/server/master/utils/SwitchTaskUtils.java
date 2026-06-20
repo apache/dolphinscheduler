@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.server.master.utils;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,6 +39,10 @@ import delight.nashornsandbox.NashornSandboxes;
 
 @Slf4j
 public class SwitchTaskUtils {
+
+    private static final long MAX_EVALUATION_CPU_TIME_MILLIS = 1_000L;
+    private static final long MAX_EVALUATION_MEMORY_BYTES = 64L * 1024L * 1024L;
+    private static final int MAX_PREPARED_STATEMENTS = 128;
 
     private static final NashornSandbox sandbox;
     private static final String rgex = "['\"]*\\$\\{(.*?)\\}['\"]*";
@@ -67,6 +73,12 @@ public class SwitchTaskUtils {
 
     static {
         sandbox = NashornSandboxes.create();
+        sandbox.setExecutor(Executors.newCachedThreadPool(
+                ThreadUtils.newDaemonThreadFactory("switch-condition-evaluator-%d")));
+        sandbox.setMaxCPUTime(MAX_EVALUATION_CPU_TIME_MILLIS);
+        sandbox.setMaxMemory(MAX_EVALUATION_MEMORY_BYTES);
+        sandbox.setMaxPreparedStatements(MAX_PREPARED_STATEMENTS);
+        sandbox.allowNoBraces(false);
         try {
             sandbox.eval(NASHORN_POLYFILL_ARRAY_PROTOTYPE_INCLUDES);
         } catch (ScriptException e) {
@@ -75,8 +87,10 @@ public class SwitchTaskUtils {
     }
 
     public static boolean evaluate(String expression) throws ScriptException {
-        Object result = sandbox.eval(expression);
-        return Boolean.TRUE.equals(result);
+        synchronized (sandbox) {
+            Object result = sandbox.eval(expression);
+            return Boolean.TRUE.equals(result);
+        }
     }
 
     public static String generateContentWithTaskParams(String condition, Map<String, Property> globalParams,
