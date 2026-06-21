@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import org.apache.dolphinscheduler.common.shell.AbstractShell.ExitCodeException;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -197,6 +198,93 @@ public class ProcessUtilsTest {
         // Verify SIGTERM,SIGKILL was never called
         mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.never());
         mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.never());
+    }
+
+    @Test
+    void testKillProcessTreatsPermissionDeniedAsAlive() throws Exception {
+        // Arrange
+        TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
+        Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
+
+        String pstreeCmd;
+        String pstreeOutput;
+        if (SystemUtils.IS_OS_MAC) {
+            pstreeCmd = "pstree -sp 12345";
+            pstreeOutput = "-+= 12345 sudo -+- 1234 86.sh";
+        } else {
+            pstreeCmd = "pstree -p 12345";
+            pstreeOutput = "sudo(12345)---86.sh(1234)";
+        }
+        mockedOSUtils.when(() -> OSUtils.exeCmd(pstreeCmd)).thenReturn(pstreeOutput);
+
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -2.*")))
+                .thenReturn("kill -2 12345 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -2 12345 1234"))
+                .thenThrow(new ExitCodeException(1, "kill: (12345) - Operation not permitted"));
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -15.*")))
+                .thenReturn("kill -15 12345 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -15 12345 1234"))
+                .thenThrow(new ExitCodeException(1, "kill: (12345) - Operation not permitted"));
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -9.*")))
+                .thenReturn("kill -9 12345 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -9 12345 1234"))
+                .thenThrow(new ExitCodeException(1, "kill: (12345) - Operation not permitted"));
+
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
+                .thenReturn("kill -0 12345")
+                .thenReturn("kill -0 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*")))
+                .thenThrow(new ExitCodeException(1, "kill: (12345) - Operation not permitted"))
+                .thenThrow(new ExitCodeException(1, "kill: (1234) - Operation not permitted"));
+
+        // Act
+        boolean result = ProcessUtils.kill(taskRequest);
+
+        // Assert
+        Assertions.assertFalse(result);
+    }
+
+    @Test
+    void testKillProcessTreatsZeroExitWithProfileWarningAsAlive() throws Exception {
+        // Arrange
+        TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
+        Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
+
+        String pstreeCmd;
+        String pstreeOutput;
+        if (SystemUtils.IS_OS_MAC) {
+            pstreeCmd = "pstree -sp 12345";
+            pstreeOutput = "-+= 12345 sudo -+- 1234 86.sh";
+        } else {
+            pstreeCmd = "pstree -p 12345";
+            pstreeOutput = "sudo(12345)---86.sh(1234)";
+        }
+        mockedOSUtils.when(() -> OSUtils.exeCmd(pstreeCmd)).thenReturn(pstreeOutput);
+
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -2.*")))
+                .thenReturn("kill -2 12345 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -2 12345 1234")).thenReturn("");
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -15.*")))
+                .thenReturn("kill -15 12345 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -15 12345 1234")).thenReturn("");
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -9.*")))
+                .thenReturn("kill -9 12345 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -9 12345 1234")).thenReturn("");
+
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
+                .thenReturn("kill -0 12345")
+                .thenReturn("kill -0 1234");
+        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*")))
+                .thenThrow(new ExitCodeException(0, "profile: line 1: warning"))
+                .thenThrow(new ExitCodeException(0, "profile: line 1: warning"));
+
+        // Act
+        boolean result = ProcessUtils.kill(taskRequest);
+
+        // Assert
+        Assertions.assertFalse(result);
     }
 
     @Test

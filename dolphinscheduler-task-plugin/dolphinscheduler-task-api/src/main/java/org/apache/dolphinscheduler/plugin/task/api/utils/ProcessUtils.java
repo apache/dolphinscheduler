@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DEFAULT_
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.shell.AbstractShell.ExitCodeException;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -102,6 +103,8 @@ public final class ProcessUtils {
     private static final String SIGINT = "2";
     private static final String SIGTERM = "15";
     private static final String SIGKILL = "9";
+    private static final String OPERATION_NOT_PERMITTED = "Operation not permitted";
+    private static final String PERMISSION_DENIED = "Permission denied";
 
     /**
      * Terminate the task process, support multi-level signal processing and fallback strategy
@@ -243,9 +246,16 @@ public final class ProcessUtils {
             // If the command executes successfully, the process exists
             return true;
         } catch (Exception e) {
-            // If the command fails, the process does not exist
-            return false;
+            return isAliveCheckPermissionFailure(e);
         }
+    }
+
+    private static boolean isAliveCheckPermissionFailure(Exception e) {
+        if (e instanceof ExitCodeException && ((ExitCodeException) e).getExitCode() == 0) {
+            return true;
+        }
+        return StringUtils.containsIgnoreCase(e.getMessage(), OPERATION_NOT_PERMITTED)
+                || StringUtils.containsIgnoreCase(e.getMessage(), PERMISSION_DENIED);
     }
 
     /**
