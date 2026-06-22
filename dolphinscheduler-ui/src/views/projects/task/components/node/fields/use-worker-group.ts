@@ -52,8 +52,11 @@ export function useWorkerGroup(projectCode: number): IJsonItem {
     options: options,
     validate: {
       trigger: ['input', 'blur'],
-      required: true,
-      message: t('project.node.worker_group_tips')
+      validator: (rule: any, value: string) => {
+        if (options.value.length === 0) return Promise.resolve()
+        if (!value) return Promise.reject(new Error(t('project.node.worker_group_tips')))
+        return Promise.resolve()
+      }
     },
     value: options.value.length > 0 ? options.value[0].value : ''
   }
