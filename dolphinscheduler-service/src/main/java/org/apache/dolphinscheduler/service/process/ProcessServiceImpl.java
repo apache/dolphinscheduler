@@ -767,7 +767,7 @@ public class ProcessServiceImpl implements ProcessService {
             if (CollectionUtils.isEqualCollection(instanceTaskCodeList,
                     definiteTaskCodeList)) {
                 List<Integer> failedTaskList = validTaskList.stream()
-                        .filter(instance -> instance.getState().isFailure())
+                        .filter(instance -> instance.getState().isFailure() || instance.getState().isKill())
                         .map(TaskInstance::getId).collect(Collectors.toList());
                 if (CollectionUtils.isEmpty(failedTaskList)) {
                     workflowInstance.setStateWithDesc(WorkflowExecutionStatus.SUCCESS, "success by task force success");
