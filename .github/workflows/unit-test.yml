@@ -294,7 +294,7 @@ jobs:
     name: Unit Test
     runs-on: ubuntu-latest
     timeout-minutes: 5
-    needs: [ unit-test, paths-filter, sanity-check ]
+    needs: [ unit-test, paths-filter, sonar, sanity-check ]
     if: always()
     steps:
       - name: Status
@@ -309,5 +309,9 @@ jobs:
           fi
           if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
             echo "Unit Test Failed!"
+            exit -1
+          fi
+          if [[ ${{ needs.sonar.result }} != 'success' ]]; then
+            echo "SonarCloud Analysis Failed!"
             exit -1
           fi
