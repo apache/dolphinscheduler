@@ -253,6 +253,15 @@ jobs:
             -Dspotless.skip=true \
             -Dmaven.test.skip=true
 
+      - name: Check SonarCloud token
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+        run: |
+          if [ -z "$SONAR_TOKEN" ]; then
+            echo "secrets.SONARCLOUD_TOKEN is not configured"
+            exit 1
+          fi
+
       - name: Run SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
