@@ -57,7 +57,7 @@ export function useEnvironmentName(
 
   const filterByWorkerGroup = (option: IEnvironmentNameOption) => {
     if (!model.workerGroup) return false
-    if (!option?.workerGroups?.length) return false
+    if (!option?.workerGroups?.length) return true
     return option.workerGroups.indexOf(model.workerGroup) !== -1
   }
 
