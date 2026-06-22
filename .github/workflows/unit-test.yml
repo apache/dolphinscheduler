@@ -254,6 +254,8 @@ jobs:
             -Dmaven.test.skip=true
 
       - name: Run SonarCloud Analysis
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
         run: >
           ./mvnw --batch-mode verify sonar:sonar
           -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
