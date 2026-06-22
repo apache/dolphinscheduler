@@ -89,7 +89,7 @@ jobs:
               modules = root.findall('.//modules/module')
 
           # Exclude aggregator-only or non-testable modules
-          exclude = re.compile(r'dolphinscheduler-bom|dolphinscheduler-dist|dolphinscheduler-microbench|dolphinscheduler-ui')
+          exclude = re.compile(r'dolphinscheduler-bom|dolphinscheduler-dist|dolphinscheduler-microbench|dolphinscheduler-ui|dolphinscheduler-master')
           result = [m.text.strip() for m in modules if m.text and not exclude.search(m.text)]
           print(json.dumps(result))
           EOF
