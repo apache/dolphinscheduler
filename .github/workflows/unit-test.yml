@@ -311,7 +311,3 @@ jobs:
             echo "Unit Test Failed!"
             exit -1
           fi
-          if [[ ${{ needs.sonar.result }} != 'success' ]]; then
-            echo "SonarCloud Analysis Failed!"
-            exit 0
-          fi
