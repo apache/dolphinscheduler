@@ -181,7 +181,20 @@ export default defineComponent({
     }
 
     const updateWorkerGroup = () => {
-      timingState.timingForm.environmentCode = null
+      if (timingState.timingForm.environmentCode) {
+        const elementExists =
+          environmentOptions.value.find(
+            (item: any) => item.value === timingState.timingForm.environmentCode
+          ) !== undefined
+        if (!elementExists) {
+          timingState.timingForm.environmentCode = null
+        }
+      } else {
+        timingState.timingForm.environmentCode =
+          environmentOptions.value.length === 0
+            ? null
+            : environmentOptions.value[0].value
+      }
     }
 
     const handlePreview = () => {

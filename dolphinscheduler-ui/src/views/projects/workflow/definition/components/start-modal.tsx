@@ -250,7 +250,24 @@ export default defineComponent({
     }
 
     const updateWorkerGroup = () => {
-      startState.startForm.environmentCode = null
+      const environmentOptions = variables.environmentList.filter(
+        (item: any) => {
+          if (!item?.workerGroups?.length) return true
+          return item.workerGroups.includes(startState.startForm.workerGroup)
+        }
+      )
+      if (startState.startForm.environmentCode) {
+        const elementExists =
+          environmentOptions.find(
+            (item: any) => item.value === startState.startForm.environmentCode
+          ) !== undefined
+        if (!elementExists) {
+          startState.startForm.environmentCode = null
+        }
+      } else {
+        startState.startForm.environmentCode =
+          (environmentOptions[0]?.value as string | null) ?? null
+      }
     }
 
     const addStartParams = () => {
@@ -428,9 +445,10 @@ export default defineComponent({
             path='environmentCode'
           >
             <NSelect
-              options={this.environmentList.filter((item: any) =>
-                item.workerGroups?.includes(this.startForm.workerGroup)
-              )}
+              options={this.environmentList.filter((item: any) => {
+                if (!item?.workerGroups?.length) return true
+                return item.workerGroups.includes(this.startForm.workerGroup)
+              })}
               v-model:value={this.startForm.environmentCode}
               clearable
               filterable
