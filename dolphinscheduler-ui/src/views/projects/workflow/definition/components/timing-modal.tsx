@@ -97,9 +97,10 @@ export default defineComponent({
     const projectCode = Number(router.currentRoute.value.params.projectCode)
 
     const environmentOptions = computed(() =>
-      variables.environmentList.filter((item: any) =>
-        item.workerGroups?.includes(timingState.timingForm.workerGroup)
-      )
+      variables.environmentList.filter((item: any) => {
+        if (!item?.workerGroups?.length) return true
+        return item.workerGroups.includes(timingState.timingForm.workerGroup)
+      })
     )
 
     const projectPreferences = ref({} as any)
