@@ -210,7 +210,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | master.env.MASTER_FAILOVER_INTERVAL | string | `"10m"` | Master failover interval, the unit is minute |
 | master.env.MASTER_HEARTBEAT_ERROR_THRESHOLD | string | `"5"` | Master heartbeat error threshold |
 | master.env.MASTER_HOST_SELECTOR | string | `"LowerWeight"` | Master host selector to select a suitable worker, optional values include Random, RoundRobin, LowerWeight |
-| master.env.MASTER_KILL_APPLICATION_WHEN_HANDLE_FAILOVER | string | `"true"` | Master kill application when handle failover |
+| master.env.MASTER_KILL_APPLICATION_WHEN_TASK_FAILOVER | string | `"true"` | Master kill application when task failover |
 | master.env.MASTER_MAX_HEARTBEAT_INTERVAL | string | `"10s"` | Master max heartbeat interval |
 | master.env.MASTER_SERVER_LOAD_PROTECTION_ENABLED | bool | `false` | If set true, will open master overload protection |
 | master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow. |
@@ -270,7 +270,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | mysql.enabled | bool | `false` | If not exists external MySQL, by default, the DolphinScheduler will use a internal MySQL |
 | mysql.image.registry | string | `"docker.io"` |  |
 | mysql.image.repository | string | `"bitnamilegacy/mysql"` |  |
-| mysql.image.tag | string | `"8.0.31-debian-11-r0"` |  |
+| mysql.image.tag | string | `"8.0.33-debian-11-r30"` |  |
 | mysql.primary.persistence.enabled | bool | `false` | Set mysql.primary.persistence.enabled to true to mount a new volume for internal MySQL |
 | mysql.primary.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
 | mysql.primary.persistence.storageClass | string | `"-"` | MySQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |

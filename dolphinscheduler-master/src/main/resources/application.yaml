@@ -99,6 +99,8 @@ master:
     # The number of threads used to execute logic task.
     # task-executor-thread-count: 10
   max-heartbeat-interval: 10s
+  # Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.
+  kill-application-when-task-failover: true
   server-load-protection:
     # If set true, will open master overload protection
     enabled: true
