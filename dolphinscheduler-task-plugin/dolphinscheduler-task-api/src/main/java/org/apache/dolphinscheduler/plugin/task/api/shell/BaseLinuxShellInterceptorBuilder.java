@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.TaskProcessGroupUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -69,7 +70,7 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         if (sudoEnable) {
             return bootstrapCommandInSudoMode();
         }
-        return bootstrapCommandInNormalMode();
+        return TaskProcessGroupUtils.prependSetsidIfEnabled(bootstrapCommandInNormalMode());
     }
 
     protected abstract String shellHeader();
@@ -132,7 +133,7 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         }
         bootstrapCommand.add("-i");
         bootstrapCommand.add(shellAbsolutePath().toString());
-        return bootstrapCommand;
+        return TaskProcessGroupUtils.prependSetsidIfEnabled(bootstrapCommand);
     }
 
     private List<String> bootstrapCommandInNormalMode() {

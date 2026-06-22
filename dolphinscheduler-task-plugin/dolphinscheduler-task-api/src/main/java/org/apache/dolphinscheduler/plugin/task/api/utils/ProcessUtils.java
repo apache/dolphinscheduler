@@ -117,6 +117,16 @@ public final class ProcessUtils {
                 return true;
             }
 
+            if (TaskProcessGroupUtils.isEnabled()) {
+                boolean processGroupKilled = TaskProcessGroupUtils.kill(processId, SHELL_KILL_WAIT_TIMEOUT);
+                if (processGroupKilled) {
+                    log.info("Successfully killed process group for task instance, processId: {}", processId);
+                    return true;
+                }
+                log.warn("Failed to kill process group for task instance, processId: {}, fallback to pid tree",
+                        processId);
+            }
+
             // Get all child processes
             List<Integer> pidList = getPidList(processId);
 
@@ -152,7 +162,7 @@ public final class ProcessUtils {
     }
 
     /**
-     * Send a kill signal to a process group
+     * Send a kill signal to a process tree
      * @param signal Signal type (SIGINT, SIGTERM, SIGKILL)
      * @param pidList Process ID list
      * @param tenantCode Tenant code
@@ -177,7 +187,7 @@ public final class ProcessUtils {
             // 1. Send the kill signal
             String killCmd = String.format("kill -%s %s", signal, pids);
             killCmd = OSUtils.getSudoCmd(tenantCode, killCmd);
-            log.info("Sending {} to process group: {}, command: {}", signal, pids, killCmd);
+            log.info("Sending {} to process tree: {}, command: {}", signal, pids, killCmd);
             OSUtils.exeCmd(killCmd);
 
             // 2. Wait for the processes to terminate with a timeout-based polling mechanism

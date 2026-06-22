@@ -24,6 +24,8 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.shell.bash.BashShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 
+import org.apache.commons.lang3.SystemUtils;
+
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -51,6 +53,40 @@ class BaseLinuxShellInterceptorBuilderTest {
             assertEquals("sudo -u root -i /tmp/test.sh", String.join(" ", sudoCommands));
 
             // resource limit mode
+            mockStatic.when(
+                    () -> PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE, false))
+                    .thenReturn(true);
+            List<String> limitModeCommands = builder.generateBootstrapCommand();
+            assertEquals("sudo systemd-run -q --scope -p CPUQuota=10% -p MemoryLimit=1024M --uid=root /tmp/test.sh",
+                    String.join(" ", limitModeCommands));
+        }
+    }
+
+    @Test
+    void generateBootstrapCommandWithProcessGroupEnabledTest() {
+        BashShellInterceptorBuilder builder = new BashShellInterceptorBuilder()
+                .shellDirectory("/tmp")
+                .shellName("test")
+                .runUser("root")
+                .cpuQuota(10)
+                .memoryQuota(1024)
+                .sudoMode(false);
+        try (MockedStatic<PropertyUtils> mockStatic = mockStatic(PropertyUtils.class)) {
+            mockStatic.when(
+                    () -> PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_PROCESS_GROUP_ENABLED,
+                            AbstractCommandExecutorConstants.TASK_PROCESS_GROUP_ENABLED_DEFAULT))
+                    .thenReturn(true);
+
+            List<String> normalCommands = builder.generateBootstrapCommand();
+            String normalCommand = SystemUtils.IS_OS_LINUX ? "setsid bash /tmp/test.sh" : "bash /tmp/test.sh";
+            assertEquals(normalCommand, String.join(" ", normalCommands));
+
+            builder.sudoMode(true);
+            List<String> sudoCommands = builder.generateBootstrapCommand();
+            String sudoCommand = SystemUtils.IS_OS_LINUX ? "setsid sudo -u root -i /tmp/test.sh"
+                    : "sudo -u root -i /tmp/test.sh";
+            assertEquals(sudoCommand, String.join(" ", sudoCommands));
+
             mockStatic.when(
                     () -> PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_RESOURCE_LIMIT_STATE, false))
                     .thenReturn(true);

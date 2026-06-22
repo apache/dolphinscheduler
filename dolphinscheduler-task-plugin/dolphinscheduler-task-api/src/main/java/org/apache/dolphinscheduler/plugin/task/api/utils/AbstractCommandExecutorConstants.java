@@ -24,4 +24,8 @@ public class AbstractCommandExecutorConstants {
     }
 
     public static final String TASK_RESOURCE_LIMIT_STATE = "task.resource.limit.state";
+
+    public static final String TASK_PROCESS_GROUP_ENABLED = "task.process.group.enabled";
+
+    public static final boolean TASK_PROCESS_GROUP_ENABLED_DEFAULT = true;
 }

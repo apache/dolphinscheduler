@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 
@@ -29,6 +30,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -49,6 +51,17 @@ public class ProcessUtilsTest {
             mockedOSUtils.close();
         }
     }
+
+    private MockedStatic<PropertyUtils> mockProcessGroupEnabled(boolean enabled) {
+        MockedStatic<PropertyUtils> mockedPropertyUtils =
+                Mockito.mockStatic(PropertyUtils.class, Mockito.CALLS_REAL_METHODS);
+        mockedPropertyUtils.when(
+                () -> PropertyUtils.getBoolean(AbstractCommandExecutorConstants.TASK_PROCESS_GROUP_ENABLED,
+                        AbstractCommandExecutorConstants.TASK_PROCESS_GROUP_ENABLED_DEFAULT))
+                .thenReturn(enabled);
+        return mockedPropertyUtils;
+    }
+
     @Test
     public void testGetPidList() throws Exception {
         // first
@@ -139,16 +152,102 @@ public class ProcessUtilsTest {
         mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*")))
                 .thenThrow(new RuntimeException("Command failed"));
 
-        // Act
-        boolean result = ProcessUtils.kill(taskRequest);
+        try (MockedStatic<PropertyUtils> mockedPropertyUtils = mockProcessGroupEnabled(false)) {
+            // Act
+            boolean result = ProcessUtils.kill(taskRequest);
 
-        // Assert
-        Assertions.assertTrue(result);
+            // Assert
+            Assertions.assertTrue(result);
 
-        // Verify SIGINT, SIGTERM, SIGKILL never called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 12345 1234"), Mockito.never());
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.never());
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.never());
+            // Verify SIGINT, SIGTERM, SIGKILL never called
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 12345 1234"), Mockito.never());
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.never());
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.never());
+        }
+    }
+
+    @Test
+    void testKillProcessGroupSuccessWithSigInt() {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_LINUX);
+        try (MockedStatic<PropertyUtils> mockedPropertyUtils = mockProcessGroupEnabled(true)) {
+            TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+            Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
+
+            mockedOSUtils.when(OSUtils::isSudoEnable).thenReturn(false);
+            mockedOSUtils.when(() -> OSUtils.exeCmd("kill -0 12345")).thenReturn("");
+            mockedOSUtils.when(() -> OSUtils.exeCmd("ps -o pgid= -p 12345")).thenReturn("12345");
+            mockedOSUtils.when(() -> OSUtils.exeCmd("kill -0 -- -12345"))
+                    .thenReturn("")
+                    .thenThrow(new RuntimeException("Command failed"))
+                    .thenThrow(new RuntimeException("Command failed"));
+            mockedOSUtils.when(() -> OSUtils.exeCmd("kill -2 -- -12345")).thenReturn("");
+
+            boolean result = ProcessUtils.kill(taskRequest);
+
+            Assertions.assertTrue(result);
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 -- -12345"), Mockito.times(1));
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 -- -12345"), Mockito.never());
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 -- -12345"), Mockito.never());
+        }
+    }
+
+    @Test
+    void testKillProcessGroupUseRootSudoInSudoMode() {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_LINUX);
+        try (MockedStatic<PropertyUtils> mockedPropertyUtils = mockProcessGroupEnabled(true)) {
+            TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+            Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
+
+            mockedOSUtils.when(OSUtils::isSudoEnable).thenReturn(true);
+            mockedOSUtils.when(() -> OSUtils.exeCmd("sudo kill -0 12345")).thenReturn("");
+            mockedOSUtils.when(() -> OSUtils.exeCmd("ps -o pgid= -p 12345")).thenReturn("12345");
+            mockedOSUtils.when(() -> OSUtils.exeCmd("sudo kill -0 -- -12345"))
+                    .thenReturn("")
+                    .thenThrow(new RuntimeException("Command failed"))
+                    .thenThrow(new RuntimeException("Command failed"));
+            mockedOSUtils.when(() -> OSUtils.exeCmd("sudo kill -2 -- -12345")).thenReturn("");
+
+            boolean result = ProcessUtils.kill(taskRequest);
+
+            Assertions.assertTrue(result);
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("sudo kill -2 -- -12345"), Mockito.times(1));
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("sudo kill -15 -- -12345"), Mockito.never());
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("sudo kill -9 -- -12345"), Mockito.never());
+        }
+    }
+
+    @Test
+    void testKillFallbackToPidTreeWhenProcessIsNotGroupLeader() {
+        Assumptions.assumeTrue(SystemUtils.IS_OS_LINUX);
+        try (MockedStatic<PropertyUtils> mockedPropertyUtils = mockProcessGroupEnabled(true)) {
+            TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+            Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
+            Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
+
+            mockedOSUtils.when(OSUtils::isSudoEnable).thenReturn(false);
+            mockedOSUtils.when(() -> OSUtils.exeCmd("kill -0 12345")).thenReturn("");
+            mockedOSUtils.when(() -> OSUtils.exeCmd("ps -o pgid= -p 12345")).thenReturn("23456");
+
+            String pstreeCmd;
+            String pstreeOutput;
+            if (SystemUtils.IS_OS_MAC) {
+                pstreeCmd = "pstree -sp 12345";
+                pstreeOutput = "-+= 12345 sudo -+- 1234 86.sh";
+            } else {
+                pstreeCmd = "pstree -p 12345";
+                pstreeOutput = "sudo(12345)---86.sh(1234)";
+            }
+            mockedOSUtils.when(() -> OSUtils.exeCmd(pstreeCmd)).thenReturn(pstreeOutput);
+            mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
+                    .thenAnswer(invocation -> "tenant-" + invocation.getArgument(1));
+            mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches("tenant-kill -0.*")))
+                    .thenThrow(new RuntimeException("Command failed"));
+
+            boolean result = ProcessUtils.kill(taskRequest);
+
+            Assertions.assertTrue(result);
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 -- -12345"), Mockito.never());
+        }
     }
 
     @Test
@@ -186,17 +285,19 @@ public class ProcessUtilsTest {
                 // Subsequent invocations fail (process is no longer alive)
                 .thenThrow(new RuntimeException("Command failed"));
 
-        // Act
-        boolean result = ProcessUtils.kill(taskRequest);
+        try (MockedStatic<PropertyUtils> mockedPropertyUtils = mockProcessGroupEnabled(false)) {
+            // Act
+            boolean result = ProcessUtils.kill(taskRequest);
 
-        // Assert
-        Assertions.assertTrue(result);
+            // Assert
+            Assertions.assertTrue(result);
 
-        // Verify SIGINT was called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 12345 1234"), Mockito.times(1));
-        // Verify SIGTERM,SIGKILL was never called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.never());
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.never());
+            // Verify SIGINT was called
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 12345 1234"), Mockito.times(1));
+            // Verify SIGTERM,SIGKILL was never called
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.never());
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.never());
+        }
     }
 
     @Test
@@ -239,16 +340,18 @@ public class ProcessUtilsTest {
                 .thenReturn("kill -0 1234");
         mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*"))).thenReturn("");
 
-        // Act
-        boolean result = ProcessUtils.kill(taskRequest);
+        try (MockedStatic<PropertyUtils> mockedPropertyUtils = mockProcessGroupEnabled(false)) {
+            // Act
+            boolean result = ProcessUtils.kill(taskRequest);
 
-        // Assert
-        Assertions.assertFalse(result);
+            // Assert
+            Assertions.assertFalse(result);
 
-        // Verify SIGINT, SIGTERM, SIGKILL was called
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 12345 1234"), Mockito.times(1));
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.times(1));
-        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.times(1));
+            // Verify SIGINT, SIGTERM, SIGKILL was called
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 12345 1234"), Mockito.times(1));
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.times(1));
+            mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.times(1));
+        }
     }
 
     @Test
