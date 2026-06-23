@@ -111,10 +111,6 @@ public final class WorkflowForm {
     }
 
     public WorkflowSaveDialog submit() {
-        WebDriverWaitFactory.createWebDriverWait(driver, 5)
-                .ignoring(org.openqa.selenium.TimeoutException.class)
-                .until(ExpectedConditions.invisibilityOfElementLocated(By.className("n-modal-mask")));
-
         buttonSave().click();
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(.,'Basic Information')]")));
