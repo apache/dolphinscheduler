@@ -130,9 +130,24 @@ const NodeDetailModal = defineComponent({
 
     const restructureNodeData = (data: INodeData) => {
       if (!data?.id) {
+        const allowedFields = [
+          'taskPriority',
+          'workerGroup',
+          'environmentCode',
+          'failRetryTimes',
+          'failRetryInterval',
+          'cpuQuota',
+          'memoryMax',
+          'timeoutFlag',
+          'timeoutNotifyStrategy',
+          'timeout'
+        ]
         for (const item in projectPreferences.value) {
-          if (projectPreferences.value[item] !== null && item in data) {
-            Object.assign(data, { item: projectPreferences.value[item] })
+          if (
+            projectPreferences.value[item] !== null &&
+            allowedFields.includes(item)
+          ) {
+            Object.assign(data, { [item]: projectPreferences.value[item] })
           }
         }
       }
