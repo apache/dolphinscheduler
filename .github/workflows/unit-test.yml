@@ -18,15 +18,7 @@
 name: Test
 
 on:
-  pull_request:
-  push:
-    paths-ignore:
-      - '**/*.md'
-      - 'dolphinscheduler-ui'
-    branches:
-      - '[0-9]+.[0-9]+.[0-9]+-prepare'
-      - '[0-9]+.[0-9]+.[0-9]+-release'
-      - 'dev'
+  pull_request_target:
 
 concurrency:
   group: unit-test-${{ github.event.pull_request.number || github.ref }}
