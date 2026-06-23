@@ -75,12 +75,14 @@ public class K8sUtils {
                                                            String namespace,
                                                            ResourceEventHandler<Job> handler) {
         try {
-            return client.batch()
+            SharedIndexInformer<Job> informer = client.batch()
                     .v1()
                     .jobs()
                     .inNamespace(namespace)
                     .withName(jobName)
-                    .inform(handler);
+                    .runnableInformer(0L);
+            informer.addEventHandler(handler);
+            return informer;
         } catch (Exception e) {
             throw new TaskException("fail to register batch job informer", e);
         }

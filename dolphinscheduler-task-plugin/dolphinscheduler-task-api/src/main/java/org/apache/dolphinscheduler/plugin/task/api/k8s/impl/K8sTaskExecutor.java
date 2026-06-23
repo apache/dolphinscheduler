@@ -201,43 +201,20 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         final String jobName = job.getMetadata().getName();
         final String namespace = job.getMetadata().getNamespace();
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        SharedIndexInformer<Job> informer = k8sUtils.createBatchJobInformer(jobName, namespace,
-                new ResourceEventHandler<Job>() {
-
-                    @Override
-                    public void onAdd(Job watchedJob) {
-                        // ignore initial add event, same as Watcher.Action.ADDED
-                    }
-
-                    @Override
-                    public void onUpdate(Job oldJob, Job watchedJob) {
-                        handleBatchJobEvent(watchedJob, taskInstanceId, taskResponse, countDownLatch);
-                    }
-
-                    @Override
-                    public void onDelete(Job watchedJob, boolean deletedFinalStateUnknown) {
-                        try {
-                            LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(),
-                                    taskRequest.getTaskInstanceId());
-                            LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
-                            log.error("[K8sJobExecutor-{}] fail in k8s", watchedJob.getMetadata().getName());
-                            taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
-                            countDownLatch.countDown();
-                        } finally {
-                            LogUtils.removeTaskInstanceLogFullPathMDC();
-                            LogUtils.removeWorkflowAndTaskInstanceIdMDC();
-                        }
-                    }
-                });
+        SharedIndexInformer<Job> informer = null;
         try {
-            boolean timeoutFlag = taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
-                    || taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
-            if (timeoutFlag) {
-                Boolean timeout = !(countDownLatch.await(taskRequest.getTaskTimeout(), TimeUnit.SECONDS));
-                waitTimeout(timeout);
-            } else {
-                countDownLatch.await();
-            }
+            informer = k8sUtils.createBatchJobInformer(jobName, namespace,
+                    createBatchJobEventHandler(taskInstanceId, taskResponse, countDownLatch));
+            informer.start().whenComplete((v, ex) -> {
+                if (ex != null && countDownLatch.getCount() > 0) {
+                    withTaskLogContext(() -> {
+                        log.error("[K8sJobExecutor-{}] fail in k8s: {}", jobName, ex.getMessage(), ex);
+                        taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
+                        countDownLatch.countDown();
+                    });
+                }
+            });
+            awaitJobCompletion(countDownLatch);
         } catch (InterruptedException e) {
             log.error("job failed in k8s: {}", e.getMessage(), e);
             Thread.currentThread().interrupt();
@@ -246,30 +223,77 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             log.error("job failed in k8s: {}", e.getMessage(), e);
             taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
         } finally {
-            informer.stop();
+            if (informer != null) {
+                informer.stop();
+            }
         }
     }
 
-    private void handleBatchJobEvent(Job watchedJob,
-                                     String taskInstanceId,
-                                     TaskResponse taskResponse,
-                                     CountDownLatch countDownLatch) {
+    private ResourceEventHandler<Job> createBatchJobEventHandler(String taskInstanceId, TaskResponse taskResponse,
+                                                                 CountDownLatch countDownLatch) {
+        return new ResourceEventHandler<Job>() {
+
+            @Override
+            public void onAdd(Job watchedJob) {
+                withTaskLogContext(() -> {
+                    log.info("event received, job: {}, action: ADD", watchedJob.getMetadata().getName());
+                    handleBatchJobTerminalStatus(watchedJob, taskInstanceId, taskResponse, countDownLatch);
+                });
+            }
+
+            @Override
+            public void onUpdate(Job oldJob, Job watchedJob) {
+                withTaskLogContext(() -> {
+                    log.info("event received, job: {}, action: UPDATE", watchedJob.getMetadata().getName());
+                    handleBatchJobTerminalStatus(watchedJob, taskInstanceId, taskResponse, countDownLatch);
+                });
+            }
+
+            @Override
+            public void onDelete(Job watchedJob, boolean deletedFinalStateUnknown) {
+                withTaskLogContext(() -> {
+                    log.info("event received, job: {}, action: DELETE", watchedJob.getMetadata().getName());
+                    log.error("[K8sJobExecutor-{}] fail in k8s", watchedJob.getMetadata().getName());
+                    taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
+                    countDownLatch.countDown();
+                });
+            }
+        };
+    }
+
+    private void awaitJobCompletion(CountDownLatch countDownLatch) throws InterruptedException {
+        boolean timeoutFlag = taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
+                || taskRequest.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
+        if (timeoutFlag) {
+            if (!countDownLatch.await(taskRequest.getTaskTimeout(), TimeUnit.SECONDS)) {
+                waitTimeout(true);
+            }
+        } else {
+            countDownLatch.await();
+        }
+    }
+
+    private void withTaskLogContext(Runnable action) {
         try {
             LogUtils.setWorkflowAndTaskInstanceIDMDC(taskRequest.getWorkflowInstanceId(),
                     taskRequest.getTaskInstanceId());
             LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
-            log.info("event received : job:{}", watchedJob.getMetadata().getName());
-            int jobStatus = getK8sJobStatus(watchedJob);
-            log.info("job {} status {}", watchedJob.getMetadata().getName(), jobStatus);
-            if (jobStatus == TaskConstants.RUNNING_CODE) {
-                return;
-            }
-            setTaskStatus(jobStatus, taskInstanceId, taskResponse);
-            countDownLatch.countDown();
+            action.run();
         } finally {
             LogUtils.removeTaskInstanceLogFullPathMDC();
             LogUtils.removeWorkflowAndTaskInstanceIdMDC();
         }
+    }
+
+    private void handleBatchJobTerminalStatus(Job watchedJob, String taskInstanceId, TaskResponse taskResponse,
+                                              CountDownLatch countDownLatch) {
+        int jobStatus = getK8sJobStatus(watchedJob);
+        log.info("job {} status {}", watchedJob.getMetadata().getName(), jobStatus);
+        if (jobStatus == TaskConstants.RUNNING_CODE) {
+            return;
+        }
+        setTaskStatus(jobStatus, taskInstanceId, taskResponse);
+        countDownLatch.countDown();
     }
 
     private void parsePodLogOutput() {

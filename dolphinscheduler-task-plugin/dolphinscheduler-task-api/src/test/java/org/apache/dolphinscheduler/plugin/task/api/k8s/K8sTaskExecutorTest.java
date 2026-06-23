@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,6 +39,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -109,6 +111,7 @@ public class K8sTaskExecutorTest {
     private WatcherHarness startBatchJobWatcher(TaskResponse taskResponse) throws InterruptedException {
         WatcherHarness harness = new WatcherHarness();
         harness.informer = mock(SharedIndexInformer.class);
+        when(harness.informer.start()).thenReturn(CompletableFuture.completedFuture(null));
         CountDownLatch handlerReady = new CountDownLatch(1);
         AtomicReference<ResourceEventHandler<Job>> handlerRef = new AtomicReference<>();
         when(k8sUtils.createBatchJobInformer(eq(job.getMetadata().getName()), eq(namespace), any()))
@@ -168,14 +171,44 @@ public class K8sTaskExecutorTest {
     }
 
     @Test
-    public void testRegisterBatchJobInformerIgnoreOnAdd() throws Exception {
+    public void testRegisterBatchJobInformerOnAddSuccess() throws Exception {
         TaskResponse taskResponse = new TaskResponse();
         WatcherHarness harness = startBatchJobWatcher(taskResponse);
         harness.handler.onAdd(jobWithStatus(1, null));
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_SUCCESS, taskResponse.getExitStatusCode());
+    }
+
+    @Test
+    public void testRegisterBatchJobInformerOnAddFailed() throws Exception {
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(taskResponse);
+        harness.handler.onAdd(jobWithStatus(null, 1));
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_FAILURE, taskResponse.getExitStatusCode());
+    }
+
+    @Test
+    public void testRegisterBatchJobInformerOnAddRunning() throws Exception {
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(taskResponse);
+        harness.handler.onAdd(jobWithStatus(null, null));
         Assertions.assertTrue(harness.thread.isAlive());
         harness.handler.onUpdate(job, jobWithStatus(1, null));
         finishWatcher(harness);
         assertEquals(EXIT_CODE_SUCCESS, taskResponse.getExitStatusCode());
+    }
+
+    @Test
+    public void testRegisterBatchJobInformerInformerStartFailed() throws Exception {
+        TaskResponse taskResponse = new TaskResponse();
+        doThrow(new RuntimeException("informer start failed")).when(k8sUtils)
+                .createBatchJobInformer(eq(job.getMetadata().getName()), eq(namespace), any());
+        Thread thread = new Thread(() -> k8sTaskExecutor.registerBatchJobWatcher(job,
+                String.valueOf(taskInstanceId), taskResponse));
+        thread.start();
+        thread.join(5000);
+        assertEquals(EXIT_CODE_FAILURE, taskResponse.getExitStatusCode());
     }
 
     @Test
