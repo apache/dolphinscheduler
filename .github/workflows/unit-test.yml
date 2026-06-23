@@ -214,7 +214,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: 17
-          distribution: 'adopt'
+          distribution: 'temurin'
 
       - uses: actions/cache@v5
         with:
@@ -274,7 +274,6 @@ jobs:
           -Dsonar.organization=apache
           -Dsonar.core.codeCoveragePlugin=jacoco
           -Dsonar.projectKey=apache-dolphinscheduler
-          -Dsonar.token=$SONAR_TOKEN
           -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
           -Dhttp.keepAlive=false
           -Dmaven.wagon.http.pool=false
