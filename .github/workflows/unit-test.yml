@@ -33,6 +33,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: true
       - uses: ./.github/actions/paths-filter
         id: filter
@@ -49,6 +51,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
@@ -64,6 +68,9 @@ jobs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Parse modules from pom.xml
         id: set-matrix
@@ -103,6 +110,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: true
 
       - name: Collect Workflow Metrics
@@ -192,6 +201,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          repository: ${{ github.event.pull_request.head.repo.full_name || github.repository }}
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
           submodules: true
           fetch-depth: 0
 
@@ -245,6 +256,15 @@ jobs:
             -Dspotless.skip=true \
             -Dmaven.test.skip=true
 
+      - name: Check SonarCloud token
+        env:
+          SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
+        run: |
+          if [ -z "$SONAR_TOKEN" ]; then
+            echo "secrets.SONARCLOUD_TOKEN is not configured"
+            exit 1
+          fi
+
       - name: Run SonarCloud Analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONARCLOUD_TOKEN }}
@@ -257,6 +277,7 @@ jobs:
           -Dsonar.organization=apache
           -Dsonar.core.codeCoveragePlugin=jacoco
           -Dsonar.projectKey=apache-dolphinscheduler
+          -Dsonar.token=$SONAR_TOKEN
           -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
           -Dhttp.keepAlive=false
           -Dmaven.wagon.http.pool=false
@@ -292,7 +313,7 @@ jobs:
     steps:
       - name: Status
         run: |
-          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+          if [[ "${{ needs.paths-filter.outputs.not-ignore }}" == "false" && ( "${{ github.event_name }}" == "pull_request" || "${{ github.event_name }}" == "pull_request_target" ) ]]; then
             echo "Skip Unit Test!"
             exit 0
           fi
