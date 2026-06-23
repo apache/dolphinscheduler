@@ -18,15 +18,8 @@
 name: Test
 
 on:
+  workflow_dispatch:
   pull_request:
-  push:
-    paths-ignore:
-      - '**/*.md'
-      - 'dolphinscheduler-ui'
-    branches:
-      - '[0-9]+.[0-9]+.[0-9]+-prepare'
-      - '[0-9]+.[0-9]+.[0-9]+-release'
-      - 'dev'
 
 concurrency:
   group: unit-test-${{ github.event.pull_request.number || github.ref }}
@@ -53,7 +46,7 @@ jobs:
     name: Sanity Check
     runs-on: ubuntu-latest
     needs: paths-filter
-    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push' }}
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' }}
     steps:
       - uses: actions/checkout@v6
         with:
@@ -67,7 +60,7 @@ jobs:
     name: Generate Module Matrix
     runs-on: ubuntu-latest
     needs: paths-filter
-    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' || github.event_name == 'push' }}
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' }}
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
@@ -101,7 +94,7 @@ jobs:
   unit-test:
     name: Unit-Test (${{ matrix.module }} | Java ${{ matrix.java }})
     needs: [ paths-filter, generate-matrix, sanity-check ]
-    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -160,25 +153,6 @@ jobs:
             -Dsurefire.reportFormat=plain \
             -Dsurefire.redirectTestOutputToFile=false
 
-      - name: Collect jacoco exec files
-        if: always()
-        run: |
-          mkdir -p /tmp/jacoco-exec
-          find . -path "*/target/*.exec" -type f | while IFS= read -r exec_file; do
-            target_file="/tmp/jacoco-exec/${exec_file#./}"
-            mkdir -p "$(dirname "$target_file")"
-            cp "$exec_file" "$target_file"
-          done
-          find /tmp/jacoco-exec -name "*.exec" -print
-
-      - name: Upload jacoco exec
-        uses: actions/upload-artifact@v6
-        if: always()
-        with:
-          name: jacoco-exec-java${{ matrix.java }}-${{ matrix.module }}
-          path: /tmp/jacoco-exec/
-          retention-days: 1
-
       - name: Upload surefire reports
         uses: actions/upload-artifact@v6
         if: always()
@@ -186,109 +160,6 @@ jobs:
           name: surefire-java${{ matrix.java }}-${{ matrix.module }}
           path: '**/target/surefire-reports/'
           retention-days: 7
-
-      - name: Upload coverage to Codecov
-        if: matrix.java == '11'
-        run: CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
-
-  sonar:
-    name: SonarCloud Analysis
-    runs-on: ubuntu-latest
-    needs: [ paths-filter, unit-test ]
-    if: ${{ needs.unit-test.result == 'success' }}
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v6
-        with:
-          submodules: true
-          fetch-depth: 0
-
-      - name: Download all jacoco exec files (Java 11)
-        uses: actions/download-artifact@v8
-        with:
-          pattern: jacoco-exec-java11-*
-          path: all-jacoco-exec/
-          merge-multiple: true
-
-      - name: Set up JDK 17 for SonarCloud
-        uses: actions/setup-java@v5
-        with:
-          java-version: 17
-          distribution: 'adopt'
-
-      - uses: actions/cache@v5
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
-          restore-keys: ${{ runner.os }}-maven-
-
-      # Use jacococli.jar instead of jacoco:merge Maven goal.
-      # The 'fileSets' parameter of jacoco:merge cannot be passed via -D on
-      # the command line; it must be declared in pom.xml <configuration>.
-      # jacococli.jar merge accepts file paths directly, no XML config needed.
-      - name: Download jacococli.jar
-        run: |
-          JACOCO_VERSION=$(./mvnw help:evaluate -Dexpression=jacoco.version -q -DforceStdout 2>/dev/null || echo "0.8.14")
-          echo "Using JaCoCo version: $JACOCO_VERSION"
-          mvn dependency:get \
-            -Dartifact=org.jacoco:org.jacoco.cli:${JACOCO_VERSION}:jar:nodeps \
-            -Ddest=/tmp/jacococli.jar \
-            -q
-          # Fallback: copy from local .m2 cache if dependency:get did not place it at -Ddest
-          find ~/.m2 -name "org.jacoco.cli-*-nodeps.jar" | head -1 | xargs -I{} cp {} /tmp/jacococli.jar || true
-
-      - name: Merge JaCoCo exec files via jacococli
-        run: |
-          # Collect all .exec files under the downloaded artifact directory
-          EXEC_FILES=$(find all-jacoco-exec/ -name "*.exec" | tr '\n' ' ')
-          echo "Merging exec files: $EXEC_FILES"
-          mkdir -p target
-          java -jar /tmp/jacococli.jar merge $EXEC_FILES \
-            --destfile target/merged.exec
-
-      - name: Generate merged JaCoCo XML report
-        run: |
-          ./mvnw jacoco:report \
-            -Djacoco.dataFile=target/merged.exec \
-            -Dspotless.skip=true \
-            -Dmaven.test.skip=true
-
-      - name: Run SonarCloud Analysis
-        run: >
-          ./mvnw --batch-mode verify sonar:sonar
-          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-          -Dmaven.test.skip=true
-          -Dspotless.skip=true
-          -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.organization=apache
-          -Dsonar.core.codeCoveragePlugin=jacoco
-          -Dsonar.projectKey=apache-dolphinscheduler
-          -Dsonar.token=${{ secrets.SONARCLOUD_TOKEN }}
-          -Dsonar.exclusions=dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
-          -Dhttp.keepAlive=false
-          -Dmaven.wagon.http.pool=false
-          -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
-          -DskipUT=true
-          -Danalyze.skip=true
-
-  publish-test-results:
-    name: Publish Test Results
-    runs-on: ubuntu-latest
-    needs: [ paths-filter, unit-test ]
-    if: ${{ needs.unit-test.result == 'success' }}
-    steps:
-      - name: Download all surefire reports
-        uses: actions/download-artifact@v8
-        with:
-          pattern: surefire-java11-*
-          path: all-surefire/
-          merge-multiple: true
-
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        with:
-          files: all-surefire/**/*.xml
-          comment_mode: off
 
   result:
     name: Unit Test
