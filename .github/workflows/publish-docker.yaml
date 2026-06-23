@@ -17,6 +17,7 @@
 name: publish-docker
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
