@@ -77,7 +77,7 @@ public class PasswordUtils {
         String salt = PropertyUtils.getString(DATASOURCE_ENCRYPTION_SALT, DATASOURCE_ENCRYPTION_SALT_DEFAULT);
         String passwordWithSalt = new String(BASE64.decode(password), StandardCharsets.UTF_8);
         if (!passwordWithSalt.startsWith(salt)) {
-            log.warn("There is a password and salt mismatch: {} ", password);
+            log.warn("There is a password and salt mismatch");
             return password;
         }
         return new String(BASE64.decode(passwordWithSalt.substring(salt.length())), StandardCharsets.UTF_8);

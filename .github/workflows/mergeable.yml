@@ -16,6 +16,7 @@
 # under the License.
 
 on:
+  workflow_dispatch:
   pull_request:
     types:
       - opened
