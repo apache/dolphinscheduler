@@ -18,6 +18,7 @@
 name: issue-robot
 
 on:
+  workflow_dispatch:
   issues:
     types: [opened]
 
