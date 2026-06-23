@@ -16,55 +16,67 @@
 #
 
 backend:
-  - 'dolphinscheduler-alert/**/*'
-  - 'dolphinscheduler-api/**/*'
-  - 'dolphinscheduler-authentication/**/*'
-  - 'dolphinscheduler-bom/**/*'
-  - 'dolphinscheduler-common/**/*'
-  - 'dolphinscheduler-dao/**/*'
-  - 'dolphinscheduler-dao-plugin/**/*'
-  - 'dolphinscheduler-datasource-plugin/**/*'
-  - 'dolphinscheduler-dist/**/*'
-  - 'dolphinscheduler-extract/**/*'
-  - 'dolphinscheduler-master/**/*'
-  - 'dolphinscheduler-meter/**/*'
-  - 'dolphinscheduler-microbench/**/*'
-  - 'dolphinscheduler-registry/**/*'
-  - 'dolphinscheduler-scheduler-plugin/**/*'
-  - 'dolphinscheduler-service/**/*'
-  - 'dolphinscheduler-spi/**/*'
-  - 'dolphinscheduler-standalone-server/**/*'
-  - 'dolphinscheduler-storage-plugin/**/*'
-  - 'dolphinscheduler-task-plugin/**/*'
-  - 'dolphinscheduler-tools/**/*'
-  - 'dolphinscheduler-worker/**/*'
-  - 'dolphinscheduler-yarn-aop/**/*'
-  - 'script/**/*'
-  - '.github/workflows/backend.yml'
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'dolphinscheduler-alert/**/*'
+          - 'dolphinscheduler-api/**/*'
+          - 'dolphinscheduler-authentication/**/*'
+          - 'dolphinscheduler-bom/**/*'
+          - 'dolphinscheduler-common/**/*'
+          - 'dolphinscheduler-dao/**/*'
+          - 'dolphinscheduler-dao-plugin/**/*'
+          - 'dolphinscheduler-datasource-plugin/**/*'
+          - 'dolphinscheduler-dist/**/*'
+          - 'dolphinscheduler-extract/**/*'
+          - 'dolphinscheduler-master/**/*'
+          - 'dolphinscheduler-meter/**/*'
+          - 'dolphinscheduler-microbench/**/*'
+          - 'dolphinscheduler-registry/**/*'
+          - 'dolphinscheduler-scheduler-plugin/**/*'
+          - 'dolphinscheduler-service/**/*'
+          - 'dolphinscheduler-spi/**/*'
+          - 'dolphinscheduler-standalone-server/**/*'
+          - 'dolphinscheduler-storage-plugin/**/*'
+          - 'dolphinscheduler-task-plugin/**/*'
+          - 'dolphinscheduler-tools/**/*'
+          - 'dolphinscheduler-worker/**/*'
+          - 'dolphinscheduler-yarn-aop/**/*'
+          - 'script/**/*'
+          - '.github/workflows/backend.yml'
 
 document:
-  - 'docs/**/*'
-  - '**/*.md'
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**/*'
+          - '**/*.md'
 
 CI&CD:
-  - any: ['.github/**/*']
+  - changed-files:
+      - any-glob-to-any-file: '.github/**/*'
 
 docker:
-  - any: ['deploy/docker/**/*']
+  - changed-files:
+      - any-glob-to-any-file: 'deploy/docker/**/*'
 
 UI:
-  - any: ['dolphinscheduler-ui/**/*']
-  - any: ['.github/workflows/frontend.yml']
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'dolphinscheduler-ui/**/*'
+          - '.github/workflows/frontend.yml'
 
 e2e:
-  - any: ['dolphinscheduler-e2e/**/*']
-  - any: ['dolphinscheduler-api-test/**/*']
-  - any: ['.github/workflows/e2e.yml']
-  - any: ['.github/workflows/api-test.yml']
-  - any: ['.github/workflows/e2e-k8s.yml']
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'dolphinscheduler-e2e/**/*'
+          - 'dolphinscheduler-api-test/**/*'
+          - '.github/workflows/e2e.yml'
+          - '.github/workflows/api-test.yml'
+          - '.github/workflows/e2e-k8s.yml'
 
 test:
-  - any: ['**/test/**/*']
+  - changed-files:
+      - any-glob-to-any-file: '**/test/**/*'
 
 kubernetes:
-  - any: ['deploy/kubernetes/**/*']
+  - changed-files:
+      - any-glob-to-any-file: 'deploy/kubernetes/**/*'
