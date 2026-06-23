@@ -18,6 +18,7 @@
 name: "pull-request-target-robot"
 
 on:
+  workflow_dispatch:
   pull_request_target:
 
 jobs:
@@ -35,7 +36,7 @@ jobs:
           submodules: true
 
       - name: "Label in pull request"
-        uses: actions/labeler@v4
+        uses: actions/labeler@v6
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           configuration-path: .github/actions/labeler/labeler.yml
