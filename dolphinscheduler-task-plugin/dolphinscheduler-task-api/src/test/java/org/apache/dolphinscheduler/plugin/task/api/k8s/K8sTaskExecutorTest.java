@@ -134,8 +134,7 @@ public class K8sTaskExecutorTest {
                     handlerReady.countDown();
                     return harness.informer;
                 });
-        harness.thread = new Thread(() -> executor.registerBatchJobWatcher(job,
-                String.valueOf(taskInstanceId), taskResponse));
+        harness.thread = new Thread(() -> executor.registerBatchJobWatcher(job, taskResponse));
         harness.thread.start();
         Assertions.assertTrue(handlerReady.await(5, TimeUnit.SECONDS));
         harness.handler = handlerRef.get();
@@ -218,8 +217,7 @@ public class K8sTaskExecutorTest {
         TaskResponse taskResponse = new TaskResponse();
         doThrow(new RuntimeException("informer start failed")).when(k8sUtils)
                 .createBatchJobInformer(eq(job.getMetadata().getName()), eq(namespace), any());
-        Thread thread = new Thread(() -> k8sTaskExecutor.registerBatchJobWatcher(job,
-                String.valueOf(taskInstanceId), taskResponse));
+        Thread thread = new Thread(() -> k8sTaskExecutor.registerBatchJobWatcher(job, taskResponse));
         thread.start();
         thread.join(5000);
         assertEquals(EXIT_CODE_FAILURE, taskResponse.getExitStatusCode());

@@ -200,7 +200,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     }
 
-    public void registerBatchJobWatcher(Job job, String taskInstanceId, TaskResponse taskResponse) {
+    public void registerBatchJobWatcher(Job job, TaskResponse taskResponse) {
         final String jobName = job.getMetadata().getName();
         final String namespace = job.getMetadata().getNamespace();
         final CountDownLatch countDownLatch = new CountDownLatch(1);
@@ -208,7 +208,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         ScheduledExecutorService jobStatusPoller = null;
         try {
             informer = k8sUtils.createBatchJobInformer(jobName, namespace,
-                    createBatchJobEventHandler(taskInstanceId, taskResponse, countDownLatch));
+                    createBatchJobEventHandler(taskResponse, countDownLatch));
             informer.start().whenComplete((v, ex) -> {
                 if (ex != null && countDownLatch.getCount() > 0) {
                     withTaskLogContext(() -> {
@@ -218,7 +218,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                     });
                 }
             });
-            jobStatusPoller = startJobStatusPoller(jobName, namespace, taskInstanceId, taskResponse, countDownLatch);
+            jobStatusPoller = startJobStatusPoller(jobName, namespace, taskResponse, countDownLatch);
             awaitJobCompletion(countDownLatch);
         } catch (InterruptedException e) {
             log.error("job failed in k8s: {}", e.getMessage(), e);
@@ -246,14 +246,13 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     private ScheduledExecutorService startJobStatusPoller(String jobName,
                                                           String namespace,
-                                                          String taskInstanceId,
                                                           TaskResponse taskResponse,
                                                           CountDownLatch countDownLatch) {
         ScheduledExecutorService jobStatusPoller = ThreadUtils.newSingleDaemonScheduledExecutorService(
                 "K8sJobStatusPoller-" + jobName);
         long pollIntervalSeconds = getJobStatusPollIntervalSeconds();
         jobStatusPoller.scheduleAtFixedRate(
-                () -> pollBatchJobStatus(jobName, namespace, taskInstanceId, taskResponse, countDownLatch),
+                () -> pollBatchJobStatus(jobName, namespace, taskResponse, countDownLatch),
                 pollIntervalSeconds,
                 pollIntervalSeconds,
                 TimeUnit.SECONDS);
@@ -262,7 +261,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     private void pollBatchJobStatus(String jobName,
                                     String namespace,
-                                    String taskInstanceId,
                                     TaskResponse taskResponse,
                                     CountDownLatch countDownLatch) {
         if (countDownLatch.getCount() == 0) {
@@ -278,14 +276,14 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                     countDownLatch.countDown();
                     return;
                 }
-                handleBatchJobTerminalStatus(polledJob, taskInstanceId, taskResponse, countDownLatch);
+                handleBatchJobTerminalStatus(polledJob, taskResponse, countDownLatch);
             } catch (Exception e) {
                 log.warn("[K8sJobExecutor-{}] failed to poll job status: {}", jobName, e.getMessage());
             }
         });
     }
 
-    private ResourceEventHandler<Job> createBatchJobEventHandler(String taskInstanceId, TaskResponse taskResponse,
+    private ResourceEventHandler<Job> createBatchJobEventHandler(TaskResponse taskResponse,
                                                                  CountDownLatch countDownLatch) {
         return new ResourceEventHandler<Job>() {
 
@@ -293,7 +291,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             public void onAdd(Job watchedJob) {
                 withTaskLogContext(() -> {
                     log.info("event received, job: {}, action: ADD", watchedJob.getMetadata().getName());
-                    handleBatchJobTerminalStatus(watchedJob, taskInstanceId, taskResponse, countDownLatch);
+                    handleBatchJobTerminalStatus(watchedJob, taskResponse, countDownLatch);
                 });
             }
 
@@ -301,7 +299,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             public void onUpdate(Job oldJob, Job watchedJob) {
                 withTaskLogContext(() -> {
                     log.info("event received, job: {}, action: UPDATE", watchedJob.getMetadata().getName());
-                    handleBatchJobTerminalStatus(watchedJob, taskInstanceId, taskResponse, countDownLatch);
+                    handleBatchJobTerminalStatus(watchedJob, taskResponse, countDownLatch);
                 });
             }
 
@@ -344,7 +342,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         }
     }
 
-    private void handleBatchJobTerminalStatus(Job watchedJob, String taskInstanceId, TaskResponse taskResponse,
+    private void handleBatchJobTerminalStatus(Job watchedJob, TaskResponse taskResponse,
                                               CountDownLatch countDownLatch) {
         if (countDownLatch.getCount() == 0) {
             return;
@@ -395,7 +393,6 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
     @Override
     public TaskResponse run(String k8sParameterStr) throws Exception {
         TaskResponse result = new TaskResponse();
-        int taskInstanceId = taskRequest.getTaskInstanceId();
         try {
             if (StringUtils.isEmpty(k8sParameterStr)) {
                 return result;
@@ -405,7 +402,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             k8sUtils.buildClient(configYaml);
             submitJob2k8s(k8sParameterStr);
             parsePodLogOutput();
-            registerBatchJobWatcher(job, Integer.toString(taskInstanceId), result);
+            registerBatchJobWatcher(job, result);
 
             if (podLogOutputFuture != null) {
                 try {
