@@ -60,6 +60,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +83,8 @@ import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
  */
 @Slf4j
 public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
+
+    private static final long JOB_STATUS_POLL_INTERVAL_SECONDS = 30L;
 
     private Job job;
     protected boolean podLogOutputIsFinished = false;
@@ -202,6 +205,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         final String namespace = job.getMetadata().getNamespace();
         final CountDownLatch countDownLatch = new CountDownLatch(1);
         SharedIndexInformer<Job> informer = null;
+        ScheduledExecutorService jobStatusPoller = null;
         try {
             informer = k8sUtils.createBatchJobInformer(jobName, namespace,
                     createBatchJobEventHandler(taskInstanceId, taskResponse, countDownLatch));
@@ -214,6 +218,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                     });
                 }
             });
+            jobStatusPoller = startJobStatusPoller(jobName, namespace, taskInstanceId, taskResponse, countDownLatch);
             awaitJobCompletion(countDownLatch);
         } catch (InterruptedException e) {
             log.error("job failed in k8s: {}", e.getMessage(), e);
@@ -223,10 +228,61 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             log.error("job failed in k8s: {}", e.getMessage(), e);
             taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
         } finally {
+            if (jobStatusPoller != null) {
+                jobStatusPoller.shutdownNow();
+            }
             if (informer != null) {
                 informer.stop();
             }
         }
+    }
+
+    /**
+     * Returns the interval for polling Job status. Protected so unit tests can override with a shorter value.
+     */
+    protected long getJobStatusPollIntervalSeconds() {
+        return JOB_STATUS_POLL_INTERVAL_SECONDS;
+    }
+
+    private ScheduledExecutorService startJobStatusPoller(String jobName,
+                                                          String namespace,
+                                                          String taskInstanceId,
+                                                          TaskResponse taskResponse,
+                                                          CountDownLatch countDownLatch) {
+        ScheduledExecutorService jobStatusPoller = ThreadUtils.newSingleDaemonScheduledExecutorService(
+                "K8sJobStatusPoller-" + jobName);
+        long pollIntervalSeconds = getJobStatusPollIntervalSeconds();
+        jobStatusPoller.scheduleAtFixedRate(
+                () -> pollBatchJobStatus(jobName, namespace, taskInstanceId, taskResponse, countDownLatch),
+                pollIntervalSeconds,
+                pollIntervalSeconds,
+                TimeUnit.SECONDS);
+        return jobStatusPoller;
+    }
+
+    private void pollBatchJobStatus(String jobName,
+                                    String namespace,
+                                    String taskInstanceId,
+                                    TaskResponse taskResponse,
+                                    CountDownLatch countDownLatch) {
+        if (countDownLatch.getCount() == 0) {
+            return;
+        }
+        withTaskLogContext(() -> {
+            try {
+                log.info("[K8sJobExecutor-{}] polling job status via GET", jobName);
+                Job polledJob = k8sUtils.getJob(jobName, namespace);
+                if (polledJob == null) {
+                    log.error("[K8sJobExecutor-{}] job not found during status polling", jobName);
+                    taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
+                    countDownLatch.countDown();
+                    return;
+                }
+                handleBatchJobTerminalStatus(polledJob, taskInstanceId, taskResponse, countDownLatch);
+            } catch (Exception e) {
+                log.warn("[K8sJobExecutor-{}] failed to poll job status: {}", jobName, e.getMessage());
+            }
+        });
     }
 
     private ResourceEventHandler<Job> createBatchJobEventHandler(String taskInstanceId, TaskResponse taskResponse,
@@ -252,6 +308,9 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             @Override
             public void onDelete(Job watchedJob, boolean deletedFinalStateUnknown) {
                 withTaskLogContext(() -> {
+                    if (countDownLatch.getCount() == 0) {
+                        return;
+                    }
                     log.info("event received, job: {}, action: DELETE", watchedJob.getMetadata().getName());
                     log.error("[K8sJobExecutor-{}] fail in k8s", watchedJob.getMetadata().getName());
                     taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
@@ -287,12 +346,15 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     private void handleBatchJobTerminalStatus(Job watchedJob, String taskInstanceId, TaskResponse taskResponse,
                                               CountDownLatch countDownLatch) {
+        if (countDownLatch.getCount() == 0) {
+            return;
+        }
         int jobStatus = getK8sJobStatus(watchedJob);
         log.info("job {} status {}", watchedJob.getMetadata().getName(), jobStatus);
         if (jobStatus == TaskConstants.RUNNING_CODE) {
             return;
         }
-        setTaskStatus(jobStatus, taskInstanceId, taskResponse);
+        setTaskStatus(jobStatus, watchedJob.getMetadata().getName(), taskResponse);
         countDownLatch.countDown();
     }
 
@@ -417,13 +479,13 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
         }
     }
 
-    public void setTaskStatus(int jobStatus, String taskInstanceId, TaskResponse taskResponse) {
+    public void setTaskStatus(int jobStatus, String jobName, TaskResponse taskResponse) {
         if (jobStatus == EXIT_CODE_SUCCESS || jobStatus == EXIT_CODE_FAILURE) {
             if (jobStatus == EXIT_CODE_SUCCESS) {
-                log.info("[K8sJobExecutor-{}] succeed in k8s", job.getMetadata().getName());
+                log.info("[K8sJobExecutor-{}] succeed in k8s", jobName);
                 taskResponse.setExitStatusCode(EXIT_CODE_SUCCESS);
             } else {
-                log.error("[K8sJobExecutor-{}] fail in k8s", job.getMetadata().getName());
+                log.error("[K8sJobExecutor-{}] fail in k8s", jobName);
                 taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
             }
         }

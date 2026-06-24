@@ -97,9 +97,18 @@ public class K8sTaskExecutorTest {
     }
 
     private void injectK8sUtils(K8sTaskExecutor executor, K8sUtils mockK8sUtils) throws Exception {
-        Field field = executor.getClass().getSuperclass().getDeclaredField("k8sUtils");
-        field.setAccessible(true);
-        field.set(executor, mockK8sUtils);
+        Class<?> type = executor.getClass();
+        while (type != null) {
+            try {
+                Field field = type.getDeclaredField("k8sUtils");
+                field.setAccessible(true);
+                field.set(executor, mockK8sUtils);
+                return;
+            } catch (NoSuchFieldException ignored) {
+                type = type.getSuperclass();
+            }
+        }
+        throw new NoSuchFieldException("k8sUtils");
     }
 
     private TaskExecutionContext getTaskRequest() throws Exception {
@@ -109,6 +118,11 @@ public class K8sTaskExecutorTest {
     }
 
     private WatcherHarness startBatchJobWatcher(TaskResponse taskResponse) throws InterruptedException {
+        return startBatchJobWatcher(k8sTaskExecutor, taskResponse);
+    }
+
+    private WatcherHarness startBatchJobWatcher(K8sTaskExecutor executor,
+                                                TaskResponse taskResponse) throws InterruptedException {
         WatcherHarness harness = new WatcherHarness();
         harness.informer = mock(SharedIndexInformer.class);
         when(harness.informer.start()).thenReturn(CompletableFuture.completedFuture(null));
@@ -120,7 +134,7 @@ public class K8sTaskExecutorTest {
                     handlerReady.countDown();
                     return harness.informer;
                 });
-        harness.thread = new Thread(() -> k8sTaskExecutor.registerBatchJobWatcher(job,
+        harness.thread = new Thread(() -> executor.registerBatchJobWatcher(job,
                 String.valueOf(taskInstanceId), taskResponse));
         harness.thread.start();
         Assertions.assertTrue(handlerReady.await(5, TimeUnit.SECONDS));
@@ -234,6 +248,45 @@ public class K8sTaskExecutorTest {
         assertEquals(EXIT_CODE_FAILURE, taskResponse.getExitStatusCode());
     }
 
+    @Test
+    public void testRegisterBatchJobInformerJobStatusPollingSuccess() throws Exception {
+        K8sTaskExecutor pollingExecutor = new K8sTaskExecutor(getTaskRequest()) {
+
+            @Override
+            protected long getJobStatusPollIntervalSeconds() {
+                return 1L;
+            }
+        };
+        injectK8sUtils(pollingExecutor, k8sUtils);
+        when(k8sUtils.getJob(eq(job.getMetadata().getName()), eq(namespace)))
+                .thenReturn(jobWithStatus(1, null));
+
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(pollingExecutor, taskResponse);
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_SUCCESS, taskResponse.getExitStatusCode());
+        verify(k8sUtils).getJob(eq(job.getMetadata().getName()), eq(namespace));
+    }
+
+    @Test
+    public void testRegisterBatchJobInformerJobStatusPollingDeleted() throws Exception {
+        K8sTaskExecutor pollingExecutor = new K8sTaskExecutor(getTaskRequest()) {
+
+            @Override
+            protected long getJobStatusPollIntervalSeconds() {
+                return 1L;
+            }
+        };
+        injectK8sUtils(pollingExecutor, k8sUtils);
+        when(k8sUtils.getJob(eq(job.getMetadata().getName()), eq(namespace))).thenReturn(null);
+
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(pollingExecutor, taskResponse);
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_FAILURE, taskResponse.getExitStatusCode());
+        verify(k8sUtils).getJob(eq(job.getMetadata().getName()), eq(namespace));
+    }
+
     private static final class WatcherHarness {
 
         private SharedIndexInformer<Job> informer;
@@ -253,7 +306,7 @@ public class K8sTaskExecutorTest {
         int jobStatus = 0;
         TaskResponse taskResponse = new TaskResponse();
         k8sTaskExecutor.setJob(job);
-        k8sTaskExecutor.setTaskStatus(jobStatus, String.valueOf(taskInstanceId), taskResponse);
+        k8sTaskExecutor.setTaskStatus(jobStatus, job.getMetadata().getName(), taskResponse);
         Assertions.assertEquals(0, taskResponse.getExitStatusCode());
     }
     @Test

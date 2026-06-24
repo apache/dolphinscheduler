@@ -62,13 +62,21 @@ public class K8sUtils {
         }
     }
 
-    public Boolean jobExist(String jobName, String namespace) {
+    public Job getJob(String jobName, String namespace) {
         try {
-            Job job = client.batch().v1().jobs().inNamespace(namespace).withName(jobName).get();
-            return job != null;
+            return client.batch()
+                    .v1()
+                    .jobs()
+                    .inNamespace(namespace)
+                    .withName(jobName)
+                    .get();
         } catch (Exception e) {
-            throw new TaskException("fail to check job: ", e);
+            throw new TaskException("fail to get job: " + jobName, e);
         }
+    }
+
+    public Boolean jobExist(String jobName, String namespace) {
+        return getJob(jobName, namespace) != null;
     }
 
     public SharedIndexInformer<Job> createBatchJobInformer(String jobName,
