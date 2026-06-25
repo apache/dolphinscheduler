@@ -35,6 +35,7 @@ import {
 import { useUserDetail } from './use-user-detail'
 import Modal from '@/components/modal'
 import type { IRecord } from '../types'
+import { useUserStore } from '@/store/user/user'
 
 const props = {
   show: {
@@ -55,6 +56,7 @@ export const UserModal = defineComponent({
     const { t } = useI18n()
     const { state, IS_ADMIN, formRules, onReset, onSave, onSetValues } =
       useUserDetail()
+    const userStore = useUserStore()
     const onCancel = () => {
       onReset()
       ctx.emit('cancel')
@@ -84,7 +86,8 @@ export const UserModal = defineComponent({
       formRules,
       onCancel,
       onConfirm,
-      trim
+      trim,
+      userStore
     }
   },
   render(props: { currentRecord: IRecord }) {
@@ -120,6 +123,10 @@ export const UserModal = defineComponent({
               minlength={3}
               maxlength={39}
               placeholder={t('security.user.username_tips')}
+              disabled={
+                currentRecord?.id &&
+                this.userStore.getSecurityConfigType !== 'PASSWORD'
+              }
             />
           </NFormItem>
           {!this.currentRecord?.id && (
