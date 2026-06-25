@@ -99,6 +99,7 @@ class WorkflowSwitchE2ETest {
         workflowForm.<ShellTaskForm>addTask(TaskType.SHELL)
                 .script("echo ${today}\necho ${global_param}\n")
                 .name("pre-task")
+                .setWorkerGroup("default")
                 .submit();
 
         SwitchTaskForm switchTaskForm = workflowForm.addTask(TaskType.SWITCH);
@@ -110,12 +111,14 @@ class WorkflowSwitchE2ETest {
                 .script("echo ${key}")
                 .preTask("switch")
                 .name(ifBranchName)
+                .setWorkerGroup("default")
                 .submit();
 
         workflowForm.<ShellTaskForm>addTask(TaskType.SHELL)
                 .script("echo ${key}")
                 .preTask("switch")
                 .name(elseBranchName)
+                .setWorkerGroup("default")
                 .submit();
 
         // format dag

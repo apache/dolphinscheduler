@@ -117,6 +117,7 @@ public class WorkflowHttpTaskE2ETest {
                 .url(mockServerUrl)
                 .name("test-1")
                 .addParam("today", "${system.datetime}")
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()

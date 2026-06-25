@@ -71,6 +71,12 @@ public abstract class TaskNodeForm {
     private WebElement selectEnv;
 
     @FindBys({
+            @FindBy(className = "worker-group-select"),
+            @FindBy(className = "n-base-selection"),
+    })
+    private WebElement selectWorkerGroup;
+
+    @FindBys({
             @FindBy(className = "btn-custom-parameters"),
             @FindBy(tagName = "button"),
     })
@@ -138,6 +144,26 @@ public abstract class TaskNodeForm {
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No such envName: " + envName))
                 .click();
+
+        return this;
+    }
+
+    public TaskNodeForm setWorkerGroup(String workerGroupName) {
+        ((JavascriptExecutor) parent().driver()).executeScript(
+                "document.querySelector('.worker-group-select .n-base-selection').click()");
+
+        try {
+            WebDriverWaitFactory.createWebDriverWait(parent().driver(), Duration.ofSeconds(2))
+                    .until(ExpectedConditions.elementToBeClickable(
+                            By.xpath("//*[contains(@class, 'n-base-selection-option') and text()='" + workerGroupName
+                                    + "']")))
+                    .click();
+        } catch (org.openqa.selenium.TimeoutException e) {
+            ((JavascriptExecutor) parent().driver()).executeScript(
+                    "arguments[0].value = '" + workerGroupName + "'",
+                    selectWorkerGroup);
+            parent.driver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
+        }
 
         return this;
     }

@@ -118,6 +118,7 @@ class WorkflowE2ETest {
                 .script("echo ${today}\necho ${global_param}\n")
                 .name("test-1")
                 .addParam("today", "${system.datetime}")
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()

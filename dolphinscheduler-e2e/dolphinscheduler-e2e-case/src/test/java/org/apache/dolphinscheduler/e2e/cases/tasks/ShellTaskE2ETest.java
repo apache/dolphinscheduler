@@ -84,6 +84,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
                 .script("echo hello world\n")
                 .name(taskName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -119,6 +120,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
                 .script("[ \"${name}\" = \"tom\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
                 .name(taskName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -155,6 +157,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .script("[ \"${name}\" = \"tom\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
                 .name(taskName)
                 .addParam("name", "tom")
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -190,6 +193,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .script("[ \"${name}\" = \"jerry\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
                 .name(taskName)
                 .addParam("name", "tom")
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -232,6 +236,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .script("cat " + testFileName + ".sh")
                 .name(taskName)
                 .selectResource(testFileName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -266,6 +271,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
                 .script("echo 'I am failed'\n exit1\n")
                 .name(taskName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()

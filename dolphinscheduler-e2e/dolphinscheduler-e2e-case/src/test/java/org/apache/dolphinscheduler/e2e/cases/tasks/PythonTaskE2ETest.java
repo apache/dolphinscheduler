@@ -97,6 +97,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
                 .script(pythonScripts)
                 .name(taskName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -139,6 +140,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
                 .script(pythonScripts)
                 .name(taskName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -182,6 +184,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .script(pythonScripts)
                 .name(taskName)
                 .addParam("name", "tom")
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -224,6 +227,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .script(pythonScripts)
                 .name(taskName)
                 .addParam("name", "tom")
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -281,6 +285,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .name(taskName)
                 .selectResource(testFileName)
                 .addParam("file_name", String.format("%s.sh", testFileName))
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -318,6 +323,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
                 .script(pythonScripts)
                 .name(taskName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
