@@ -22,11 +22,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,6 +44,7 @@ public class WorkflowGraph implements IWorkflowGraph {
     public WorkflowGraph(List<WorkflowTaskRelation> workflowTaskRelations, List<TaskDefinition> taskDefinitions) {
         checkNotNull(taskDefinitions, "taskDefinitions can not be null");
         checkNotNull(workflowTaskRelations, "taskDefinitions can not be null");
+        checkIfDAG(workflowTaskRelations, taskDefinitions);
         this.predecessors = new HashMap<>();
         this.successors = new HashMap<>();
 
@@ -62,6 +65,53 @@ public class WorkflowGraph implements IWorkflowGraph {
 
         addTaskNodes(taskDefinitions);
         addTaskEdge(workflowTaskRelations);
+    }
+
+    private void checkIfDAG(List<WorkflowTaskRelation> workflowTaskRelations, List<TaskDefinition> taskDefinitions) {
+        Map<Long, List<Long>> preTaskCodeMap = workflowTaskRelations
+                .stream()
+                .filter(relation -> relation.getPreTaskCode() > 0 && relation.getPostTaskCode() > 0)
+                .collect(Collectors.groupingBy(WorkflowTaskRelation::getPostTaskCode,
+                        Collectors.mapping(WorkflowTaskRelation::getPreTaskCode, Collectors.toList())));
+        Map<Long, List<Long>> postTaskCodeMap = workflowTaskRelations
+                .stream()
+                .filter(relation -> relation.getPreTaskCode() > 0 && relation.getPostTaskCode() > 0)
+                .collect(Collectors.groupingBy(WorkflowTaskRelation::getPreTaskCode,
+                        Collectors.mapping(WorkflowTaskRelation::getPostTaskCode, Collectors.toList())));
+
+        Map<Long, Integer> inDegreeCount = new HashMap<>();
+        for (TaskDefinition taskDefinition : taskDefinitions) {
+            List<Long> preTasks = preTaskCodeMap.get(taskDefinition.getCode());
+            inDegreeCount.put(taskDefinition.getCode(), preTasks == null ? 0 : preTasks.size());
+        }
+
+        Queue<Long> queue = new ArrayDeque<>();
+        for (Map.Entry<Long, Integer> entry : inDegreeCount.entrySet()) {
+            if (entry.getValue() == 0) {
+                queue.offer(entry.getKey());
+            }
+        }
+
+        Set<Long> sortedTaskCodes = new HashSet<>();
+        while (!queue.isEmpty()) {
+            Long taskCode = queue.poll();
+            sortedTaskCodes.add(taskCode);
+
+            List<Long> postCodes = postTaskCodeMap.get(taskCode);
+            if (postCodes == null) {
+                continue;
+            }
+            for (Long postCode : postCodes) {
+                inDegreeCount.put(postCode, inDegreeCount.get(postCode) - 1);
+                if (inDegreeCount.get(postCode) == 0) {
+                    queue.offer(postCode);
+                }
+            }
+        }
+
+        if (sortedTaskCodes.size() < taskDefinitions.size()) {
+            throw new IllegalArgumentException("The workflow task relation is not a DAG");
+        }
     }
 
     @Override
