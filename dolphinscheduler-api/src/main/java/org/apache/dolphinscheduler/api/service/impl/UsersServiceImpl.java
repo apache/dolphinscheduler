@@ -21,6 +21,8 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.security.AuthenticationType;
+import org.apache.dolphinscheduler.api.security.SecurityConfig;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -101,6 +103,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private SessionService sessionService;
 
+    @Autowired
+    private SecurityConfig securityConfig;
+
+    private boolean isNotPasswordAuthenticationMode() {
+        return !AuthenticationType.PASSWORD.name().equals(securityConfig.getType());
+    }
+
     /**
      * create user, only system admin have permission
      *
@@ -126,6 +135,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                            int state) throws Exception {
         if (!isAdmin(loginUser)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
+        if (isNotPasswordAuthenticationMode()) {
+            throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
         }
 
         // check all user params
@@ -358,6 +371,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(userName)) {
 
+            if (isNotPasswordAuthenticationMode()) {
+                throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
+            }
+
             if (!CheckUtils.checkUserName(userName)) {
                 throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
             }
@@ -371,6 +388,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (StringUtils.isNotEmpty(userPassword)) {
+
+            if (isNotPasswordAuthenticationMode()) {
+                throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
+            }
+
             if (!CheckUtils.checkPasswordLength(userPassword)) {
                 throw new ServiceException(Status.USER_PASSWORD_LENGTH_ERROR);
             }
@@ -872,6 +894,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     @Transactional
     public User registerUser(String userName, String userPassword, String repeatPassword, String email) {
+
+        if (isNotPasswordAuthenticationMode()) {
+            throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
+        }
+
         // check user params
         String msg = this.checkUserParams(userName, userPassword, email, "");
         if (!StringUtils.isEmpty(msg)) {
