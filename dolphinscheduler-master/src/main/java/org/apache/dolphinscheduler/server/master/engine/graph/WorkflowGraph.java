@@ -24,11 +24,11 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -85,16 +85,16 @@ public class WorkflowGraph implements IWorkflowGraph {
             inDegreeCount.put(taskDefinition.getCode(), preTasks == null ? 0 : preTasks.size());
         }
 
-        Queue<Long> queue = new ArrayDeque<>();
+        Deque<Long> queue = new ArrayDeque<>();
         for (Map.Entry<Long, Integer> entry : inDegreeCount.entrySet()) {
             if (entry.getValue() == 0) {
-                queue.offer(entry.getKey());
+                queue.addLast(entry.getKey());
             }
         }
 
         Set<Long> sortedTaskCodes = new HashSet<>();
         while (!queue.isEmpty()) {
-            Long taskCode = queue.poll();
+            Long taskCode = queue.pollFirst();
             sortedTaskCodes.add(taskCode);
 
             List<Long> postCodes = postTaskCodeMap.get(taskCode);
@@ -104,7 +104,7 @@ public class WorkflowGraph implements IWorkflowGraph {
             for (Long postCode : postCodes) {
                 inDegreeCount.put(postCode, inDegreeCount.get(postCode) - 1);
                 if (inDegreeCount.get(postCode) == 0) {
-                    queue.offer(postCode);
+                    queue.addLast(postCode);
                 }
             }
         }
