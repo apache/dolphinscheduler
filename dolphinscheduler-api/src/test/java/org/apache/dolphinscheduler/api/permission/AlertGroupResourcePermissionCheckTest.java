@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class AlertGroupResourcePermissionCheckTest {
     private ResourcePermissionCheckServiceImpl.AlertGroupResourcePermissionCheck alertGroupResourcePermissionCheck;
 
     @Mock
-    private AlertGroupMapper alertGroupMapper;
+    private AlertGroupDao alertGroupDao;
 
     @Test
     public void testPermissionCheck() {
@@ -69,7 +69,7 @@ public class AlertGroupResourcePermissionCheckTest {
         ids.add(alertGroup.getId());
         List<AlertGroup> alertGroups = Arrays.asList(alertGroup);
 
-        Mockito.when(alertGroupMapper.queryAllGroupList()).thenReturn(alertGroups);
+        Mockito.when(alertGroupDao.queryAllGroupList()).thenReturn(alertGroups);
 
         Assertions.assertEquals(ids, alertGroupResourcePermissionCheck.listAuthorizedResourceIds(user.getId(), logger));
     }

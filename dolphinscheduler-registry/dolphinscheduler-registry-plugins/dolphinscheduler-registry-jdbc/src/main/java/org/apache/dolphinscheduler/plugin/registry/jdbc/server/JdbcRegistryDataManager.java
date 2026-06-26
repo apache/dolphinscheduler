@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.registry.jdbc.server;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryThreadFactory;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.KeyUtils;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.DataType;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryDataChangeEventDTO;
@@ -36,6 +35,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -61,6 +61,8 @@ public class JdbcRegistryDataManager
 
     private final TransactionTemplate jdbcRegistryTransactionTemplate;
 
+    private final ScheduledExecutorService schedulerThreadExecutor;
+
     private final List<RegistryRowChangeListener<JdbcRegistryDataDTO>> registryRowChangeListeners;
 
     private long lastDetectedJdbcRegistryDataChangeEventId = -1;
@@ -68,11 +70,13 @@ public class JdbcRegistryDataManager
     public JdbcRegistryDataManager(JdbcRegistryProperties registryProperties,
                                    JdbcRegistryDataRepository jdbcRegistryDataRepository,
                                    JdbcRegistryDataChangeEventRepository jdbcRegistryDataChangeEventRepository,
-                                   TransactionTemplate jdbcRegistryTransactionTemplate) {
+                                   TransactionTemplate jdbcRegistryTransactionTemplate,
+                                   ScheduledExecutorService schedulerThreadExecutor) {
         this.registryProperties = registryProperties;
         this.jdbcRegistryDataChangeEventRepository = jdbcRegistryDataChangeEventRepository;
         this.jdbcRegistryDataRepository = jdbcRegistryDataRepository;
         this.jdbcRegistryTransactionTemplate = jdbcRegistryTransactionTemplate;
+        this.schedulerThreadExecutor = schedulerThreadExecutor;
         this.registryRowChangeListeners = new CopyOnWriteArrayList<>();
     }
 
@@ -80,13 +84,13 @@ public class JdbcRegistryDataManager
     public void start() {
         this.lastDetectedJdbcRegistryDataChangeEventId =
                 jdbcRegistryDataChangeEventRepository.getMaxJdbcRegistryDataChangeEventId();
-        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(
+        schedulerThreadExecutor.scheduleWithFixedDelay(
                 this::detectJdbcRegistryDataChangeEvent,
                 registryProperties.getHeartbeatRefreshInterval().toMillis(),
                 registryProperties.getHeartbeatRefreshInterval().toMillis(),
                 TimeUnit.MILLISECONDS);
 
-        JdbcRegistryThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(
+        schedulerThreadExecutor.scheduleWithFixedDelay(
                 this::purgeHistoryJdbcRegistryDataChangeEvent,
                 0,
                 Duration.ofHours(keepJdbcRegistryDataChangeEventHours).toHours(),

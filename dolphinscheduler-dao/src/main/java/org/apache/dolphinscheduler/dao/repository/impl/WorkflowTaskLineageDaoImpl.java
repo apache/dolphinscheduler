@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import lombok.NonNull;
 
@@ -83,4 +84,14 @@ public class WorkflowTaskLineageDaoImpl extends BaseDao<WorkflowTaskLineage, Wor
         return mybatisMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
     }
 
+    @Override
+    public int updateWorkflowTaskLineage(List<WorkflowTaskLineage> workflowTaskLineages) {
+        if (CollectionUtils.isEmpty(workflowTaskLineages)) {
+            return 0;
+        }
+        this.batchDeleteByWorkflowDefinitionCode(
+                workflowTaskLineages.stream().map(WorkflowTaskLineage::getWorkflowDefinitionCode)
+                        .distinct().collect(Collectors.toList()));
+        return mybatisMapper.batchInsert(workflowTaskLineages);
+    }
 }

@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -47,7 +47,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class LoginHandlerInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Autowired
     private Authenticator authenticator;
@@ -76,7 +76,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
                 return false;
             }
         } else {
-            user = userMapper.queryUserByToken(token, new Date());
+            user = userDao.queryUserByToken(token, new Date());
             if (user == null) {
                 response.setStatus(HttpStatus.SC_UNAUTHORIZED);
                 log.info("user token has expired");

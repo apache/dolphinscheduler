@@ -83,7 +83,10 @@ waste time。
 [//]: # (DolphinScheduler使用`Spotless`为您自动修复代码风格和格式问题，)
 [//]: # (详情见[开发手册]&#40;../development-environment-setup.md#代码风格&#41;`代码风格`一栏。)
 
-DolphinScheduler使用`Spotless`为您自动修复代码风格和格式问题，
+DolphinScheduler 使用 `Spotless` 来统一代码风格和格式，覆盖范围包括 Java 源文件、`pom.xml` 以及本目录下的 Markdown 文档。
+
+**提交 Pull Request 前，必须先在本地执行 `./mvnw spotless:apply` 并提交格式化结果。** CI 会运行 `./mvnw spotless:check`，任何文件未格式化都会导致 PR 失败。
+
 详情见[开发手册](../development-environment-setup.md)`代码风格`一栏。
 
 ### 相关问题

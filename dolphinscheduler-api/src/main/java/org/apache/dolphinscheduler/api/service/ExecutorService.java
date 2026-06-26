@@ -83,12 +83,8 @@ public interface ExecutorService {
 
     /**
      * force start Task Instance
-     *
-     * @param loginUser
-     * @param queueId
-     * @return
      */
-    Map<String, Object> forceStartTaskInstance(User loginUser, int queueId);
+    void forceStartTaskInstance(User loginUser, int queueId);
 
     /**
      * execute stream task instance

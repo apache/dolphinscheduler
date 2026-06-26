@@ -190,15 +190,14 @@ public class RegistryClient {
         return registry.exists(key);
     }
 
-    public boolean getLock(String key) {
+    public RegistryLock getLock(String key) {
         if (!registry.isConnected()) {
             throw new IllegalStateException("The registry is not connected");
         }
-        return registry.acquireLock(key);
-    }
-
-    public boolean releaseLock(String key) {
-        return registry.releaseLock(key);
+        if (!registry.acquireLock(key)) {
+            throw new RegistryException("Failed to acquire registry lock: " + key);
+        }
+        return new RegistryLock(registry, key);
     }
 
     public void setStoppable(IStoppable stoppable) {

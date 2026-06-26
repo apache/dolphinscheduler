@@ -87,7 +87,14 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
     @Override
     public void run() {
         while (runningFlag.get()) {
-            TaskDispatchableEvent<ITaskExecution> taskEntry = workerGroupEventBus.take();
+            final TaskDispatchableEvent<ITaskExecution> taskEntry;
+            try {
+                taskEntry = workerGroupEventBus.take();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.info("{} interrupted, exiting run loop", this.getName());
+                return;
+            }
             ITaskExecution taskExecution = taskEntry.getData();
             try (
                     TaskExecutorMDCUtils.MDCAutoClosable ignore =
@@ -123,9 +130,9 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
 
             // If dispatch failed, will put the task back to the queue
             // The task will be dispatched after waiting time.
-            // the waiting time will increase multiple of times, but will not exceed 60 seconds
-            long waitingTimeMillis = Math.min(
-                    taskExecution.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L);
+            // the waiting time grows with the fail count, bounded between 1 and 60 seconds
+            long waitingTimeMillis = Math.max(1_000L, Math.min(
+                    taskExecution.getTaskExecutionContext().increaseDispatchFailTimes() * 1_000L, 60_000L));
             dispatchTask(taskExecution, waitingTimeMillis);
             log.warn("Dispatch Task: {} failed will retry after: {}/ms", taskInstanceId,
                     waitingTimeMillis, ex);

@@ -19,14 +19,15 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.ProductInfoDto;
 import org.apache.dolphinscheduler.common.enums.PluginType;
+import org.apache.dolphinscheduler.dao.entity.PluginDefine;
 
-import java.util.Map;
+import java.util.List;
 
 public interface UiPluginService {
 
-    Map<String, Object> queryUiPluginsByType(PluginType pluginType);
+    List<PluginDefine> queryUiPluginsByType(PluginType pluginType);
 
-    Map<String, Object> queryUiPluginDetailById(int id);
+    PluginDefine queryUiPluginDetailById(int id);
 
     ProductInfoDto queryProductInfo();
 

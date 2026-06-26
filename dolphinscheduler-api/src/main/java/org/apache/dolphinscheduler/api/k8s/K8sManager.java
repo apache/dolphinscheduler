@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.k8s;
 
 import org.apache.dolphinscheduler.dao.entity.Cluster;
-import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
+import org.apache.dolphinscheduler.dao.repository.ClusterDao;
 import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 
 import java.util.Hashtable;
@@ -46,7 +46,7 @@ public class K8sManager {
     private static Map<Long, KubernetesClient> clientMap = new Hashtable<>();
 
     @Autowired
-    private ClusterMapper clusterMapper;
+    private ClusterDao clusterDao;
 
     /**
      * get k8s client for api use
@@ -88,7 +88,7 @@ public class K8sManager {
         if (clusterCode == null) {
             return;
         }
-        Cluster cluster = clusterMapper.queryByClusterCode(clusterCode);
+        Cluster cluster = clusterDao.queryByClusterCode(clusterCode);
         if (cluster == null) {
             return;
         }
@@ -99,7 +99,7 @@ public class K8sManager {
     }
 
     private void createK8sClientInner(Long clusterCode) {
-        Cluster cluster = clusterMapper.queryByClusterCode(clusterCode);
+        Cluster cluster = clusterDao.queryByClusterCode(clusterCode);
         if (cluster == null) {
             return;
         }

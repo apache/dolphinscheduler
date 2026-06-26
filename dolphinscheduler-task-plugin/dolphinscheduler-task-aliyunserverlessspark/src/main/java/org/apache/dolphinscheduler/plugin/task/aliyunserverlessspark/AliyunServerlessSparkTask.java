@@ -154,7 +154,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                 return aliyunServerlessSparkClient.startJobRun(
                         aliyunServerlessSparkParameters.getWorkspaceId(), startJobRunRequest);
             } catch (Exception e) {
-                throw new AliyunServerlessSparkTaskException("Failed to start job run!");
+                throw new AliyunServerlessSparkTaskException("Failed to start job run! ", e);
             }
         }, retryPolicy);
 
@@ -224,7 +224,7 @@ public class AliyunServerlessSparkTask extends AbstractRemoteTask {
                                 aliyunServerlessSparkParameters.getWorkspaceId(), jobRunId,
                                 cancelJobRunRequest);
                     } catch (Exception e) {
-                        throw new AliyunServerlessSparkTaskException("Failed to cancel job run!");
+                        throw new AliyunServerlessSparkTaskException("Failed to cancel job run! ", e);
                     }
                 }, retryPolicy);
     }

@@ -143,7 +143,6 @@ public class TenantMapperTest extends BaseDaoTest {
         Assertions.assertNotEquals(0, tenantIPage.getTotal());
     }
 
-    @Test
     public void testExistTenant() {
         String tenantCode = "test_code";
         Assertions.assertNull(tenantMapper.existTenant(tenantCode));

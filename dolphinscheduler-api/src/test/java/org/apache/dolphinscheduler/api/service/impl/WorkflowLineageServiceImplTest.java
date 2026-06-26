@@ -28,8 +28,8 @@ import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 
 import java.util.Arrays;
@@ -54,16 +54,16 @@ class WorkflowLineageServiceImplTest {
     private WorkflowTaskLineageDao workflowTaskLineageDao;
 
     @Mock
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(workflowLineageService, "workflowTaskLineageDao", workflowTaskLineageDao);
-        ReflectionTestUtils.setField(workflowLineageService, "workflowDefinitionMapper", workflowDefinitionMapper);
-        ReflectionTestUtils.setField(workflowLineageService, "taskDefinitionMapper", taskDefinitionMapper);
+        ReflectionTestUtils.setField(workflowLineageService, "workflowDefinitionDao", workflowDefinitionDao);
+        ReflectionTestUtils.setField(workflowLineageService, "taskDefinitionDao", taskDefinitionDao);
     }
 
     @Test
@@ -77,7 +77,7 @@ class WorkflowLineageServiceImplTest {
                 workflowLineageService.queryDownstreamDependentWorkflowDefinitions(workflowCode);
 
         assertThat(result).isEmpty();
-        verifyNoInteractions(workflowDefinitionMapper, taskDefinitionMapper);
+        verifyNoInteractions(workflowDefinitionDao, taskDefinitionDao);
     }
 
     @Test
@@ -108,7 +108,7 @@ class WorkflowLineageServiceImplTest {
         workflowDefinition201.setCode(201L);
         workflowDefinition201.setVersion(4);
 
-        when(workflowDefinitionMapper.queryByCodes(Arrays.asList(200L, 201L)))
+        when(workflowDefinitionDao.queryByCodes(Arrays.asList(200L, 201L)))
                 .thenReturn(Arrays.asList(workflowDefinition200, workflowDefinition201));
 
         TaskDefinition taskDefinition = new TaskDefinition();
@@ -116,7 +116,7 @@ class WorkflowLineageServiceImplTest {
         taskDefinition.setTaskParams("task-params");
         taskDefinition.setWorkerGroup("test-group");
 
-        when(taskDefinitionMapper.queryByCodeList(Collections.singletonList(300L)))
+        when(taskDefinitionDao.queryByCodes(Collections.singletonList(300L)))
                 .thenReturn(Collections.singletonList(taskDefinition));
 
         List<DependentWorkflowDefinition> result =
@@ -142,7 +142,7 @@ class WorkflowLineageServiceImplTest {
         assertThat(workflowDependent.getWorkerGroup()).isNull();
         assertThat(workflowDependent.getWorkflowDefinitionVersion()).isEqualTo(4);
 
-        verify(taskDefinitionMapper).queryByCodeList(Collections.singletonList(300L));
+        verify(taskDefinitionDao).queryByCodes(Collections.singletonList(300L));
     }
 
     @Test
@@ -158,11 +158,11 @@ class WorkflowLineageServiceImplTest {
         when(workflowTaskLineageDao
                 .queryWorkFlowLineageByDept(Constants.DEFAULT_PROJECT_CODE, root, Constants.DEPENDENT_ALL_TASK))
                         .thenReturn(Collections.singletonList(edge));
-        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(child)))
+        when(workflowDefinitionDao.queryByCodes(Collections.singletonList(child)))
                 .thenReturn(Collections.singletonList(WorkflowDefinition.builder().code(child).version(1).build()));
 
         List<WorkflowDefinition> result =
-                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(root, false);
+                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(root, false, false);
 
         assertThat(result).extracting(WorkflowDefinition::getCode).containsExactly(child);
     }
@@ -195,13 +195,13 @@ class WorkflowLineageServiceImplTest {
 
         WorkflowDefinition workflowB = WorkflowDefinition.builder().code(codeB).version(1).build();
         WorkflowDefinition workflowC = WorkflowDefinition.builder().code(codeC).version(1).build();
-        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(codeB)))
+        when(workflowDefinitionDao.queryByCodes(Collections.singletonList(codeB)))
                 .thenReturn(Collections.singletonList(workflowB));
-        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(codeC)))
+        when(workflowDefinitionDao.queryByCodes(Collections.singletonList(codeC)))
                 .thenReturn(Collections.singletonList(workflowC));
 
         List<WorkflowDefinition> result =
-                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(codeA, true);
+                workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(codeA, true, false);
 
         assertThat(result).extracting(WorkflowDefinition::getCode).containsExactly(codeB, codeC);
     }
@@ -223,7 +223,7 @@ class WorkflowLineageServiceImplTest {
         WorkflowDefinition workflowB = new WorkflowDefinition();
         workflowB.setCode(codeB);
         workflowB.setReleaseState(ReleaseState.OFFLINE);
-        when(workflowDefinitionMapper.queryByCodes(Collections.singletonList(codeB)))
+        when(workflowDefinitionDao.queryByCodes(Collections.singletonList(codeB)))
                 .thenReturn(Collections.singletonList(workflowB));
 
         List<WorkflowDefinition> result =

@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowReques
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowRequestTransformer;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -52,11 +51,11 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.command.CommandService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -84,7 +83,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private ProjectService projectService;
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Lazy()
     @Autowired
@@ -100,10 +99,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
-    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
+    private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Autowired
     private TaskGroupQueueMapper taskGroupQueueMapper;
@@ -126,7 +125,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     @Transactional
     public Integer triggerWorkflowDefinition(final WorkflowTriggerRequest triggerRequest) {
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(
+                triggerRequest.getLoginUser(),
+                triggerRequest.getProjectCode(),
+                ApiFuncIdentificationConstant.RERUN);
         final TriggerWorkflowDTO triggerWorkflowDTO = triggerWorkflowRequestTransformer.transform(triggerRequest);
+        // verify the workflow definition belongs to the URL's project
+        if (triggerWorkflowDTO.getWorkflowDefinition() == null
+                || triggerWorkflowDTO.getWorkflowDefinition().getProjectCode() != triggerRequest.getProjectCode()) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                    String.valueOf(triggerRequest.getWorkflowDefinitionCode()));
+        }
         // todo: use validator chain
         triggerWorkflowDTOValidator.validate(triggerWorkflowDTO);
         return executorClient.triggerWorkflowDefinition().execute(triggerWorkflowDTO);
@@ -135,8 +145,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     @Transactional
     public List<Integer> backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest) {
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(
+                workflowBackFillRequest.getLoginUser(),
+                workflowBackFillRequest.getProjectCode(),
+                ApiFuncIdentificationConstant.RERUN);
         final BackfillWorkflowDTO backfillWorkflowDTO =
                 backfillWorkflowRequestTransformer.transform(workflowBackFillRequest);
+        // verify the workflow definition belongs to the URL's project
+        if (backfillWorkflowDTO.getWorkflowDefinition() == null
+                || backfillWorkflowDTO.getWorkflowDefinition().getProjectCode() != workflowBackFillRequest
+                        .getProjectCode()) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                    String.valueOf(workflowBackFillRequest.getWorkflowDefinitionCode()));
+        }
         backfillWorkflowDTOValidator.validate(backfillWorkflowDTO);
         return executorClient.backfillWorkflowDefinition().execute(backfillWorkflowDTO);
     }
@@ -175,13 +197,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     public boolean checkSubWorkflowDefinitionValid(WorkflowDefinition workflowDefinition) {
         // query all sub workflows under the current workflow
         List<WorkflowTaskRelation> workflowTaskRelations =
-                workflowTaskRelationMapper.queryDownstreamByWorkflowDefinitionCode(workflowDefinition.getCode());
+                workflowTaskRelationDao.queryDownstreamByWorkflowDefinitionCode(workflowDefinition.getCode());
         if (workflowTaskRelations.isEmpty()) {
             return true;
         }
         Set<Long> relationCodes =
                 workflowTaskRelations.stream().map(WorkflowTaskRelation::getPostTaskCode).collect(Collectors.toSet());
-        List<TaskDefinition> taskDefinitions = taskDefinitionMapper.queryByCodeList(relationCodes);
+        List<TaskDefinition> taskDefinitions = taskDefinitionDao.queryByCodes(relationCodes);
 
         // find out the workflow definition code
         Set<Long> workflowDefinitionCodeSet = new HashSet<>();
@@ -195,7 +217,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
 
         // check sub releaseState
-        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionMapper.queryByCodes(workflowDefinitionCodeSet);
+        List<WorkflowDefinition> workflowDefinitions = workflowDefinitionDao.queryByCodes(workflowDefinitionCodeSet);
         return workflowDefinitions.stream()
                 .filter(definition -> definition.getReleaseState().equals(ReleaseState.OFFLINE))
                 .collect(Collectors.toSet())
@@ -357,8 +379,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     @Override
-    public Map<String, Object> forceStartTaskInstance(User loginUser, int queueId) {
-        Map<String, Object> result = new HashMap<>();
+    public void forceStartTaskInstance(User loginUser, int queueId) {
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
         // check workflow instance exist
         workflowInstanceDao.queryOptionalById(taskGroupQueue.getWorkflowInstanceId())
@@ -372,9 +393,6 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         taskGroupQueue.setForceStart(Flag.YES.getCode());
         taskGroupQueue.setUpdateTime(new Date());
         taskGroupQueueMapper.updateById(taskGroupQueue);
-
-        result.put(Constants.STATUS, Status.SUCCESS);
-        return result;
     }
 
     @Override

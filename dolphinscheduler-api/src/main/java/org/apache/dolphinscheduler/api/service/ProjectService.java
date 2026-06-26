@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
-import java.util.Map;
 
 public interface ProjectService {
 
@@ -50,45 +49,13 @@ public interface ProjectService {
      *
      * @param loginUser login user
      * @param projectName project name
-     * @return project detail information
+     * @return project (throws {@link ServiceException} on not-found or no-perm)
      */
-    Map<String, Object> queryByName(User loginUser, String projectName);
-
-    /**
-     * check project and authorization
-     *
-     * @param loginUser login user
-     * @param project project
-     * @param projectCode project code
-     * @param perm String
-     * @return true if the login user have permission to see the project
-     */
-    @Deprecated
-    Map<String, Object> checkProjectAndAuth(User loginUser, Project project, long projectCode, String perm);
+    Project queryByName(User loginUser, String projectName);
 
     void checkProjectAndAuthThrowException(User loginUser, Project project, String permission) throws ServiceException;
 
     void checkProjectAndAuthThrowException(User loginUser, Long projectCode, String permission) throws ServiceException;
-
-    boolean hasProjectAndPerm(User loginUser, Project project, Map<String, Object> result, String perm);
-
-    /**
-     * has project and permission
-     *
-     * @param loginUser  login user
-     * @param project    project
-     * @param result     result
-     * @param permission String
-     * @return true if the login user have permission to the project
-     */
-    @Deprecated
-    boolean hasProjectAndPerm(User loginUser, Project project, Result result, String permission);
-
-    @Deprecated
-    boolean hasProjectAndWritePerm(User loginUser, Project project, Result result);
-
-    @Deprecated
-    boolean hasProjectAndWritePerm(User loginUser, Project project, Map<String, Object> result);
 
     void checkHasProjectWritePermissionThrowException(User loginUser, long projectCode);
 
@@ -173,12 +140,12 @@ public interface ProjectService {
     Result queryAuthorizedUser(User loginUser, Long projectCode);
 
     /**
-     * query authorized project
+     * query authorized project list created by the login user
      *
      * @param loginUser login user
      * @return projects which the user have permission to see, Except for items created by this user
      */
-    Map<String, Object> queryProjectCreatedByUser(User loginUser);
+    List<Project> queryProjectCreatedByUser(User loginUser);
 
     /**
      * query all project list that have one or more workflow definitions.
@@ -193,18 +160,6 @@ public interface ProjectService {
      * @return project list
      */
     Result queryProjectCreatedAndAuthorizedByUser(User loginUser);
-
-    /**
-     * check project and authorization
-     *
-     * @param result result
-     * @param loginUser login user
-     * @param project project
-     * @param projectCode project code
-     * @param perm String
-     * @return true if the login user have permission to see the project
-     */
-    void checkProjectAndAuth(Result result, User loginUser, Project project, long projectCode, String perm);
 
     /**
      * the project list in dependent node's permissions should not be restricted

@@ -1,94 +1,91 @@
 # Commit Message Notice
 
-### Preface
+A good commit message states **what changed and why** at a glance. The full story belongs in the linked Issue / Pull Request — keep the commit message itself concise.
 
-A good commit message can help other developers (or future developers) quickly understand the context of related changes, and can also help project managers determine whether the commit is suitable for inclusion in the release. But when we checked the commit logs of many open source projects, we found an interesting problem. Some developers have very good code quality, but the commit message record is rather confusing. When other contributors or learners are viewing the code, it can’t be intuitively understood through commit log.
-The purpose of the changes before and after the submission, as Peter Hutterer said：Re-establishing the context of a piece of code is wasteful. We can’t avoid it completely, so our efforts should go to reducing it as much as possible. Commit messages can do exactly that and as a result, a commit message shows whether a developer is a good collaborator. Therefore, DolphinScheduler developed the protocol in conjunction with other communities and official Apache documents.
-
-### Commit Message RIP
-
-#### 1：Clearly modify the content
-
-A commit message should clearly state what issues (bug fixes, function enhancements, etc.) the submission solves, so that other developers can better track the issues and clarify the optimization during the version iteration process.
-
-#### 2：Associate the corresponding Pull Request or Issue
-
-When our changes are large, the commit message should best be associated with the relevant Issue or Pull Request on GitHub, so that our developers can quickly understand the context of the code submission through the associated information when reviewing the code. If the current commit is for an issue, then the issue can be closed in the Footer section.
-
-#### 3：Unified format
-
-The formatted CommitMessage can help provide more historical information for quick browsing, and it can also generate a Change Log directly from commit.
-
-Commit message should include three parts: Header, Body and Footer. Among them, Header is required, Body and Footer can be omitted.
-
-##### Header
-
-The header part has only one line, including three fields: type (required), scope (optional), and subject (required).
-
-[DS-ISSUE number][type] subject
-
-(1) Type is used to indicate the category of commit, and only the following 7 types are allowed.
-
-- feat：features
-- fix：Bug fixes
-- docs：Documentation
-- style： Format (does not affect changes in code operation)
-- refactor：Refactoring (It is not a new feature or a code change to fix a bug)
-- test：Add test
-- chore：Changes in the build process or auxiliary tools
-
-If the type is feat and fix, the commit will definitely appear in the change log. Other types (docs, chore, style, refactor, test) are not recommended.
-
-(2) Scope
-
-Scope is used to indicate the scope of commit impact, such as server, remote, etc. If there is no suitable scope, you can use \*.
-
-(3) subject
-
-Subject is a short description of the purpose of the commit, no more than 50 characters.
-
-##### Body
-
-The body part is a detailed description of this commit, which can be divided into multiple lines, and the line break will wrap with 72 characters to avoid automatic line wrapping affecting the appearance.
-
-Note the following points in the Body section:
-
-- Use the verb-object structure, note the use of present tense. For example, use change instead of changed or changes
-
-- Don't capitalize the first letter
-
-- The end of the sentence does not need a ‘.’ (period)
-
-##### Footer
-
-Footer only works in two situations
-
-(1) Incompatible changes
-
-If the current code is not compatible with the previous version, the Footer part starts with BREAKING CHANGE, followed by a description of the change, the reason for the change, and the migration method.
-
-(2) Close Issue
-
-If the current commit is for a certain issue, you can close the issue in the Footer section, or close multiple issues at once.
-
-##### For Example
+## Format
 
 ```
-[DS-001][docs-en] add commit message
+[Type-ISSUE_ID][Scope] Subject
 
-- commit message RIP
-- build some conventions
-- help the commit messages become clean and tidy
-- help developers and release managers better track issues
-  and clarify the optimization in the version iteration
+(optional body — bullet list of the main changes)
 
-This closes #001
+(optional footer — BREAKING CHANGE / Closes #xxx)
 ```
 
-### Reference documents
+Header is required; body and footer are optional. Aim for a Subject under 72 characters so it does not get truncated on GitHub.
 
-[Commit message format](https://cwiki.apache.org/confluence/display/GEODE/Commit+Message+Format)
+### Type (required)
 
-[On commit messages-Peter Hutterer](http://who-t.blogspot.com/2009/12/on-commit-messages.html)
+|     Type      |                                                When to use                                                |  Issue ID required?  |
+|---------------|-----------------------------------------------------------------------------------------------------------|----------------------|
+| `Feature`     | A new user-visible feature                                                                                | Yes                  |
+| `Improvement` | Enhancement to an existing feature (refactor, perf, UX polish)                                            | Yes                  |
+| `Fix`         | Bug fix                                                                                                   | Yes                  |
+| `Doc`         | Documentation only                                                                                        | Yes                  |
+| `DSIP`        | A change implementing a [DSIP](https://github.com/apache/dolphinscheduler/issues?q=label%3ADSIP) proposal | Yes (the DSIP issue) |
+| `Chore`       | Build, CI, test scaffolding, dependency bumps, trivial cleanup                                            | No                   |
 
-[RocketMQ Community Operation Conventions](https://mp.weixin.qq.com/s/LKM4IXAY-7dKhTzGu5-oug)
+Every type **except `Chore`** must carry an Issue ID. If no Issue exists for the change, file one first or reclassify it as `Chore`.
+
+### Scope (optional)
+
+The module the change touches: `Master`, `Worker`, `API`, `UI`, `TaskPlugin`, `Dao`, etc. Match a real module name. Omit `[Scope]` when the change is genuinely cross-cutting (most `Chore` commits).
+
+### Subject (required)
+
+A short imperative sentence describing the change.
+
+- Use the imperative mood: *Add*, *Fix*, *Remove* — not *Added* / *Adds*.
+- State the **purpose**, not the implementation detail. The diff already shows the *how*.
+- No trailing period.
+
+### Body (optional, recommended for non-trivial changes)
+
+When the change is not self-evident from the Subject, add a bullet list of the main changes. Keep it tight — one line per change point. Lengthy rationale, design notes, or testing plans go in the **Pull Request description** (see [PULL_REQUEST_TEMPLATE.md](https://github.com/apache/dolphinscheduler/blob/dev/.github/PULL_REQUEST_TEMPLATE.md)), not in the commit message.
+
+### Footer (optional)
+
+- `BREAKING CHANGE: <description>` — for incompatible changes. Required if the change breaks RPC, DB schema, or public API compatibility. Also add an entry to `docs/docs/en/guide/upgrade/incompatible.md`.
+- `Closes #1234` — to auto-close the linked issue on merge.
+
+## Examples
+
+Good:
+
+```
+[Fix-18201][TaskPlugin] Fix RemoteShell task NullPointerException on empty stdout
+```
+
+```
+[Improvement-18224][API] Migrate EnvironmentService to typed return values
+
+- Replace Map<String, Object> returns with dedicated DTOs
+- Update controller and unit tests accordingly
+```
+
+```
+[Chore][API] Remove deprecated ProjectService#checkProjectAndAuth
+```
+
+```
+[Feature-17900][Master] Support task-group priority override at runtime
+
+- Add priority field to TaskGroupQueue
+- Honor override when dispatching ready tasks
+
+Closes #17900
+```
+
+Avoid:
+
+- `fix bug` — no type prefix, no scope, no information.
+- `[fix] update master` — wrong casing, missing issue ID, vague subject.
+- `[Improvement][Master] refactor scheduler to use new state machine and also fix a NPE in worker dispatch and adjust some logs` — multiple unrelated changes; split into separate commits.
+
+## References
+
+- [PULL_REQUEST_TEMPLATE.md](https://github.com/apache/dolphinscheduler/blob/dev/.github/PULL_REQUEST_TEMPLATE.md)
+- [Pull Request Notice](./pull-request.md)
+- [Apache Geode commit message format](https://cwiki.apache.org/confluence/display/GEODE/Commit+Message+Format)
+- [On commit messages — Peter Hutterer](http://who-t.blogspot.com/2009/12/on-commit-messages.html)
+

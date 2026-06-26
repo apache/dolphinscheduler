@@ -67,13 +67,11 @@
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>emr_serverless_spark20230808</artifactId>
-            <version>2.4.1</version>
         </dependency>
 
         <dependency>
             <groupId>com.aliyun</groupId>
             <artifactId>credentials-java</artifactId>
-            <version>0.3.0</version>
         </dependency>
     </dependencies>
 

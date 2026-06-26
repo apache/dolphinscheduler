@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.server.master.engine.system.event.AbstractSystemEvent;
 import org.apache.dolphinscheduler.server.master.engine.system.event.ISystemEventHandler;
-import org.apache.dolphinscheduler.server.master.failover.FailoverCoordinator;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.StopWatch;
@@ -42,9 +41,6 @@ public class SystemEventBusFireWorker extends BaseDaemonThread implements AutoCl
 
     @Autowired
     private SystemEventBus systemEventBus;
-
-    @Autowired
-    private FailoverCoordinator failoverCoordinator;
 
     @Autowired
     private List<ISystemEventHandler> systemEventHandlers;

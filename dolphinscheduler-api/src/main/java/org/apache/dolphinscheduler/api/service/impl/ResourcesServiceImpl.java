@@ -70,8 +70,8 @@ import org.apache.dolphinscheduler.api.vo.resources.FetchFileContentResponse;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
@@ -101,7 +101,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     private TenantDao tenantDao;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Autowired
     private StorageOperator storageOperator;
@@ -392,7 +392,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public String queryResourceBaseDir(User loginUser, ResourceType type) {
 
-        User user = userMapper.selectById(loginUser.getId());
+        User user = userDao.queryById(loginUser.getId());
         if (user == null) {
             throw new ServiceException(Status.USER_NOT_EXIST);
         }

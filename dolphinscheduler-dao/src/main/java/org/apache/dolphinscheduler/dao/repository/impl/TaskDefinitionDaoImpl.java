@@ -43,6 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.collect.Lists;
 
 @Repository
@@ -87,6 +88,16 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
     }
 
     @Override
+    public TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion) {
+        return taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, taskDefinitionVersion);
+    }
+
+    @Override
+    public void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion) {
+        mybatisMapper.deleteByWorkflowDefinitionCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion);
+    }
+
+    @Override
     public void deleteByTaskDefinitionCodes(Set<Long> needToDeleteTaskDefinitionCodes) {
         if (CollectionUtils.isEmpty(needToDeleteTaskDefinitionCodes)) {
             return;
@@ -105,6 +116,31 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
     @Override
     public TaskDefinition queryByCode(long taskCode) {
         return mybatisMapper.queryByCode(taskCode);
+    }
+
+    @Override
+    public TaskDefinition queryByName(long projectCode, long workflowDefinitionCode, String taskName) {
+        return mybatisMapper.queryByName(projectCode, workflowDefinitionCode, taskName);
+    }
+
+    @Override
+    public List<TaskDefinition> queryByWorkerGroup(String workerGroup) {
+        return mybatisMapper.selectList(
+                new QueryWrapper<TaskDefinition>().lambda().eq(TaskDefinition::getWorkerGroup, workerGroup));
+    }
+
+    @Override
+    public long countByEnvironmentCode(long environmentCode) {
+        return mybatisMapper.selectCount(
+                new QueryWrapper<TaskDefinition>().lambda().eq(TaskDefinition::getEnvironmentCode, environmentCode));
+    }
+
+    @Override
+    public List<TaskDefinition> queryByEnvironmentCodeAndWorkerGroup(long environmentCode, String workerGroup) {
+        return mybatisMapper.selectList(
+                new QueryWrapper<TaskDefinition>().lambda()
+                        .eq(TaskDefinition::getEnvironmentCode, environmentCode)
+                        .eq(TaskDefinition::getWorkerGroup, workerGroup));
     }
 
     @Override

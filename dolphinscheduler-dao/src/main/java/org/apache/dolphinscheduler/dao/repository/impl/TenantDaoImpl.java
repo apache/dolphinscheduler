@@ -22,11 +22,14 @@ import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 
+import java.util.List;
 import java.util.Optional;
 
 import lombok.NonNull;
 
 import org.springframework.stereotype.Repository;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
 
 @Repository
 public class TenantDaoImpl extends BaseDao<Tenant, TenantMapper> implements TenantDao {
@@ -38,5 +41,25 @@ public class TenantDaoImpl extends BaseDao<Tenant, TenantMapper> implements Tena
     @Override
     public Optional<Tenant> queryByCode(String tenantCode) {
         return Optional.ofNullable(mybatisMapper.queryByTenantCode(tenantCode));
+    }
+
+    @Override
+    public Tenant queryDetailById(int tenantId) {
+        return mybatisMapper.queryById(tenantId);
+    }
+
+    @Override
+    public List<Tenant> queryTenantListByQueueId(Integer queueId) {
+        return mybatisMapper.queryTenantListByQueueId(queueId);
+    }
+
+    @Override
+    public IPage<Tenant> queryTenantPaging(IPage<Tenant> page, List<Integer> ids, String searchVal) {
+        return mybatisMapper.queryTenantPaging(page, ids, searchVal);
+    }
+
+    @Override
+    public boolean existTenant(String tenantCode) {
+        return Boolean.TRUE.equals(mybatisMapper.existTenant(tenantCode));
     }
 }

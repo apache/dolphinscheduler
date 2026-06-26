@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
 import org.apache.ibatis.annotations.Param;
@@ -47,6 +48,10 @@ public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
      * @return worker group list
      */
     List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
+
+    int updateAddrListByWorkerGroupName(@Param("name") String name,
+                                        @Param("addrList") String addrList,
+                                        @Param("source") WorkerGroupSource source);
 
     int deleteByWorkerGroupName(@Param("name") String name);
 }
