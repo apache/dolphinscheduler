@@ -124,7 +124,7 @@ export const UserModal = defineComponent({
               maxlength={39}
               placeholder={t('security.user.username_tips')}
               disabled={
-                currentRecord?.id &&
+                !!currentRecord?.id &&
                 this.userStore.getSecurityConfigType !== 'PASSWORD'
               }
             />
