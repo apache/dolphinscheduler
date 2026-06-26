@@ -65,10 +65,15 @@ public class S3StorageOperator extends AbstractStorageOperator implements Closea
     private final AmazonS3 s3Client;
 
     public S3StorageOperator(S3StorageProperties s3StorageProperties) {
-        super(s3StorageProperties.getResourceUploadPath());
-        bucketName = s3StorageProperties.getBucketName();
-        s3Client = AmazonS3ClientFactory.createAmazonS3Client(s3StorageProperties.getS3Configuration());
+        this(s3StorageProperties.getBucketName(), s3StorageProperties.getResourceUploadPath(),
+                AmazonS3ClientFactory.createAmazonS3Client(s3StorageProperties.getS3Configuration()));
         exceptionWhenBucketNameNotExists(bucketName);
+    }
+
+    S3StorageOperator(String bucketName, String resourceUploadPath, AmazonS3 s3Client) {
+        super(resourceUploadPath);
+        this.bucketName = bucketName;
+        this.s3Client = s3Client;
     }
 
     @Override
@@ -224,17 +229,21 @@ public class S3StorageOperator extends AbstractStorageOperator implements Closea
                 .withDelimiter("/")
                 .withPrefix(s3ResourceAbsolutePath);
 
-        ListObjectsV2Result listObjectsV2Result = s3Client.listObjectsV2(listObjectsV2Request);
         List<StorageEntity> storageEntities = new ArrayList<>();
-        storageEntities.addAll(listObjectsV2Result.getCommonPrefixes()
-                .stream()
-                .map(this::transformCommonPrefixToStorageEntity)
-                .collect(Collectors.toList()));
-        storageEntities.addAll(
-                listObjectsV2Result.getObjectSummaries().stream()
-                        .filter(s3ObjectSummary -> !s3ObjectSummary.getKey().equals(s3ResourceAbsolutePath))
-                        .map(this::transformS3ObjectToStorageEntity)
-                        .collect(Collectors.toList()));
+        ListObjectsV2Result listObjectsV2Result;
+        do {
+            listObjectsV2Result = s3Client.listObjectsV2(listObjectsV2Request);
+            storageEntities.addAll(listObjectsV2Result.getCommonPrefixes()
+                    .stream()
+                    .map(this::transformCommonPrefixToStorageEntity)
+                    .collect(Collectors.toList()));
+            storageEntities.addAll(
+                    listObjectsV2Result.getObjectSummaries().stream()
+                            .filter(s3ObjectSummary -> !s3ObjectSummary.getKey().equals(s3ResourceAbsolutePath))
+                            .map(this::transformS3ObjectToStorageEntity)
+                            .collect(Collectors.toList()));
+            listObjectsV2Request.setContinuationToken(listObjectsV2Result.getNextContinuationToken());
+        } while (listObjectsV2Result.isTruncated());
 
         return storageEntities;
     }
