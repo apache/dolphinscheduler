@@ -65,6 +65,7 @@ export default {
   user_name_tips: '请输入用户名',
   user_password: '密码',
   user_password_tips: '请输入密码',
+  user_password_edit_tips: '请输入新密码（不填则保持原密码）',
   aws_region: 'AwsRegion',
   aws_region_tips: '请输入AwsRegion',
   aws_access_key: 'AwsAccessKey',

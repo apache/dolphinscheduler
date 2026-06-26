@@ -68,6 +68,7 @@ export default {
   user_name_tips: 'Please enter your username',
   user_password: 'Password',
   user_password_tips: 'Please enter your password',
+  user_password_edit_tips: 'Enter new password (leave blank to keep original)',
   aws_region: 'Aws Region',
   aws_region_tips: 'Please enter AwsRegion',
   aws_access_key: 'AwsAccessKey',
