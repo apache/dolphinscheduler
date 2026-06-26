@@ -27,8 +27,10 @@ import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
+import java.lang.reflect.Proxy;
 import java.nio.file.FileAlreadyExistsException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import lombok.SneakyThrows;
@@ -46,6 +48,9 @@ import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.ListObjectsV2Request;
+import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
 
 public class S3StorageOperatorTest {
 
@@ -260,6 +265,20 @@ public class S3StorageOperatorTest {
     }
 
     @Test
+    public void testListStorageEntity_shouldFetchAllS3Pages() {
+        AtomicInteger listObjectsCallCount = new AtomicInteger();
+        AmazonS3 amazonS3 = createPagedAmazonS3Client(listObjectsCallCount);
+        S3StorageOperator storageOperator = new S3StorageOperator("dolphinscheduler",
+                "tmp/dolphinscheduler", amazonS3);
+
+        List<StorageEntity> storageEntities =
+                storageOperator.listStorageEntity("tmp/dolphinscheduler/default/resources/largeDirectory");
+
+        assertThat(storageEntities).hasSize(1001);
+        assertThat(listObjectsCallCount.get()).isEqualTo(2);
+    }
+
+    @Test
     public void testListStorageEntity_directoryNotExist() {
         List<StorageEntity> storageEntities =
                 s3StorageOperator.listStorageEntity("tmp/dolphinscheduler/notExist/resources");
@@ -300,6 +319,39 @@ public class S3StorageOperatorTest {
         if (minIOContainer != null) {
             minIOContainer.stop();
         }
+    }
+
+    private AmazonS3 createPagedAmazonS3Client(AtomicInteger listObjectsCallCount) {
+        return (AmazonS3) Proxy.newProxyInstance(
+                AmazonS3.class.getClassLoader(),
+                new Class<?>[]{AmazonS3.class},
+                (proxy, method, args) -> {
+                    if (!"listObjectsV2".equals(method.getName())) {
+                        return null;
+                    }
+
+                    ListObjectsV2Request request = (ListObjectsV2Request) args[0];
+                    int callIndex = listObjectsCallCount.getAndIncrement();
+                    if (callIndex == 0) {
+                        assertThat(request.getContinuationToken()).isNull();
+                        return createListObjectsV2Result("next-page-token", 0, 1000);
+                    }
+                    assertThat(request.getContinuationToken()).isEqualTo("next-page-token");
+                    return createListObjectsV2Result(null, 1000, 1001);
+                });
+    }
+
+    private ListObjectsV2Result createListObjectsV2Result(String nextContinuationToken, int start, int end) {
+        ListObjectsV2Result listObjectsV2Result = new ListObjectsV2Result();
+        listObjectsV2Result.setTruncated(nextContinuationToken != null);
+        listObjectsV2Result.setNextContinuationToken(nextContinuationToken);
+        for (int i = start; i < end; i++) {
+            S3ObjectSummary s3ObjectSummary = new S3ObjectSummary();
+            s3ObjectSummary.setKey(String.format(
+                    "tmp/dolphinscheduler/default/resources/largeDirectory/demo-%04d.sql", i));
+            listObjectsV2Result.getObjectSummaries().add(s3ObjectSummary);
+        }
+        return listObjectsV2Result;
     }
 
 }
