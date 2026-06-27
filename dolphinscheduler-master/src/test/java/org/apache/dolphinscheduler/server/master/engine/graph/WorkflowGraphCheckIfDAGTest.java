@@ -90,8 +90,10 @@ public class WorkflowGraphCheckIfDAGTest {
         workflowTaskRelations.add(relation1);
         workflowTaskRelations.add(relation2);
 
-        Assertions.assertThrows(IllegalArgumentException.class,
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> new WorkflowGraph(workflowTaskRelations, taskDefinitions));
+        Assertions.assertTrue(exception.getMessage().contains("1"));
+        Assertions.assertTrue(exception.getMessage().contains("2"));
     }
 
     @Test
@@ -172,9 +174,13 @@ public class WorkflowGraphCheckIfDAGTest {
     @Test
     public void checkIfDAGComplexDAGThrowsException() {
         TaskDefinition task1 = new TaskDefinition(1L, 1);
+        task1.setName("task1");
         TaskDefinition task2 = new TaskDefinition(2L, 1);
+        task2.setName("task2");
         TaskDefinition task3 = new TaskDefinition(3L, 1);
+        task3.setName("task3");
         TaskDefinition task4 = new TaskDefinition(4L, 1);
+        task4.setName("task4");
         taskDefinitions.add(task1);
         taskDefinitions.add(task2);
         taskDefinitions.add(task3);
@@ -187,36 +193,32 @@ public class WorkflowGraphCheckIfDAGTest {
         relation1.setPostTaskVersion(1);
 
         WorkflowTaskRelation relation2 = new WorkflowTaskRelation();
-        relation2.setPreTaskCode(1L);
+        relation2.setPreTaskCode(2L);
         relation2.setPreTaskVersion(1);
         relation2.setPostTaskCode(3L);
         relation2.setPostTaskVersion(1);
 
         WorkflowTaskRelation relation3 = new WorkflowTaskRelation();
-        relation3.setPreTaskCode(2L);
+        relation3.setPreTaskCode(3L);
         relation3.setPreTaskVersion(1);
         relation3.setPostTaskCode(4L);
         relation3.setPostTaskVersion(1);
 
         WorkflowTaskRelation relation4 = new WorkflowTaskRelation();
-        relation4.setPreTaskCode(3L);
+        relation4.setPreTaskCode(4L);
         relation4.setPreTaskVersion(1);
-        relation4.setPostTaskCode(4L);
+        relation4.setPostTaskCode(2L);
         relation4.setPostTaskVersion(1);
-
-        WorkflowTaskRelation relation5 = new WorkflowTaskRelation();
-        relation5.setPreTaskCode(4L);
-        relation5.setPreTaskVersion(1);
-        relation5.setPostTaskCode(3L);
-        relation5.setPostTaskVersion(1);
 
         workflowTaskRelations.add(relation1);
         workflowTaskRelations.add(relation2);
         workflowTaskRelations.add(relation3);
         workflowTaskRelations.add(relation4);
-        workflowTaskRelations.add(relation5);
 
-        Assertions.assertThrows(IllegalArgumentException.class,
+        IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> new WorkflowGraph(workflowTaskRelations, taskDefinitions));
+        Assertions.assertTrue(exception.getMessage().contains("2"));
+        Assertions.assertTrue(exception.getMessage().contains("3"));
+        Assertions.assertTrue(exception.getMessage().contains("4"));
     }
 }

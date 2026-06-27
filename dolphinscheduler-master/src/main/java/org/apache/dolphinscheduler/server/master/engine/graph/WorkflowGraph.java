@@ -110,8 +110,24 @@ public class WorkflowGraph implements IWorkflowGraph {
         }
 
         if (sortedTaskCodes.size() < taskDefinitions.size()) {
-            throw new IllegalArgumentException("The workflow task relation is not a DAG");
+            Map<Long, TaskDefinition> taskDefinitionByCode = taskDefinitions.stream()
+                    .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinition -> taskDefinition));
+            List<String> cyclicTasks = inDegreeCount.entrySet()
+                    .stream()
+                    .filter(entry -> entry.getValue() > 0)
+                    .map(entry -> formatTaskIdentifier(entry.getKey(), taskDefinitionByCode))
+                    .collect(Collectors.toList());
+            throw new IllegalArgumentException(
+                    "The workflow task relation is not a DAG, cyclic tasks: " + String.join(", ", cyclicTasks));
         }
+    }
+
+    private String formatTaskIdentifier(Long taskCode, Map<Long, TaskDefinition> taskDefinitionByCode) {
+        TaskDefinition taskDefinition = taskDefinitionByCode.get(taskCode);
+        if (taskDefinition != null && taskDefinition.getName() != null && !taskDefinition.getName().isEmpty()) {
+            return taskDefinition.getName() + "(" + taskCode + ")";
+        }
+        return String.valueOf(taskCode);
     }
 
     @Override
