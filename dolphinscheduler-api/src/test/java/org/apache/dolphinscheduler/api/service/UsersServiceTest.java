@@ -26,6 +26,8 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.security.AuthenticationType;
+import org.apache.dolphinscheduler.api.security.SecurityConfig;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -52,6 +54,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -104,9 +107,17 @@ public class UsersServiceTest {
     @Mock
     private SessionService sessionService;
 
+    @Mock
+    private SecurityConfig securityConfig;
+
     private String queueName = "UsersServiceTestQueue";
 
     private static final Logger serviceLogger = LoggerFactory.getLogger(BaseServiceImpl.class);
+
+    @BeforeEach
+    public void setUp() {
+        when(securityConfig.getType()).thenReturn(AuthenticationType.PASSWORD.name());
+    }
 
     @Test
     public void testCreateUserForLdap() {
