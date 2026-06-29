@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
+import java.time.Duration;
 import java.util.List;
 
 import lombok.Getter;
