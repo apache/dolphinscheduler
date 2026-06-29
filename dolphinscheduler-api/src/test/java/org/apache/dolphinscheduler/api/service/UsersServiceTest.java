@@ -62,6 +62,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -306,6 +307,36 @@ public class UsersServiceTest {
                 "offline",
                 1,
                 "Asia/Shanghai"));
+    }
+
+    @Test
+    public void testUpdateUserAllowsNonCredentialChangesInNonPasswordMode() {
+        ReflectionTestUtils.setField(usersService, "securityAuthenticationType", "OIDC");
+        when(userDao.queryById(any())).thenReturn(getUser());
+        when(userDao.updateById(any())).thenReturn(true);
+
+        assertDoesNotThrow(() -> usersService.updateUser(getLoginUser(),
+                1,
+                "userTest0001",
+                null,
+                "user@example.com",
+                1,
+                "13457864543",
+                "queue",
+                1,
+                "Asia/Shanghai"));
+
+        assertThrowsServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE,
+                () -> usersService.updateUser(getLoginUser(),
+                        1,
+                        "updatedUser",
+                        null,
+                        "user@example.com",
+                        1,
+                        "13457864543",
+                        "queue",
+                        1,
+                        "Asia/Shanghai"));
     }
 
     @Test

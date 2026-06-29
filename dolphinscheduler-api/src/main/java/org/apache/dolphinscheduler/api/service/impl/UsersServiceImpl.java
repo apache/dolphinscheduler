@@ -370,7 +370,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
         }
 
-        if (StringUtils.isNotEmpty(userName)) {
+        if (StringUtils.isNotEmpty(userName) && !StringUtils.equals(userName, user.getUserName())) {
 
             if (isNotPasswordAuthenticationMode()) {
                 throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
