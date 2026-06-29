@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.security.AuthenticationType;
-import org.apache.dolphinscheduler.api.security.SecurityConfig;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -66,6 +65,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -103,11 +103,12 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private SessionService sessionService;
 
-    @Autowired
-    private SecurityConfig securityConfig;
+    @Value("${security.authentication.type:PASSWORD}")
+    private String securityAuthenticationType = AuthenticationType.PASSWORD.name();
 
     private boolean isNotPasswordAuthenticationMode() {
-        return !AuthenticationType.PASSWORD.name().equals(securityConfig.getType());
+        return StringUtils.isNotBlank(securityAuthenticationType)
+                && !AuthenticationType.PASSWORD.name().equals(securityAuthenticationType);
     }
 
     /**

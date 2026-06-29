@@ -194,7 +194,8 @@ public class LoginControllerOidcTest extends AbstractControllerTest {
         when(oidcAuthenticator.login(state, code)).thenReturn(user);
         when(sessionService.createSessionIfAbsent(user)).thenReturn(session);
 
-        String expectedRedirectUrl = String.format("%s/login?sessionId=%s&authType=%s", uiUrl, sessionId, "oidc");
+        String expectedRedirectUrl = String.format("%s/login?sessionId=%s&authType=%s&securityConfigType=%s",
+                uiUrl, sessionId, "oidc", "OIDC");
 
         performOidcCallback(code, null, state)
                 .andExpect(status().isFound())
