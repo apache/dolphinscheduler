@@ -150,21 +150,21 @@ public abstract class TaskNodeForm {
     }
 
     public TaskNodeForm setWorkerGroup(String workerGroupName) {
-        ((JavascriptExecutor) parent().driver()).executeScript(
-                "document.querySelector('.worker-group-select .n-base-selection').click()");
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectWorkerGroup);
 
-        try {
-            WebDriverWaitFactory.createWebDriverWait(parent().driver(), Duration.ofSeconds(2))
-                    .until(ExpectedConditions.elementToBeClickable(
-                            By.xpath("//*[contains(@class, 'n-base-selection-option') and text()='" + workerGroupName
-                                    + "']")))
-                    .click();
-        } catch (org.openqa.selenium.TimeoutException e) {
-            ((JavascriptExecutor) parent().driver()).executeScript(
-                    "arguments[0].value = '" + workerGroupName + "'",
-                    selectWorkerGroup);
-            parent.driver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
-        }
+        final By optionsLocator = By.xpath(
+                "//div[contains(@class, 'n-select-menu')]//div[contains(@class, 'n-base-select-option')]");
+
+        WebDriverWaitFactory.createWebDriverWait(parent().driver(), Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        parent().driver()
+                .findElements(optionsLocator)
+                .stream()
+                .filter(it -> workerGroupName.equals(it.getText().trim()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such worker group: " + workerGroupName))
+                .click();
 
         return this;
     }

@@ -80,7 +80,7 @@ public class WorkflowHttpTaskE2ETest {
 
         userPage.update(user, user, email, phone, tenant)
                 .goToNav(ProjectPage.class)
-                .create(project);
+                .createProjectUntilSuccess(project);
     }
 
     @AfterAll

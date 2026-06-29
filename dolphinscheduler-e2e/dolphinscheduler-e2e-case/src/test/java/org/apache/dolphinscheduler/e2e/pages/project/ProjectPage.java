@@ -71,10 +71,10 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
 
     public ProjectPage createProjectUntilSuccess(String project) {
         create(project);
-        assignWorkerGroup(project, "default");
         await().untilAsserted(() -> assertThat(projectList())
                 .as("project list should contain newly-created project")
                 .anyMatch(it -> it.getText().contains(project)));
+        assignWorkerGroup(project, "default");
         return this;
     }
 

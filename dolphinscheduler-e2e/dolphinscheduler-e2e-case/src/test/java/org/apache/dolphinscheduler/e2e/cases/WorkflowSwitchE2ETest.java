@@ -66,7 +66,7 @@ class WorkflowSwitchE2ETest {
                 .goToTab(TenantPage.class)
                 .create(tenant)
                 .goToNav(ProjectPage.class)
-                .create(project);
+                .createProjectUntilSuccess(project);
     }
 
     @AfterAll
