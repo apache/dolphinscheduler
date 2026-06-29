@@ -285,6 +285,35 @@ public class K8sTaskExecutorTest {
         verify(k8sUtils).getJob(eq(job.getMetadata().getName()), eq(namespace));
     }
 
+    @Test
+    public void testRegisterBatchJobInformerConsecutivePollFailuresWithoutTimeoutStrategy() throws Exception {
+        TaskExecutionContext taskRequest = getTaskRequest();
+        taskRequest.setTaskTimeoutStrategy(TaskTimeoutStrategy.WARN);
+
+        K8sTaskExecutor pollingExecutor = new K8sTaskExecutor(taskRequest) {
+
+            @Override
+            protected long getJobStatusPollIntervalSeconds() {
+                return 1L;
+            }
+
+            @Override
+            protected int getMaxConsecutivePollFailures() {
+                return 2;
+            }
+        };
+        injectK8sUtils(pollingExecutor, k8sUtils);
+        when(k8sUtils.getJob(eq(job.getMetadata().getName()), eq(namespace)))
+                .thenThrow(new RuntimeException("apiserver unreachable"));
+
+        TaskResponse taskResponse = new TaskResponse();
+        WatcherHarness harness = startBatchJobWatcher(pollingExecutor, taskResponse);
+        finishWatcher(harness);
+        assertEquals(EXIT_CODE_FAILURE, taskResponse.getExitStatusCode());
+        verify(k8sUtils, org.mockito.Mockito.atLeast(2))
+                .getJob(eq(job.getMetadata().getName()), eq(namespace));
+    }
+
     private static final class WatcherHarness {
 
         private SharedIndexInformer<Job> informer;

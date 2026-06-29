@@ -62,6 +62,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.api.model.Affinity;
@@ -85,6 +86,7 @@ import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
 
     private static final long JOB_STATUS_POLL_INTERVAL_SECONDS = 30L;
+    private static final int MAX_CONSECUTIVE_POLL_FAILURES = 3;
 
     private Job job;
     protected boolean podLogOutputIsFinished = false;
@@ -218,7 +220,9 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                     });
                 }
             });
-            jobStatusPoller = startJobStatusPoller(jobName, namespace, taskResponse, countDownLatch);
+            AtomicInteger consecutivePollFailures = new AtomicInteger(0);
+            jobStatusPoller = startJobStatusPoller(jobName, namespace, taskResponse, countDownLatch,
+                    consecutivePollFailures);
             awaitJobCompletion(countDownLatch);
         } catch (InterruptedException e) {
             log.error("job failed in k8s: {}", e.getMessage(), e);
@@ -238,21 +242,31 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
     }
 
     /**
-     * Returns the interval for polling Job status. Protected so unit tests can override with a shorter value.
+     * Returns the interval for polling Job status.
+     * Protected so unit tests can override with a shorter value.
      */
     protected long getJobStatusPollIntervalSeconds() {
         return JOB_STATUS_POLL_INTERVAL_SECONDS;
     }
 
+    /**
+     * Returns the max consecutive GET poll failures before failing the task.
+     * Protected so unit tests can override with a lower value.
+     */
+    protected int getMaxConsecutivePollFailures() {
+        return MAX_CONSECUTIVE_POLL_FAILURES;
+    }
+
     private ScheduledExecutorService startJobStatusPoller(String jobName,
                                                           String namespace,
                                                           TaskResponse taskResponse,
-                                                          CountDownLatch countDownLatch) {
+                                                          CountDownLatch countDownLatch,
+                                                          AtomicInteger consecutivePollFailures) {
         ScheduledExecutorService jobStatusPoller = ThreadUtils.newSingleDaemonScheduledExecutorService(
                 "K8sJobStatusPoller-" + jobName);
         long pollIntervalSeconds = getJobStatusPollIntervalSeconds();
         jobStatusPoller.scheduleAtFixedRate(
-                () -> pollBatchJobStatus(jobName, namespace, taskResponse, countDownLatch),
+                () -> pollBatchJobStatus(jobName, namespace, taskResponse, countDownLatch, consecutivePollFailures),
                 pollIntervalSeconds,
                 pollIntervalSeconds,
                 TimeUnit.SECONDS);
@@ -262,7 +276,8 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
     private void pollBatchJobStatus(String jobName,
                                     String namespace,
                                     TaskResponse taskResponse,
-                                    CountDownLatch countDownLatch) {
+                                    CountDownLatch countDownLatch,
+                                    AtomicInteger consecutivePollFailures) {
         if (countDownLatch.getCount() == 0) {
             return;
         }
@@ -270,6 +285,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             try {
                 log.info("[K8sJobExecutor-{}] polling job status via GET", jobName);
                 Job polledJob = k8sUtils.getJob(jobName, namespace);
+                consecutivePollFailures.set(0);
                 if (polledJob == null) {
                     log.error("[K8sJobExecutor-{}] job not found during status polling", jobName);
                     taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
@@ -278,7 +294,14 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 }
                 handleBatchJobTerminalStatus(polledJob, taskResponse, countDownLatch);
             } catch (Exception e) {
-                log.warn("[K8sJobExecutor-{}] failed to poll job status: {}", jobName, e.getMessage());
+                int failures = consecutivePollFailures.incrementAndGet();
+                log.warn("[K8sJobExecutor-{}] failed to poll job status ({}/{}): {}",
+                        jobName, failures, getMaxConsecutivePollFailures(), e.getMessage());
+                if (failures >= getMaxConsecutivePollFailures()) {
+                    log.error("[K8sJobExecutor-{}] fail in k8s: exceeded consecutive poll failure limit", jobName);
+                    taskResponse.setExitStatusCode(EXIT_CODE_FAILURE);
+                    countDownLatch.countDown();
+                }
             }
         });
     }
