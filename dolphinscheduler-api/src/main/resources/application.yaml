@@ -142,6 +142,8 @@ api:
   base-url: http://127.0.0.1:12345/dolphinscheduler
   ui-url: http://127.0.0.1:5173
   audit-enable: false
+  # Whether to test datasource connectivity before creating or updating a datasource.
+  datasource-connection-enable: false
   # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
   # global max request number per second
   # default tenant-level max request number
@@ -264,8 +266,6 @@ casdoor:
   # Doplhinscheduler login url
   redirect-url: ""
 
-datasource:
-  connection-test-on-save: false
 
 # Override by profile
 

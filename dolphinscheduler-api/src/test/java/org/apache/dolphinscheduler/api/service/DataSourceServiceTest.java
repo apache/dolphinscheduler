@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServi
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -74,7 +75,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
@@ -96,6 +96,9 @@ public class DataSourceServiceTest {
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
+
+    @Mock
+    private ApiConfig apiConfig;
 
     @Mock
     private IPage<DataSource> dataSourceList;
@@ -250,7 +253,7 @@ public class DataSourceServiceTest {
         postgreSqlDatasourceParam.setPassword("postgres");
         postgreSqlDatasourceParam.setName("dataSource01");
 
-        ReflectionTestUtils.setField(dataSourceService, "connectionTestOnSaveEnabled", true);
+        when(apiConfig.isDatasourceConnectionEnable()).thenReturn(true);
         passResourcePermissionCheckService();
         when(dataSourceDao.queryDataSourceByName(postgreSqlDatasourceParam.getName().trim())).thenReturn(null);
 
@@ -289,7 +292,7 @@ public class DataSourceServiceTest {
         dataSource.setName("dataSource01");
         dataSource.setType(DbType.POSTGRESQL);
 
-        ReflectionTestUtils.setField(dataSourceService, "connectionTestOnSaveEnabled", true);
+        when(apiConfig.isDatasourceConnectionEnable()).thenReturn(true);
         passResourcePermissionCheckService();
         when(dataSourceDao.queryById(dataSourceId)).thenReturn(dataSource);
         when(dataSourceDao.queryDataSourceByName(postgreSqlDatasourceParam.getName())).thenReturn(null);
@@ -339,7 +342,7 @@ public class DataSourceServiceTest {
         dataSource.setName("dataSource01");
         dataSource.setType(DbType.POSTGRESQL);
 
-        ReflectionTestUtils.setField(dataSourceService, "connectionTestOnSaveEnabled", false);
+        when(apiConfig.isDatasourceConnectionEnable()).thenReturn(false);
         passResourcePermissionCheckService();
         when(dataSourceDao.queryById(dataSourceId)).thenReturn(dataSource);
         when(dataSourceDao.queryDataSourceByName(Mockito.anyString())).thenReturn(null);

@@ -162,6 +162,8 @@ api:
   base-url: http://localhost:12345/dolphinscheduler
   ui-url: http://localhost:5173
   audit-enable: false
+  # Whether to test datasource connectivity before creating or updating a datasource.
+  datasource-connection-enable: false
   traffic-control:
     global-switch: false
     max-global-qps-rate: 300

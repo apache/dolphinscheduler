@@ -965,6 +965,9 @@ api:
   #      jackson:
   #        time-zone: UTC
   #        date-format: "yyyy-MM-dd HH:mm:ss"
+  #      api:
+  #        # Whether to test datasource connectivity before creating or updating a datasource.
+  #        datasource-connection-enable: false
   # -- Periodic probe of container liveness. Container will be restarted if the probe fails.
   # More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes)
   livenessProbe:

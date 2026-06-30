@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_UPDATE;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -59,7 +60,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,8 +78,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Autowired
     private DataSourceUserDao datasourceUserDao;
 
-    @Value("${datasource.connection-test-on-save:false}")
-    private boolean connectionTestOnSaveEnabled;
+    @Autowired
+    private ApiConfig apiConfig;
 
     private static final String TABLE = "TABLE";
     private static final String VIEW = "VIEW";
@@ -103,7 +103,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(datasourceParam);
 
-        if (connectionTestOnSaveEnabled) {
+        if (apiConfig.isDatasourceConnectionEnable()) {
             checkConnection(datasourceParam.getType(), connectionParam);
         }
 
@@ -159,7 +159,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             connectionParam.setPassword(oldParams.path(Constants.PASSWORD).asText());
         }
 
-        if (connectionTestOnSaveEnabled) {
+        if (apiConfig.isDatasourceConnectionEnable()) {
             checkConnection(dataSourceParam.getType(), connectionParam);
         }
 
