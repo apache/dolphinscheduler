@@ -36,7 +36,7 @@ public interface DataSourceService {
      * @param loginUser login user
      * @param datasourceParam datasource configuration DTO
      * @return created {@link DataSource} entity (sensitive fields masked)
-     * @throws ServiceException if permission denied, security check fails, or connection test fails
+     * @throws ServiceException if permission denied, security check fails, or configured connection test fails
      */
     DataSource createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam);
 
@@ -46,7 +46,7 @@ public interface DataSourceService {
      * @param loginUser login user
      * @param dataSourceParam datasource params
      * @return updated {@link DataSource} entity (sensitive fields masked)
-     * @throws ServiceException if permission denied, security check fails, or connection test fails
+     * @throws ServiceException if permission denied, security check fails, or configured connection test fails
      */
     DataSource updateDataSource(User loginUser, BaseDataSourceParamDTO dataSourceParam);
 

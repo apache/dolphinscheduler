@@ -264,6 +264,8 @@ casdoor:
   # Doplhinscheduler login url
   redirect-url: ""
 
+datasource:
+  connection-test-on-save: false
 
 # Override by profile
 
