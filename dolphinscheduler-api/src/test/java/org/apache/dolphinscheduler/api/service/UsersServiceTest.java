@@ -340,6 +340,62 @@ public class UsersServiceTest {
     }
 
     @Test
+    public void testUserPasswordManagementRejectedWhenOAuth2EnabledWithPasswordAuthentication() {
+        ReflectionTestUtils.setField(usersService, "securityAuthenticationType", "PASSWORD");
+        ReflectionTestUtils.setField(usersService, "oauth2Enabled", true);
+        when(userDao.queryById(any())).thenReturn(getUser());
+        when(userDao.updateById(any())).thenReturn(true);
+
+        assertThrowsServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE,
+                () -> usersService.createUser(getLoginUser(),
+                        "newUser",
+                        "userTest0001",
+                        "new-user@example.com",
+                        1,
+                        "13457864543",
+                        "queue",
+                        1));
+
+        assertThrowsServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE,
+                () -> usersService.registerUser("newUser", "userTest0001", "userTest0001", "new-user@example.com"));
+
+        assertDoesNotThrow(() -> usersService.updateUser(getLoginUser(),
+                1,
+                "userTest0001",
+                null,
+                "user@example.com",
+                1,
+                "13457864543",
+                "queue",
+                1,
+                "Asia/Shanghai"));
+
+        assertThrowsServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE,
+                () -> usersService.updateUser(getLoginUser(),
+                        1,
+                        "updatedUser",
+                        null,
+                        "user@example.com",
+                        1,
+                        "13457864543",
+                        "queue",
+                        1,
+                        "Asia/Shanghai"));
+
+        assertThrowsServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE,
+                () -> usersService.updateUser(getLoginUser(),
+                        1,
+                        "userTest0001",
+                        "updatedPassword",
+                        "user@example.com",
+                        1,
+                        "13457864543",
+                        "queue",
+                        1,
+                        "Asia/Shanghai"));
+    }
+
+    @Test
     public void testUpdateUserSimple() {
         // null user -> USER_NOT_EXIST
         assertThrowsServiceException(Status.USER_NOT_EXIST, () -> usersService.updateUser(null));

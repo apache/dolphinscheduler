@@ -106,7 +106,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Value("${security.authentication.type:PASSWORD}")
     private String securityAuthenticationType = AuthenticationType.PASSWORD.name();
 
-    private boolean isNotPasswordAuthenticationMode() {
+    @Value("${security.authentication.oauth2.enable:false}")
+    private boolean oauth2Enabled;
+
+    private boolean isPasswordManagementDisabled() {
+        if (oauth2Enabled) {
+            return true;
+        }
         return StringUtils.isNotBlank(securityAuthenticationType)
                 && !AuthenticationType.PASSWORD.name().equals(securityAuthenticationType);
     }
@@ -138,7 +144,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        if (isNotPasswordAuthenticationMode()) {
+        if (isPasswordManagementDisabled()) {
             throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
         }
 
@@ -372,7 +378,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(userName) && !StringUtils.equals(userName, user.getUserName())) {
 
-            if (isNotPasswordAuthenticationMode()) {
+            if (isPasswordManagementDisabled()) {
                 throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
             }
 
@@ -390,7 +396,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         if (StringUtils.isNotEmpty(userPassword)) {
 
-            if (isNotPasswordAuthenticationMode()) {
+            if (isPasswordManagementDisabled()) {
                 throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
             }
 
@@ -896,7 +902,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Transactional
     public User registerUser(String userName, String userPassword, String repeatPassword, String email) {
 
-        if (isNotPasswordAuthenticationMode()) {
+        if (isPasswordManagementDisabled()) {
             throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
         }
 
