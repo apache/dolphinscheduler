@@ -36,6 +36,11 @@ public class ApiConfigTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testIsDatasourceConnectionEnable() {
+        Assertions.assertFalse(apiConfig.isDatasourceConnectionEnable());
+    }
+
+    @Test
     public void testGetTrafficControlConfig() {
         ApiConfig.TrafficConfiguration trafficControl = apiConfig.getTrafficControl();
 
