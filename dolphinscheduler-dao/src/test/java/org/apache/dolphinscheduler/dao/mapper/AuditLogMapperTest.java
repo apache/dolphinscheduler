@@ -80,7 +80,15 @@ public class AuditLogMapperTest extends BaseDaoTest {
         List<String> operationTypeList = Lists.newArrayList(AuditOperationType.CREATE.getName());
 
         IPage<AuditLog> logIPage =
-                logMapper.queryAuditLog(page, objectTypeList, operationTypeList, "", "", null, null);
+                logMapper.queryAuditLog(page, objectTypeList, operationTypeList, null, "", "", null, null);
         Assertions.assertNotEquals(0, logIPage.getTotal());
+
+        IPage<AuditLog> userLogPage =
+                logMapper.queryAuditLog(new Page<>(1, 3), objectTypeList, operationTypeList, 1, "", "", null, null);
+        Assertions.assertNotEquals(0, userLogPage.getTotal());
+
+        IPage<AuditLog> otherUserLogPage =
+                logMapper.queryAuditLog(new Page<>(1, 3), objectTypeList, operationTypeList, 2, "", "", null, null);
+        Assertions.assertEquals(0, otherUserLogPage.getTotal());
     }
 }
