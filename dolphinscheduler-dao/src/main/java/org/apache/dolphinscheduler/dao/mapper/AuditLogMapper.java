@@ -35,6 +35,7 @@ public interface AuditLogMapper extends BaseMapper<AuditLog> {
     IPage<AuditLog> queryAuditLog(IPage<AuditLog> page,
                                   @Param("modelTypeList") List<String> modelTypeList,
                                   @Param("operationTypeList") List<String> operationTypeList,
+                                  @Param("userId") Integer userId,
                                   @Param("userName") String userName,
                                   @Param("modelName") String modelName,
                                   @Param("startDate") Date startDate,

@@ -227,7 +227,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             throw new ServiceException(Status.FORCE_TASK_SUCCESS_ERROR);
         }
         processService.forceWorkflowInstanceSuccessByTaskInstanceId(task);
-        log.info("Force success task instance:{} success", taskInstanceId);
+        log.info("Force success task instance id: {} success", taskInstanceId);
     }
 
     @Override

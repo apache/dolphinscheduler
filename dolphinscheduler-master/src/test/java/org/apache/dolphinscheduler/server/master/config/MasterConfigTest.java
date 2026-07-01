@@ -83,4 +83,9 @@ public class MasterConfigTest {
         assertThat(policy.isDispatchTimeoutEnabled()).isFalse();
         assertThat(policy.getMaxTaskDispatchDuration()).isEqualTo(Duration.ofHours(1));
     }
+
+    @Test
+    public void getKillApplicationWhenTaskFailover() {
+        assertThat(masterConfig.isKillApplicationWhenTaskFailover()).isTrue();
+    }
 }

@@ -18,6 +18,7 @@
 name: OWASP Dependency Check
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - '[0-9]+.[0-9]+.[0-9]+-prepare'
