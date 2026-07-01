@@ -50,6 +50,9 @@
                 #{operation_type}
             </foreach>
         </if>
+        <if test="userId != null">
+            and log.user_id = #{userId}
+        </if>
         <if test="userName != null and userName != ''">
             and u.user_name like concat ('%', #{userName}, '%')
         </if>

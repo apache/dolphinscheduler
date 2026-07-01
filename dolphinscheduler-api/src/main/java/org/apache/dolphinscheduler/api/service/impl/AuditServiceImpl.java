@@ -22,7 +22,9 @@ import org.apache.dolphinscheduler.api.service.AuditService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
 
 import java.util.ArrayList;
@@ -59,6 +61,7 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
     /**
      * query audit log paging
      *
+     * @param loginUser           login user
      * @param modelTypes          object types
      * @param operationTypes      operation types
      * @param startDate           start time
@@ -70,7 +73,8 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
      * @return audit log string data
      */
     @Override
-    public PageInfo<AuditDto> queryLogListPaging(String modelTypes,
+    public PageInfo<AuditDto> queryLogListPaging(User loginUser,
+                                                 String modelTypes,
                                                  String operationTypes,
                                                  String startDate,
                                                  String endDate,
@@ -83,10 +87,11 @@ public class AuditServiceImpl extends BaseServiceImpl implements AuditService {
 
         Date start = checkAndParseDateParameters(startDate);
         Date end = checkAndParseDateParameters(endDate);
+        Integer userId = loginUser.getUserType() == UserType.ADMIN_USER ? null : loginUser.getId();
 
         IPage<AuditLog> logIPage =
                 auditLogMapper.queryAuditLog(new Page<>(pageNo, pageSize), objectTypeCodeList, operationTypeCodeList,
-                        userName, modelName, start, end);
+                        userId, userName, modelName, start, end);
         List<AuditDto> auditDtos =
                 logIPage.getRecords().stream().map(this::transformAuditLog).collect(Collectors.toList());
 
