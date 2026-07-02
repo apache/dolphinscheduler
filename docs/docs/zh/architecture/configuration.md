@@ -260,7 +260,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | casdoor.organization-name                             |                                      | Casdoor中的组织名称                                   |
 | casdoor.application-name                              |                                      | Casdoor中的应用名称                                   |
 | casdoor.redirect-url                                  |                                      | dolphinscheduler登录URL                           |
-| api.datasource-connection-enable                      | false                                | 在创建或更新数据源时是否需要提前测试其连接性                          |
+| api.datasource-connection-enable                      | false                                | 在创建或更新数据源时是否需要强制测试其连接性                          |
 | api.traffic.control.global.switch                     | false                                | 流量控制全局开关                                        |
 | api.traffic.control.max-global-qps-rate               | 300                                  | 全局最大请求数/秒                                       |
 | api.traffic.control.tenant-switch                     | false                                | 流量控制租户开关                                        |
