@@ -200,6 +200,15 @@ public abstract class AbstractCommandExecutor {
                     LogWatch watcher = ProcessUtils.getPodLogWatcher(taskRequest.getK8sTaskExecutionContext(),
                             taskRequest.getTaskAppId(), "")) {
                 if (watcher == null) {
+                    TaskExecutionStatus appStatus = ProcessUtils.getApplicationStatus(
+                            taskRequest.getK8sTaskExecutionContext(),
+                            taskRequest.getTaskAppId());
+                    if (appStatus.isSuccess()) {
+
+                        log.warn(
+                                "The driver pod does not exist, but application already succeeded. Skip log collection.");
+                        return;
+                    }
                     throw new RuntimeException("The driver pod does not exist.");
                 } else {
                     String line;

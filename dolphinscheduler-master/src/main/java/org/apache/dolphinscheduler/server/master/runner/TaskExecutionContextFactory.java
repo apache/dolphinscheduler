@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourc
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.utils.MapUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
+import org.apache.dolphinscheduler.plugin.task.spark.SparkParameters;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecutionGraph;
 import org.apache.dolphinscheduler.server.master.engine.task.runnable.ITaskExecutionRunnable;
@@ -148,6 +149,13 @@ public class TaskExecutionContextFactory {
                 K8sTaskParameters k8sTaskParameters =
                         JSONUtils.parseObject(taskInstance.getTaskParams(), K8sTaskParameters.class);
                 namespace = k8sTaskParameters.getNamespace();
+                break;
+
+            case "SPARK":
+                SparkParameters sparkParameters =
+                        JSONUtils.parseObject(taskInstance.getTaskParams(), SparkParameters.class);
+                namespace = sparkParameters.getNamespace();
+
                 break;
             default:
                 break;
