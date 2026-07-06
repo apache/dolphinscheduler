@@ -37,6 +37,18 @@ public class SensitiveDataConverter extends MessageConverter {
     private static Pattern multilinePattern;
     private static final Set<String> maskPatterns = new HashSet<>();
 
+    private static final String KNOWN_SENSITIVE_CONFIGURATION_KEY_REGEX =
+            "(?:password|access[._-]?key(?:[._-]?(?:id|secret))?|secret[._-]?access[._-]?key|secret[._-]?key)";
+
+    private static final Pattern QUOTED_SENSITIVE_CONFIGURATION_PATTERN = Pattern.compile(
+            "((?:\\\\?\\\"|')?" + KNOWN_SENSITIVE_CONFIGURATION_KEY_REGEX
+                    + "(?:\\\\?\\\"|')?\\s*(?::|=)\\s*(?:\\\\?\\\"|'))(.*?)(\\\\?\\\"|')",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
+    private static final Pattern UNQUOTED_SENSITIVE_CONFIGURATION_PATTERN = Pattern.compile(
+            "(" + KNOWN_SENSITIVE_CONFIGURATION_KEY_REGEX + "\\s*(?::|=)\\s*)([^\\s,;&}'\\\"]+)()",
+            Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
     static {
         addMaskPattern(TaskConstants.DATASOURCE_PASSWORD_REGEX);
     }
@@ -64,6 +76,11 @@ public class SensitiveDataConverter extends MessageConverter {
             return logMsg;
         }
 
+        String maskedLogMsg = maskByConfiguredPatterns(logMsg);
+        return maskKnownSensitiveConfiguration(maskedLogMsg);
+    }
+
+    private static String maskByConfiguredPatterns(final String logMsg) {
         final StringBuffer sb = new StringBuffer(logMsg.length());
         final Matcher matcher = multilinePattern.matcher(logMsg);
 
@@ -72,6 +89,22 @@ public class SensitiveDataConverter extends MessageConverter {
         }
         matcher.appendTail(sb);
 
+        return sb.toString();
+    }
+
+    private static String maskKnownSensitiveConfiguration(final String logMsg) {
+        String maskedLogMsg = maskKnownSensitiveConfiguration(logMsg, QUOTED_SENSITIVE_CONFIGURATION_PATTERN);
+        return maskKnownSensitiveConfiguration(maskedLogMsg, UNQUOTED_SENSITIVE_CONFIGURATION_PATTERN);
+    }
+
+    private static String maskKnownSensitiveConfiguration(final String logMsg, final Pattern pattern) {
+        final StringBuffer sb = new StringBuffer(logMsg.length());
+        final Matcher matcher = pattern.matcher(logMsg);
+        while (matcher.find()) {
+            matcher.appendReplacement(sb,
+                    Matcher.quoteReplacement(matcher.group(1) + TaskConstants.SENSITIVE_DATA_MASK + matcher.group(3)));
+        }
+        matcher.appendTail(sb);
         return sb.toString();
     }
 

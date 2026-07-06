@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.log;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.K8S_CONFIG_REGEX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.HashMap;
 
@@ -123,5 +124,34 @@ class SensitiveDataConverterTest {
         final String maskedLog = SensitiveDataConverter.maskSensitiveData(msg);
 
         assertEquals(maskMsg, maskedLog);
+    }
+
+    @Test
+    void testMaskObjectStorageCredentialsInCommonFormats() {
+        HashMap<String, String> tcs = new HashMap<>();
+        tcs.put("{\"accessKeyId\":\"AKIA_TEST\",\"accessKeySecret\":\"SECRET_TEST\",\"bucket\":\"ds\"}",
+                "{\"accessKeyId\":\"******\",\"accessKeySecret\":\"******\",\"bucket\":\"ds\"}");
+        tcs.put("connectionParams=\"{\\\"accessKeyId\\\":\\\"AKIA_TEST\\\",\\\"accessKeySecret\\\":\\\"SECRET_TEST\\\"}\"",
+                "connectionParams=\"{\\\"accessKeyId\\\":\\\"******\\\",\\\"accessKeySecret\\\":\\\"******\\\"}\"");
+        tcs.put("OssConnection{accessKeyId='AKIA_TEST', accessKeySecret='SECRET_TEST', endPoint='oss-cn'}",
+                "OssConnection{accessKeyId='******', accessKeySecret='******', endPoint='oss-cn'}");
+        tcs.put("remote.logging.oss.access.key.id=AKIA_TEST&remote.logging.oss.access.key.secret=SECRET_TEST&bucket=ds",
+                "remote.logging.oss.access.key.id=******&remote.logging.oss.access.key.secret=******&bucket=ds");
+        tcs.put("resource.aws.access.key.id=AKIA_TEST\nresource.aws.secret.access.key=SECRET_TEST\nresource.aws.region=cn-north-1",
+                "resource.aws.access.key.id=******\nresource.aws.secret.access.key=******\nresource.aws.region=cn-north-1");
+
+        for (String logMsg : tcs.keySet()) {
+            assertEquals(tcs.get(logMsg), SensitiveDataConverter.maskSensitiveData(logMsg));
+        }
+    }
+
+    @Test
+    void testDoesNotMaskNonSensitiveWordsContainingKeyOrSecret() {
+        String logMsg = "secretary=alice, monkey=banana, keystore=/tmp/ks, access=public, bucket=ds";
+
+        final String maskedLog = SensitiveDataConverter.maskSensitiveData(logMsg);
+
+        assertEquals(logMsg, maskedLog);
+        assertFalse(maskedLog.contains("******"));
     }
 }

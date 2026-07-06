@@ -80,7 +80,7 @@ public class DinkyTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         this.dinkyParameters = JSONUtils.parseObject(taskParams, DinkyParameters.class);
-        log.info("Initialize dinky task params: {}", JSONUtils.toPrettyJsonString(dinkyParameters));
+        log.info("Initialize dinky task: {}", DinkyLogSanitizer.summarizeParameters(dinkyParameters));
         if (this.dinkyParameters == null || !this.dinkyParameters.checkParameters()) {
             throw new DinkyTaskException("dinky task params is not valid");
         }
@@ -160,10 +160,10 @@ public class DinkyTask extends AbstractRemoteTask {
                             result.get(apiResultDataKey).get(DinkyTaskConstants.API_RESULT_JOB_INSTANCE_ID).asText();
                 }
             } else {
-                log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG + "{}", result.get(DinkyTaskConstants.API_RESULT_MSG));
+                String errorMessage = DinkyLogSanitizer.sanitizeMessage(result.get(DinkyTaskConstants.API_RESULT_MSG));
+                log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG + "{}", errorMessage);
                 setExitStatusCode(EXIT_CODE_FAILURE);
-                throw new TaskException(
-                        DinkyTaskConstants.SUBMIT_FAILED_MSG + result.get(DinkyTaskConstants.API_RESULT_MSG));
+                throw new TaskException(DinkyTaskConstants.SUBMIT_FAILED_MSG + errorMessage);
             }
         } catch (Exception ex) {
             Thread.currentThread().interrupt();
@@ -199,8 +199,7 @@ public class DinkyTask extends AbstractRemoteTask {
                         // Use address-taskId as app id
                         setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));
                         setExitStatusCode(exitStatusCode);
-                        log.info("dinky task finished with results: {}",
-                                jobInstanceInfoResult.get(apiResultDatasKey));
+                        log.info("dinky task finished, status: {}", jobInstanceStatus);
                         finishFlag = true;
                         break;
                     case DinkyTaskConstants.STATUS_FAILED:
@@ -250,8 +249,7 @@ public class DinkyTask extends AbstractRemoteTask {
                         // Use address-taskId as app id
                         setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));
                         setExitStatusCode(exitStatusCode);
-                        log.info("dinky task finished with results: {}",
-                                jobInstanceInfoResult.get(apiResultDataKey));
+                        log.info("dinky task finished, status: {}", jobInstanceStatus);
                         finishFlag = true;
                         break;
                     case DinkyTaskConstants.STATUS_FAILED:
@@ -312,7 +310,7 @@ public class DinkyTask extends AbstractRemoteTask {
 
     private void errorHandle(Object msg) {
         setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
-        log.error("dinky task submit failed with error: {}", msg);
+        log.error("dinky task submit failed with error: {}", DinkyLogSanitizer.sanitizeMessage(msg));
     }
 
     @Override
@@ -352,7 +350,7 @@ public class DinkyTask extends AbstractRemoteTask {
                 }
             }
         }
-        log.info("sending variables to dinky: {}", variables);
+        log.info("sending variables to dinky: {}", DinkyLogSanitizer.summarizeVariables(variables));
         return variables;
     }
 
@@ -404,7 +402,8 @@ public class DinkyTask extends AbstractRemoteTask {
         try {
             result = mapper.readTree(res);
         } catch (JsonProcessingException e) {
-            log.error("dinky task submit failed with error", e);
+            log.error("dinky task response parse failed, responseLength: {}, errorType: {}",
+                    StringUtils.length(res), e.getClass().getSimpleName());
         }
         return result;
     }
@@ -426,7 +425,8 @@ public class DinkyTask extends AbstractRemoteTask {
             HttpResponse response = httpClient.execute(httpGet);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 result = EntityUtils.toString(response.getEntity());
-                log.info("dinky task succeed with results: {}", result);
+                log.info("dinky task request succeeded, statusCode: {}, responseLength: {}",
+                        response.getStatusLine().getStatusCode(), result.length());
             } else {
                 log.error("dinky task terminated,response: {}", response);
             }
@@ -455,7 +455,8 @@ public class DinkyTask extends AbstractRemoteTask {
             HttpResponse response = httpClient.execute(httpPost);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 result = EntityUtils.toString(response.getEntity());
-                log.info("dinky task succeed with results: {}", result);
+                log.info("dinky task request succeeded, statusCode: {}, responseLength: {}",
+                        response.getStatusLine().getStatusCode(), result.length());
             } else {
                 log.error("dinky task terminated,response: {}", response);
             }
