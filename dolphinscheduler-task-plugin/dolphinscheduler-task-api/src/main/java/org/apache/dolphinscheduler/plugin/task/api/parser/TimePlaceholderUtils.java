@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -648,7 +648,13 @@ public class TimePlaceholderUtils {
 
             if (Character.isDigit(expression.charAt(index + 1))) {
                 String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = addMinutes(date, calcMinutes(addMinuteExpr));
+                int addMinuteValue = calcMinutes(addMinuteExpr);
+                Date targetDate;
+                if (addMinuteValue % (60 * 24) == 0) {
+                    targetDate = addDays(date, addMinuteValue / (60 * 24));
+                } else {
+                    targetDate = addMinutes(date, addMinuteValue);
+                }
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
@@ -658,7 +664,13 @@ public class TimePlaceholderUtils {
 
             if (Character.isDigit(expression.charAt(index + 1))) {
                 String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = addMinutes(date, 0 - calcMinutes(addMinuteExpr));
+                int addMinuteValue = calcMinutes(addMinuteExpr);
+                Date targetDate;
+                if (addMinuteValue % (60 * 24) == 0) {
+                    targetDate = addDays(date, -(addMinuteValue / (60 * 24)));
+                } else {
+                    targetDate = addMinutes(date, -addMinuteValue);
+                }
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
