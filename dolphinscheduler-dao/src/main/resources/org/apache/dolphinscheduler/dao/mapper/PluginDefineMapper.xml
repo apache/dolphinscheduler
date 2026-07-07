@@ -18,17 +18,6 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.PluginDefineMapper">
-    <select id="checkTableExist" resultType="int" databaseId="mysql">
-        select count(*) from information_schema.TABLES where table_name = 't_ds_plugin_define' and table_schema = database()
-    </select>
-
-    <select id="checkTableExist" resultType="int" databaseId="postgresql">
-        select count(*) from information_schema.tables where table_name = 't_ds_plugin_define' and table_schema = current_schema()
-    </select>
-
-    <select id="checkTableExist" resultType="int">
-        select count(*) from information_schema.TABLES where table_name = 't_ds_plugin_define'
-    </select>
 
     <select id="queryAllPluginDefineList" resultType="org.apache.dolphinscheduler.dao.entity.PluginDefine">
         select *
