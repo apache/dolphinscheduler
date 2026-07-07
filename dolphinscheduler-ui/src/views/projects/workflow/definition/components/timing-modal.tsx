@@ -259,14 +259,14 @@ export default defineComponent({
           timingForm.environmentCode = projectPreferences.value.environmentCode
         }
       }
-      if (projectPreferences.value?.alertGroup && variables?.alertGroups) {
+      if (projectPreferences.value?.alertGroups && variables?.alertGroups) {
         if (
           containValueInOptions(
             variables.alertGroups,
-            projectPreferences.value.alertGroup
+            projectPreferences.value.alertGroups
           )
         ) {
-          timingForm.warningGroupId = projectPreferences.value.alertGroup
+          timingForm.warningGroupId = projectPreferences.value.alertGroups
         }
       }
     }
