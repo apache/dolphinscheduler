@@ -29,7 +29,7 @@ public class MaskUtils {
         if (str == null) {
             return null;
         }
-        if (maskStartIndex == 0) {
+        if (maskStartIndex <= 0) {
             return MASK_STRING;
         }
         if (maskStartIndex >= str.length()) {

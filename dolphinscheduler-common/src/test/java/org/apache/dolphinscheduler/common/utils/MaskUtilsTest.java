@@ -33,6 +33,7 @@ class MaskUtilsTest {
     @Test
     void testMaskStringWithStartIndex() {
         assertEquals("****", MaskUtils.maskString("sensitiveData", 0));
+        assertEquals("****", MaskUtils.maskString("sensitiveData", -1));
         assertEquals("se****", MaskUtils.maskString("sensitiveData", 2));
         assertEquals("****", MaskUtils.maskString("", 0));
         assertEquals(null, MaskUtils.maskString(null, 1));
