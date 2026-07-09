@@ -18,13 +18,16 @@
 package org.apache.dolphinscheduler.api.service;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.service.impl.AuditServiceImpl;
 import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
+import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.AuditLogMapper;
 
 import java.util.ArrayList;
@@ -59,11 +62,13 @@ public class AuditServiceTest {
         IPage<AuditLog> page = new Page<>(1, 10);
         page.setRecords(getLists());
         page.setTotal(1L);
-        when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(), Mockito.eq(""),
+        when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(), Mockito.isNull(),
+                Mockito.eq(""),
                 Mockito.eq(""),
                 eq(start), eq(end))).thenReturn(page);
         Assertions.assertDoesNotThrow(() -> {
             auditService.queryLogListPaging(
+                    getUser(1, "admin", UserType.ADMIN_USER),
                     "",
                     "",
                     "2020-11-01 00:00:00",
@@ -73,6 +78,29 @@ public class AuditServiceTest {
                     1,
                     10);
         });
+    }
+
+    @Test
+    public void testQueryLogListPagingRestrictsGeneralUserToOwnAuditLogs() {
+        IPage<AuditLog> page = new Page<>(1, 10);
+        page.setRecords(getLists());
+        page.setTotal(1L);
+        when(auditLogMapper.queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(), Mockito.eq(10),
+                Mockito.eq("otherUser"), Mockito.eq(""), Mockito.isNull(), Mockito.isNull())).thenReturn(page);
+
+        auditService.queryLogListPaging(
+                getUser(10, "generalUser", UserType.GENERAL_USER),
+                "",
+                "",
+                null,
+                null,
+                "otherUser",
+                "",
+                1,
+                10);
+
+        verify(auditLogMapper).queryAuditLog(Mockito.any(Page.class), Mockito.any(), Mockito.any(), Mockito.eq(10),
+                Mockito.eq("otherUser"), Mockito.eq(""), Mockito.isNull(), Mockito.isNull());
     }
 
     private List<AuditLog> getLists() {
@@ -87,5 +115,13 @@ public class AuditServiceTest {
         auditLog.setOperationType(AuditOperationType.CREATE.getName());
         auditLog.setModelType(AuditModelType.PROJECT.getName());
         return auditLog;
+    }
+
+    private User getUser(Integer id, String userName, UserType userType) {
+        User user = new User();
+        user.setId(id);
+        user.setUserName(userName);
+        user.setUserType(userType);
+        return user;
     }
 }
