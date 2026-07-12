@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.commons.lang3.SystemUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,19 @@ import org.junit.jupiter.api.Test;
 
 @Slf4j
 public class OSUtilsTest {
+
+    @Test
+    void testParseWindowsUserListIgnoresNonSeparatorLines() {
+        String result = String.join("\r\n",
+                "User accounts for \\\\host",
+                "",
+                "-x-",
+                "-------------------------------------------------------------------------------",
+                "alice                    bob",
+                "The command completed successfully.");
+
+        Assertions.assertEquals(Arrays.asList("alice", "bob"), OSUtils.parseWindowsUserList(result));
+    }
 
     @Test
     public void existTenantCodeInLinux() {

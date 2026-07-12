@@ -126,7 +126,11 @@ public class OSUtils {
      */
     private static List<String> getUserListFromWindows() throws IOException {
         String result = exeCmd("net user");
-        String[] lines = result.split("\n");
+        return parseWindowsUserList(result);
+    }
+
+    static List<String> parseWindowsUserList(String result) {
+        String[] lines = result.split("\\R");
 
         int startPos = 0;
         int endPos = lines.length - 2;
@@ -138,7 +142,7 @@ public class OSUtils {
             int count = 0;
             if (lines[i].charAt(0) == '-') {
                 for (int j = 0; j < lines[i].length(); j++) {
-                    if (lines[i].charAt(i) == '-') {
+                    if (lines[i].charAt(j) == '-') {
                         count++;
                     }
                 }
