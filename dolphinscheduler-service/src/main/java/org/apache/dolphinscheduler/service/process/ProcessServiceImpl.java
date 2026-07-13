@@ -745,6 +745,10 @@ public class ProcessServiceImpl implements ProcessService {
         return cluster == null ? null : ClusterConfUtils.getK8sConfig(cluster.getConfig());
     }
 
+    /**
+     * Force the workflow instance to success only when every enabled task in the workflow definition has a
+     * corresponding instance, and the given task is the only forced success task.
+     */
     @Override
     public void forceWorkflowInstanceSuccessByTaskInstanceId(TaskInstance task) {
         WorkflowInstance workflowInstance = findWorkflowInstanceDetailById(task.getWorkflowInstanceId()).orElse(null);
@@ -760,15 +764,16 @@ public class ProcessServiceImpl implements ProcessService {
             List<Long> definiteTaskCodeList =
                     taskDefinitionLogs.stream().filter(definitionLog -> definitionLog.getFlag() == Flag.YES)
                             .map(TaskDefinitionLog::getCode).collect(Collectors.toList());
-            // only all tasks have instances
             if (CollectionUtils.isEqualCollection(instanceTaskCodeList,
                     definiteTaskCodeList)) {
-                List<Integer> failTaskList = validTaskList.stream()
+                List<Integer> failedTaskList = validTaskList.stream()
                         .filter(instance -> instance.getState().isFailure() || instance.getState().isKill())
                         .map(TaskInstance::getId).collect(Collectors.toList());
-                if (failTaskList.size() == 1 && failTaskList.contains(task.getId())) {
+                if (CollectionUtils.isEmpty(failedTaskList)) {
                     workflowInstance.setStateWithDesc(WorkflowExecutionStatus.SUCCESS, "success by task force success");
                     workflowInstanceDao.updateById(workflowInstance);
+                    log.info("force workflow instance {} to success by task instance {}",
+                            workflowInstance.getId(), task.getId());
                 }
             }
         }

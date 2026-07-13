@@ -154,6 +154,7 @@ master:
   listen-port: 5678
   # master heartbeat interval
   max-heartbeat-interval: 10s
+  kill-application-when-task-failover: true
   server-load-protection:
     enabled: true
     # Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow.

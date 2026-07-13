@@ -60,17 +60,6 @@ export function useModal(
             return new Error(t('security.environment.environment_config_tips'))
           }
         }
-      },
-      description: {
-        required: true,
-        trigger: ['input', 'blur'],
-        validator() {
-          if (variables.model.description === '') {
-            return new Error(
-              t('security.environment.environment_description_tips')
-            )
-          }
-        }
       }
     }
   })

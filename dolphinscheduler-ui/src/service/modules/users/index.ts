@@ -19,7 +19,6 @@ import { axios } from '@/service/service'
 import {
   UserNameReq,
   UserNamesReq,
-  AlertGroupIdReq,
   UserReq,
   IdReq,
   UserIdReq,
@@ -38,14 +37,6 @@ export function activateUser(data: UserNameReq): any {
     url: '/users/activate',
     method: 'post',
     data
-  })
-}
-
-export function authorizedUser(params: AlertGroupIdReq): any {
-  return axios({
-    url: '/users/authed-user',
-    method: 'get',
-    params
   })
 }
 
@@ -172,14 +163,6 @@ export function revokeProject(data: ProjectCodeReq & UserIdReq): any {
     url: '/users/revoke-project',
     method: 'post',
     data
-  })
-}
-
-export function unauthorizedUser(params: AlertGroupIdReq): any {
-  return axios({
-    url: '/users/unauth-user',
-    method: 'get',
-    params
   })
 }
 

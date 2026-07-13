@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import static org.apache.dolphinscheduler.api.enums.Status.AUTHORIZED_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_USER_BY_ID_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.GET_USER_INFO_ERROR;
@@ -26,7 +25,6 @@ import static org.apache.dolphinscheduler.api.enums.Status.GRANT_K8S_NAMESPACE_E
 import static org.apache.dolphinscheduler.api.enums.Status.GRANT_PROJECT_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_USER_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.REVOKE_PROJECT_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UNAUTHORIZED_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_USER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.USER_LIST_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_USERNAME_ERROR;
@@ -312,30 +310,6 @@ public class UsersController extends BaseController {
     public Result verifyUserName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                  @RequestParam(value = "userName") String userName) {
         return usersService.verifyUserName(userName);
-    }
-
-    @Operation(summary = "unauthorizedUser", description = "UNAUTHORIZED_USER_NOTES")
-    @Parameters({
-            @Parameter(name = "alertgroupId", description = "ALERT_GROUP_ID", required = true, schema = @Schema(implementation = String.class))
-    })
-    @GetMapping(value = "/unauth-user")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(UNAUTHORIZED_USER_ERROR)
-    public Result<List<User>> unauthorizedUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                               @RequestParam("alertgroupId") Integer alertgroupId) {
-        return Result.success(usersService.unauthorizedUser(loginUser, alertgroupId));
-    }
-
-    @Operation(summary = "authorizedUser", description = "AUTHORIZED_USER_NOTES")
-    @Parameters({
-            @Parameter(name = "alertgroupId", description = "ALERT_GROUP_ID", required = true, schema = @Schema(implementation = String.class))
-    })
-    @GetMapping(value = "/authed-user")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(AUTHORIZED_USER_ERROR)
-    public Result<List<User>> authorizedUser(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                             @RequestParam("alertgroupId") Integer alertgroupId) {
-        return Result.success(usersService.authorizedUser(loginUser, alertgroupId));
     }
 
     @Operation(summary = "registerUser", description = "REGISTER_USER_NOTES")

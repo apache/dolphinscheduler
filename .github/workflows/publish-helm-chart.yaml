@@ -17,6 +17,7 @@
 name: publish-helm-chart
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
