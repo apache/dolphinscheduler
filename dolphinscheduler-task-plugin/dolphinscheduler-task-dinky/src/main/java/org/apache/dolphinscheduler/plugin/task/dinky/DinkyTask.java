@@ -398,14 +398,13 @@ public class DinkyTask extends AbstractRemoteTask {
 
     private JsonNode parse(String res) {
         ObjectMapper mapper = new ObjectMapper();
-        JsonNode result = null;
         try {
-            result = mapper.readTree(res);
+            return mapper.readTree(res);
         } catch (JsonProcessingException e) {
-            log.error("dinky task response parse failed, responseLength: {}, errorType: {}",
-                    StringUtils.length(res), e.getClass().getSimpleName());
+            throw new DinkyTaskException(
+                    "dinky task response parse failed, responseLength: " + StringUtils.length(res) + ", errorType: "
+                            + e.getClass().getSimpleName());
         }
-        return result;
     }
 
     private String doGet(String url, Map<String, String> params) {

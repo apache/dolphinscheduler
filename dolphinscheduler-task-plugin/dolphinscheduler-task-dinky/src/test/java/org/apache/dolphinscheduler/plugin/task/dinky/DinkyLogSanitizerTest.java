@@ -18,12 +18,14 @@
 package org.apache.dolphinscheduler.plugin.task.dinky;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -98,14 +100,18 @@ class DinkyLogSanitizerTest {
     }
 
     @Test
-    void testParseMalformedResponseReturnsNullWithoutExposingRawResponse() throws Exception {
+    void testParseMalformedResponseFailsExplicitlyWithoutExposingRawResponse() throws Exception {
         DinkyTask task = new DinkyTask(new TaskExecutionContext());
         Method parseMethod = DinkyTask.class.getDeclaredMethod("parse", String.class);
         parseMethod.setAccessible(true);
+        String response = "malformed response accessKeyId=AKIA_TEST accessKeySecret=SECRET_TEST";
 
-        Object result = parseMethod.invoke(task,
-                "malformed response accessKeyId=AKIA_TEST accessKeySecret=SECRET_TEST");
+        InvocationTargetException exception =
+                assertThrows(InvocationTargetException.class, () -> parseMethod.invoke(task, response));
 
-        assertNull(result);
+        DinkyTaskException cause = assertInstanceOf(DinkyTaskException.class, exception.getCause());
+        assertTrue(cause.getMessage().contains("dinky task response parse failed"));
+        assertFalse(cause.getMessage().contains("AKIA_TEST"));
+        assertFalse(cause.getMessage().contains("SECRET_TEST"));
     }
 }
