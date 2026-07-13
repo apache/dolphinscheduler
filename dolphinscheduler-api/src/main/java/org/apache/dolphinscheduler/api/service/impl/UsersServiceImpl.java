@@ -847,7 +847,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             msg = userName;
         } else if (!CheckUtils.checkPassword(password)) {
             log.warn("Parameter password check failed.");
-            msg = password;
+            msg = "password";
         } else if (!CheckUtils.checkEmail(email)) {
             log.warn("Parameter email check failed.");
             msg = email;
