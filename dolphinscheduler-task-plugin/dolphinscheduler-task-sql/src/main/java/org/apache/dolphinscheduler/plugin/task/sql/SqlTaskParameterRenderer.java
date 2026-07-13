@@ -152,6 +152,11 @@ final class SqlTaskParameterRenderer {
             return escapeSqlString(value);
         }
         if (identifierContext) {
+            if (!isValidIdentifierFragment(value)) {
+                throw new TaskException(String.format(
+                        "Invalid SQL identifier fragment for property %s",
+                        property.getProp()));
+            }
             return value;
         }
         DataType dataType = property.getType();
@@ -268,7 +273,16 @@ final class SqlTaskParameterRenderer {
     }
 
     private static boolean isIdentifierContextChar(char ch) {
-        return Character.isLetterOrDigit(ch) || ch == '_' || ch == '$' || ch == '.';
+        return isIdentifierFragmentChar(ch) || ch == '.';
+    }
+
+    private static boolean isValidIdentifierFragment(String value) {
+        return StringUtils.isNotEmpty(value)
+                && value.chars().allMatch(SqlTaskParameterRenderer::isIdentifierFragmentChar);
+    }
+
+    private static boolean isIdentifierFragmentChar(int ch) {
+        return Character.isLetterOrDigit(ch) || ch == '_' || ch == '$';
     }
 
     private static final class Placeholder {

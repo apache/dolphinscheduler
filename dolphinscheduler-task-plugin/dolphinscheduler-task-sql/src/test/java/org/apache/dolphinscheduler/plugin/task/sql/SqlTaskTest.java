@@ -690,6 +690,17 @@ class SqlTaskTest {
     }
 
     @Test
+    void testSqlTaskLocalRenderer_rejectsInvalidIdentifierFragment() {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("suffix", new Property("suffix", Direct.IN, DataType.VARCHAR, "2025-04-11"));
+
+        Assertions.assertThrows(
+                TaskException.class,
+                () -> SqlTaskParameterRenderer.render(
+                        "create table test_${suffix}", prepareParamsMap, 1));
+    }
+
+    @Test
     void testSqlTaskLocalRenderer_rejectsInvalidNumericLiteral() throws Exception {
         Map<String, Property> prepareParamsMap = new HashMap<>();
         prepareParamsMap.put("id", new Property("id", Direct.IN, DataType.INTEGER, "1 OR 1=1"));
