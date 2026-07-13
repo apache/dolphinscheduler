@@ -118,6 +118,11 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
 
     List<TaskGroupQueue> queryByTaskInstanceId(@Param("taskInstanceId") Integer taskInstanceId);
 
+    TaskGroupQueue queryByIdForUpdate(@Param("id") Integer id);
+
+    int deleteByTaskInstanceIdAndStatus(@Param("taskInstanceId") Integer taskInstanceId,
+                                        @Param("status") int status);
+
     List<TaskGroupQueue> queryUsingTaskGroupQueueByGroupId(@Param("taskGroupId") Integer taskGroupId,
                                                            @Param("status") int status,
                                                            @Param("inQueue") int inQueue,

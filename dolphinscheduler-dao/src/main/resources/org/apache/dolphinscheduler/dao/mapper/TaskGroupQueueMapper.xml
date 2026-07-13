@@ -236,6 +236,20 @@
         where task_id = #{taskInstanceId}
     </select>
 
+    <select id="queryByIdForUpdate" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
+        select
+        <include refid="baseSql" />
+        from t_ds_task_group_queue
+        where id = #{id}
+        for update
+    </select>
+
+    <delete id="deleteByTaskInstanceIdAndStatus">
+        delete from t_ds_task_group_queue
+        where task_id = #{taskInstanceId}
+        and status = #{status}
+    </delete>
+
     <select id="queryUsingTaskGroupQueueByGroupId" resultType="org.apache.dolphinscheduler.dao.entity.TaskGroupQueue">
         select
         <include refid="baseSql" />

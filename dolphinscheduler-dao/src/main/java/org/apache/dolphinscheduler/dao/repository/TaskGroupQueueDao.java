@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
+import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
@@ -64,6 +65,24 @@ public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
      * @return TaskGroupQueue ordered by priority desc
      */
     List<TaskGroupQueue> queryByTaskInstanceId(Integer taskInstanceId);
+
+    /**
+     * Query and lock the TaskGroupQueue until the current transaction completes.
+     * This method must be called in an active transaction.
+     *
+     * @param id taskGroupQueue id
+     * @return TaskGroupQueue, or null if it does not exist
+     */
+    TaskGroupQueue queryByIdForUpdate(Integer id);
+
+    /**
+     * Delete the TaskGroupQueue only when its current status matches the expected status.
+     *
+     * @param taskInstanceId taskInstance id
+     * @param status expected status
+     * @return true if a TaskGroupQueue was deleted
+     */
+    boolean deleteByTaskInstanceIdAndStatus(Integer taskInstanceId, TaskGroupQueueStatus status);
 
     /**
      * Query all {@link TaskGroupQueue} which status is TaskGroupQueueStatus.ACQUIRE_SUCCESS and forceStart is {@link org.apache.dolphinscheduler.common.enums.Flag#NO}.

@@ -92,6 +92,17 @@ public interface ITaskGroupCoordinator extends AutoCloseable {
     void releaseTaskGroupSlot(TaskInstance taskInstance);
 
     /**
+     * Remove the task from the TaskGroup waiting queue.
+     * <p>
+     * The removal succeeds only while the queue is still in {@link TaskGroupQueueStatus#WAIT_QUEUE}. A successful
+     * removal guarantees that the coordinator has not acquired the queue for dispatch.
+     *
+     * @param taskInstance taskInstance
+     * @return true if the task was removed from the waiting queue
+     */
+    boolean removeTaskFromWaitingTaskGroupQueue(TaskInstance taskInstance);
+
+    /**
      * Close the TaskGroupCoordinator, once closed, the coordinator will not work until you have started the coordinator again.
      */
     @Override

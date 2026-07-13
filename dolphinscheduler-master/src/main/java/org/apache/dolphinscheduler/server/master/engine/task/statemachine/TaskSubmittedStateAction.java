@@ -143,6 +143,11 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
             taskExecution.getWorkflowEventBus().publish(TaskPausedLifecycleEvent.of(taskExecution));
             return;
         }
+        if (taskGroupCoordinator.removeTaskFromWaitingTaskGroupQueue(taskExecution.getTaskInstance())) {
+            log.info("Success pause task: {} while waiting for TaskGroup slot", taskExecution.getName());
+            taskExecution.getWorkflowEventBus().publish(TaskPausedLifecycleEvent.of(taskExecution));
+            return;
+        }
         log.info("The task[id={}] is submitted and already dispatched, cannot pause, will try to pause it after 5s",
                 taskExecution.getId());
         taskExecution.getWorkflowEventBus()
@@ -164,6 +169,11 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
         throwExceptionIfStateIsNotMatch(taskExecution);
         if (workerGroupDispatcherCoordinator.removeTask(taskExecution)) {
             log.info("Success kill task[id={}] before dispatch", taskExecution.getId());
+            taskExecution.getWorkflowEventBus().publish(TaskKilledLifecycleEvent.of(taskExecution));
+            return;
+        }
+        if (taskGroupCoordinator.removeTaskFromWaitingTaskGroupQueue(taskExecution.getTaskInstance())) {
+            log.info("Success kill task: {} while waiting for TaskGroup slot", taskExecution.getName());
             taskExecution.getWorkflowEventBus().publish(TaskKilledLifecycleEvent.of(taskExecution));
             return;
         }

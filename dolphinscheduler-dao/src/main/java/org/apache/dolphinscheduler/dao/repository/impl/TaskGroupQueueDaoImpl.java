@@ -68,6 +68,16 @@ public class TaskGroupQueueDaoImpl extends BaseDao<TaskGroupQueue, TaskGroupQueu
     }
 
     @Override
+    public TaskGroupQueue queryByIdForUpdate(Integer id) {
+        return mybatisMapper.queryByIdForUpdate(id);
+    }
+
+    @Override
+    public boolean deleteByTaskInstanceIdAndStatus(Integer taskInstanceId, TaskGroupQueueStatus status) {
+        return mybatisMapper.deleteByTaskInstanceIdAndStatus(taskInstanceId, status.getCode()) > 0;
+    }
+
+    @Override
     public List<TaskGroupQueue> queryAcquiredTaskGroupQueueByGroupId(Integer taskGroupId) {
         return mybatisMapper.queryUsingTaskGroupQueueByGroupId(
                 taskGroupId,
