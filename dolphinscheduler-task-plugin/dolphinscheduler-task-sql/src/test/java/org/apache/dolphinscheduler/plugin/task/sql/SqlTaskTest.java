@@ -667,7 +667,7 @@ class SqlTaskTest {
     }
 
     @Test
-    void testSqlTaskLocalRenderer_keepsPlaceholderInsideJsonStringLiteral() throws Exception {
+    void testSqlTaskLocalRenderer_replacesPlaceholderInsideJsonStringLiteral() throws Exception {
         Map<String, Property> prepareParamsMap = new HashMap<>();
         prepareParamsMap.put("name", new Property("name", Direct.IN, DataType.VARCHAR, "O'Reilly"));
 
