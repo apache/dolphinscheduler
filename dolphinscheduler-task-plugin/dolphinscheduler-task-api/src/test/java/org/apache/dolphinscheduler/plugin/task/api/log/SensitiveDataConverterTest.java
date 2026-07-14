@@ -146,6 +146,14 @@ class SensitiveDataConverterTest {
     }
 
     @Test
+    void testMaskQuotedSensitiveValueContainingEscapedQuote() {
+        String logMsg = "{\"password\":\"abc\\\"VISIBLE_SUFFIX\",\"bucket\":\"ds\"}";
+        String expected = "{\"password\":\"******\",\"bucket\":\"ds\"}";
+
+        assertEquals(expected, SensitiveDataConverter.maskSensitiveData(logMsg));
+    }
+
+    @Test
     void testDoesNotMaskNonSensitiveWordsContainingKeyOrSecret() {
         String logMsg = "secretary=alice, monkey=banana, keystore=/tmp/ks, access=public, bucket=ds";
 

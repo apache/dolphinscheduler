@@ -40,9 +40,9 @@ public class SensitiveDataConverter extends MessageConverter {
     private static final String KNOWN_SENSITIVE_CONFIGURATION_KEY_REGEX =
             "(?:password|access[._-]?key(?:[._-]?(?:id|secret))?|secret[._-]?access[._-]?key|secret[._-]?key)";
 
-    private static final Pattern QUOTED_SENSITIVE_CONFIGURATION_PATTERN = Pattern.compile(
+    private static final Pattern QUOTED_SENSITIVE_CONFIGURATION_PREFIX_PATTERN = Pattern.compile(
             "((?:\\\\?\\\"|')?" + KNOWN_SENSITIVE_CONFIGURATION_KEY_REGEX
-                    + "(?:\\\\?\\\"|')?\\s*(?::|=)\\s*(?:\\\\?\\\"|'))(.*?)(\\\\?\\\"|')",
+                    + "(?:\\\\?\\\"|')?\\s*(?::|=)\\s*(\\\\?\\\"|'))",
             Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
 
     private static final Pattern UNQUOTED_SENSITIVE_CONFIGURATION_PATTERN = Pattern.compile(
@@ -76,8 +76,8 @@ public class SensitiveDataConverter extends MessageConverter {
             return logMsg;
         }
 
-        String maskedLogMsg = maskByConfiguredPatterns(logMsg);
-        return maskKnownSensitiveConfiguration(maskedLogMsg);
+        String maskedLogMsg = maskKnownSensitiveConfiguration(logMsg);
+        return maskByConfiguredPatterns(maskedLogMsg);
     }
 
     private static String maskByConfiguredPatterns(final String logMsg) {
@@ -93,8 +93,52 @@ public class SensitiveDataConverter extends MessageConverter {
     }
 
     private static String maskKnownSensitiveConfiguration(final String logMsg) {
-        String maskedLogMsg = maskKnownSensitiveConfiguration(logMsg, QUOTED_SENSITIVE_CONFIGURATION_PATTERN);
+        String maskedLogMsg = maskQuotedSensitiveConfiguration(logMsg);
         return maskKnownSensitiveConfiguration(maskedLogMsg, UNQUOTED_SENSITIVE_CONFIGURATION_PATTERN);
+    }
+
+    private static String maskQuotedSensitiveConfiguration(final String logMsg) {
+        final StringBuilder sb = new StringBuilder(logMsg.length());
+        final Matcher matcher = QUOTED_SENSITIVE_CONFIGURATION_PREFIX_PATTERN.matcher(logMsg);
+        int appendFrom = 0;
+        int searchFrom = 0;
+        while (matcher.find(searchFrom)) {
+            final String quote = matcher.group(2);
+            final int closingQuoteStart = findClosingQuote(logMsg, matcher.end(), quote);
+            if (closingQuoteStart < 0) {
+                searchFrom = matcher.end();
+                continue;
+            }
+            final int closingQuoteEnd = closingQuoteStart + quote.length();
+            sb.append(logMsg, appendFrom, matcher.end());
+            sb.append(TaskConstants.SENSITIVE_DATA_MASK);
+            sb.append(logMsg, closingQuoteStart, closingQuoteEnd);
+            appendFrom = closingQuoteEnd;
+            searchFrom = closingQuoteEnd;
+        }
+        sb.append(logMsg, appendFrom, logMsg.length());
+        return sb.toString();
+    }
+
+    private static int findClosingQuote(final String logMsg, final int valueStart, final String quote) {
+        final char quoteCharacter = quote.charAt(quote.length() - 1);
+        final boolean escapedQuote = quote.length() == 2 && quote.charAt(0) == '\\';
+        for (int i = valueStart; i < logMsg.length(); i++) {
+            if (logMsg.charAt(i) != quoteCharacter) {
+                continue;
+            }
+            int precedingBackslashes = 0;
+            for (int j = i - 1; j >= valueStart && logMsg.charAt(j) == '\\'; j--) {
+                precedingBackslashes++;
+            }
+            if (escapedQuote && precedingBackslashes % 4 == 1) {
+                return i - 1;
+            }
+            if (!escapedQuote && precedingBackslashes % 2 == 0) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private static String maskKnownSensitiveConfiguration(final String logMsg, final Pattern pattern) {
