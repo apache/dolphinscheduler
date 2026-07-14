@@ -152,7 +152,8 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
         int exitCode = this.process.exitValue();
-        boolean isCancelled = EXIT_CODE_KILL == exitCode || EXIT_CODE_HARD_KILL == exitCode || EXIT_CODE_SIGINT_KILL == exitCode;
+        boolean isCancelled =
+                EXIT_CODE_KILL == exitCode || EXIT_CODE_HARD_KILL == exitCode || EXIT_CODE_SIGINT_KILL == exitCode;
         String exitLogMessage = isCancelled ? "process has killed." : "process has exited.";
         log.info("{} execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
                 exitLogMessage, taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, exitCode);
