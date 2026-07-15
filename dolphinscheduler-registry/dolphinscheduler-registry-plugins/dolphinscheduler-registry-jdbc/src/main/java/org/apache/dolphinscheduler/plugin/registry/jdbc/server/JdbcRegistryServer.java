@@ -321,8 +321,10 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         if (CollectionUtils.isEmpty(jdbcRegistryClients)) {
             return;
         }
-        if (jdbcRegistryServerState == JdbcRegistryServerState.STOPPED) {
-            log.warn("The JdbcRegistryServer is STOPPED, will not refresh clients: {} heartbeat.",
+        if (jdbcRegistryServerState == JdbcRegistryServerState.STOPPED
+                || jdbcRegistryServerState == JdbcRegistryServerState.DISCONNECTED) {
+            log.warn("The JdbcRegistryServer is {}, will not refresh clients: {} heartbeat.",
+                    jdbcRegistryServerState,
                     CollectionUtils.collect(jdbcRegistryClients, IJdbcRegistryClient::getJdbcRegistryClientIdentify));
             return;
         }
@@ -341,7 +343,10 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 }
                 JdbcRegistryClientHeartbeatDTO clone = jdbcRegistryClientHeartbeatDTO.clone();
                 clone.setLastHeartbeatTime(now);
-                jdbcRegistryClientRepository.updateById(jdbcRegistryClientHeartbeatDTO);
+                if (!jdbcRegistryClientRepository.updateById(clone)) {
+                    throw new RegistryException(
+                            "The client heartbeat has expired: " + jdbcRegistryClientHeartbeatDTO.getId());
+                }
                 jdbcRegistryClientHeartbeatDTO.setLastHeartbeatTime(clone.getLastHeartbeatTime());
             }
             if (jdbcRegistryServerState == JdbcRegistryServerState.SUSPENDED) {
