@@ -58,6 +58,7 @@ import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
+import org.apache.dolphinscheduler.common.shell.AbstractShell.ExitCodeException;
 
 @Slf4j
 public final class ProcessUtils {
@@ -242,8 +243,17 @@ public final class ProcessUtils {
             OSUtils.exeCmd(checkCmd);
             // If the command executes successfully, the process exists
             return true;
+        } catch (ExitCodeException e) {
+            // kill -0 may return exit code 0 (process exists) even when stderr contains
+            // messages like "Operation not permitted". Only non-zero exit code means process is dead.
+            if (e.getExitCode() == 0) {
+                log.debug("kill -0 returned exit code 0 with non-empty stderr for pid {}, process is alive", pid);
+                return true;
+            }
+            log.debug("kill -0 returned exit code {} for pid {}, process is not alive", e.getExitCode(), pid);
+            return false;
         } catch (Exception e) {
-            // If the command fails, the process does not exist
+            // If the command fails for other reasons, assume process does not exist
             return false;
         }
     }
