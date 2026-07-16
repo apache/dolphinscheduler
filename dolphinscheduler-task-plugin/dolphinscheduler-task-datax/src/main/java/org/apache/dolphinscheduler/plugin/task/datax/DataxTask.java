@@ -186,6 +186,23 @@ public class DataxTask extends AbstractTask {
 
         if (dataXParameters.getCustomConfig() == Flag.YES.ordinal()) {
             json = dataXParameters.getJson().replaceAll("\\r\\n", System.lineSeparator());
+            if (StringUtils.isBlank(json) || "{}".equals(json.trim())) {
+                List<ResourceInfo> resourceFilesList = dataXParameters.getResourceFilesList();
+                if (CollectionUtils.isNotEmpty(resourceFilesList)) {
+                    for (ResourceInfo resourceInfo : resourceFilesList) {
+                        String resourceName = resourceInfo.getResourceName();
+                        if (resourceName != null && resourceName.endsWith(".json")) {
+                            File resourceFile = new File(taskRequest.getExecutePath(),
+                                    new File(resourceName).getName());
+                            if (resourceFile.exists()) {
+                                log.info("Loading DataX custom JSON from resource file: {}", resourceFile.getAbsolutePath());
+                                json = FileUtils.readFileToString(resourceFile, StandardCharsets.UTF_8);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         } else {
             ObjectNode job = JSONUtils.createObjectNode();
             job.putArray("content").addAll(buildDataxJobContentJson());
