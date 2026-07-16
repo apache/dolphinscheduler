@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.log.archive.TaskLogArchiver;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
@@ -103,6 +104,9 @@ public class MasterServer implements IStoppable {
     @Autowired
     private WorkerGroupDispatcherCoordinator workerGroupDispatcherCoordinator;
 
+    @Autowired
+    private TaskLogArchiver taskLogArchiver;
+
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
 
@@ -138,6 +142,8 @@ public class MasterServer implements IStoppable {
         this.workflowEngine.start();
 
         this.schedulerApi.start();
+
+        this.taskLogArchiver.start();
 
         this.systemEventBus
                 .publish(GlobalMasterFailoverEvent.of(new Date(ServerLifeCycleManager.getServerStartupTime())));
@@ -187,6 +193,7 @@ public class MasterServer implements IStoppable {
                 MasterRpcServer closedRpcServer = masterRPCServer;
                 MasterCoordinator closeMasterCoordinator = masterCoordinator;
                 MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
+                TaskLogArchiver closedTaskLogArchiver = taskLogArchiver;
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
                 SpringApplicationContext closedSpringContext = springApplicationContext;

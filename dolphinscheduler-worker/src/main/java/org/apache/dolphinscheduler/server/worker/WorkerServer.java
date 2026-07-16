@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
+import org.apache.dolphinscheduler.common.log.archive.TaskLogArchiver;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
@@ -62,6 +63,9 @@ public class WorkerServer implements IStoppable {
     @Autowired
     private PhysicalTaskEngineDelegator physicalTaskEngineDelegator;
 
+    @Autowired
+    private TaskLogArchiver taskLogArchiver;
+
     /**
      * worker server startup, not use web service
      *
@@ -88,6 +92,8 @@ public class WorkerServer implements IStoppable {
         this.workerRegistryClient.start();
 
         this.physicalTaskEngineDelegator.start();
+
+        this.taskLogArchiver.start();
 
         WorkerServerMetrics.registerWorkerCpuUsageGauge(() -> {
             SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
@@ -122,7 +128,8 @@ public class WorkerServer implements IStoppable {
         try (
                 final PhysicalTaskEngineDelegator ignore1 = physicalTaskEngineDelegator;
                 final WorkerRpcServer ignore2 = workerRpcServer;
-                final WorkerRegistryClient ignore3 = workerRegistryClient) {
+                final WorkerRegistryClient ignore3 = workerRegistryClient;
+                final TaskLogArchiver ignore4 = taskLogArchiver) {
             log.info("Worker server is stopping, current cause : {}", cause);
         } catch (Exception e) {
             log.error("Worker server stop failed, current cause: {}", cause, e);

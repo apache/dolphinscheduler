@@ -295,6 +295,11 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | master.command-fetch-strategy.config.fetch-size                             | 10                           | master拉取command数量                                                                       |
 | master.task-dispatch-policy.dispatch-timeout-enabled                        | false                        | 是否开启master分派超时检测功能                                                                      |
 | master.task-dispatch-policy.max-task-dispatch-duration                      | 1h                           | master分派检测的超时时长，默认为一小时                                                                  |
+| task-log-archive.enabled                                                    | false                        | 是否归档本地任务实例日志。为false时归档器不会启动，不会触碰任何日志文件。                                                 |
+| task-log-archive.check-interval                                             | 1d                           | 归档器扫描日志根目录的周期。                                                                          |
+| task-log-archive.archive-threshold                                          | 30d                          | 日志按天分区目录早于该时长（按自然天计算）后会被压缩为zip归档包。                                                      |
+| task-log-archive.expire-enabled                                             | false                        | 是否删除过期的归档包。这是唯一会永久删除日志数据的配置项。                                                           |
+| task-log-archive.expire-threshold                                           | 90d                          | 归档包早于该时长后被删除。仅在 `task-log-archive.expire-enabled` 为true时生效，且应大于 `task-log-archive.archive-threshold`。 |
 
 ## Worker Server相关配置
 
@@ -318,6 +323,11 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | 100       | worker.physical-task-config.task-executor-thread-size                       | Worker中任务最大并发度                                                                          |
 | true      | worker.tenant-config.auto-create-tenant-enabled                             | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。               |
 | false     | worker.tenant-config.default-tenant-enabled                                 | 如果设置为true, 将会使用worker服务启动用户作为 `default` 租户。                                             |
+| false     | task-log-archive.enabled                                                    | 是否归档本地任务实例日志。为false时归档器不会启动，不会触碰任何日志文件。                                                 |
+| 1d        | task-log-archive.check-interval                                             | 归档器扫描日志根目录的周期。                                                                          |
+| 30d       | task-log-archive.archive-threshold                                          | 日志按天分区目录早于该时长（按自然天计算）后会被压缩为zip归档包。                                                      |
+| false     | task-log-archive.expire-enabled                                             | 是否删除过期的归档包。这是唯一会永久删除日志数据的配置项。                                                           |
+| 90d       | task-log-archive.expire-threshold                                           | 归档包早于该时长后被删除。仅在 `task-log-archive.expire-enabled` 为true时生效，且应大于 `task-log-archive.archive-threshold`。 |
 
 ## Alert Server相关配置
 

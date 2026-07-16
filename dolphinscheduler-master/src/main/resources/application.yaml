@@ -140,6 +140,19 @@ master:
       cpu-usage-weight: 30
       task-thread-pool-usage-weight: 40
 
+# Local task-instance log archiving. Each master/worker archives the task logs it stored on its own disk.
+task-log-archive:
+  # Master switch. When false the archiver never runs and no log file is touched.
+  enabled: false
+  # How often the archiver scans the log base directory.
+  check-interval: 1d
+  # A day partition is packed into a zip once it is older than this (whole days from today).
+  archive-threshold: 30d
+  # Whether archived zips are eventually deleted. This is the only setting that removes log data permanently.
+  expire-enabled: false
+  # An archive zip is removed once it is older than this. Only consulted when expire-enabled is true, and should exceed archive-threshold.
+  expire-threshold: 90d
+
 server:
   port: 5679
 
