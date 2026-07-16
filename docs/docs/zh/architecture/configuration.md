@@ -270,63 +270,63 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 位置：`master-server/conf/application.yaml`
 
-|                                     参数                                      |             默认值              |                                           描述                                            |
-|-----------------------------------------------------------------------------|------------------------------|-----------------------------------------------------------------------------------------|
-| master.listen-port                                                          | 5678                         | master监听端口                                                                              |
-| master.pre-exec-threads                                                     | 10                           | master准备执行任务的数量，用于限制并行的command                                                          |
-| master.exec-threads                                                         | 100                          | master工作线程数量,用于限制并行的流程实例数量                                                              |
-| master.dispatch-task-number                                                 | 3                            | master每个批次的派发任务数量                                                                       |
-| master.worker-load-balancer-configuration-properties.type                   | DYNAMIC_WEIGHTED_ROUND_ROBIN | Master 将会使用Worker的动态CPU/Memory/线程池使用率来计算Worker的负载，负载越低的worker将会有更高的机会被分发任务              |
-| master.max-heartbeat-interval                                               | 10s                          | master最大心跳间隔                                                                            |
-| master.task-commit-retry-times                                              | 5                            | 任务重试次数                                                                                  |
-| master.task-commit-interval                                                 | 1000                         | 任务提交间隔,单位为毫秒                                                                            |
-| master.state-wheel-interval                                                 | 5                            | 轮询检查状态时间                                                                                |
-| master.server-load-protection.enabled                                       | true                         | 是否开启系统保护策略                                                                              |
-| master.server-load-protection.max-system-cpu-usage-percentage-thresholds    | 0.7                          | master最大系统cpu使用值,只有当前系统cpu使用值低于最大系统cpu使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的操作系统CPU       |
-| master.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | 0.7                          | master最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的JVM CPU |
-| master.server-load-protection.max-system-memory-usage-percentage-thresholds | 0.7                          | master最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的操作系统内存          |
-| master.server-load-protection.max-disk-usage-percentage-thresholds          | 0.7                          | master最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的操作系统磁盘空间         |
-| master.server-load-protection.max-concurrent-workflow-instances             | 2147483647                   | Master最大并发工作流实例数. 当Master的工作流实例数达到或超过此值时，Master服务将被标记为繁忙.                               |
-| master.failover-interval                                                    | 10                           | failover间隔，单位为分钟                                                                        |
-| master.kill-application-when-task-failover                                  | true                         | 当任务实例failover时，是否kill掉yarn或k8s application                                              |
-| master.master.worker-group-refresh-interval                                 | 10s                          | 定期将workerGroup从数据库中同步到内存的时间间隔                                                           |
-| master.command-fetch-strategy.type                                          | ID_SLOT_BASED                | Command拉取策略, 目前仅支持 `ID_SLOT_BASED`                                                      |
-| master.command-fetch-strategy.config.id-step                                | 1                            | 数据库中t_ds_command的id自增步长                                                                 |
-| master.command-fetch-strategy.config.fetch-size                             | 10                           | master拉取command数量                                                                       |
-| master.task-dispatch-policy.dispatch-timeout-enabled                        | false                        | 是否开启master分派超时检测功能                                                                      |
-| master.task-dispatch-policy.max-task-dispatch-duration                      | 1h                           | master分派检测的超时时长，默认为一小时                                                                  |
-| task-log-archive.enabled                                                    | false                        | 是否归档本地任务实例日志。为false时归档器不会启动，不会触碰任何日志文件。                                                 |
-| task-log-archive.check-interval                                             | 1d                           | 归档器扫描日志根目录的周期。                                                                          |
-| task-log-archive.archive-threshold                                          | 30d                          | 日志按天分区目录早于该时长（按自然天计算）后会被压缩为zip归档包。                                                      |
-| task-log-archive.expire-enabled                                             | false                        | 是否删除过期的归档包。这是唯一会永久删除日志数据的配置项。                                                           |
+|                                     参数                                      |             默认值              |                                                  描述                                                   |
+|-----------------------------------------------------------------------------|------------------------------|-------------------------------------------------------------------------------------------------------|
+| master.listen-port                                                          | 5678                         | master监听端口                                                                                            |
+| master.pre-exec-threads                                                     | 10                           | master准备执行任务的数量，用于限制并行的command                                                                        |
+| master.exec-threads                                                         | 100                          | master工作线程数量,用于限制并行的流程实例数量                                                                            |
+| master.dispatch-task-number                                                 | 3                            | master每个批次的派发任务数量                                                                                     |
+| master.worker-load-balancer-configuration-properties.type                   | DYNAMIC_WEIGHTED_ROUND_ROBIN | Master 将会使用Worker的动态CPU/Memory/线程池使用率来计算Worker的负载，负载越低的worker将会有更高的机会被分发任务                            |
+| master.max-heartbeat-interval                                               | 10s                          | master最大心跳间隔                                                                                          |
+| master.task-commit-retry-times                                              | 5                            | 任务重试次数                                                                                                |
+| master.task-commit-interval                                                 | 1000                         | 任务提交间隔,单位为毫秒                                                                                          |
+| master.state-wheel-interval                                                 | 5                            | 轮询检查状态时间                                                                                              |
+| master.server-load-protection.enabled                                       | true                         | 是否开启系统保护策略                                                                                            |
+| master.server-load-protection.max-system-cpu-usage-percentage-thresholds    | 0.7                          | master最大系统cpu使用值,只有当前系统cpu使用值低于最大系统cpu使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的操作系统CPU                     |
+| master.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | 0.7                          | master最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的JVM CPU               |
+| master.server-load-protection.max-system-memory-usage-percentage-thresholds | 0.7                          | master最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的操作系统内存                        |
+| master.server-load-protection.max-disk-usage-percentage-thresholds          | 0.7                          | master最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,master服务才能调度任务. 默认值为0.7: 会使用70%的操作系统磁盘空间                       |
+| master.server-load-protection.max-concurrent-workflow-instances             | 2147483647                   | Master最大并发工作流实例数. 当Master的工作流实例数达到或超过此值时，Master服务将被标记为繁忙.                                             |
+| master.failover-interval                                                    | 10                           | failover间隔，单位为分钟                                                                                      |
+| master.kill-application-when-task-failover                                  | true                         | 当任务实例failover时，是否kill掉yarn或k8s application                                                            |
+| master.master.worker-group-refresh-interval                                 | 10s                          | 定期将workerGroup从数据库中同步到内存的时间间隔                                                                         |
+| master.command-fetch-strategy.type                                          | ID_SLOT_BASED                | Command拉取策略, 目前仅支持 `ID_SLOT_BASED`                                                                    |
+| master.command-fetch-strategy.config.id-step                                | 1                            | 数据库中t_ds_command的id自增步长                                                                               |
+| master.command-fetch-strategy.config.fetch-size                             | 10                           | master拉取command数量                                                                                     |
+| master.task-dispatch-policy.dispatch-timeout-enabled                        | false                        | 是否开启master分派超时检测功能                                                                                    |
+| master.task-dispatch-policy.max-task-dispatch-duration                      | 1h                           | master分派检测的超时时长，默认为一小时                                                                                |
+| task-log-archive.enabled                                                    | false                        | 是否归档本地任务实例日志。为false时归档器不会启动，不会触碰任何日志文件。                                                               |
+| task-log-archive.check-interval                                             | 1d                           | 归档器扫描日志根目录的周期。                                                                                        |
+| task-log-archive.archive-threshold                                          | 30d                          | 日志按天分区目录早于该时长（按自然天计算）后会被压缩为zip归档包。                                                                    |
+| task-log-archive.expire-enabled                                             | false                        | 是否删除过期的归档包。这是唯一会永久删除日志数据的配置项。                                                                         |
 | task-log-archive.expire-threshold                                           | 90d                          | 归档包早于该时长后被删除。仅在 `task-log-archive.expire-enabled` 为true时生效，且应大于 `task-log-archive.archive-threshold`。 |
 
 ## Worker Server相关配置
 
 位置：`worker-server/conf/application.yaml`
 
-|    默认值    |                                     参数                                      |                                           描述                                            |
-|-----------|-----------------------------------------------------------------------------|-----------------------------------------------------------------------------------------|
-| 1234      | worker.listen-port                                                          | worker监听端口                                                                              |
-| 10s       | worker.max-heartbeat-interval                                               | worker最大心跳间隔                                                                            |
-| 100       | worker.host-weight                                                          | 派发任务时，worker主机的权重                                                                       |
-| true      | worker.tenant-auto-create                                                   | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。               |
-| true      | worker.server-load-protection.enabled                                       | 是否开启系统保护策略                                                                              |
-| 0.8       | worker.server-load-protection.max-system-cpu-usage-percentage-thresholds    | worker最大系统cpu使用值,只有当前系统cpu使用值低于最大系统cpu使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统CPU       |
-| 0.8       | worker.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | worker最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的JVM CPU |
-| 0.8       | worker.server-load-protection.max-system-memory-usage-percentage-thresholds | worker最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统内存          |
-| 0.8       | worker.server-load-protection.max-disk-usage-percentage-thresholds          | worker最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统磁盘空间         |
-| 0m        | master.server-load-protection.max-workflow-instance-runtime                 | 一个工作流实例最大的运行时间，如果超过这个时间，实例会被kill。 默认值为 0d 表示没有限制, 最小值为1分钟。                              |
-| 0m        | master.server-load-protection.max-task-instance-runtime                     | 一个任务实例最大的运行时间，如果超过这个时间，实例会被kill。 默认值为 0d 表示没有限制, 最小值为1分钟。                               |
-| localhost | worker.alert-listen-host                                                    | alert监听host                                                                             |
-| 50052     | worker.alert-listen-port                                                    | alert监听端口                                                                               |
-| 100       | worker.physical-task-config.task-executor-thread-size                       | Worker中任务最大并发度                                                                          |
-| true      | worker.tenant-config.auto-create-tenant-enabled                             | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。               |
-| false     | worker.tenant-config.default-tenant-enabled                                 | 如果设置为true, 将会使用worker服务启动用户作为 `default` 租户。                                             |
-| false     | task-log-archive.enabled                                                    | 是否归档本地任务实例日志。为false时归档器不会启动，不会触碰任何日志文件。                                                 |
-| 1d        | task-log-archive.check-interval                                             | 归档器扫描日志根目录的周期。                                                                          |
-| 30d       | task-log-archive.archive-threshold                                          | 日志按天分区目录早于该时长（按自然天计算）后会被压缩为zip归档包。                                                      |
-| false     | task-log-archive.expire-enabled                                             | 是否删除过期的归档包。这是唯一会永久删除日志数据的配置项。                                                           |
+|    默认值    |                                     参数                                      |                                                  描述                                                   |
+|-----------|-----------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------|
+| 1234      | worker.listen-port                                                          | worker监听端口                                                                                            |
+| 10s       | worker.max-heartbeat-interval                                               | worker最大心跳间隔                                                                                          |
+| 100       | worker.host-weight                                                          | 派发任务时，worker主机的权重                                                                                     |
+| true      | worker.tenant-auto-create                                                   | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。                             |
+| true      | worker.server-load-protection.enabled                                       | 是否开启系统保护策略                                                                                            |
+| 0.8       | worker.server-load-protection.max-system-cpu-usage-percentage-thresholds    | worker最大系统cpu使用值,只有当前系统cpu使用值低于最大系统cpu使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统CPU                     |
+| 0.8       | worker.server-load-protection.max-jvm-cpu-usage-percentage-thresholds       | worker最大JVM cpu使用值,只有当前JVM cpu使用值低于最大JVM cpu使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的JVM CPU               |
+| 0.8       | worker.server-load-protection.max-system-memory-usage-percentage-thresholds | worker最大系统 内存使用值,只有当前系统内存使用值低于最大系统内存使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统内存                        |
+| 0.8       | worker.server-load-protection.max-disk-usage-percentage-thresholds          | worker最大系统磁盘使用值,只有当前系统磁盘使用值低于最大系统磁盘使用值,worker服务才能接收任务. 默认值为0.8: 会使用80%的操作系统磁盘空间                       |
+| 0m        | master.server-load-protection.max-workflow-instance-runtime                 | 一个工作流实例最大的运行时间，如果超过这个时间，实例会被kill。 默认值为 0d 表示没有限制, 最小值为1分钟。                                            |
+| 0m        | master.server-load-protection.max-task-instance-runtime                     | 一个任务实例最大的运行时间，如果超过这个时间，实例会被kill。 默认值为 0d 表示没有限制, 最小值为1分钟。                                             |
+| localhost | worker.alert-listen-host                                                    | alert监听host                                                                                           |
+| 50052     | worker.alert-listen-port                                                    | alert监听端口                                                                                             |
+| 100       | worker.physical-task-config.task-executor-thread-size                       | Worker中任务最大并发度                                                                                        |
+| true      | worker.tenant-config.auto-create-tenant-enabled                             | 租户对应于系统的用户,由worker提交作业.如果系统没有该用户,则在参数worker.tenant.auto.create为true后自动创建。                             |
+| false     | worker.tenant-config.default-tenant-enabled                                 | 如果设置为true, 将会使用worker服务启动用户作为 `default` 租户。                                                           |
+| false     | task-log-archive.enabled                                                    | 是否归档本地任务实例日志。为false时归档器不会启动，不会触碰任何日志文件。                                                               |
+| 1d        | task-log-archive.check-interval                                             | 归档器扫描日志根目录的周期。                                                                                        |
+| 30d       | task-log-archive.archive-threshold                                          | 日志按天分区目录早于该时长（按自然天计算）后会被压缩为zip归档包。                                                                    |
+| false     | task-log-archive.expire-enabled                                             | 是否删除过期的归档包。这是唯一会永久删除日志数据的配置项。                                                                         |
 | 90d       | task-log-archive.expire-threshold                                           | 归档包早于该时长后被删除。仅在 `task-log-archive.expire-enabled` 为true时生效，且应大于 `task-log-archive.archive-threshold`。 |
 
 ## Alert Server相关配置
