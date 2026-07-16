@@ -344,8 +344,10 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 JdbcRegistryClientHeartbeatDTO clone = jdbcRegistryClientHeartbeatDTO.clone();
                 clone.setLastHeartbeatTime(now);
                 if (!jdbcRegistryClientRepository.updateById(clone)) {
-                    throw new RegistryException(
-                            "The client heartbeat has expired: " + jdbcRegistryClientHeartbeatDTO.getId());
+                    log.error("The client heartbeat has expired: {}", jdbcRegistryClientHeartbeatDTO.getId());
+                    jdbcRegistryServerState = JdbcRegistryServerState.DISCONNECTED;
+                    doTriggerOnDisConnectedListener();
+                    return;
                 }
                 jdbcRegistryClientHeartbeatDTO.setLastHeartbeatTime(clone.getLastHeartbeatTime());
             }

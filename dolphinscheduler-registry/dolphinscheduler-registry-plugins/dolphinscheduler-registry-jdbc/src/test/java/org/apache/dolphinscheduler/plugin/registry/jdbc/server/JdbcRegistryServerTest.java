@@ -106,6 +106,19 @@ class JdbcRegistryServerTest {
     }
 
     @Test
+    void refreshClientsHeartbeat_shouldDisconnectImmediatelyWhenStartedHeartbeatRecordWasPurged() {
+        ReflectionTestUtils.setField(jdbcRegistryServer, "jdbcRegistryServerState", JdbcRegistryServerState.STARTED);
+        Mockito.when(jdbcRegistryClientRepository.updateById(Mockito.any())).thenReturn(false);
+
+        ReflectionTestUtils.invokeMethod(jdbcRegistryServer, "refreshClientsHeartbeat");
+        ReflectionTestUtils.invokeMethod(jdbcRegistryServer, "refreshClientsHeartbeat");
+
+        Truth.assertThat(jdbcRegistryServer.getServerState()).isEqualTo(JdbcRegistryServerState.DISCONNECTED);
+        Mockito.verify(jdbcRegistryClientRepository).updateById(Mockito.any());
+        Mockito.verify(connectionStateListener).onDisConnected();
+    }
+
+    @Test
     void refreshClientsHeartbeat_shouldPersistCurrentHeartbeatTimestamp() {
         ArgumentCaptor<JdbcRegistryClientHeartbeatDTO> registeredHeartbeat =
                 ArgumentCaptor.forClass(JdbcRegistryClientHeartbeatDTO.class);
