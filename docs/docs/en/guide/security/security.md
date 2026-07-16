@@ -23,6 +23,15 @@ Administrator login, default username/password: admin/dolphinscheduler123
 > 1. Currently, only admin users can modify tenant.
 > 2. If you create a tenant manually in the Linux, you need to add the manually created tenant to the dolphinscheduler bootstrap user's group, so that the tenant will have enough working directory permissions.
 
+## Tenant and External Data Permissions
+
+DolphinScheduler tenants are Linux execution identities used by workers to submit jobs. They should not be treated as fine-grained permission principals for external data systems.
+
+- External data systems (databases, object stores, catalogs) are responsible for validating and enforcing their own data permissions. A DolphinScheduler tenant alone does not grant access to external resources.
+- Long-lived external credentials (passwords, API keys, tokens) should not be stored in task definitions or printed in logs. Use DolphinScheduler's built-in credential management or external secrets management solutions instead.
+- When configuring data source connections or resource access, always verify that the external system's access control policies align with your organizational security requirements.
+
+
 ![create-tenant](../../../../img/new_ui/dev/security/create-tenant.png)
 
 ## Create Normal User
