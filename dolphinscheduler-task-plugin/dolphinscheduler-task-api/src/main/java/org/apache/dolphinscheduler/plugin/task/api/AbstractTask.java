@@ -141,7 +141,9 @@ public abstract class AbstractTask {
         if (exitStatusCode == TaskConstants.EXIT_CODE_SUCCESS) {
             return TaskExecutionStatus.SUCCESS;
         }
-        if (exitStatusCode == TaskConstants.EXIT_CODE_KILL || exitStatusCode == TaskConstants.EXIT_CODE_HARD_KILL) {
+        if (exitStatusCode == TaskConstants.EXIT_CODE_KILL
+                || exitStatusCode == TaskConstants.EXIT_CODE_HARD_KILL
+                || exitStatusCode == TaskConstants.EXIT_CODE_SIGINT_KILL) {
             return TaskExecutionStatus.KILL;
         }
         return TaskExecutionStatus.FAILURE;
