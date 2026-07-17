@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
@@ -67,13 +68,13 @@ public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
     List<TaskGroupQueue> queryByTaskInstanceId(Integer taskInstanceId);
 
     /**
-     * Query and lock the TaskGroupQueue until the current transaction completes.
-     * This method must be called in an active transaction.
+     * Atomically change a waiting TaskGroupQueue to acquired.
      *
      * @param id taskGroupQueue id
-     * @return TaskGroupQueue, or null if it does not exist
+     * @param updateTime update time
+     * @return true if the waiting TaskGroupQueue was acquired
      */
-    TaskGroupQueue queryByIdForUpdate(Integer id);
+    boolean acquireTaskGroupQueue(Integer id, Date updateTime);
 
     /**
      * Delete the TaskGroupQueue only when its current status matches the expected status.

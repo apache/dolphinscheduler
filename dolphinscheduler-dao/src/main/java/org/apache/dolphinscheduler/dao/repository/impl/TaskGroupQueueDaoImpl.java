@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.Date;
 import java.util.List;
 
 import lombok.NonNull;
@@ -68,8 +69,14 @@ public class TaskGroupQueueDaoImpl extends BaseDao<TaskGroupQueue, TaskGroupQueu
     }
 
     @Override
-    public TaskGroupQueue queryByIdForUpdate(Integer id) {
-        return mybatisMapper.queryByIdForUpdate(id);
+    public boolean acquireTaskGroupQueue(Integer id, Date updateTime) {
+        return mybatisMapper.acquireTaskGroupQueue(
+                id,
+                TaskGroupQueueStatus.WAIT_QUEUE.getCode(),
+                TaskGroupQueueStatus.ACQUIRE_SUCCESS.getCode(),
+                Flag.YES.getCode(),
+                Flag.NO.getCode(),
+                updateTime) > 0;
     }
 
     @Override

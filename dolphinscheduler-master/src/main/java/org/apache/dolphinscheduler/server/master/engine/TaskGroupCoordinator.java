@@ -261,21 +261,16 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         }
     }
 
+    /**
+     * Delete the queue before notifying so only one coordinator can notify it. A notification failure rolls back the
+     * transaction and restores the queue for retry.
+     */
     private boolean notifyForceStartTaskGroupQueue(TaskGroupQueue taskGroupQueue) {
-        // Keep the row lock through notification so cancellation and dispatch cannot both succeed.
         final Boolean notified = transactionTemplate.execute(transactionStatus -> {
-            final TaskGroupQueue lockedTaskGroupQueue =
-                    taskGroupQueueDao.queryByIdForUpdate(taskGroupQueue.getId());
-            if (lockedTaskGroupQueue == null
-                    || lockedTaskGroupQueue.getInQueue() != Flag.YES.getCode()
-                    || lockedTaskGroupQueue.getForceStart() != Flag.YES.getCode()) {
+            if (!taskGroupQueueDao.deleteById(taskGroupQueue.getId())) {
                 return false;
             }
-            notifyWaitingTaskInstance(lockedTaskGroupQueue);
-            if (!taskGroupQueueDao.deleteById(lockedTaskGroupQueue.getId())) {
-                throw new IllegalStateException(
-                        "Failed to delete ForceStart TaskGroupQueue: " + lockedTaskGroupQueue.getId());
-            }
+            notifyWaitingTaskInstance(taskGroupQueue);
             return true;
         });
         if (notified == null) {
@@ -338,27 +333,15 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     }
 
     private boolean acquireTaskGroupSlotAndNotify(TaskGroupQueue taskGroupQueue) {
-        // The queue claim, slot acquisition and notification are one transaction. A notification failure rolls back
-        // both database changes and leaves the queue available for pause/kill cancellation.
         final Boolean acquired = transactionTemplate.execute(transactionStatus -> {
-            final TaskGroupQueue lockedTaskGroupQueue =
-                    taskGroupQueueDao.queryByIdForUpdate(taskGroupQueue.getId());
-            if (lockedTaskGroupQueue == null
-                    || lockedTaskGroupQueue.getInQueue() != Flag.YES.getCode()
-                    || lockedTaskGroupQueue.getForceStart() != Flag.NO.getCode()
-                    || lockedTaskGroupQueue.getStatus() != TaskGroupQueueStatus.WAIT_QUEUE) {
+            if (!taskGroupDao.acquireTaskGroupSlot(taskGroupQueue.getGroupId())) {
                 return false;
             }
-            if (!taskGroupDao.acquireTaskGroupSlot(lockedTaskGroupQueue.getGroupId())) {
+            if (!taskGroupQueueDao.acquireTaskGroupQueue(taskGroupQueue.getId(), new Date())) {
+                transactionStatus.setRollbackOnly();
                 return false;
             }
-            notifyWaitingTaskInstance(lockedTaskGroupQueue);
-            lockedTaskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
-            lockedTaskGroupQueue.setUpdateTime(new Date());
-            if (!taskGroupQueueDao.updateById(lockedTaskGroupQueue)) {
-                throw new IllegalStateException(
-                        "Failed to mark TaskGroupQueue as acquired: " + lockedTaskGroupQueue.getId());
-            }
+            notifyWaitingTaskInstance(taskGroupQueue);
             return true;
         });
         if (acquired == null) {
