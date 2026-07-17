@@ -144,7 +144,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
             return;
         }
         if (taskExecution.getTaskInstance().getTaskGroupId() > 0
-                && taskGroupCoordinator.removeTaskFromWaitingTaskGroupQueue(taskExecution.getTaskInstance())) {
+                && taskGroupCoordinator.releaseWaitingTaskGroupSlot(taskExecution.getTaskInstance())) {
             log.info("Success pause task: {} while waiting for TaskGroup slot", taskExecution.getName());
             taskExecution.getWorkflowEventBus().publish(TaskPausedLifecycleEvent.of(taskExecution));
             return;
@@ -174,7 +174,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
             return;
         }
         if (taskExecution.getTaskInstance().getTaskGroupId() > 0
-                && taskGroupCoordinator.removeTaskFromWaitingTaskGroupQueue(taskExecution.getTaskInstance())) {
+                && taskGroupCoordinator.releaseWaitingTaskGroupSlot(taskExecution.getTaskInstance())) {
             log.info("Success kill task: {} while waiting for TaskGroup slot", taskExecution.getName());
             taskExecution.getWorkflowEventBus().publish(TaskKilledLifecycleEvent.of(taskExecution));
             return;

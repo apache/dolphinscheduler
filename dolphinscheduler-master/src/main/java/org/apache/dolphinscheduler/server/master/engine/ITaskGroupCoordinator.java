@@ -100,7 +100,7 @@ public interface ITaskGroupCoordinator extends AutoCloseable {
      * @param taskInstance taskInstance
      * @return true if the task was removed from the waiting queue
      */
-    boolean removeTaskFromWaitingTaskGroupQueue(TaskInstance taskInstance);
+    boolean releaseWaitingTaskGroupSlot(TaskInstance taskInstance);
 
     /**
      * Close the TaskGroupCoordinator, once closed, the coordinator will not work until you have started the coordinator again.

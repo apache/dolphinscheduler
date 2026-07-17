@@ -427,7 +427,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     }
 
     @Override
-    public boolean removeTaskFromWaitingTaskGroupQueue(TaskInstance taskInstance) {
+    public boolean releaseWaitingTaskGroupSlot(TaskInstance taskInstance) {
         if (taskInstance == null) {
             throw new IllegalArgumentException("The TaskInstance is null");
         }
