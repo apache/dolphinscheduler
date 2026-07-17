@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
@@ -185,7 +186,15 @@ public class DataxTask extends AbstractTask {
         }
 
         if (dataXParameters.getCustomConfig() == Flag.YES.ordinal()) {
-            json = dataXParameters.getJson().replaceAll("\\r\\n", System.lineSeparator());
+            if (CollectionUtils.isNotEmpty(dataXParameters.getResourceList())) {
+                String resourceFileName = dataXParameters.getResourceList().get(0).getResourceName();
+                ResourceContext resourceContext = taskRequest.getResourceContext();
+                json = FileUtils.readFileToString(
+                        new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
+                        StandardCharsets.UTF_8);
+            } else {
+                json = dataXParameters.getJson().replaceAll("\\r\\n", System.lineSeparator());
+            }
         } else {
             ObjectNode job = JSONUtils.createObjectNode();
             job.putArray("content").addAll(buildDataxJobContentJson());
