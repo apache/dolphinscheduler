@@ -130,6 +130,35 @@ public class TimePlaceholderUtilsTest {
     }
 
     @Test
+    public void timePlaceHolderForPeriodBoundariesWithDayOffset() {
+        assertEquals("20220801",
+                ParameterUtils.convertParameterPlaceholders("$[month_begin(yyyyMMdd,0)]", timeParams));
+        assertEquals("20220804",
+                ParameterUtils.convertParameterPlaceholders("$[month_begin(yyyyMMdd,3)]", timeParams));
+        assertEquals("20220831",
+                ParameterUtils.convertParameterPlaceholders("$[month_end(yyyyMMdd,0)]", timeParams));
+        assertEquals("20220830",
+                ParameterUtils.convertParameterPlaceholders("$[month_end(yyyyMMdd,-1)]", timeParams));
+        assertEquals("20220822",
+                ParameterUtils.convertParameterPlaceholders("$[week_begin(yyyyMMdd,0)]", timeParams));
+        assertEquals("20220823",
+                ParameterUtils.convertParameterPlaceholders("$[week_begin(yyyyMMdd,1)]", timeParams));
+        assertEquals("20220828",
+                ParameterUtils.convertParameterPlaceholders("$[week_end(yyyyMMdd,0)]", timeParams));
+        assertEquals("20220826",
+                ParameterUtils.convertParameterPlaceholders("$[week_end(yyyyMMdd,-2)]", timeParams));
+    }
+
+    @Test
+    public void timePlaceHolderForTimestamp() {
+        Date targetDate = DateUtils.parse("2022-08-26 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        String expectedTimestamp = String.valueOf(targetDate.getTime() / 1000);
+
+        assertEquals(expectedTimestamp,
+                ParameterUtils.convertParameterPlaceholders("$[timestamp(yyyyMMddHHmmss)]", timeParams));
+    }
+
+    @Test
     void formatTimeExpressionWithInvalidExpression() {
         assertEquals("$[week_last_day(yyyy-MM-dd,0) - 1]",
                 TimePlaceholderUtils.formatTimeExpression("$[week_last_day(yyyy-MM-dd,0) - 1]", new Date(), true));

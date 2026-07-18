@@ -109,6 +109,23 @@ public class ParameterUtilsTest {
                 ParameterUtils.convertParameterPlaceholders(sql, paramsMap));
     }
 
+    @Test
+    public void convertParameterPlaceholdersResolvesNamedParametersBeforeTimeExpressions() {
+        Map<String, String> parameterMap = new HashMap<>();
+        parameterMap.put(DateConstants.PARAMETER_DATETIME, "20220826000000");
+        parameterMap.put(DateConstants.PARAMETER_BUSINESS_DATE, "20220825");
+        parameterMap.put("offset", "-1");
+        parameterMap.put("partition_date", "$[yyyyMMdd]");
+
+        String value = "partition=${partition_date}, nested=$[yyyyMMdd${offset}], "
+                + "biz=${system.biz.date}, previous=$[yyyy-MM-dd HH:mm:ss-1], "
+                + "next=$[yyyy-MM-dd HH:mm:ss+1]";
+
+        assertEquals("partition=20220826, nested=20220825, biz=20220825, "
+                + "previous=2022-08-25 00:00:00, next=2022-08-27 00:00:00",
+                ParameterUtils.convertParameterPlaceholders(value, parameterMap));
+    }
+
     /**
      * Test handleEscapes
      */

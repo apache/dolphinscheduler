@@ -231,6 +231,10 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/built-in.html',
                             },
                             {
+                                title: 'Parameter Combination',
+                                link: '/en-us/docs/dev/user_doc/guide/parameter/parameter-combination.html',
+                            },
+                            {
                                 title: 'Global Parameter',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/global.html',
                             },
@@ -957,6 +961,10 @@ export default {
                             {
                                 title: '内置参数',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/built-in.html',
+                            },
+                            {
+                                title: '参数组合使用',
+                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/parameter-combination.html',
                             },
                             {
                                 title: '全局参数',
