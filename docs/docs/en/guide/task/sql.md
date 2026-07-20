@@ -29,13 +29,12 @@ Refer to [datasource-setting](../installation/datasource-setting.md) `DataSource
 
 ## Parameter Rendering
 
-SQL task renders custom parameters in the SQL text before submitting it to the datasource through JDBC `Statement`.
+SQL task replaces custom-parameter placeholders in the SQL text before submitting it to the datasource through JDBC `Statement`.
 
-- `${name}` renders a SQL literal by default: string/date/time/timestamp values are wrapped in single quotes and embedded single quotes are escaped, while numeric and boolean values are rendered without quotes.
-- `LIST` values render as comma-separated SQL literals, for example `id in (${ids})` can become `id in (1,'a')`.
-- When `${name}` is part of an identifier, for example `create table test_${bizDate}`, the value is rendered as an identifier fragment without extra quotes.
-- `!{name}` keeps raw text replacement semantics for SQL fragments that must not be quoted automatically. Use it only for trusted SQL fragments because DolphinScheduler does not escape raw text replacements.
-- If a placeholder refers to a missing custom parameter, the SQL task fails fast instead of leaving the placeholder unresolved.
+- Both `${name}` and `!{name}` insert the parameter value as text. DolphinScheduler does not add quotes, escape characters, interpret the parameter type, or otherwise adapt the value to a database dialect.
+- Write datasource-specific SQL syntax, including any required quotes, in the SQL statement or parameter value. Only use trusted parameter values because text replacement does not prevent SQL injection.
+- Rendering scans the source SQL once. Placeholder-like text introduced by a parameter value is not rendered again.
+- If a source placeholder is unclosed or refers to a missing custom parameter, the SQL task fails before submitting the statement to the datasource.
 
 ## Task Example
 
