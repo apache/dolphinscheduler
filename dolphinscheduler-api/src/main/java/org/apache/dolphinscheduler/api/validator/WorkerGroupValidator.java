@@ -49,8 +49,15 @@ public class WorkerGroupValidator implements IValidator<WorkerGroupValidationCon
         String workerGroup = context.getWorkerGroup();
         long projectCode = context.getProjectCode();
 
-        if (StringUtils.isNotBlank(workerGroup)
-                && !projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, workerGroup)) {
+        if (StringUtils.isEmpty(workerGroup)) {
+            log.warn("Worker group is empty or null for project {}", projectCode);
+            throw new ServiceException(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT, workerGroup);
+        }
+
+        Set<String> assignedWorkerGroupNames =
+                projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(projectCode);
+
+        if (assignedWorkerGroupNames == null || !assignedWorkerGroupNames.contains(workerGroup)) {
             log.warn("Worker group {} is not assigned to project {}", workerGroup, projectCode);
             throw new ServiceException(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT, workerGroup);
         }
@@ -68,14 +75,9 @@ public class WorkerGroupValidator implements IValidator<WorkerGroupValidationCon
             return;
         }
 
-        List<String> validWorkerGroups = workerGroups.stream()
-                .filter(StringUtils::isNotBlank)
+        List<String> distinctWorkerGroups = workerGroups.stream()
                 .distinct()
                 .collect(Collectors.toList());
-
-        if (CollectionUtils.isEmpty(validWorkerGroups)) {
-            return;
-        }
 
         Set<String> assignedWorkerGroupNames = projectWorkerGroupRelationService
                 .getAllAssignedWorkerGroupNames(projectCode);
@@ -85,8 +87,8 @@ public class WorkerGroupValidator implements IValidator<WorkerGroupValidationCon
         }
 
         Set<String> finalAssignedWorkerGroupNames = assignedWorkerGroupNames;
-        List<String> unassignedWorkerGroups = validWorkerGroups.stream()
-                .filter(wg -> !finalAssignedWorkerGroupNames.contains(wg))
+        List<String> unassignedWorkerGroups = distinctWorkerGroups.stream()
+                .filter(wg -> StringUtils.isEmpty(wg) || !finalAssignedWorkerGroupNames.contains(wg))
                 .collect(Collectors.toList());
 
         if (!unassignedWorkerGroups.isEmpty()) {

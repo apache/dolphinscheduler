@@ -259,4 +259,101 @@ public class ProjectWorkerGroupRelationServiceTest {
         taskDefinition.setWorkerGroup("new");
         return taskDefinition;
     }
+
+    @Test
+    public void testIsWorkerGroupAssignedToProject() {
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject());
+        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode))
+                .thenReturn(Sets.newHashSet("g_suyc"));
+        Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(projectCode))
+                .thenReturn(new ArrayList<>());
+        Mockito.when(scheduleDao.querySchedulerListByProjectName(Mockito.any()))
+                .thenReturn(Lists.newArrayList());
+
+        Assertions.assertTrue(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "g_suyc"));
+
+        Assertions.assertFalse(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, ""));
+
+        Assertions
+                .assertFalse(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "default"));
+
+        Assertions.assertFalse(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, null));
+
+        Assertions.assertFalse(
+                projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "unassigned_group"));
+    }
+
+    @Test
+    public void testIsWorkerGroupAssignedToProjectWithDefaultAssigned() {
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject());
+        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode))
+                .thenReturn(Sets.newHashSet("g_suyc", "default"));
+        Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(projectCode))
+                .thenReturn(new ArrayList<>());
+        Mockito.when(scheduleDao.querySchedulerListByProjectName(Mockito.any()))
+                .thenReturn(Lists.newArrayList());
+
+        Assertions.assertTrue(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "g_suyc"));
+
+        Assertions.assertTrue(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "default"));
+
+        Assertions.assertFalse(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, ""));
+
+        Assertions.assertFalse(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, null));
+
+        Assertions.assertFalse(
+                projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "unassigned_group"));
+    }
+
+    @Test
+    public void testIsWorkerGroupAssignedToProjectWithUsedWorkerGroups() {
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject());
+        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode))
+                .thenReturn(Sets.newHashSet("g_suyc"));
+        Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(projectCode))
+                .thenReturn(Lists.newArrayList("group-from-task"));
+
+        org.apache.dolphinscheduler.dao.entity.Schedule schedule =
+                new org.apache.dolphinscheduler.dao.entity.Schedule();
+        schedule.setWorkerGroup("group-from-schedule");
+        Mockito.when(scheduleDao.querySchedulerListByProjectName(Mockito.any()))
+                .thenReturn(Lists.newArrayList(schedule));
+
+        Assertions.assertTrue(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "g_suyc"));
+
+        Assertions.assertTrue(
+                projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "group-from-task"));
+
+        Assertions.assertTrue(
+                projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "group-from-schedule"));
+
+        Assertions
+                .assertFalse(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "default"));
+
+        Assertions.assertFalse(
+                projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(projectCode, "unassigned_group"));
+    }
+
+    @Test
+    public void testGetAllAssignedWorkerGroupNamesWithUsedWorkerGroups() {
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject());
+        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode))
+                .thenReturn(Sets.newHashSet("g_suyc"));
+        Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(projectCode))
+                .thenReturn(Lists.newArrayList("group-from-task"));
+
+        org.apache.dolphinscheduler.dao.entity.Schedule schedule =
+                new org.apache.dolphinscheduler.dao.entity.Schedule();
+        schedule.setWorkerGroup("group-from-schedule");
+        Mockito.when(scheduleDao.querySchedulerListByProjectName(Mockito.any()))
+                .thenReturn(Lists.newArrayList(schedule));
+
+        java.util.Set<String> assignedGroups =
+                projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(projectCode);
+
+        Assertions.assertEquals(3, assignedGroups.size());
+        Assertions.assertTrue(assignedGroups.contains("g_suyc"));
+        Assertions.assertTrue(assignedGroups.contains("group-from-task"));
+        Assertions.assertTrue(assignedGroups.contains("group-from-schedule"));
+    }
 }

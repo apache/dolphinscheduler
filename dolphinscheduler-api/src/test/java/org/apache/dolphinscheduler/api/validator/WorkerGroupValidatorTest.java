@@ -54,8 +54,8 @@ class WorkerGroupValidatorTest {
                 .projectCode(PROJECT_CODE)
                 .build();
 
-        assertThatCode(() -> workerGroupValidator.validate(context))
-                .doesNotThrowAnyException();
+        assertThatThrownBy(() -> workerGroupValidator.validate(context))
+                .isInstanceOf(ServiceException.class);
     }
 
     @Test
@@ -65,8 +65,8 @@ class WorkerGroupValidatorTest {
                 .projectCode(PROJECT_CODE)
                 .build();
 
-        assertThatCode(() -> workerGroupValidator.validate(context))
-                .doesNotThrowAnyException();
+        assertThatThrownBy(() -> workerGroupValidator.validate(context))
+                .isInstanceOf(ServiceException.class);
     }
 
     @Test
@@ -76,15 +76,16 @@ class WorkerGroupValidatorTest {
                 .projectCode(PROJECT_CODE)
                 .build();
 
-        assertThatCode(() -> workerGroupValidator.validate(context))
-                .doesNotThrowAnyException();
+        assertThatThrownBy(() -> workerGroupValidator.validate(context))
+                .isInstanceOf(ServiceException.class);
     }
 
     @Test
     void testValidate_validWorkerGroup() {
-        String validWorkerGroup = "default";
-        when(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(PROJECT_CODE, validWorkerGroup))
-                .thenReturn(true);
+        String validWorkerGroup = "g_suyc";
+        Set<String> assignedGroups = new HashSet<>(Collections.singletonList(validWorkerGroup));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
 
         WorkerGroupValidationContext context = WorkerGroupValidationContext.builder()
                 .workerGroup(validWorkerGroup)
@@ -98,8 +99,9 @@ class WorkerGroupValidatorTest {
     @Test
     void testValidate_invalidWorkerGroup() {
         String invalidWorkerGroup = "invalid-group";
-        when(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(PROJECT_CODE, invalidWorkerGroup))
-                .thenReturn(false);
+        Set<String> assignedGroups = new HashSet<>(Collections.singletonList("g_suyc"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
 
         WorkerGroupValidationContext context = WorkerGroupValidationContext.builder()
                 .workerGroup(invalidWorkerGroup)
@@ -112,14 +114,51 @@ class WorkerGroupValidatorTest {
     }
 
     @Test
+    void testValidate_defaultNotAssigned() {
+        String workerGroup = "default";
+        Set<String> assignedGroups = new HashSet<>(Collections.singletonList("g_suyc"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        WorkerGroupValidationContext context = WorkerGroupValidationContext.builder()
+                .workerGroup(workerGroup)
+                .projectCode(PROJECT_CODE)
+                .build();
+
+        // "default" should fail when not explicitly assigned
+        assertThatThrownBy(() -> workerGroupValidator.validate(context))
+                .isInstanceOf(ServiceException.class)
+                .hasMessageContaining("default");
+    }
+
+    @Test
+    void testValidate_defaultAssigned() {
+        String workerGroup = "default";
+        Set<String> assignedGroups = new HashSet<>(Arrays.asList("g_suyc", "default"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        WorkerGroupValidationContext context = WorkerGroupValidationContext.builder()
+                .workerGroup(workerGroup)
+                .projectCode(PROJECT_CODE)
+                .build();
+
+        // "default" should pass when explicitly assigned
+        assertThatCode(() -> workerGroupValidator.validate(context))
+                .doesNotThrowAnyException();
+    }
+
+    @Test
     void testValidate_differentProjectCode() {
         long anotherProjectCode = 2L;
-        String workerGroup = "default";
+        String workerGroup = "g_suyc";
 
-        when(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(PROJECT_CODE, workerGroup))
-                .thenReturn(true);
-        when(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(anotherProjectCode, workerGroup))
-                .thenReturn(false);
+        Set<String> assignedGroups1 = new HashSet<>(Collections.singletonList(workerGroup));
+        Set<String> assignedGroups2 = new HashSet<>(Collections.singletonList("other-group"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups1);
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(anotherProjectCode))
+                .thenReturn(assignedGroups2);
 
         // Should pass for PROJECT_CODE
         WorkerGroupValidationContext validContext = WorkerGroupValidationContext.builder()
@@ -140,9 +179,41 @@ class WorkerGroupValidatorTest {
 
     @Test
     void testValidate_caseSensitive() {
-        String workerGroup = "Default";
-        when(projectWorkerGroupRelationService.isWorkerGroupAssignedToProject(PROJECT_CODE, workerGroup))
-                .thenReturn(false);
+        String workerGroup = "G_SUYC";
+        Set<String> assignedGroups = new HashSet<>(Collections.singletonList("g_suyc"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        WorkerGroupValidationContext context = WorkerGroupValidationContext.builder()
+                .workerGroup(workerGroup)
+                .projectCode(PROJECT_CODE)
+                .build();
+
+        assertThatThrownBy(() -> workerGroupValidator.validate(context))
+                .isInstanceOf(ServiceException.class);
+    }
+
+    @Test
+    void testValidate_assignedWorkerGroupsNull() {
+        String workerGroup = "g_suyc";
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(null);
+
+        WorkerGroupValidationContext context = WorkerGroupValidationContext.builder()
+                .workerGroup(workerGroup)
+                .projectCode(PROJECT_CODE)
+                .build();
+
+        assertThatThrownBy(() -> workerGroupValidator.validate(context))
+                .isInstanceOf(ServiceException.class);
+    }
+
+    @Test
+    void testValidate_assignedWorkerGroupsEmpty() {
+        String workerGroup = "g_suyc";
+        Set<String> assignedGroups = new HashSet<>();
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
 
         WorkerGroupValidationContext context = WorkerGroupValidationContext.builder()
                 .workerGroup(workerGroup)
@@ -168,14 +239,15 @@ class WorkerGroupValidatorTest {
     @Test
     void testBatchValidate_listWithOnlyEmptyStrings() {
         List<String> workerGroups = Arrays.asList("", "  ", null);
-        assertThatCode(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
-                .doesNotThrowAnyException();
+        // Empty/null values should cause validation failure
+        assertThatThrownBy(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .isInstanceOf(ServiceException.class);
     }
 
     @Test
     void testBatchValidate_allValidWorkerGroups() {
-        List<String> workerGroups = Arrays.asList("default", "group-a", "group-b");
-        Set<String> assignedGroups = new HashSet<>(Arrays.asList("default", "group-a", "group-b"));
+        List<String> workerGroups = Arrays.asList("g_suyc", "group-a", "group-b");
+        Set<String> assignedGroups = new HashSet<>(Arrays.asList("g_suyc", "group-a", "group-b"));
         when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
                 .thenReturn(assignedGroups);
 
@@ -185,8 +257,8 @@ class WorkerGroupValidatorTest {
 
     @Test
     void testBatchValidate_someInvalidWorkerGroups() {
-        List<String> workerGroups = Arrays.asList("default", "invalid-group");
-        Set<String> assignedGroups = new HashSet<>(Collections.singletonList("default"));
+        List<String> workerGroups = Arrays.asList("g_suyc", "invalid-group");
+        Set<String> assignedGroups = new HashSet<>(Collections.singletonList("g_suyc"));
         when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
                 .thenReturn(assignedGroups);
 
@@ -210,8 +282,8 @@ class WorkerGroupValidatorTest {
 
     @Test
     void testBatchValidate_withDuplicates() {
-        List<String> workerGroups = Arrays.asList("default", "default", "group-a");
-        Set<String> assignedGroups = new HashSet<>(Arrays.asList("default", "group-a"));
+        List<String> workerGroups = Arrays.asList("g_suyc", "g_suyc", "group-a");
+        Set<String> assignedGroups = new HashSet<>(Arrays.asList("g_suyc", "group-a"));
         when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
                 .thenReturn(assignedGroups);
 
@@ -222,13 +294,71 @@ class WorkerGroupValidatorTest {
 
     @Test
     void testBatchValidate_withEmptyStrings() {
-        List<String> workerGroups = Arrays.asList("default", "", "group-a");
-        Set<String> assignedGroups = new HashSet<>(Arrays.asList("default", "group-a"));
+        List<String> workerGroups = Arrays.asList("g_suyc", "", "group-a");
+        Set<String> assignedGroups = new HashSet<>(Arrays.asList("g_suyc", "group-a"));
         when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
                 .thenReturn(assignedGroups);
 
-        // Should not throw because empty strings are filtered out
+        // Should throw because empty strings are now invalid
+        assertThatThrownBy(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .isInstanceOf(ServiceException.class);
+    }
+
+    @Test
+    void testBatchValidate_defaultNotAssigned() {
+        List<String> workerGroups = Arrays.asList("g_suyc", "default");
+        Set<String> assignedGroups = new HashSet<>(Collections.singletonList("g_suyc"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        // "default" should fail when not explicitly assigned
+        assertThatThrownBy(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .isInstanceOf(ServiceException.class)
+                .hasMessageContaining("default");
+    }
+
+    @Test
+    void testBatchValidate_defaultAssigned() {
+        List<String> workerGroups = Arrays.asList("g_suyc", "default");
+        Set<String> assignedGroups = new HashSet<>(Arrays.asList("g_suyc", "default"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        // "default" should pass when explicitly assigned
         assertThatCode(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
                 .doesNotThrowAnyException();
+    }
+
+    @Test
+    void testBatchValidate_assignedWorkerGroupsNull() {
+        List<String> workerGroups = Arrays.asList("g_suyc", "group-a");
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(null);
+
+        assertThatThrownBy(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .isInstanceOf(ServiceException.class);
+    }
+
+    @Test
+    void testBatchValidate_assignedWorkerGroupsEmpty() {
+        List<String> workerGroups = Arrays.asList("g_suyc", "group-a");
+        Set<String> assignedGroups = new HashSet<>();
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        assertThatThrownBy(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .isInstanceOf(ServiceException.class);
+    }
+
+    @Test
+    void testBatchValidate_mixedNullAndValidValues() {
+        List<String> workerGroups = Arrays.asList("g_suyc", null, "group-a");
+        Set<String> assignedGroups = new HashSet<>(Arrays.asList("g_suyc", "group-a"));
+        when(projectWorkerGroupRelationService.getAllAssignedWorkerGroupNames(PROJECT_CODE))
+                .thenReturn(assignedGroups);
+
+        // Should fail because null is invalid even though other groups are valid
+        assertThatThrownBy(() -> workerGroupValidator.validate(workerGroups, PROJECT_CODE))
+                .isInstanceOf(ServiceException.class);
     }
 }
