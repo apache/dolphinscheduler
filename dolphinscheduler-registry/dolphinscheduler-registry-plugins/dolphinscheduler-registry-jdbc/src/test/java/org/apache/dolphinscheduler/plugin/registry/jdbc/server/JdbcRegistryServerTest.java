@@ -27,6 +27,11 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryD
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryLockRepository;
 
 import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.junit.jupiter.api.AfterEach;
@@ -116,6 +121,35 @@ class JdbcRegistryServerTest {
         Truth.assertThat(jdbcRegistryServer.getServerState()).isEqualTo(JdbcRegistryServerState.DISCONNECTED);
         Mockito.verify(jdbcRegistryClientRepository).updateById(Mockito.any());
         Mockito.verify(connectionStateListener).onDisConnected();
+    }
+
+    @Test
+    void refreshClientsHeartbeat_shouldNotDisconnectWhenCloseWinsRace() throws Exception {
+        ReflectionTestUtils.setField(jdbcRegistryServer, "jdbcRegistryServerState", JdbcRegistryServerState.STARTED);
+        CountDownLatch heartbeatUpdateStarted = new CountDownLatch(1);
+        CountDownLatch allowHeartbeatUpdateToFinish = new CountDownLatch(1);
+        Mockito.when(jdbcRegistryClientRepository.updateById(Mockito.any())).thenAnswer(invocation -> {
+            heartbeatUpdateStarted.countDown();
+            allowHeartbeatUpdateToFinish.await(5, TimeUnit.SECONDS);
+            return false;
+        });
+        ExecutorService heartbeatExecutor = Executors.newSingleThreadExecutor();
+        Future<?> heartbeatFuture = heartbeatExecutor.submit(() -> {
+            ReflectionTestUtils.invokeMethod(jdbcRegistryServer, "refreshClientsHeartbeat");
+        });
+
+        try {
+            Truth.assertThat(heartbeatUpdateStarted.await(5, TimeUnit.SECONDS)).isTrue();
+            jdbcRegistryServer.close();
+            allowHeartbeatUpdateToFinish.countDown();
+            heartbeatFuture.get(5, TimeUnit.SECONDS);
+        } finally {
+            allowHeartbeatUpdateToFinish.countDown();
+            heartbeatExecutor.shutdownNow();
+        }
+
+        Truth.assertThat(jdbcRegistryServer.getServerState()).isEqualTo(JdbcRegistryServerState.STOPPED);
+        Mockito.verify(connectionStateListener, Mockito.never()).onDisConnected();
     }
 
     @Test

@@ -256,7 +256,9 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
 
     @Override
     public void close() {
-        jdbcRegistryServerState = JdbcRegistryServerState.STOPPED;
+        synchronized (this) {
+            jdbcRegistryServerState = JdbcRegistryServerState.STOPPED;
+        }
         schedulerThreadExecutor.shutdown();
         List<Long> clientIds = jdbcRegistryClients.stream()
                 .map(IJdbcRegistryClient::getJdbcRegistryClientIdentify)
@@ -345,8 +347,9 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 clone.setLastHeartbeatTime(now);
                 if (!jdbcRegistryClientRepository.updateById(clone)) {
                     log.error("The client heartbeat has expired: {}", jdbcRegistryClientHeartbeatDTO.getId());
-                    jdbcRegistryServerState = JdbcRegistryServerState.DISCONNECTED;
-                    doTriggerOnDisConnectedListener();
+                    if (transitionToDisconnected()) {
+                        doTriggerOnDisConnectedListener();
+                    }
                     return;
                 }
                 jdbcRegistryClientHeartbeatDTO.setLastHeartbeatTime(clone.getLastHeartbeatTime());
@@ -366,8 +369,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                     break;
                 case SUSPENDED:
                     if (System.currentTimeMillis() - lastSuccessHeartbeat > jdbcRegistryProperties.getSessionTimeout()
-                            .toMillis()) {
-                        jdbcRegistryServerState = JdbcRegistryServerState.DISCONNECTED;
+                            .toMillis() && transitionToDisconnected()) {
                         doTriggerOnDisConnectedListener();
                     }
                     break;
@@ -375,6 +377,15 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                     break;
             }
         }
+    }
+
+    private synchronized boolean transitionToDisconnected() {
+        if (jdbcRegistryServerState != JdbcRegistryServerState.STARTED
+                && jdbcRegistryServerState != JdbcRegistryServerState.SUSPENDED) {
+            return false;
+        }
+        jdbcRegistryServerState = JdbcRegistryServerState.DISCONNECTED;
+        return true;
     }
 
     private void doTriggerReconnectedListener() {
