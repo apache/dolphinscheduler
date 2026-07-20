@@ -15,23 +15,38 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.server.master.failover;
+package org.apache.dolphinscheduler.server.master.log;
 
-import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
-import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
-import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailoverLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
-import org.springframework.stereotype.Component;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
-@Component
-public class TaskFailover {
+import org.slf4j.MDC;
 
-    public void failoverTask(final ITaskExecution taskExecution) {
-        LogUtils.setWorkflowInstanceIdMDC(taskExecution.getWorkflowInstance().getId());
-        taskExecution.getWorkflowEventBus().publish(TaskFailoverLifecycleEvent.of(taskExecution));
-        LogUtils.removeWorkflowInstanceIdMDC();
-        WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.sift.AbstractDiscriminator;
+
+/**
+ * Workflow Log Discriminator
+ */
+@Slf4j
+@Getter
+@Setter
+public class WorkflowLogDiscriminator extends AbstractDiscriminator<ILoggingEvent> {
+
+    private String key;
+
+    private String logBase;
+
+    @Override
+    public String getDiscriminatingValue(ILoggingEvent event) {
+        String workflowInstanceLogPath = MDC.get(WorkflowLogUtils.WORKFLOW_INSTANCE_LOG_FULL_PATH_MDC_KEY);
+        if (workflowInstanceLogPath == null) {
+            log.error("The workflow instance log path is null, please check the logback configuration, log: {}", event);
+        }
+        return workflowInstanceLogPath;
     }
 
 }

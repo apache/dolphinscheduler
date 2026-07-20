@@ -16,8 +16,9 @@
  */
 
 import _ from 'lodash'
-import { reactive, h, ref } from 'vue'
+import { reactive, h, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAsyncState } from '@vueuse/core'
 import { useRouter } from 'vue-router'
 import ButtonLink from '@/components/button-link'
 import { RowKey } from 'naive-ui/lib/data-table/src/interface'
@@ -27,6 +28,7 @@ import {
   deleteWorkflowInstanceById,
   batchDeleteWorkflowInstanceByIds
 } from '@/service/modules/workflow-instances'
+import { queryWorkflowLogDetail, downloadWorkflowLog } from '@/service/modules/workflow-log'
 import { execute } from '@/service/modules/executors'
 import TableAction from './components/table-action'
 import {
@@ -69,7 +71,14 @@ export function useTable() {
       .workflowDefinitionCode
       ? ref(Number(router.currentRoute.value.query.workflowDefinitionCode))
       : ref(),
-    loadingRef: ref(false)
+    loadingRef: ref(false),
+    // Log related variables
+    showLogModalRef: ref(false),
+    logRef: ref(''),
+    logLoadingRef: ref(true),
+    currentLogRow: ref<IWorkflowInstance | null>(null),
+    skipLineNum: ref(0),
+    limit: ref(1000)
   })
 
   const createColumns = (variables: any) => {
@@ -239,7 +248,9 @@ export function useTable() {
                 })
               }
             },
-            onDeleteInstance: () => deleteInstance(_row.id)
+            onDeleteInstance: () => deleteInstance(_row.id),
+            onViewLog: () => viewLog(_row),
+            onDownloadLog: () => downloadLog(_row)
           })
       }
     ]
@@ -353,13 +364,66 @@ export function useTable() {
     })
   }
 
+  /**
+   * View workflow log
+   */
+  const viewLog = (row: IWorkflowInstance) => {
+    variables.currentLogRow = row
+    variables.showLogModalRef = true
+  }
+
+  /**
+   * Fetch workflow log
+   */
+  const fetchLog = (row: any) => {
+    const { state } = useAsyncState(
+      queryWorkflowLogDetail({
+        workflowInstanceId: Number(row.id),
+        limit: variables.limit,
+        skipLineNum: variables.skipLineNum
+      }).then((res: any) => {
+        variables.logRef += res?.message || ''
+        if (res?.message && res.message !== '') {
+          variables.skipLineNum += res.lineNum
+          fetchLog(row)
+        } else {
+          variables.logLoadingRef = false
+        }
+      }),
+      {}
+    )
+
+    return state
+  }
+
+  /**
+   * Download workflow log
+   */
+  const downloadLog = (row: IWorkflowInstance) => {
+    downloadWorkflowLog({ workflowInstanceId: row.id })
+  }
+
+  /**
+   * Close log modal
+   */
+  const closeLogModal = () => {
+    variables.showLogModalRef = false
+    variables.logRef = ''
+    variables.currentLogRow = null
+  }
+
   return {
     variables,
     createColumns,
     getTableData,
-    batchDeleteInstance
+    batchDeleteInstance,
+    viewLog,
+    downloadLog,
+    closeLogModal,
+    fetchLog
   }
 }
+
 
 export function renderWorkflowStateCell(
   state: IWorkflowExecutionState,

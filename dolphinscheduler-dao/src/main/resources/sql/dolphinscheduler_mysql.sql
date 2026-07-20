@@ -644,6 +644,7 @@ CREATE TABLE `t_ds_workflow_instance` (
   `dry_run` tinyint(4) DEFAULT '0' COMMENT 'dry run flag：0 normal, 1 dry run',
   `next_workflow_instance_id` int(11) DEFAULT '0' COMMENT 'serial queue next workflowInstanceId',
   `restart_time` datetime DEFAULT NULL COMMENT 'workflow instance restart time',
+  `log_path` longtext DEFAULT NULL COMMENT 'workflow instance log path',
   PRIMARY KEY (`id`),
   KEY `workflow_instance_index` (`workflow_definition_code`,`id`) USING BTREE,
   KEY `start_time_index` (`start_time`,`end_time`) USING BTREE

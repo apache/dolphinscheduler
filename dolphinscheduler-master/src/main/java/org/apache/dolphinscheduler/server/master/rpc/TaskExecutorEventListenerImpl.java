@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.rpc;
 
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.ITaskExecutorEventListener;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRuntimeContextChangedEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
@@ -54,7 +56,10 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
 
     @Override
     public void onTaskExecutorDispatched(final TaskExecutorDispatchedLifecycleEvent taskExecutorDispatchedLifecycleEvent) {
-        LogUtils.setWorkflowInstanceIdMDC(taskExecutorDispatchedLifecycleEvent.getWorkflowInstanceId());
+        int workflowInstanceId = taskExecutorDispatchedLifecycleEvent.getWorkflowInstanceId();
+        LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
+        WorkflowInstance workflowInstance = workflowRepository.get(workflowInstanceId).getWorkflowInstance();
+        WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(workflowInstance.getLogPath());
         try {
             final ITaskExecution taskExecution =
                     getTaskExecution(taskExecutorDispatchedLifecycleEvent);
@@ -66,12 +71,16 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
             taskExecution.getWorkflowEventBus().publish(taskDispatchedLifecycleEvent);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
+            WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
         }
     }
 
     @Override
     public void onTaskExecutorRunning(final TaskExecutorStartedLifecycleEvent taskExecutorStartedLifecycleEvent) {
-        LogUtils.setWorkflowInstanceIdMDC(taskExecutorStartedLifecycleEvent.getWorkflowInstanceId());
+        int workflowInstanceId = taskExecutorStartedLifecycleEvent.getWorkflowInstanceId();
+        LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
+        WorkflowInstance workflowInstance = workflowRepository.get(workflowInstanceId).getWorkflowInstance();
+        WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(workflowInstance.getLogPath());
         try {
             final ITaskExecution taskExecution =
                     getTaskExecution(taskExecutorStartedLifecycleEvent);
@@ -84,31 +93,39 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
             taskExecution.getWorkflowEventBus().publish(taskRunningEvent);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
+            WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
         }
     }
 
     @Override
-    public void onTaskExecutorRuntimeContextChanged(final TaskExecutorRuntimeContextChangedLifecycleEvent taskExecutorRuntimeContextChangedLifecycleEventr) {
-        LogUtils.setWorkflowInstanceIdMDC(taskExecutorRuntimeContextChangedLifecycleEventr.getWorkflowInstanceId());
+    public void onTaskExecutorRuntimeContextChanged(final TaskExecutorRuntimeContextChangedLifecycleEvent taskExecutorRuntimeContextChangedLifecycleEvent) {
+        int workflowInstanceId = taskExecutorRuntimeContextChangedLifecycleEvent.getWorkflowInstanceId();
+        LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
+        WorkflowInstance workflowInstance = workflowRepository.get(workflowInstanceId).getWorkflowInstance();
+        WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(workflowInstance.getLogPath());
         try {
             final ITaskExecution taskExecution =
-                    getTaskExecution(taskExecutorRuntimeContextChangedLifecycleEventr);
+                    getTaskExecution(taskExecutorRuntimeContextChangedLifecycleEvent);
 
             final TaskRuntimeContextChangedEvent taskRuntimeContextChangedEvent =
                     TaskRuntimeContextChangedEvent.builder()
                             .taskExecution(taskExecution)
-                            .runtimeContext(taskExecutorRuntimeContextChangedLifecycleEventr.getAppIds())
+                            .runtimeContext(taskExecutorRuntimeContextChangedLifecycleEvent.getAppIds())
                             .build();
 
             taskExecution.getWorkflowEventBus().publish(taskRuntimeContextChangedEvent);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
+            WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
         }
     }
 
     @Override
     public void onTaskExecutorSuccess(final TaskExecutorSuccessLifecycleEvent taskExecutorSuccessLifecycleEvent) {
-        LogUtils.setWorkflowInstanceIdMDC(taskExecutorSuccessLifecycleEvent.getWorkflowInstanceId());
+        int workflowInstanceId = taskExecutorSuccessLifecycleEvent.getWorkflowInstanceId();
+        LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
+        WorkflowInstance workflowInstance = workflowRepository.get(workflowInstanceId).getWorkflowInstance();
+        WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(workflowInstance.getLogPath());
         try {
             final ITaskExecution taskExecution =
                     getTaskExecution(taskExecutorSuccessLifecycleEvent);
@@ -120,12 +137,16 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
             taskExecution.getWorkflowEventBus().publish(taskSuccessEvent);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
+            WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
         }
     }
 
     @Override
     public void onTaskExecutorFailed(final TaskExecutorFailedLifecycleEvent taskExecutorFailedLifecycleEvent) {
-        LogUtils.setWorkflowInstanceIdMDC(taskExecutorFailedLifecycleEvent.getWorkflowInstanceId());
+        int workflowInstanceId = taskExecutorFailedLifecycleEvent.getWorkflowInstanceId();
+        LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
+        WorkflowInstance workflowInstance = workflowRepository.get(workflowInstanceId).getWorkflowInstance();
+        WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(workflowInstance.getLogPath());
         try {
             final ITaskExecution taskExecution =
                     getTaskExecution(taskExecutorFailedLifecycleEvent);
@@ -136,12 +157,16 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
             taskExecution.getWorkflowEventBus().publish(taskFailedEvent);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
+            WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
         }
     }
 
     @Override
     public void onTaskExecutorKilled(final TaskExecutorKilledLifecycleEvent taskExecutorKilledLifecycleEvent) {
-        LogUtils.setWorkflowInstanceIdMDC(taskExecutorKilledLifecycleEvent.getWorkflowInstanceId());
+        int workflowInstanceId = taskExecutorKilledLifecycleEvent.getWorkflowInstanceId();
+        LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
+        WorkflowInstance workflowInstance = workflowRepository.get(workflowInstanceId).getWorkflowInstance();
+        WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(workflowInstance.getLogPath());
         try {
             final ITaskExecution taskExecution =
                     getTaskExecution(taskExecutorKilledLifecycleEvent);
@@ -152,12 +177,16 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
             taskExecution.getWorkflowEventBus().publish(taskKilledEvent);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
+            WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
         }
     }
 
     @Override
     public void onTaskExecutorPaused(final TaskExecutorPausedLifecycleEvent taskExecutorPausedLifecycleEvent) {
-        LogUtils.setWorkflowInstanceIdMDC(taskExecutorPausedLifecycleEvent.getWorkflowInstanceId());
+        int workflowInstanceId = taskExecutorPausedLifecycleEvent.getWorkflowInstanceId();
+        LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
+        WorkflowInstance workflowInstance = workflowRepository.get(workflowInstanceId).getWorkflowInstance();
+        WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(workflowInstance.getLogPath());
         try {
             final ITaskExecution taskExecution =
                     getTaskExecution(taskExecutorPausedLifecycleEvent);
@@ -165,6 +194,7 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
             taskExecution.getWorkflowEventBus().publish(taskPausedEvent);
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
+            WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
         }
     }
 

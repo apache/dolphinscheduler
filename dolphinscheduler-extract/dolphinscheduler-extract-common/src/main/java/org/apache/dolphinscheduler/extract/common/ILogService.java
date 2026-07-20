@@ -23,6 +23,10 @@ import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFil
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogFileDownloadRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogFileDownloadResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogPageQueryRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogPageQueryResponse;
 
 @RpcService
 public interface ILogService {
@@ -35,5 +39,14 @@ public interface ILogService {
 
     @RpcMethod
     void removeTaskInstanceLog(String taskInstanceLogAbsolutePath);
+
+    @RpcMethod
+    WorkflowInstanceLogFileDownloadResponse getWorkflowInstanceWholeLogFileBytes(WorkflowInstanceLogFileDownloadRequest workflowInstanceLogFileDownloadRequest);
+
+    @RpcMethod
+    WorkflowInstanceLogPageQueryResponse pageQueryWorkflowInstanceLog(WorkflowInstanceLogPageQueryRequest workflowInstanceLogPageQueryRequest);
+
+    @RpcMethod
+    void removeWorkflowInstanceLog(String workflowInstanceLogAbsolutePath);
 
 }

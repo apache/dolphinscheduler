@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.command.ICommandHandler;
@@ -39,10 +40,12 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.execution.Workf
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -69,6 +72,9 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
     @Autowired
     protected ProjectDao projectDao;
 
+    @Autowired
+    protected WorkflowInstanceDao workflowInstanceDao;
+
     @Override
     public WorkflowExecution handleCommand(final Command command) {
         final WorkflowExecuteContextBuilder workflowExecuteContextBuilder = WorkflowExecuteContext.builder()
@@ -81,6 +87,7 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         assembleWorkflowInstanceLifecycleListeners(workflowExecuteContextBuilder);
         assembleWorkflowEventBus(workflowExecuteContextBuilder);
         assembleWorkflowExecutionGraph(workflowExecuteContextBuilder);
+        assembleWorkflowInstanceLogPath(workflowExecuteContextBuilder);
 
         final WorkflowExecutionBuilder workflowExecutionBuilder = WorkflowExecutionBuilder
                 .builder()
@@ -157,6 +164,22 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         final Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
         checkArgument(project != null, "Cannot find the project code: " + workflowDefinition.getProjectCode());
         workflowExecuteContextBuilder.setProject(project);
+    }
+
+    protected void assembleWorkflowInstanceLogPath(final WorkflowExecuteContextBuilder workflowExecuteContextBuilder) {
+        final WorkflowInstance workflowInstance = workflowExecuteContextBuilder.getWorkflowInstance();
+        final Date logTime = workflowInstance.getRestartTime() != null
+                ? workflowInstance.getRestartTime()
+                : workflowInstance.getStartTime();
+        final String logPath = WorkflowLogUtils.getWorkflowInstanceLogFullPath(
+                logTime,
+                workflowInstance.getWorkflowDefinitionCode(),
+                workflowInstance.getWorkflowDefinitionVersion(),
+                workflowInstance.getId());
+        workflowInstance.setLogPath(logPath);
+        workflowInstanceDao.updateById(workflowInstance);
+
+        workflowExecuteContextBuilder.setWorkflowInstance(workflowInstance);
     }
 
 }

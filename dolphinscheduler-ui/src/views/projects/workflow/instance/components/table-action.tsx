@@ -25,7 +25,9 @@ import {
   CloseCircleOutlined,
   PauseCircleOutlined,
   ControlOutlined,
-  PlayCircleOutlined
+  PlayCircleOutlined,
+  AlignLeftOutlined,
+  DownloadOutlined
 } from '@vicons/antd'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
@@ -48,7 +50,9 @@ export default defineComponent({
     'reStore',
     'stop',
     'suspend',
-    'deleteInstance'
+    'deleteInstance',
+    'viewLog',
+    'downloadLog'
   ],
   setup(props, ctx) {
     const router: Router = useRouter()
@@ -89,6 +93,14 @@ export default defineComponent({
       ctx.emit('deleteInstance')
     }
 
+    const handleViewLog = () => {
+      ctx.emit('viewLog', props.row)
+    }
+
+    const handleDownloadLog = () => {
+      ctx.emit('downloadLog', props.row)
+    }
+
     return {
       handleEdit,
       handleReRun,
@@ -97,6 +109,8 @@ export default defineComponent({
       handleSuspend,
       handleDeleteInstance,
       handleGantt,
+      handleViewLog,
+      handleDownloadLog,
       ...toRefs(props)
     }
   },
@@ -290,6 +304,44 @@ export default defineComponent({
               >
                 <NIcon>
                   <ControlOutlined />
+                </NIcon>
+              </NButton>
+            )
+          }}
+        </NTooltip>
+        <NTooltip trigger={'hover'}>
+          {{
+            default: () => t('project.workflow.view_log'),
+            trigger: () => (
+              <NButton
+                tag='div'
+                size='small'
+                type='info'
+                circle
+                disabled={!this.row?.host || this.row?.disabled}
+                onClick={this.handleViewLog}
+              >
+                <NIcon>
+                  <AlignLeftOutlined />
+                </NIcon>
+              </NButton>
+            )
+          }}
+        </NTooltip>
+        <NTooltip trigger={'hover'}>
+          {{
+            default: () => t('project.workflow.download_log'),
+            trigger: () => (
+              <NButton
+                tag='div'
+                size='small'
+                type='info'
+                circle
+                disabled={!this.row?.host || this.row?.disabled}
+                onClick={this.handleDownloadLog}
+              >
+                <NIcon>
+                  <DownloadOutlined />
                 </NIcon>
               </NButton>
             )

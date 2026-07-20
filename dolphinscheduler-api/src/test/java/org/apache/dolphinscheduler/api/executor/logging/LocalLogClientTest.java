@@ -23,6 +23,7 @@ import static org.junit.Assert.assertNotNull;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.extract.common.ILogService;
@@ -31,6 +32,10 @@ import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFil
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogFileDownloadRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogFileDownloadResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogPageQueryRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogPageQueryResponse;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -98,6 +103,39 @@ public class LocalLogClientTest {
             public void removeTaskInstanceLog(String taskInstanceLogAbsolutePath) {
 
             }
+
+            @Override
+            public WorkflowInstanceLogFileDownloadResponse getWorkflowInstanceWholeLogFileBytes(WorkflowInstanceLogFileDownloadRequest workflowInstanceLogFileDownloadRequest) {
+                if (workflowInstanceLogFileDownloadRequest.getWorkflowInstanceId() == 1) {
+                    return new WorkflowInstanceLogFileDownloadResponse(new byte[0], LogResponseStatus.SUCCESS, "");
+                } else if (workflowInstanceLogFileDownloadRequest.getWorkflowInstanceId() == 10) {
+                    return new WorkflowInstanceLogFileDownloadResponse("log content".getBytes(),
+                            LogResponseStatus.SUCCESS,
+                            "");
+                }
+
+                throw new ServiceException("download error");
+            }
+
+            @Override
+            public WorkflowInstanceLogPageQueryResponse pageQueryWorkflowInstanceLog(WorkflowInstanceLogPageQueryRequest workflowInstanceLogPageQueryRequest) {
+                if (workflowInstanceLogPageQueryRequest.getWorkflowInstanceId() != null) {
+                    if (workflowInstanceLogPageQueryRequest.getWorkflowInstanceId() == 100) {
+                        throw new ServiceException("query log error");
+                    } else if (workflowInstanceLogPageQueryRequest.getWorkflowInstanceId() == 10) {
+                        return new WorkflowInstanceLogPageQueryResponse("Partial log content",
+                                LogResponseStatus.SUCCESS,
+                                "");
+                    }
+                }
+
+                return new WorkflowInstanceLogPageQueryResponse();
+            }
+
+            @Override
+            public void removeWorkflowInstanceLog(String workflowInstanceLogAbsolutePath) {
+
+            }
         });
         springServerMethodInvokerDiscovery.start();
     }
@@ -130,6 +168,33 @@ public class LocalLogClientTest {
         taskInstance.setLogPath("/path/to/log");
 
         TaskInstanceLogPageQueryResponse actualResponse = localLogClient.getPartLog(taskInstance, 0, 10);
+
+        assertNotNull(actualResponse);
+        assertEquals("Partial log content", actualResponse.getLogContent());
+    }
+
+    @Test
+    public void testGetWorkflowWholeLogSuccess() {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setHost("127.0.0.1:" + nettyServerPort);
+        workflowInstance.setId(1);
+        workflowInstance.setLogPath("/path/to/log");
+
+        WorkflowInstanceLogFileDownloadResponse actualResponse = localLogClient.getWorkflowWholeLog(workflowInstance);
+
+        assertNotNull(actualResponse);
+        assertArrayEquals("".getBytes(), actualResponse.getLogBytes());
+    }
+
+    @Test
+    public void testGetWorkflowPartLogSuccess() {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setHost("127.0.0.1:" + nettyServerPort);
+        workflowInstance.setId(10);
+        workflowInstance.setLogPath("/path/to/log");
+
+        WorkflowInstanceLogPageQueryResponse actualResponse =
+                localLogClient.getWorkflowPartLog(workflowInstance, 0, 10);
 
         assertNotNull(actualResponse);
         assertEquals("Partial log content", actualResponse.getLogContent());

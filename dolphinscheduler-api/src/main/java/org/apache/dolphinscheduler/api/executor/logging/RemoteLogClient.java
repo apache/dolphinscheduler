@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.executor.logging;
 
 import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
 import org.springframework.stereotype.Component;
 
@@ -49,6 +50,15 @@ public class RemoteLogClient {
         // todo We can optimize requests by the actual range, reducing disk usage and network traffic.
         return LogUtils.rollViewLogLines(
                 LogUtils.readPartFileContentFromRemote(taskInstance.getLogPath(), skipLineNum, limit));
+    }
+
+    public byte[] getWorkflowWholeLog(WorkflowInstance workflowInstance) {
+        return LogUtils.getFileContentBytesFromRemote(workflowInstance.getLogPath());
+    }
+
+    public String getWorkflowPartLog(WorkflowInstance workflowInstance, int skipLineNum, int limit) {
+        return LogUtils.rollViewLogLines(
+                LogUtils.readPartFileContentFromRemote(workflowInstance.getLogPath(), skipLineNum, limit));
     }
 
 }

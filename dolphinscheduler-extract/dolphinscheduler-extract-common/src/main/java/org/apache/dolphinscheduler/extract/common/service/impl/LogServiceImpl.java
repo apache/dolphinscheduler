@@ -25,6 +25,10 @@ import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFil
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogFileDownloadRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogFileDownloadResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogPageQueryRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogPageQueryResponse;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -80,6 +84,45 @@ public class LogServiceImpl implements ILogService {
     @Override
     public void removeTaskInstanceLog(String taskInstanceLogAbsolutePath) {
         FileUtils.deleteFile(taskInstanceLogAbsolutePath);
+    }
+
+    @Override
+    public WorkflowInstanceLogFileDownloadResponse getWorkflowInstanceWholeLogFileBytes(WorkflowInstanceLogFileDownloadRequest workflowInstanceLogFileDownloadRequest) {
+        final WorkflowInstanceLogFileDownloadResponse workflowInstanceLogFileDownloadResponse =
+                new WorkflowInstanceLogFileDownloadResponse();
+        try {
+            byte[] bytes = LogUtils
+                    .getFileContentBytesFromLocal(
+                            workflowInstanceLogFileDownloadRequest.getWorkflowInstanceLogAbsolutePath());
+            workflowInstanceLogFileDownloadResponse.setLogBytes(bytes);
+        } catch (Exception e) {
+            workflowInstanceLogFileDownloadResponse.setCode(LogResponseStatus.ERROR);
+            workflowInstanceLogFileDownloadResponse.setMessage(ExceptionUtils.getRootCauseMessage(e));
+        }
+        return workflowInstanceLogFileDownloadResponse;
+    }
+
+    @Override
+    public WorkflowInstanceLogPageQueryResponse pageQueryWorkflowInstanceLog(WorkflowInstanceLogPageQueryRequest workflowInstanceLogPageQueryRequest) {
+        final WorkflowInstanceLogPageQueryResponse workflowInstanceLogPageQueryResponse =
+                new WorkflowInstanceLogPageQueryResponse();
+        List<String> lines;
+        try {
+            lines = LogUtils.readPartFileContentFromLocal(
+                    workflowInstanceLogPageQueryRequest.getWorkflowInstanceLogAbsolutePath(),
+                    workflowInstanceLogPageQueryRequest.getSkipLineNum(),
+                    workflowInstanceLogPageQueryRequest.getLimit());
+            workflowInstanceLogPageQueryResponse.setLogContent(LogUtils.rollViewLogLines(lines));
+        } catch (Exception e) {
+            workflowInstanceLogPageQueryResponse.setCode(LogResponseStatus.ERROR);
+            workflowInstanceLogPageQueryResponse.setMessage(ExceptionUtils.getMessage(e));
+        }
+        return workflowInstanceLogPageQueryResponse;
+    }
+
+    @Override
+    public void removeWorkflowInstanceLog(String workflowInstanceLogAbsolutePath) {
+        FileUtils.deleteFile(workflowInstanceLogAbsolutePath);
     }
 
 }

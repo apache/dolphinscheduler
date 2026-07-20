@@ -75,6 +75,8 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
@@ -818,6 +820,18 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         deleteSubWorkflowInstanceIfNeeded(workflowInstanceId);
         // delete alert
         alertDao.deleteByWorkflowInstanceId(workflowInstanceId);
+        // delete workflow instance log
+        WorkflowInstance workflowInstance = processService.findWorkflowInstanceById(workflowInstanceId);
+        if (workflowInstance != null && StringUtils.isNotBlank(workflowInstance.getLogPath())) {
+            // Remove workflow instance log failed will not affect the deletion of workflow instance
+            try {
+                Clients.withService(ILogService.class)
+                        .withHost(workflowInstance.getHost())
+                        .removeWorkflowInstanceLog(workflowInstance.getLogPath());
+            } catch (Exception ex) {
+                log.error("Remove workflow instance log error", ex);
+            }
+        }
         // delete workflow instance
         workflowInstanceDao.deleteById(workflowInstanceId);
     }

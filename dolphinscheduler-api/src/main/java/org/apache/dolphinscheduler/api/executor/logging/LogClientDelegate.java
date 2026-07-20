@@ -18,9 +18,12 @@
 package org.apache.dolphinscheduler.api.executor.logging;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogFileDownloadResponse;
+import org.apache.dolphinscheduler.extract.common.transportor.WorkflowInstanceLogPageQueryResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -105,6 +108,74 @@ public class LogClientDelegate {
         boolean exists = registryClient.checkNodeExists(taskInstance.getHost(), nodeType);
         if (!exists) {
             log.warn("Node {} does not exist for task instance {}", taskInstance.getHost(), taskInstance.getId());
+        }
+        return exists;
+    }
+
+    /**
+     * Retrieves a portion of the log string for a given workflow instance.
+     * This method first attempts to fetch the log from local storage; if unsuccessful, it tries to obtain the log from remote storage.
+     *
+     * @param workflowInstance The workflow instance object, containing information needed for log retrieval.
+     * @param skipLineNum The number of log lines to skip from the beginning.
+     * @param limit The maximum number of log lines to retrieve.
+     * @return A string containing the specified portion of the log.
+     */
+    public String getWorkflowPartLogString(WorkflowInstance workflowInstance, int skipLineNum, int limit) {
+        checkWorkflowArgs(workflowInstance);
+        if (checkWorkflowNodeExists(workflowInstance)) {
+            WorkflowInstanceLogPageQueryResponse response =
+                    localLogClient.getWorkflowPartLog(workflowInstance, skipLineNum, limit);
+            if (response.getCode() == LogResponseStatus.SUCCESS) {
+                return response.getLogContent();
+            } else {
+                log.warn("get part log string is not success for workflow instance {}; reason :{}",
+                        workflowInstance.getId(), response.getMessage());
+                return remoteLogClient.getWorkflowPartLog(workflowInstance, skipLineNum, limit);
+            }
+        } else {
+            return remoteLogClient.getWorkflowPartLog(workflowInstance, skipLineNum, limit);
+        }
+    }
+
+    /**
+     * Retrieves the complete log content for a given workflow instance as a byte array.
+     * This method first attempts to fetch the log from local storage; if unsuccessful, it tries to obtain the log from remote storage.
+     *
+     * @param workflowInstance The workflow instance object, containing information needed for log retrieval.
+     * @return A byte array containing the complete log content.
+     */
+    public byte[] getWorkflowWholeLogBytes(WorkflowInstance workflowInstance) {
+        checkWorkflowArgs(workflowInstance);
+        if (checkWorkflowNodeExists(workflowInstance)) {
+            WorkflowInstanceLogFileDownloadResponse response = localLogClient.getWorkflowWholeLog(workflowInstance);
+            if (response.getCode() == LogResponseStatus.SUCCESS) {
+                return response.getLogBytes();
+            } else {
+                log.warn("get whole log bytes is not success for workflow instance {}; reason :{}",
+                        workflowInstance.getId(), response.getMessage());
+                return remoteLogClient.getWorkflowWholeLog(workflowInstance);
+            }
+        } else {
+            return remoteLogClient.getWorkflowWholeLog(workflowInstance);
+        }
+    }
+
+    private static void checkWorkflowArgs(WorkflowInstance workflowInstance) {
+        if (workflowInstance == null) {
+            throw new IllegalArgumentException("workflow instance is null");
+        }
+    }
+
+    private boolean checkWorkflowNodeExists(WorkflowInstance workflowInstance) {
+        String host = workflowInstance.getHost();
+        if (host == null || host.isEmpty()) {
+            log.warn("Host is null or empty for workflow instance {}", workflowInstance.getId());
+            return false;
+        }
+        boolean exists = registryClient.checkNodeExists(host, RegistryNodeType.MASTER);
+        if (!exists) {
+            log.warn("Node {} does not exist for workflow instance {}", host, workflowInstance.getId());
         }
         return exists;
     }

@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.utils.ExceptionUtils;
+import org.apache.dolphinscheduler.server.master.utils.WorkflowLogUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
@@ -86,11 +87,14 @@ public class WorkflowEventBusFireWorker {
             final String workflowInstanceName = workflowExecution.getName();
             try {
                 LogUtils.setWorkflowInstanceIdMDC(workflowInstanceId);
+                WorkflowLogUtils.setWorkflowInstanceLogFullPathMDC(
+                        workflowExecution.getWorkflowExecuteContext().getWorkflowInstance().getLogPath());
                 doFireSingleWorkflowEventBus(workflowExecution);
             } catch (Exception ex) {
                 log.error("Fire event failed for WorkflowExecuteRunnable: {}", workflowInstanceName, ex);
             } finally {
                 LogUtils.removeWorkflowInstanceIdMDC();
+                WorkflowLogUtils.removeWorkflowInstanceLogFullPathMDC();
             }
         }
     }

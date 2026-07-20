@@ -292,6 +292,11 @@ public enum Status {
     UPDATE_PROJECT_PREFERENCE_STATE_ERROR(10303, "Failed to update the state of the project preference", "更新项目偏好设置错误"),
     VERSION_INFO_STATE_ERROR(10304, "Failed to obtain project version and address", "获取版本信息错误"),
 
+    QUERY_WORKFLOW_INSTANCE_LOG_ERROR(10305, "view workflow instance log error: {0}", "查询工作流实例日志错误: {0}"),
+    DOWNLOAD_WORKFLOW_INSTANCE_LOG_FILE_ERROR(10306, "download workflow instance log file error", "下载工作流日志文件错误"),
+    WORKFLOW_INSTANCE_NOT_FOUND(10307, "workflow instance not found", "工作流实例不存在"),
+    WORKFLOW_INSTANCE_HOST_IS_NULL(10308, "workflow instance host is null", "工作流实例host为空"),
+
     OIDC_TOKEN_EXCHANGE_FAILED(15000, "OIDC token exchange failed", "OIDC令牌交换失败"),
     OIDC_ID_TOKEN_ISSUER_INVALID(15001, "Invalid issuer in OIDC ID token", "OIDC ID令牌的颁发者无效"),
     OIDC_ID_TOKEN_AUDIENCE_INVALID(15002, "Invalid audience in OIDC ID token", "OIDC ID令牌的受众无效"),
