@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
@@ -185,7 +186,19 @@ public class DataxTask extends AbstractTask {
         }
 
         if (dataXParameters.getCustomConfig() == Flag.YES.ordinal()) {
-            json = dataXParameters.getJson().replaceAll("\\r\\n", System.lineSeparator());
+            json = dataXParameters.getJson();
+            if (StringUtils.isBlank(json) || "{}".equals(json.trim())) {
+                List<ResourceInfo> resourceList = dataXParameters.getResourceList();
+                if (CollectionUtils.isNotEmpty(resourceList)) {
+                    String resourceFileName = new File(resourceList.get(0).getResourceName()).getName();
+                    File resourceFile = new File(taskRequest.getExecutePath(), resourceFileName);
+                    if (resourceFile.exists()) {
+                        json = FileUtils.readFileToString(resourceFile, StandardCharsets.UTF_8);
+                        log.info("Read datax json from resource file: {}", resourceFile.getAbsolutePath());
+                    }
+                }
+            }
+            json = json.replaceAll("\\r\\n", System.lineSeparator());
         } else {
             ObjectNode job = JSONUtils.createObjectNode();
             job.putArray("content").addAll(buildDataxJobContentJson());
