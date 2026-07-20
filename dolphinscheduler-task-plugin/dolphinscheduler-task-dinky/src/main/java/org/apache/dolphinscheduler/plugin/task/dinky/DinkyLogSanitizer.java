@@ -17,9 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.task.dinky;
 
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.message.BasicNameValuePair;
+
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,10 +42,31 @@ final class DinkyLogSanitizer {
         if (parameters == null) {
             return "null";
         }
-        return "address=" + sanitizeMessage(parameters.getAddress())
+        return "address=" + sanitizeAddress(parameters.getAddress())
                 + ", taskId=" + sanitizeMessage(parameters.getTaskId())
                 + ", online=" + parameters.isOnline()
                 + ", localParamKeys=" + summarizeLocalParamKeys(parameters.getLocalParams());
+    }
+
+    static String sanitizeAddress(final Object address) {
+        if (address == null) {
+            return null;
+        }
+        try {
+            URIBuilder uriBuilder = new URIBuilder(String.valueOf(address));
+            uriBuilder.setUserInfo(null);
+            List<NameValuePair> sanitizedParameters = new ArrayList<>();
+            for (NameValuePair parameter : uriBuilder.getQueryParams()) {
+                String value = isSensitiveAddressParameter(parameter.getName())
+                        ? TaskConstants.SENSITIVE_DATA_MASK
+                        : parameter.getValue();
+                sanitizedParameters.add(new BasicNameValuePair(parameter.getName(), value));
+            }
+            uriBuilder.setParameters(sanitizedParameters);
+            return sanitizeMessage(uriBuilder.build());
+        } catch (URISyntaxException | IllegalArgumentException ex) {
+            return TaskConstants.SENSITIVE_DATA_MASK;
+        }
     }
 
     static String summarizeVariables(final Map<String, String> variables) {
@@ -54,6 +82,12 @@ final class DinkyLogSanitizer {
             return null;
         }
         return SensitiveDataConverter.maskSensitiveData(String.valueOf(message));
+    }
+
+    private static boolean isSensitiveAddressParameter(final String name) {
+        return "username".equalsIgnoreCase(name)
+                || "password".equalsIgnoreCase(name)
+                || "token".equalsIgnoreCase(name);
     }
 
     private static Set<String> summarizeLocalParamKeys(final List<Property> localParams) {

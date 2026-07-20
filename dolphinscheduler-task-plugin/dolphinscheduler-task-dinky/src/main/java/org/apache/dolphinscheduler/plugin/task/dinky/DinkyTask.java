@@ -179,7 +179,8 @@ public class DinkyTask extends AbstractRemoteTask {
             String taskId = this.dinkyParameters.getTaskId();
             if (status && jobInstanceId == null) {
                 // Use address-taskId as app id
-                setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));
+                setAppIds(String.format(
+                        DinkyTaskConstants.APPIDS_FORMAT, DinkyLogSanitizer.sanitizeAddress(address), taskId));
                 setExitStatusCode(mapStatusToExitCode(true));
                 log.info("Dinky common sql task finished.");
                 return;
@@ -197,7 +198,8 @@ public class DinkyTask extends AbstractRemoteTask {
                     case DinkyTaskConstants.STATUS_FINISHED:
                         final int exitStatusCode = mapStatusToExitCode(status);
                         // Use address-taskId as app id
-                        setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));
+                        setAppIds(String.format(
+                                DinkyTaskConstants.APPIDS_FORMAT, DinkyLogSanitizer.sanitizeAddress(address), taskId));
                         setExitStatusCode(exitStatusCode);
                         log.info("dinky task finished, status: {}", jobInstanceStatus);
                         finishFlag = true;
@@ -229,7 +231,8 @@ public class DinkyTask extends AbstractRemoteTask {
             String taskId = this.dinkyParameters.getTaskId();
             if (status && jobInstanceId == null) {
                 // Use address-taskId as app id
-                setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));
+                setAppIds(String.format(
+                        DinkyTaskConstants.APPIDS_FORMAT, DinkyLogSanitizer.sanitizeAddress(address), taskId));
                 setExitStatusCode(mapStatusToExitCode(true));
                 log.info("Dinky common sql task finished.");
                 return;
@@ -247,7 +250,8 @@ public class DinkyTask extends AbstractRemoteTask {
                     case DinkyTaskConstants.STATUS_FINISHED:
                         final int exitStatusCode = mapStatusToExitCode(status);
                         // Use address-taskId as app id
-                        setAppIds(String.format(DinkyTaskConstants.APPIDS_FORMAT, address, taskId));
+                        setAppIds(String.format(
+                                DinkyTaskConstants.APPIDS_FORMAT, DinkyLogSanitizer.sanitizeAddress(address), taskId));
                         setExitStatusCode(exitStatusCode);
                         log.info("dinky task finished, status: {}", jobInstanceStatus);
                         finishFlag = true;
@@ -321,15 +325,16 @@ public class DinkyTask extends AbstractRemoteTask {
     @Override
     public void cancelApplication() throws TaskException {
         String address = this.dinkyParameters.getAddress();
+        String sanitizedAddress = DinkyLogSanitizer.sanitizeAddress(address);
         String taskId = this.dinkyParameters.getTaskId();
         log.info("trying terminate dinky task, taskId: {}, address: {}, taskId: {}",
                 this.taskExecutionContext.getTaskInstanceId(),
-                address,
+                sanitizedAddress,
                 taskId);
         cancelTask(address, taskId);
         log.warn("dinky task terminated, taskId: {}, address: {}, taskId: {}",
                 this.taskExecutionContext.getTaskInstanceId(),
-                address,
+                sanitizedAddress,
                 taskId);
     }
 
@@ -420,7 +425,7 @@ public class DinkyTask extends AbstractRemoteTask {
             }
             URI uri = uriBuilder.build();
             httpGet = new HttpGet(uri);
-            log.info("access url: {}", uri);
+            log.info("access url: {}", DinkyLogSanitizer.sanitizeAddress(uri));
             HttpResponse response = httpClient.execute(httpGet);
             if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
                 result = EntityUtils.toString(response.getEntity());
