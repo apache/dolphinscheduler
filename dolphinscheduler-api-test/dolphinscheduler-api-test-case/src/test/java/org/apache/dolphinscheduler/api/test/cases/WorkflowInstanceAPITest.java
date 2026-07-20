@@ -116,6 +116,8 @@ public class WorkflowInstanceAPITest {
             projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
                     .getBody().getData()).get(0)).get("code");
 
+            projectPage.assignWorkerGroups(loginUser, projectCode, new String[]{"default"});
+
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());

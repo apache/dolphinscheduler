@@ -122,6 +122,8 @@ public class DependentTaskAPITest {
         Assertions.assertNotEquals(0, projectCode, "project should be found by name");
         log.info("project code: {}", projectCode);
 
+        projectPage.assignWorkerGroups(loginUser, projectCode, new String[]{"default"});
+
         // create upstream workflow definition (shell task: echo hello)
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("workflow-json/test.json").getFile());

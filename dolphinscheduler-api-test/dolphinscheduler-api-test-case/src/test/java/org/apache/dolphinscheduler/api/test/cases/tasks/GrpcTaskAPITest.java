@@ -103,6 +103,8 @@ public class GrpcTaskAPITest {
             projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
                     .getBody().getData()).get(0)).get("code");
 
+            projectPage.assignWorkerGroups(loginUser, projectCode, new String[]{"default"});
+
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/task-grpc/grpcFailedWorkflow.json").getFile());
@@ -152,6 +154,8 @@ public class GrpcTaskAPITest {
             Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
             projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
                     .getBody().getData()).get(0)).get("code");
+
+            projectPage.assignWorkerGroups(loginUser, projectCode, new String[]{"default"});
 
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
