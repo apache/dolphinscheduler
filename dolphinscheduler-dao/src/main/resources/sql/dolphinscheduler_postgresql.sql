@@ -1160,6 +1160,7 @@ DROP TABLE IF EXISTS t_ds_environment_worker_group_relation;
 CREATE TABLE t_ds_environment_worker_group_relation (
   id serial NOT NULL,
   environment_code bigint NOT NULL,
+  worker_group_id int NOT NULL,
   worker_group varchar(255) NOT NULL,
   operator int DEFAULT NULL,
   create_time timestamp DEFAULT NULL,
