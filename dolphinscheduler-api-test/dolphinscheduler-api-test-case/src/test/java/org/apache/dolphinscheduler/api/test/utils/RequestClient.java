@@ -151,6 +151,82 @@ public class RequestClient {
     }
 
     @SneakyThrows
+    public HttpResponse postJson(String url, Map<String, String> headers, String jsonBody) {
+        if (headers == null) {
+            headers = new HashMap<>();
+        }
+
+        String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
+        headers.put("Content-Type", "application/json");
+        Headers headersBuilder = Headers.of(headers);
+        RequestBody requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+        log.info("POST JSON request to {}, Headers: {}", requestUrl, headersBuilder);
+        Request request = new Request.Builder()
+                .headers(headersBuilder)
+                .url(requestUrl)
+                .post(requestBody)
+                .build();
+        Response response = this.httpClient.newCall(request).execute();
+        int responseCode = response.code();
+        HttpResponseBody responseData = null;
+        Map<String, String> responseHeaders = new HashMap<>();
+
+        Headers responseHeadersObj = response.headers();
+        for (String name : responseHeadersObj.names()) {
+            responseHeaders.put(name, responseHeadersObj.get(name));
+        }
+
+        if (response.body() != null) {
+            responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
+        }
+        response.close();
+
+        HttpResponse httpResponse = new HttpResponse(responseCode, responseData, responseHeaders);
+
+        log.info("POST JSON response: {}", httpResponse);
+
+        return httpResponse;
+    }
+
+    @SneakyThrows
+    public HttpResponse putJson(String url, Map<String, String> headers, String jsonBody) {
+        if (headers == null) {
+            headers = new HashMap<>();
+        }
+
+        String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
+        headers.put("Content-Type", "application/json");
+        Headers headersBuilder = Headers.of(headers);
+        RequestBody requestBody = RequestBody.create(jsonBody, MediaType.parse("application/json"));
+        log.info("PUT JSON request to {}, Headers: {}", requestUrl, headersBuilder);
+        Request request = new Request.Builder()
+                .headers(headersBuilder)
+                .url(requestUrl)
+                .put(requestBody)
+                .build();
+        Response response = this.httpClient.newCall(request).execute();
+        int responseCode = response.code();
+        HttpResponseBody responseData = null;
+        Map<String, String> responseHeaders = new HashMap<>();
+
+        Headers responseHeadersObj = response.headers();
+        for (String name : responseHeadersObj.names()) {
+            responseHeaders.put(name, responseHeadersObj.get(name));
+        }
+
+        if (response.body() != null) {
+            responseData = JSONUtils.parseObject(response.body().string(), HttpResponseBody.class);
+        }
+        response.close();
+
+        HttpResponse httpResponse = new HttpResponse(responseCode, responseData, responseHeaders);
+
+        log.info("PUT JSON response: {}", httpResponse);
+
+        return httpResponse;
+    }
+
+    @SneakyThrows
     public HttpResponse put(String url, Map<String, String> headers, Map<String, Object> params) {
         if (headers == null) {
             headers = new HashMap<>();
