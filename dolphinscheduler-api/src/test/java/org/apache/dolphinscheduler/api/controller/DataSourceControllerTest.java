@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -24,9 +26,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.DataSource;
 
 import java.util.HashMap;
 
@@ -39,12 +44,20 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 public class DataSourceControllerTest extends AbstractControllerTest {
+
+    @Autowired
+    private ApiConfig apiConfig;
+
+    @MockBean
+    private DataSourceService dataSourceService;
 
     private static final Logger logger = LoggerFactory.getLogger(DataSourceControllerTest.class);
 
@@ -267,5 +280,129 @@ public class DataSourceControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testDatasourceConnectionEnableDefaultValue() {
+        Assertions.assertFalse(apiConfig.isDatasourceConnectionEnable(),
+                "datasource-connection-enable should be false by default");
+    }
+
+    @Test
+    public void testCreateDataSourceWithMockedService() throws Exception {
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("name", "test-mysql-ds");
+        paramsMap.put("note", "test data source");
+        paramsMap.put("type", "MYSQL");
+        paramsMap.put("host", "127.0.0.1");
+        paramsMap.put("port", 3306);
+        paramsMap.put("database", "test_db");
+        paramsMap.put("userName", "root");
+        paramsMap.put("password", "password");
+
+        DataSource mockDataSource = new DataSource();
+        mockDataSource.setId(1);
+        mockDataSource.setName("test-mysql-ds");
+
+        when(dataSourceService.createDataSource(any(), any())).thenReturn(mockDataSource);
+
+        MvcResult mvcResult = mockMvc.perform(post("/datasources")
+                .header("sessionId", sessionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSONUtils.toJsonString(paramsMap)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    public void testUpdateDataSourceWithMockedService() throws Exception {
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("id", 1);
+        paramsMap.put("name", "test-mysql-ds-update");
+        paramsMap.put("note", "test data source update");
+        paramsMap.put("type", "MYSQL");
+        paramsMap.put("host", "127.0.0.1");
+        paramsMap.put("port", 3306);
+        paramsMap.put("database", "test_db");
+        paramsMap.put("userName", "root");
+        paramsMap.put("password", "password");
+
+        DataSource mockDataSource = new DataSource();
+        mockDataSource.setId(1);
+        mockDataSource.setName("test-mysql-ds-update");
+
+        when(dataSourceService.updateDataSource(any(), any())).thenReturn(mockDataSource);
+
+        MvcResult mvcResult = mockMvc.perform(put("/datasources/1")
+                .header("sessionId", sessionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSONUtils.toJsonString(paramsMap)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    public void testCreateDataSourceConnectionCheckDisabled() throws Exception {
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("name", "test-mysql-ds-disabled");
+        paramsMap.put("note", "test data source with connection check disabled");
+        paramsMap.put("type", "MYSQL");
+        paramsMap.put("host", "invalid-host");
+        paramsMap.put("port", 3306);
+        paramsMap.put("database", "test_db");
+        paramsMap.put("userName", "root");
+        paramsMap.put("password", "password");
+
+        DataSource mockDataSource = new DataSource();
+        mockDataSource.setId(1);
+        mockDataSource.setName("test-mysql-ds-disabled");
+
+        when(dataSourceService.createDataSource(any(), any())).thenReturn(mockDataSource);
+
+        MvcResult mvcResult = mockMvc.perform(post("/datasources")
+                .header("sessionId", sessionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSONUtils.toJsonString(paramsMap)))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    public void testUpdateDataSourceConnectionCheckDisabled() throws Exception {
+        HashMap<String, Object> paramsMap = new HashMap<>();
+        paramsMap.put("id", 1);
+        paramsMap.put("name", "test-mysql-ds-update-disabled");
+        paramsMap.put("note", "test data source update with connection check disabled");
+        paramsMap.put("type", "MYSQL");
+        paramsMap.put("host", "invalid-host");
+        paramsMap.put("port", 3306);
+        paramsMap.put("database", "test_db");
+        paramsMap.put("userName", "root");
+        paramsMap.put("password", "password");
+
+        DataSource mockDataSource = new DataSource();
+        mockDataSource.setId(1);
+        mockDataSource.setName("test-mysql-ds-update-disabled");
+
+        when(dataSourceService.updateDataSource(any(), any())).thenReturn(mockDataSource);
+
+        MvcResult mvcResult = mockMvc.perform(put("/datasources/1")
+                .header("sessionId", sessionId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JSONUtils.toJsonString(paramsMap)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
     }
 }
