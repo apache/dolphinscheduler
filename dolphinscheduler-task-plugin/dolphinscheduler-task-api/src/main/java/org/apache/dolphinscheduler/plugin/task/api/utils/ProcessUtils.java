@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
  * this work for additional information regarding copyright ownership.
@@ -243,7 +243,30 @@ public final class ProcessUtils {
             // If the command executes successfully, the process exists
             return true;
         } catch (Exception e) {
-            // If the command fails, the process does not exist
+            // kill -0 may fail with "Operation not permitted" when the process exists
+            // but is owned by a different user (e.g., root-owned sudo parent process
+            // when the task runs as a tenant). Try fallback mechanism to detect alive state.
+            log.debug("kill -0 failed for pid {}, checking via fallback. Error: {}", pid, e.getMessage());
+            return isProcessAliveByAlternativeCheck(pid);
+        }
+    }
+
+    /**
+     * Fallback check for process alive status when kill -0 fails due to permission issues.
+     * On Linux, checks /proc filesystem; on other OS, uses ps command.
+     */
+    private static boolean isProcessAliveByAlternativeCheck(int pid) {
+        try {
+            if (SystemUtils.IS_OS_LINUX) {
+                // On Linux, /proc/<pid> directory exists as long as the process is running
+                return new java.io.File("/proc/" + pid).exists();
+            }
+            // For non-Linux systems, use ps -p to check existence
+            String checkCmd = String.format("ps -p %d", pid);
+            OSUtils.exeCmd(checkCmd);
+            return true;
+        } catch (Exception e) {
+            log.debug("Fallback alive check also failed for pid {}. Error: {}", pid, e.getMessage());
             return false;
         }
     }
