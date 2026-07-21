@@ -106,7 +106,9 @@ public class EmrServerlessTaskAPITest {
         projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
                 .getBody().getData()).get(0)).get("code");
 
-        projectPage.assignWorkerGroups(loginUser, projectCode, new String[]{"default"});
+        HttpResponse assignWorkerGroupsResponse =
+                projectPage.assignWorkerGroups(loginUser, projectCode, new String[]{"default"});
+        Assertions.assertTrue(assignWorkerGroupsResponse.getBody().getSuccess());
 
         // upload test workflow definition json
         ClassLoader classLoader = getClass().getClassLoader();
