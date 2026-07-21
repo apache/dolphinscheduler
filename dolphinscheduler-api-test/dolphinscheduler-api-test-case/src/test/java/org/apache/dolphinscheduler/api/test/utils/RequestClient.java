@@ -31,10 +31,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 
 import java.io.File;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -95,20 +98,55 @@ public class RequestClient {
     }
 
     public static String getParams(Map<String, Object> params) {
-        StringBuilder sb = new StringBuilder(Constants.QUESTION_MARK);
-        if (!params.isEmpty()) {
-            for (Map.Entry<String, Object> item : params.entrySet()) {
-                Object value = item.getValue();
-                if (Objects.nonNull(value)) {
-                    sb.append(Constants.AND_MARK);
-                    sb.append(item.getKey());
-                    sb.append(Constants.EQUAL_MARK);
-                    sb.append(value);
-                }
-            }
-            return sb.toString();
-        } else {
+        if (params == null || params.isEmpty()) {
             return "";
+        }
+
+        if (!(params instanceof SortedMap)) {
+            params = new TreeMap<>(params);
+        }
+
+        StringBuilder sb = new StringBuilder(params.size() * 16);
+        boolean isFirst = true;
+
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            Object value = entry.getValue();
+            if (value == null) {
+                continue;
+            }
+
+            String key = entry.getKey();
+
+            if (value.getClass().isArray()) {
+                int length = java.lang.reflect.Array.getLength(value);
+                for (int i = 0; i < length; i++) {
+                    Object item = java.lang.reflect.Array.get(value, i);
+                    if (item != null) {
+                        appendParam(sb, isFirst, key, item.toString());
+                        isFirst = false;
+                    }
+                }
+            } else {
+                appendParam(sb, isFirst, key, value.toString());
+                isFirst = false;
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private static void appendParam(StringBuilder sb, boolean isFirst, String key, String value) {
+        if (isFirst) {
+            sb.append(Constants.QUESTION_MARK);
+        } else {
+            sb.append(Constants.AND_MARK);
+        }
+        try {
+            sb.append(URLEncoder.encode(key, StandardCharsets.UTF_8.name()))
+                    .append(Constants.EQUAL_MARK)
+                    .append(URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
+        } catch (Exception e) {
+            sb.append(key).append(Constants.EQUAL_MARK).append(value);
         }
     }
 
