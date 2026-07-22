@@ -89,7 +89,8 @@ class AlertSenderTest {
         // 1.alert instance does not exist
         when(alertDao.listInstanceByAlertGroupId(ALERT_GROUP_ID)).thenReturn(null);
 
-        AlertSendResponse alertSendResponse = alertSender.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT);
+        AlertSendResponse alertSendResponse =
+                alertSender.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT, AlertType.TASK_RESULT);
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -104,7 +105,7 @@ class AlertSenderTest {
         alertInstanceList.add(alertPluginInstance);
         when(alertDao.listInstanceByAlertGroupId(1)).thenReturn(alertInstanceList);
 
-        alertSendResponse = alertSender.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT);
+        alertSendResponse = alertSender.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT, AlertType.TASK_RESULT);
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -114,7 +115,7 @@ class AlertSenderTest {
         when(alertChannelMock.process(Mockito.any())).thenReturn(null);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
 
-        alertSendResponse = alertSender.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT);
+        alertSendResponse = alertSender.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT, AlertType.TASK_RESULT);
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -126,7 +127,7 @@ class AlertSenderTest {
         when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
 
-        alertSendResponse = alertSender.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT);
+        alertSendResponse = alertSender.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT, AlertType.TASK_RESULT);
         Assertions.assertFalse(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));
@@ -138,7 +139,7 @@ class AlertSenderTest {
         when(alertChannelMock.process(Mockito.any())).thenReturn(alertResult);
         when(alertPluginManager.getAlertChannel(1)).thenReturn(Optional.of(alertChannelMock));
 
-        alertSendResponse = alertSender.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT);
+        alertSendResponse = alertSender.syncHandler(ALERT_GROUP_ID, TITLE, CONTENT, AlertType.TASK_RESULT);
         Assertions.assertTrue(alertSendResponse.isSuccess());
         alertSendResponse.getResResults().forEach(result -> logger
                 .info("alert send response result, status:{}, message:{}", result.isSuccess(), result.getMessage()));

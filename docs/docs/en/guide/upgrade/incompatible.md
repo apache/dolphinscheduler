@@ -44,3 +44,7 @@ This document records the incompatible updates between each version. You need to
 
 * Remove import and export of workflow definition. ([#17940])(https://github.com/apache/dolphinscheduler/issues/17940)
 
+## 3.5.0
+
+* Rename the `sendEmail` field in SQL task parameters to `sendAlert`. The data migration script will automatically migrate `sendEmail` to `sendAlert` in the `t_ds_task_definition` and `t_ds_task_definition_log` tables.([#17854])(https://github.com/apache/dolphinscheduler/issues/17854)
+

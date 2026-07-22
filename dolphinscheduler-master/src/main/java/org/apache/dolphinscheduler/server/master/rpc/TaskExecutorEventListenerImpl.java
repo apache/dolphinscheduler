@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.rpc;
 
 import org.apache.dolphinscheduler.extract.master.ITaskExecutorEventListener;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.Tas
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskRuntimeContextChangedEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
+import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 import org.apache.dolphinscheduler.task.executor.events.IReportableTaskExecutorLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorFailedLifecycleEvent;
@@ -51,6 +53,9 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
 
     @Autowired
     private IWorkflowRepository workflowRepository;
+
+    @Autowired
+    private WorkflowAlertManager workflowAlertManager;
 
     @Override
     public void onTaskExecutorDispatched(final TaskExecutorDispatchedLifecycleEvent taskExecutorDispatchedLifecycleEvent) {
@@ -118,6 +123,14 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
                     .varPool(taskExecutorSuccessLifecycleEvent.getVarPool())
                     .build();
             taskExecution.getWorkflowEventBus().publish(taskSuccessEvent);
+
+            if (taskExecutorSuccessLifecycleEvent.isNeedAlert()) {
+                TaskAlertInfo taskAlertInfo = taskExecutorSuccessLifecycleEvent.getTaskAlertInfo();
+                workflowAlertManager.sendTaskResultAlert(
+                        taskAlertInfo,
+                        taskExecution.getTaskExecutionContext().getProjectCode(),
+                        taskExecution.getTaskExecutionContext().getWorkflowInstanceId());
+            }
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();
         }

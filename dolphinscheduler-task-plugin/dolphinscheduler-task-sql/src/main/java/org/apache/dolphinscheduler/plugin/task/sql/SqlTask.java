@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
@@ -290,10 +291,25 @@ public class SqlTask extends AbstractTask {
         String result = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
                 : JSONUtils.toJsonString(resultJSONArray);
 
-        if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
-            sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
+        if (Boolean.TRUE.equals(sqlParameters.getSendAlert())) {
+            // Truncate alert content to avoid oversized payload when query result is large
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
+                    : TaskConstants.DEFAULT_DISPLAY_ROWS;
+            String alertContent;
+            if (resultJSONArray.size() > displayRows) {
+                ArrayNode truncatedArray = JSONUtils.createArrayNode();
+                for (int i = 0; i < Math.min(displayRows, resultJSONArray.size()); i++) {
+                    truncatedArray.add(resultJSONArray.get(i));
+                }
+                alertContent = JSONUtils.toJsonString(truncatedArray);
+                log.debug("Alert content truncated to {} rows", displayRows);
+            } else {
+                alertContent = result;
+            }
+
+            prepareTaskResultAlert(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
                     ? sqlParameters.getTitle()
-                    : taskExecutionContext.getTaskName() + " query result sets", result);
+                    : taskExecutionContext.getTaskName() + " query result sets", alertContent);
         }
         log.debug("execute sql result : {}", result);
         return result;
@@ -320,18 +336,20 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * send alert as an attachment
+     * Prepare task result alert info
      *
-     * @param title   title
-     * @param content content
+     * @param alertGroupId alert group id
+     * @param title   alert title
+     * @param content alert content
      */
-    private void sendAttachment(int groupId, String title, String content) {
-        setNeedAlert(Boolean.TRUE);
+    private void prepareTaskResultAlert(int alertGroupId, String title, String content) {
         TaskAlertInfo taskAlertInfo = new TaskAlertInfo();
-        taskAlertInfo.setAlertGroupId(groupId);
+        taskAlertInfo.setAlertGroupId(alertGroupId);
         taskAlertInfo.setContent(content);
         taskAlertInfo.setTitle(title);
-        setTaskAlertInfo(taskAlertInfo);
+        taskAlertInfo.setAlertType(AlertType.TASK_RESULT);
+        taskExecutionContext.setNeedAlert(true);
+        taskExecutionContext.setTaskAlertInfo(taskAlertInfo);
     }
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {

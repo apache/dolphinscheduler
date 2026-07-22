@@ -73,8 +73,6 @@ public class SqlParameters extends AbstractParameters {
      */
     private int sqlType;
 
-    private Boolean sendEmail;
-
     private int displayRows;
 
     /**
@@ -85,6 +83,7 @@ public class SqlParameters extends AbstractParameters {
      * 3 TABLE+attachment
      */
     private String showType;
+
     /**
      * SQL connection parameters
      */
@@ -92,7 +91,19 @@ public class SqlParameters extends AbstractParameters {
     private List<String> preStatements;
     private List<String> postStatements;
 
+    /**
+     * Whether to send alert for SQL query result
+     */
+    private Boolean sendAlert;
+
+    /**
+     * Alert group id
+     */
     private int groupId;
+
+    /**
+     * Alert title
+     */
     private String title;
 
     private int limit;
@@ -173,7 +184,7 @@ public class SqlParameters extends AbstractParameters {
                 + ", sqlSource='" + sqlSource + '\''
                 + ", sqlResource='" + sqlResource + '\''
                 + ", sqlType=" + sqlType
-                + ", sendEmail=" + sendEmail
+                + ", sendAlert=" + sendAlert
                 + ", displayRows=" + displayRows
                 + ", limit=" + limit
                 + ", showType='" + showType + '\''

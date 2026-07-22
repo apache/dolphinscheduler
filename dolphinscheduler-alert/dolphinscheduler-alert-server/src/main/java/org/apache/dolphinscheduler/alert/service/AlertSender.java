@@ -55,13 +55,16 @@ public class AlertSender extends AbstractEventSender<Alert> {
      * @param alertGroupId alertGroupId
      * @param title        title
      * @param content      content
+     * @param alertType    alertType
      * @return AlertSendResponseCommand
      */
-    public AlertSendResponse syncHandler(int alertGroupId, String title, String content) {
+    public AlertSendResponse syncHandler(int alertGroupId, String title, String content,
+                                         org.apache.dolphinscheduler.common.enums.AlertType alertType) {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = AlertData.builder()
                 .content(content)
                 .title(title)
+                .alertType(alertType.getCode())
                 .build();
 
         boolean sendResponseStatus = true;

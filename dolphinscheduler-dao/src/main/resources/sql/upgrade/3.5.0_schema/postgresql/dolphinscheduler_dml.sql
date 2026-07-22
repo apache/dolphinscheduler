@@ -13,27 +13,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-package org.apache.dolphinscheduler.extract.alert.request;
+UPDATE t_ds_task_definition
+SET task_params = (
+    (task_params::jsonb - 'sendEmail')
+    || jsonb_build_object('sendAlert', task_params::jsonb->'sendEmail')
+)::text
+WHERE jsonb_path_exists(task_params::jsonb, '$.sendEmail');
 
-import org.apache.dolphinscheduler.common.enums.AlertType;
+UPDATE t_ds_task_definition_log
+SET task_params = (
+    (task_params::jsonb - 'sendEmail')
+    || jsonb_build_object('sendAlert', task_params::jsonb->'sendEmail')
+)::text
+WHERE jsonb_path_exists(task_params::jsonb, '$.sendEmail');
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class AlertSendRequest {
-
-    private int groupId;
-
-    private String title;
-
-    private String content;
-
-    private AlertType alertType;
-
-}

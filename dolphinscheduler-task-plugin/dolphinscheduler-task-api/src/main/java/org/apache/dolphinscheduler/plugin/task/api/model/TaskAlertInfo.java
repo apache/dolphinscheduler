@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.model;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
+
 import lombok.Data;
 
 @Data
@@ -27,4 +29,6 @@ public class TaskAlertInfo {
     private String content;
 
     private Integer alertGroupId;
+
+    private AlertType alertType;
 }

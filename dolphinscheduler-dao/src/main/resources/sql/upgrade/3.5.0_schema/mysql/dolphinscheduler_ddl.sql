@@ -13,27 +13,5 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-package org.apache.dolphinscheduler.extract.alert.request;
-
-import org.apache.dolphinscheduler.common.enums.AlertType;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class AlertSendRequest {
-
-    private int groupId;
-
-    private String title;
-
-    private String content;
-
-    private AlertType alertType;
-
-}

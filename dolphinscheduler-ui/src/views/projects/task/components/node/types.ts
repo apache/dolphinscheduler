@@ -305,7 +305,7 @@ interface ITaskParams {
   datasource?: string
   sql?: string
   sqlType?: string
-  sendEmail?: boolean
+  sendAlert?: boolean
   displayRows?: number
   title?: string
   groupId?: string

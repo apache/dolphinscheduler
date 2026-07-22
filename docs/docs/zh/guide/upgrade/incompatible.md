@@ -4,7 +4,6 @@
 
 ## dev
 
-* 将mysql驱动版本从8.0.16升级至8.0.33 ([#14684](https://github.com/apache/dolphinscheduler/pull/14684))
 * 更改了环境变量名称，将 `PYTHON_HOME` 改为 `PYTHON_LAUNCHER`， 将 `DATAX_HOME` 改为 `DATAX_LAUNCHER` ([#14523](https://github.com/apache/dolphinscheduler/pull/14523))
 * 更新了SQL任务中用于匹配变量的正则表达式 ([#13378](https://github.com/apache/dolphinscheduler/pull/13378))
 * Remove the spark version of spark task ([#11860](https://github.com/apache/dolphinscheduler/pull/11860)).
@@ -47,4 +46,8 @@
 ## 3.4.1
 
 * 移除导入导出工作流([#17940])(https://github.com/apache/dolphinscheduler/issues/17940)
+
+## 3.5.0
+
+* 将SQL任务参数中的 `sendEmail` 字段重命名为 `sendAlert`，数据迁移脚本会自动将 `t_ds_task_definition` 和 `t_ds_task_definition_log` 表中的 `sendEmail` 迁移为 `sendAlert`。([#17854])(https://github.com/apache/dolphinscheduler/issues/17854)
 

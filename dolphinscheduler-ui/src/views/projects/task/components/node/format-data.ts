@@ -208,9 +208,9 @@ export function formatParams(data: INodeData): {
     taskParams.sqlType = data.sqlType
     taskParams.preStatements = data.preStatements
     taskParams.postStatements = data.postStatements
-    taskParams.sendEmail = data.sendEmail
+    taskParams.sendAlert = data.sendAlert
     taskParams.displayRows = data.displayRows
-    if (data.sqlType === '0' && data.sendEmail) {
+    if (data.sqlType === '0' && data.sendAlert) {
       taskParams.title = data.title
       taskParams.groupId = data.groupId
     }

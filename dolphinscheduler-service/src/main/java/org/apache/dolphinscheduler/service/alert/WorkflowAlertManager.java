@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -206,6 +207,30 @@ public class WorkflowAlertManager {
     public void sendWorkflowTimeoutAlert(WorkflowInstance workflowInstance) {
         ProjectUser projectUser = projectDao.queryProjectWithUserByWorkflowInstanceId(workflowInstance.getId());
         alertDao.sendWorkflowTimeoutAlert(workflowInstance, projectUser);
+    }
+
+    /**
+     * Send task result alert
+     *
+     * @param taskAlertInfo task alert info
+     * @param projectCode project code
+     * @param workflowInstanceId workflow instance id
+     */
+    public void sendTaskResultAlert(TaskAlertInfo taskAlertInfo, Long projectCode, Integer workflowInstanceId) {
+        if (taskAlertInfo == null || taskAlertInfo.getAlertGroupId() == null) {
+            return;
+        }
+        Alert alert = new Alert();
+        alert.setTitle(taskAlertInfo.getTitle());
+        alert.setContent(taskAlertInfo.getContent());
+        alert.setAlertGroupId(taskAlertInfo.getAlertGroupId());
+        alert.setAlertType(taskAlertInfo.getAlertType());
+        alert.setWarningType(WarningType.SUCCESS);
+        alert.setCreateTime(new Date());
+        alert.setProjectCode(projectCode);
+        alert.setWorkflowInstanceId(workflowInstanceId);
+        alertDao.addAlert(alert);
+        log.info("Added task result alert for workflow instance: {}", workflowInstanceId);
     }
 
 }
