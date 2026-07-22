@@ -8,14 +8,37 @@ Amazon EMR 任务类型，用于在AWS上操作EMR集群并执行计算任务。
 * `RUN_JOB_FLOW` 使用 [API_RunJobFlow](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples) 提交 [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) 对象
 * `ADD_JOB_FLOW_STEPS` 使用 [API_AddJobFlowSteps](https://docs.aws.amazon.com/emr/latest/APIReference/API_AddJobFlowSteps.html#API_AddJobFlowSteps_Examples) 提交 [AddJobFlowStepsRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/AddJobFlowStepsRequest.html) 对象
 
+## 前置条件
+
+EMR 任务使用 [AWS Default Credential Provider Chain](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html) 进行身份认证。
+使用 EMR 任务前，必须通过以下方式之一配置 AWS 凭证：
+
+* **环境变量**：在 DolphinScheduler Worker 运行的环境中设置 `AWS_ACCESS_KEY_ID` 和 `AWS_SECRET_ACCESS_KEY`。
+* **凭证文件**：在 Worker 机器上创建 `~/.aws/credentials`，内容如下：
+  ```
+  [default]
+  aws_access_key_id = YOUR_ACCESS_KEY
+  aws_secret_access_key = YOUR_SECRET_KEY
+  ```
+* **IAM 角色**：如果 DolphinScheduler Worker 运行在挂载了 IAM 角色的 EC2 实例上，凭证会自动获取。
+
+IAM 用户或角色需要至少拥有以下权限：
+- `elasticmapreduce:RunJobFlow`
+- `elasticmapreduce:AddJobFlowSteps`
+- `elasticmapreduce:DescribeStep`
+- `elasticmapreduce:CancelSteps`
+- `elasticmapreduce:ListSteps`
+
+> **常见错误**：如果遇到 `The security token included in the request is invalid` 错误，说明 AWS 凭证未正确配置或已过期。请检查 Access Key 和 Secret Key 是否正确，或确认 IAM 角色是否拥有所需权限。
+
 ## 任务参数
 
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
-|     **任务参数**      |                                                                                                                                                          **描述**                                                                                                                                                          |
-|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 程序类型              | 选择程序类型，如果是`RUN_JOB_FLOW`，则需要填写`jobFlowDefineJson`，如果是`ADD_JOB_FLOW_STEPS`，则需要填写`stepsDefineJson`                                                                                                                                                                                                                         |
-| jobFlowDefineJson | [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) 对象对应的JSON，详细JSON定义参见 [API_RunJobFlow_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples)                          |
+|     **任务参数**       |                                                                                                                                                                                                  **描述**                                                                                                                                                                                                  |
+|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 程序类型              | 选择程序类型，如果是`RUN_JOB_FLOW`，则需要填写`jobFlowDefineJson`，如果是`ADD_JOB_FLOW_STEPS`，则需要填写`stepsDefineJson`                                                                                                                                                                                                                                                                               |
+| jobFlowDefineJson | [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) 对象对应的JSON，详细JSON定义参见 [API_RunJobFlow_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples)                                                                                        |
 | stepsDefineJson   | [AddJobFlowStepsRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/AddJobFlowStepsRequest.html) 对象对应的JSON，详细JSON定义参见 [API_AddJobFlowSteps_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_AddJobFlowSteps.html#API_AddJobFlowSteps_Examples) |
 
 ## 任务样例
@@ -99,4 +122,3 @@ stepsDefineJson 参数样例
 
 - EMR 任务类型的故障转移尚未实现。目前，DolphinScheduler 仅支持对 yarn task type 进行故障转移。其他任务类型，如 EMR 任务、k8s 任务尚未准备好。
 - `stepsDefineJson` 一个任务定义仅支持关联单个step，这样可以更好的保证任务状态的可靠性。
-
