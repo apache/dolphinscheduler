@@ -8,6 +8,29 @@ Using [aws-java-sdk](https://aws.amazon.com/cn/sdk-for-java/) in the background 
 * `RUN_JOB_FLOW` Using [API_RunJobFlow](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples) submit [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) object
 * `ADD_JOB_FLOW_STEPS` Using [API_AddJobFlowSteps](https://docs.aws.amazon.com/emr/latest/APIReference/API_AddJobFlowSteps.html#API_AddJobFlowSteps_Examples) submit [AddJobFlowStepsRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/AddJobFlowStepsRequest.html) object
 
+## Prerequisites
+
+The EMR task uses the [AWS Default Credential Provider Chain](https://docs.aws.amazon.com/sdk-for-java/latest/developer-guide/credentials.html) for authentication.
+You must configure AWS credentials in one of the following ways before using the EMR task:
+
+* **Environment Variables**: Set `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` in the environment where the DolphinScheduler worker runs.
+* **Credentials File**: Create `~/.aws/credentials` on the worker machine with the following content:
+  ```
+  [default]
+  aws_access_key_id = YOUR_ACCESS_KEY
+  aws_secret_access_key = YOUR_SECRET_KEY
+  ```
+* **IAM Role**: If the DolphinScheduler worker runs on an EC2 instance with an IAM role attached, credentials are automatically obtained.
+
+The IAM user or role must have the following minimum permissions:
+- `elasticmapreduce:RunJobFlow`
+- `elasticmapreduce:AddJobFlowSteps`
+- `elasticmapreduce:DescribeStep`
+- `elasticmapreduce:CancelSteps`
+- `elasticmapreduce:ListSteps`
+
+> **Common Error**: If you see `The security token included in the request is invalid`, it means your AWS credentials are not properly configured or have expired. Verify your access key and secret key, or check if your IAM role has the required permissions.
+
 ## Create Task
 
 * Click `Project Management -> Project Name -> Workflow Definition`, click the `Create Workflow` button to enter the DAG editing page.
@@ -17,10 +40,10 @@ Using [aws-java-sdk](https://aws.amazon.com/cn/sdk-for-java/) in the background 
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-|   **Parameter**   |                                                                                                                                                                       **Description**                                                                                                                                                                       |
-|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Program Type      | Select the program type. If it is `RUN_JOB_FLOW`, you need to fill in `jobFlowDefineJson`, if it is `ADD_JOB_FLOW_STEPS`, you need to fill in `stepsDefineJson`.                                                                                                                                                                                            |
-| jobFlowDefineJson | JSON corresponding to the [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) object, for details refer to [API_RunJobFlow_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples).                          |
+|   **Parameter**   |                                                                                                                                                                                                                                                                                                                                                                                           **Description**                                                                                                                                                                                                                                                                                                                                                                                        |
+|-------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Program Type      | Select the program type. If it is `RUN_JOB_FLOW`, you need to fill in `jobFlowDefineJson`, if it is `ADD_JOB_FLOW_STEPS`, you need to fill in `stepsDefineJson`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| jobFlowDefineJson | JSON corresponding to the [RunJobFlowRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/RunJobFlowRequest.html) object, for details refer to [API_RunJobFlow_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_RunJobFlow.html#API_RunJobFlow_Examples).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | stepsDefineJson   | JSON corresponding to the [AddJobFlowStepsRequest](https://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/services/elasticmapreduce/model/AddJobFlowStepsRequest.html) object, for details refer to [API_AddJobFlowSteps_Examples](https://docs.aws.amazon.com/emr/latest/APIReference/API_AddJobFlowSteps.html#API_AddJobFlowSteps_Examples). |
 
 ## Task Example
@@ -104,4 +127,3 @@ stepsDefineJson example
 
 - Failover on EMR Task type has not been implemented. In this time, DolphinScheduler only supports failover on yarn task type . Other task type, such as EMR task, k8s task not ready yet.
 - `stepsDefineJson` A task definition only supports the association of a single step, which can better ensure the reliability of the task state.
-
