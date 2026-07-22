@@ -21,19 +21,8 @@ import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponseBody;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-
-import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
@@ -98,6 +87,10 @@ public class RequestClient {
     }
 
     public static String getParams(Map<String, Object> params) {
+        return getParams(params, true);
+    }
+
+    public static String getParams(Map<String, Object> params, boolean includeQuestionMark) {
         if (params == null || params.isEmpty()) {
             return "";
         }
@@ -122,12 +115,12 @@ public class RequestClient {
                 for (int i = 0; i < length; i++) {
                     Object item = java.lang.reflect.Array.get(value, i);
                     if (item != null) {
-                        appendParam(sb, isFirst, key, item.toString());
+                        appendParam(sb, isFirst, key, item.toString(), includeQuestionMark);
                         isFirst = false;
                     }
                 }
             } else {
-                appendParam(sb, isFirst, key, value.toString());
+                appendParam(sb, isFirst, key, value.toString(), includeQuestionMark);
                 isFirst = false;
             }
         }
@@ -135,9 +128,12 @@ public class RequestClient {
         return sb.toString();
     }
 
-    private static void appendParam(StringBuilder sb, boolean isFirst, String key, String value) {
+    private static void appendParam(StringBuilder sb, boolean isFirst, String key, String value,
+                                    boolean includeQuestionMark) {
         if (isFirst) {
-            sb.append(Constants.QUESTION_MARK);
+            if (includeQuestionMark) {
+                sb.append(Constants.QUESTION_MARK);
+            }
         } else {
             sb.append(Constants.AND_MARK);
         }
@@ -159,7 +155,8 @@ public class RequestClient {
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
         headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
         Headers headersBuilder = Headers.of(headers);
-        RequestBody requestBody = FormBody.create(getParams(params), MediaType.parse(Constants.REQUEST_CONTENT_TYPE));
+        RequestBody requestBody =
+                FormBody.create(getParams(params, false), MediaType.parse(Constants.REQUEST_CONTENT_TYPE));
         log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
                 .headers(headersBuilder)
@@ -197,7 +194,8 @@ public class RequestClient {
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
         headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
         Headers headersBuilder = Headers.of(headers);
-        RequestBody requestBody = FormBody.create(getParams(params), MediaType.parse(Constants.REQUEST_CONTENT_TYPE));
+        RequestBody requestBody =
+                FormBody.create(getParams(params, false), MediaType.parse(Constants.REQUEST_CONTENT_TYPE));
         log.info("PUT request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
                 .headers(headersBuilder)
@@ -224,33 +222,6 @@ public class RequestClient {
         log.info("PUT response: {}", httpResponse);
 
         return httpResponse;
-    }
-
-    public CloseableHttpResponse postWithFile(String url, Map<String, String> headers, Map<String, Object> params,
-                                              File file) {
-        try {
-            Headers headersBuilder = Headers.of(headers);
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-            builder.addTextBody("json", getParams(params), ContentType.MULTIPART_FORM_DATA);
-            builder.addBinaryBody(
-                    "file",
-                    Files.newInputStream(file.toPath()),
-                    ContentType.APPLICATION_OCTET_STREAM,
-                    file.getName());
-            HttpEntity multipart = builder.build();
-            String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
-            log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
-            HttpPost httpPost = new HttpPost(requestUrl);
-            for (Map.Entry<String, String> header : headers.entrySet()) {
-                httpPost.setHeader(new BasicHeader(header.getKey(), header.getValue()));
-            }
-            httpPost.setEntity(multipart);
-            CloseableHttpClient client = HttpClients.createDefault();
-            return client.execute(httpPost);
-        } catch (Exception e) {
-            log.error("error", e);
-        }
-        return null;
     }
 
     @SneakyThrows
