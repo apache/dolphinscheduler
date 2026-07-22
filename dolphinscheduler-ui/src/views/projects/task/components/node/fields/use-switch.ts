@@ -17,7 +17,7 @@
 import { ref, watch, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTaskNodeStore } from '@/store/project/task-node'
-import { queryProcessDefinitionByCode } from '@/service/modules/process-definition'
+import { queryWorkflowDefinitionByCode } from '@/service/modules/workflow-definition'
 import { findIndex } from 'lodash'
 import type { IJsonItem } from '../types'
 
@@ -33,8 +33,8 @@ export function useSwitch(
     if (loading.value) return
     loading.value = true
     branchFlowOptions.value = []
-    const res = await queryProcessDefinitionByCode(
-      model.processName,
+    const res = await queryWorkflowDefinitionByCode(
+      model.workflowDefinitionName,
       projectCode
     )
     res?.taskDefinitionList.forEach((item: any) => {
@@ -75,9 +75,9 @@ export function useSwitch(
   }
 
   watch(
-    () => [model.processName, model.nextCode],
+    () => [model.workflowName, model.nextCode],
     () => {
-      if (model.processName) {
+      if (model.workflowName) {
         getOtherTaskDefinitionList()
       }
     }

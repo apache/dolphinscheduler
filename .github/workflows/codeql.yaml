@@ -17,12 +17,15 @@
 name: "CodeQL"
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - 'dev'
   pull_request:
     branches:
       - 'dev'
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
 
 concurrency:
   group: codeql-${{ github.event.pull_request.number || github.ref }}
@@ -36,12 +39,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v6
       with:
         submodules: true
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v4
       with:
         languages: java
         queries: +security-and-quality
@@ -49,9 +52,8 @@ jobs:
     - run: |
         ./mvnw -B clean install \
           -Dmaven.test.skip \
-          -Dmaven.javadoc.skip \
           -Dspotless.skip=true \
           -Prelease
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@v4

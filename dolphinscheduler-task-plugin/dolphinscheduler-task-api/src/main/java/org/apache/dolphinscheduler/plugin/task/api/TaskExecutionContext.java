@@ -17,13 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
@@ -45,219 +45,90 @@ public class TaskExecutionContext implements Serializable {
 
     private static final long serialVersionUID = -1L;
 
-    /**
-     * task id
-     */
     private int taskInstanceId;
 
-    /**
-     * task name
-     */
     private String taskName;
 
-    /**
-     * task first submit time.
-     */
     private long firstSubmitTime;
 
-    /**
-     * task start time
-     */
     private long startTime;
 
-    /**
-     * task type
-     */
     private String taskType;
 
     private String workflowInstanceHost;
 
-    /**
-     * host
-     */
     private String host;
 
-    /**
-     * task execute path
-     */
     private String executePath;
 
-    /**
-     * log path
-     */
     private String logPath;
 
-    /**
-     * applicationId path
-     */
     private String appInfoPath;
 
-    /**
-     * task json
-     */
-    private String taskJson;
-
-    /**
-     * processId
-     */
     private int processId;
 
-    /**
-     * processCode
-     */
-    private Long processDefineCode;
+    private Long workflowDefinitionCode;
 
-    /**
-     * processVersion
-     */
-    private int processDefineVersion;
+    private int workflowDefinitionVersion;
 
-    /**
-     * appIds
-     */
     private String appIds;
 
-    /**
-     * process instance id
-     */
-    private int processInstanceId;
+    private int workflowInstanceId;
 
-    /**
-     * process instance schedule time
-     */
+    private String workflowInstanceName;
+
+    private Long projectCode;
+
     private long scheduleTime;
 
-    /**
-     * process instance global parameters
-     */
     private String globalParams;
 
-    /**
-     * execute user id
-     */
     private int executorId;
 
-    /**
-     * command type if complement
-     */
-    private int cmdTypeIfComplement;
-
-    /**
-     * tenant code
-     */
     private String tenantCode;
 
-    /**
-     * process define id
-     */
-    private int processDefineId;
+    private int workflowDefinitionId;
 
-    /**
-     * project id
-     */
-    private int projectId;
-
-    /**
-     * project code
-     */
-    private long projectCode;
-
-    /**
-     * taskParams
-     */
     private String taskParams;
 
-    /**
-     * environmentConfig
-     */
     private String environmentConfig;
 
     /**
-     * definedParams
-     * // todo: we need to rename definedParams, prepareParamsMap, paramsMap, this is confusing
-     */
-    private Map<String, String> definedParams;
-
-    /**
-     * prepare params map
+     * Include local params, global params, varpool transport from successors, start-up params and system built-in params
      */
     private Map<String, Property> prepareParamsMap;
 
-    /**
-     * task AppId
-     */
+    // Please use task instanceId
+    @Deprecated
     private String taskAppId;
 
-    /**
-     * task timeout strategy
-     */
     private TaskTimeoutStrategy taskTimeoutStrategy;
 
-    /**
-     * task timeout
-     */
     private int taskTimeout;
 
-    /**
-     * worker group
-     */
     private String workerGroup;
-
-    /**
-     * current execution status
-     */
-    private TaskExecutionStatus currentExecutionStatus;
 
     private ResourceParametersHelper resourceParametersHelper;
 
-    /**
-     * endTime
-     */
     private long endTime;
 
-    /**
-     * sql TaskExecutionContext
-     */
     private SQLTaskExecutionContext sqlTaskExecutionContext;
-    /**
-     * k8s TaskExecutionContext
-     */
+
     private K8sTaskExecutionContext k8sTaskExecutionContext;
 
     private ResourceContext resourceContext;
 
-    /**
-     * taskInstance varPool
-     */
-    private String varPool;
+    private List<Property> varPool;
 
-    /**
-     * dry run flag
-     */
     private int dryRun;
 
-    private Map<String, Property> paramsMap;
-
-    private DataQualityTaskExecutionContext dataQualityTaskExecutionContext;
-
-    /**
-     * cpu quota
-     */
     private Integer cpuQuota;
 
-    /**
-     * max memory
-     */
     private Integer memoryMax;
 
-    /**
-     * test flag
-     */
-    private int testFlag;
-
-    private boolean logBufferEnable;
-
     private int dispatchFailTimes;
+
+    private final long firstDispatchTime = System.currentTimeMillis();
 
     public int increaseDispatchFailTimes() {
         return ++dispatchFailTimes;

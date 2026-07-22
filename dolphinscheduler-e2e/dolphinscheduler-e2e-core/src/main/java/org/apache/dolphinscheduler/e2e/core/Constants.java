@@ -17,13 +17,14 @@
 
 package org.apache.dolphinscheduler.e2e.core;
 
-import lombok.experimental.UtilityClass;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import lombok.experimental.UtilityClass;
+
 @UtilityClass
 public final class Constants {
+
     /**
      * tmp directory path
      */
@@ -38,4 +39,8 @@ public final class Constants {
      * chrome download path in selenium/standalone-chrome-debug container
      */
     public static final String SELENIUM_CONTAINER_CHROME_DOWNLOAD_PATH = "/home/seluser/Downloads";
+
+    public static final String LINE_SEPARATOR = "\n";
+
+    public static final long DEFAULT_SLEEP_MILLISECONDS = 500;
 }

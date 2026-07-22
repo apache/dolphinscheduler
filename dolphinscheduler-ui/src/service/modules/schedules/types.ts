@@ -33,8 +33,8 @@ interface ListReq {
   searchVal?: string
 }
 
-interface ProcessDefinitionCodeReq {
-  processDefinitionCode?: number
+interface WorkflowDefinitionCodeReq {
+  workflowDefinitionCode?: number
 }
 
 interface ScheduleReq {
@@ -45,14 +45,14 @@ interface WorkerGroupIdReq {
   workerGroupId?: number
 }
 
-interface ScheduleListReq extends ListReq, ProcessDefinitionCodeReq {
-  processDefinitionId: number
+interface ScheduleListReq extends ListReq, WorkflowDefinitionCodeReq {
+  workflowDefinitionId: number
 }
 
-interface CreateScheduleReq extends ScheduleReq, ProcessDefinitionCodeReq {
+interface CreateScheduleReq extends ScheduleReq, WorkflowDefinitionCodeReq {
   environmentCode?: number
   failureStrategy?: 'END' | 'CONTINUE'
-  processInstancePriority?: 'HIGHEST' | 'HIGH' | 'MEDIUM' | 'LOW' | 'LOWEST'
+  workflowInstancePriority?: 'HIGHEST' | 'HIGH' | 'MEDIUM' | 'LOW' | 'LOWEST'
   warningGroupId?: number
   warningType?: 'NONE' | 'SUCCESS' | 'FAILURE' | 'ALL'
   workerGroup?: string
@@ -79,7 +79,7 @@ export {
   IdReq,
   CodeReq,
   ListReq,
-  ProcessDefinitionCodeReq,
+  WorkflowDefinitionCodeReq,
   ScheduleReq,
   WorkerGroupIdReq,
   ScheduleListReq,

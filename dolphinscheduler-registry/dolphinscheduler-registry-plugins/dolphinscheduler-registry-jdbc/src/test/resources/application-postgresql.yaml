@@ -23,6 +23,6 @@ spring:
 
 registry:
   type: jdbc
-  term-refresh-interval: 1s
-  term-expire-times: 1
+  heartbeat-refresh-interval: 1s
+  session-timeout: 3s
 

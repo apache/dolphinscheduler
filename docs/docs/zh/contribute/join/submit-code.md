@@ -53,7 +53,9 @@ git checkout -b xxx origin/dev
 
 确保分支`xxx`是基于官方dev分支的最新代码
 
-* 在新建的分支上本地修改代码以后，提交到自己仓库：
+* 在新建的分支上本地修改代码后，先执行 `./mvnw spotless:apply` 应用项目统一格式化，再进行提交。CI 会运行 `./mvnw spotless:check`，任何文件未格式化都会导致 PR 失败（参见 [Pull Request Code Style](./pull-request.md#pull-request-code-style)）。
+
+* 提交到自己仓库：
 
   `git commit -m 'commit content'`
 

@@ -46,12 +46,12 @@ public class SSHUtils {
             session.addPasswordIdentity(password);
         }
 
-        // add public key identity
-        String publicKey = connectionParam.getPublicKey();
-        if (StringUtils.isNotEmpty(publicKey)) {
+        // add private key identity
+        String privateKey = connectionParam.getPrivateKey();
+        if (StringUtils.isNotEmpty(privateKey)) {
             try {
                 KeyPairResourceLoader loader = SecurityUtils.getKeyPairResourceParser();
-                Collection<KeyPair> keyPairCollection = loader.loadKeyPairs(null, null, null, publicKey);
+                Collection<KeyPair> keyPairCollection = loader.loadKeyPairs(null, null, null, privateKey);
                 for (KeyPair keyPair : keyPairCollection) {
                     session.addPublicKeyIdentity(keyPair);
                 }

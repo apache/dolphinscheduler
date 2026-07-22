@@ -38,7 +38,7 @@ import {
   NGrid
 } from 'naive-ui'
 import { useRoute } from 'vue-router'
-import { verifyName } from '@/service/modules/process-definition'
+import { verifyName } from '@/service/modules/workflow-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
 import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
@@ -98,23 +98,23 @@ export default defineComponent({
       },
       globalParams: {
         validator() {
-          const props = new Set()
+          const globalParams = formValue.value.globalParams || []
 
-          const keys = formValue.value.globalParams.map((item) => item.key)
-          const keysSet = new Set(keys)
-          if (keysSet.size !== keys.length) {
-            return new Error(t('project.dag.prop_repeat'))
-          }
+          if (!globalParams || globalParams.length === 0) return true
 
-          for (const param of formValue.value.globalParams) {
-            const prop = param.value
-            const direct = param.direct
-            if (direct === 'IN' && !prop) {
-              return new Error(t('project.dag.prop_empty'))
+          for (const param of globalParams) {
+            if (!param.key || param.key.trim() === '') {
+              return new Error(t('project.dag.prop_key_empty'))
             }
-
-            props.add(prop)
           }
+
+          const keys = globalParams.map((item) => (item.key || '').trim())
+          const uniqueKeys = new Set(keys)
+          if (uniqueKeys.size !== keys.length) {
+            return new Error(t('project.dag.prop_key_repeat'))
+          }
+
+          return true
         }
       }
     }
@@ -123,10 +123,10 @@ export default defineComponent({
         if (!valid) {
           const params = {
             name: formValue.value.name,
-            code: props.definition?.processDefinition.code
+            code: props.definition?.workflowDefinition.code
           } as { name: string; code?: number }
           if (
-            props.definition?.processDefinition.name !== formValue.value.name
+            props.definition?.workflowDefinition.name !== formValue.value.name
           ) {
             verifyName(params, projectCode).then(() =>
               context.emit('save', formValue.value)
@@ -142,21 +142,23 @@ export default defineComponent({
     }
 
     const updateModalData = () => {
-      const process = props.definition?.processDefinition
-      if (process) {
-        formValue.value.name = process.name
-        formValue.value.description = process.description
-        formValue.value.executionType = process.executionType || 'PARALLEL'
-        if (process.timeout && process.timeout > 0) {
+      const workflow = props.definition?.workflowDefinition
+      if (workflow) {
+        formValue.value.name = workflow.name
+        formValue.value.description = workflow.description
+        formValue.value.executionType = workflow.executionType || 'PARALLEL'
+        if (workflow.timeout && workflow.timeout > 0) {
           formValue.value.timeoutFlag = true
-          formValue.value.timeout = process.timeout
+          formValue.value.timeout = workflow.timeout
         }
-        formValue.value.globalParams = process.globalParamList.map((param) => ({
-          key: param.prop,
-          value: param.value,
-          direct: param.direct,
-          type: param.type
-        }))
+        formValue.value.globalParams = workflow.globalParamList.map(
+          (param) => ({
+            key: param.prop,
+            value: param.value,
+            direct: param.direct,
+            type: param.type
+          })
+        )
       }
     }
 
@@ -165,7 +167,7 @@ export default defineComponent({
     onMounted(() => updateModalData())
 
     watch(
-      () => props.definition?.processDefinition,
+      () => props.definition?.workflowDefinition,
       () => updateModalData()
     )
 
@@ -178,7 +180,7 @@ export default defineComponent({
         autoFocus={false}
       >
         <NForm model={formValue.value} rules={rule} ref={formRef}>
-          <NFormItem label={t('project.dag.workflow_name')} path='name'>
+          <NFormItem label={t('project.node.workflow_name')} path='name'>
             <NInput
               allowInput={trim}
               v-model:value={formValue.value.name}
@@ -210,7 +212,7 @@ export default defineComponent({
           )}
           {!props.instance && (
             <NFormItem
-              label={t('project.dag.process_execute_type')}
+              label={t('project.dag.workflow_execute_type')}
               path='executionType'
             >
               <NSelect
@@ -248,7 +250,12 @@ export default defineComponent({
             >
               {{
                 default: (param: {
-                  value: { key: string; direct: string; type: string; value: string }
+                  value: {
+                    key: string
+                    direct: string
+                    type: string
+                    value: string
+                  }
                 }) => (
                   <NGrid xGap={12} cols={24}>
                     <NGridItem span={6}>
@@ -269,20 +276,20 @@ export default defineComponent({
                     </NGridItem>
                     <NGridItem span={7}>
                       <NSelect
-                          options={[
-                            { value: 'VARCHAR', label: 'VARCHAR' },
-                            { value: 'INTEGER', label: 'INTEGER' },
-                            { value: 'LONG', label: 'LONG' },
-                            { value: 'FLOAT', label: 'FLOAT' },
-                            { value: 'DOUBLE', label: 'DOUBLE' },
-                            { value: 'DATE', label: 'DATE' },
-                            { value: 'TIME', label: 'TIME' },
-                            { value: 'BOOLEAN', label: 'BOOLEAN' },
-                            { value: 'LIST', label: 'LIST' },
-                            { value: 'FILE', label: 'FILE' }
-                          ]}
-                          v-model:value={param.value.type}
-                          defaultValue={'VARCHAR'}
+                        options={[
+                          { value: 'VARCHAR', label: 'VARCHAR' },
+                          { value: 'INTEGER', label: 'INTEGER' },
+                          { value: 'LONG', label: 'LONG' },
+                          { value: 'FLOAT', label: 'FLOAT' },
+                          { value: 'DOUBLE', label: 'DOUBLE' },
+                          { value: 'DATE', label: 'DATE' },
+                          { value: 'TIME', label: 'TIME' },
+                          { value: 'BOOLEAN', label: 'BOOLEAN' },
+                          { value: 'LIST', label: 'LIST' },
+                          { value: 'FILE', label: 'FILE' }
+                        ]}
+                        v-model:value={param.value.type}
+                        defaultValue={'VARCHAR'}
                       />
                     </NGridItem>
                     <NGridItem span={6}>

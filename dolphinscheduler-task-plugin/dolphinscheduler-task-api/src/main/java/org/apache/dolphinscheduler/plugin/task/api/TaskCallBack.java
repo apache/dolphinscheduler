@@ -21,7 +21,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 
 public interface TaskCallBack {
 
-    public void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo);
+    void updateRemoteApplicationInfo(int taskInstanceId, ApplicationInfo applicationInfo);
 
-    public void updateTaskInstanceInfo(int taskInstanceId);
+    // todo:The pid should put into runtime context
+    @Deprecated
+    void updateTaskInstanceInfo(int taskInstanceId);
 }

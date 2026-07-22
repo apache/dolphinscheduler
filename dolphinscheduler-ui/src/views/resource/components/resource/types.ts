@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-export type ResourceType = 'FILE' | 'UDF'
+export type ResourceType = 'FILE'
 
 export interface ResourceFileTableData {
   name: string

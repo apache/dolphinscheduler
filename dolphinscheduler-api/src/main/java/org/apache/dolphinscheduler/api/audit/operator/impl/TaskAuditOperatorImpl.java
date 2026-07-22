@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 public class TaskAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Override
     public void modifyAuditOperationType(AuditType auditType, Map<String, Object> paramsMap,
@@ -62,7 +62,7 @@ public class TaskAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        TaskDefinition obj = taskDefinitionMapper.queryByCode(objId);
+        TaskDefinition obj = taskDefinitionDao.queryByCode(objId);
         return obj == null ? "" : obj.getName();
     }
 }

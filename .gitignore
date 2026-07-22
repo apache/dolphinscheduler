@@ -53,3 +53,11 @@ dolphinscheduler-common/test
 dolphinscheduler-worker/logs
 dolphinscheduler-master/logs
 dolphinscheduler-api/logs
+__pycache__
+ds_schema_check_test
+
+# Agent
+docs/superpowers/
+.claude/worktrees
+CLAUDE.local.md
+AGENT.local.md

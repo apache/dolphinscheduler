@@ -19,11 +19,9 @@ package org.apache.dolphinscheduler.api.dto;
 
 import java.util.Date;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class AuditDto {
 
     private String userName;

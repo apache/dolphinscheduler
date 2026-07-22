@@ -24,10 +24,10 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
 
 public enum TaskExecutionStatus {
 
+    // todo: refactor the state like WorkflowExecutionStatus
     SUBMITTED_SUCCESS(0, "submit success"),
     RUNNING_EXECUTION(1, "running"),
     PAUSE(3, "pause"),
-    STOP(5, "stop"),
     FAILURE(6, "failure"),
     SUCCESS(7, "success"),
     NEED_FAULT_TOLERANCE(8, "need fault tolerance"),
@@ -82,12 +82,8 @@ public enum TaskExecutionStatus {
         return this == TaskExecutionStatus.PAUSE;
     }
 
-    public boolean isStop() {
-        return this == TaskExecutionStatus.STOP;
-    }
-
     public boolean isFinished() {
-        return isSuccess() || isKill() || isFailure() || isPause() || isStop() || isForceSuccess();
+        return isSuccess() || isKill() || isFailure() || isPause() || isForceSuccess();
     }
 
     public boolean isNeedFaultTolerance() {
@@ -120,7 +116,7 @@ public enum TaskExecutionStatus {
 
     @Override
     public String toString() {
-        return "TaskExecutionStatus{" + "code=" + code + ", desc='" + desc + '\'' + '}';
+        return name();
     }
 
 }

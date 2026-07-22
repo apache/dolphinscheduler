@@ -17,16 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.storage.oss;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.factory.OssClientFactory;
-import org.apache.dolphinscheduler.common.model.OssConnection;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -65,76 +62,52 @@ import com.aliyun.oss.model.PutObjectRequest;
 @Slf4j
 public class OssStorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
 
-    private String accessKeyId;
-
-    private String accessKeySecret;
-
     private String region;
 
     private String bucketName;
-
-    private String endPoint;
-
-    private OssConnection ossConnection;
 
     private OSS ossClient;
 
     public OssStorageOperator(String resourceBaseAbsolutePath) {
         super(resourceBaseAbsolutePath);
+        init();
     }
 
     private void init() {
-        this.accessKeyId = readOssAccessKeyID();
-        this.accessKeySecret = readOssAccessKeySecret();
-        this.endPoint = readOssEndPoint();
+        final String accessKeyId = readOssAccessKeyID();
+        final String accessKeySecret = readOssAccessKeySecret();
+        final String endPoint = readOssEndPoint();
         this.region = readOssRegion();
         this.bucketName = readOssBucketName();
-        this.ossConnection = buildOssConnection();
-        this.ossClient = buildOssClient();
-        ensureBucketSuccessfullyCreated(bucketName);
-    }
-
-    // TODO: change to use the following init method after DS supports Configuration / Connection Center
-    public void init(OssConnection ossConnection) {
-        this.accessKeyId = readOssAccessKeyID();
-        this.accessKeySecret = readOssAccessKeySecret();
-        this.endPoint = readOssEndPoint();
-        this.region = readOssRegion();
-        this.bucketName = readOssBucketName();
-        this.ossConnection = ossConnection;
-        this.ossClient = buildOssClient();
+        this.ossClient = OssClientFactory.buildOssClient(new OssConnection(accessKeyId, accessKeySecret, endPoint));
         ensureBucketSuccessfullyCreated(bucketName);
     }
 
     protected String readOssAccessKeyID() {
-        return PropertyUtils.getString(TaskConstants.ALIBABA_CLOUD_ACCESS_KEY_ID);
+        return PropertyUtils.getString(OssConstants.ALIBABA_CLOUD_ACCESS_KEY_ID);
     }
 
     protected String readOssAccessKeySecret() {
-        return PropertyUtils.getString(TaskConstants.ALIBABA_CLOUD_ACCESS_KEY_SECRET);
+        return PropertyUtils.getString(OssConstants.ALIBABA_CLOUD_ACCESS_KEY_SECRET);
     }
 
     protected String readOssRegion() {
-        return PropertyUtils.getString(TaskConstants.ALIBABA_CLOUD_REGION);
+        return PropertyUtils.getString(OssConstants.ALIBABA_CLOUD_REGION);
     }
 
     protected String readOssBucketName() {
-        return PropertyUtils.getString(Constants.ALIBABA_CLOUD_OSS_BUCKET_NAME);
+        return PropertyUtils.getString(StorageConstants.ALIBABA_CLOUD_OSS_BUCKET_NAME);
     }
 
     protected String readOssEndPoint() {
-        return PropertyUtils.getString(Constants.ALIBABA_CLOUD_OSS_END_POINT);
-    }
-
-    protected OssConnection buildOssConnection() {
-        return new OssConnection(accessKeyId, accessKeySecret, endPoint);
+        return PropertyUtils.getString(StorageConstants.ALIBABA_CLOUD_OSS_END_POINT);
     }
 
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
         if (resourceBaseAbsolutePath.startsWith("/")) {
-            log.warn("{} -> {} should not start with / in Oss", Constants.RESOURCE_UPLOAD_PATH,
+            log.warn("{} -> {} should not start with / in Oss", StorageConstants.RESOURCE_UPLOAD_PATH,
                     resourceBaseAbsolutePath);
             return resourceBaseAbsolutePath.substring(1);
         }
@@ -172,7 +145,7 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
-            FileUtils.createDirectoryWith755(dstFile.getParentFile().toPath());
+            FileUtils.createDirectoryWithPermission(dstFile.getParentFile().toPath(), FileUtils.PERMISSION_755);
         }
         OSSObject ossObject = ossClient.getObject(bucketName, srcFilePath);
         try (
@@ -257,6 +230,10 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
                 .withPrefix(ossResourceAbsolutePath);
 
         ListObjectsV2Result listObjectsV2Result = ossClient.listObjectsV2(listObjectsV2Request);
+
+        // Collect common prefixes (directories)
+        Set<String> commonPrefixSet = new HashSet<>(listObjectsV2Result.getCommonPrefixes());
+
         List<StorageEntity> storageEntities = new ArrayList<>();
         storageEntities.addAll(listObjectsV2Result.getCommonPrefixes()
                 .stream()
@@ -264,7 +241,10 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
                 .collect(Collectors.toList()));
         storageEntities.addAll(
                 listObjectsV2Result.getObjectSummaries().stream()
-                        .filter(s3ObjectSummary -> !s3ObjectSummary.getKey().equals(resourceAbsolutePath))
+                        // Filter out the current directory itself
+                        .filter(ossObjectSummary -> !ossObjectSummary.getKey().equals(ossResourceAbsolutePath))
+                        // Filter out directory marker objects that are already in commonPrefixes
+                        .filter(ossObjectSummary -> !commonPrefixSet.contains(ossObjectSummary.getKey()))
                         .map(this::transformOSSObjectToStorageEntity)
                         .collect(Collectors.toList()));
 
@@ -306,7 +286,7 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
         return transformOSSObjectToStorageEntity(object);
     }
 
-    public void ensureBucketSuccessfullyCreated(String bucketName) {
+    private void ensureBucketSuccessfullyCreated(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
             throw new IllegalArgumentException("resource.alibaba.cloud.oss.bucket.name is empty");
         }
@@ -319,11 +299,6 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
 
         log.info("bucketName: {} has been found, the current regionName is {}", bucketName, region);
     }
-
-    protected OSS buildOssClient() {
-        return OssClientFactory.buildOssClient(ossConnection);
-    }
-
     protected StorageEntity transformOSSObjectToStorageEntity(OSSObject ossObject) {
         ResourceMetadata resourceMetaData = getResourceMetaData(ossObject.getKey());
 
@@ -334,6 +309,7 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
         storageEntity.setType(resourceMetaData.getResourceType());
         storageEntity.setDirectory(resourceMetaData.isDirectory());
         storageEntity.setSize(ossObject.getObjectMetadata().getContentLength());
+        storageEntity.setRelativePath(resourceMetaData.getResourceRelativePath());
         storageEntity.setCreateTime(ossObject.getObjectMetadata().getLastModified());
         storageEntity.setUpdateTime(ossObject.getObjectMetadata().getLastModified());
         return storageEntity;
@@ -364,11 +340,13 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
         StorageEntity entity = new StorageEntity();
         entity.setFileName(new File(absolutePath).getName());
         entity.setFullName(absolutePath);
+        entity.setPfullName(resourceMetaData.getResourceParentAbsolutePath());
         entity.setDirectory(resourceMetaData.isDirectory());
         entity.setType(resourceMetaData.getResourceType());
         entity.setSize(0L);
         entity.setCreateTime(null);
         entity.setUpdateTime(null);
+        entity.setRelativePath(resourceMetaData.getResourceRelativePath());
         return entity;
     }
 

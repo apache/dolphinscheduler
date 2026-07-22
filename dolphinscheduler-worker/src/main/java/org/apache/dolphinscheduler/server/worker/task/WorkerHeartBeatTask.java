@@ -27,9 +27,11 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerServerLoadProtection;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
+import org.apache.dolphinscheduler.server.worker.metrics.WorkerServerMetrics;
+import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContainer;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -38,29 +40,32 @@ import lombok.extern.slf4j.Slf4j;
 public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
 
     private final WorkerConfig workerConfig;
+    private final WorkerServerLoadProtection workerServerLoadProtection;
     private final RegistryClient registryClient;
 
     private final MetricsProvider metricsProvider;
-    private final WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool;
 
     private final int processId;
 
+    private final ITaskExecutorContainer taskExecutorContainer;
+
     public WorkerHeartBeatTask(@NonNull WorkerConfig workerConfig,
+                               @NonNull WorkerServerLoadProtection workerServerLoadProtection,
                                @NonNull MetricsProvider metricsProvider,
                                @NonNull RegistryClient registryClient,
-                               @NonNull WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool) {
+                               @NonNull ITaskExecutorContainer taskExecutorContainer) {
         super("WorkerHeartBeatTask", workerConfig.getMaxHeartbeatInterval().toMillis());
+        this.workerServerLoadProtection = workerServerLoadProtection;
         this.metricsProvider = metricsProvider;
         this.workerConfig = workerConfig;
         this.registryClient = registryClient;
-        this.workerTaskExecutorThreadPool = workerTaskExecutorThreadPool;
+        this.taskExecutorContainer = taskExecutorContainer;
         this.processId = OSUtils.getProcessID();
     }
 
     @Override
     public WorkerHeartBeat getHeartBeat() {
         SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
-        ServerStatus serverStatus = getServerStatus(systemMetrics, workerConfig, workerTaskExecutorThreadPool);
 
         return WorkerHeartBeat.builder()
                 .startupTime(ServerLifeCycleManager.getServerStartupTime())
@@ -68,35 +73,43 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                 .jvmCpuUsage(systemMetrics.getJvmCpuUsagePercentage())
                 .cpuUsage(systemMetrics.getSystemCpuUsagePercentage())
                 .jvmMemoryUsage(systemMetrics.getJvmMemoryUsedPercentage())
+                .jvmHeapUsed(systemMetrics.getJvmHeapUsed())
+                .jvmHeapMax(systemMetrics.getJvmHeapMax())
+                .jvmNonHeapUsed(systemMetrics.getJvmNonHeapUsed())
+                .jvmNonHeapMax(systemMetrics.getJvmNonHeapMax())
                 .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
                 .diskUsage(systemMetrics.getDiskUsedPercentage())
                 .processId(processId)
                 .workerHostWeight(workerConfig.getHostWeight())
-                .threadPoolUsage(workerTaskExecutorThreadPool.getRunningTaskExecutorSize()
-                        + workerTaskExecutorThreadPool.getWaitingTaskExecutorSize())
-                .serverStatus(serverStatus)
+                .threadPoolUsage(taskExecutorContainer.slotUsage())
+                .serverStatus(
+                        workerServerLoadProtection.isOverload(systemMetrics) ? ServerStatus.BUSY : ServerStatus.NORMAL)
                 .host(NetUtils.getHost())
                 .port(workerConfig.getListenPort())
+                .workerGroup(workerConfig.getGroup())
                 .build();
     }
 
     @Override
-    public void writeHeartBeat(WorkerHeartBeat workerHeartBeat) {
+    public void writeHeartBeat(final WorkerHeartBeat workerHeartBeat) {
+        final String failoverNodePath = RegistryUtils.getFailoveredNodePath(workerHeartBeat);
+        if (registryClient.exists(failoverNodePath)) {
+            log.warn("The worker: {} is under {}, means it has been failover will close myself",
+                    workerHeartBeat,
+                    failoverNodePath);
+            registryClient
+                    .getStoppable()
+                    .stop("The worker exist: " + failoverNodePath + ", means it has been failover will close myself");
+            return;
+        }
         String workerHeartBeatJson = JSONUtils.toJsonString(workerHeartBeat);
         String workerRegistryPath = workerConfig.getWorkerRegistryPath();
         registryClient.persistEphemeral(workerRegistryPath, workerHeartBeatJson);
+        WorkerServerMetrics.incWorkerHeartbeatCount();
         log.debug(
                 "Success write worker group heartBeatInfo into registry, workerRegistryPath: {} workerHeartBeatInfo: {}",
-                workerRegistryPath, workerHeartBeatJson);
+                workerRegistryPath,
+                workerHeartBeatJson);
     }
 
-    private ServerStatus getServerStatus(SystemMetrics systemMetrics,
-                                         WorkerConfig workerConfig,
-                                         WorkerTaskExecutorThreadPool workerTaskExecutorThreadPool) {
-        if (workerTaskExecutorThreadPool.isOverload()) {
-            return ServerStatus.BUSY;
-        }
-        WorkerServerLoadProtection serverLoadProtection = workerConfig.getServerLoadProtection();
-        return serverLoadProtection.isOverload(systemMetrics) ? ServerStatus.BUSY : ServerStatus.NORMAL;
-    }
 }

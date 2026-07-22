@@ -3,7 +3,7 @@
 ## Overview
 
 Use `Dinky Task` to create a dinky-type task and support one-stop development, debugging, operation and maintenance of FlinkSql, Flink jar and SQL. When the worker executes `Dinky Task`,
-it will call `Dinky API` to trigger dinky task. Click [here](http://www.dlink.top/) for details about `Dinky`.
+it will call `Dinky API` to trigger dinky task. Click [here](https://www.dinky.org.cn/) for details about `Dinky`.
 
 ## Create Task
 
@@ -12,16 +12,14 @@ it will call `Dinky API` to trigger dinky task. Click [here](http://www.dlink.to
 
 ## Task Parameter
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
-| **Parameter** |                                                                                       **Description**                                                                                        |
-|---------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Dinky Address | The url for a dinky server.                                                                                                                                                                  |
-| Dinky Task ID | The unique task id for a dinky task.                                                                                                                                                         |
-| Online Task   | Specify whether the current dinky job is online. If yes, the submitted job can only be submitted successfully when it is published and there is no corresponding Flink job instance running. |
+|   **Parameter**   |                                                                                                                    **Description**                                                                                                                     |
+|-------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Dinky Address     | The URL for the Dinky service, e.g., http://localhost:8888.                                                                                                                                                                                            |
+| Dinky Task ID     | The unique task id for a dinky task.                                                                                                                                                                                                                   |
+| Online Task       | Specify whether the current dinky job is online. If yes, the submitted job can only be submitted successfully when it is published and there is no corresponding Flink job instance running.                                                           |
+| Custom Parameters | Starting from Dinky 1.0, support for passing custom parameters is available. Currently, only `IN` type inputs are supported, with no support for `OUT` type outputs. Supports the `${param}` syntax for retrieving global or local dynamic parameters. |
 
 ## Task Example
 

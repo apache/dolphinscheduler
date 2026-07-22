@@ -82,20 +82,10 @@
     </select>
     <select id="queryProjectListPaging" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
-        <include refid="baseSqlV2">
-            <property name="alias" value="p"/>
-        </include> ,
-        u.user_name as user_name,
-        count(distinct def.id) AS def_count,
-        count(distinct inst.id) as inst_running_count
+            <include refid="baseSqlV2">
+                <property name="alias" value="p"/>
+            </include>
         from t_ds_project p
-        left join t_ds_user u on u.id=p.user_id
-        left join t_ds_process_definition def
-        on def.project_code = p.code
-        left join t_ds_process_instance inst
-        on inst.process_definition_code = def.code
-        and inst.process_definition_version = def.version
-        and inst.state = 1
         where 1=1
         <if test="projectsIds != null and projectsIds.size() > 0">
             and p.id  in
@@ -108,7 +98,7 @@
             OR p.description LIKE concat('%', #{searchName}, '%')
             )
         </if>
-        group by p.id,u.user_name
+        group by p.id
         order by p.id desc
     </select>
     <select id="queryAuthedProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
@@ -151,17 +141,17 @@
              union select id as project_id  from t_ds_project where user_id=#{userId})
     </select>
 
-    <select id="queryProjectWithUserByProcessInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
+    <select id="queryProjectWithUserByWorkflowInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.ProjectUser">
         select
             dp.id project_id,
             dp.code project_code,
             dp.name project_name,
             u.user_name user_name
-        from t_ds_process_instance di
-        join t_ds_process_definition dpd on di.process_definition_code = dpd.code
+        from t_ds_workflow_instance di
+        join t_ds_workflow_definition dpd on di.workflow_definition_code = dpd.code
         join t_ds_project dp on dpd.project_code = dp.code
         join t_ds_user u on dp.user_id = u.id
-        where di.id = #{processInstanceId};
+        where di.id = #{workflowInstanceId};
     </select>
 
     <select id="queryAllProject" resultType="org.apache.dolphinscheduler.dao.entity.Project">
@@ -202,13 +192,13 @@
             <property name="alias" value="p"/>
         </include>
         from t_ds_task_instance ti
-        join t_ds_process_instance pi on ti.process_instance_id = pi.id
-        join t_ds_process_definition pd on pi.process_definition_code = pd.code
+        join t_ds_workflow_instance pi on ti.workflow_instance_id = pi.id
+        join t_ds_workflow_definition pd on pi.workflow_definition_code = pd.code
         join t_ds_project p on p.code = pd.project_code
         where ti.id = #{taskInstanceId}
     </select>
     <select id="queryAllWorkflowCounts" resultType="java.lang.Integer">
-        SELECT COUNT(*) FROM t_ds_process_definition
+        SELECT COUNT(*) FROM t_ds_workflow_definition
         where 1=1
         <if test="projectsCodes != null and projectsCodes.size() > 0">
             and project_code  in

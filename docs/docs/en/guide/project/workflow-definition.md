@@ -56,7 +56,7 @@ Click the `Save` button and configure `process execution type` in the pop-up win
 
 - `Parallel`: If there are multiple instances of the same workflow definition, execute the instances in parallel.
 - `Serial Wait`: If there are multiple instances of the same workflow definition, execute the instances in serial.
-- `Serial Discard`: If there are multiple instances of the same workflow definition, discard the later ones and kill the current running ones.
+- `Serial Discard`: If there is a running instance of the same workflow definition, the later ones will be discarded; the running instance is not affected.
 - `Serial Priority`: If there are multiple instances of the same workflow definition, execute the instances according to the priority in serial.
 
 ![workflow-execution-type](../../../../img/new_ui/dev/project/workflow-execution-type.png)
@@ -106,7 +106,7 @@ After selecting multiple workflows, you can perform batch operations at the bott
 
 Description of workflow operating parameters:
 
-* Failure strategy: When a task node fails to execute, other parallel task nodes need to execute this strategy. "Continue" means: after a certain task fails, other task nodes execute normally; "End" means: terminate all tasks execution, and terminate the entire process.
+* Failure strategy: When a task node fails to execute, other parallel task nodes need to execute this strategy. "Continue" means: after a certain task fails, end the workflow after waiting for other task nodes at the same level to execute normally.; "End" means: terminate all tasks execution, and terminate the entire workflow.
 * Notification strategy: When the process is over, send the process execution result notification email according to the process status, options including no send, send if success, send of failure, send whatever result.
 * Process priority: The priority of process operation, divide into five levels: highest (HIGHEST), high (HIGH), medium (MEDIUM), low (LOW), and lowest (LOWEST). When the number of master threads is insufficient, high priority processes will execute first in the execution queue, and processes with the same priority will execute in the order of first in, first out.
 * Worker group: The process can only be executed in the specified worker machine group. The default is `Default`, which can execute on any worker.
@@ -188,6 +188,3 @@ Description of workflow operating parameters:
 - View the Schedule Timing：After the scheduled time goes online, you can check the current timing situation through the "Timing" button<img src="../../../../img/timing.png" width="35"/>. But it cannot be modified, as shown in the below figure.
   ![workflow-time04](../../../../img/new_ui/dev/project/workflow-time04.png)
 
-## Import Workflow
-
-Click `Project Management -> Workflow -> Workflow Definition` to enter the workflow definition page, click the `Import Workflow` button to import the local workflow file, the workflow definition list displays the imported workflow and the status is offline.

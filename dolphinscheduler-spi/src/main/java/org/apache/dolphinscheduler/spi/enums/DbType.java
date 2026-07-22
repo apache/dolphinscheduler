@@ -23,9 +23,12 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import lombok.Getter;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.google.common.base.Functions;
 
+@Getter
 public enum DbType {
 
     MYSQL(0, "mysql", "mysql"),
@@ -55,7 +58,11 @@ public enum DbType {
     ZEPPELIN(24, "zeppelin", "zeppelin"),
     SAGEMAKER(25, "sagemaker", "sagemaker"),
 
-    K8S(26, "k8s", "k8s");
+    K8S(26, "k8s", "k8s"),
+
+    ALIYUN_SERVERLESS_SPARK(27, "aliyun_serverless_spark", "aliyun serverless spark"),
+    DOLPHINDB(28, "dolphindb", "dolphindb");
+
     private static final Map<Integer, DbType> DB_TYPE_MAP =
             Arrays.stream(DbType.values()).collect(toMap(DbType::getCode, Functions.identity()));
     @EnumValue
@@ -79,18 +86,6 @@ public enum DbType {
     public static DbType ofName(String name) {
         return Arrays.stream(DbType.values()).filter(e -> e.name().equals(name)).findFirst()
                 .orElseThrow(() -> new NoSuchElementException("no such db type"));
-    }
-
-    public int getCode() {
-        return code;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getDescp() {
-        return descp;
     }
 
     public boolean isHive() {

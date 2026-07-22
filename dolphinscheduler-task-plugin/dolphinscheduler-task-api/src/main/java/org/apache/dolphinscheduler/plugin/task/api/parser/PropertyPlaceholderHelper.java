@@ -119,7 +119,7 @@ public class PropertyPlaceholderHelper {
      */
     public String replacePlaceholders(String value, PlaceholderResolver placeholderResolver) {
         notNull(value, "'value' must not be null");
-        return parseStringValue(value, placeholderResolver, new HashSet<String>());
+        return parseStringValue(value, placeholderResolver, new HashSet<>());
     }
 
     protected String parseStringValue(

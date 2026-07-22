@@ -80,9 +80,11 @@ const AlarmGroupModal = defineComponent({
         } else {
           variables.model.id = props.row.id
           variables.model.groupName = props.row.groupName
-          variables.model.alertInstanceIds = props.row.alertInstanceIds
-            .split(',')
-            .map((item: string) => Number(item))
+          if (props.row.alertInstanceIds != null) {
+            variables.model.alertInstanceIds = props.row.alertInstanceIds
+              .split(',')
+              .map((item: string) => Number(item))
+          }
           variables.model.description = props.row.description
         }
       }
@@ -93,9 +95,11 @@ const AlarmGroupModal = defineComponent({
       () => {
         variables.model.id = props.row.id
         variables.model.groupName = props.row.groupName
-        variables.model.alertInstanceIds = props.row.alertInstanceIds
-          .split(',')
-          .map((item: string) => Number(item))
+        if (props.row.alertInstanceIds != null) {
+          variables.model.alertInstanceIds = props.row.alertInstanceIds
+            .split(',')
+            .map((item: string) => Number(item))
+        }
         variables.model.description = props.row.description
       }
     )

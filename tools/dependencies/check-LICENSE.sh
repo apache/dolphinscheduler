@@ -28,6 +28,8 @@ tar -zxf dolphinscheduler-dist/target/apache-dolphinscheduler*-bin.tar.gz --stri
 # licenses
 echo '=== Self modules: ' && ./mvnw --batch-mode --quiet -Dexec.executable='echo' -Dexec.args='${project.artifactId}-${project.version}.jar' exec:exec | tee self-modules.txt
 
+echo '=== Self modules: ' && ./mvnw --batch-mode --quiet -Dexec.executable='echo' -Dexec.args='${project.artifactId}-${project.version}-shade.jar' exec:exec | tee -a self-modules.txt
+
 echo '=== Distributed dependencies: ' && find dist -name "*.jar" -exec basename {} \; | sort | uniq | tee all-dependencies.txt
 
 # Exclude all self modules(jars) to generate all third-party dependencies

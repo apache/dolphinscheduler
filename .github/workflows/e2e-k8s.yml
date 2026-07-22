@@ -16,10 +16,13 @@
 #
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
       - dev
+      - '[0-9]+.[0-9]+.[0-9]+-prepare'
+      - '[0-9]+.[0-9]+.[0-9]+-release'
 
 name: E2E-K8S
 
@@ -35,8 +38,10 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+      - uses: ./.github/actions/paths-filter
         id: filter
         with:
           filters: |
@@ -47,26 +52,27 @@ jobs:
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 40
     steps:
-      - uses: actions/checkout@v2
+      - run: df -h
+      - name: "node-cleanup"
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+          sudo docker image prune --all --force
+          sudo docker builder prune -a
+      - run: df -h
+      - uses: actions/checkout@v6
         with:
           submodules: true
+      - run: df -h
       - name: Build Image
         run: |
           ./mvnw -B clean package \
-          -Dmaven.test.skip \
-          -Dmaven.javadoc.skip \
+          -Dmaven.test.skip=true \
           -Dspotless.skip=true \
-          -Dmaven.checkstyle.skip \
-          -Dmaven.deploy.skip \
-          -Ddocker.push.skip=true \
-          -Pdocker,release -Ddocker.tag=ci \
-          -pl org.apache.dolphinscheduler:dolphinscheduler-alert-server \
-          -pl dolphinscheduler-tools \
-          -pl dolphinscheduler-api \
-          -pl dolphinscheduler-master \
-          -pl dolphinscheduler-worker -am
+          -Pdocker,staging \
+          -Ddocker.tag=ci \
+          -Danalyze.skip=true
       - name: Create k8s Kind Cluster
         run: |
           # install kubectl
@@ -145,3 +151,20 @@ jobs:
               done
             done
           done
+  result:
+    name: E2E-K8S-Result
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [ e2e-k8s, paths-filter ]
+    if: always()
+    steps:
+      - name: Status
+        run: |
+          if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
+            echo "Skip E2E-K8S!"
+            exit 0
+          fi
+          if [[ ${{ needs.e2e-k8s.result }} != 'success' ]]; then
+            echo "E2E-K8S Failed!"
+            exit -1
+          fi

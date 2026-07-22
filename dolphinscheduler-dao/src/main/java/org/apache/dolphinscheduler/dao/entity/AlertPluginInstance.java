@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.enums.AlertPluginInstanceType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
-
 import java.util.Date;
 
 import lombok.Data;
@@ -34,15 +31,9 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_alert_plugin_instance")
 public class AlertPluginInstance {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * plugin_define_id
-     */
     @TableField(value = "plugin_define_id", updateStrategy = FieldStrategy.NEVER)
     private int pluginDefineId;
 
@@ -52,33 +43,12 @@ public class AlertPluginInstance {
     @TableField("instance_name")
     private String instanceName;
 
-    /**
-     * plugin_instance_params
-     */
     @TableField("plugin_instance_params")
     private String pluginInstanceParams;
 
-    /**
-     * instance_type. 0 normal, 1 global
-     */
-    @TableField("instance_type")
-    private AlertPluginInstanceType instanceType;
-
-    /**
-     * warning_type
-     */
-    @TableField("warning_type")
-    private WarningType warningType;
-
-    /**
-     * create_time
-     */
     @TableField("create_time")
     private Date createTime;
 
-    /**
-     * update_time
-     */
     @TableField("update_time")
     private Date updateTime;
 
@@ -95,11 +65,10 @@ public class AlertPluginInstance {
         this.instanceName = instanceName;
     }
 
-    public AlertPluginInstance(int id, String pluginInstanceParams, String instanceName, WarningType warningType,
+    public AlertPluginInstance(int id, String pluginInstanceParams, String instanceName,
                                Date updateDate) {
         this.id = id;
         this.pluginInstanceParams = pluginInstanceParams;
-        this.warningType = warningType;
         this.updateTime = updateDate;
         this.instanceName = instanceName;
     }

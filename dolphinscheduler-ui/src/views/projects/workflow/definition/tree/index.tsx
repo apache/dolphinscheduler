@@ -43,7 +43,7 @@ import UseD3Tree from '@/views/projects/workflow/definition/tree/use-d3-tree'
 import Tree from '@/views/projects/workflow/definition/tree/use-d3-tree/tree'
 import { IChartDataItem } from '@/components/chart/modules/types'
 import { Router, useRouter } from 'vue-router'
-import { viewTree } from '@/service/modules/process-definition'
+import { viewTree } from '@/service/modules/workflow-definition'
 import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 import { tasksState, uuid } from '@/common/common'
 import type { ITaskTypeNodeOption } from './types'
@@ -78,9 +78,9 @@ export default defineComponent({
         image: `${import.meta.env.BASE_URL}images/task-icons/shell.png`
       },
       {
-        taskType: 'SUB_PROCESS',
+        taskType: 'SUB_WORKFLOW',
         color: '#4295DA',
-        image: `${import.meta.env.BASE_URL}images/task-icons/sub_process.png`
+        image: `${import.meta.env.BASE_URL}images/task-icons/sub_workflow.png`
       },
       {
         taskType: 'PROCEDURE',
@@ -126,11 +126,6 @@ export default defineComponent({
         taskType: 'DATAX',
         color: '#75CC71',
         image: `${import.meta.env.BASE_URL}images/task-icons/datax.png`
-      },
-      {
-        taskType: 'PIGEON',
-        color: '#5EC459',
-        image: `${import.meta.env.BASE_URL}images/task-icons/pigeon.png`
       },
       {
         taskType: 'SQOOP',

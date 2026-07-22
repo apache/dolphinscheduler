@@ -48,9 +48,10 @@ export function useJava({
     timeoutNotifyStrategy: ['WARN'],
     timeout: 30,
     mainJar: undefined,
-    runType: 'JAVA',
+    runType: 'FAT_JAR',
     mainArgs: '',
     jvmArgs: '',
+    mainClass: '',
     programType: 'JAVA'
   } as unknown as INodeData)
 
@@ -58,12 +59,12 @@ export function useJava({
   if (from === 1) {
     extra = [
       Fields.useTaskType(model, readonly),
-      Fields.useProcessName({
+      Fields.useWorkflowName({
         model,
         projectCode,
         isCreate: !data?.id,
         from,
-        processName: data?.processName
+        workflowName: data?.workflowDefinitionName
       })
     ]
   }
@@ -73,7 +74,6 @@ export function useJava({
       Fields.useName(from),
       ...extra,
       Fields.useRunFlag(),
-      Fields.useCache(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),

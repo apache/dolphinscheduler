@@ -28,7 +28,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DynamicSubWorkflowDto {
 
-    private long processInstanceId;
+    private long workflowInstanceId;
 
     private String name;
 

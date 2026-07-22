@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 
 import java.util.Date;
 
@@ -43,15 +43,12 @@ import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 
-/**
- * data analysis controller test
- */
 public class DataAnalysisControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(DataAnalysisControllerTest.class);
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     private int createProject() {
         Project project = new Project();
@@ -59,7 +56,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         project.setName("ut project");
         project.setUserId(1);
         project.setCreateTime(new Date());
-        projectMapper.insert(project);
+        projectDao.insert(project);
         return project.getId();
     }
 
@@ -83,7 +80,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         assertThat(result.getCode())
                 .isNotNull()
                 .isEqualTo(Status.SUCCESS.getCode());
-        projectMapper.deleteById(projectId);
+        projectDao.deleteById(projectId);
     }
 
     @Test
@@ -95,7 +92,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         paramsMap.add("endDate", "2019-12-28 00:00:00");
         paramsMap.add("projectCode", "16");
 
-        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/process-state-count")
+        MvcResult mvcResult = mockMvc.perform(get("/projects/analysis/workflow-state-count")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
                 .andExpect(status().isOk())
@@ -107,7 +104,7 @@ public class DataAnalysisControllerTest extends AbstractControllerTest {
         assertThat(result.getCode())
                 .isEqualTo(Status.SUCCESS.getCode());
 
-        projectMapper.deleteById(projectId);
+        projectDao.deleteById(projectId);
     }
 
     @Test

@@ -14,16 +14,25 @@ DolphinScheduler allows parameter transfer between tasks. Currently, transfer di
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
 * [Python](../task/python.md)
-* [SubProcess](../task/sub-process.md)
+* [SubWorkflow](../task/sub-workflow.md)
 * [Kubernetes](../task/kubernetes.md)
+* [Zeppelin](../task/zeppelin.md)
+* [Http](../task/http.md)
 
-When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. If it is a SubProcess node, there is no need to set a parameter in [Current Node Settings], but an `OUT` direction parameter needs to be set in the workflow definition of the subprocess.
+When defining an upstream node, if there is a need to transmit the result of that node to a dependency related downstream node. You need to set an `OUT` direction parameter to [Custom Parameters] of the [Current Node Settings]. If it is a sub-workflow node, there is no need to set a parameter in [Current Node Settings], but an `OUT` direction parameter needs to be set in the workflow definition of the sub-workflow.
 
 The value of upstream parameter can be updated in downstream node in the same way as [setting parameter](#create-a-shell-task-and-set-parameters).
 
 Upstream parameter will be override when defining parameter with the same name in downstream node.
 
-> Note: If there are no dependencies between nodes, local parameters cannot be passed upstream.
+> Note:
+>
+> 1. Parameter passing behavior has changed in version 3.3.x**
+>    In legacy versions (3.2.2 and earlier), downstream node B could obtain the OUT type output X of upstream node A without configuring an IN type local variable X.
+>    In new versions (3.3.0 and later), the logic for obtaining local variables has been modified: downstream node B can only use the OUT type output X of upstream node A if it has configured an IN type local variable X.
+>    See the Node_B and Node_mysql examples below for details.
+>
+> 2. If there are no dependencies between nodes, local parameters cannot be passed upstream.
 
 ### Example
 
@@ -46,11 +55,15 @@ When the SHELL node is defined, the log detects the format of `${setValue(output
 
 Create the Node_B task, which is mainly used to test and output the parameters passed by the upstream task Node_A.
 
+In the custom parameters, add an IN type value parameter and an output parameter.
+
 ![context-parameter02](../../../../img/new_ui/dev/parameter/context_parameter02.png)
 
 #### Create SQL tasks and use parameters
 
 When the SHELL task is completed, we can use the output passed upstream as the query object for the SQL. The id of the query is renamed to ID and is output as a parameter.
+
+In the custom parameters, add an `OUT` type `ID` parameter and an `IN` type `output` parameter.
 
 ![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter03.png)
 
@@ -94,29 +107,29 @@ For example
 
 Attention: When the variable value contains the `\n` identifier, such as ` value = "hello \n world" `, value needs to be carried out in a special way. You need to use `print('${setValue(key=%s)}' % repr(value))`, otherwise the argument cannot be passed to the subsequent flow.
 
-#### Pass parameter from SubProcess task to downstream
+#### Pass parameter from SubWorkflow task to downstream
 
-In the workflow definition of the subprocess, define `OUT` direction parameters as output parameters, and these parameters can be passed to the downstream tasks of the subprocess node.
+In the workflow definition of the sub-workflow, define `OUT` direction parameters as output parameters, and these parameters can be passed to the downstream tasks of the sub-workflow node.
 
-Create an A task in the workflow definition of the subprocess, add var1 and var2 parameters to the custom parameters, and write the following script:
+Create an A task in the workflow definition of the sub-workflow, add var1 and var2 parameters to the custom parameters, and write the following script:
 
-![context-subprocess01](../../../../img/new_ui/dev/parameter/context-subprocess01.png)
+![context-sub-workflow01](../../../../img/new_ui/dev/parameter/context-sub-workflow01.png)
 
-Save the subprocess_example1 workflow and set the global parameters var1.
+Save the sub-workflow_example1 workflow and set the global parameters var1.
 
-![context-subprocess02](../../../../img/new_ui/dev/parameter/context-subprocess02.png)
+![context-sub-workflow02](../../../../img/new_ui/dev/parameter/context-sub-workflow02.png)
 
-Create a sub_process task in a new workflow, and use the subprocess_example1 workflow as the sub-node.
+Create a sub_workflow task in a new workflow, and use the sub-workflow_example1 workflow as the sub-node.
 
-![context-subprocess03](../../../../img/new_ui/dev/parameter/context-subprocess03.png)
+![context-sub-workflow03](../../../../img/new_ui/dev/parameter/context-sub-workflow03.png)
 
-Create a shell task as a downstream task of the sub_process task, and write the following script:
+Create a shell task as a downstream task of the sub_workflow task, and write the following script:
 
-![context-subprocess04](../../../../img/new_ui/dev/parameter/context-subprocess04.png)
+![context-sub-workflow04](../../../../img/new_ui/dev/parameter/context-sub-workflow04.png)
 
 Save the workflow and run it. The result of the downstream task is as follows:
 
-![context-subprocess05](../../../../img/new_ui/dev/parameter/context-subprocess05.png)
+![context-sub-workflow05](../../../../img/new_ui/dev/parameter/context-sub-workflow05.png)
 
 Although the two parameters var1 and var2 are output in the A task, only the `OUT` parameter var1 is defined in the workflow definition, and the downstream task successfully outputs var1. It proves that the var1 parameter is passed in the workflow with reference to the expected value.
 
@@ -129,3 +142,13 @@ For example
 ![kubernetes_context_param](../../../../img/new_ui/dev/parameter/k8s_context_param.png)
 
 Another special consideration, not always can DolphinScheduler collect pod logs, if the user redirects the log output stream, DolphinScheduler can not collect logs for use and can not use the output parameter, either.
+
+#### Pass parameter from Zeppelin task to downstream
+
+In the custom parameters, add an `IN` type `input` parameter.
+
+For example
+
+![zeppelin_parameters](../../../../img/new_ui/dev/parameter/zeppelin_parameters01.png)
+
+Note: json key must be enclosed in " "

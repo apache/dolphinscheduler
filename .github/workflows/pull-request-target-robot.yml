@@ -18,6 +18,7 @@
 name: "pull-request-target-robot"
 
 on:
+  workflow_dispatch:
   pull_request_target:
 
 jobs:
@@ -29,13 +30,13 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: "Checkout ${{ github.ref }}"
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           persist-credentials: false
           submodules: true
 
       - name: "Label in pull request"
-        uses: actions/labeler@v4
+        uses: actions/labeler@v6
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           configuration-path: .github/actions/labeler/labeler.yml

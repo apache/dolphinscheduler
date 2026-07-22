@@ -19,12 +19,12 @@ package org.apache.dolphinscheduler.plugin.storage.gcs;
 
 import static org.apache.dolphinscheduler.common.constants.Constants.EMPTY_STRING;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -85,7 +85,7 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
         if (resourceBaseAbsolutePath.startsWith("/")) {
-            log.warn("{} -> {} should not start with / in Gcs", Constants.RESOURCE_UPLOAD_PATH,
+            log.warn("{} -> {} should not start with / in Gcs", StorageConstants.RESOURCE_UPLOAD_PATH,
                     resourceBaseAbsolutePath);
             return resourceBaseAbsolutePath.substring(1);
         }
@@ -112,7 +112,7 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         if (dstFile.isDirectory()) {
             Files.delete(dstFile.toPath());
         } else {
-            FileUtils.createDirectoryWith755(dstFile.getParentFile().toPath());
+            FileUtils.createDirectoryWithPermission(dstFile.getParentFile().toPath(), FileUtils.PERMISSION_755);
         }
 
         Blob blob = gcsStorage.get(BlobId.of(bucketName, srcFilePath));
@@ -243,7 +243,7 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
 
     private void checkBucketNameExists(String bucketName) {
         if (StringUtils.isBlank(bucketName)) {
-            throw new IllegalArgumentException(Constants.GOOGLE_CLOUD_STORAGE_BUCKET_NAME + " is blank");
+            throw new IllegalArgumentException(StorageConstants.GOOGLE_CLOUD_STORAGE_BUCKET_NAME + " is blank");
         }
 
         boolean exist = false;
@@ -273,6 +273,7 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
         entity.setDirectory(resourceMetaData.isDirectory());
         entity.setType(resourceMetaData.getResourceType());
         entity.setSize(blob.getSize());
+        entity.setRelativePath(resourceMetaData.getResourceRelativePath());
         entity.setCreateTime(Date.from(blob.getCreateTimeOffsetDateTime().toInstant()));
         entity.setUpdateTime(Date.from(blob.getUpdateTimeOffsetDateTime().toInstant()));
         return entity;

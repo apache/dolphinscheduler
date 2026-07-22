@@ -4,9 +4,9 @@
 
 Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支持两个不同类型的 spark 命令提交任务：
 
-(1) `spark submit` 方式提交任务。更多详情查看 [spark-submit](https://spark.apache.org/docs/3.2.1/submitting-applications.html#launching-applications-with-spark-submit)。
+(1) `spark submit` 方式提交任务。更多详情查看 [spark-submit](https://spark.apache.org/docs/latest/submitting-applications.html#launching-applications-with-spark-submit)。
 
-(2) `spark sql` 方式提交任务。更多详情查看 [spark sql](https://spark.apache.org/docs/3.2.1/sql-ref-syntax.html)。
+(2) `spark sql` 方式提交任务。更多详情查看 [spark sql](https://spark.apache.org/docs/latest/sql-distributed-sql-engine-spark-sql-cli.html)。
 
 ## 创建任务
 
@@ -15,9 +15,6 @@ Spark  任务类型用于执行 Spark 应用。对于 Spark 节点，worker 支�
 - 拖动工具栏的 <img src="../../../../img/tasks/icons/spark.png" width="15"/> 任务节点到画板中。
 
 ## 任务参数
-
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
 
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 - 程序类型：支持 Java、Scala、Python 和 SQL 四种语言。

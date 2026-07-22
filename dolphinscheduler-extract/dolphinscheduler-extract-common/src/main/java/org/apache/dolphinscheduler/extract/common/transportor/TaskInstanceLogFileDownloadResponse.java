@@ -28,4 +28,8 @@ public class TaskInstanceLogFileDownloadResponse {
 
     private byte[] logBytes;
 
+    private LogResponseStatus code = LogResponseStatus.SUCCESS;
+
+    private String message;
+
 }

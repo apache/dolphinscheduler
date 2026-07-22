@@ -28,11 +28,12 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerServerLoadProtection;
-import org.apache.dolphinscheduler.server.worker.runner.WorkerTaskExecutorThreadPool;
+import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskExecutorContainerProvider;
+import org.apache.dolphinscheduler.task.executor.container.ExclusiveThreadTaskExecutorContainer;
+import org.apache.dolphinscheduler.task.executor.container.TaskExecutorContainerConfig;
 
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -42,8 +43,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Lists;
 
 /**
  * worker registry test
@@ -51,28 +52,34 @@ import org.slf4j.LoggerFactory;
 @ExtendWith(MockitoExtension.class)
 public class WorkerRegistryClientTest {
 
-    private static final Logger log = LoggerFactory.getLogger(WorkerRegistryClientTest.class);
     @InjectMocks
     private WorkerRegistryClient workerRegistryClient;
     @Mock
     private RegistryClient registryClient;
     @Mock
+    private WorkerServerLoadProtection workerServerLoadProtection;
+    @Mock
     private WorkerConfig workerConfig;
     @Mock
     private MetricsProvider metricsProvider;
     @Mock
-    private WorkerTaskExecutorThreadPool workerManagerThread;
-    @Mock
-    private WorkerConnectStrategy workerConnectStrategy;
+    private PhysicalTaskExecutorContainerProvider physicalTaskExecutorContainerDelegator;
     @Mock
     private IStoppable stoppable;
 
     @Test
     public void testWorkerRegistryClientbasic() {
 
+        final TaskExecutorContainerConfig containerConfig = TaskExecutorContainerConfig.builder()
+                .taskExecutorThreadPoolSize(10)
+                .containerName("test")
+                .build();
+        final ExclusiveThreadTaskExecutorContainer container =
+                new ExclusiveThreadTaskExecutorContainer(containerConfig);
+        given(physicalTaskExecutorContainerDelegator.getExecutorContainer()).willReturn(container);
+
         given(workerConfig.getWorkerAddress()).willReturn(NetUtils.getAddr(1234));
         given(workerConfig.getMaxHeartbeatInterval()).willReturn(Duration.ofSeconds(1));
-        given(workerConfig.getServerLoadProtection()).willReturn(new WorkerServerLoadProtection());
         given(metricsProvider.getSystemMetrics()).willReturn(new SystemMetrics());
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(RegistryNodeType.class)))
                 .willReturn(true);
@@ -85,8 +92,7 @@ public class WorkerRegistryClientTest {
 
     @Test
     public void testWorkerRegistryClientgetAlertServerAddress() {
-        given(registryClient.getServerList(Mockito.any(RegistryNodeType.class)))
-                .willReturn(new ArrayList<Server>());
+        given(registryClient.getServerList(Mockito.any(RegistryNodeType.class))).willReturn(new ArrayList<>());
         Assertions.assertEquals(workerRegistryClient.getAlertServerAddress(), Optional.empty());
         Mockito.reset(registryClient);
         String host = "test";
@@ -94,8 +100,7 @@ public class WorkerRegistryClientTest {
         Server server = new Server();
         server.setHost(host);
         server.setPort(port);
-        given(registryClient.getServerList(Mockito.any(RegistryNodeType.class)))
-                .willReturn(new ArrayList<Server>(Arrays.asList(server)));
+        given(registryClient.getServerList(Mockito.any(RegistryNodeType.class))).willReturn(Lists.newArrayList(server));
         Assertions.assertEquals(workerRegistryClient.getAlertServerAddress().get().getAddress(),
                 String.format("%s:%d", host, port));
     }

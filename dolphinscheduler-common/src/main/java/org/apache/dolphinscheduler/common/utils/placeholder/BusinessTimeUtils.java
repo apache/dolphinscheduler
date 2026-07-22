@@ -29,9 +29,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * business time utils
- */
 public class BusinessTimeUtils {
 
     private BusinessTimeUtils() {
@@ -59,7 +56,6 @@ public class BusinessTimeUtils {
             case RECOVER_SUSPENDED_PROCESS:
             case START_FAILURE_TASK_PROCESS:
             case REPEAT_RUNNING:
-            case DYNAMIC_GENERATION:
             case SCHEDULER:
             default:
                 businessDate = addDays(new Date(), -1);

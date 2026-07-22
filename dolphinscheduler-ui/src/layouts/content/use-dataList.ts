@@ -26,12 +26,12 @@ import {
   DesktopOutlined,
   SafetyCertificateOutlined,
   UserOutlined,
+  SelectOutlined,
   LogoutOutlined,
   FundProjectionScreenOutlined,
   PartitionOutlined,
   SettingOutlined,
   FileSearchOutlined,
-  RobotOutlined,
   AppstoreOutlined,
   UsergroupAddOutlined,
   UserAddOutlined,
@@ -43,9 +43,6 @@ import {
   KeyOutlined,
   SafetyOutlined,
   GroupOutlined,
-  ContainerOutlined,
-  ApartmentOutlined,
-  BarsOutlined,
   CloudServerOutlined,
   ClusterOutlined
 } from '@vicons/antd'
@@ -157,11 +154,6 @@ export function useDataList() {
             icon: renderIcon(SettingOutlined),
             children: [
               {
-                label: t('menu.task_definition'),
-                key: `/projects/${projectCode}/task/definitions`,
-                payload: { projectName: projectName }
-              },
-              {
                 label: t('menu.task_instance'),
                 key: `/projects/${projectCode}/task/instances`,
                 payload: { projectName: projectName }
@@ -181,21 +173,6 @@ export function useDataList() {
             icon: renderIcon(FileSearchOutlined)
           },
           {
-            label: t('menu.udf_manage'),
-            key: 'udf-manage',
-            icon: renderIcon(RobotOutlined),
-            children: [
-              {
-                label: t('menu.resource_manage'),
-                key: '/resource/resource-manage'
-              },
-              {
-                label: t('menu.function_manage'),
-                key: '/resource/function-manage'
-              }
-            ]
-          },
-          {
             label: t('menu.task_group_manage'),
             key: 'task-group-manage',
             icon: renderIcon(GroupOutlined),
@@ -209,24 +186,6 @@ export function useDataList() {
                 key: '/resource/task-group-queue'
               }
             ]
-          }
-        ]
-      },
-      {
-        label: () =>
-          h(NEllipsis, null, { default: () => t('menu.data_quality') }),
-        key: 'data-quality',
-        icon: renderIcon(ContainerOutlined),
-        children: [
-          {
-            label: t('menu.task_result'),
-            key: '/data-quality/task-result',
-            icon: renderIcon(ApartmentOutlined)
-          },
-          {
-            label: t('menu.rule'),
-            key: '/data-quality/rule',
-            icon: renderIcon(BarsOutlined)
           }
         ]
       },
@@ -375,6 +334,11 @@ export function useDataList() {
         key: 'password',
         icon: renderIcon(KeyOutlined),
         disabled: userStore.getSecurityConfigType !== 'PASSWORD'
+      },
+      {
+        label: t('user_dropdown.about'),
+        key: 'about',
+        icon: renderIcon(SelectOutlined)
       },
       {
         label: t('user_dropdown.logout'),

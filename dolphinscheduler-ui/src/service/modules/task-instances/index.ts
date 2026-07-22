@@ -54,13 +54,3 @@ export function savePoint(projectCode: number, taskId: number): any {
     method: 'post'
   })
 }
-
-export function removeTaskInstanceCache(
-  projectCode: number,
-  taskId: number
-): any {
-  return axios({
-    url: `projects/${projectCode}/task-instances/${taskId}/remove-cache`,
-    method: 'delete'
-  })
-}

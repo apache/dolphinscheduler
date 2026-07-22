@@ -20,18 +20,16 @@ package org.apache.dolphinscheduler.plugin.registry.zookeeper;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
-import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import org.apache.commons.lang3.time.DurationUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.api.ACLProvider;
-import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
@@ -101,13 +99,18 @@ final class ZookeeperRegistry implements Registry {
 
     @Override
     public void start() {
+        final StopWatch stopWatch = StopWatch.createStarted();
         client.start();
         try {
             if (!client.blockUntilConnected(DurationUtils.toMillisInt(properties.getBlockUntilConnected()),
                     MILLISECONDS)) {
                 client.close();
-                throw new RegistryException("zookeeper connect failed in : " + properties.getConnectString() + "ms");
+                throw new RegistryException(
+                        "zookeeper connect failed to: " + properties.getConnectString() + " in : "
+                                + properties.getBlockUntilConnected().toMillis() + "ms");
             }
+            stopWatch.stop();
+            log.info("ZookeeperRegistry started at: {}/ms", stopWatch.getTime());
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RegistryException("Zookeeper registry start failed", e);
@@ -136,20 +139,15 @@ final class ZookeeperRegistry implements Registry {
     }
 
     @Override
-    public void subscribe(String path, SubscribeListener listener) {
+    public void subscribe(final String path, final SubscribeListener listener) {
         final TreeCache treeCache = treeCacheMap.computeIfAbsent(path, $ -> new TreeCache(client, path));
-        treeCache.getListenable().addListener(($, event) -> listener.notify(new EventAdaptor(event, path)));
+        treeCache.getListenable().addListener(new ZookeeperTreeCacheListenerAdapter(path, listener));
         try {
             treeCache.start();
         } catch (Exception e) {
             treeCacheMap.remove(path);
             throw new RegistryException("Failed to subscribe listener for key: " + path, e);
         }
-    }
-
-    @Override
-    public void unsubscribe(String path) {
-        CloseableUtils.closeQuietly(treeCacheMap.get(path));
     }
 
     @Override
@@ -220,12 +218,6 @@ final class ZookeeperRegistry implements Registry {
         try {
             interProcessMutex =
                     Optional.ofNullable(processMutexMap.get(key)).orElse(new InterProcessMutex(client, key));
-            if (interProcessMutex.isAcquiredInThisProcess()) {
-                // Since etcd/jdbc cannot implement a reentrant lock, we need to check if the lock is already acquired
-                // If it is already acquired, return true directly
-                // This means you only need to release once when you acquire multiple times
-                return true;
-            }
             interProcessMutex.acquire();
             processMutexMap.put(key, interProcessMutex);
             return true;
@@ -252,9 +244,6 @@ final class ZookeeperRegistry implements Registry {
         try {
             interProcessMutex =
                     Optional.ofNullable(processMutexMap.get(key)).orElse(new InterProcessMutex(client, key));
-            if (interProcessMutex.isAcquiredInThisProcess()) {
-                return true;
-            }
             if (interProcessMutex.acquire(timeout, MILLISECONDS)) {
                 processMutexMap.put(key, interProcessMutex);
                 return true;
@@ -284,6 +273,9 @@ final class ZookeeperRegistry implements Registry {
         }
         try {
             interProcessMutex.release();
+            if (interProcessMutex.isOwnedByCurrentThread()) {
+                return true;
+            }
             processMutexMap.remove(key);
             if (processMutexMap.isEmpty()) {
                 threadLocalLockMap.remove();
@@ -303,32 +295,5 @@ final class ZookeeperRegistry implements Registry {
     public void close() {
         treeCacheMap.values().forEach(CloseableUtils::closeQuietly);
         CloseableUtils.closeQuietly(client);
-    }
-
-    static final class EventAdaptor extends Event {
-
-        public EventAdaptor(TreeCacheEvent event, String key) {
-            key(key);
-
-            switch (event.getType()) {
-                case NODE_ADDED:
-                    type(Type.ADD);
-                    break;
-                case NODE_UPDATED:
-                    type(Type.UPDATE);
-                    break;
-                case NODE_REMOVED:
-                    type(Type.REMOVE);
-                    break;
-                default:
-                    break;
-            }
-
-            final ChildData data = event.getData();
-            if (data != null) {
-                path(data.getPath());
-                data(new String(data.getData()));
-            }
-        }
     }
 }

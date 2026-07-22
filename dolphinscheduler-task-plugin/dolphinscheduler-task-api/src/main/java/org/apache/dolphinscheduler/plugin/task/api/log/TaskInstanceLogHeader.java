@@ -17,47 +17,31 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.log;
 
-import java.util.List;
-
 import lombok.extern.slf4j.Slf4j;
-
-import com.google.common.collect.Lists;
 
 @Slf4j
 public class TaskInstanceLogHeader {
 
-    private static final List<String> INITIALIZE_TASK_CONTEXT_HEADER = Lists.newArrayList(
-            "\n***********************************************************************************************",
-            "*********************************  Initialize task context  ***********************************",
-            "***********************************************************************************************");
-    private static final List<String> LOAD_TASK_INSTANCE_PLUGIN_HEADER = Lists.newArrayList(
-            "\n***********************************************************************************************",
-            "*********************************  Load task instance plugin  *********************************",
-            "***********************************************************************************************");
+    public static final String DOLPHIN_EMOJI = "\uD83D\uDC2C";
+
+    private static final String INITIALIZE_TASK_CONTEXT_HEADER = DOLPHIN_EMOJI + " Initialize Task Context";
+    private static final String LOAD_TASK_INSTANCE_PLUGIN_HEADER = DOLPHIN_EMOJI + " Load Task Instance Plugin";
+    private static final String EXECUTE_TASK_HEADER = DOLPHIN_EMOJI + " Execute Task Instance";
+    private static final String FINALIZE_TASK_HEADER = DOLPHIN_EMOJI + " Finalize Task Instance";
 
     public static void printInitializeTaskContextHeader() {
-        INITIALIZE_TASK_CONTEXT_HEADER.forEach(log::info);
+        log.info(INITIALIZE_TASK_CONTEXT_HEADER);
     }
 
-    private static final List<String> EXECUTE_TASK_HEADER = Lists.newArrayList(
-            "\n***********************************************************************************************",
-            "*********************************  Execute task instance  *************************************",
-            "***********************************************************************************************");
-
-    private static final List<String> FINALIZE_TASK_HEADER = Lists.newArrayList(
-            "\n***********************************************************************************************",
-            "*********************************  Finalize task instance  ************************************",
-            "***********************************************************************************************");
-
     public static void printLoadTaskInstancePluginHeader() {
-        LOAD_TASK_INSTANCE_PLUGIN_HEADER.forEach(log::info);
+        log.info(LOAD_TASK_INSTANCE_PLUGIN_HEADER);
     }
 
     public static void printExecuteTaskHeader() {
-        EXECUTE_TASK_HEADER.forEach(log::info);
+        log.info(EXECUTE_TASK_HEADER);
     }
 
     public static void printFinalizeTaskHeader() {
-        FINALIZE_TASK_HEADER.forEach(log::info);
+        log.info(FINALIZE_TASK_HEADER);
     }
 }

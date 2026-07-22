@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
@@ -34,7 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -47,38 +49,23 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.base.Strings;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("t_ds_task_definition")
 public class TaskDefinition {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * code
-     */
     private long code;
 
-    /**
-     * name
-     */
     private String name;
 
-    /**
-     * version
-     */
     private int version;
 
-    /**
-     * description
-     */
     private String description;
 
-    /**
-     * project code
-     */
     private long projectCode;
 
     /**
@@ -86,9 +73,6 @@ public class TaskDefinition {
      */
     private int userId;
 
-    /**
-     * task type
-     */
     private String taskType;
 
     /**
@@ -112,59 +96,28 @@ public class TaskDefinition {
 
     /**
      * task is valid: yes/no
+     * // todo: remove the flag field
      */
     private Flag flag;
 
-    /**
-     * task is cache: yes/no
-     */
-    private Flag isCache;
-
-    /**
-     * task priority
-     */
     private Priority taskPriority;
 
-    /**
-     * user name
-     */
     @TableField(exist = false)
     private String userName;
 
-    /**
-     * project name
-     */
     @TableField(exist = false)
     private String projectName;
 
-    /**
-     * worker group
-     */
     private String workerGroup;
 
-    /**
-     * environment code
-     */
     private long environmentCode;
 
-    /**
-     * fail retry times
-     */
     private int failRetryTimes;
 
-    /**
-     * fail retry interval
-     */
     private int failRetryInterval;
 
-    /**
-     * timeout flag
-     */
     private TimeoutFlag timeoutFlag;
 
-    /**
-     * timeout notify strategy
-     */
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     private TaskTimeoutStrategy timeoutNotifyStrategy;
 
@@ -184,14 +137,8 @@ public class TaskDefinition {
     @Deprecated
     private String resourceIds;
 
-    /**
-     * create time
-     */
     private Date createTime;
 
-    /**
-     * update time
-     */
     private Date updateTime;
 
     /**
@@ -200,18 +147,12 @@ public class TaskDefinition {
     @TableField(exist = false)
     private String modifyBy;
 
-    /**
-     * task group id
-     */
     private int taskGroupId;
     /**
-     * task group id
+     * task group priority, todo: we should add this field to task instance when create task instance
      */
     private int taskGroupPriority;
 
-    /**
-     * cpu quota
-     */
     private Integer cpuQuota;
 
     /**
@@ -219,13 +160,7 @@ public class TaskDefinition {
      */
     private Integer memoryMax;
 
-    /**
-     * task execute type
-     */
     private TaskExecuteType taskExecuteType;
-
-    public TaskDefinition() {
-    }
 
     public TaskDefinition(long code, int version) {
         this.code = code;
@@ -260,10 +195,6 @@ public class TaskDefinition {
         return taskParamMap;
     }
 
-    public String getDependence() {
-        return JSONUtils.getNodeString(this.taskParams, Constants.DEPENDENCE);
-    }
-
     public Integer getCpuQuota() {
         return cpuQuota == null ? -1 : cpuQuota;
     }
@@ -287,7 +218,6 @@ public class TaskDefinition {
                 && Objects.equals(taskType, that.taskType)
                 && Objects.equals(taskParams, that.taskParams)
                 && flag == that.flag
-                && isCache == that.isCache
                 && taskPriority == that.taskPriority
                 && Objects.equals(workerGroup, that.workerGroup)
                 && timeoutFlag == that.timeoutFlag

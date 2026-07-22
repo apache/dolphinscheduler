@@ -17,10 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.registry.jdbc;
 
-import static com.google.common.truth.Truth.assertThat;
-
 import org.apache.dolphinscheduler.plugin.registry.RegistryTestCase;
-import org.apache.dolphinscheduler.plugin.registry.jdbc.model.JdbcRegistryLock;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.server.IJdbcRegistryServer;
+import org.apache.dolphinscheduler.registry.api.ConnectionState;
+
+import java.util.concurrent.atomic.AtomicReference;
 
 import lombok.SneakyThrows;
 
@@ -28,32 +29,36 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+
+import com.google.common.truth.Truth;
 
 @SpringBootTest(classes = {JdbcRegistryProperties.class})
 @SpringBootApplication(scanBasePackageClasses = JdbcRegistryProperties.class)
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public abstract class JdbcRegistryTestCase extends RegistryTestCase<JdbcRegistry> {
 
     @Autowired
     private JdbcRegistryProperties jdbcRegistryProperties;
 
     @Autowired
-    private JdbcOperator jdbcOperator;
+    private IJdbcRegistryServer jdbcRegistryServer;
 
-    @Test
     @SneakyThrows
-    public void testTryToAcquireLock_lockIsAlreadyBeenAcquired() {
-        final String lockKey = "testTryToAcquireLock_lockIsAlreadyBeenAcquired";
-        // acquire success
-        JdbcRegistryLock jdbcRegistryLock = jdbcOperator.tryToAcquireLock(lockKey);
-        // acquire failed
-        assertThat(jdbcOperator.tryToAcquireLock(lockKey)).isNull();
-        // release
-        jdbcOperator.releaseLock(jdbcRegistryLock.getId());
+    @Test
+    public void testAddConnectionStateListener() {
+
+        AtomicReference<ConnectionState> connectionState = new AtomicReference<>();
+        registry.addConnectionStateListener(connectionState::set);
+
+        // todo: since the jdbc registry is started at the auto configuration, the stateListener is added after the
+        // registry is started.
+        Truth.assertThat(connectionState.get()).isNull();
     }
 
     @Override
     public JdbcRegistry createRegistry() {
-        return new JdbcRegistry(jdbcRegistryProperties, jdbcOperator);
+        return new JdbcRegistry(jdbcRegistryProperties, jdbcRegistryServer);
     }
 
 }

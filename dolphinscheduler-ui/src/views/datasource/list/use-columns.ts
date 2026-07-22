@@ -41,9 +41,8 @@ export function useColumns(onCallback: Function) {
   const getColumns = (): { columns: TableColumns; tableWidth: number } => {
     const columns = [
       {
-        title: '#',
-        key: 'index',
-        render: (unused, rowIndex) => rowIndex + 1,
+        title: 'id',
+        key: 'id',
         ...COLUMN_WIDTH_CONFIG['index']
       },
       {

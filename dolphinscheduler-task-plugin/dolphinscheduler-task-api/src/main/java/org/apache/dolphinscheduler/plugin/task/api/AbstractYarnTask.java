@@ -17,28 +17,28 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.APPID_COLLECT;
-import static org.apache.dolphinscheduler.common.constants.Constants.DEFAULT_COLLECT_WAY;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.APPID_COLLECT;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DEFAULT_COLLECT_WAY;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import java.util.List;
-import java.util.Map;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractYarnTask extends AbstractRemoteTask {
 
-    private ShellCommandExecutor shellCommandExecutor;
+    private final ShellCommandExecutor shellCommandExecutor;
 
     public AbstractYarnTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskRequest);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskRequest);
     }
 
     // todo split handle to submit and track
@@ -46,7 +46,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         try {
             IShellInterceptorBuilder shellActuatorBuilder = ShellInterceptorBuilderFactory.newBuilder()
-                    .properties(getProperties())
+                    .properties(ParameterUtils.convert(taskRequest.getPrepareParamsMap()))
                     // todo: do we need to move the replace to subclass?
                     .appendScript(getScript().replaceAll("\\r\\n", System.lineSeparator()));
             // SHELL task exit code
@@ -109,9 +109,4 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
      * Get the script used to bootstrap the task
      */
     protected abstract String getScript();
-
-    /**
-     * Get the properties of the task used to replace the placeholders in the script.
-     */
-    protected abstract Map<String, String> getProperties();
 }

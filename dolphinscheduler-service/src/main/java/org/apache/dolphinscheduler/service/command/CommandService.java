@@ -18,13 +18,7 @@
 package org.apache.dolphinscheduler.service.command;
 
 import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstanceMap;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
-/**
- * Command Service
- */
 public interface CommandService {
 
     /**
@@ -50,27 +44,4 @@ public interface CommandService {
      */
     boolean verifyIsNeedCreateCommand(Command command);
 
-    /**
-     * create recovery waiting thread command when thread pool is not enough for the process instance.
-     * sub work process instance need not create recovery command.
-     * create recovery waiting thread  command and delete origin command at the same time.
-     * if the recovery command is exists, only update the field update_time
-     *
-     * @param originCommand   originCommand
-     * @param processInstance processInstance
-     */
-    void createRecoveryWaitingThreadCommand(Command originCommand, ProcessInstance processInstance);
-
-    /**
-     * create sub work process command
-     * @param parentProcessInstance parent process instance
-     * @param childInstance child process instance
-     * @param instanceMap process instance map
-     * @param task task instance
-     * @return command
-     */
-    Command createSubProcessCommand(ProcessInstance parentProcessInstance,
-                                    ProcessInstance childInstance,
-                                    ProcessInstanceMap instanceMap,
-                                    TaskInstance task);
 }

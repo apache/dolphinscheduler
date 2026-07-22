@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -391,14 +392,14 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
         }
 
         // Whether an edge can be successfully added(fromNode -> toNode),need to determine whether the DAG has cycle!
-        int verticesCount = getNodesCount();
+        Set<Node> visited = new HashSet<>();
 
         Queue<Node> queue = new LinkedList<>();
 
         queue.add(toNode);
 
         // if DAG doesn't find fromNode, it's not has cycle!
-        while (!queue.isEmpty() && (--verticesCount > 0)) {
+        while (!queue.isEmpty()) {
             Node key = queue.poll();
 
             for (Node subsequentNode : getSubsequentNodes(key)) {
@@ -406,7 +407,9 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
                     return false;
                 }
 
-                queue.add(subsequentNode);
+                if (visited.add(subsequentNode)) {
+                    queue.add(subsequentNode);
+                }
             }
         }
 
@@ -494,15 +497,6 @@ public class DAG<Node, NodeInfo, EdgeInfo> {
 
         // if notZeroIndegreeNodeMap is empty,there is no ring!
         return new AbstractMap.SimpleEntry<>(notZeroIndegreeNodeMap.size() == 0, topoResultList);
-    }
-
-    /**
-     * Get all the nodes that are in the graph
-     *
-     * @return all nodes in the graph
-     */
-    public Set<Node> getAllNodesList() {
-        return nodesMap.keySet();
     }
 
     @Override

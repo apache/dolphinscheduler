@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.constants.DateConstants;
 
 import java.time.Duration;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.google.common.collect.Sets;
 
@@ -34,77 +35,37 @@ public class TaskConstants {
 
     public static final String FLINK_APPLICATION_REGEX = "JobID \\w+";
 
-    /**
-     * exit code kill
-     */
+    public static final String DATASOURCE_PASSWORD_REGEX =
+            "(?<=((?i)password((\" : \")|(\":\")|(\\\\\":\\\\\")|(=')))).*?(?=((\")|(\\\\\")|(')))";
+
     public static final int EXIT_CODE_KILL = 137;
+    public static final int EXIT_CODE_HARD_KILL = 143;
+    public static final int EXIT_CODE_SIGINT_KILL = 130;
     public static final String PID = "pid";
 
-    /**
-     * QUESTION ?
-     */
     public static final String QUESTION = "?";
 
-    /**
-     * comma ,
-     */
     public static final String COMMA = ",";
 
-    /**
-     * hyphen
-     */
     public static final String HYPHEN = "-";
 
-    /**
-     * slash /
-     */
     public static final String SLASH = "/";
 
-    /**
-     * COLON :
-     */
     public static final String COLON = ":";
 
-    /**
-     * SPACE " "
-     */
     public static final String SPACE = " ";
 
-    /**
-     * SINGLE_SLASH /
-     */
     public static final String SINGLE_SLASH = "/";
 
-    /**
-     * DOUBLE_SLASH //
-     */
     public static final String DOUBLE_SLASH = "//";
 
-    /**
-     * SINGLE_QUOTES "'"
-     */
     public static final String SINGLE_QUOTES = "'";
-    /**
-     * DOUBLE_QUOTES "\""
-     */
     public static final String DOUBLE_QUOTES = "\"";
 
-    /**
-     * SEMICOLON ;
-     */
     public static final String SEMICOLON = ";";
 
-    /**
-     * EQUAL SIGN
-     */
     public static final String EQUAL_SIGN = "=";
-    /**
-     * AT SIGN
-     */
-    public static final String AT_SIGN = "@";
-    /**
-     * UNDERLINE
-     */
+
     public static final String UNDERLINE = "_";
 
     /**
@@ -112,18 +73,9 @@ public class TaskConstants {
      */
     public static final int SLEEP_TIME_MILLIS = 1000;
 
-    /**
-     * exit code failure
-     */
     public static final int EXIT_CODE_FAILURE = -1;
 
-    /**
-     * exit code success
-     */
     public static final int EXIT_CODE_SUCCESS = 0;
-    /**
-     * running code
-     */
     public static final int RUNNING_CODE = 1;
 
     public static final String SH = "sh";
@@ -210,62 +162,23 @@ public class TaskConstants {
      * the name of the project to which current task belongs
      */
     public static final String PARAMETER_PROJECT_NAME = "system.project.name";
-    /**
-     * month_begin
-     */
     public static final String MONTH_BEGIN = "month_begin";
-    /**
-     * add_months
-     */
     public static final String ADD_MONTHS = "add_months";
-    /**
-     * month_end
-     */
     public static final String MONTH_END = "month_end";
-    /**
-     * week_begin
-     */
     public static final String WEEK_BEGIN = "week_begin";
-    /**
-     * week_end
-     */
     public static final String WEEK_END = "week_end";
-    /**
-     * this_day
-     */
     public static final String THIS_DAY = "this_day";
-    /**
-     * last_day
-     */
     public static final String LAST_DAY = "last_day";
 
-    /**
-     * month_first_day
-     */
     public static final String MONTH_FIRST_DAY = "month_first_day";
 
-    /**
-     * month_last_day
-     */
     public static final String MONTH_LAST_DAY = "month_last_day";
 
-    /**
-     * week_first_day
-     */
     public static final String WEEK_FIRST_DAY = "week_first_day";
 
-    /**
-     * week_last_day
-     */
     public static final String WEEK_LAST_DAY = "week_last_day";
 
-    /**
-     * year_week
-     */
     public static final String YEAR_WEEK = "year_week";
-    /**
-     * timestamp
-     */
     public static final String TIMESTAMP = "timestamp";
     public static final char SUBTRACT_CHAR = '-';
     public static final char ADD_CHAR = '+';
@@ -283,19 +196,10 @@ public class TaskConstants {
     public static final String LOCAL_PARAMS_LIST = "localParamsList";
     public static final String TASK_TYPE = "taskType";
     public static final String QUEUE = "queue";
-    /**
-     * default display rows
-     */
     public static final int DEFAULT_DISPLAY_ROWS = 10;
 
-    /**
-     * jar
-     */
     public static final String JAR = "jar";
 
-    /**
-     * hadoop
-     */
     public static final String HADOOP = "hadoop";
 
     /**
@@ -303,64 +207,15 @@ public class TaskConstants {
      */
     public static final String D = "-D";
 
-    /**
-     * datasource encryption salt
-     */
-    public static final String DATASOURCE_ENCRYPTION_SALT_DEFAULT = "!@#$%^&*";
-    public static final String DATASOURCE_ENCRYPTION_ENABLE = "datasource.encryption.enable";
-    public static final String DATASOURCE_ENCRYPTION_SALT = "datasource.encryption.salt";
-
-    /**
-     * kerberos
-     */
-    public static final String KERBEROS = "kerberos";
-
-    /**
-     * kerberos expire time
-     */
-    public static final String KERBEROS_EXPIRE_TIME = "kerberos.expire.time";
-
-    /**
-     * java.security.krb5.conf
-     */
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
 
-    /**
-     * java.security.krb5.conf.path
-     */
     public static final String JAVA_SECURITY_KRB5_CONF_PATH = "java.security.krb5.conf.path";
-
-    /**
-     * loginUserFromKeytab user
-     */
-    public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
-
-    /**
-     * loginUserFromKeytab path
-     */
-    public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
-
-    /**
-     * hadoop.security.authentication
-     */
-    public static final String HADOOP_SECURITY_AUTHENTICATION = "hadoop.security.authentication";
 
     /**
      * hadoop.security.authentication
      */
     public static final String HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE =
             "hadoop.security.authentication.startup.state";
-
-    /**
-     * hdfs/s3 configuration
-     * resource.storage.upload.base.path
-     */
-    public static final String RESOURCE_UPLOAD_PATH = "resource.storage.upload.base.path";
-
-    /**
-     * data.quality.jar.dir
-     */
-    public static final String DATA_QUALITY_JAR_DIR = "data-quality.jar.dir";
 
     public static final String TASK_TYPE_DATA_QUALITY = "DATA_QUALITY";
 
@@ -374,19 +229,6 @@ public class TaskConstants {
     public static final String AZURE_ACCESS_SUB_ID = "resource.azure.subId";
     public static final String AZURE_SECRET_TENANT_ID = "resource.azure.tenant.id";
     public static final String QUERY_INTERVAL = "resource.query.interval";
-
-    /**
-     * alibaba cloud config
-     */
-    public static final String ALIBABA_CLOUD_ACCESS_KEY_ID = "resource.alibaba.cloud.access.key.id";
-    public static final String ALIBABA_CLOUD_ACCESS_KEY_SECRET = "resource.alibaba.cloud.access.key.secret";
-    public static final String ALIBABA_CLOUD_REGION = "resource.alibaba.cloud.region";
-
-    /**
-     * huawei cloud config
-     */
-    public static final String HUAWEI_CLOUD_ACCESS_KEY_ID = "resource.huawei.cloud.access.key.id";
-    public static final String HUAWEI_CLOUD_ACCESS_KEY_SECRET = "resource.huawei.cloud.access.key.secret";
 
     /**
      * use for k8s task
@@ -418,4 +260,28 @@ public class TaskConstants {
     // Loop task constants
     public static final Duration DEFAULT_LOOP_STATUS_INTERVAL = Duration.ofSeconds(5L);
 
+    /**
+     * sql params regex
+     */
+    public static final String GROUP_NAME1 = "paramName1";
+    public static final String GROUP_NAME2 = "paramName2";
+    public static final String SQL_PARAMS_REGEX =
+            String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", GROUP_NAME1, GROUP_NAME2);
+    public static final Pattern SQL_PARAMS_PATTERN = Pattern.compile(SQL_PARAMS_REGEX);
+
+    public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
+
+    public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
+
+    /**
+     * fetch applicationId way
+     */
+    public static final String APPID_COLLECT = "appId.collect";
+    public static final String DEFAULT_COLLECT_WAY = "log";
+
+    public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
+    public static final String TASK_INSTANCE_ID_MDC_KEY = "taskInstanceId";
+
+    public static final String STAR = "*";
+    public static final String SENSITIVE_DATA_MASK = "******";
 }

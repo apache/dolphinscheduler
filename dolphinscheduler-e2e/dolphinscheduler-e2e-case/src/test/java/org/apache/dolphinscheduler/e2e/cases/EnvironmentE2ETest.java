@@ -1,24 +1,21 @@
 /*
- * Licensed to Apache Software Foundation (ASF) under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Apache Software Foundation (ASF) licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.apache.dolphinscheduler.e2e.cases;
-
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,15 +24,17 @@ import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
+@DisableIfTestFails
 class EnvironmentE2ETest {
 
     private static final String environmentName = "test_environment_name";
@@ -55,8 +54,7 @@ class EnvironmentE2ETest {
         new LoginPage(browser)
                 .login("admin", "dolphinscheduler123")
                 .goToNav(SecurityPage.class)
-                .goToTab(EnvironmentPage.class)
-        ;
+                .goToTab(EnvironmentPage.class);
     }
 
     @Test
@@ -80,10 +78,8 @@ class EnvironmentE2ETest {
         final EnvironmentPage page = new EnvironmentPage(browser);
         page.create(environmentName, environmentConfig, environmentDesc, environmentWorkerGroup);
 
-        Awaitility.await().untilAsserted(() ->
-                assertThat(browser.findElement(By.tagName("body")).getText())
-                        .contains("already exists")
-        );
+        Awaitility.await().untilAsserted(() -> assertThat(browser.findElement(By.tagName("body")).getText())
+                .contains("already exists"));
 
         page.createEnvironmentForm().buttonCancel().click();
     }
@@ -92,7 +88,8 @@ class EnvironmentE2ETest {
     @Order(30)
     void testEditEnvironment() {
         final EnvironmentPage page = new EnvironmentPage(browser);
-        page.update(environmentName, editEnvironmentName, editEnvironmentConfig, editEnvironmentDesc, editEnvironmentWorkerGroup);
+        page.update(environmentName, editEnvironmentName, editEnvironmentConfig, editEnvironmentDesc,
+                editEnvironmentWorkerGroup);
 
         Awaitility.await().untilAsserted(() -> {
             browser.navigate().refresh();
@@ -114,12 +111,11 @@ class EnvironmentE2ETest {
             browser.navigate().refresh();
 
             assertThat(
-                    page.environmentList()
-            )
-            .as("Environment list should not contain deleted environment")
-            .noneMatch(
-                    it -> it.getText().contains(environmentName) || it.getText().contains(editEnvironmentName)
-            );
+                    page.environmentList())
+                            .as("Environment list should not contain deleted environment")
+                            .noneMatch(
+                                    it -> it.getText().contains(environmentName)
+                                            || it.getText().contains(editEnvironmentName));
         });
     }
 }

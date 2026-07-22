@@ -24,7 +24,6 @@ public abstract class AbstractServerStatusChangeListener implements ServerStatus
 
     @Override
     public void change(HAServer.ServerStatus originStatus, HAServer.ServerStatus currentStatus) {
-        log.info("The status change from {} to {}.", originStatus, currentStatus);
         if (originStatus == HAServer.ServerStatus.ACTIVE) {
             if (currentStatus == HAServer.ServerStatus.STAND_BY) {
                 changeToStandBy();

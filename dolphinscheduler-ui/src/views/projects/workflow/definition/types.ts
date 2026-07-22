@@ -56,9 +56,9 @@ export interface ICrontabData {
   endTime: string
   environmentCode: number
   failureStrategy: string
-  processDefinitionCode: number
-  processDefinitionName: string
-  processInstancePriority: string
+  workflowDefinitionCode: number
+  workflowDefinitionName: string
+  workflowInstancePriority: string
   projectName: string
   releaseState: 'ONLINE' | 'OFFLINE'
   startTime: string

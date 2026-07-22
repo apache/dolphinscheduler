@@ -38,12 +38,13 @@ class SyncClientMethodInvoker extends AbstractClientMethodInvoker {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         RpcMethod sync = method.getAnnotation(RpcMethod.class);
-        Transporter transporter = new Transporter();
-        transporter.setBody(JsonSerializer.serialize(StandardRpcRequest.of(args)));
-        transporter.setHeader(TransporterHeader.of(methodIdentifier));
+        final Transporter transporter = Transporter.of(
+                TransporterHeader.of(methodIdentifier),
+                JsonSerializer.serialize(StandardRpcRequest.of(args)));
 
-        SyncRequestDto syncRequestDto = SyncRequestDto.builder()
+        final SyncRequestDto syncRequestDto = SyncRequestDto.builder()
                 .timeoutMillis(sync.timeout())
+                .retryStrategy(sync.retry())
                 .transporter(transporter)
                 .serverHost(serverHost)
                 .build();

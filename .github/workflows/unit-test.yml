@@ -18,16 +18,8 @@
 name: Test
 
 on:
+  workflow_dispatch:
   pull_request:
-  push:
-    paths-ignore:
-      - '**/*.md'
-      - 'dolphinscheduler-ui'
-    branches:
-      - dev
-
-env:
-  LOG_DIR: /tmp/dolphinscheduler
 
 concurrency:
   group: unit-test-${{ github.event.pull_request.number || github.ref }}
@@ -40,75 +32,140 @@ jobs:
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
-      - uses: actions/checkout@v2
-      - uses: dorny/paths-filter@b2feaf19c27470162a626bd6fa8438ae5b263721
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+      - uses: ./.github/actions/paths-filter
         id: filter
         with:
           filters: |
             not-ignore:
               - '!(docs/**)'
-  unit-test:
-    name: Unit-Test
-    needs: paths-filter
-    if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
+
+  sanity-check:
+    name: Sanity Check
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        java: ['8', '11']
-    timeout-minutes: 45
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v6
         with:
           submodules: true
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  generate-matrix:
+    name: Generate Module Matrix
+    runs-on: ubuntu-latest
+    needs: paths-filter
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' }}
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Parse modules from pom.xml
+        id: set-matrix
+        run: |
+          MODULES=$(python3 - <<'EOF'
+          import xml.etree.ElementTree as ET, json, re
+
+          tree = ET.parse('pom.xml')
+          ns = {'m': 'http://maven.apache.org/POM/4.0.0'}
+          root = tree.getroot()
+
+          # Support both namespaced and non-namespaced pom.xml
+          modules = root.findall('.//m:modules/m:module', ns)
+          if not modules:
+              modules = root.findall('.//modules/module')
+
+          # Exclude aggregator-only or non-testable modules
+          exclude = re.compile(r'dolphinscheduler-bom|dolphinscheduler-dist|dolphinscheduler-microbench|dolphinscheduler-ui')
+          result = [m.text.strip() for m in modules if m.text and not exclude.search(m.text)]
+          print(json.dumps(result))
+          EOF
+          )
+
+          echo "matrix={\"module\":$MODULES}" >> "$GITHUB_OUTPUT"
+          echo "Discovered modules: $MODULES"
+
+  unit-test:
+    name: Unit-Test (${{ matrix.module }} | Java ${{ matrix.java }})
+    needs: [ paths-filter, generate-matrix, sanity-check ]
+    if: ${{ needs.paths-filter.outputs.not-ignore == 'true' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '8', '11' ]
+        module: ${{ fromJSON(needs.generate-matrix.outputs.matrix).module }}
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - name: Collect Workflow Metrics
+        uses: ./.github/actions/actions-workflow-metrics
+
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
           distribution: 'adopt'
-      - uses: actions/cache@v3
+
+      - uses: actions/cache@v5
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-unit-test
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}-backend
           restore-keys: ${{ runner.os }}-maven-
 
-      - name: Run Unit tests
-        run: ./mvnw clean verify -B -Dmaven.test.skip=false -Dspotless.skip=true -DskipUT=false
-      - name: Upload coverage report to codecov
-        run: CODECOV_TOKEN="09c2663f-b091-4258-8a47-c981827eb29a" bash <(curl -s https://codecov.io/bash)
+      # Install the target module and its upstream dependencies into the local
+      # Maven repository without running tests. Use skipTests instead of
+      # maven.test.skip so packaging still sees provided-scope dependencies and
+      # attaches any test/provided artifacts required by downstream modules.
+      - name: Install Dependencies (${{ matrix.module }})
+        run: |
+          export MAVEN_OPTS="-Xmx14g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
+          ./mvnw install -B \
+            -pl "dolphinscheduler-bom,${{ matrix.module }}" \
+            -am \
+            -DskipTests=true \
+            -Dspotless.skip=true \
+            -DskipUT=true \
+            -Djacoco.skip=true \
+            -Danalyze.skip=true
 
-      # Set up JDK 17 for SonarCloud.
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
+      # Verify only the target module. Do not use -am here, otherwise Maven
+      # will run the verify lifecycle for dependency modules too.
+      - name: Run Unit Tests (${{ matrix.module }})
+        run: |
+          export MAVEN_OPTS="-Xmx14g -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=1024m"
+          ./mvnw verify -B \
+            -pl "${{ matrix.module }}" \
+            -Dmaven.test.skip=false \
+            -Dspotless.skip=true \
+            -DskipUT=false \
+            -Danalyze.skip=true \
+            -Dsurefire.printSummary=true \
+            -Dsurefire.useFile=false \
+            -Dsurefire.reportFormat=plain \
+            -Dsurefire.redirectTestOutputToFile=false
+
+      - name: Upload surefire reports
+        uses: actions/upload-artifact@v6
+        if: always()
         with:
-          java-version: 17
-          distribution: 'adopt'
-      - name: Run SonarCloud Analysis
-        run: >
-          ./mvnw --batch-mode verify sonar:sonar
-          -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
-          -Dmaven.test.skip=true
-          -Dspotless.skip=true
-          -Dsonar.host.url=https://sonarcloud.io
-          -Dsonar.organization=apache
-          -Dsonar.core.codeCoveragePlugin=jacoco
-          -Dsonar.projectKey=apache-dolphinscheduler
-          -Dsonar.login=e4058004bc6be89decf558ac819aa1ecbee57682
-          -Dsonar.exclusions=,dolphinscheduler-ui/src/**/i18n/locale/*.js,dolphinscheduler-microbench/src/**/*
-          -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
-          -DskipUT=true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          name: surefire-java${{ matrix.java }}-${{ matrix.module }}
+          path: '**/target/surefire-reports/'
+          retention-days: 7
 
   result:
     name: Unit Test
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    needs: [ unit-test, paths-filter ]
+    timeout-minutes: 5
+    needs: [ unit-test, paths-filter, sanity-check ]
     if: always()
     steps:
       - name: Status
@@ -116,6 +173,10 @@ jobs:
           if [[ ${{ needs.paths-filter.outputs.not-ignore }} == 'false' && ${{ github.event_name }} == 'pull_request' ]]; then
             echo "Skip Unit Test!"
             exit 0
+          fi
+          if [[ ${{ needs.sanity-check.result }} != 'success' ]]; then
+            echo "Sanity Check Failed!"
+            exit -1
           fi
           if [[ ${{ needs.unit-test.result }} != 'success' ]]; then
             echo "Unit Test Failed!"

@@ -17,18 +17,17 @@
 
 package org.apache.dolphinscheduler.api.enums;
 
-/**
- * execute type
- */
 public enum ExecuteType {
 
     /**
      * operation type
+     * 0 none
      * 1 repeat running
      * 2 resume pause
      * 3 resume failure
      * 4 stop
      * 5 pause
+     * 6 execute task
      */
     NONE(0, "NONE"),
 

@@ -28,9 +28,10 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 
 import java.util.Date;
+import java.util.Objects;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -43,11 +44,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-
-/**
- * alert group controller test
- */
 public class AlertGroupControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AlertGroupController.class);
@@ -55,21 +51,22 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
     private static final String defaultTestAlertGroupName = "cxc test group name";
 
     @Autowired
-    AlertGroupMapper alertGroupMapper;
+    AlertGroupDao alertGroupDao;
 
     private int createEntity() {
         AlertGroup alertGroup = new AlertGroup();
         alertGroup.setGroupName(defaultTestAlertGroupName);
         alertGroup.setCreateTime(new Date());
         alertGroup.setUpdateTime(new Date());
-        alertGroupMapper.insert(alertGroup);
+        alertGroupDao.insert(alertGroup);
         return alertGroup.getId();
     }
 
     @AfterEach
     public void clear() {
-        alertGroupMapper.delete(
-                new QueryWrapper<AlertGroup>().lambda().eq(AlertGroup::getGroupName, defaultTestAlertGroupName));
+        alertGroupDao.queryAllGroupList().stream()
+                .filter(group -> Objects.equals(group.getGroupName(), defaultTestAlertGroupName))
+                .forEach(group -> alertGroupDao.deleteById(group.getId()));
     }
 
     @Test
@@ -215,52 +212,6 @@ public class AlertGroupControllerTest extends AbstractControllerTest {
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void test100DelAlertGroupById() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        MvcResult mvcResult = mockMvc.perform(delete("/alert-groups/2")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.NOT_ALLOW_TO_DELETE_DEFAULT_ALARM_GROUP.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void test110UpdateAlertGroupById() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("groupName", defaultTestAlertGroupName);
-        paramsMap.add("groupType", "email");
-        paramsMap.add("description", "update alter group");
-        paramsMap.add("alertInstanceIds", "");
-        MvcResult mvcResult = mockMvc.perform(put("/alert-groups/2")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.NOT_ALLOW_TO_UPDATE_GLOBAL_ALARM_GROUP.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
-    }
-
-    @Test
-    public void test120QueryNormalAlertGroupList() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        MvcResult mvcResult = mockMvc.perform(get("/alert-groups/normal-list")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
         logger.info(mvcResult.getResponse().getContentAsString());
     }
 }

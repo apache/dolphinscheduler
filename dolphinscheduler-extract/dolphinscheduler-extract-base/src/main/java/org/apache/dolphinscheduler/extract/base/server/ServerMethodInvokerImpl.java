@@ -19,6 +19,9 @@ package org.apache.dolphinscheduler.extract.base.server;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 class ServerMethodInvokerImpl implements ServerMethodInvoker {
 
@@ -28,10 +31,13 @@ class ServerMethodInvokerImpl implements ServerMethodInvoker {
 
     private final String methodIdentify;
 
+    private final List<Class<?>> parameterTypes;
+
     ServerMethodInvokerImpl(Object serviceBean, Method method) {
         this.serviceBean = serviceBean;
         this.method = method;
         this.methodIdentify = method.toGenericString();
+        this.parameterTypes = Lists.newArrayList(method.getParameterTypes());
     }
 
     @Override
@@ -42,6 +48,26 @@ class ServerMethodInvokerImpl implements ServerMethodInvoker {
         } catch (InvocationTargetException ex) {
             throw ex.getTargetException();
         }
+    }
+
+    @Override
+    public boolean isParameterTypeValidated(Class<?>[] argsTypes) {
+        if (argsTypes == null || argsTypes.length == 0) {
+            return parameterTypes.isEmpty();
+        }
+        if (parameterTypes.size() != argsTypes.length) {
+            return false;
+        }
+        for (int i = 0; i < parameterTypes.size(); i++) {
+            Class<?> argType = argsTypes[i];
+            if (argType == null) {
+                continue;
+            }
+            if (!parameterTypes.get(i).isAssignableFrom(argType)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

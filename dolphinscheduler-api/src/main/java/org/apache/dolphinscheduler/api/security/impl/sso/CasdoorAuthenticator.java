@@ -48,7 +48,7 @@ public class CasdoorAuthenticator extends AbstractSsoAuthenticator {
     private String adminUserName;
 
     @Override
-    public User login(@NonNull String state, String code) {
+    public User login(@NonNull String userName, String code) {
         ServletRequestAttributes servletRequestAttributes =
                 (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (servletRequestAttributes == null) {
@@ -59,11 +59,11 @@ public class CasdoorAuthenticator extends AbstractSsoAuthenticator {
         // Invalid state
         request.getSession().setAttribute(Constants.SSO_LOGIN_USER_STATE, null);
         // Check state to protect from CSRF attack
-        if (originalState == null || !MessageDigest.isEqual(originalState.getBytes(), state.getBytes())) {
+        if (originalState == null || !MessageDigest.isEqual(originalState.getBytes(), userName.getBytes())) {
             return null;
         }
 
-        String token = casdoorAuthService.getOAuthToken(code, state);
+        String token = casdoorAuthService.getOAuthToken(code, userName);
         CasdoorUser casdoorUser = casdoorAuthService.parseJwtToken(token);
         User user = null;
         if (casdoorUser.getName() != null) {

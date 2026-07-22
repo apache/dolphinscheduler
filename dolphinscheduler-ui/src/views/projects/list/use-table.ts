@@ -123,14 +123,6 @@ export function useTable() {
         }
       },
       {
-        title: t('project.list.process_instance_running_count'),
-        key: 'instRunningCount',
-        width: 120,
-        ellipsis: {
-          tooltip: true
-        }
-      },
-      {
         title: t('project.list.description'),
         key: 'description',
         ...COLUMN_WIDTH_CONFIG['note']
@@ -190,7 +182,7 @@ export function useTable() {
                           circle: true,
                           type: 'info',
                           size: 'small',
-                          class: 'edit',
+                          class: 'assign-worker-group-btn',
                           onClick: () => {
                             handleAssign(row)
                           }
@@ -255,6 +247,7 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(''),
     totalPage: ref(1),
+    totalCount: ref(0),
     showModalRef: ref(false),
     showWorkerGroupModalRef: ref(false),
     statusRef: ref(0),
@@ -267,6 +260,7 @@ export function useTable() {
     variables.loadingRef = true
     const { state } = useAsyncState(
       queryProjectListPaging(params).then((res: ProjectRes) => {
+        variables.totalCount = res.total
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item, unused) => {
           item.createTime = format(

@@ -27,18 +27,44 @@ then access the `Grafana` by the url: `http://localhost:3001` for dashboards.
 
 ## Configuration
 
-- Please add the following config in master/worker/alert/api's yaml file to enable the metrics exporter.
-
-```yaml
-metrics:
-  enabled: true
-```
-
-- Once the metrics exporter enabled, you could access the metrics by the url `http://ip:port/actuator/prometheus`.
+You could access the metrics by the url `http://ip:port/actuator/prometheus`.
 
 The exporter port is the `server.port` defined in application.yaml, e.g: master: `server.port: 5679`, worker: `server.port: 1235`, alert: `server.port: 50053`, api: `server.port: 12345`.
 
 For example, you can get the master metrics by `curl http://localhost:5679/actuator/prometheus`.
+
+## Endpoint Security Authentication
+
+Spring Boot Actuator provides a series of HTTP endpoints for monitoring and managing applications. By default, these endpoints may be exposed on public or internal networks, posing a risk of information leakage.
+
+Therefore, we strongly recommend enabling endpoint security authentication in production environments. Currently, HTTP Basic Authentication is supported, and you can choose either of the following two configuration methods.
+
+- You can configure it individually in the application.yaml file of each service:
+
+```yaml
+management:
+  security:
+    enabled: true
+    username: username
+    password: password
+    exclude: [health,metrics]
+```
+
+- Alternatively, you can configure it globally via the dolphinscheduler_env.sh file:
+
+```sh
+export MANAGEMENT_SECURITY_ENABLED=true
+export MANAGEMENT_SECURITY_USERNAME=username
+export MANAGEMENT_SECURITY_PASSWORD=password
+export MANAGEMENT_SECURITY_EXCLUDE="health,metrics"
+```
+
+- After enabling security authentication, you could access `prometheus-format` metrics using the following commands:
+
+```sh
+curl -u username:password 'http://localhost:12345/dolphinscheduler/actuator/prometheus'
+curl -H 'Authorization: Basic xxxxx' 'http://localhost:12345/dolphinscheduler/actuator/prometheus' 
+```
 
 ## Naming Convention & Mapping
 

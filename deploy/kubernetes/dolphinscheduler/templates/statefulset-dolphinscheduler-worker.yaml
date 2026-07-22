@@ -23,6 +23,7 @@ metadata:
     {{- include "dolphinscheduler.worker.labels" . | nindent 4 }}
 spec:
   podManagementPolicy: {{ .Values.worker.podManagementPolicy }}
+  updateStrategy: {{- include "dolphinscheduler.tplvalues.render" (dict "value" .Values.worker.updateStrategy "context" $ ) | nindent 4 }}
   replicas: {{ .Values.worker.replicas }}
   selector:
     matchLabels:
@@ -59,6 +60,10 @@ spec:
       imagePullSecrets:
       - name: {{ .Values.image.pullSecret }}
       {{- end }}
+      {{- if .Values.worker.initContainers }}
+      initContainers:
+        {{- toYaml .Values.worker.initContainers | nindent 8 }}
+      {{- end }}
       containers:
         - name: {{ include "dolphinscheduler.fullname" . }}-worker
           image: {{ include "dolphinscheduler.image.fullname.worker" . }}
@@ -82,6 +87,16 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "dolphinscheduler.fullname" . }}-common
+            {{- if .Values.worker.envFromSecret }}
+            - secretRef:
+                name: {{ .Values.worker.envFromSecret }}
+            {{- end }}
+            {{- if .Values.worker.envFromSecrets }}
+            {{- range .Values.worker.envFromSecrets }}
+            - secretRef:
+                name: {{ . }}
+            {{- end }}
+            {{- end }}
           {{- if .Values.worker.resources }}
           resources:
             {{- toYaml .Values.worker.resources | nindent 12 }}
@@ -89,7 +104,31 @@ spec:
           {{- if .Values.worker.livenessProbe.enabled }}
           livenessProbe:
             exec:
-              command: ["curl", "-s", "http://localhost:1235/actuator/health/liveness"]
+              command:
+                - sh
+                - -c
+                - |
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
+                  {{- $excludeStr := .Values.common.configmap.MANAGEMENT_SECURITY_EXCLUDE | default "health,metrics" }}
+                  {{- $rawList := split "," $excludeStr }}
+                  {{- $cleanList := list }}
+                  {{- range $item := $rawList }}
+                    {{- $trimmed := trim $item }}
+                    {{- if $trimmed }}
+                      {{- $cleanList = append $cleanList $trimmed }}
+                    {{- end }}
+                  {{- end }}
+                  {{- $shouldPermitAll := has "health" $cleanList }}
+                  {{- $cmd := "curl -s http://localhost:1235/actuator/health/liveness" }}
+                  {{- if (and $enableSecurity (not $shouldPermitAll)) }}
+                      {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
+                      {{- $password := .Values.common.configmap.MANAGEMENT_SECURITY_PASSWORD }}
+                      {{- $authString := printf "%s:%s" $username $password }}
+                      {{- $base64Auth := b64enc $authString }}
+                      {{- $authHeader := printf "Authorization: Basic %s" $base64Auth }}
+                      {{- $cmd = printf "%s -H '%s'" $cmd $authHeader }}
+                  {{- end }}
+                  {{ $cmd }}
             initialDelaySeconds: {{ .Values.worker.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.worker.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.worker.livenessProbe.timeoutSeconds }}
@@ -99,7 +138,31 @@ spec:
           {{- if .Values.worker.readinessProbe.enabled }}
           readinessProbe:
             exec:
-              command: ["curl", "-s", "http://localhost:1235/actuator/health/readiness"]
+              command:
+                - sh
+                - -c
+                - |
+                  {{- $enableSecurity := .Values.common.configmap.MANAGEMENT_SECURITY_ENABLED | default false }}
+                   {{- $excludeStr := .Values.common.configmap.MANAGEMENT_SECURITY_EXCLUDE | default "health,metrics" }}
+                   {{- $rawList := split "," $excludeStr }}
+                   {{- $cleanList := list }}
+                   {{- range $item := $rawList }}
+                     {{- $trimmed := trim $item }}
+                     {{- if $trimmed }}
+                       {{- $cleanList = append $cleanList $trimmed }}
+                     {{- end }}
+                   {{- end }}
+                   {{- $shouldPermitAll := has "health" $cleanList }}
+                  {{- $cmd := "curl -s http://localhost:1235/actuator/health/readiness" }}
+                  {{- if (and $enableSecurity (not $shouldPermitAll)) }}
+                      {{- $username := .Values.common.configmap.MANAGEMENT_SECURITY_USERNAME }}
+                      {{- $password := .Values.common.configmap.MANAGEMENT_SECURITY_PASSWORD }}
+                      {{- $authString := printf "%s:%s" $username $password }}
+                      {{- $base64Auth := b64enc $authString }}
+                      {{- $authHeader := printf "Authorization: Basic %s" $base64Auth }}
+                      {{- $cmd = printf "%s -H '%s'" $cmd $authHeader }}
+                  {{- end }}
+                  {{ $cmd }}
             initialDelaySeconds: {{ .Values.worker.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.worker.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.worker.readinessProbe.timeoutSeconds }}
@@ -117,11 +180,14 @@ spec:
               subPath: application.yaml
             {{- end }}
             - name: config-volume
-              mountPath: /opt/dolphinscheduler/conf/common.properties
+              mountPath: /opt/dolphinscheduler/worker-server/conf/common.properties
               subPath: common.properties
             {{- include "dolphinscheduler.sharedStorage.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
+            {{- if .Values.worker.extraVolumeMounts }}
+            {{- toYaml .Values.worker.extraVolumeMounts | nindent 12 }}
+            {{- end }}
       volumes:
         {{- if .Values.worker.persistentVolumeClaim.enabled }}
         - name: {{ include "dolphinscheduler.fullname" . }}-worker-data
@@ -155,6 +221,9 @@ spec:
         {{- include "dolphinscheduler.sharedStorage.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.etcd.ssl.volume" . | nindent 8 }}
+        {{- if .Values.worker.extraVolumes }}
+        {{- toYaml .Values.worker.extraVolumes | nindent 8 }}
+        {{- end }}
   {{- if .Values.worker.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     {{- if .Values.worker.persistentVolumeClaim.dataPersistentVolume.enabled }}

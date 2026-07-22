@@ -5,10 +5,10 @@
 Before setting up the DolphinScheduler development environment, please make sure you have installed the software as below:
 
 - [Git](https://git-scm.com/downloads)
-- [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (Currently does not support jdk 11)
+- [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8+
 - [Maven](http://maven.apache.org/download.cgi): v3.5+
-- [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler version is lower than 3.0, please install node v12.20+)
-- [Pnpm](https://pnpm.io/installation): v6.x
+- [Node](https://nodejs.org/en/download): v16.0+
+- [Pnpm](https://pnpm.io/installation): v7.0+ (Make sure pnpm is compatible with Node.js, see also: [Compatibility](https://pnpm.io/installation#compatibility))
 
 ### Clone Git Repository
 
@@ -27,13 +27,13 @@ Supporting system:
 - MacOS
 - Liunx
 
-Run `mvn clean install -Prelease -Dmaven.test.skip=true`
+Run `./mvnw clean install -Prelease -Dmaven.test.skip=true`
 
-### Code Style
+### Backend Code Style
 
-DolphinScheduler uses `Spotless` for code style and formatting checks.
+DolphinScheduler uses `Spotless` for backend code style and formatting checks.
 You could run the following command and `Spotless` will automatically fix
-the code style and formatting errors for you:
+the backend code style and formatting errors for you:
 
 ```shell
 ./mvnw spotless:apply
@@ -54,20 +54,58 @@ pre-commit install
 
 Now, every time you commit your code, `pre-commit` will automatically run `Spotless` to check the code style and formatting.
 
+### Frontend Code Style
+
+DolphinScheduler uses `pnpm` to check and automatically fix frontend code style and formatting issues.
+First, navigate to the frontend project directory:
+
+```shell
+cd dolphinscheduler-ui
+```
+
+Then, run the following commands to automatically fix ESLint-fixable issues and format the code:
+
+```shell
+pnpm run lint      # Fix ESLint issues
+pnpm run prettier  # Format code
+```
+
+Finally, you can run the following command to perform a full TypeScript type check and catch type-related errors early:
+
+```shell
+pnpm exec vue-tsc --noEmit  # Type check
+```
+
+### Helm Template Guidelines
+
+After modifying files related to Helm templates, you can use the following command to debug the Helm templates:
+
+```shell
+helm template ./deploy/kubernetes/dolphinscheduler --debug 
+```
+
+Once the Helm templates are debugged and verified, use the following command to automatically update the README.md file (manually updating may likely result in incorrect formatting):
+
+```shell
+./mvnw validate -P helm-doc -pl :dolphinscheduler
+```
+
 ## Docker image build
 
 DolphinScheduler will release new Docker images after it released, you could find them in [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler).
 
 - If you want to modify DolphinScheduler source code, and build Docker images locally, you can run when finished the modification
 
+> -Pstaging contains plugins, suitable for development and testing as well as offline deployment without a network environment
+> -Prelease does not contain plugins, suitable for production environments, and plugins can be downloaded on demand from a network that can access plugins
+
 ```shell
 cd dolphinscheduler
 ./mvnw -B clean package \
        -Dmaven.test.skip \
-       -Dmaven.javadoc.skip \
        -Dspotless.skip = true \
        -Ddocker.tag=<TAG> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 When the command is finished you could find them by command `docker images`.
@@ -78,12 +116,10 @@ When the command is finished you could find them by command `docker images`.
 cd dolphinscheduler
 ./mvnw -B clean deploy \
        -Dmaven.test.skip \
-       -Dmaven.javadoc.skip \
        -Dspotless.skip = true \
-       -Dmaven.deploy.skip \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 - If you want to modify DolphinScheduler source code, and also want to add customize dependencies of Docker image, you can modify the definition of Dockerfile after modifying the source code. You can run the following command to find all Dockerfile files.
@@ -131,13 +167,23 @@ Use different Git branch to develop different codes
 
 ### Start backend server
 
-Find the class `org.apache.dolphinscheduler.StandaloneServer` in Intellij IDEA and clikc run main function to startup.
+Find the class `org.apache.dolphinscheduler.StandaloneServer` in IntelliJ IDEA and click run main function to startup.
+
+> Note: Please check the option `Add dependencies with "provided" scope to classpath` in the startup configuration before starting, so as to avoid the problem that no dependencies can be found during startup.
 
 ### Start frontend server
 
 Install frontend dependencies and run it.
 
-> Note: You can see more detail about the frontend setting in [frontend development](./frontend-development.md).
+> Note: You can see more detail about the frontend setting in [frontend development](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-ui/README.md).
+
+If you have not yet installed `pnpm`, you can install it using the following command before running the front-end component:
+
+```shell
+npm install -g pnpm
+```
+
+After ensuring that `pnpm` has been installed, run the following command:
 
 ```shell
 cd dolphinscheduler-ui
@@ -177,14 +223,14 @@ Following steps will guide how to start the DolphinScheduler backend service
 
 ##### Backend Start Prepare
 
-- Open project: Use IDE open the project, here we use Intellij IDEA as an example, after opening it will take a while for Intellij IDEA to complete the dependent download
+- Open project: Use IDE open the project, here we use IntelliJ IDEA as an example, after opening it will take a while for IntelliJ IDEA to complete the dependent download
 
 - File change
 
-  - If you use MySQL as your metadata database, you need to modify `dolphinscheduler/pom.xml` and change the `scope` of the `mysql-connector-java` dependency to `compile`. This step is not necessary to use PostgreSQL
+  - If you use MySQL as your metadata database, you need to modify `dolphinscheduler-bom/pom.xml` and change the `scope` of the `mysql-connector-j` dependency to `compile`. This step is not necessary to use PostgreSQL
   - Modify database configuration, modify the database configuration in the `dolphinscheduler-master/src/main/resources/application.yaml`
-  - Modify database configuration, modify the database configuration in the `dolphinscheduler-worker/src/main/resources/application.yaml`
   - Modify database configuration, modify the database configuration in the `dolphinscheduler-api/src/main/resources/application.yaml`
+  - Modify database configuration, modify the database configuration in the `dolphinscheduler-alert/dolphinscheduler-alert-server/src/main/resources/application.yaml`
 
 We here use MySQL with database, username, password named dolphinscheduler as an example
 
@@ -197,30 +243,14 @@ spring:
     password: dolphinscheduler
 ```
 
-- Log level: add a line `<appender-ref ref="STDOUT"/>` to the following configuration to enable the log to be displayed on the command line
-
-  `dolphinscheduler-master/src/main/resources/logback-spring.xml`
-  `dolphinscheduler-worker/src/main/resources/logback-spring.xml`
-  `dolphinscheduler-api/src/main/resources/logback-spring.xml`
-
-  here we add the result after modify as below:
-
-  ```diff
-  <root level="INFO">
-  +  <appender-ref ref="STDOUT"/>
-    <appender-ref ref="APILOGFILE"/>
-  </root>
-  ```
-
-> **_Note:_** Only DolphinScheduler 2.0 and later versions need to inatall plugin before start server. It not need before version 2.0.
-
 ##### Server start
 
 There are three services that need to be started, including MasterServer, WorkerServer, ApiApplicationServer.
 
-- MasterServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.master.MasterServer` by Intellij IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-- WorkerServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.worker.WorkerServer` by Intellij IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-- ApiApplicationServer：Execute function `main` in the class `org.apache.dolphinscheduler.api.ApiApplicationServer` by Intellij IDEA, with the configuration _VM Options_ `-Dlogging.config=classpath:logback-spring.xml -Dspring.profiles.active=api,mysql`. After it started, you could find Open API documentation in http://localhost:12345/dolphinscheduler/swagger-ui/index.html
+- MasterServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.master.MasterServer` by IntelliJ IDEA, with the configuration _VM Options_ `-DDOCKER=true -Dspring.profiles.active=mysql`
+- WorkerServer：Execute function `main` in the class `org.apache.dolphinscheduler.server.worker.WorkerServer` by IntelliJ IDEA, with the configuration _VM Options_ `-DDOCKER=true`
+- AlertServer：Execute function `main` in the class `org.apache.dolphinscheduler.alert.AlertServer` by IntelliJ IDEA, with the configuration _VM Options_ `-DDOCKER=true -Dspring.profiles.active=mysql`
+- ApiApplicationServer：Execute function `main` in the class `org.apache.dolphinscheduler.api.ApiApplicationServer` by IntelliJ IDEA, with the configuration _VM Options_ `-DDOCKER=true -Dspring.profiles.active=mysql`. After it started, you could find Open API documentation in http://localhost:12345/dolphinscheduler/swagger-ui/index.html
 
 > The `mysql` in the VM Options `-Dspring.profiles.active=mysql` means specified configuration file
 

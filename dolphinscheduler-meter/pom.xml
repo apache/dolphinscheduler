@@ -45,7 +45,7 @@
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-common</artifactId>
-            <version>dev-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>

@@ -32,16 +32,16 @@ import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
@@ -80,22 +81,19 @@ public class TenantServiceTest {
     private QueueService queueService;
 
     @Mock
-    private TenantMapper tenantMapper;
+    private TenantDao tenantDao;
 
     @Mock
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Mock
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Mock
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
-
-    @Mock
-    private StorageOperator storageOperator;
 
     private static final String tenantCode = "hayden";
     private static final String tenantDesc = "This is the tenant desc";
@@ -106,7 +104,7 @@ public class TenantServiceTest {
     public void testCreateTenant() {
 
         User loginUser = getLoginUser();
-        when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
+        when(tenantDao.existTenant(tenantCode)).thenReturn(true);
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, loginUser.getId(),
                 TENANT_CREATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
@@ -136,7 +134,7 @@ public class TenantServiceTest {
 
     @Test
     public void testCreateTenantError() {
-        when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
+        when(tenantDao.existTenant(tenantCode)).thenReturn(true);
 
         // tenantCode exist
         assertThrowsServiceException(Status.OS_TENANT_CODE_EXIST,
@@ -156,7 +154,7 @@ public class TenantServiceTest {
         ids.add(1);
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT,
                 getLoginUser().getId(), tenantServiceImplLogger)).thenReturn(ids);
-        when(tenantMapper.queryTenantPaging(any(Page.class), Mockito.anyList(), Mockito.eq(tenantDesc)))
+        when(tenantDao.queryTenantPaging(any(Page.class), Mockito.anyList(), Mockito.eq(tenantDesc)))
                 .thenReturn(page);
         PageInfo<Tenant> pageInfo = tenantService.queryTenantList(getLoginUser(), tenantDesc, 1, 10);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
@@ -165,12 +163,12 @@ public class TenantServiceTest {
 
     @Test
     public void testUpdateTenant() {
-        when(tenantMapper.queryById(1)).thenReturn(getTenant());
+        when(tenantDao.queryDetailById(1)).thenReturn(getTenant());
         when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TENANT, getLoginUser().getId(),
                 TENANT_UPDATE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);
-        when(tenantMapper.updateById(any())).thenReturn(1);
+        when(tenantDao.updateById(any())).thenReturn(true);
 
         // update not exists tenant
         assertThrowsServiceException(Status.TENANT_NOT_EXIST,
@@ -189,12 +187,12 @@ public class TenantServiceTest {
                 getLoginUser().getId(), TENANT_DELETE, baseServiceLogger)).thenReturn(true);
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.TENANT, null, 0,
                 baseServiceLogger)).thenReturn(true);
-        when(tenantMapper.queryById(1)).thenReturn(getTenant());
-        when(processInstanceMapper.queryByTenantCodeAndStatus(tenantCode,
-                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES))
+        when(tenantDao.queryDetailById(1)).thenReturn(getTenant());
+        when(workflowInstanceDao.queryByTenantCodeAndStatus(tenantCode,
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES))
                         .thenReturn(getInstanceList());
-        when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(getScheduleList());
-        when(userMapper.queryUserListByTenant(3)).thenReturn(getUserList());
+        when(scheduleDao.queryScheduleListByTenant(tenantCode)).thenReturn(getScheduleList());
+        when(userDao.queryUserListByTenant(3)).thenReturn(getUserList());
 
         // TENANT_NOT_EXIST
         assertThrowsServiceException(Status.TENANT_NOT_EXIST, () -> tenantService.deleteTenantById(getLoginUser(), 12));
@@ -204,26 +202,26 @@ public class TenantServiceTest {
                 () -> tenantService.deleteTenantById(getLoginUser(), 1));
 
         // DELETE_TENANT_BY_ID_FAIL_DEFINES
-        when(processInstanceMapper.queryByTenantCodeAndStatus(any(), any())).thenReturn(Collections.emptyList());
-        when(tenantMapper.queryById(2)).thenReturn(getTenant(2));
+        when(workflowInstanceDao.queryByTenantCodeAndStatus(any(), any())).thenReturn(Collections.emptyList());
+        when(tenantDao.queryDetailById(2)).thenReturn(getTenant(2));
         assertThrowsServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES,
                 () -> tenantService.deleteTenantById(getLoginUser(), 2));
 
         // DELETE_TENANT_BY_ID_FAIL_USERS
-        when(tenantMapper.queryById(3)).thenReturn(getTenant(3));
-        when(scheduleMapper.queryScheduleListByTenant(tenantCode)).thenReturn(Collections.emptyList());
+        when(tenantDao.queryDetailById(3)).thenReturn(getTenant(3));
+        when(scheduleDao.queryScheduleListByTenant(tenantCode)).thenReturn(Collections.emptyList());
         assertThrowsServiceException(Status.DELETE_TENANT_BY_ID_FAIL_USERS,
                 () -> tenantService.deleteTenantById(getLoginUser(), 3));
 
         // success
-        when(tenantMapper.queryById(4)).thenReturn(getTenant(4));
-        when(tenantMapper.deleteById(4)).thenReturn(1);
+        when(tenantDao.queryDetailById(4)).thenReturn(getTenant(4));
+        when(tenantDao.deleteById(4)).thenReturn(true);
         assertDoesNotThrow(() -> tenantService.deleteTenantById(getLoginUser(), 4));
     }
 
     @Test
     public void testVerifyTenantCode() {
-        when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
+        when(tenantDao.existTenant(tenantCode)).thenReturn(true);
         // tenantCode exist
         assertThrowsServiceException(Status.OS_TENANT_CODE_EXIST,
                 () -> tenantService.verifyTenantCode(getTenant().getTenantCode()));
@@ -236,13 +234,13 @@ public class TenantServiceTest {
         Tenant tenant;
 
         // Tenant exists
-        when(tenantMapper.existTenant(tenantCode)).thenReturn(true);
-        when(tenantMapper.queryByTenantCode(tenantCode)).thenReturn(getTenant());
+        when(tenantDao.existTenant(tenantCode)).thenReturn(true);
+        when(tenantDao.queryByCode(tenantCode)).thenReturn(Optional.of(getTenant()));
         tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName);
         Assertions.assertEquals(getTenant(), tenant);
 
         // Tenant not exists
-        when(tenantMapper.existTenant(tenantCode)).thenReturn(false);
+        when(tenantDao.existTenant(tenantCode)).thenReturn(false);
         when(queueService.createQueueIfNotExists(queue, queueName)).thenReturn(getQueue());
         tenant = tenantService.createTenantIfNotExists(tenantCode, tenantDesc, queue, queueName);
         Assertions.assertEquals(tenantCode, tenant.getTenantCode());
@@ -291,11 +289,11 @@ public class TenantServiceTest {
         return userList;
     }
 
-    private List<ProcessInstance> getInstanceList() {
-        List<ProcessInstance> processInstances = new ArrayList<>();
-        ProcessInstance processInstance = new ProcessInstance();
-        processInstances.add(processInstance);
-        return processInstances;
+    private List<WorkflowInstance> getInstanceList() {
+        List<WorkflowInstance> workflowInstances = new ArrayList<>();
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstances.add(workflowInstance);
+        return workflowInstances;
     }
 
     private List<Schedule> getScheduleList() {

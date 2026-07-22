@@ -48,12 +48,7 @@ export function useLinkis({
     timeout: 30,
     timeoutNotifyStrategy: ['WARN'],
     useCustom: false,
-    paramScript: [
-      {
-        prop: '',
-        value: ''
-      }
-    ],
+    paramScript: [],
     rawScript: ''
   } as INodeData)
 
@@ -62,7 +57,6 @@ export function useLinkis({
       Fields.useName(from),
       ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
-      Fields.useCache(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),

@@ -27,14 +27,12 @@
         <version>dev-SNAPSHOT</version>
     </parent>
 
-    <groupId>org.apache.dolphinscheduler</groupId>
     <artifactId>dolphinscheduler-extract-common</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-extract-base</artifactId>
-            <version>${project.version}</version>
         </dependency>
     </dependencies>
 

@@ -29,6 +29,7 @@
 
     <modules>
         <module>dolphinscheduler-aws-authentication</module>
+        <module>dolphinscheduler-actuator-authentication</module>
     </modules>
 
     <dependencyManagement>
@@ -42,5 +43,4 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
 </project>

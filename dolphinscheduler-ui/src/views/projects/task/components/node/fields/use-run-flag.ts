@@ -34,7 +34,6 @@ export function useRunFlag(): IJsonItem {
     type: 'radio',
     field: 'flag',
     name: t('project.node.run_flag'),
-    options: options,
-    span: 12
+    options: options
   }
 }

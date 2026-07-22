@@ -30,19 +30,16 @@ import javax.management.timer.Timer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class DateUtilsTest {
 
-    @BeforeEach
-    public void before() {
-        ThreadLocalContext.getTimezoneThreadLocal().remove();
-    }
+    private final TimeZone defaultTimeZone = TimeZone.getDefault();
 
     @AfterEach
-    public void after() {
-        ThreadLocalContext.getTimezoneThreadLocal().remove();
+    public void rollbackTimeZone() {
+        TimeZone.setDefault(defaultTimeZone);
+        ThreadLocalContext.removeTimezone();
     }
 
     @Test
@@ -242,11 +239,11 @@ public class DateUtilsTest {
     public void testTimezone() {
 
         String time = "2019-01-28 00:00:00";
-        ThreadLocalContext.timezoneThreadLocal.set("UTC");
+        ThreadLocalContext.setTimezone("UTC");
         Date utcDate = DateUtils.stringToDate(time);
         Assertions.assertEquals(time, DateUtils.dateToString(utcDate));
 
-        ThreadLocalContext.timezoneThreadLocal.set("Asia/Shanghai");
+        ThreadLocalContext.setTimezone("Asia/Shanghai");
         Date shanghaiDate = DateUtils.stringToDate(time);
         Assertions.assertEquals(time, DateUtils.dateToString(shanghaiDate));
 

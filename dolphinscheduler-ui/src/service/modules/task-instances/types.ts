@@ -29,9 +29,9 @@ interface TaskListReq {
   endDate?: string
   executorName?: string
   host?: string
-  processInstanceId?: number
-  processInstanceName?: string
-  processDefinitionName?: string
+  workflowInstanceId?: number
+  workflowInstanceName?: string
+  workflowDefinitionName?: string
   searchVal?: string
   startDate?: string
   stateType?: string
@@ -59,7 +59,7 @@ interface TotalList {
   taskComplete: boolean
   firstRun: boolean
   environmentCode: number
-  processInstance?: any
+  workflowInstance?: any
   pid: number
   appLink: string
   taskCode: any
@@ -69,8 +69,8 @@ interface TotalList {
   state: string
   workerGroup: string
   conditionsTask: boolean
-  processInstancePriority?: any
-  processInstanceId: number
+  workflowInstancePriority?: any
+  workflowInstanceId: number
   dependency: Dependency
   alertFlag: string
   dependentResult?: any
@@ -78,19 +78,19 @@ interface TotalList {
   switchDependency: SwitchDependency
   maxRetryTimes: number
   executorName: string
-  subProcess: boolean
+  subWorkflow: boolean
   submitTime: string
   taskGroupId: number
   name: string
   taskDefinitionVersion: number
-  processInstanceName: string
+  workflowInstanceName: string
   taskGroupPriority: number
   taskDefine?: any
   dryRun: number
   flag: string
   taskParams: string
   duration: string
-  processDefine?: any
+  workflowDefinition?: any
   taskType: string
   taskInstancePriority: string
   logPath: string

@@ -19,12 +19,11 @@ package org.apache.dolphinscheduler.plugin.task.seatunnel.flink;
 
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelParameters;
 
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class SeatunnelFlinkParameters extends SeatunnelParameters {
 

@@ -25,7 +25,6 @@ import java.util.List;
 public interface StorageOperator {
 
     String FILE_FOLDER_NAME = "resources";
-    String UDF_FOLDER_NAME = "udfs";
 
     ResourceMetadata getResourceMetaData(String resourceAbsolutePath);
 

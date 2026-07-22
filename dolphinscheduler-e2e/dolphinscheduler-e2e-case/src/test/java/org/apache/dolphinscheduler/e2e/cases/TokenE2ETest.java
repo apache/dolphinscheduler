@@ -1,20 +1,18 @@
 /*
- * Licensed to Apache Software Foundation (ASF) under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Apache Software Foundation (ASF) licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.apache.dolphinscheduler.e2e.cases;
@@ -26,14 +24,16 @@ import org.apache.dolphinscheduler.e2e.pages.LoginPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TokenPage;
 
-import org.testcontainers.shaded.org.awaitility.Awaitility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junitpioneer.jupiter.DisableIfTestFails;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @DolphinScheduler(composeFiles = "docker/basic/docker-compose.yaml")
+@DisableIfTestFails
 public class TokenE2ETest {
 
     private static final String userName = "admin";
@@ -43,10 +43,9 @@ public class TokenE2ETest {
     @BeforeAll
     public static void setup() {
         new LoginPage(browser)
-            .login("admin", "dolphinscheduler123")
-            .goToNav(SecurityPage.class)
-            .goToTab(TokenPage.class)
-        ;
+                .login("admin", "dolphinscheduler123")
+                .goToNav(SecurityPage.class)
+                .goToTab(TokenPage.class);
     }
 
     @Test
@@ -59,9 +58,9 @@ public class TokenE2ETest {
             browser.navigate().refresh();
 
             assertThat(page.tokenList())
-                .as("Token list should contain newly-created token")
-                .extracting(WebElement::getText)
-                .anyMatch(it -> it.contains(userName));
+                    .as("Token list should contain newly-created token")
+                    .extracting(WebElement::getText)
+                    .anyMatch(it -> it.contains(userName));
         });
     }
 
@@ -76,9 +75,9 @@ public class TokenE2ETest {
             browser.navigate().refresh();
 
             assertThat(page.tokenList())
-                .as("Token list should contain newly-modified token")
-                .extracting(WebElement::getText)
-                .isNotEqualTo(oldToken);
+                    .as("Token list should contain newly-modified token")
+                    .extracting(WebElement::getText)
+                    .isNotEqualTo(oldToken);
         });
     }
 
@@ -92,7 +91,7 @@ public class TokenE2ETest {
             browser.navigate().refresh();
 
             assertThat(page.tokenList())
-                .noneMatch(it -> it.getText().contains(userName));
+                    .noneMatch(it -> it.getText().contains(userName));
         });
     }
 

@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.spi.params.base;
 
+import lombok.Data;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
@@ -25,6 +27,7 @@ import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
  * form validate
  */
 @JsonDeserialize(builder = Validate.Builder.class)
+@Data
 public class Validate {
 
     @JsonProperty("required")
@@ -62,7 +65,7 @@ public class Validate {
         return new Builder();
     }
 
-    @JsonPOJOBuilder(buildMethodName = "build", withPrefix = "set")
+    @JsonPOJOBuilder(withPrefix = "set")
     public static class Builder {
 
         private boolean required = false;
@@ -110,29 +113,5 @@ public class Validate {
         public Validate build() {
             return new Validate(this);
         }
-    }
-
-    public boolean isRequired() {
-        return required;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getTrigger() {
-        return trigger;
-    }
-
-    public Double getMin() {
-        return min;
-    }
-
-    public Double getMax() {
-        return max;
     }
 }

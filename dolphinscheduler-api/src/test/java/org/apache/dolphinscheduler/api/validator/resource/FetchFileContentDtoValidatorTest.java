@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.api.validator.resource;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowServiceException;
@@ -77,6 +78,19 @@ class FetchFileContentDtoValidatorTest {
                 "Internal Server Error: skipLineNum must be greater than or equal to 0",
                 () -> fetchFileContentDtoValidator.validate(fetchFileContentDto));
 
+    }
+
+    @Test
+    void testValidate_limitInvalid() {
+        FetchFileContentDto fetchFileContentDto = FetchFileContentDto.builder()
+                .loginUser(loginUser)
+                .resourceFileAbsolutePath("/tmp")
+                .skipLineNum(0)
+                .limit(0)
+                .build();
+        assertThrowServiceException(
+                "Internal Server Error: limit must be -1 or greater than 0",
+                () -> fetchFileContentDtoValidator.validate(fetchFileContentDto));
     }
 
     @Test

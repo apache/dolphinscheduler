@@ -1,92 +1,91 @@
 # Commit Message 须知
 
-### 前言
+一个好的 commit message 应当一眼说清**改了什么、为什么改**。完整的来龙去脉留给关联的 Issue / Pull Request —— commit message 本身保持精炼。
 
-一个好的 commit message 是能够帮助其他的开发者（或者未来的开发者）快速理解相关变更的上下文，同时也可以帮助项目管理人员确定该提交是否适合包含在发行版中。但当我们在查看了很多开源项目的 commit log 后，发现一个有趣的问题，一部分开发者，代码质量很不错，但是 commit message 记录却比较混乱，当其他贡献者或者学习者在查看代码的时候，并不能通过 commit log 很直观的了解
-该提交前后变更的目的，正如 Peter Hutterer 所言：Re-establishing the context of a piece of code is wasteful. We can’t avoid it completely, so our efforts should go to reducing it as much as possible. Commit messages can do exactly that and as a result, a commit message shows whether a developer is a good collaborator. 因此，DolphinScheduler 结合其他社区以及 Apache 官方文档制定了该规约。
+## 格式
 
-### Commit Message RIP
+```
+[Type-ISSUE_ID][Scope] Subject
 
-#### 1：明确修改内容
+(可选 body —— 用要点列出主要改动)
 
-commit message 应该明确说明该提交解决了哪些问题（bug 修复、功能增强等），以便于用户开发者更好的跟踪问题，明确版本迭代过程中的优化情况。
+(可选 footer —— BREAKING CHANGE / Closes #xxx)
+```
 
-#### 2：关联相应的Pull Request 或者Issue
+Header 必填，body 和 footer 可选。Subject 建议控制在 72 字符内，避免在 GitHub 上被截断。
 
-当我们的改动较大的时候，commit message 最好能够关联 GitHub 上的相关 Issue 或者 Pull Request，这样，我们的开发者在查阅代码的时候能够通过关联信息较为迅速的了解改代码提交的上下文情景，如果当前 commit 针对某个 issue，那么可以在 Footer 部分关闭这个 issue。
+### Type（必填）
 
-#### 3：统一的格式
+|     Type      |                                        使用场景                                         |  是否必须带 Issue ID  |
+|---------------|-------------------------------------------------------------------------------------|------------------|
+| `Feature`     | 用户可见的新功能                                                                            | 是                |
+| `Improvement` | 已有功能的增强（重构、性能、体验优化）                                                                 | 是                |
+| `Fix`         | Bug 修复                                                                              | 是                |
+| `Doc`         | 仅文档变动                                                                               | 是                |
+| `DSIP`        | 实现某个 [DSIP](https://github.com/apache/dolphinscheduler/issues?q=label%3ADSIP) 提案的变更 | 是（对应 DSIP issue） |
+| `Chore`       | 构建、CI、测试脚手架、依赖升级、零碎清理                                                               | 否                |
 
-格式化后的 CommitMessage 能够帮助我们提供更多的历史信息，方便快速浏览，同时也可以直接从 commit 生成 Change Log。
+除 `Chore` 外的所有 type **都必须带上 Issue ID**。如果没有现成 Issue，请先创建一个；否则把它归类为 `Chore`。
 
-Commit message 应该包括三个部分：Header，Body 和 Footer。其中，Header 是必需的，Body 和 Footer 可以省略。
+### Scope（可选）
 
-##### header
+变更涉及的模块名：`Master`、`Worker`、`API`、`UI`、`TaskPlugin`、`Dao` 等。请使用真实存在的模块名。当变更确实横跨多个模块（多数 `Chore` commit 属于此类）时可以省略 `[Scope]`。
 
-Header 部分只有一行，包括三个字段：type（必需）、scope（可选）和 subject（必需）。
+### Subject（必填）
 
-[DS-ISSUE编号][type] subject
+一句简短的祈使句，描述本次改动。
 
-(1) type 用于说明 commit 的类别，只允许使用下面7个标识。
+- 使用祈使语气：*Add*、*Fix*、*Remove*，不要用 *Added* / *Adds*。
+- 说**目的**，不要说实现细节 —— *如何改*已经体现在 diff 中。
+- 句末不加句号。
 
-* feat：新功能（feature）
-* fix：修补bug
-* docs：文档（documentation）
-* style： 格式（不影响代码运行的变动）
-* refactor：重构（即不是新增功能，也不是修改bug的代码变动）
-* test：增加测试
-* chore：构建过程或辅助工具的变动
+### Body（可选，非平凡改动建议写）
 
-如果 type 为 feat 和 fix，则该 commit 将肯定出现在 Change log 之中。其他情况（docs、chore、style、refactor、test）建议不放入。
+当 Subject 无法自解释时，用要点列出主要改动。保持紧凑，一行一个改动点。详细的设计动机、权衡考量、测试方案应当写在 **Pull Request 描述**里（见 [PULL_REQUEST_TEMPLATE.md](https://github.com/apache/dolphinscheduler/blob/dev/.github/PULL_REQUEST_TEMPLATE.md)），而不是塞进 commit message。
 
-(2）scope
+### Footer（可选）
 
-scope 用于说明 commit 影响的范围，比如 server、remote 等，如果没有更合适的范围，你可以用 *。
+- `BREAKING CHANGE: <说明>` —— 用于不兼容变更。当变更破坏 RPC、数据库 schema 或公开 API 兼容性时必须填写，并在 `docs/docs/en/guide/upgrade/incompatible.md` 中追加一条记录。
+- `Closes #1234` —— 合入时自动关闭对应 issue。
 
-(3) subject
+## 示例
 
-subject 是 commit 目的的简短描述，不超过50个字符。
+推荐：
 
-##### Body
+```
+[Fix-18201][TaskPlugin] Fix RemoteShell task NullPointerException on empty stdout
+```
 
-Body 部分是对本次 commit 的详细描述，可以分成多行，换行符将以72个字符换行，避免自动换行影响美观。
+```
+[Improvement-18224][API] Migrate EnvironmentService to typed return values
 
-Body 部分需要注意以下几点：
+- Replace Map<String, Object> returns with dedicated DTOs
+- Update controller and unit tests accordingly
+```
 
-* 使用动宾结构，注意使用现在时，比如使用 change 而非 changed 或 changes
+```
+[Chore][API] Remove deprecated ProjectService#checkProjectAndAuth
+```
 
-* 首字母不要大写
+```
+[Feature-17900][Master] Support task-group priority override at runtime
 
-* 语句最后不需要 ‘.’ (句号) 结尾
+- Add priority field to TaskGroupQueue
+- Honor override when dispatching ready tasks
 
-##### Footer
+Closes #17900
+```
 
-Footer只适用于两种情况
+不推荐：
 
-(1) 不兼容变动
+- `fix bug` —— 没有 type、没有 scope、没有信息量。
+- `[fix] update master` —— 大小写不规范、缺 issue ID、subject 含糊。
+- `[Improvement][Master] refactor scheduler to use new state machine and also fix a NPE in worker dispatch and adjust some logs` —— 多个无关改动堆在一起，应当拆成多个 commit。
 
-如果当前代码与上一个版本不兼容，则 Footer 部分以 BREAKING CHANGE 开头，后面是对变动的描述、以及变动理由和迁移方法。
+## 参考资料
 
-(2) 关闭 Issue
+- [PULL_REQUEST_TEMPLATE.md](https://github.com/apache/dolphinscheduler/blob/dev/.github/PULL_REQUEST_TEMPLATE.md)
+- [Pull Request 须知](./pull-request.md)
+- [Apache Geode 提交消息格式](https://cwiki.apache.org/confluence/display/GEODE/Commit+Message+Format)
+- [On commit messages —— Peter Hutterer](http://who-t.blogspot.com/2009/12/on-commit-messages.html)
 
-如果当前 commit 针对某个issue，那么可以在 Footer 部分关闭这个 issue,也可以一次关闭多个 issue 。
-
-##### 举个例子
-
-[DS-001][docs-zh] add commit message
-
-* commit message RIP
-* build some conventions
-* help the commit messages become clean and tidy
-* help developers and release managers better track issues
-  and clarify the optimization in the version iteration
-
-This closes #001
-
-### 参考文档
-
-[提交消息格式](https://cwiki.apache.org/confluence/display/GEODE/Commit+Message+Format)
-
-[On commit messages-Peter Hutterer](http://who-t.blogspot.com/2009/12/on-commit-messages.html)
-
-[RocketMQ Community Operation Conventions](https://mp.weixin.qq.com/s/LKM4IXAY-7dKhTzGu5-oug)

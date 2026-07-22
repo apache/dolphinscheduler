@@ -18,6 +18,7 @@ import { ref, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useDatasource, useResources } from '.'
 import type { IJsonItem } from '../types'
+import utils from '@/utils'
 
 export function useDataX(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -77,6 +78,28 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       value: 3000
     }
   ]
+  const jobChannelOptions: any[] = [
+    {
+      label: '1',
+      value: 1
+    },
+    {
+      label: '3',
+      value: 3
+    },
+    {
+      label: '5',
+      value: 5
+    },
+    {
+      label: '10',
+      value: 10
+    },
+    {
+      label: '15',
+      value: 15
+    }
+  ]
   const memoryLimitOptions = [
     {
       label: '1G',
@@ -131,7 +154,8 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
     'CLICKHOUSE',
     'DATABEND',
     'HIVE',
-    'PRESTO'
+    'PRESTO',
+    'OCEANBASE'
   ]
   onMounted(() => {
     initConstants()
@@ -174,7 +198,18 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       validate: {
         trigger: ['input', 'trigger'],
         required: true,
-        message: t('project.node.sql_empty_tips')
+        validator() {
+          if (
+            model.json === '' ||
+            model.json === undefined ||
+            model.json === null
+          ) {
+            return new Error(t('project.node.sql_empty_tips'))
+          }
+          if (!utils.isJson(model.json)) {
+            return new Error(t('project.node.json_format_tips'))
+          }
+        }
       }
     },
     useResources(useResourcesSpan),
@@ -220,6 +255,18 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     {
+      type: 'input-number',
+      field: 'batchSize',
+      name: t('project.node.datax_writer_batch_size'),
+      span: otherStatementSpan,
+      props: {
+        min: 0,
+        step: 1024,
+        placeholder: t('project.node.datax_writer_batch_size_tips')
+      },
+      value: null
+    },
+    {
       type: 'select',
       field: 'jobSpeedByte',
       name: t('project.node.datax_job_speed_byte'),
@@ -249,6 +296,14 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.datax_job_runtime_memory_xmx'),
       span: 12,
       options: memoryLimitOptions,
+      value: 1
+    },
+    {
+      type: 'input',
+      field: 'jobChannel',
+      name: t('project.node.datax_job_channel'),
+      span: jobSpeedSpan,
+      options: jobChannelOptions,
       value: 1
     },
     ...useCustomParams({ model, field: 'localParams', isSimple: true })

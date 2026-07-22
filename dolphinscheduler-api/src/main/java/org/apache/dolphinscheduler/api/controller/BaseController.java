@@ -35,9 +35,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-/**
- * base controller
- */
 public class BaseController {
 
     /**
@@ -80,25 +77,6 @@ public class BaseController {
         }
 
         return request.getRemoteAddr();
-    }
-
-    /**
-     * return data list
-     *
-     * @param result result code
-     * @return result code
-     */
-    public Result returnDataList(Map<String, Object> result) {
-        Status status = (Status) result.get(Constants.STATUS);
-        if (status == Status.SUCCESS) {
-            String msg = Status.SUCCESS.getMsg();
-            Object datalist = result.get(Constants.DATA_LIST);
-            return success(msg, datalist);
-        } else {
-            Integer code = status.getCode();
-            String msg = (String) result.get(Constants.MSG);
-            return error(code, msg);
-        }
     }
 
     /**
@@ -197,22 +175,6 @@ public class BaseController {
         result.setCode(code);
         result.setMsg(msg);
         return result;
-    }
-
-    /**
-     * put message to map
-     *
-     * @param result result
-     * @param status status
-     * @param statusParams object messages
-     */
-    protected void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
-        result.put(Constants.STATUS, status);
-        if (statusParams != null && statusParams.length > 0) {
-            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
-        } else {
-            result.put(Constants.MSG, status.getMsg());
-        }
     }
 
     /**

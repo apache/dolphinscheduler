@@ -26,4 +26,5 @@ serverPrincipal: 在服务端通过kyuubi.kinit.principal配置的Kerberos princ
 
 ## 是否原生支持
 
-是，数据源不需要任务附加操作即可使用。
+- 否，使用前需请参考 [pseudo-cluster](../installation/pseudo-cluster.md) 中的 "下载插件依赖" 章节激活数据源。
+

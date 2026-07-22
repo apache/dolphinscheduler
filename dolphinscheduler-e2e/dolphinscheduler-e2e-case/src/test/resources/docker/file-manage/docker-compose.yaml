@@ -21,20 +21,28 @@ services:
   dolphinscheduler:
     image: apache/dolphinscheduler-standalone-server:ci
     environment:
-      MASTER_MAX_CPU_LOAD_AVG: 100
-      WORKER_TENANT_AUTO_CREATE: 'true'
+      MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      MASTER_SERVER_LOAD_PROTECTION_MAX_JVM_CPU_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      MASTER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      MASTER_KILL_APPLICATION_WHEN_TASK_FAILOVER: 'true'
+      WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      WORKER_SERVER_LOAD_PROTECTION_MAX_JVM_CPU_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED: 'true'
     ports:
       - "12345:12345"
     networks:
       - e2e
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
+      test: [ "CMD", "curl", "http://localhost:12345/dolphinscheduler/actuator/health" ]
       interval: 5s
       timeout: 5s
       retries: 120
     volumes:
-      - ./common.properties:/opt/dolphinscheduler/conf/common.properties
-      - ./aws.yaml:/opt/dolphinscheduler/conf/aws.yaml
+      - ./common.properties:/opt/dolphinscheduler/standalone-server/conf/common.properties
+      - ./aws.yaml:/opt/dolphinscheduler/standalone-server/conf/aws.yaml
     depends_on:
       s3:
         condition: service_healthy

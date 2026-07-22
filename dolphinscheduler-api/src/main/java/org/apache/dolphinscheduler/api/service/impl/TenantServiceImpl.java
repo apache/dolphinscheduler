@@ -30,25 +30,23 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.dao.entity.ProcessInstance;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ProcessInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TenantMapper;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -61,30 +59,24 @@ import org.springframework.transaction.annotation.Transactional;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * tenant service impl
- */
 @Service
 @Slf4j
 public class TenantServiceImpl extends BaseServiceImpl implements TenantService {
 
     @Autowired
-    private TenantMapper tenantMapper;
+    private TenantDao tenantDao;
 
     @Autowired
-    private ProcessInstanceMapper processInstanceMapper;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Autowired
     private QueueService queueService;
-
-    @Autowired(required = false)
-    private StorageOperator storageOperator;
 
     /**
      * Check the tenant new object valid or not
@@ -151,7 +143,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         }
         Tenant tenant = new Tenant(tenantCode, desc, queueId);
         createTenantValid(tenant);
-        tenantMapper.insert(tenant);
+        tenantDao.insert(tenant);
 
         return tenant;
     }
@@ -174,12 +166,12 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             return new PageInfo<>(pageNo, pageSize);
         }
         Page<Tenant> page = new Page<>(pageNo, pageSize);
-        IPage<Tenant> tenantPage = tenantMapper.queryTenantPaging(page, new ArrayList<>(ids), searchVal);
+        IPage<Tenant> tenantPage = tenantDao.queryTenantPaging(page, new ArrayList<>(ids), searchVal);
         return PageInfo.of(tenantPage);
     }
 
     /**
-     * updateProcessInstance tenant
+     * updateWorkflowInstance tenant
      *
      * @param loginUser login user
      * @param id tenant id
@@ -203,12 +195,11 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         Tenant updateTenant = new Tenant(id, tenantCode, desc, queueId);
-        Tenant existsTenant = tenantMapper.queryById(id);
+        Tenant existsTenant = tenantDao.queryDetailById(id);
         updateTenantValid(existsTenant, updateTenant);
 
         updateTenant.setCreateTime(existsTenant.getCreateTime());
-        int update = tenantMapper.updateById(updateTenant);
-        if (update <= 0) {
+        if (!tenantDao.updateById(updateTenant)) {
             throw new ServiceException(Status.UPDATE_TENANT_ERROR);
         }
     }
@@ -229,37 +220,37 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        Tenant tenant = tenantMapper.queryById(id);
+        Tenant tenant = tenantDao.queryDetailById(id);
         if (Objects.isNull(tenant)) {
             throw new ServiceException(Status.TENANT_NOT_EXIST);
         }
 
-        List<ProcessInstance> processInstances = getProcessInstancesByTenant(tenant);
-        if (CollectionUtils.isNotEmpty(processInstances)) {
-            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, processInstances.size());
+        List<WorkflowInstance> workflowInstances = getWorkflowInstancesByTenant(tenant);
+        if (CollectionUtils.isNotEmpty(workflowInstances)) {
+            throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, workflowInstances.size());
         }
 
-        List<Schedule> schedules = scheduleMapper.queryScheduleListByTenant(tenant.getTenantCode());
+        List<Schedule> schedules = scheduleDao.queryScheduleListByTenant(tenant.getTenantCode());
         if (CollectionUtils.isNotEmpty(schedules)) {
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_DEFINES, schedules.size());
         }
 
-        List<User> userList = userMapper.queryUserListByTenant(tenant.getId());
+        List<User> userList = userDao.queryUserListByTenant(tenant.getId());
         if (CollectionUtils.isNotEmpty(userList)) {
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL_USERS, userList.size());
         }
 
-        int delete = tenantMapper.deleteById(id);
-        if (delete <= 0) {
+        if (!tenantDao.deleteById(id)) {
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_ERROR);
         }
 
-        processInstanceMapper.updateProcessInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
+        workflowInstanceDao.updateWorkflowInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
     }
 
-    private List<ProcessInstance> getProcessInstancesByTenant(Tenant tenant) {
-        return processInstanceMapper.queryByTenantCodeAndStatus(tenant.getTenantCode(),
-                org.apache.dolphinscheduler.service.utils.Constants.NOT_TERMINATED_STATES);
+    private List<WorkflowInstance> getWorkflowInstancesByTenant(Tenant tenant) {
+        return workflowInstanceDao.queryByTenantCodeAndStatus(
+                tenant.getTenantCode(),
+                WorkflowExecutionStatus.NOT_TERMINAL_STATES);
     }
 
     /**
@@ -276,7 +267,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (CollectionUtils.isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return tenantMapper.selectBatchIds(ids);
+        return tenantDao.queryByIds(ids);
     }
 
     /**
@@ -299,25 +290,18 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return ture if the tenant code exists, otherwise return false
      */
     private boolean checkTenantExists(String tenantCode) {
-        Boolean existTenant = tenantMapper.existTenant(tenantCode);
-        return Boolean.TRUE.equals(existTenant);
+        return tenantDao.existTenant(tenantCode);
     }
 
     /**
      * query tenant by tenant code
      *
      * @param tenantCode tenant code
-     * @return tenant detail information
+     * @return tenant if exists, otherwise {@code null}
      */
     @Override
-    public Map<String, Object> queryByTenantCode(String tenantCode) {
-        Map<String, Object> result = new HashMap<>();
-        Tenant tenant = tenantMapper.queryByTenantCode(tenantCode);
-        if (tenant != null) {
-            result.put(Constants.DATA_LIST, tenant);
-            putMsg(result, Status.SUCCESS);
-        }
-        return result;
+    public Tenant queryByTenantCode(String tenantCode) {
+        return tenantDao.queryByCode(tenantCode).orElse(null);
     }
 
     /**
@@ -333,12 +317,12 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
     @Override
     public Tenant createTenantIfNotExists(String tenantCode, String desc, String queue, String queueName) {
         if (checkTenantExists(tenantCode)) {
-            return tenantMapper.queryByTenantCode(tenantCode);
+            return tenantDao.queryByCode(tenantCode).orElse(null);
         }
         Queue queueObj = queueService.createQueueIfNotExists(queue, queueName);
         Tenant tenant = new Tenant(tenantCode, desc, queueObj.getId());
         createTenantValid(tenant);
-        tenantMapper.insert(tenant);
+        tenantDao.insert(tenant);
         return tenant;
     }
 }

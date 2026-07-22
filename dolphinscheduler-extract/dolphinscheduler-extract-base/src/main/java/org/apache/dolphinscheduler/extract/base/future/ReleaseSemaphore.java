@@ -14,14 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.extract.base.future;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * release semaphore
- */
 public class ReleaseSemaphore {
 
     private final Semaphore semaphore;

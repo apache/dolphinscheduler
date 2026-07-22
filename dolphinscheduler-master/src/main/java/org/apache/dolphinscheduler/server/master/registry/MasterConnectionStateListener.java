@@ -20,17 +20,17 @@ package org.apache.dolphinscheduler.server.master.registry;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class MasterConnectionStateListener implements ConnectionListener {
 
-    private final MasterConnectStrategy masterConnectStrategy;
+    private final RegistryClient registryClient;
 
-    public MasterConnectionStateListener(@NonNull MasterConnectStrategy masterConnectStrategy) {
-        this.masterConnectStrategy = masterConnectStrategy;
+    public MasterConnectionStateListener(final RegistryClient registryClient) {
+        this.registryClient = registryClient;
     }
 
     @Override
@@ -43,12 +43,13 @@ public class MasterConnectionStateListener implements ConnectionListener {
             case SUSPENDED:
                 break;
             case RECONNECTED:
-                masterConnectStrategy.reconnect();
+                log.warn("Master reconnect to registry");
                 break;
             case DISCONNECTED:
-                masterConnectStrategy.disconnect();
+                registryClient.getStoppable().stop("Master disconnected from registry, will stop myself");
                 break;
             default:
+                log.warn("Unknown connection state: {}", state);
         }
     }
 }

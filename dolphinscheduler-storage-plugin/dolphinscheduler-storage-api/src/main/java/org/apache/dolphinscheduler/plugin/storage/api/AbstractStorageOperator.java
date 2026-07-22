@@ -17,9 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.storage.api;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +49,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
                 .resourceBaseDirectory(storageBaseDirectory)
                 .isDirectory(Files.getFileExtension(resourceAbsolutePath).isEmpty())
                 .tenant(segments[0])
-                .resourceType(segments[1].equals(FILE_FOLDER_NAME) ? ResourceType.FILE : ResourceType.UDF)
+                .resourceType(ResourceType.FILE)
                 .resourceRelativePath(segments.length == 2 ? "/" : segments[2])
                 .resourceParentAbsolutePath(StringUtils.substringBeforeLast(resourceAbsolutePath, File.separator))
                 .build();
@@ -60,7 +58,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        return PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler");
+        return resourceBaseAbsolutePath;
     }
 
     @Override
@@ -81,10 +79,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
         String resourceBaseDirectory;
         switch (resourceType) {
             case FILE:
-                resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, FILE_FOLDER_NAME);
-                break;
-            case UDF:
-                resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, UDF_FOLDER_NAME);
+                resourceBaseDirectory = FileUtils.concatFilePath(tenantBaseDirectory, StorageOperator.FILE_FOLDER_NAME);
                 break;
             case ALL:
                 resourceBaseDirectory = tenantBaseDirectory;
@@ -104,6 +99,15 @@ public abstract class AbstractStorageOperator implements StorageOperator {
     protected void exceptionIfPathEmpty(String resourceAbsolutePath) {
         if (StringUtils.isEmpty(resourceAbsolutePath)) {
             throw new IllegalArgumentException("Resource path should not be empty");
+        }
+    }
+
+    protected void exceptionIfPathNotUnderStorageBaseDir(String resourceAbsolutePath) {
+        String storageBaseDirectory = getStorageBaseDirectory();
+        if (!resourceAbsolutePath.startsWith(storageBaseDirectory)) {
+            throw new IllegalArgumentException(
+                    "Resource path: " + resourceAbsolutePath + " is not under storage base directory: "
+                            + storageBaseDirectory);
         }
     }
 

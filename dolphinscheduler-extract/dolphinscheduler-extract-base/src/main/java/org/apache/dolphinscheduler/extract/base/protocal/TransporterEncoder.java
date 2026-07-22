@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.extract.base.protocal;
 
-import org.apache.dolphinscheduler.extract.base.exception.RemotingException;
+import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
@@ -28,9 +28,9 @@ import io.netty.handler.codec.MessageToByteEncoder;
 public class TransporterEncoder extends MessageToByteEncoder<Transporter> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, Transporter transporter, ByteBuf out) throws Exception {
+    protected void encode(ChannelHandlerContext ctx, Transporter transporter, ByteBuf out) {
         if (transporter == null) {
-            throw new RemotingException("encode msg is null");
+            throw new RemoteException("encode msg is null");
         }
         out.writeByte(Transporter.MAGIC);
         out.writeByte(Transporter.VERSION);

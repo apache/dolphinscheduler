@@ -19,11 +19,15 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.CommandMapper">
     <select id="countCommandState" resultType="org.apache.dolphinscheduler.dao.entity.CommandCount">
-        select cmd.command_type as command_type, count(1) as count
-        from t_ds_command cmd, t_ds_process_definition process
-        where cmd.process_definition_code = process.code
+        select
+            cmd.command_type as command_type
+            ,count(1) as count
+        from
+        t_ds_command cmd
+        JOIN t_ds_workflow_definition tdpd ON tdpd.code = cmd.workflow_definition_code
+        where 1=1
         <if test="projectCodes != null and projectCodes.size() != 0">
-            and process.project_code in
+            and tdpd.project_code in
             <foreach collection="projectCodes" index="index" item="i" open="(" close=")" separator=",">
                 #{i}
             </foreach>
@@ -38,30 +42,30 @@
         *
         from t_ds_command
         where 1 = 1
-        order by process_instance_priority, id asc
+        order by workflow_instance_priority, id asc
     </select>
 
     <select id="queryCommandPageByIds" resultType="org.apache.dolphinscheduler.dao.entity.Command">
         select
         *
         from t_ds_command
-        where process_definition_code in
+        where workflow_definition_code in
             <foreach item="id" index="index" collection="workflowDefinitionCodes" open="(" separator="," close=")">
                 #{id}
             </foreach>
-        order by process_instance_priority, id asc
+        order by workflow_instance_priority, id asc
     </select>
 
     <select id="queryCommandByIdSlot" resultType="org.apache.dolphinscheduler.dao.entity.Command">
         select *
         from t_ds_command
         where (id / #{idStep}) % #{totalSlot} = #{currentSlotIndex}
-        order by process_instance_priority, id asc
+        order by workflow_instance_priority, id asc
             limit #{fetchNumber}
     </select>
     <delete id="deleteByWorkflowInstanceIds" >
         delete from t_ds_command
-        where process_instance_id in
+        where workflow_instance_id in
         <foreach collection="workflowInstanceIds" index="index" item="i" open="(" close=")" separator=",">
             #{i}
         </foreach>

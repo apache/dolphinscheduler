@@ -19,7 +19,9 @@ Administrator login, default username/password: admin/dolphinscheduler123
 - Tenant Code: **The tenant code is the user on Linux, unique and cannot be repeated**
 - The administrator enters the `Security Center->Tenant Management` page, and clicks the `Create Tenant` button to create a tenant.
 
-> Note: Currently, only admin users can modify tenant.
+> Note:
+> 1. Currently, only admin users can modify tenant.
+> 2. If you create a tenant manually in the Linux, you need to add the manually created tenant to the dolphinscheduler bootstrap user's group, so that the tenant will have enough working directory permissions.
 
 ![create-tenant](../../../../img/new_ui/dev/security/create-tenant.png)
 
@@ -103,8 +105,8 @@ public  void doPOSTParam()throws Exception{
 
 ## Granted Permissions
 
-* Granted permissions include project permissions, resource permissions, data source permissions, and UDF function permissions.
-* Administrators can authorize projects, resources, data sources, and UDF functions that ordinary users do not create. Because the authorization methods of projects, resources, data sources and UDF functions are all the same, the project authorization is used as an example to introduce.
+* Granted permissions include project permissions, resource permissions, data source permissions.
+* Administrators can authorize projects, resources, data sources that ordinary users do not create. Because the authorization methods of projects, resources, data sources are all the same, the project authorization is used as an example to introduce.
 * Note: For projects created by the user, the user has all permissions. Therefore, permission changes to projects created by users themselves are not valid.
 - The administrator enters the `Security Center -> User Management` page, and clicks the "Authorize" button of the user to be authorized, as shown in the following figure:
 
@@ -118,7 +120,7 @@ public  void doPOSTParam()throws Exception{
 
 ![no-permission-error](../../../../img/new_ui/dev/security/no-permission-error.png)
 
-- Resources, data sources, and UDF function authorization are the same as project authorization.
+- Resources, data sources authorization are the same as project authorization.
 
 ## Worker Grouping
 

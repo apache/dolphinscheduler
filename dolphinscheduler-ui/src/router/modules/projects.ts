@@ -180,17 +180,6 @@ export default {
       }
     },
     {
-      path: '/projects/:projectCode/task/definitions',
-      name: 'task-definition',
-      component: components['projects-task-definition'],
-      meta: {
-        title: '任务定义',
-        activeMenu: 'projects',
-        showSide: true,
-        auth: []
-      }
-    },
-    {
       path: '/projects/:projectCode/task/instances',
       name: 'task-instance',
       component: components['projects-task-instance'],

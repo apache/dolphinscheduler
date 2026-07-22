@@ -11,9 +11,6 @@ Dependent 节点，就是**依赖检查节点**。比如 A 流程依赖昨天的
 
 ## 任务参数
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
-
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 
 | **任务参数** |                    **描述**                    |
@@ -44,3 +41,6 @@ Dependent 节点提供了逻辑判断功能，可以按照逻辑来检测所依�
 假如，周报 A 同时还需要自身在上周二执行成功：
 
 ![dependent_task03](../../../../img/tasks/demo/dependent_task03.png)
+
+> **注意**: 依赖周期中的本周和本月代表的是自然周和自然月内的整个周期，即本周为周一到今天，1 号到 今天 为一个月，以此类推。
+

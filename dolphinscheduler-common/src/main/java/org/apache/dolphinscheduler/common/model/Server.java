@@ -30,12 +30,9 @@ public class Server {
 
     private int port;
 
-    private String zkDirectory;
+    private String serverDirectory;
 
-    /**
-     * resource info: CPU and memory
-     */
-    private String resInfo;
+    private String heartBeatInfo;
 
     private Date createTime;
 

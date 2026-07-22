@@ -63,6 +63,10 @@ export function useZeppelin(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.zeppelin_parameters_tips')
       }
     },
-    ...useCustomParams({ model, field: 'localParams', isSimple: false })
+    ...useCustomParams({
+      model,
+      field: 'localParams',
+      isSimple: model.readonly
+    })
   ]
 }

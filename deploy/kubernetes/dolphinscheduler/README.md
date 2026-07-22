@@ -109,6 +109,10 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | common.configmap.HADOOP_HOME | string | `"/opt/soft/hadoop"` | Set `HADOOP_HOME` for DolphinScheduler's task environment |
 | common.configmap.HIVE_HOME | string | `"/opt/soft/hive"` | Set `HIVE_HOME` for DolphinScheduler's task environment |
 | common.configmap.JAVA_HOME | string | `"/opt/java/openjdk"` | Set `JAVA_HOME` for DolphinScheduler's task environment |
+| common.configmap.MANAGEMENT_SECURITY_ENABLED | bool | `false` | Whether to enable management endpoints security: false, true |
+| common.configmap.MANAGEMENT_SECURITY_EXCLUDE | string | `"health,metrics"` | A list of Actuator endpoint IDs that should be accessible without authentication, even when security is enabled. Common values: health, info, prometheus, metrics. |
+| common.configmap.MANAGEMENT_SECURITY_PASSWORD | string | `""` | management endpoints security password |
+| common.configmap.MANAGEMENT_SECURITY_USERNAME | string | `""` | management endpoints security username |
 | common.configmap.PYTHON_LAUNCHER | string | `"/usr/bin/python/bin/python3"` | Set `PYTHON_LAUNCHER` for DolphinScheduler's task environment |
 | common.configmap.RESOURCE_UPLOAD_PATH | string | `"/dolphinscheduler"` | Resource store on HDFS/S3 path, please make sure the directory exists on hdfs and have read write permissions |
 | common.configmap.SPARK_HOME | string | `"/opt/soft/spark"` | Set `SPARK_HOME` for DolphinScheduler's task environment |
@@ -122,7 +126,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | common.sharedStoragePersistence.storage | string | `"20Gi"` | `PersistentVolumeClaim` size |
 | common.sharedStoragePersistence.storageClassName | string | `"-"` | Shared Storage persistent volume storage class, must support the access mode: ReadWriteMany |
 | conf.auto | bool | `false` | auto restart, if true, all components will be restarted automatically after the common configuration is updated. if false, you need to restart the components manually. default is false |
-| conf.common."alert.rpc.port" | int | `50052` | rpc port |
 | conf.common."appId.collect" | string | `"log"` | way to collect applicationId: log, aop |
 | conf.common."aws.credentials.provider.type" | string | `"AWSStaticCredentialsProvider"` |  |
 | conf.common."aws.s3.access.key.id" | string | `"minioadmin"` | The AWS access key. if resource.storage.type=S3, and credentials.provider.type is AWSStaticCredentialsProvider. This configuration is required |
@@ -131,7 +134,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."aws.s3.endpoint" | string | `"http://minio:9000"` | You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn |
 | conf.common."aws.s3.region" | string | `"ca-central-1"` | The AWS Region to use. if resource.storage.type=S3, This configuration is required |
 | conf.common."conda.path" | string | `"/opt/anaconda3/etc/profile.d/conda.sh"` | set path of conda.sh |
-| conf.common."data-quality.jar.dir" | string | `nil` | data quality option |
 | conf.common."data.basedir.path" | string | `"/tmp/dolphinscheduler"` | user data local directory path, please make sure the directory exists and have read write permissions |
 | conf.common."datasource.encryption.enable" | bool | `false` | datasource encryption enable |
 | conf.common."datasource.encryption.salt" | string | `"!@#$%^&*"` | datasource encryption salt |
@@ -157,6 +159,7 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | conf.common."resource.manager.httpaddress.port" | int | `8088` | resourcemanager port, the default value is 8088 if not specified |
 | conf.common."resource.storage.type" | string | `"S3"` | resource storage type: HDFS, S3, OSS, GCS, ABS, NONE |
 | conf.common."resource.storage.upload.base.path" | string | `"/dolphinscheduler"` | resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended |
+| conf.common."shell.kill.wait.timeout" | int | `10` | If the shell process is still active after this timeout value (in seconds), then will use kill -9 to kill it |
 | conf.common."sudo.enable" | bool | `true` | use sudo or not, if set true, executing user is tenant user and deploy user needs sudo permissions; if set false, executing user is the deploy user and doesn't need sudo permissions |
 | conf.common."support.hive.oneSession" | bool | `false` | Whether hive SQL is executed in the same session |
 | conf.common."task.resource.limit.state" | bool | `false` | Task resource limit state |
@@ -175,6 +178,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | externalDatabase.username | string | `"root"` | The username of external database |
 | externalRegistry.registryPluginName | string | `"zookeeper"` | If exists external registry and set `zookeeper.enable` && `registryEtcd.enabled` && `registryJdbc.enabled` to false, specify the external registry plugin name |
 | externalRegistry.registryServers | string | `"127.0.0.1:2181"` | If exists external registry and set `zookeeper.enable` && `registryEtcd.enabled` && `registryJdbc.enabled` to false, specify the external registry servers |
+| global | object | `{"security":{"allowInsecureImages":true}}` | Global settings for Bitnami subcharts |
+| global.security.allowInsecureImages | bool | `true` | Allow using non-standard container images (required for bitnamilegacy images) |
 | image.alert | string | `"dolphinscheduler-alert-server"` | alert-server image |
 | image.api | string | `"dolphinscheduler-api"` | api-server image |
 | image.master | string | `"dolphinscheduler-master"` | master image |
@@ -205,13 +210,15 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | master.env.MASTER_FAILOVER_INTERVAL | string | `"10m"` | Master failover interval, the unit is minute |
 | master.env.MASTER_HEARTBEAT_ERROR_THRESHOLD | string | `"5"` | Master heartbeat error threshold |
 | master.env.MASTER_HOST_SELECTOR | string | `"LowerWeight"` | Master host selector to select a suitable worker, optional values include Random, RoundRobin, LowerWeight |
-| master.env.MASTER_KILL_APPLICATION_WHEN_HANDLE_FAILOVER | string | `"true"` | Master kill application when handle failover |
+| master.env.MASTER_KILL_APPLICATION_WHEN_TASK_FAILOVER | string | `"true"` | Master kill application when task failover |
 | master.env.MASTER_MAX_HEARTBEAT_INTERVAL | string | `"10s"` | Master max heartbeat interval |
 | master.env.MASTER_SERVER_LOAD_PROTECTION_ENABLED | bool | `false` | If set true, will open master overload protection |
 | master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow. |
 | master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_JVM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max jvm cpu usage, when the master's jvm cpu usage is smaller then this value, master server can execute workflow. |
 | master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max system cpu usage, when the master's system cpu usage is smaller then this value, master server can execute workflow. |
 | master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Master max System memory usage , when the master's system memory usage is smaller then this value, master server can execute workflow. |
+| master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_TASK_INSTANCE_RUNTIME | string | `"0d"` | Maximum allowed running time for a task instance. If the running duration exceeds this value, the instance will be killed. The default value of 0d indicates no limit. |
+| master.env.MASTER_SERVER_LOAD_PROTECTION_MAX_WORKFLOW_INSTANCE_RUNTIME | string | `"0d"` | Maximum allowed running time for a workflow instance. If the running duration exceeds this value, the instance will be killed. The default value of 0d indicates no limit. |
 | master.env.MASTER_STATE_WHEEL_INTERVAL | string | `"5s"` | master state wheel interval, the unit is second |
 | master.env.MASTER_TASK_COMMIT_INTERVAL | string | `"1s"` | master commit task interval, the unit is second |
 | master.env.MASTER_TASK_COMMIT_RETRYTIMES | string | `"5"` | Master commit task retry times |
@@ -246,10 +253,14 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | master.service.serviceMonitor.labels | object | `{}` | serviceMonitor.labels ServiceMonitor extra labels |
 | master.service.serviceMonitor.path | string | `"/actuator/prometheus"` | serviceMonitor.path path of the metrics endpoint |
 | master.tolerations | list | `[]` | Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission, effectively unioning the set of nodes tolerated by the pod and the RuntimeClass. |
+| master.updateStrategy | object | `{"type":"RollingUpdate"}` | Update strategy ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies  |
 | minio.auth.rootPassword | string | `"minioadmin"` | minio password |
 | minio.auth.rootUser | string | `"minioadmin"` | minio username |
 | minio.defaultBuckets | string | `"dolphinscheduler"` | minio default buckets |
 | minio.enabled | bool | `true` | Deploy minio and configure it as the default storage for DolphinScheduler, note this is for demo only, not for production. |
+| minio.image.registry | string | `"docker.io"` |  |
+| minio.image.repository | string | `"bitnamilegacy/minio"` |  |
+| minio.image.tag | string | `"2022.10.29-debian-11-r0"` |  |
 | minio.persistence.enabled | bool | `false` | Set minio.persistence.enabled to true to mount a new volume for internal minio |
 | mysql.auth.database | string | `"dolphinscheduler"` | mysql database |
 | mysql.auth.params | string | `"characterEncoding=utf8"` | mysql params |
@@ -257,18 +268,24 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | mysql.auth.username | string | `"ds"` | mysql username |
 | mysql.driverClassName | string | `"com.mysql.cj.jdbc.Driver"` | mysql driverClassName |
 | mysql.enabled | bool | `false` | If not exists external MySQL, by default, the DolphinScheduler will use a internal MySQL |
+| mysql.image.registry | string | `"docker.io"` |  |
+| mysql.image.repository | string | `"bitnamilegacy/mysql"` |  |
+| mysql.image.tag | string | `"8.0.33-debian-11-r30"` |  |
 | mysql.primary.persistence.enabled | bool | `false` | Set mysql.primary.persistence.enabled to true to mount a new volume for internal MySQL |
 | mysql.primary.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
 | mysql.primary.persistence.storageClass | string | `"-"` | MySQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
+| postgresql.auth.database | string | `"dolphinscheduler"` | The database for internal PostgreSQL |
+| postgresql.auth.password | string | `"root"` | The password for internal PostgreSQL |
+| postgresql.auth.username | string | `"root"` | The username for internal PostgreSQL |
 | postgresql.driverClassName | string | `"org.postgresql.Driver"` | The driverClassName for internal PostgreSQL |
 | postgresql.enabled | bool | `true` | If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL |
+| postgresql.image.registry | string | `"docker.io"` |  |
+| postgresql.image.repository | string | `"bitnamilegacy/postgresql"` |  |
+| postgresql.image.tag | string | `"15.1.0-debian-11-r12"` |  |
 | postgresql.params | string | `"characterEncoding=utf8"` | The params for internal PostgreSQL |
-| postgresql.persistence.enabled | bool | `false` | Set postgresql.persistence.enabled to true to mount a new volume for internal PostgreSQL |
-| postgresql.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
-| postgresql.persistence.storageClass | string | `"-"` | PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
-| postgresql.postgresqlDatabase | string | `"dolphinscheduler"` | The database for internal PostgreSQL |
-| postgresql.postgresqlPassword | string | `"root"` | The password for internal PostgreSQL |
-| postgresql.postgresqlUsername | string | `"root"` | The username for internal PostgreSQL |
+| postgresql.primary.persistence.enabled | bool | `false` | Set postgresql.primary.persistence.enabled to true to mount a new volume for internal PostgreSQL |
+| postgresql.primary.persistence.size | string | `"20Gi"` | `PersistentVolumeClaim` size |
+| postgresql.primary.persistence.storageClass | string | `"-"` | PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |
 | registryEtcd.authority | string | `""` | Etcd authority |
 | registryEtcd.enabled | bool | `false` | If you want to use Etcd for your registry center, change this value to true. And set zookeeper.enabled to false |
 | registryEtcd.endpoints | string | `""` | Etcd endpoints |
@@ -293,8 +310,9 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | security.authentication.ldap.ssl.jksbase64content | string | `""` | LDAP jks file base64 content. If you use macOS, please run `base64 -b 0 -i /path/to/your.jks`. If you use Linux, please run `base64 -w 0 /path/to/your.jks`. If you use Windows, please run `certutil -f -encode /path/to/your.jks`. Then copy the base64 content to below field in one line |
 | security.authentication.ldap.ssl.truststore | string | `"/opt/ldapkeystore.jks"` | LDAP jks file absolute path, do not change this value |
 | security.authentication.ldap.ssl.truststorepassword | string | `""` | LDAP jks password |
-| security.authentication.ldap.urls | string | `"ldap://ldap.forumsys.com:389/"` | LDAP urls |
-| security.authentication.ldap.user.admin | string | `"read-only-admin"` | Admin user account when you log-in with LDAP |
+| security.authentication.ldap.url | string | `"ldap://ldap.forumsys.com:389/"` | LDAP url |
+| security.authentication.ldap.user.adminuserfilter | string | `"(&(uid={0})(memberOf=cn=admin-group,ou=apps,dc=example,dc=com))"` | Any user matching this filter becomes an Admin. If set to `""`, ignore this option |
+| security.authentication.ldap.user.adminusername | string | `"read-only-admin"` | Admin user account when you log-in with LDAP. If the filter doesn't match anything this also acts as fallback. Set to `""` to ignore this option if you want to use filter only |
 | security.authentication.ldap.user.emailattribute | string | `"mail"` | LDAP user email attribute |
 | security.authentication.ldap.user.identityattribute | string | `"uid"` | LDAP user identity attribute |
 | security.authentication.ldap.user.notexistaction | string | `"CREATE"` | action when ldap user is not exist,default value: CREATE. Optional values include(CREATE,DENY) |
@@ -306,7 +324,6 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.customizedConfig | object | `{}` | configure aligned with https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-worker/src/main/resources/application.yaml |
 | worker.enableCustomizedConfig | bool | `false` | enable configure custom config |
 | worker.enabled | bool | `true` | Enable or disable the Worker component |
-| worker.env.DEFAULT_TENANT_ENABLED | bool | `false` | If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`; |
 | worker.env.WORKER_EXEC_THREADS | string | `"100"` | Worker execute thread number to limit task instances |
 | worker.env.WORKER_HOST_WEIGHT | string | `"100"` | Worker host weight to dispatch tasks |
 | worker.env.WORKER_MAX_HEARTBEAT_INTERVAL | string | `"10s"` | Worker heartbeat interval |
@@ -316,6 +333,9 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max system cpu usage, when the worker's system cpu usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS | float | `0.7` | Worker max memory usage , when the worker's memory usage is smaller then this value, worker server can be dispatched tasks. |
 | worker.env.WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED | bool | `true` | tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true. |
+| worker.env.WORKER_TENANT_CONFIG_DEFAULT_TENANT_ENABLED | bool | `false` | If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`; |
+| worker.envFromSecret | string | `""` | Direct Secret Mounting Mount secrets directly as environment variables Single secret |
+| worker.initContainers | object | `{}` | Init Container for Advanced Processing Use when you need to transform, validate, or prepare configuration files |
 | worker.keda.advanced | object | `{}` | Specify HPA related options |
 | worker.keda.cooldownPeriod | int | `30` | How many seconds KEDA will wait before scaling to zero. Note that HPA has a separate cooldown period for scale-downs |
 | worker.keda.enabled | bool | `false` | Enable or disable the Keda component |
@@ -358,8 +378,12 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.service.serviceMonitor.labels | object | `{}` | serviceMonitor.labels ServiceMonitor extra labels |
 | worker.service.serviceMonitor.path | string | `"/actuator/prometheus"` | serviceMonitor.path path of the metrics endpoint |
 | worker.tolerations | list | `[]` | Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission, effectively unioning the set of nodes tolerated by the pod and the RuntimeClass. |
+| worker.updateStrategy.type | string | `"RollingUpdate"` |  |
 | zookeeper.enabled | bool | `true` | If not exists external registry, the zookeeper registry will be used by default. |
 | zookeeper.fourlwCommandsWhitelist | string | `"srvr,ruok,wchs,cons"` | A list of comma separated Four Letter Words commands to use |
+| zookeeper.image.registry | string | `"docker.io"` |  |
+| zookeeper.image.repository | string | `"bitnamilegacy/zookeeper"` |  |
+| zookeeper.image.tag | string | `"3.9.3-debian-12-r21"` |  |
 | zookeeper.persistence.enabled | bool | `false` | Set `zookeeper.persistence.enabled` to true to mount a new volume for internal ZooKeeper |
 | zookeeper.persistence.size | string | `"20Gi"` | PersistentVolumeClaim size |
 | zookeeper.persistence.storageClass | string | `"-"` | ZooKeeper data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |

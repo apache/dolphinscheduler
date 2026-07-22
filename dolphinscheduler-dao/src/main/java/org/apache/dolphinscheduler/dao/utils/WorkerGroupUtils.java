@@ -17,7 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.utils;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Collections;
+import java.util.List;
+
+import com.google.common.collect.Lists;
 
 public class WorkerGroupUtils {
 
@@ -40,6 +48,14 @@ public class WorkerGroupUtils {
 
     public static String getDefaultWorkerGroup() {
         return DEFAULT_WORKER_GROUP;
+    }
+
+    public static List<String> getWorkerAddressListFromWorkerGroup(WorkerGroup workerGroup) {
+        String addrList = workerGroup.getAddrList();
+        if (StringUtils.isEmpty(addrList)) {
+            return Collections.emptyList();
+        }
+        return Lists.newArrayList(addrList.split(Constants.COMMA));
     }
 
 }

@@ -1,28 +1,29 @@
 /*
- * Licensed to Apache Software Foundation (ASF) under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Apache Software Foundation (ASF) licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
+import org.apache.dolphinscheduler.e2e.models.users.IUser;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
-import java.time.Duration;
 import java.util.List;
+
+import lombok.Getter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -32,13 +33,11 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-
-import lombok.Getter;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 @Getter
 public final class UserPage extends NavBarPage implements SecurityPage.Tab {
+
     @FindBy(className = "btn-create-user")
     private WebElement buttonCreateUser;
 
@@ -46,14 +45,13 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
     private List<WebElement> userList;
 
     @FindBys({
-        @FindBy(className = "n-popconfirm__action"),
-        @FindBy(className = "n-button--primary-type"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
     private final UserForm createUserForm = new UserForm();
     private final UserForm editUserForm = new UserForm();
-
 
     public UserPage(RemoteWebDriver driver) {
         super(driver);
@@ -67,41 +65,9 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
         createUserForm().btnSelectTenantDropdown().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
-
-        createUserForm().selectTenant()
-            .stream()
-            .filter(it -> it.getText().contains(tenant))
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
-            .click();
-
-        createUserForm().inputEmail().sendKeys(email);
-        createUserForm().inputPhone().sendKeys(phone);
-        createUserForm().buttonSubmit().click();
-
-        return this;
-    }
-
-    public UserPage update(String user, String editUser, String editEmail, String editPhone,
-                           String tenant) {
-        userList().stream()
-            .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
-            .flatMap(it -> it.findElements(By.className("edit")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No edit button in user list"))
-            .click();
-
-        editUserForm().inputUserName().sendKeys(Keys.CONTROL+"a");
-        editUserForm().inputUserName().sendKeys(Keys.BACK_SPACE);
-        editUserForm().inputUserName().sendKeys(editUser);
-
-        createUserForm().btnSelectTenantDropdown().click();
-
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                        "n-base-select-option__content")));
 
         createUserForm().selectTenant()
                 .stream()
@@ -110,11 +76,57 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
                 .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
                 .click();
 
-        editUserForm().inputEmail().sendKeys(Keys.CONTROL+"a");
+        createUserForm().inputEmail().sendKeys(email);
+        createUserForm().inputPhone().sendKeys(phone);
+        createUserForm().buttonSubmit().click();
+
+        return this;
+    }
+
+    public UserPage update(IUser user) {
+        return update(
+                user.getUserName(),
+                user.getUserName(),
+                user.getEmail(),
+                user.getPhone(),
+                user.getTenant());
+    }
+
+    public UserPage update(String user,
+                           String editUser,
+                           String editEmail,
+                           String editPhone,
+                           String tenant) {
+        userList().stream()
+                .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
+                .flatMap(it -> it.findElements(By.className("edit")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No edit button in user list"))
+                .click();
+
+        editUserForm().inputUserName().sendKeys(Keys.CONTROL + "a");
+        editUserForm().inputUserName().sendKeys(Keys.BACK_SPACE);
+        editUserForm().inputUserName().sendKeys(editUser);
+
+        createUserForm().btnSelectTenantDropdown().click();
+
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                        "n-base-select-option__content")));
+
+        createUserForm().selectTenant()
+                .stream()
+                .filter(it -> it.getText().contains(tenant))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(String.format("No %s in tenant dropdown list", tenant)))
+                .click();
+
+        editUserForm().inputEmail().sendKeys(Keys.CONTROL + "a");
         editUserForm().inputEmail().sendKeys(Keys.BACK_SPACE);
         editUserForm().inputEmail().sendKeys(editEmail);
 
-        editUserForm().inputPhone().sendKeys(Keys.CONTROL+"a");
+        editUserForm().inputPhone().sendKeys(Keys.CONTROL + "a");
         editUserForm().inputPhone().sendKeys(Keys.BACK_SPACE);
         editUserForm().inputPhone().sendKeys(editPhone);
 
@@ -125,13 +137,13 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
     public UserPage delete(String user) {
         userList()
-            .stream()
-            .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
-            .flatMap(it -> it.findElements(By.className("delete")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No delete button in user list"))
-            .click();
+                .stream()
+                .filter(it -> it.findElement(By.className("name")).getAttribute("innerHTML").contains(user))
+                .flatMap(it -> it.findElements(By.className("delete")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No delete button in user list"))
+                .click();
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
@@ -140,25 +152,26 @@ public final class UserPage extends NavBarPage implements SecurityPage.Tab {
 
     @Getter
     public class UserForm {
+
         UserForm() {
             PageFactory.initElements(driver, this);
         }
 
         @FindBys({
-            @FindBy(className = "input-username"),
-            @FindBy(tagName = "input"),
+                @FindBy(className = "input-username"),
+                @FindBy(tagName = "input"),
         })
         private WebElement inputUserName;
 
         @FindBys({
-            @FindBy(className = "input-password"),
-            @FindBy(tagName = "input"),
+                @FindBy(className = "input-password"),
+                @FindBy(tagName = "input"),
         })
         private WebElement inputUserPassword;
 
         @FindBys({
-            @FindBy(className = "select-tenant"),
-            @FindBy(className = "n-base-selection"),
+                @FindBy(className = "select-tenant"),
+                @FindBy(className = "n-base-selection"),
         })
         private WebElement btnSelectTenantDropdown;
 

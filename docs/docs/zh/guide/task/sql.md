@@ -6,7 +6,7 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 
 ## 创建数据源
 
-可参考 [数据源配置](../howto/datasource-setting.md) `数据源中心`。
+可参考 [数据源配置](../installation/datasource-setting.md) `数据源中心`。
 
 ## 创建任务
 
@@ -14,9 +14,6 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 - 工具栏中拖动 <img src="../../../../img/tasks/icons/sql.png" width="25"/> 到画板中，选择需要连接的数据源，即可完成创建。
 
 ## 任务参数
-
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
 
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 - 数据源：选择对应的数据源
@@ -26,7 +23,6 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 - 默认采用`;\n`作为SQL分隔符,拆分成多段SQL语句执行。Hive的JDBC不支持一次执行多段SQL语句，请不要使用`;\n`。
 - sql参数：输入参数格式为key1=value1;key2=value2…
 - sql语句：SQL语句
-- UDF函数：对于HIVE类型的数据源，可以引用资源中心中创建的UDF函数，其他类型的数据源暂不支持UDF函数。
 - 自定义参数：SQL任务类型，而存储过程是自定义参数顺序，给方法设置值自定义参数类型和数据类型，同存储过程任务类型一样。区别在于SQL任务类型自定义参数会替换sql语句中${变量}。
 - 前置sql:前置sql在sql语句之前执行。
 - 后置sql:后置sql在sql语句之后执行。
@@ -57,5 +53,4 @@ SQL任务类型，用于连接数据库并执行相应SQL。
 ## 注意事项
 
 * 注意SQL类型的选择，如果是INSERT等操作需要选择非查询类型。
-* 为了兼容长会话情况,UDF函数的创建是通过CREATE OR REPLACE语句
 

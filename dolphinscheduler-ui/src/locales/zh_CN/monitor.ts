@@ -19,13 +19,18 @@ export default {
   master: {
     cpu_usage: '处理器使用量',
     memory_usage: '内存使用量',
-    disk_available: '磁盘可用容量',
-    load_average: '平均负载量',
+    disk_usage: '磁盘使用量',
     create_time: '创建时间',
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
     directory: '注册目录',
+    running_workflows: '运行中的工作流',
+    workflow_name: '工作流实例',
+    workflow_state: '状态',
+    workflow_start_time: '开始时间',
+    workflow_run_times: '运行次数',
+    running_tasks: '运行中的任务',
     master_no_data_result_title: 'Master节点不存在',
     master_no_data_result_desc:
       '目前没有任何Master节点，请先创建Master节点，再访问该页面'
@@ -33,14 +38,18 @@ export default {
   worker: {
     cpu_usage: '处理器使用量',
     memory_usage: '内存使用量',
-    disk_available: '磁盘可用容量',
-    load_average: '平均负载量',
+    disk_usage: '磁盘使用量',
     thread_pool_usage: '线程池使用量',
     create_time: '创建时间',
     last_heartbeat_time: '最后心跳时间',
     directory_detail: '目录详情',
     host: '主机',
     directory: '注册目录',
+    running_tasks: '运行中的任务',
+    task_name: '任务名称',
+    task_type: '任务类型',
+    task_workflow_instance: '工作流实例',
+    task_start_time: '开始时间',
     worker_no_data_result_title: 'Worker节点不存在',
     worker_no_data_result_desc:
       '目前没有任何Worker节点，请先创建Worker节点，再访问该页面'
@@ -59,8 +68,17 @@ export default {
     db_no_data_result_desc: '目前没有任何DB节点，请先创建DB节点，再访问该页面'
   },
   statistics: {
-    command_number_of_waiting_for_running: '待执行的命令数',
-    failure_command_number: '执行失败的命令数'
+    command_statistics_list: '命令统计列表',
+    failure_command_statistics_list: '失败命令统计列表',
+    command_type: '命令类型',
+    command_param: '命令参数',
+    task_info: '任务信息',
+    task_params: '任务参数',
+    worker_info: 'Worker信息',
+    warning_info: '警告信息',
+    executor_id: '执行用户Id',
+    message: '错误信息',
+    time: '时间'
   },
   audit_log: {
     user_name: '用户名称',

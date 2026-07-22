@@ -18,11 +18,12 @@
 package org.apache.dolphinscheduler.plugin.datasource.presto.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
@@ -31,7 +32,6 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -102,20 +102,23 @@ public class PrestoDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         PrestoConnectionParam prestoConnectionParam = (PrestoConnectionParam) connectionParam;
-        /**
-         * return jdbc url without other parameters, avoid to assign same parameters both in URL and properties.
-         * or else got error msg: Connection property '...' is both in the URL and an argument
-         * ref to <a href="https://prestodb.io/docs/current/installation/jdbc.html">Presto JDBC Driver</>
-         */
+        if (MapUtils.isNotEmpty(prestoConnectionParam.getOther())) {
+            return String.format("%s?%s", prestoConnectionParam.getJdbcUrl(),
+                    transformOther(prestoConnectionParam.getOther()));
+        }
         return prestoConnectionParam.getJdbcUrl();
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
+    public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
         PrestoConnectionParam prestoConnectionParam = (PrestoConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
-        return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                prestoConnectionParam.getUser(), PasswordUtils.decodePassword(prestoConnectionParam.getPassword()));
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(getJdbcUrl(prestoConnectionParam))
+                .username(prestoConnectionParam.getUser())
+                .password(PasswordUtils.decodePassword(prestoConnectionParam.getPassword()))
+                .build()
+                .getConnection();
     }
 
     @Override

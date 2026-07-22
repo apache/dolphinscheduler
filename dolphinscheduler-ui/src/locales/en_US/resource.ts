@@ -55,17 +55,7 @@ export default {
     return: 'Return',
     save: 'Save'
   },
-  udf: {
-    udf_resources: 'UDF resources',
-    upload_udf_resources: 'Upload UDF Resources',
-    udf_source_name: 'UDF Resource Name',
-    user_name: 'Resource userName'
-  },
   function: {
-    udf_function: 'UDF Function',
-    create_udf_function: 'Create UDF Function',
-    edit_udf_function: 'Edit UDF Function',
-    udf_function_name: 'UDF Function Name',
     user_name: 'Resource userName',
     class_name: 'Class Name',
     type: 'Type',
@@ -78,22 +68,15 @@ export default {
     delete: 'Delete',
     success: 'Success',
     package_name: 'Package Name',
-    udf_resources: 'UDF Resources',
     instructions: 'Instructions',
     upload_resources: 'Upload Resources',
-    udf_resources_directory: 'UDF resources directory',
     delete_confirm: 'Delete?',
     enter_keyword_tips: 'Please enter keyword',
-    enter_udf_unction_name_tips: 'Please enter a UDF function name',
     enter_package_name_tips: 'Please enter a Package name',
-    enter_select_udf_resources_tips: 'Please select UDF resources',
-    enter_select_udf_resources_directory_tips:
-      'Please select UDF resources directory',
     enter_instructions_tips: 'Please enter a instructions',
     enter_name_tips: 'Please enter name',
     enter_description_tips: 'Please enter description',
-    upload: 'Upload',
-    upload_udf_resources: 'Upload UDF Resources'
+    upload: 'Upload'
   },
   task_group_option: {
     manage: 'Task group manage',

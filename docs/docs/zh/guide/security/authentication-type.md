@@ -14,22 +14,23 @@ security:
     # IF you set type `LDAP`, below config will be effective
     ldap:
       # ldap server config
-      urls: ldap://ldap.forumsys.com:389/
+      url: ldap://ldap.forumsys.com:389/
       base-dn: dc=example,dc=com
-      username: cn=read-only-admin,dc=example,dc=com
+      username: cn=admin,dc=example,dc=com
       password: password
       user:
-        # admin userId when you use LDAP login
-        admin: read-only-admin
-        identity-attribute: uid
-        email-attribute: mail
-        # action when ldap user is not exist (supported types: CREATE,DENY)
-        not-exist-action: CREATE
+         # admin userId when you use LDAP login
+         admin: ldap-admin
+         # user search filter to find admin user
+         identity-attribute: uid
+         email-attribute: mail
+         # action when ldap user is not exist (supported types: CREATE,DENY)
+         not-exist-action: DENY
       ssl:
-        enable: false
-        # jks file absolute path && password
-        trust-store: "/ldapkeystore.jks"
-        trust-store-password: "password"
+         enable: false
+         # jks file absolute path && password
+         trust-store: "/ldapkeystore.jks"
+         trust-store-password: "password"
     casdoor:
       user:
         admin: ""
@@ -71,31 +72,6 @@ casdoor:
    redirect-url: ""
 ```
 
-具体字段解释详见：[Api-server相关配置](../../architecture/configuration.md)
-
-## 开发者LDAP测试
-
-我们提供了一个单元测试类，可以在不启动项目的情况下测试DolphinScheduler与LDAP的集成。
-
-> dolphinscheduler-api/src/test/java/org/apache/dolphinscheduler/api/security/impl/ldap/LdapServiceTest.java
-
-使用步骤如下：
-- 修改`TestPropertySource`配置参数为你的LDAP信息;
-- 修改`ldapLogin`方法中的userId和userPwd为你的账号密码;
-- 修改`ldapLogin`方法中的expected email为正常登陆的返回值;
-- 执行`ldapLogin`方法，判断LDAP登陆结果是否为预期;
-
-如果你要启用ssl，请修改`TestPropertySource`配置中ssl相关参数为：
-
-```
-security.authentication.ldap.ssl.enable=false
-// absolute path
-security.authentication.ldap.ssl.trust-store=/ldapkeystore.jks 
-security.authentication.ldap.ssl.trust-store-password=yourpassword
-```
-
-运行`ldapLoginSSL`方法，判断email是否为预期的返回值。
-
 ## 通过 Casdoor 实现 SSO 登录
 
 Casdoor 是基于 OAuth 2.0、OIDC、SAML 和 CAS 的面向 UI 的身份访问管理（IAM）/单点登录（SSO）平台。您可以通过以下步骤通过 Casdoor 为 Dolphinscheduler 添加 SSO 功能：
@@ -105,7 +81,7 @@ Casdoor 是基于 OAuth 2.0、OIDC、SAML 和 CAS 的面向 UI 的身份访问�
 首先，需要部署 Casdoor。 您可以参考 Casdoor 官方文档进行[安装](https://casdoor.org/docs/basic/server-installation)。 成功部署后，您需要确保：
 
 * Casdoor 服务器在 http://localhost:8000 上成功运行。
-* 打开您喜欢的浏览器并访问 http://localhost:7001，您将看到 Casdoor 的登录页面。
+* 打开您喜欢的浏览器并访问 http://localhost:7001 ，您将看到 Casdoor 的登录页面。
 * 输入 admin 和 123，测试登录功能是否正常工作。
 
 然后，您可以通过以下步骤在自己的应用程序中快速实现基于 Casdoor 的登录页面。

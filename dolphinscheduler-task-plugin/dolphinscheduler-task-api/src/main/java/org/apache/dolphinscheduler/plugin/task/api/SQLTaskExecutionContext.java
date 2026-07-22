@@ -17,71 +17,24 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
-import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.UdfFuncParameters;
-
 import java.io.Serializable;
-import java.util.List;
 
-/**
- *  SQL Task ExecutionContext
- */
+import lombok.Data;
+
+@Data
 public class SQLTaskExecutionContext implements Serializable {
 
-    /**
-     * warningGroupId
-     */
     private int warningGroupId;
 
-    /**
-     * connectionParams
-     */
     private String connectionParams;
 
-    private List<UdfFuncParameters> udfFuncParametersList;
-
-    /**
-     * DefaultFS
-     */
     private String defaultFS;
-
-    public int getWarningGroupId() {
-        return warningGroupId;
-    }
-
-    public void setWarningGroupId(int warningGroupId) {
-        this.warningGroupId = warningGroupId;
-    }
-
-    public List<UdfFuncParameters> getUdfFuncParametersList() {
-        return udfFuncParametersList;
-    }
-
-    public void setUdfFuncParametersList(List<UdfFuncParameters> udfFuncParametersList) {
-        this.udfFuncParametersList = udfFuncParametersList;
-    }
-
-    public String getConnectionParams() {
-        return connectionParams;
-    }
-
-    public void setConnectionParams(String connectionParams) {
-        this.connectionParams = connectionParams;
-    }
-
-    public String getDefaultFS() {
-        return defaultFS;
-    }
-
-    public void setDefaultFS(String defaultFS) {
-        this.defaultFS = defaultFS;
-    }
 
     @Override
     public String toString() {
         return "SQLTaskExecutionContext{"
                 + "warningGroupId=" + warningGroupId
                 + ", connectionParams='" + connectionParams + '\''
-                + ", udfFuncParametersList=" + udfFuncParametersList
                 + ", defaultFS='" + defaultFS + '\'' + '}';
     }
 }

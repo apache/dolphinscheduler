@@ -33,9 +33,7 @@ export default {
   workflow_timing: '工作流定时',
   task: '任务',
   task_instance: '任务实例',
-  task_definition: '任务定义',
   file_manage: '文件管理',
-  udf_manage: 'UDF管理',
   resource_manage: '资源管理',
   function_manage: '函数管理',
   service_manage: '服务管理',
@@ -59,7 +57,6 @@ export default {
   task_group_manage: '任务组管理',
   task_group_option: '任务组配置',
   task_group_queue: '任务组队列',
-  data_quality: '数据质量',
   task_result: '任务结果',
   rule: '规则管理'
 }

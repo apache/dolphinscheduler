@@ -36,11 +36,16 @@ public class MasterServerMetrics {
                     .register(Metrics.globalRegistry);
 
     /**
-     * Used to measure the number of process command consumed by master.
+     * Used to measure the number of workflow command consumed by master.
      */
     private final Counter masterConsumeCommandCounter =
             Counter.builder("ds.master.consume.command.count")
                     .description("Master server consume command count")
+                    .register(Metrics.globalRegistry);
+
+    private final Counter masterHeartBeatCounter =
+            Counter.builder("ds.master.heartbeat.count")
+                    .description("master heartbeat count")
                     .register(Metrics.globalRegistry);
 
     public void registerMasterMemoryAvailableGauge(Supplier<Number> supplier) {
@@ -75,4 +80,7 @@ public class MasterServerMetrics {
         masterConsumeCommandCounter.increment(commandCount);
     }
 
+    public void incMasterHeartbeatCount() {
+        masterHeartBeatCounter.increment();
+    }
 }

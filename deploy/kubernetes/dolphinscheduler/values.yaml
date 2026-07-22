@@ -19,6 +19,12 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+# -- Global settings for Bitnami subcharts
+global:
+  security:
+    # -- Allow using non-standard container images (required for bitnamilegacy images)
+    allowInsecureImages: true
+
 # -- World time and date for cities in all time zones
 timezone: "Asia/Shanghai"
 
@@ -56,23 +62,29 @@ datasource:
 postgresql:
   # -- If not exists external PostgreSQL, by default, the DolphinScheduler will use a internal PostgreSQL
   enabled: true
-  # -- The username for internal PostgreSQL
-  postgresqlUsername: "root"
-  # -- The password for internal PostgreSQL
-  postgresqlPassword: "root"
-  # -- The database for internal PostgreSQL
-  postgresqlDatabase: "dolphinscheduler"
   # -- The driverClassName for internal PostgreSQL
   driverClassName: "org.postgresql.Driver"
   # -- The params for internal PostgreSQL
   params: "characterEncoding=utf8"
-  persistence:
-    # -- Set postgresql.persistence.enabled to true to mount a new volume for internal PostgreSQL
-    enabled: false
-    # -- `PersistentVolumeClaim` size
-    size: "20Gi"
-    # -- PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning
-    storageClass: "-"
+  auth:
+    # -- The username for internal PostgreSQL
+    username: "root"
+    # -- The password for internal PostgreSQL
+    password: "root"
+    # -- The database for internal PostgreSQL
+    database: "dolphinscheduler"
+  primary:
+    persistence:
+      # -- Set postgresql.primary.persistence.enabled to true to mount a new volume for internal PostgreSQL
+      enabled: false
+      # -- `PersistentVolumeClaim` size
+      size: "20Gi"
+      # -- PostgreSQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning
+      storageClass: "-"
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/postgresql
+    tag: 15.1.0-debian-11-r12
 
 mysql:
   # -- If not exists external MySQL, by default, the DolphinScheduler will use a internal MySQL
@@ -96,6 +108,10 @@ mysql:
       size: "20Gi"
       # -- MySQL data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning
       storageClass: "-"
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/mysql
+    tag: 8.0.33-debian-11-r30
 
 minio:
   # -- Deploy minio and configure it as the default storage for DolphinScheduler, note this is for demo only, not for production.
@@ -110,6 +126,10 @@ minio:
     enabled: false
   # -- minio default buckets
   defaultBuckets: "dolphinscheduler"
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/minio
+    tag: 2022.10.29-debian-11-r0
 
 
 externalDatabase:
@@ -148,6 +168,10 @@ zookeeper:
     size: "20Gi"
     # -- ZooKeeper data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning
     storageClass: "-"
+  image:
+    registry: docker.io
+    repository: bitnamilegacy/zookeeper
+    tag: 3.9.3-debian-12-r21
 
 registryEtcd:
   # -- If you want to use Etcd for your registry center, change this value to true. And set zookeeper.enabled to false
@@ -205,8 +229,8 @@ security:
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
     ldap:
-      # -- LDAP urls
-      urls: ldap://ldap.forumsys.com:389/
+      # -- LDAP url
+      url: ldap://ldap.forumsys.com:389/
       # -- LDAP base dn
       basedn: dc=example,dc=com
       # -- LDAP username
@@ -214,8 +238,10 @@ security:
       # -- LDAP password
       password: password
       user:
-        # -- Admin user account when you log-in with LDAP
-        admin: read-only-admin
+        # -- Any user matching this filter becomes an Admin. If set to `""`, ignore this option
+        adminuserfilter: (&(uid={0})(memberOf=cn=admin-group,ou=apps,dc=example,dc=com))
+        # -- Admin user account when you log-in with LDAP. If the filter doesn't match anything this also acts as fallback. Set to `""` to ignore this option if you want to use filter only
+        adminusername: read-only-admin
         # -- LDAP user identity attribute
         identityattribute: uid
         # -- LDAP user email attribute
@@ -336,9 +362,6 @@ conf:
     # -- datasource encryption salt
     datasource.encryption.salt: '!@#$%^&*'
 
-    # -- data quality option
-    data-quality.jar.dir:
-
     # -- Whether hive SQL is executed in the same session
     support.hive.oneSession: false
 
@@ -348,8 +371,8 @@ conf:
     # -- development state
     development.state: false
 
-    # -- rpc port
-    alert.rpc.port: 50052
+    # -- If the shell process is still active after this timeout value (in seconds), then will use kill -9 to kill it
+    shell.kill.wait.timeout: 10
 
     # -- set path of conda.sh
     conda.path: /opt/anaconda3/etc/profile.d/conda.sh
@@ -394,6 +417,14 @@ common:
     FLINK_HOME: "/opt/soft/flink"
     # -- Set `DATAX_LAUNCHER` for DolphinScheduler's task environment
     DATAX_LAUNCHER: "/opt/soft/datax/bin/datax.py"
+    # -- Whether to enable management endpoints security: false, true
+    MANAGEMENT_SECURITY_ENABLED: false
+    # -- management endpoints security username
+    MANAGEMENT_SECURITY_USERNAME: ""
+    # -- management endpoints security password
+    MANAGEMENT_SECURITY_PASSWORD: ""
+    # -- A list of Actuator endpoint IDs that should be accessible without authentication, even when security is enabled. Common values: health, info, prometheus, metrics.
+    MANAGEMENT_SECURITY_EXCLUDE: "health,metrics"
   ## Shared storage persistence mounted into api, master and worker, such as Hadoop, Spark, Flink and DataX binary package
   sharedStoragePersistence:
     # -- Set `common.sharedStoragePersistence.enabled` to `true` to mount a shared storage volume for Hadoop, Spark binary and etc
@@ -424,6 +455,11 @@ master:
   enabled: true
   # -- PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
+  # -- Update strategy
+  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  #
+  updateStrategy:
+    type: RollingUpdate
   # -- Replicas is the desired number of replicas of the given Template.
   replicas: "3"
   # -- You can use annotations to attach arbitrary non-identifying metadata to objects.
@@ -537,10 +573,14 @@ master:
     MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.7
     # -- Master max disk usage , when the master's disk usage is smaller then this value, master server can execute workflow.
     MASTER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.7
+    # -- Maximum allowed running time for a workflow instance. If the running duration exceeds this value, the instance will be killed. The default value of 0d indicates no limit.
+    MASTER_SERVER_LOAD_PROTECTION_MAX_WORKFLOW_INSTANCE_RUNTIME: 0d
+    # -- Maximum allowed running time for a task instance. If the running duration exceeds this value, the instance will be killed. The default value of 0d indicates no limit.
+    MASTER_SERVER_LOAD_PROTECTION_MAX_TASK_INSTANCE_RUNTIME: 0d
     # -- Master failover interval, the unit is minute
     MASTER_FAILOVER_INTERVAL: "10m"
-    # -- Master kill application when handle failover
-    MASTER_KILL_APPLICATION_WHEN_HANDLE_FAILOVER: "true"
+    # -- Master kill application when task failover
+    MASTER_KILL_APPLICATION_WHEN_TASK_FAILOVER: "true"
   service:
     # -- annotations may need to be set when want to scrapy metrics by prometheus but not install prometheus operator
     annotations: {}
@@ -562,6 +602,43 @@ worker:
   enabled: true
   # -- PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
   podManagementPolicy: "Parallel"
+  # -- Update strategy
+  # ref: https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/#update-strategies
+  #
+  # -- Direct Secret Mounting
+  # Mount secrets directly as environment variables
+  # Single secret
+  envFromSecret: ""
+  
+  # Multiple secrets (advanced use cases)
+  # Use when you have variables distributed across different secrets
+  # envFromSecrets:
+  #   - "git-sync-secret"        # Git synchronization credentials
+  #   - "database-secret"        # Database connection details
+  #   - "external-api-secret"    # Third-party API keys
+  
+  # -- Init Container for Advanced Processing
+  # Use when you need to transform, validate, or prepare configuration files
+  initContainers: {}
+    # - name: config-processor
+    #  image: busybox:latest
+    #  command:
+    #    - /bin/sh
+    #    - -c
+    #    - |
+    #      echo "⚙️ Init startup settings..."
+    #      # Create specific starup script for an specific environment settings in worker pods.
+    #      # You can use unix variables from secrets
+    #  envFrom:
+    #    # -- Example secret name for initContainer
+    #    - secretRef:
+    #        name: git-sync-secret
+    #    # -- Example volumeMounts for initContiner
+    #  volumeMounts:
+    #    - name: shared-config
+    #      mountPath: /shared-config
+  updateStrategy:
+    type: RollingUpdate
   # -- Replicas is the desired number of replicas of the given Template.
   replicas: "3"
   # -- You can use annotations to attach arbitrary non-identifying metadata to objects.
@@ -678,7 +755,7 @@ worker:
     # -- tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true.
     WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED: true
     # -- If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`;
-    DEFAULT_TENANT_ENABLED: false
+    WORKER_TENANT_CONFIG_DEFAULT_TENANT_ENABLED: false
 
   keda:
     # -- Enable or disable the Keda component
@@ -977,7 +1054,6 @@ api:
     #  cloud: []
     #  logic: []
     #  dataIntegration: []
-    #  dataQuality: []
     #  machineLearning: []
     #  other: []
 

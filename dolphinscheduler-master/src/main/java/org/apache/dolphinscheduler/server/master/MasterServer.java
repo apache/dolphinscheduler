@@ -26,27 +26,33 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
-import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceProcessorProvider;
+import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourcePluginManager;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.registry.api.RegistryConfiguration;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
+import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
+import org.apache.dolphinscheduler.server.master.cluster.ClusterStateMonitors;
+import org.apache.dolphinscheduler.server.master.engine.MasterCoordinator;
+import org.apache.dolphinscheduler.server.master.engine.WorkflowEngine;
+import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
+import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBusFireWorker;
+import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.WorkerGroupDispatcherCoordinator;
 import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
-import org.apache.dolphinscheduler.server.master.registry.MasterSlotManager;
 import org.apache.dolphinscheduler.server.master.rpc.MasterRpcServer;
-import org.apache.dolphinscheduler.server.master.runner.EventExecuteService;
-import org.apache.dolphinscheduler.server.master.runner.FailoverExecuteThread;
-import org.apache.dolphinscheduler.server.master.runner.MasterSchedulerBootstrap;
-import org.apache.dolphinscheduler.server.master.runner.taskgroup.TaskGroupCoordinator;
+import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 import org.apache.dolphinscheduler.service.ServiceConfiguration;
 import org.apache.dolphinscheduler.service.bean.SpringApplicationContext;
 
+import java.util.Date;
+
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
 
-import org.quartz.SchedulerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -68,16 +74,10 @@ public class MasterServer implements IStoppable {
     private MasterRegistryClient masterRegistryClient;
 
     @Autowired
-    private MasterSchedulerBootstrap masterSchedulerBootstrap;
+    private WorkflowEngine workflowEngine;
 
     @Autowired
     private SchedulerApi schedulerApi;
-
-    @Autowired
-    private EventExecuteService eventExecuteService;
-
-    @Autowired
-    private FailoverExecuteThread failoverExecuteThread;
 
     @Autowired
     private MasterRpcServer masterRPCServer;
@@ -86,10 +86,22 @@ public class MasterServer implements IStoppable {
     private MetricsProvider metricsProvider;
 
     @Autowired
-    private MasterSlotManager masterSlotManager;
+    private ClusterStateMonitors clusterStateMonitors;
 
     @Autowired
-    private TaskGroupCoordinator taskGroupCoordinator;
+    private ClusterManager clusterManager;
+
+    @Autowired
+    private SystemEventBus systemEventBus;
+
+    @Autowired
+    private SystemEventBusFireWorker systemEventBusFireWorker;
+
+    @Autowired
+    private MasterCoordinator masterCoordinator;
+
+    @Autowired
+    private WorkerGroupDispatcherCoordinator workerGroupDispatcherCoordinator;
 
     public static void main(String[] args) {
         MasterServerMetrics.registerUncachedException(DefaultUncaughtExceptionHandler::getUncaughtExceptionCount);
@@ -103,27 +115,33 @@ public class MasterServer implements IStoppable {
      * run master server
      */
     @PostConstruct
-    public void run() throws SchedulerException {
+    public void initialized() {
+        ServerLifeCycleManager.toRunning();
+
         // init rpc server
         this.masterRPCServer.start();
 
         // install task plugin
         TaskPluginManager.loadTaskPlugin();
-        DataSourceProcessorProvider.initialize();
-
-        this.masterSlotManager.start();
+        DataSourcePluginManager.loadDataSourcePlugin();
 
         // self tolerant
         this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
 
-        this.masterSchedulerBootstrap.start();
+        this.masterCoordinator.start();
 
-        this.eventExecuteService.start();
-        this.failoverExecuteThread.start();
+        this.clusterManager.start();
+
+        this.clusterStateMonitors.start();
+
+        this.workflowEngine.start();
 
         this.schedulerApi.start();
-        this.taskGroupCoordinator.start();
+
+        this.systemEventBus
+                .publish(GlobalMasterFailoverEvent.of(new Date(ServerLifeCycleManager.getServerStartupTime())));
+        this.systemEventBusFireWorker.start();
 
         MasterServerMetrics.registerMasterCpuUsageGauge(() -> {
             SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
@@ -143,13 +161,15 @@ public class MasterServer implements IStoppable {
                 close("MasterServer shutdownHook");
             }
         }));
+        log.info("MasterServer initialized successfully in {} ms",
+                System.currentTimeMillis() - ServerLifeCycleManager.getServerStartupTime());
     }
 
-    /**
-     * gracefully close
-     *
-     * @param cause close cause
-     */
+    @PreDestroy
+    public void shutdown() {
+        close("MasterServer shutdown");
+    }
+
     public void close(String cause) {
         // set stop signal is true
         // execute only once
@@ -159,16 +179,21 @@ public class MasterServer implements IStoppable {
         }
         // thread sleep 3 seconds for thread quietly stop
         ThreadUtils.sleep(Constants.SERVER_CLOSE_WAIT_TIME.toMillis());
+        MasterThreadFactory.getDefaultSchedulerThreadExecutor().shutdownNow();
         try (
+                SystemEventBusFireWorker systemEventBusFireWorker1 = systemEventBusFireWorker;
+                WorkflowEngine workflowEngine1 = workflowEngine;
                 SchedulerApi closedSchedulerApi = schedulerApi;
-                MasterSchedulerBootstrap closedSchedulerBootstrap = masterSchedulerBootstrap;
                 MasterRpcServer closedRpcServer = masterRPCServer;
+                MasterCoordinator closeMasterCoordinator = masterCoordinator;
                 MasterRegistryClient closedMasterRegistryClient = masterRegistryClient;
                 // close spring Context and will invoke method with @PreDestroy annotation to destroy beans.
                 // like ServerNodeManager,HostManager,TaskResponseService,CuratorZookeeperClient,etc
-                SpringApplicationContext closedSpringContext = springApplicationContext) {
+                SpringApplicationContext closedSpringContext = springApplicationContext;
+                WorkerGroupDispatcherCoordinator closeWorkerGroupDispatcherCoordinator =
+                        workerGroupDispatcherCoordinator) {
 
-            log.info("Master server is stopping, current cause : {}", cause);
+            log.info("MasterServer is stopping, current cause : {}", cause);
         } catch (Exception e) {
             log.error("MasterServer stop failed, current cause: {}", cause, e);
             return;
@@ -179,5 +204,9 @@ public class MasterServer implements IStoppable {
     @Override
     public void stop(String cause) {
         close(cause);
+
+        // make sure exit after server closed, don't call System.exit in close logic, will cause deadlock if close
+        // multiple times at the same time
+        System.exit(1);
     }
 }

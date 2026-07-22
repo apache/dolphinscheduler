@@ -36,7 +36,6 @@ public class ResponseFuture {
 
     private final long opaque;
 
-    // remove the timeout
     private final long timeoutMillis;
 
     private final CountDownLatch latch = new CountDownLatch(1);

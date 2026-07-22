@@ -19,21 +19,17 @@ package org.apache.dolphinscheduler.plugin.task.api.am;
 
 import java.util.List;
 
-import lombok.RequiredArgsConstructor;
-import lombok.Value;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.ToString;
 
-@Value
-@RequiredArgsConstructor
+@Getter
+@ToString
+@AllArgsConstructor
 public class YarnApplicationManagerContext implements ApplicationManagerContext {
 
-    /**
-     * execute path
-     */
     private final String executePath;
 
-    /**
-     * tenant code
-     */
     private final String tenantCode;
 
     /**

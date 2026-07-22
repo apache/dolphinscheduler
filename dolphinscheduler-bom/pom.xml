@@ -29,9 +29,8 @@
 
     <properties>
         <netty.version>4.1.53.Final</netty.version>
-        <spring-boot.version>2.7.3</spring-boot.version>
+        <spring-boot.version>2.7.11</spring-boot.version>
         <spring-ldap.version>2.4.1</spring-ldap.version>
-        <java-websocket.version>1.5.1</java-websocket.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <quartz.version>2.3.2</quartz.version>
         <druid.version>1.2.20</druid.version>
@@ -40,14 +39,15 @@
         <!-- todo: Should upgrade the jetcd.test, 0.7.1 doesn't support arm -->
         <jetcd.test.version>0.7.1</jetcd.test.version>
         <io.grpc.version>1.41.0</io.grpc.version>
+        <commons-text.version>1.4</commons-text.version>
         <commons-codec.version>1.11</commons-codec.version>
         <commons-logging.version>1.1.1</commons-logging.version>
-        <commons-lang3.version>3.12.0</commons-lang3.version>
+        <commons-lang3.version>3.17.0</commons-lang3.version>
         <commons-httpclient>3.0.1</commons-httpclient>
         <commons-beanutils.version>1.9.4</commons-beanutils.version>
         <commons-configuration.version>1.10</commons-configuration.version>
         <commons-email.version>1.5</commons-email.version>
-        <commons-collections4.version>4.3</commons-collections4.version>
+        <commons-collections4.version>4.5.0</commons-collections4.version>
         <httpclient.version>4.5.13</httpclient.version>
         <httpcore.version>4.4.15</httpcore.version>
         <jackson.version>2.13.4</jackson.version>
@@ -58,23 +58,24 @@
         <cron-utils.version>9.1.6</cron-utils.version>
         <h2.version>2.2.220</h2.version>
         <mysql-connector.version>8.0.33</mysql-connector.version>
+        <dolphindb-jdbc.version>3.00.3.0</dolphindb-jdbc.version>
         <vertica-jdbc.version>12.0.4-0</vertica-jdbc.version>
         <oracle-jdbc.version>21.5.0.0</oracle-jdbc.version>
         <dameng-jdbc.version>8.1.2.79</dameng-jdbc.version>
         <ngdbc.version>2.4.51</ngdbc.version>
         <slf4j.version>1.7.36</slf4j.version>
-        <poi.version>4.1.2</poi.version>
+        <poi.version>5.4.1</poi.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
         <activation.version>1.1</activation.version>
         <javax-mail>1.6.2</javax-mail>
         <guava.version>31.1-jre</guava.version>
-        <postgresql.version>42.4.1</postgresql.version>
+        <postgresql.version>42.4.4</postgresql.version>
         <hive-jdbc.version>2.3.9</hive-jdbc.version>
         <kyuubi-jdbc.version>1.7.0</kyuubi-jdbc.version>
-        <commons-io.version>2.11.0</commons-io.version>
+        <commons-io.version>2.19.0</commons-io.version>
         <oshi-core.version>6.1.1</oshi-core.version>
         <clickhouse-jdbc.version>0.4.6</clickhouse-jdbc.version>
-        <databend-jdbc.version>0.0.7</databend-jdbc.version>
+        <databend-jdbc.version>0.3.9</databend-jdbc.version>
         <lz4-java.version>1.4.0</lz4-java.version>
         <mssql-jdbc.version>11.2.1.jre8</mssql-jdbc.version>
         <presto-jdbc.version>0.238.1</presto-jdbc.version>
@@ -83,27 +84,23 @@
         <reflections.version>0.10.2</reflections.version>
         <py4j.version>0.10.9</py4j.version>
         <jsr305.version>3.0.0</jsr305.version>
-        <commons-compress.version>1.21</commons-compress.version>
-        <commons-math3.version>3.1.1</commons-math3.version>
-        <error_prone_annotations.version>2.5.1</error_prone_annotations.version>
+        <commons-compress.version>1.27.1</commons-compress.version>
+        <commons-math3.version>3.6.1</commons-math3.version>
         <hibernate-validator.version>6.2.2.Final</hibernate-validator.version>
         <aws-sdk.version>1.12.300</aws-sdk.version>
         <aliyun-sdk-oss.version>3.15.1</aliyun-sdk-oss.version>
         <joda-time.version>2.10.13</joda-time.version>
-        <okhttp.version>4.9.3</okhttp.version>
-        <json-path.version>2.7.0</json-path.version>
+        <okhttp.version>4.12.0</okhttp.version>
         <spring-cloud-dependencies.version>2021.0.3</spring-cloud-dependencies.version>
         <gson.version>2.9.1</gson.version>
         <dropwizard.metrics-version>4.2.11</dropwizard.metrics-version>
         <snappy.version>1.1.10.1</snappy.version>
-        <spark.version>3.2.2</spark.version>
         <janino.version>3.0.16</janino.version>
         <snakeyaml.version>1.33</snakeyaml.version>
         <htrace.version>4.1.1</htrace.version>
         <datasync.version>2.17.282</datasync.version>
         <springdoc-openapi-ui.version>1.6.9</springdoc-openapi-ui.version>
         <aspectj.version>1.9.7</aspectj.version>
-        <zt-zip.version>1.15</zt-zip.version>
         <trino-jdbc.version>402</trino-jdbc.version>
         <azure-identity.version>1.7.1</azure-identity.version>
         <redshift-jdbc42.version>2.1.0.9</redshift-jdbc42.version>
@@ -118,17 +115,95 @@
         <azure-sdk-bom.version>1.2.10</azure-sdk-bom.version>
         <protobuf.version>3.17.2</protobuf.version>
         <esdk-obs.version>3.23.3</esdk-obs.version>
+        <qcloud-cos.version>5.6.231</qcloud-cos.version>
         <system-lambda.version>1.2.1</system-lambda.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
-        <testcontainer.version>1.19.3</testcontainer.version>
+        <testcontainer.version>1.21.4</testcontainer.version>
         <checker-qual.version>3.19.0</checker-qual.version>
         <zeppelin-client.version>0.10.1</zeppelin-client.version>
         <aliyun-voice.version>2.1.4</aliyun-voice.version>
         <nashorn-sandbox.version>0.3.2</nashorn-sandbox.version>
+        <brace-expansion.version>2.0.1</brace-expansion.version>
+        <protoc.version>3.17.3</protoc.version>
+        <j2objc.version>1.3</j2objc.version>
+        <guice.version>7.0.0</guice.version>
+        <jsr305.version>3.0.0</jsr305.version>
+        <error.prone.annotations.version>2.11.0</error.prone.annotations.version>
+        <emr-serverless-spark.version>2.4.1</emr-serverless-spark.version>
+        <credentials-java.version>1.0.1</credentials-java.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- grpc -->
+            <dependency>
+                <groupId>com.google.code.findbugs</groupId>
+                <artifactId>jsr305</artifactId>
+                <version>${jsr305.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>${error.prone.annotations.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-bom</artifactId>
+                <version>${io.grpc.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-services</artifactId>
+                <version>${io.grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-netty</artifactId>
+                <version>${io.grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-netty-shaded</artifactId>
+                <version>${io.grpc.version}</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-protobuf</artifactId>
+                <version>${io.grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-api</artifactId>
+                <version>${io.grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-core</artifactId>
+                <version>${io.grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-stub</artifactId>
+                <version>${io.grpc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java-util</artifactId>
+                <version>${protobuf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.j2objc</groupId>
+                <artifactId>j2objc-annotations</artifactId>
+                <version>${j2objc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>${commons-text.version}</version>
+            </dependency>
             <!-- aspectj -->
             <dependency>
                 <groupId>org.aspectj</groupId>
@@ -139,6 +214,11 @@
                 <groupId>org.aspectj</groupId>
                 <artifactId>aspectjrt</artifactId>
                 <version>${aspectj.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.protobuf</groupId>
+                <artifactId>protobuf-java</artifactId>
+                <version>${protobuf.version}</version>
             </dependency>
 
             <!-- netty -->
@@ -169,11 +249,6 @@
                 <scope>test</scope>
             </dependency>
 
-            <dependency>
-                <groupId>org.java-websocket</groupId>
-                <artifactId>Java-WebSocket</artifactId>
-                <version>${java-websocket.version}</version>
-            </dependency>
             <!-- mybatis -->
             <dependency>
                 <groupId>com.baomidou</groupId>
@@ -296,13 +371,6 @@
                 <version>${jetcd.test.version}</version>
                 <scope>test</scope>
             </dependency>
-            <dependency>
-                <groupId>io.grpc</groupId>
-                <artifactId>grpc-bom</artifactId>
-                <version>${io.grpc.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
 
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -366,7 +434,11 @@
                 <artifactId>jackson-core</artifactId>
                 <version>${jackson.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
             <!--protostuff-->
             <dependency>
                 <groupId>io.protostuff</groupId>
@@ -392,8 +464,8 @@
             </dependency>
 
             <dependency>
-                <groupId>mysql</groupId>
-                <artifactId>mysql-connector-java</artifactId>
+                <groupId>com.mysql</groupId>
+                <artifactId>mysql-connector-j</artifactId>
                 <version>${mysql-connector.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -660,11 +732,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>jsr305</artifactId>
-                <version>${jsr305.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-compress</artifactId>
                 <version>${commons-compress.version}</version>
@@ -673,11 +740,6 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-math3</artifactId>
                 <version>${commons-math3.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.google.errorprone</groupId>
-                <artifactId>error_prone_annotations</artifactId>
-                <version>${error_prone_annotations.version}</version>
             </dependency>
 
             <!-- https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator -->
@@ -690,6 +752,11 @@
             <dependency>
                 <groupId>com.amazonaws</groupId>
                 <artifactId>aws-java-sdk-emr</artifactId>
+                <version>${aws-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.amazonaws</groupId>
+                <artifactId>aws-java-sdk-emrserverless</artifactId>
                 <version>${aws-sdk.version}</version>
             </dependency>
             <dependency>
@@ -735,12 +802,6 @@
             </dependency>
 
             <dependency>
-                <groupId>com.jayway.jsonpath</groupId>
-                <artifactId>json-path</artifactId>
-                <version>${json-path.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud-dependencies.version}</version>
@@ -778,18 +839,6 @@
             </dependency>
 
             <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-core_2.12</artifactId>
-                <version>${spark.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.module</groupId>
-                        <artifactId>jackson-module-scala_2.11</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
                 <groupId>org.apache.sshd</groupId>
                 <artifactId>sshd-sftp</artifactId>
                 <version>${sshd.version}</version>
@@ -798,42 +847,6 @@
                 <groupId>org.apache.sshd</groupId>
                 <artifactId>sshd-scp</artifactId>
                 <version>${sshd.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-sql_2.12</artifactId>
-                <version>${spark.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>com.fasterxml.jackson.core</groupId>
-                        <artifactId>jackson-core</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.apache.spark</groupId>
-                <artifactId>spark-hive_2.12</artifactId>
-                <version>${spark.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-httpclient</groupId>
-                        <artifactId>commons-httpclient</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.jackson</groupId>
-                        <artifactId>jackson-core-asl</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.jackson</groupId>
-                        <artifactId>jackson-mapper-asl</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
@@ -859,11 +872,6 @@
                 <version>${springdoc-openapi-ui.version}</version>
             </dependency>
 
-            <dependency>
-                <groupId>org.zeroturnaround</groupId>
-                <artifactId>zt-zip</artifactId>
-                <version>${zt-zip.version}</version>
-            </dependency>
             <dependency>
                 <groupId>com.azure</groupId>
                 <artifactId>azure-identity</artifactId>
@@ -915,15 +923,25 @@
             </dependency>
 
             <dependency>
-                <groupId>com.google.protobuf</groupId>
-                <artifactId>protobuf-java</artifactId>
-                <version>${protobuf.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>com.huaweicloud</groupId>
                 <artifactId>esdk-obs-java-bundle</artifactId>
                 <version>${esdk-obs.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
+                <groupId>com.qcloud</groupId>
+                <artifactId>cos_api</artifactId>
+                <version>${qcloud-cos.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.logging.log4j</groupId>
@@ -941,6 +959,18 @@
                 <artifactId>system-lambda</artifactId>
                 <version>${system-lambda.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>emr_serverless_spark20230808</artifactId>
+                <version>${emr-serverless-spark.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.aliyun</groupId>
+                <artifactId>credentials-java</artifactId>
+                <version>${credentials-java.version}</version>
             </dependency>
 
             <!-- test dependencies on TestContainers -->
@@ -988,6 +1018,18 @@
                 <artifactId>delight-nashorn-sandbox</artifactId>
                 <version>${nashorn-sandbox.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.webjars.npm</groupId>
+                <artifactId>brace-expansion</artifactId>
+                <version>${brace-expansion.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.dolphindb</groupId>
+                <artifactId>jdbc</artifactId>
+                <version>${dolphindb-jdbc.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -998,8 +1040,8 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <zookeeper.version>3.8.0</zookeeper.version>
-                <curator.version>5.3.0</curator.version>
+                <zookeeper.version>3.8.3</zookeeper.version>
+                <curator.version>5.5.0</curator.version>
             </properties>
         </profile>
         <profile>

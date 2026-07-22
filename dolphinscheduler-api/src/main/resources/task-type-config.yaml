@@ -24,6 +24,7 @@ task:
     - 'SQL'
     - 'SPARK'
     - 'FLINK'
+    - 'GRPC'
     - 'HTTP'
     - 'MR'
     - 'DINKY'
@@ -32,31 +33,28 @@ task:
     - 'REMOTESHELL'
   cloud:
     - 'EMR'
+    - 'EMR_SERVERLESS'
     - 'K8S'
     - 'DMS'
     - 'DATA_FACTORY'
+    - 'ALIYUN_SERVERLESS_SPARK'
   logic:
-    - 'SUB_PROCESS'
+    - 'SUB_WORKFLOW'
     - 'DEPENDENT'
     - 'CONDITIONS'
     - 'SWITCH'
-    - 'DYNAMIC'
   dataIntegration:
     - 'SEATUNNEL'
     - 'DATAX'
     - 'SQOOP'
-  dataQuality:
-    - 'DATA_QUALITY'
   machineLearning:
     - 'JUPYTER'
     - 'MLFLOW'
     - 'OPENMLDB'
     - 'DVC'
     - 'SAGEMAKER'
-    - 'PYTORCH'
     - 'KUBEFLOW'
   other:
-    - 'PIGEON'
     - 'ZEPPELIN'
     - 'CHUNJUN'
     - 'DATASYNC'

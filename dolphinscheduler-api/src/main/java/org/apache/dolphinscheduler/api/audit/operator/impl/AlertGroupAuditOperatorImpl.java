@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.mapper.AlertGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class AlertGroupAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private AlertGroupMapper alertGroupMapper;
+    private AlertGroupDao alertGroupDao;
 
     @Override
     public String getObjectNameFromIdentity(Object identity) {
@@ -37,7 +37,7 @@ public class AlertGroupAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        AlertGroup obj = alertGroupMapper.selectById(objId);
+        AlertGroup obj = alertGroupDao.queryById(objId);
         return obj == null ? "" : obj.getGroupName();
     }
 }

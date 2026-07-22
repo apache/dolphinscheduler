@@ -55,6 +55,6 @@ export function useWorkerGroup(projectCode: number): IJsonItem {
       required: true,
       message: t('project.node.worker_group_tips')
     },
-    value: 'default'
+    value: options.value.length > 0 ? options.value[0].value : ''
   }
 }

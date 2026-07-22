@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.api.test.utils;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
 import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT;
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import org.apache.dolphinscheduler.api.test.core.Constants;
 
@@ -57,9 +56,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 
-/**
- * json utils
- */
 public class JSONUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(JSONUtils.class);
@@ -72,8 +68,11 @@ public class JSONUtils {
      * can use static singleton, inject: just make sure to reuse!
      */
     private static final ObjectMapper objectMapper =
-        new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false).configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true).configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
-            .configure(REQUIRE_SETTERS_FOR_GETTERS, true).setTimeZone(TimeZone.getDefault()).setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
+            new ObjectMapper().configure(FAIL_ON_UNKNOWN_PROPERTIES, false)
+                    .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
+                    .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
+                    .configure(REQUIRE_SETTERS_FOR_GETTERS, true).setTimeZone(TimeZone.getDefault())
+                    .setDateFormat(new SimpleDateFormat(Constants.YYYY_MM_DD_HH_MM_SS));
 
     private JSONUtils() {
         throw new UnsupportedOperationException("Construct JSONUtils");
@@ -362,9 +361,6 @@ public class JSONUtils {
 
     }
 
-    /**
-     * json data deserializer
-     */
     public static class JsonDataDeserializer extends JsonDeserializer<String> {
 
         @Override

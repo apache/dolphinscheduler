@@ -34,7 +34,11 @@ service ssh start
 /bin/bash $DOLPHINSCHEDULER_HOME/tools/bin/upgrade-schema.sh
 
 #Start Cluster
-/bin/bash $DOLPHINSCHEDULER_HOME/bin/start-all.sh
+/bin/bash $DOLPHINSCHEDULER_HOME/bin/dolphinscheduler-daemon.sh start master-server
+/bin/bash $DOLPHINSCHEDULER_HOME/bin/dolphinscheduler-daemon.sh start worker-server
+/bin/bash $DOLPHINSCHEDULER_HOME/bin/dolphinscheduler-daemon.sh start api-server
+/bin/bash $DOLPHINSCHEDULER_HOME/bin/dolphinscheduler-daemon.sh start alert-server
+
 
 #Keep running
 tail -f /dev/null

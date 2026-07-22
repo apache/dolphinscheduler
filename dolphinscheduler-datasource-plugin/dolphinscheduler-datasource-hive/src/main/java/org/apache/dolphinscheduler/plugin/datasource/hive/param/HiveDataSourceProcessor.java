@@ -18,11 +18,12 @@
 package org.apache.dolphinscheduler.plugin.datasource.hive.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
@@ -30,10 +31,10 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
         hiveDataSourceParamDTO.setLoginUserKeytabUsername(hiveConnectionParam.getLoginUserKeytabUsername());
         hiveDataSourceParamDTO.setLoginUserKeytabPath(hiveConnectionParam.getLoginUserKeytabPath());
         hiveDataSourceParamDTO.setJavaSecurityKrb5Conf(hiveConnectionParam.getJavaSecurityKrb5Conf());
+        hiveDataSourceParamDTO.setPrincipal(hiveConnectionParam.getPrincipal());
 
         String[] tmpArray = hiveConnectionParam.getAddress().split(Constants.DOUBLE_SLASH);
         StringBuilder hosts = new StringBuilder();
@@ -123,21 +125,32 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) connectionParam;
-        String jdbcUrl = hiveConnectionParam.getJdbcUrl();
-        if (MapUtils.isNotEmpty(hiveConnectionParam.getOther())) {
-            return jdbcUrl + ";" + transformOther(hiveConnectionParam.getOther());
+
+        StringBuilder jdbcUrlBuilder = new StringBuilder(hiveConnectionParam.getJdbcUrl());
+        if (StringUtils.isNotBlank(hiveConnectionParam.getPrincipal())) {
+            jdbcUrlBuilder.append(";principal=").append(hiveConnectionParam.getPrincipal());
         }
-        return jdbcUrl;
+        if (MapUtils.isNotEmpty(hiveConnectionParam.getOther())) {
+            jdbcUrlBuilder.append(";").append(transformOther(hiveConnectionParam.getOther()));
+        }
+
+        return jdbcUrlBuilder.toString();
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws IOException, ClassNotFoundException, SQLException {
+    public Connection getConnection(ConnectionParam connectionParam) throws IOException, SQLException {
         HiveConnectionParam hiveConnectionParam = (HiveConnectionParam) connectionParam;
-        CommonUtils.loadKerberosConf(hiveConnectionParam.getJavaSecurityKrb5Conf(),
-                hiveConnectionParam.getLoginUserKeytabUsername(), hiveConnectionParam.getLoginUserKeytabPath());
-        Class.forName(getDatasourceDriver());
-        return DriverManager.getConnection(getJdbcUrl(connectionParam),
-                hiveConnectionParam.getUser(), PasswordUtils.decodePassword(hiveConnectionParam.getPassword()));
+        CommonUtils.loadKerberosConf(
+                hiveConnectionParam.getJavaSecurityKrb5Conf(),
+                hiveConnectionParam.getLoginUserKeytabUsername(),
+                hiveConnectionParam.getLoginUserKeytabPath());
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(getJdbcUrl(hiveConnectionParam))
+                .username(hiveConnectionParam.getUser())
+                .password(PasswordUtils.decodePassword(hiveConnectionParam.getPassword()))
+                .build()
+                .getConnection();
     }
 
     @Override

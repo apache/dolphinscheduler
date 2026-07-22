@@ -31,6 +31,8 @@ server:
       custom-format: '%{client}a - %u %t "%r" %s %O %{ms}Tms'
 
 spring:
+  application:
+    name: api-server
   profiles:
     active: postgresql
   banner:
@@ -70,11 +72,12 @@ spring:
       org.quartz.scheduler.makeSchedulerThreadDaemon: true
       org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
       org.quartz.jobStore.clusterCheckinInterval: 5000
-      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 1
+      org.quartz.scheduler.batchTriggerAcquisitionMaxCount: 25
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
     static-path-pattern: /static/**
+    dispatch-trace-request: false
   cloud.discovery.client.composite-indicator.enabled: false
 
 springdoc:
@@ -97,6 +100,11 @@ mybatis-plus:
     banner: false
 
 management:
+  security:
+    enabled: false
+    username: username
+    password: password
+    exclude: [health,metrics]
   endpoints:
     web:
       exposure:
@@ -129,6 +137,10 @@ registry:
     digest: ~
 
 api:
+  # The base URL for the API server, used for constructing callback URLs for features like OIDC.
+  # This should be the public-facing URL of the DolphinScheduler API.
+  base-url: http://127.0.0.1:12345/dolphinscheduler
+  ui-url: http://127.0.0.1:5173
   audit-enable: false
   # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
   # global max request number per second
@@ -145,9 +157,8 @@ api:
   python-gateway:
     # Weather enable python gateway server or not. The default value is false.
     enabled: false
-    # Authentication token for connection from python api to python gateway server. Should be changed the default value
-    # when you deploy in public network.
-    auth-token: jwUDzpLsNKEFER4*a8gruBH_GsAurNxU7A@Xc
+    # Authentication token for connection from python api to python gateway server. Should not be empty when enabled
+    auth-token:
     # The address of Python gateway server start. Set its value to `0.0.0.0` if your Python API run in different
     # between Python gateway server. It could be be specific to other address like `127.0.0.1` or `localhost`
     gateway-server-address: 0.0.0.0
@@ -165,27 +176,26 @@ api:
     # (0 = infinite), and socket server would never close even though no requests accept
     read-timeout: 0
 
-metrics:
-  enabled: true
-
 security:
   authentication:
-    # Authentication types (supported types: PASSWORD,LDAP,CASDOOR_SSO)
+    # Authentication types (supported types: PASSWORD, LDAP, CASDOOR_SSO, OIDC)
     type: PASSWORD
     # IF you set type `LDAP`, below config will be effective
     ldap:
       # ldap server config
-      urls: ldap://ldap.forumsys.com:389/
+      url: ldap://ldap.forumsys.com:389/
       base-dn: dc=example,dc=com
-      username: cn=read-only-admin,dc=example,dc=com
+      username: cn=admin,dc=example,dc=com
       password: password
       user:
-        # admin userId when you use LDAP login
-        admin: read-only-admin
+        # admin username when you use LDAP login
+        admin-username: ldap-admin
+        # user search filter to find admin user
+        admin-user-filter: (&(cn={0}))
         identity-attribute: uid
         email-attribute: mail
         # action when ldap user is not exist (supported types: CREATE,DENY)
-        not-exist-action: CREATE
+        not-exist-action: DENY
       ssl:
         enable: false
         # jks file absolute path && password
@@ -217,6 +227,29 @@ security:
           callbackUrl: ""
           iconUri: ""
           provider: google
+    oidc:
+      enable: false
+      providers:
+        # registrationId used in URLs and internal mapping
+        keycloak:
+          display-name: "Login with Keycloak" # Text for UI Button
+          issuer-uri: http://keycloak:8080/realms/dolphinscheduler
+          icon-uri: "/images/providers-icon/keycloak.png"
+          client-id: dolphinscheduler-client
+          client-secret: dolphinscheduler-client-secret
+          # Optional: Specify client auth method (e.g., client_secret_basic, client_secret_post). Defaults if omitted.
+          # client-authentication-method: client_secret_basic
+          scope: openid, profile, email, groups # Default: openid, profile, email
+          user-name-attribute: preferred_username # Claim to use as username (e.g., email, preferred_username)
+          groups-claim: groups # Optional: Claim containing user groups/roles
+        # Add more providers here (e.g., okta, azure, google)
+        # okta: ....
+      user: # Settings for auto-provisioning OIDC users
+        auto-create: false # Create a DS user if not found? Default: false
+        default-tenant-code: "default" # Tenant code for auto-created users
+        default-queue: "default" # Queue for auto-created users (if needed by permissions)
+        admin-group-mapping: # Groups that map to an administrator role
+          - dolphinscheduler-admins
 casdoor:
   # Your Casdoor server url
   endpoint: ""

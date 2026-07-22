@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.prometheus;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
 import org.apache.dolphinscheduler.spi.params.input.InputParam;
@@ -43,7 +44,7 @@ public final class PrometheusAlertChannelFactory implements AlertChannelFactory 
                 InputParam
                         .newBuilder(PrometheusAlertConstants.NAME_ALERT_MANAGER_URL,
                                 PrometheusAlertConstants.ALERT_MANAGER_URL)
-                        .setPlaceholder(AlertInputTips.URL.getMsg())
+                        .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.URL)))
                         .addValidate(Validate.newBuilder()
                                 .setRequired(true)
                                 .build())
@@ -52,14 +53,14 @@ public final class PrometheusAlertChannelFactory implements AlertChannelFactory 
                 InputParam
                         .newBuilder(PrometheusAlertConstants.NAME_ALERT_MANAGER_ANNOTATIONS,
                                 PrometheusAlertConstants.ALERT_MANAGER_ANNOTATIONS)
-                        .setPlaceholder(AlertInputTips.ANNOTATION.getMsg())
+                        .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.ANNOTATION)))
                         .addValidate(Validate.newBuilder()
                                 .setRequired(false).build())
                         .build();
         InputParam generatorUrlParam =
                 InputParam
                         .newBuilder(PrometheusAlertConstants.NAME_GENERATOR_URL, PrometheusAlertConstants.GENERATOR_URL)
-                        .setPlaceholder(AlertInputTips.GENERATOR_URL.getMsg())
+                        .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.GENERATOR_URL)))
                         .addValidate(Validate.newBuilder()
                                 .setRequired(false).build())
                         .build();

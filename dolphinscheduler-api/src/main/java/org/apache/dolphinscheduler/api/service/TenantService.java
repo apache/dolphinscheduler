@@ -22,11 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
-import java.util.Map;
 
-/**
- * tenant service
- */
 public interface TenantService {
 
     /**
@@ -56,7 +52,7 @@ public interface TenantService {
     PageInfo<Tenant> queryTenantList(User loginUser, String searchVal, Integer pageNo, Integer pageSize);
 
     /**
-     * updateProcessInstance tenant
+     * updateWorkflowInstance tenant
      *
      * @param loginUser  login user
      * @param id         tennat id
@@ -101,9 +97,9 @@ public interface TenantService {
      * query tenant by tenant code
      *
      * @param tenantCode tenant code
-     * @return tenant list
+     * @return tenant if exists, otherwise {@code null}
      */
-    Map<String, Object> queryByTenantCode(String tenantCode);
+    Tenant queryByTenantCode(String tenantCode);
 
     /**
      * Make sure tenant with given name exists, and create the tenant if not exists

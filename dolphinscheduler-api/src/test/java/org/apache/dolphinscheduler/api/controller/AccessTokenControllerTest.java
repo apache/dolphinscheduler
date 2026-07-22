@@ -37,9 +37,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-/**
- * access token controller test
- */
 public class AccessTokenControllerTest extends AbstractControllerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(AccessTokenControllerTest.class);
@@ -90,7 +87,7 @@ public class AccessTokenControllerTest extends AbstractControllerTest {
         MvcResult mvcResult = mockMvc.perform(post("/access-tokens")
                 .header("sessionId", sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);

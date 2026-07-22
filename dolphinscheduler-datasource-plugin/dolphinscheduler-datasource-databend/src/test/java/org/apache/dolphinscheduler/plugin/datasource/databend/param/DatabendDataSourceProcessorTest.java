@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.databend.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
@@ -30,15 +30,12 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
 public class DatabendDataSourceProcessorTest {
 
-    private DatabendDataSourceProcessor databendDataSourceProcessor = new DatabendDataSourceProcessor();
+    private final DatabendDataSourceProcessor databendDataSourceProcessor = new DatabendDataSourceProcessor();
 
     @Test
     public void testCheckDatasourceParam() {

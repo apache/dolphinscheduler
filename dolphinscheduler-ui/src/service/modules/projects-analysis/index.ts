@@ -33,9 +33,9 @@ export function countDefinitionByUser(params: CodeReq): any {
   })
 }
 
-export function countProcessInstanceState(params: StateReq): any {
+export function countWorkflowInstanceState(params: StateReq): any {
   return axios({
-    url: '/projects/analysis/process-state-count',
+    url: '/projects/analysis/workflow-state-count',
     method: 'get',
     params
   })

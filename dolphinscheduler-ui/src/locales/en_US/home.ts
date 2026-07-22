@@ -17,8 +17,8 @@
 
 export default {
   task_state_statistics: 'Task State Statistics',
-  process_state_statistics: 'Process State Statistics',
-  process_definition_statistics: 'Process Definition Statistics',
+  workflow_state_statistics: 'Workflow State Statistics',
+  workflow_definition_statistics: 'Workflow Definition Statistics',
   number: 'Number',
   state: 'State',
   submitted_success: 'SUBMITTED_SUCCESS',
@@ -31,13 +31,10 @@ export default {
   success: 'SUCCESS',
   need_fault_tolerance: 'NEED_FAULT_TOLERANCE',
   kill: 'KILL',
-  waiting_thread: 'WAITING_THREAD',
   waiting_depend: 'WAITING_DEPEND',
   delay_execution: 'DELAY_EXECUTION',
   forced_success: 'FORCED_SUCCESS',
   serial_wait: 'SERIAL_WAIT',
   dispatch: 'DISPATCH',
-  ready_block: 'READY_BLOCK',
-  block: 'BLOCK',
-  wait_to_run: 'WAIT_TO_RUN'
+  failover: 'FAILOVER'
 }

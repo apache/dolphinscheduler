@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -336,19 +337,22 @@ public class DinkyTask extends AbstractRemoteTask {
 
     private Map<String, String> generateVariables() {
         Map<String, String> variables = new ConcurrentHashMap<>();
-        List<Property> propertyList = JSONUtils.toList(taskExecutionContext.getGlobalParams(), Property.class);
-        if (propertyList != null && !propertyList.isEmpty()) {
-            for (Property property : propertyList) {
-                variables.put(property.getProp(), property.getValue());
+        Map<String, Property> prepareParamsMap = taskExecutionContext.getPrepareParamsMap();
+        prepareParamsMap.forEach((key, property) -> {
+            if (property != null && property.getValue() != null) {
+                variables.put(key, property.getValue().trim());
+            }
+        });
+        List<Property> localParams = this.dinkyParameters.getLocalParams();
+        if (localParams != null) {
+            for (Property property : localParams) {
+                String value = ParameterUtils.convertParameterPlaceholders(property.getValue(), variables);
+                if (value != null && !value.isEmpty()) {
+                    variables.put(property.getProp(), value.trim());
+                }
             }
         }
-        List<Property> localParams = this.dinkyParameters.getLocalParams();
-        if (localParams == null || localParams.isEmpty()) {
-            return variables;
-        }
-        for (Property property : localParams) {
-            variables.put(property.getProp(), property.getValue());
-        }
+        log.info("sending variables to dinky: {}", variables);
         return variables;
     }
 

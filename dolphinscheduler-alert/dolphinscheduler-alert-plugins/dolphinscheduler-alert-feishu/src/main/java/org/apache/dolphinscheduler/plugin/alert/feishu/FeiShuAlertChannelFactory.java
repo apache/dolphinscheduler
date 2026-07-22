@@ -25,6 +25,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.STRING_YES;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.DataType;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
@@ -86,7 +87,7 @@ public final class FeiShuAlertChannelFactory implements AlertChannelFactory {
                         .build();
         InputParam passwordParam = InputParam
                 .newBuilder(FeiShuParamsConstants.NAME_FEI_SHU_PASSWORD, FeiShuParamsConstants.FEI_SHU_PASSWORD)
-                .setPlaceholder(AlertInputTips.PASSWORD.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.PASSWORD)))
                 .setType("password")
                 .build();
 

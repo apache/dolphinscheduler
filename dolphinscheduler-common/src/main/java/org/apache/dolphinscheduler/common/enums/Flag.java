@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import lombok.Getter;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
 /**
@@ -26,8 +28,8 @@ import com.baomidou.mybatisplus.annotation.EnumValue;
  * have_arr_variables
  * have_map_variables
  * have_alert
- * is_cache
  */
+@Getter
 public enum Flag {
 
     /**
@@ -46,11 +48,10 @@ public enum Flag {
     private final int code;
     private final String descp;
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
+    public static Flag of(int code) {
+        if (code == 0) {
+            return NO;
+        }
+        return YES;
     }
 }

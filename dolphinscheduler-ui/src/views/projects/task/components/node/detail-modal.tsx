@@ -40,7 +40,7 @@ import {
 import { NIcon } from 'naive-ui'
 import { TASK_TYPES_MAP } from '../../constants/task-type'
 import { Router, useRouter } from 'vue-router'
-import { querySubProcessInstanceByTaskCode } from '@/service/modules/process-instances'
+import { querySubWorkflowInstanceByTaskCode } from '@/service/modules/workflow-instances'
 import { useTaskNodeStore } from '@/store/project/task-node'
 import type {
   ITaskData,
@@ -77,7 +77,7 @@ const props = {
   definition: {
     type: Object as PropType<Ref<EditWorkflowDefinition>>
   },
-  processInstance: {
+  workflowInstance: {
     type: Object as PropType<WorkflowInstance>
   },
   taskInstance: {
@@ -130,15 +130,30 @@ const NodeDetailModal = defineComponent({
 
     const restructureNodeData = (data: INodeData) => {
       if (!data?.id) {
+        const allowedFields = [
+          'taskPriority',
+          'workerGroup',
+          'environmentCode',
+          'failRetryTimes',
+          'failRetryInterval',
+          'cpuQuota',
+          'memoryMax',
+          'timeoutFlag',
+          'timeoutNotifyStrategy',
+          'timeout'
+        ]
         for (const item in projectPreferences.value) {
-          if (projectPreferences.value[item] !== null && item in data) {
-            Object.assign(data, { item: projectPreferences.value[item] })
+          if (
+            projectPreferences.value[item] !== null &&
+            allowedFields.includes(item)
+          ) {
+            Object.assign(data, { [item]: projectPreferences.value[item] })
           }
         }
       }
     }
 
-    const initHeaderLinks = (processInstance: any, taskType?: ITaskType) => {
+    const initHeaderLinks = (workflowInstance: any, taskType?: ITaskType) => {
       headerLinks.value = [
         {
           text: t('project.node.instructions'),
@@ -179,29 +194,27 @@ const NodeDetailModal = defineComponent({
         },
         {
           text: t('project.node.enter_this_child_node'),
-          show:
-            props.data.taskType === 'SUB_PROCESS' ||
-            props.data.taskType === 'DYNAMIC',
+          show: props.data.taskType === 'SUB_WORKFLOW',
           disabled:
             !props.data.id ||
             (router.currentRoute.value.name === 'workflow-instance-detail' &&
               !props.taskInstance),
           action: () => {
             if (router.currentRoute.value.name === 'workflow-instance-detail') {
-              querySubProcessInstanceByTaskCode(
+              querySubWorkflowInstanceByTaskCode(
                 { taskId: props.taskInstance?.id },
                 { projectCode: props.projectCode }
               ).then((res: any) => {
                 router.push({
                   name: 'workflow-instance-detail',
-                  params: { id: res.subProcessInstanceId },
-                  query: { code: props.data.taskParams?.processDefinitionCode }
+                  params: { id: res.subWorkflowInstanceId },
+                  query: { code: props.data.taskParams?.workflowDefinitionCode }
                 })
               })
             } else {
               router.push({
                 name: 'workflow-definition-detail',
-                params: { code: props.data.taskParams?.processDefinitionCode }
+                params: { code: props.data.taskParams?.workflowDefinitionCode }
               })
             }
           },
@@ -213,7 +226,7 @@ const NodeDetailModal = defineComponent({
     const onTaskTypeChange = (taskType: ITaskType) => {
       // eslint-disable-next-line vue/no-mutating-props
       props.data.taskType = taskType
-      initHeaderLinks(props.processInstance, props.data.taskType)
+      initHeaderLinks(props.workflowInstance, props.data.taskType)
     }
 
     provide(
@@ -235,7 +248,7 @@ const NodeDetailModal = defineComponent({
       () => [props.show, props.data],
       async () => {
         if (!props.show) return
-        initHeaderLinks(props.processInstance, props.data.taskType)
+        initHeaderLinks(props.workflowInstance, props.data.taskType)
         taskStore.init()
         const nodeData = formatModel(props.data)
         await nextTick()

@@ -54,8 +54,6 @@ export function useCellActive(options: Options) {
   function setEdgeStyle(edge: Edge) {
     const isHover = edge === hoverCell.value
     const isSelected = graph.value?.isSelected(edge)
-    // TODO
-    // const labelName = this.getEdgeLabelName ? this.getEdgeLabelName(edge) : ''
     let edgeProps = null
 
     if (isHover) {
@@ -69,14 +67,9 @@ export function useCellActive(options: Options) {
     edge.setAttrs(edgeProps.attrs)
     edge.setLabels([
       {
-        ..._.merge(
-          {
-            attrs: _.cloneDeep(edgeProps.defaultLabel.attrs)
-          }
-          // {
-          //   attrs: { label: { text: labelName } }
-          // }
-        )
+        ..._.merge({
+          attrs: _.cloneDeep(edgeProps.defaultLabel.attrs)
+        })
       }
     ])
   }

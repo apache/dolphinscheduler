@@ -4,7 +4,7 @@
 
 DataX task type for executing DataX programs. For DataX nodes, the worker will execute `${DATAX_LAUNCHER}` to analyze the input json file.
 
-Please set environment name `PYTHON_LAUNCHER` before you run datax task, some of datax release version only support `python2.7`
+Please set environment name `PYTHON_LAUNCHER` and `DATAX_LAUNCHER` in `dolphinshceduler_env.sh` before you run datax task, some of datax release version only support `python2.7`
 
 ## Create Task
 
@@ -12,9 +12,6 @@ Please set environment name `PYTHON_LAUNCHER` before you run datax task, some of
 - Drag the <img src="../../../../img/tasks/icons/datax.png" width="15"/> from the toolbar to the drawing board.
 
 ## Task Parameters
-
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 

@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.service.cron;
 
 import org.apache.dolphinscheduler.common.enums.CycleEnum;
@@ -84,9 +85,6 @@ public class CycleFactory {
         return new YearCycle(cron);
     }
 
-    /**
-     * day cycle
-     */
     public static class DayCycle extends AbstractCycle {
 
         public DayCycle(Cron cron) {
@@ -125,9 +123,6 @@ public class CycleFactory {
         }
     }
 
-    /**
-     * hour cycle
-     */
     public static class HourCycle extends AbstractCycle {
 
         public HourCycle(Cron cron) {
@@ -202,9 +197,6 @@ public class CycleFactory {
         }
     }
 
-    /**
-     * month cycle
-     */
     public static class MonthCycle extends AbstractCycle {
 
         public MonthCycle(Cron cron) {
@@ -248,9 +240,6 @@ public class CycleFactory {
         }
     }
 
-    /**
-     * week cycle
-     */
     public static class WeekCycle extends AbstractCycle {
 
         public WeekCycle(Cron cron) {
@@ -288,9 +277,6 @@ public class CycleFactory {
         }
     }
 
-    /**
-     * year cycle
-     */
     public static class YearCycle extends AbstractCycle {
 
         public YearCycle(Cron cron) {

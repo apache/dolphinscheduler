@@ -25,16 +25,16 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.regex.Pattern;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 public class SeatunnelParameters extends AbstractParameters {
+
+    private static final Pattern STARTUP_SCRIPT_PATTERN = Pattern.compile("^[A-Za-z0-9][A-Za-z0-9._-]*\\.sh$");
 
     private String startupScript;
 
@@ -42,17 +42,18 @@ public class SeatunnelParameters extends AbstractParameters {
 
     private String rawScript;
 
-    /**
-     * resource list
-     */
     private List<ResourceInfo> resourceList;
 
     @Override
     public boolean checkParameters() {
-        return Objects.nonNull(startupScript)
+        return isValidStartupScript(startupScript)
                 && ((BooleanUtils.isTrue(useCustom) && StringUtils.isNotBlank(rawScript))
                         || (BooleanUtils.isFalse(useCustom) && CollectionUtils.isNotEmpty(resourceList)
                                 && resourceList.size() == 1));
+    }
+
+    private static boolean isValidStartupScript(String startupScript) {
+        return StringUtils.isNotBlank(startupScript) && STARTUP_SCRIPT_PATTERN.matcher(startupScript).matches();
     }
 
     @Override

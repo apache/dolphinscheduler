@@ -44,6 +44,8 @@ public abstract class BaseConnectionParam implements ConnectionParam {
 
     protected String validationQuery;
 
+    protected String compatibleMode;
+
     protected Map<String, String> other;
 
 }

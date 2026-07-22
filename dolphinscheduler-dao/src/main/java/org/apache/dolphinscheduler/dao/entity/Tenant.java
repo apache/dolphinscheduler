@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Date;
@@ -29,46 +30,22 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_tenant")
 public class Tenant {
 
-    /**
-     * id
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
-    /**
-     * tenant code
-     */
     private String tenantCode;
 
-    /**
-     * description
-     */
     private String description;
 
-    /**
-     * queue id
-     */
     private int queueId;
 
-    /**
-     * queue name
-     */
     @TableField(exist = false)
     private String queueName;
 
-    /**
-     * queue
-     */
     @TableField(exist = false)
     private String queue;
 
-    /**
-     * create time
-     */
     private Date createTime;
-    /**
-     * update time
-     */
     private Date updateTime;
 
     public Tenant() {

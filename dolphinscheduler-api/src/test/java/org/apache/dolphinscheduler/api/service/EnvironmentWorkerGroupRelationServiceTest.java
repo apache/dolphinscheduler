@@ -17,13 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.impl.EnvironmentWorkerGroupRelationServiceImpl;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 
-import java.util.Map;
+import java.util.List;
 
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
@@ -54,18 +52,18 @@ public class EnvironmentWorkerGroupRelationServiceTest {
     public void testQueryEnvironmentWorkerGroupRelation() {
         Mockito.when(relationMapper.queryByEnvironmentCode(1L))
                 .thenReturn(Lists.newArrayList(new EnvironmentWorkerGroupRelation()));
-        Map<String, Object> result = relationService.queryEnvironmentWorkerGroupRelation(1L);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        List<EnvironmentWorkerGroupRelation> relations = relationService.queryEnvironmentWorkerGroupRelation(1L);
+        logger.info(relations.toString());
+        Assertions.assertEquals(1, relations.size());
     }
 
     @Test
     public void testQueryAllEnvironmentWorkerGroupRelationList() {
         Mockito.when(relationMapper.selectList(Mockito.any()))
                 .thenReturn(Lists.newArrayList(new EnvironmentWorkerGroupRelation()));
-        Map<String, Object> result = relationService.queryAllEnvironmentWorkerGroupRelationList();
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        List<EnvironmentWorkerGroupRelation> relations = relationService.queryAllEnvironmentWorkerGroupRelationList();
+        logger.info(relations.toString());
+        Assertions.assertEquals(1, relations.size());
     }
 
 }

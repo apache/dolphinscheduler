@@ -65,7 +65,6 @@ public class WorkerGroupMapperTest extends BaseDaoTest {
         workerGroup.setCreateTime(new Date());
         workerGroup.setUpdateTime(new Date());
         workerGroup.setSystemDefault(true);
-        workerGroup.setOtherParamsJson("");
         workerGroup.setAddrList("localhost");
         workerGroupMapper.insert(workerGroup);
         return workerGroup;

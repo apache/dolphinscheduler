@@ -24,11 +24,10 @@ import { useTextCopy } from '../components/dag/use-text-copy'
 import {
   batchCopyByCodes,
   batchDeleteByCodes,
-  batchExportByCodes,
   deleteByCode,
   queryListPaging,
   release
-} from '@/service/modules/process-definition'
+} from '@/service/modules/workflow-definition'
 import { offline, online } from '@/service/modules/schedules'
 import TableAction from './components/table-action'
 import styles from './index.module.scss'
@@ -62,6 +61,7 @@ export function useTable() {
     pageSize: ref(10),
     searchVal: ref(),
     totalPage: ref(1),
+    totalCount: ref(0),
     timingType: ref('create'),
     timingState: ref('OFFLINE'),
     showRef: ref(false),
@@ -176,7 +176,7 @@ export function useTable() {
                   onClick: () => {
                     void router.push({
                       name: 'workflow-instance-list',
-                      query: { processDefineCode: row.code }
+                      query: { workflowDefinitionCode: row.code }
                     })
                   }
                 },
@@ -275,7 +275,6 @@ export function useTable() {
             onReleaseWorkflow: () => releaseWorkflow(row),
             onReleaseScheduler: () => releaseScheduler(row),
             onCopyWorkflow: () => copyWorkflow(row),
-            onExportWorkflow: () => exportWorkflow(row),
             onGotoWorkflowTree: () => gotoWorkflowTree(row)
           })
       }
@@ -306,6 +305,8 @@ export function useTable() {
       variables.timingState = row.scheduleReleaseState
     } else {
       variables.row = row
+      variables.timingType = 'create'
+      variables.timingState = 'OFFLINE'
     }
   }
 
@@ -335,19 +336,6 @@ export function useTable() {
         pageNo: variables.page,
         searchVal: variables.searchVal
       })
-    })
-  }
-
-  const batchExportWorkflow = () => {
-    const fileName = 'workflow_' + new Date().getTime()
-    const data = {
-      codes: _.join(variables.checkedRowKeys, ',')
-    }
-
-    batchExportByCodes(data, variables.projectCode).then((res: any) => {
-      downloadBlob(res, fileName)
-      window.$message.success(t('project.workflow.success'))
-      variables.checkedRowKeys = []
     })
   }
 
@@ -397,12 +385,6 @@ export function useTable() {
     variables.row = row
     if (data.releaseState === 'ONLINE') {
       release(data, variables.projectCode, row.code).then(() => {
-        variables.setTimingDialogShowRef = true
-        if (row?.schedule) {
-          variables.row = row.schedule
-          variables.timingType = 'update'
-          variables.timingState = row.scheduleReleaseState
-        }
         getTableData({
           pageSize: variables.pageSize,
           pageNo: variables.page,
@@ -514,42 +496,6 @@ export function useTable() {
     })
   }
 
-  const downloadBlob = (data: any, fileNameS = 'json') => {
-    if (!data) {
-      return
-    }
-    const blob = new Blob([data])
-    const fileName = `${fileNameS}.json`
-    if ('download' in document.createElement('a')) {
-      // Not IE
-      const url = window.URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.style.display = 'none'
-      link.href = url
-      link.setAttribute('download', fileName)
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link) // remove element after downloading is complete.
-      window.URL.revokeObjectURL(url) // release blob object
-    } else {
-      // IE 10+
-      if (window.navigator.msSaveBlob) {
-        window.navigator.msSaveBlob(blob, fileName)
-      }
-    }
-  }
-
-  const exportWorkflow = (row: any) => {
-    const fileName = 'workflow_' + new Date().getTime()
-
-    const data = {
-      codes: String(row.code)
-    }
-    batchExportByCodes(data, variables.projectCode).then((res: any) => {
-      downloadBlob(res, fileName)
-    })
-  }
-
   const gotoWorkflowTree = (row: any) => {
     router.push({
       name: 'workflow-definition-tree',
@@ -560,16 +506,28 @@ export function useTable() {
   const getTableData = (params: IDefinitionParam) => {
     if (variables.loadingRef) return
     variables.loadingRef = true
-    const { state } = useAsyncState(
-      queryListPaging({ ...params }, variables.projectCode).then((res: any) => {
+    // Always release loading lock, even when request fails.
+    const queryStatePromise = queryListPaging(
+      { ...params },
+      variables.projectCode
+    )
+      .then((res: any) => {
+        variables.totalCount = res.total
         variables.totalPage = res.totalPage
         variables.tableData = res.totalList.map((item: any) => {
           return { ...item }
         })
+      })
+      .catch((err: Error) => {
+        window.$message.error(
+          err?.message || t('project.workflow.request_failed')
+        )
+      })
+      .finally(() => {
         variables.loadingRef = false
-      }),
-      { total: 0, table: [] }
-    )
+      })
+
+    const { state } = useAsyncState(queryStatePromise, { total: 0, table: [] })
     return state
   }
 
@@ -578,7 +536,6 @@ export function useTable() {
     createColumns,
     getTableData,
     batchDeleteWorkflow,
-    batchExportWorkflow,
     batchCopyWorkflow
   }
 }

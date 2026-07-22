@@ -18,8 +18,8 @@
 import { useRoute } from 'vue-router'
 import { defineComponent, onMounted, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { viewVariables } from '@/service/modules/process-instances'
-import { viewProcessDefinitionVariables } from '@/service/modules/process-definition'
+import { viewVariables } from '@/service/modules/workflow-instances'
+import { viewWorkflowDefinitionVariables } from '@/service/modules/workflow-definition'
 import styles from './variables.module.scss'
 import { NButton } from 'naive-ui'
 
@@ -34,7 +34,7 @@ export default defineComponent({
 
     const instanceId = Number(route.params.id)
 
-    const processCode = Number(route.params.code)
+    const workflowCode = Number(route.params.code)
 
     const globalParams = computed(() => {
       return paramsRef.value && paramsRef.value.globalParams
@@ -50,7 +50,7 @@ export default defineComponent({
 
     const getViewVariables = () => {
       if (Number.isNaN(instanceId)) {
-        viewProcessDefinitionVariables(projectCode, processCode).then(
+        viewWorkflowDefinitionVariables(projectCode, workflowCode).then(
           (res: any) => {
             paramsRef.value = res
           }

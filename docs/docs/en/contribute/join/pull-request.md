@@ -82,8 +82,11 @@ Please refer to the commit message section.
 [//]: # (DolphinScheduler uses `Spotless` to automatically fix code style and formatting errors,)
 [//]: # (see [Development Environment Setup]&#40;../development-environment-setup.md#code-style&#41; `Code Style` section for details.)
 
-DolphinScheduler uses `Spotless` to automatically fix code style and formatting errors,
-see [Development Environment Setup](../development-environment-setup.md) `Code Style` section for details.
+DolphinScheduler uses `Spotless` to enforce code style and formatting. It covers Java sources, `pom.xml`, and Markdown files (including the docs in this directory).
+
+**Before opening a Pull Request, you must run `./mvnw spotless:apply` locally and commit the result.** CI runs `./mvnw spotless:check` and will fail the PR if any file is not formatted.
+
+See [Development Environment Setup](../development-environment-setup.md) `Code Style` section for details.
 
 ### Question
 

@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 
 import org.apache.commons.lang3.StringUtils;
@@ -29,11 +32,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * k8s task parameters
- */
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Slf4j
 public class K8sTaskParameters extends AbstractParameters {
@@ -66,5 +68,33 @@ public class K8sTaskParameters extends AbstractParameters {
         ResourceParametersHelper resources = super.getResources();
         resources.put(ResourceType.DATASOURCE, datasource);
         return resources;
+    }
+
+    public K8sTaskExecutionContext generateK8sTaskExecutionContext(
+                                                                   ResourceParametersHelper parametersHelper,
+                                                                   int datasource) {
+        DataSourceParameters dataSourceParameters =
+                (DataSourceParameters) parametersHelper
+                        .getResourceParameters(ResourceType.DATASOURCE, datasource);
+
+        String connectionParams = null;
+        if (dataSourceParameters != null) {
+            connectionParams = dataSourceParameters.getConnectionParams();
+        }
+
+        String configYaml = null;
+        String namespace = null;
+        if (StringUtils.isNotEmpty(connectionParams) && JSONUtils.checkJsonValid(connectionParams, false)) {
+            K8sTaskParameters connectionTaskParameters =
+                    JSONUtils.parseObject(connectionParams, K8sTaskParameters.class);
+            configYaml = connectionTaskParameters.getKubeConfig();
+            namespace = connectionTaskParameters.getNamespace();
+        }
+
+        return K8sTaskExecutionContext.builder()
+                .configYaml(configYaml)
+                .namespace(namespace)
+                .connectionParams(connectionParams)
+                .build();
     }
 }

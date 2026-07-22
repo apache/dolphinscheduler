@@ -34,9 +34,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import okhttp3.HttpUrl;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -62,9 +61,7 @@ public class HttpTaskTest {
 
     private static final String APPLICATION_JSON_VALUE = "application/json";
 
-    private static final String MOCK_DISPATCH_PATH_REQ_BODY_TO_RES_BODY = "/requestBody/to/responseBody";
-
-    private static final String MOCK_DISPATCH_PATH_REQ_PARAMS_TO_RES_BODY = "/requestParams/to/responseBody";
+    private static final String DEFAULT_MOCK_PATH = "/test";
 
     private final List<MockWebServer> mockWebServers = new ArrayList<>();
 
@@ -76,26 +73,23 @@ public class HttpTaskTest {
 
     @Test
     public void testHandleCheckCodeDefaultSuccess() throws Exception {
-        HttpTask getHttpTask = generateHttpTask(HttpMethod.GET, HttpStatus.SC_OK);
-        HttpTask postHttpTask = generateHttpTask(HttpMethod.POST, HttpStatus.SC_OK);
-        HttpTask headHttpTask = generateHttpTask(HttpMethod.HEAD, HttpStatus.SC_OK);
-        HttpTask putHttpTask = generateHttpTask(HttpMethod.PUT, HttpStatus.SC_OK);
-        HttpTask deleteHttpTask = generateHttpTask(HttpMethod.DELETE, HttpStatus.SC_OK);
+        HttpTask getHttpTask = generateHttpTask(HttpRequestMethod.GET, HttpStatus.SC_OK);
+        HttpTask postHttpTask = generateHttpTask(HttpRequestMethod.POST, HttpStatus.SC_OK);
+        HttpTask putHttpTask = generateHttpTask(HttpRequestMethod.PUT, HttpStatus.SC_OK);
+        HttpTask deleteHttpTask = generateHttpTask(HttpRequestMethod.DELETE, HttpStatus.SC_OK);
         getHttpTask.handle(null);
         postHttpTask.handle(null);
-        headHttpTask.handle(null);
         putHttpTask.handle(null);
         deleteHttpTask.handle(null);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, getHttpTask.getExitStatusCode());
         Assertions.assertEquals(EXIT_CODE_SUCCESS, postHttpTask.getExitStatusCode());
-        Assertions.assertEquals(EXIT_CODE_SUCCESS, headHttpTask.getExitStatusCode());
         Assertions.assertEquals(EXIT_CODE_SUCCESS, putHttpTask.getExitStatusCode());
         Assertions.assertEquals(EXIT_CODE_SUCCESS, deleteHttpTask.getExitStatusCode());
     }
 
     @Test
     public void testHandleCheckCodeDefaultError() throws Exception {
-        HttpTask getHttpTask = generateHttpTask(HttpMethod.GET, HttpStatus.SC_BAD_REQUEST);
+        HttpTask getHttpTask = generateHttpTask(HttpRequestMethod.GET, HttpStatus.SC_BAD_REQUEST);
         getHttpTask.handle(null);
         Assertions.assertEquals(EXIT_CODE_FAILURE, getHttpTask.getExitStatusCode());
     }
@@ -103,9 +97,9 @@ public class HttpTaskTest {
     @Test
     public void testHandleCheckCodeCustom() throws Exception {
         String condition = HttpStatus.SC_CREATED + "";
-        HttpTask httpTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.STATUS_CODE_CUSTOM,
-                condition, HttpStatus.SC_CREATED, "");
-        HttpTask httpErrorTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.STATUS_CODE_CUSTOM,
+        HttpTask httpTask = generateHttpTask(HttpRequestMethod.GET, HttpCheckCondition.STATUS_CODE_CUSTOM,
+                condition, HttpStatus.SC_CREATED, "{\"status\": 201}");
+        HttpTask httpErrorTask = generateHttpTask(HttpRequestMethod.GET, HttpCheckCondition.STATUS_CODE_CUSTOM,
                 condition, HttpStatus.SC_OK, "");
         httpTask.handle(null);
         httpErrorTask.handle(null);
@@ -115,9 +109,9 @@ public class HttpTaskTest {
 
     @Test
     public void testHandleCheckBodyContains() throws Exception {
-        HttpTask httpTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.BODY_CONTAINS,
+        HttpTask httpTask = generateHttpTask(HttpRequestMethod.GET, HttpCheckCondition.BODY_CONTAINS,
                 "success", HttpStatus.SC_OK, "{\"status\": \"success\"}");
-        HttpTask httpErrorTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.BODY_CONTAINS,
+        HttpTask httpErrorTask = generateHttpTask(HttpRequestMethod.GET, HttpCheckCondition.BODY_CONTAINS,
                 "success", HttpStatus.SC_OK, "{\"status\": \"failed\"}");
         httpTask.handle(null);
         httpErrorTask.handle(null);
@@ -127,9 +121,9 @@ public class HttpTaskTest {
 
     @Test
     public void testHandleCheckBodyNotContains() throws Exception {
-        HttpTask httpTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.BODY_NOT_CONTAINS,
+        HttpTask httpTask = generateHttpTask(HttpRequestMethod.GET, HttpCheckCondition.BODY_NOT_CONTAINS,
                 "failed", HttpStatus.SC_OK, "{\"status\": \"success\"}");
-        HttpTask httpErrorTask = generateHttpTask(HttpMethod.GET, HttpCheckCondition.BODY_NOT_CONTAINS,
+        HttpTask httpErrorTask = generateHttpTask(HttpRequestMethod.GET, HttpCheckCondition.BODY_NOT_CONTAINS,
                 "failed", HttpStatus.SC_OK, "{\"status\": \"failed\"}");
         httpTask.handle(null);
         httpErrorTask.handle(null);
@@ -138,37 +132,36 @@ public class HttpTaskTest {
     }
 
     @Test
-    public void testHandleWithHttpBodyParams() throws Exception {
-        List<HttpProperty> httpParams = new ArrayList<>();
-        HttpProperty property = new HttpProperty();
-        property.setProp("day");
-        property.setValue("${day}");
-        property.setHttpParametersType(HttpParametersType.BODY);
-        httpParams.add(property);
+    public void testHandleWithHttpBody() throws Exception {
+        String httpBody = "{\"day\": ${day}}";
+        String httpResponse = "{\"day\": \"20220812\"}";
 
         Map<String, String> prepareParamsMap = new HashMap<>();
         prepareParamsMap.put("day", "20220812");
-        // The MockWebServer will return the request body as response body directly
-        // So we just need to check if the response body contains string "20220812"
-        HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_BODY_TO_RES_BODY, HttpMethod.POST, null,
-                httpParams, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
-                HttpStatus.SC_OK, "");
+
+        HttpTask httpTask = generateHttpTask(DEFAULT_MOCK_PATH, HttpRequestMethod.POST, httpBody,
+                null, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
+                HttpStatus.SC_OK, httpResponse);
         httpTask.handle(null);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
 
     @Test
-    public void testHandleWithHttpBody() throws Exception {
-        String httpBody = "{\"day\": ${day}}";
+    public void testHandleWithComplexHttpBody() throws Exception {
+        String httpBody = "{\"name\":\"tom\",\"scores\":[100,98],\"metadata\":{\"grade\":\"A\"}}";
+        String httpResponse = "{\"status\": \"success\"}";
+        String url = withMockWebServer(DEFAULT_MOCK_PATH, HttpStatus.SC_OK, httpResponse);
+        HttpTask httpTask = generateHttpTask(url, HttpRequestMethod.POST, httpBody,
+                new ArrayList<>(), null, HttpCheckCondition.STATUS_CODE_DEFAULT, "");
 
-        Map<String, String> prepareParamsMap = new HashMap<>();
-        prepareParamsMap.put("day", "20220812");
-        // The MockWebServer will return the request body as response body directly
-        // So we just need to check if the response body contains string "20220812"
-        HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_BODY_TO_RES_BODY, HttpMethod.POST, httpBody,
-                null, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
-                HttpStatus.SC_OK, "");
         httpTask.handle(null);
+
+        MockWebServer server = getLatestMockWebServer();
+        RecordedRequest recordedRequest = server.takeRequest(1, TimeUnit.SECONDS);
+        Assertions.assertNotNull(recordedRequest);
+        String actualRequestBody = recordedRequest.getBody().readUtf8();
+        Assertions.assertTrue(actualRequestBody.contains("\"scores\":[100,98]"));
+        Assertions.assertTrue(actualRequestBody.contains("\"metadata\":{\"grade\":\"A\"}"));
         Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
 
@@ -183,18 +176,18 @@ public class HttpTaskTest {
 
         Map<String, String> prepareParamsMap = new HashMap<>();
         prepareParamsMap.put("day", "20220812");
-        // The MockWebServer will return the request parameter as response body directly
-        // So we just need to check if the response body contains string "20220812"
-        HttpTask httpTask = generateHttpTask(MOCK_DISPATCH_PATH_REQ_PARAMS_TO_RES_BODY, HttpMethod.POST, null,
+        String httpResponse = "{\"day\": \"20220812\"}";
+
+        HttpTask httpTask = generateHttpTask(DEFAULT_MOCK_PATH, HttpRequestMethod.POST, null,
                 httpParams, prepareParamsMap, HttpCheckCondition.BODY_CONTAINS, "20220812",
-                HttpStatus.SC_OK, "");
+                HttpStatus.SC_OK, httpResponse);
         httpTask.handle(null);
         Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
 
     @Test
     public void testAddDefaultOutput() throws Exception {
-        HttpTask httpTask = generateHttpTask(HttpMethod.GET, HttpStatus.SC_OK);
+        HttpTask httpTask = generateHttpTask(HttpRequestMethod.GET, HttpStatus.SC_OK);
         AbstractParameters httpParameters = httpTask.getParameters();
         String response = "{\"status\": \"success\"}";
         httpTask.addDefaultOutput(response);
@@ -208,6 +201,39 @@ public class HttpTaskTest {
         Assertions.assertEquals(response, property.getValue());
     }
 
+    @Test
+    public void testHandleSetsVarPoolToTaskExecutionContext() throws Exception {
+        String responseBody = "{\"status\": \"success\", \"data\": \"test\"}";
+        String taskName = "testHttpTask";
+
+        TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskExecutionContext.getTaskName()).thenReturn(taskName);
+
+        String url = withMockWebServer(DEFAULT_MOCK_PATH, HttpStatus.SC_OK, responseBody);
+        String paramData = generateHttpParameters(url, HttpRequestMethod.GET, "",
+                new ArrayList<>(), HttpCheckCondition.STATUS_CODE_DEFAULT, "");
+        Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(paramData);
+
+        HttpTask httpTask = new HttpTask(taskExecutionContext);
+        httpTask.init();
+        httpTask.handle(null);
+
+        Mockito.verify(taskExecutionContext, Mockito.times(1)).setVarPool(Mockito.anyList());
+
+        Mockito.verify(taskExecutionContext).setVarPool(Mockito.argThat(varPool -> {
+            if (varPool == null || varPool.isEmpty()) {
+                return false;
+            }
+            Property property = varPool.get(0);
+            return property.getProp().equals(taskName + ".response")
+                    && property.getDirect() == Direct.OUT
+                    && property.getType() == DataType.VARCHAR
+                    && property.getValue().contains("status");
+        }));
+
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+    }
+
     private String withMockWebServer(String path, int actualResponseCode,
                                      String actualResponseBody) throws IOException {
         MockWebServer server = new MockWebServer();
@@ -217,26 +243,39 @@ public class HttpTaskTest {
         return server.url(path).toString();
     }
 
-    private HttpTask generateHttpTask(HttpMethod httpMethod, int actualResponseCode) throws IOException {
-        return generateHttpTask("/test", httpMethod, null, null, null,
+    private HttpTask generateHttpTask(HttpRequestMethod httpRequestMethod, int actualResponseCode) throws IOException {
+        return generateHttpTask(DEFAULT_MOCK_PATH, httpRequestMethod, "", new ArrayList<>(), null,
                 HttpCheckCondition.STATUS_CODE_DEFAULT, "", actualResponseCode, "");
     }
 
-    private HttpTask generateHttpTask(HttpMethod httpMethod, HttpCheckCondition httpCheckConditionType,
+    private HttpTask generateHttpTask(HttpRequestMethod httpRequestMethod, HttpCheckCondition httpCheckConditionType,
                                       String condition, int actualResponseCode,
                                       String actualResponseBody) throws IOException {
-        return generateHttpTask("/test", httpMethod, null, null, null,
+        return generateHttpTask(DEFAULT_MOCK_PATH, httpRequestMethod, "", new ArrayList<>(), null,
                 httpCheckConditionType, condition, actualResponseCode, actualResponseBody);
     }
-    private HttpTask generateHttpTask(String mockPath, HttpMethod httpMethod, String httpBody,
+
+    private HttpTask generateHttpTask(String mockPath, HttpRequestMethod httpRequestMethod, String httpBody,
                                       List<HttpProperty> httpParams,
                                       Map<String, String> prepareParamsMap, HttpCheckCondition httpCheckConditionType,
                                       String condition, int actualResponseCode,
                                       String actualResponseBody) throws IOException {
         String url = withMockWebServer(mockPath, actualResponseCode, actualResponseBody);
+        return generateHttpTask(url, httpRequestMethod, httpBody, httpParams, prepareParamsMap,
+                httpCheckConditionType, condition);
+    }
+
+    private HttpTask generateHttpTask(String url, HttpRequestMethod httpRequestMethod, String httpBody,
+                                      List<HttpProperty> httpParams,
+                                      Map<String, String> prepareParamsMap, HttpCheckCondition httpCheckConditionType,
+                                      String condition) throws JsonProcessingException {
         String paramData =
-                generateHttpParameters(url, httpMethod, httpBody, httpParams, httpCheckConditionType, condition);
+                generateHttpParameters(url, httpRequestMethod, httpBody, httpParams, httpCheckConditionType, condition);
         return generateHttpTaskFromParamData(paramData, prepareParamsMap);
+    }
+
+    private MockWebServer getLatestMockWebServer() {
+        return mockWebServers.get(mockWebServers.size() - 1);
     }
 
     private HttpTask generateHttpTaskFromParamData(String paramData, Map<String, String> prepareParamsMap) {
@@ -257,20 +296,19 @@ public class HttpTaskTest {
         return httpTask;
     }
 
-    private String generateHttpParameters(String url, HttpMethod httpMethod, String httpBody,
+    private String generateHttpParameters(String url, HttpRequestMethod httpRequestMethod, String httpBody,
                                           List<HttpProperty> httpParams,
                                           HttpCheckCondition httpCheckConditionType,
                                           String condition) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         HttpParameters httpParameters = new HttpParameters();
         httpParameters.setUrl(url);
-        httpParameters.setHttpMethod(httpMethod);
-        httpParameters.setHttpBody(httpBody);
+        httpParameters.setHttpRequestMethod(httpRequestMethod);
+        httpParameters.setHttpRequestBody(httpBody);
         httpParameters.setHttpCheckCondition(httpCheckConditionType);
         httpParameters.setCondition(condition);
         httpParameters.setConnectTimeout(10000);
-        httpParameters.setSocketTimeout(10000);
-        httpParameters.setHttpParams(httpParams);
+        httpParameters.setHttpRequestParams(httpParams);
         return mapper.writeValueAsString(httpParameters);
     }
 
@@ -283,26 +321,7 @@ public class HttpTaskTest {
                         .setResponseCode(actualResponseCode)
                         .setHeader(CONTENT_TYPE, APPLICATION_JSON_VALUE);
 
-                if (request.getPath().startsWith(MOCK_DISPATCH_PATH_REQ_BODY_TO_RES_BODY)) {
-                    // return request body as mock response body
-                    mockResponse.setBody(request.getBody().readUtf8());
-                } else if (request.getPath().startsWith(MOCK_DISPATCH_PATH_REQ_PARAMS_TO_RES_BODY)) {
-                    // return request params as mock response body
-                    ObjectMapper mapper = new ObjectMapper();
-                    HttpUrl httpUrl = request.getRequestUrl();
-                    Set<String> parameterNames = httpUrl.queryParameterNames();
-                    Map<String, String> resBodyMap = new HashMap<>();
-                    parameterNames.forEach(name -> resBodyMap.put(name, httpUrl.queryParameter(name)));
-                    try {
-                        mockResponse.setBody(mapper.writeValueAsString(resBodyMap));
-                    } catch (JsonProcessingException e) {
-                        throw new IllegalArgumentException(e);
-                    }
-                } else if (request.getPath().startsWith(path)) {
-                    mockResponse.setBody(actualResponseBody);
-                } else {
-                    mockResponse.setResponseCode(HttpStatus.SC_NOT_FOUND);
-                }
+                mockResponse.setBody(actualResponseBody);
                 return mockResponse;
             }
         };

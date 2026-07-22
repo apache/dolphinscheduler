@@ -42,7 +42,9 @@ git checkout -b xxx origin/dev
 ```
 
 Make sure that the branch `xxx` is building successfully on the latest code of the official dev branch
-* After modifying the code locally in the new branch, submit it to your own repository:
+* After modifying the code locally in the new branch, run `./mvnw spotless:apply` to apply project formatting before committing. CI runs `./mvnw spotless:check` and will fail the PR if any file is not formatted (see [Pull Request Code Style](./pull-request.md#pull-request-code-style)).
+
+* Submit it to your own repository:
 
 `git commit -m 'commit content'`
 

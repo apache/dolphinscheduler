@@ -51,7 +51,7 @@ public final class WebexTeamsSender {
     private final String atSomeoneInRoom;
     private final WebexTeamsDestination destination;
 
-    public WebexTeamsSender(Map<String, String> config) {
+    WebexTeamsSender(Map<String, String> config) {
         botAccessToken = config.get(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_BOT_ACCESS_TOKEN);
         roomId = config.get(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_ROOM_ID);
         toPersonId = config.get(WebexTeamsParamsConstants.NAME_WEBEX_TEAMS_TO_PERSON_ID);
@@ -65,7 +65,7 @@ public final class WebexTeamsSender {
                 "WebexTeams message destination could not be determined. Provide only one destination in the roomId, toPersonEmail, or toPersonId field");
     }
 
-    public AlertResult sendWebexTeamsAlter(AlertData alertData) {
+    AlertResult sendWebexTeamsAlter(AlertData alertData) {
         AlertResult alertResult = new AlertResult();
         alertResult.setSuccess(false);
         alertResult.setMessage("send webex teams alert fail.");
@@ -146,7 +146,7 @@ public final class WebexTeamsSender {
         return post;
     }
 
-    public static String addAtPersonEmailInRoom(String formatContent, String atPersonEmailInRoom) {
+    private static String addAtPersonEmailInRoom(String formatContent, String atPersonEmailInRoom) {
         String[] emailArr = atPersonEmailInRoom.split(",");
         StringBuilder formatContentBuilder = new StringBuilder(formatContent);
         for (String email : emailArr) {
@@ -156,7 +156,7 @@ public final class WebexTeamsSender {
         return formatContentBuilder.toString();
     }
 
-    public static String formatContent(AlertData alertData) {
+    private static String formatContent(AlertData alertData) {
         if (alertData.getContent() != null) {
             List<Map> list = JSONUtils.toList(alertData.getContent(), Map.class);
             if (list.isEmpty()) {

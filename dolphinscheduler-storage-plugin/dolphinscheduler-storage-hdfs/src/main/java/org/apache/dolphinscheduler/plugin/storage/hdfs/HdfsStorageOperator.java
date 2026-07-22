@@ -17,13 +17,16 @@
 
 package org.apache.dolphinscheduler.plugin.storage.hdfs;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -32,9 +35,7 @@ import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileStatus;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.FileUtil;
-import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.hdfs.HdfsConfiguration;
 import org.apache.hadoop.security.UserGroupInformation;
 
@@ -53,6 +54,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
@@ -99,11 +101,24 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
 
         String defaultFS = hdfsProperties.getDefaultFS();
         if (StringUtils.isNotEmpty(defaultFS)) {
-            configuration.set(Constants.HDFS_DEFAULT_FS, hdfsProperties.getDefaultFS());
+            configuration.set(StorageConstants.HDFS_DEFAULT_FS, hdfsProperties.getDefaultFS());
         }
 
         if (CommonUtils.getKerberosStartupState()) {
             CommonUtils.loadKerberosConf(configuration);
+            final Long kerberosExpireTimeInHour = PropertyUtils.getLong(DataSourceConstants.KERBEROS_EXPIRE_TIME, -1L);
+            if (kerberosExpireTimeInHour > 0) {
+                ThreadUtils.newDaemonScheduledExecutorService("ds-hdfs-kerberos-refresh-%s", 1)
+                        .scheduleWithFixedDelay(() -> {
+                            try {
+                                UserGroupInformation.getLoginUser().checkTGTAndReloginFromKeytab();
+                                fs = FileSystem.get(configuration);
+                                log.info("checkTGTAndReloginFromKeytab finished");
+                            } catch (Exception e) {
+                                log.error("checkTGTAndReloginFromKeytab Error", e);
+                            }
+                        }, kerberosExpireTimeInHour, kerberosExpireTimeInHour, TimeUnit.HOURS);
+            }
             fs = FileSystem.get(configuration);
             log.info("Initialize HdfsStorageOperator with kerberos");
             return;
@@ -224,7 +239,6 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
     @Override
     public List<StorageEntity> listFileStorageEntityRecursively(String resourceAbsolutePath) {
         exceptionIfPathEmpty(resourceAbsolutePath);
-
         List<StorageEntity> result = new ArrayList<>();
 
         LinkedList<String> foldersToFetch = new LinkedList<>();
@@ -232,10 +246,16 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
 
         while (!foldersToFetch.isEmpty()) {
             String absolutePath = foldersToFetch.pollFirst();
-            RemoteIterator<LocatedFileStatus> remoteIterator = fs.listFiles(new Path(absolutePath), true);
-            while (remoteIterator.hasNext()) {
-                LocatedFileStatus locatedFileStatus = remoteIterator.next();
-                result.add(transformFileStatusToResourceMetadata(locatedFileStatus));
+            Path path = new Path(absolutePath);
+            if (!fs.exists(path)) {
+                continue;
+            }
+            FileStatus[] fileStatuses = fs.listStatus(path);
+            for (FileStatus fileStatus : fileStatuses) {
+                if (fileStatus.isDirectory()) {
+                    foldersToFetch.addLast(fileStatus.getPath().toString());
+                }
+                result.add(transformFileStatusToResourceMetadata(fileStatus));
             }
         }
         return result;
@@ -265,7 +285,6 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
         Path fileStatusPath = fileStatus.getPath();
         String fileAbsolutePath = fileStatusPath.toString();
         ResourceMetadata resourceMetaData = getResourceMetaData(fileAbsolutePath);
-
         return StorageEntity.builder()
                 .fileName(fileStatusPath.getName())
                 .fullName(fileAbsolutePath)
@@ -273,6 +292,7 @@ public class HdfsStorageOperator extends AbstractStorageOperator implements Clos
                 .type(resourceMetaData.getResourceType())
                 .isDirectory(fileStatus.isDirectory())
                 .size(fileStatus.getLen())
+                .relativePath(resourceMetaData.getResourceRelativePath())
                 .createTime(new Date(fileStatus.getModificationTime()))
                 .updateTime(new Date(fileStatus.getModificationTime()))
                 .build();

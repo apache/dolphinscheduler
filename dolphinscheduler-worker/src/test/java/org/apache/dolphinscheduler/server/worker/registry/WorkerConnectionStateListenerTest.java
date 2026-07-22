@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.server.worker.registry;
 import static org.mockito.Mockito.times;
 
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
-import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,8 +28,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * worker registry test
@@ -37,24 +35,23 @@ import org.slf4j.LoggerFactory;
 @ExtendWith(MockitoExtension.class)
 public class WorkerConnectionStateListenerTest {
 
-    private static final Logger log = LoggerFactory.getLogger(WorkerConnectionStateListenerTest.class);
     @InjectMocks
     private WorkerConnectionStateListener workerConnectionStateListener;
+
     @Mock
-    private WorkerConfig workerConfig;
-    @Mock
-    private WorkerConnectStrategy workerConnectStrategy;
+    private RegistryClient registryClient;
 
     @Test
     public void testWorkerConnectionStateListener() {
+        Mockito.when(registryClient.getStoppable()).thenReturn(cause -> {
+            // do nothing
+        });
+
         workerConnectionStateListener.onUpdate(ConnectionState.CONNECTED);
-
         workerConnectionStateListener.onUpdate(ConnectionState.RECONNECTED);
-        Mockito.verify(workerConnectStrategy, times(1)).reconnect();
-
         workerConnectionStateListener.onUpdate(ConnectionState.SUSPENDED);
-
+        Mockito.verify(registryClient, times(0)).getStoppable();
         workerConnectionStateListener.onUpdate(ConnectionState.DISCONNECTED);
-        Mockito.verify(workerConnectStrategy, times(1)).disconnect();
+        Mockito.verify(registryClient, times(1)).getStoppable();
     }
 }

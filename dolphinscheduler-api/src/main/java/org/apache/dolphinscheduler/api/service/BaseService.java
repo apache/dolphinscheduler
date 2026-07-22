@@ -24,11 +24,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Date;
-import java.util.Map;
 
-/**
- * base service
- */
 public interface BaseService {
 
     /**
@@ -49,15 +45,6 @@ public interface BaseService {
     boolean isNotAdmin(User loginUser);
 
     /**
-     * put message to map
-     *
-     * @param result result code
-     * @param status status
-     * @param statusParams status message
-     */
-    void putMsg(Map<String, Object> result, Status status, Object... statusParams);
-
-    /**
      * put message to result object
      *
      * @param result result code
@@ -65,16 +52,6 @@ public interface BaseService {
      * @param statusParams status message
      */
     void putMsg(Result<Object> result, Status status, Object... statusParams);
-
-    /**
-     * check
-     *
-     * @param result result
-     * @param bool bool
-     * @param userNoOperationPerm status
-     * @return check result
-     */
-    boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm);
 
     /**
      * Verify that the operator has permissions

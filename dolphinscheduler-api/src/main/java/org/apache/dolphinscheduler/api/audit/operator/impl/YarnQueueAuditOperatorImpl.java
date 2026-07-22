@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.api.audit.operator.impl;
 
 import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.dao.entity.Queue;
-import org.apache.dolphinscheduler.dao.mapper.QueueMapper;
+import org.apache.dolphinscheduler.dao.repository.QueueDao;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 public class YarnQueueAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private QueueMapper queueMapper;
+    private QueueDao queueDao;
 
     @Override
     public String getObjectNameFromIdentity(Object identity) {
@@ -37,7 +37,7 @@ public class YarnQueueAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        Queue obj = queueMapper.selectById(objId);
+        Queue obj = queueDao.queryById(objId);
         return obj == null ? "" : obj.getQueueName();
     }
 }

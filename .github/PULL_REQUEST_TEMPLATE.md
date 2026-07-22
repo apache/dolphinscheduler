@@ -1,5 +1,9 @@
 <!--Thanks very much for contributing to Apache DolphinScheduler, we are happy that you want to help us improve DolphinScheduler! -->
 
+## Was this PR generated or assisted by AI?
+
+<!--(Please answer YES or NO. If YES, please specify which parts were generated or assisted by AI)-->
+
 ## Purpose of the pull request
 
 <!--(For example: This pull request adds checkstyle plugin).-->
@@ -34,4 +38,4 @@ This change added tests and can be verified as follows:
 ## Pull Request Notice
 [Pull Request Notice](https://github.com/apache/dolphinscheduler/blob/dev/docs/docs/en/contribute/join/pull-request.md)
 
-If your pull request contain incompatible change, you should also add it to `docs/docs/en/guide/upgrede/incompatible.md`
+If your pull request contains incompatible change, you should also add it to `docs/docs/en/guide/upgrade/incompatible.md`

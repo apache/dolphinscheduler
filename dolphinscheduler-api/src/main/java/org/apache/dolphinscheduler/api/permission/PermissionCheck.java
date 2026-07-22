@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.permission;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -28,22 +27,22 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import org.slf4j.Logger;
 
 public class PermissionCheck<T> {
 
-    /**
-     * logger
-     */
     private Logger logger;
-    /**
-     * Authorization Type
-     */
+
     private AuthorizationType authorizationType;
 
     /**
      * Authorization Type
      */
+    @Getter
+    @Setter
     private ProcessService processService;
 
     /**
@@ -51,41 +50,10 @@ public class PermissionCheck<T> {
      */
     private T[] needChecks;
 
-    /**
-     * resoruce info
-     */
-    private List<ResourceInfo> resourceList;
-
-    /**
-     * user id
-     */
+    @Getter
+    @Setter
     private int userId;
 
-    /**
-     * permission check
-     *
-     * @param authorizationType authorization type
-     * @param processService process dao
-     */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService) {
-        this.authorizationType = authorizationType;
-        this.processService = processService;
-    }
-
-    /**
-     * permission check
-     */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
-                           int userId) {
-        this.authorizationType = authorizationType;
-        this.processService = processService;
-        this.needChecks = needChecks;
-        this.userId = userId;
-    }
-
-    /**
-     * permission check
-     */
     public PermissionCheck(AuthorizationType authorizationType, ProcessService processService, T[] needChecks,
                            int userId, Logger logger) {
         this.authorizationType = authorizationType;
@@ -93,72 +61,6 @@ public class PermissionCheck<T> {
         this.needChecks = needChecks;
         this.userId = userId;
         this.logger = logger;
-    }
-
-    /**
-     * permission check
-     */
-    public PermissionCheck(AuthorizationType authorizationType, ProcessService processService,
-                           List<ResourceInfo> resourceList, int userId, Logger logger) {
-        this.authorizationType = authorizationType;
-        this.processService = processService;
-        this.resourceList = resourceList;
-        this.userId = userId;
-        this.logger = logger;
-    }
-
-    public AuthorizationType getAuthorizationType() {
-        return authorizationType;
-    }
-
-    public void setAuthorizationType(AuthorizationType authorizationType) {
-        this.authorizationType = authorizationType;
-    }
-
-    public ProcessService getProcessService() {
-        return processService;
-    }
-
-    public void setProcessService(ProcessService processService) {
-        this.processService = processService;
-    }
-
-    public T[] getNeedChecks() {
-        return needChecks;
-    }
-
-    public void setNeedChecks(T[] needChecks) {
-        this.needChecks = needChecks;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
-    }
-
-    public List<ResourceInfo> getResourceList() {
-        return resourceList;
-    }
-
-    public void setResourceList(List<ResourceInfo> resourceList) {
-        this.resourceList = resourceList;
-    }
-
-    /**
-     * has permission
-     *
-     * @return true if has permission
-     */
-    public boolean hasPermission() {
-        try {
-            checkPermission();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     /**

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.script;
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
 import org.apache.dolphinscheduler.alert.api.AlertChannelFactory;
 import org.apache.dolphinscheduler.alert.api.AlertInputTips;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.spi.params.base.ParamsOptions;
 import org.apache.dolphinscheduler.spi.params.base.PluginParams;
 import org.apache.dolphinscheduler.spi.params.base.Validate;
@@ -47,7 +48,7 @@ public final class ScriptAlertChannelFactory implements AlertChannelFactory {
                 .addValidate(Validate.newBuilder()
                         .setRequired(false)
                         .build())
-                .setPlaceholder(AlertInputTips.CUSTOMIZED_PARAMS.getMsg())
+                .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.CUSTOMIZED_PARAMS)))
                 .build();
         // need check file type and file exist
         InputParam scriptPathParam =
@@ -55,7 +56,7 @@ public final class ScriptAlertChannelFactory implements AlertChannelFactory {
                         .addValidate(Validate.newBuilder()
                                 .setRequired(true)
                                 .build())
-                        .setPlaceholder(AlertInputTips.SCRIPT_PATH.getMsg())
+                        .setPlaceholder(JSONUtils.toJsonString(AlertInputTips.getAllMsg(AlertInputTips.SCRIPT_PATH)))
                         .build();
 
         RadioParam scriptTypeParams = RadioParam

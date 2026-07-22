@@ -23,7 +23,6 @@ package org.apache.dolphinscheduler.common.lifecycle;
 public enum ServerStatus {
 
     RUNNING(0, "The current server is running"),
-    WAITING(1, "The current server is waiting, this means it cannot work"),
     STOPPED(2, "The current server is stopped"),
     ;
 

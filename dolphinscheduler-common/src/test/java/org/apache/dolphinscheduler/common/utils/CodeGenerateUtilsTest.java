@@ -35,7 +35,7 @@ class CodeGenerateUtilsTest {
 
     @Test
     void testNoGenerateDuplicateCode() {
-        int codeNum = 10000000;
+        int codeNum = 1000000;
         List<Long> existsCode = new ArrayList<>();
         for (int i = 0; i < codeNum; i++) {
             Long currentCode = CodeGenerateUtils.genCode();

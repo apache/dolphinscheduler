@@ -21,16 +21,17 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY
 import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES;
 import static com.fasterxml.jackson.databind.DeserializationFeature.READ_UNKNOWN_ENUM_VALUES_AS_NULL;
 import static com.fasterxml.jackson.databind.MapperFeature.REQUIRE_SETTERS_FOR_GETTERS;
+import static com.fasterxml.jackson.databind.SerializationFeature.FAIL_ON_EMPTY_BEANS;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.YYYY_MM_DD_HH_MM_SS;
 
+import org.apache.dolphinscheduler.common.constants.SystemConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.TimeZone;
 
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -38,9 +39,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-/**
- * json serialize or deserialize
- */
 @Slf4j
 public class JsonSerializer {
 
@@ -49,10 +47,11 @@ public class JsonSerializer {
             .configure(ACCEPT_EMPTY_ARRAY_AS_NULL_OBJECT, true)
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
+            .configure(FAIL_ON_EMPTY_BEANS, false)
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new JSONUtils.LocalDateTimeSerializer())
                     .addDeserializer(LocalDateTime.class, new JSONUtils.LocalDateTimeDeserializer()))
-            .defaultTimeZone(TimeZone.getDefault())
+            .defaultTimeZone(SystemConstants.DEFAULT_TIME_ZONE)
             .defaultDateFormat(new SimpleDateFormat(YYYY_MM_DD_HH_MM_SS))
             .build();
 
@@ -60,13 +59,6 @@ public class JsonSerializer {
 
     }
 
-    /**
-     * serialize to byte
-     *
-     * @param obj object
-     * @param <T> object type
-     * @return byte array
-     */
     public static <T> byte[] serialize(T obj) {
         if (obj == null) {
             return null;
@@ -79,44 +71,14 @@ public class JsonSerializer {
         }
     }
 
-    /**
-     * serialize to string
-     *
-     * @param obj object
-     * @param <T> object type
-     * @return string
-     */
-    public static <T> String serializeToString(T obj) {
-        String json = "";
-        try {
-            json = objectMapper.writeValueAsString(obj);
-        } catch (JsonProcessingException e) {
-            log.error("serializeToString exception!", e);
-        }
-
-        return json;
-    }
-
-    /**
-     * deserialize
-     *
-     * @param src   byte array
-     * @param clazz class
-     * @param <T>   deserialize type
-     * @return deserialize type
-     */
+    @SneakyThrows
     public static <T> T deserialize(byte[] src, Class<T> clazz) {
         if (src == null) {
             return null;
         }
 
         String json = new String(src, StandardCharsets.UTF_8);
-        try {
-            return objectMapper.readValue(json, clazz);
-        } catch (IOException e) {
-            log.error("deserialize exception!", e);
-            return null;
-        }
+        return objectMapper.readValue(json, clazz);
     }
 
 }

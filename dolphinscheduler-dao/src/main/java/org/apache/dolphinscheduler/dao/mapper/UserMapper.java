@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode;
+import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -29,9 +29,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * user mapper interface
- */
 public interface UserMapper extends BaseMapper<User> {
 
     /**
@@ -90,14 +87,6 @@ public interface UserMapper extends BaseMapper<User> {
      * @return user
      */
     User queryDetailsById(@Param("userId") int userId);
-
-    /**
-     * query user list by alertgroupId
-     *
-     * @param alertgroupId alertgroupId
-     * @return user list
-     */
-    List<User> queryUserListByAlertGroupId(@Param("alertgroupId") int alertgroupId);
 
     /**
      * query user list by tenantId
@@ -174,9 +163,9 @@ public interface UserMapper extends BaseMapper<User> {
     /**
      * query User and task flow binding relationship
      *
-     * @param processDefinitionCodes processDefinitionCodes
+     * @param workflowDefinitionCodes workflowDefinitionCodes
      * @return user with process definition code
      */
-    List<UserWithProcessDefinitionCode> queryUserWithProcessDefinitionCode(@Param("processDefinitionCodes") List<Long> processDefinitionCodes);
+    List<UserWithWorkflowDefinitionCode> queryUserWithWorkflowDefinitionCode(@Param("workflowDefinitionCodes") List<Long> workflowDefinitionCodes);
 
 }

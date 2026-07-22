@@ -20,11 +20,11 @@ package org.apache.dolphinscheduler.plugin.datasource.redshift.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-@Getter
-@Setter
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class RedshiftDataSourceParamDTO extends BaseDataSourceParamDTO {
 
     protected RedshiftAuthMode mode;

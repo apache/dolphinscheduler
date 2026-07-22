@@ -55,17 +55,24 @@ export function useTable() {
         key: 'addrList',
         render: (row: WorkerGroupItem) =>
           h(NSpace, null, {
-            default: () =>
-              row.addrList
-                .split(',')
-                .map((item: string) =>
-                  h(
-                    NTag,
-                    { type: 'success', size: 'small' },
-                    { default: () => item }
+            default: () => {
+              const addrList = row.addrList ? row.addrList.split(',') : []
+              return addrList.length
+                ? addrList.map((item: string) =>
+                    h(
+                      NTag,
+                      { type: 'success', size: 'small' },
+                      { default: () => item }
+                    )
                   )
-                )
+                : h('span', { style: { color: '#999' } }, '-')
+            }
           })
+      },
+      {
+        title: t('security.worker_group.source'),
+        key: 'source',
+        className: 'source'
       },
       {
         title: t('security.worker_group.create_time'),

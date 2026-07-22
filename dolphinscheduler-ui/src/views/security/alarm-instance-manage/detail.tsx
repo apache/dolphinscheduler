@@ -23,15 +23,7 @@ import {
   ref,
   getCurrentInstance
 } from 'vue'
-import {
-  NSelect,
-  NInput,
-  NSwitch,
-  NRadioGroup,
-  NSpace,
-  NRadio,
-  NButton
-} from 'naive-ui'
+import { NSelect, NInput, NButton } from 'naive-ui'
 import { isFunction } from 'lodash'
 import { useI18n } from 'vue-i18n'
 import { useForm } from './use-form'
@@ -61,11 +53,10 @@ const DetailModal = defineComponent({
   props,
   emits: ['cancel', 'update'],
   setup(props, ctx) {
-    const { t } = useI18n()
+    const { t, locale } = useI18n()
 
     const rules = ref<IFormRules>({})
     const elements = ref<IFormItem[]>([]) as IElements
-    const warningTypeSpan = ref(24)
 
     const {
       meta,
@@ -103,17 +94,35 @@ const DetailModal = defineComponent({
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
+    function isJSON(str: string): boolean {
+      try {
+        const parsed = JSON.parse(str)
+        return typeof parsed === 'object' && parsed !== null
+      } catch (e) {
+        return false
+      }
+    }
+
+    function updatePlaceholder(mergedItem: any) {
+      const { props } = mergedItem
+      if (!props || !props.placeholder) return
+
+      const placeholder = props.placeholder
+      if (!isJSON(placeholder)) return
+
+      const msgMap = JSON.parse(placeholder)
+      if (locale.value === 'zh_CN') {
+        props.placeholder = msgMap.zhMsg
+      } else if (locale.value === 'en_US') {
+        props.placeholder = msgMap.enMsg
+      }
+    }
+
     watch(
       () => props.show,
       async () => {
         props.show && props.currentRecord && setDetail(props.currentRecord)
       }
-    )
-    watch(
-      () => state.detailForm.instanceType,
-      () =>
-        (warningTypeSpan.value =
-          state.detailForm.instanceType === 'GLOBAL' ? 0 : 24)
     )
     watch(
       () => state.json,
@@ -124,6 +133,7 @@ const DetailModal = defineComponent({
           mergedItem.name = t(
             'security.alarm_instance' + '.' + mergedItem.field
           )
+          updatePlaceholder(mergedItem)
         })
         const { rules: fieldsRules, elements: fieldsElements } =
           getElementByJson(state.json, state.detailForm)
@@ -141,7 +151,6 @@ const DetailModal = defineComponent({
       ...toRefs(state),
       ...toRefs(status),
       meta,
-      warningTypeSpan,
       rules,
       elements,
       onChangePlugin,
@@ -156,7 +165,6 @@ const DetailModal = defineComponent({
       show,
       t,
       meta,
-      warningTypeSpan,
       rules,
       elements,
       detailForm,
@@ -209,32 +217,6 @@ const DetailModal = defineComponent({
                     )
                   },
                   {
-                    path: 'instanceType',
-                    label: t('security.alarm_instance.is_global_instance'),
-                    widget: (
-                      <NSwitch
-                        checkedValue={'GLOBAL'}
-                        uncheckedValue={'NORMAL'}
-                        disabled={!!currentRecord?.id}
-                        v-model:value={detailForm.instanceType}
-                      />
-                    )
-                  },
-                  {
-                    path: 'warningType',
-                    label: t('security.alarm_instance.WarningType'),
-                    span: warningTypeSpan,
-                    widget: (
-                      <NRadioGroup v-model:value={detailForm.warningType}>
-                        <NSpace>
-                          <NRadio value={'SUCCESS'}>{'success'}</NRadio>
-                          <NRadio value={'FAILURE'}>{'failure'}</NRadio>
-                          <NRadio value={'ALL'}>{'all'}</NRadio>
-                        </NSpace>
-                      </NRadioGroup>
-                    )
-                  },
-                  {
                     path: 'pluginDefineId',
                     label: t('security.alarm_instance.select_plugin'),
                     widget: (
@@ -246,6 +228,7 @@ const DetailModal = defineComponent({
                           'security.alarm_instance.select_plugin_tips'
                         )}
                         on-update:value={onChangePlugin}
+                        filterable
                       />
                     )
                   },

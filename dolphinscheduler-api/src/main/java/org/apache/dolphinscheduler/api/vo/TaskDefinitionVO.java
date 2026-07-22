@@ -18,31 +18,27 @@
 package org.apache.dolphinscheduler.api.vo;
 
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
-import org.apache.dolphinscheduler.dao.entity.ProcessTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 
 import java.util.List;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import org.springframework.beans.BeanUtils;
 
-/**
- * @author fanwanlong
- */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class TaskDefinitionVO extends TaskDefinition {
 
-    /**
-     * process task related list
-     */
-    private List<ProcessTaskRelation> processTaskRelationList;
+    private List<WorkflowTaskRelation> workflowTaskRelationList;
 
     public TaskDefinitionVO() {
     }
 
-    public TaskDefinitionVO(List<ProcessTaskRelation> processTaskRelationList) {
-        this.processTaskRelationList = processTaskRelationList;
+    public TaskDefinitionVO(List<WorkflowTaskRelation> workflowTaskRelationList) {
+        this.workflowTaskRelationList = workflowTaskRelationList;
     }
 
     public static TaskDefinitionVO fromTaskDefinition(TaskDefinition taskDefinition) {

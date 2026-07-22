@@ -1,29 +1,31 @@
 /*
- * Licensed to Apache Software Foundation (ASF) under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Apache Software Foundation (ASF) licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.apache.dolphinscheduler.e2e.pages.security;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage.Tab;
 
-import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import lombok.Getter;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -35,12 +37,11 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import lombok.Getter;
-
 import com.google.common.base.Strings;
 
 @Getter
 public final class TokenPage extends NavBarPage implements Tab {
+
     @FindBy(className = "btn-create-token")
     private WebElement buttonCreateToken;
 
@@ -48,8 +49,8 @@ public final class TokenPage extends NavBarPage implements Tab {
     private List<WebElement> tokenList;
 
     @FindBys({
-        @FindBy(className = "n-popconfirm__action"),
-        @FindBy(className = "n-button--primary-type"),
+            @FindBy(className = "n-popconfirm__action"),
+            @FindBy(className = "n-button--primary-type"),
     })
     private WebElement buttonConfirm;
 
@@ -69,10 +70,13 @@ public final class TokenPage extends NavBarPage implements Tab {
     public TokenPage create(String userName) {
         buttonCreateToken().click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(createTokenForm().selectUserNameDropdown()));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(createTokenForm().selectUserNameDropdown()));
+        setExpireTime(30);
         createTokenForm().selectUserNameDropdown().click();
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
-                "n-base-select-option__content")));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName(
+                        "n-base-select-option__content")));
         createTokenForm().selectUserNameList()
                 .stream()
                 .filter(it -> it.getText().contains(userName))
@@ -81,7 +85,8 @@ public final class TokenPage extends NavBarPage implements Tab {
                         userName)))
                 .click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(createTokenForm().buttonGenerateToken()));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(createTokenForm().buttonGenerateToken()));
         createTokenForm().buttonGenerateToken().click();
 
         createTokenForm().buttonSubmit().click();
@@ -91,16 +96,18 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     public TokenPage update(String userName) {
         tokenList().stream()
-            .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
-            .flatMap(it -> it.findElements(By.className("edit")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No edit button in token list"))
-            .click();
+                .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
+                .flatMap(it -> it.findElements(By.className("edit")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No edit button in token list"))
+                .click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
         editTokenForm().buttonGenerateToken().click();
-        new WebDriverWait(driver, Duration.ofSeconds(30)).until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(editTokenForm().buttonGenerateToken()));
 
         editTokenForm().buttonSubmit().click();
 
@@ -109,23 +116,23 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     public String getToken(String userName) {
         return tokenList().stream()
-                          .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
-                          .flatMap(it -> it.findElements(By.className("token")).stream())
-                          .filter(it -> !Strings.isNullOrEmpty(it.getAttribute("innerHTML")))
-                          .map(it -> it.getAttribute("innerHTML"))
-                          .findFirst()
-                          .orElseThrow(() -> new IllegalArgumentException("No token for such user: " + userName));
+                .filter(it -> it.findElement(By.className("username")).getAttribute("innerHTML").contains(userName))
+                .flatMap(it -> it.findElements(By.className("token")).stream())
+                .filter(it -> !Strings.isNullOrEmpty(it.getAttribute("innerHTML")))
+                .map(it -> it.getAttribute("innerHTML"))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No token for such user: " + userName));
     }
 
     public TokenPage delete(String userName) {
         tokenList()
-            .stream()
-            .filter(it -> it.getText().contains(userName))
-            .flatMap(it -> it.findElements(By.className("delete")).stream())
-            .filter(WebElement::isDisplayed)
-            .findFirst()
-            .orElseThrow(() -> new RuntimeException("No delete button in token list"))
-            .click();
+                .stream()
+                .filter(it -> it.getText().contains(userName))
+                .flatMap(it -> it.findElements(By.className("delete")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No delete button in token list"))
+                .click();
 
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", buttonConfirm());
 
@@ -134,13 +141,14 @@ public final class TokenPage extends NavBarPage implements Tab {
 
     @Getter
     public class TokenForm {
+
         TokenForm() {
             PageFactory.initElements(driver, this);
         }
 
         @FindBys({
-            @FindBy(className = "input-username"),
-            @FindBy(className = "n-base-selection"),
+                @FindBy(className = "input-username"),
+                @FindBy(className = "n-base-selection"),
         })
         private WebElement selectUserNameDropdown;
 
@@ -156,5 +164,26 @@ public final class TokenPage extends NavBarPage implements Tab {
         @FindBy(className = "btn-cancel")
         private WebElement buttonCancel;
 
+    }
+
+    private void setExpireTime(int daysAfter) {
+        try {
+            By dateTimePickerInputLocator = By.cssSelector(".n-date-picker input[type='text']");
+            WebDriverWait wait = WebDriverWaitFactory.createWebDriverWait(driver);
+            WebElement dateTimeInput = wait.until(ExpectedConditions.elementToBeClickable(dateTimePickerInputLocator));
+
+            LocalDateTime futureDateTime = LocalDateTime.now().plusDays(daysAfter);
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            String futureDateTimeStr = futureDateTime.format(dateTimeFormatter);
+
+            ((JavascriptExecutor) driver).executeScript(
+                    "arguments[0].value = arguments[1]; " +
+                            "arguments[0].dispatchEvent(new Event('input')); " +
+                            "arguments[0].dispatchEvent(new Event('change')); ",
+                    dateTimeInput, futureDateTimeStr);
+        } catch (Exception e) {
+            throw new RuntimeException(
+                    "Failed to set expire time after " + daysAfter + " days. Error: " + e.getMessage(), e);
+        }
     }
 }

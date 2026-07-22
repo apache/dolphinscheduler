@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import lombok.Getter;
+
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- * Authorization type
- */
+@Getter
 public enum AuthorizationType {
 
     /**
@@ -51,7 +51,6 @@ public enum AuthorizationType {
     @Deprecated
     UDF_FILE(2, "udf file"),
     DATASOURCE(3, "data source"),
-    UDF(4, "udf function"),
     PROJECTS(5, "projects"),
     WORKER_GROUP(6, "worker group"),
     ALERT_GROUP(7, "alert group"),
@@ -63,7 +62,6 @@ public enum AuthorizationType {
     MONITOR(13, "monitor"),
     ALERT_PLUGIN_INSTANCE(14, "alert plugin instance"),
     TENANT(15, "tenant"),
-    DATA_QUALITY(16, "data quality"),
     TASK_GROUP(17, "task group"),
     ;
 
@@ -76,11 +74,4 @@ public enum AuthorizationType {
     private final int code;
     private final String descp;
 
-    public int getCode() {
-        return code;
-    }
-
-    public String getDescp() {
-        return descp;
-    }
 }

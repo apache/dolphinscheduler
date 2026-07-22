@@ -16,6 +16,8 @@
 #
 
 spring:
+  application:
+    name: alert-server
   profiles:
     active: postgresql
   jackson:
@@ -50,6 +52,11 @@ server:
   port: 50053
 
 management:
+  security:
+    enabled: false
+    username: username
+    password: password
+    exclude: [health,metrics]
   endpoints:
     web:
       exposure:
@@ -89,9 +96,6 @@ registry:
     connection-timeout: 15s
     block-until-connected: 15s
     digest: ~
-
-metrics:
-  enabled: true
 
 # Override by profile
 

@@ -17,7 +17,7 @@
 
 import { reactive } from 'vue'
 import { useAsyncState } from '@vueuse/core'
-import { viewGanttTree } from '@/service/modules/process-instances'
+import { viewGanttTree } from '@/service/modules/workflow-instances'
 import { IGanttRes } from './type'
 
 export function useGantt() {

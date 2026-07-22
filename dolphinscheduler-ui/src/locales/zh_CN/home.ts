@@ -17,8 +17,8 @@
 
 export default {
   task_state_statistics: '任务实例状态统计',
-  process_state_statistics: '工作流实例状态统计',
-  process_definition_statistics: '工作流定义统计',
+  workflow_state_statistics: '工作流实例状态统计',
+  workflow_definition_statistics: '工作流定义统计',
   number: '数量',
   state: '状态',
   submitted_success: '提交成功',
@@ -31,13 +31,10 @@ export default {
   success: '成功',
   need_fault_tolerance: '需要容错',
   kill: 'KILL',
-  waiting_thread: '等待线程',
   waiting_depend: '等待依赖完成',
   delay_execution: '延时执行',
   forced_success: '强制成功',
   serial_wait: '串行等待',
   dispatch: '派发',
-  ready_block: '准备阻断',
-  block: '阻断',
-  wait_to_run: '等待执行'
+  failover: '恢复容错'
 }

@@ -18,23 +18,30 @@
 package org.apache.dolphinscheduler.common.utils;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.junit.jupiter.api.io.TempDir;
 
 import com.google.common.truth.Truth;
 
-@ExtendWith(MockitoExtension.class)
 public class FileUtilsTest {
+
+    @TempDir
+    public Path folder;
+
+    private String rootPath;
+
+    @BeforeEach
+    public void setUp() throws Exception {
+        rootPath = folder.toString();
+    }
 
     @Test
     public void testGetDownloadFilename() {
@@ -48,15 +55,15 @@ public class FileUtilsTest {
 
     @Test
     public void testGetProcessExecDir() {
-        String dir = FileUtils.getTaskInstanceWorkingDirectory("test", 1L, 2L, 1, 3, 4);
-        Assertions.assertEquals("/tmp/dolphinscheduler/exec/process/test/1/2_1/3/4", dir);
+        String dir = FileUtils.getTaskInstanceWorkingDirectory(4);
+        Assertions.assertEquals("/tmp/dolphinscheduler/exec/process/4", dir);
     }
 
     @Test
-    public void createDirectoryWith755() throws IOException {
+    public void testCreateDirectoryWithPermission() throws IOException {
         Path path = Paths.get("/tmp/createWorkDirAndUserIfAbsent");
         try {
-            FileUtils.createDirectoryWith755(path);
+            FileUtils.createDirectoryWithPermission(path, FileUtils.PERMISSION_755);
             File file = path.toFile();
             Assertions.assertTrue(file.exists());
             Assertions.assertTrue(file.isDirectory());
@@ -64,7 +71,7 @@ public class FileUtilsTest {
             Assertions.assertTrue(file.canRead());
             Assertions.assertTrue(file.canWrite());
 
-            FileUtils.createDirectoryWith755(Paths.get("/"));
+            FileUtils.createDirectoryWithPermission(Paths.get("/"), FileUtils.PERMISSION_755);
         } catch (Exception e) {
             e.printStackTrace();
             Assertions.fail(e.getMessage());
@@ -74,14 +81,16 @@ public class FileUtilsTest {
     }
 
     @Test
-    public void testWriteContent2File() throws FileNotFoundException {
+    public void testWriteContent2File() throws IOException {
         // file exists, fmt is invalid
-        String filePath = "test/testFile.txt";
+        String filePath = rootPath + "/testFile.txt";
         String content = "正正正faffdasfasdfas，한국어； 한글……にほんご\nfrançais";
         FileUtils.writeContent2File(content, filePath);
 
-        String fileContent = FileUtils.readFile2Str(new FileInputStream(filePath));
-        Assertions.assertEquals(content, fileContent);
+        try (final InputStream inputStream = Files.newInputStream(Paths.get(filePath))) {
+            final String fileContent = FileUtils.readFile2Str(inputStream);
+            Assertions.assertEquals(content, fileContent);
+        }
     }
 
     @Test
@@ -116,9 +125,9 @@ public class FileUtilsTest {
 
     @Test
     void testGetFileChecksum() throws Exception {
-        String filePath1 = "test/testFile1.txt";
-        String filePath2 = "test/testFile2.txt";
-        String filePath3 = "test/testFile3.txt";
+        String filePath1 = rootPath + "/testFile1.txt";
+        String filePath2 = rootPath + "/testFile2.txt";
+        String filePath3 = rootPath + "/testFile3.txt";
         String content1 = "正正正faffdasfasdfas，한국어； 한글……にほんご\nfrançais";
         String content2 = "正正正faffdasfasdfas，한국어； 한글……にほん\nfrançais";
         FileUtils.writeContent2File(content1, filePath1);
@@ -132,15 +141,17 @@ public class FileUtilsTest {
         Assertions.assertNotEquals(checksum1, checksum2);
         Assertions.assertEquals(checksum1, checksum3);
 
-        String dirPath = "test/";
-
-        Assertions.assertDoesNotThrow(
-                () -> FileUtils.getFileChecksum(dirPath));
+        Assertions.assertDoesNotThrow(() -> FileUtils.getFileChecksum(rootPath));
     }
 
-    @AfterEach
-    public void tearDown() {
-        FileUtils.deleteFile("test");
-    }
+    @Test
+    void createFileWith755() throws IOException {
+        final String filePath = folder.toString() + "/test/a/b/test.txt";
+        FileUtils.createFileWith755(Paths.get(filePath));
 
+        final File file = new File(filePath);
+        Assertions.assertTrue(file.canRead());
+        Assertions.assertTrue(file.canWrite());
+        Assertions.assertTrue(file.canExecute());
+    }
 }

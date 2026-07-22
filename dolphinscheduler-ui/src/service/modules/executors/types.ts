@@ -34,15 +34,14 @@ type Exec =
   | 'REPEAT_RUNNING'
   | 'PAUSE'
   | 'STOP'
-  | 'RECOVER_WAITING_THREAD'
 
 interface ExecuteReq {
   executeType: Execute
-  processInstanceId: number
+  workflowInstanceId: number
 }
 
 interface ExecuteTaskReq {
-  processInstanceId: number
+  workflowInstanceId: number
   startNodeList: number
   taskDependType: string
 }
@@ -51,13 +50,13 @@ interface ProjectCodeReq {
   projectCode: number
 }
 
-interface ProcessDefinitionCodeReq {
-  processDefinitionCode: number
+interface WorkflowDefinitionCodeReq {
+  workflowDefinitionCode: number
 }
 
-interface ProcessInstanceReq extends ProcessDefinitionCodeReq {
+interface WorkflowInstanceReq extends WorkflowDefinitionCodeReq {
   failureStrategy: 'END' | 'CONTINUE'
-  processInstancePriority: 'HIGHEST' | 'HIGH' | 'MEDIUM' | 'LOW' | 'LOWEST'
+  workflowInstancePriority: 'HIGHEST' | 'HIGH' | 'MEDIUM' | 'LOW' | 'LOWEST'
   scheduleTime: string
   warningGroupId: number
   warningType: 'NONE' | 'SUCCESS' | 'FAILURE' | 'ALL'
@@ -78,6 +77,6 @@ export {
   ExecuteReq,
   ExecuteTaskReq,
   ProjectCodeReq,
-  ProcessDefinitionCodeReq,
-  ProcessInstanceReq
+  WorkflowDefinitionCodeReq,
+  WorkflowInstanceReq
 }

@@ -26,8 +26,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -39,8 +38,7 @@ import org.springframework.stereotype.Component;
 @EnableConfigurationProperties
 @PropertySource(value = {"classpath:task-type-config.yaml"}, factory = YamlPropertySourceFactory.class)
 @ConfigurationProperties(prefix = "task")
-@Getter
-@Setter
+@Data
 @Slf4j
 public class TaskTypeConfiguration {
 
@@ -48,7 +46,6 @@ public class TaskTypeConfiguration {
     private List<String> cloud;
     private List<String> logic;
     private List<String> dataIntegration;
-    private List<String> dataQuality;
     private List<String> other;
     private List<String> machineLearning;
 
@@ -64,7 +61,6 @@ public class TaskTypeConfiguration {
         logic.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_LOGIC)));
         dataIntegration
                 .forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_DATA_INTEGRATION)));
-        dataQuality.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_DATA_QUALITY)));
         machineLearning
                 .forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_MACHINE_LEARNING)));
         other.forEach(task -> defaultTaskTypes.add(new FavTaskDto(task, false, Constants.TYPE_OTHER)));
@@ -76,7 +72,6 @@ public class TaskTypeConfiguration {
         log.info("support default cloud task types: {}", cloud);
         log.info("support default logic task types: {}", logic);
         log.info("support default dataIntegration task types: {}", dataIntegration);
-        log.info("support default dataQuality task types: {}", dataQuality);
         log.info("support default machineLearning task types: {}", machineLearning);
         log.info("support default other task types: {}", other);
     }

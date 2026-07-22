@@ -47,10 +47,11 @@ export function useSql({
     type: 'MYSQL',
     displayRows: 10,
     sql: '',
+    sqlSource: 'SCRIPT',
+    sqlResource: '',
     sqlType: '0',
     preStatements: [],
     postStatements: [],
-    udfs: [],
     timeoutNotifyStrategy: ['WARN']
   } as INodeData)
 
@@ -59,7 +60,6 @@ export function useSql({
       Fields.useName(from),
       ...Fields.useTaskDefinition({ projectCode, from, readonly, data, model }),
       Fields.useRunFlag(),
-      Fields.useCache(),
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),

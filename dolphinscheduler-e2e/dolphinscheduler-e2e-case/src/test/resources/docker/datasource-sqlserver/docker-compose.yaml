@@ -21,14 +21,22 @@ services:
   dolphinscheduler:
     image: apache/dolphinscheduler-standalone-server:ci
     environment:
-      MASTER_MAX_CPU_LOAD_AVG: 100
-      WORKER_TENANT_AUTO_CREATE: 'true'
+      MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      MASTER_SERVER_LOAD_PROTECTION_MAX_JVM_CPU_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      MASTER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      MASTER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      MASTER_KILL_APPLICATION_WHEN_TASK_FAILOVER: 'true'
+      WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_CPU_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      WORKER_SERVER_LOAD_PROTECTION_MAX_JVM_CPU_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      WORKER_SERVER_LOAD_PROTECTION_MAX_SYSTEM_MEMORY_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      WORKER_SERVER_LOAD_PROTECTION_MAX_DISK_USAGE_PERCENTAGE_THRESHOLDS: 0.95
+      WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED: 'true'
     ports:
       - "12345:12345"
     networks:
       - e2e
     healthcheck:
-      test: [ "CMD", "curl", "http://localhost:12345/actuator/health" ]
+      test: [ "CMD", "curl", "http://localhost:12345/dolphinscheduler/actuator/health" ]
       interval: 5s
       timeout: 5s
       retries: 120
@@ -36,13 +44,16 @@ services:
       sqlserver:
         condition: service_healthy
   sqlserver:
-    image: alexk002/sqlserver2019_demo:1
+    image: mcr.microsoft.com/mssql/server:2019-latest
     ports:
       - "1433:1433"
+    environment:
+      - MSSQL_SA_PASSWORD=OcP2020123
+      - ACCEPT_EULA=Y
     networks:
       - e2e
     healthcheck:
-      test: /opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P OcP2020123 -Q "SELECT 1"
+      test: /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P OcP2020123 -Q "SELECT 1" -C
       interval: 5s
       timeout: 5s
       retries: 120

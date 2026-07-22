@@ -27,7 +27,7 @@ interface WorkFlowNameReq {
   workFlowName: string
 }
 
-interface WorkFlowListRes extends WorkflowCodeReq {
+interface WorkFlowRelationDetailListRes extends WorkflowCodeReq {
   workFlowName: string
   workFlowPublishStatus: string
   scheduleStartTime?: any
@@ -43,8 +43,10 @@ interface WorkFlowRelationList {
 }
 
 interface WorkflowRes {
-  workFlowList: WorkFlowListRes[]
-  workFlowRelationList: WorkFlowRelationList[]
+  data: {
+    workFlowRelationDetailList: WorkFlowRelationDetailListRes[]
+    workFlowRelationList: WorkFlowRelationList[]
+  }
 }
 
 interface DependentTaskReq extends WorkflowCodeReq {
@@ -57,5 +59,5 @@ export {
   WorkFlowNameReq,
   DependentTaskReq,
   WorkflowRes,
-  WorkFlowListRes
+  WorkFlowRelationDetailListRes
 }

@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.CommonUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
@@ -136,7 +136,7 @@ public class KyuubiDataSourceProcessorTest {
         Map<String, String> other = new HashMap<>();
         other.put("serverTimezone", "Asia/Shanghai");
         connectionParam.setOther(other);
-        Assertions.assertEquals("jdbc:kyuubi://localhost1:5142,localhost2:5142/default?serverTimezone=Asia/Shanghai",
+        Assertions.assertEquals("jdbc:kyuubi://localhost1:5142,localhost2:5142/default;serverTimezone=Asia/Shanghai",
                 kyuubiDatasourceProcessor.getJdbcUrl(connectionParam));
     }
 

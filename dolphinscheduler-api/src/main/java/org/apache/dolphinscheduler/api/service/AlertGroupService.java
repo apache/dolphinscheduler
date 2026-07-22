@@ -23,9 +23,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
 
-/**
- * alert group service
- */
 public interface AlertGroupService {
 
     /**
@@ -35,14 +32,6 @@ public interface AlertGroupService {
      * @return alert group list
      */
     List<AlertGroup> queryAllAlertGroup(User loginUser);
-
-    /**
-     * query normal alert group list
-     *
-     * @param loginUser
-     * @return alert group list which is is not 2
-     */
-    List<AlertGroup> queryNormalAlertGroups(User loginUser);
 
     /**
      * query alert group by id
@@ -76,7 +65,7 @@ public interface AlertGroupService {
     AlertGroup createAlertGroup(User loginUser, String groupName, String desc, String alertInstanceIds);
 
     /**
-     * updateProcessInstance alert group
+     * updateWorkflowInstance alert group
      *
      * @param loginUser login user
      * @param id alert group id

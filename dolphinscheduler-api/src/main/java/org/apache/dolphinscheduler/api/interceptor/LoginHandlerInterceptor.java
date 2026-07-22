@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.UserMapper;
+import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpStatus;
@@ -47,7 +47,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class LoginHandlerInterceptor implements HandlerInterceptor {
 
     @Autowired
-    private UserMapper userMapper;
+    private UserDao userDao;
 
     @Autowired
     private Authenticator authenticator;
@@ -76,7 +76,7 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
                 return false;
             }
         } else {
-            user = userMapper.queryUserByToken(token, new Date());
+            user = userDao.queryUserByToken(token, new Date());
             if (user == null) {
                 response.setStatus(HttpStatus.SC_UNAUTHORIZED);
                 log.info("user token has expired");
@@ -91,14 +91,15 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
             return false;
         }
         request.setAttribute(Constants.SESSION_USER, user);
-        ThreadLocalContext.getTimezoneThreadLocal().set(user.getTimeZone());
+        ThreadLocalContext.setTimezone(user.getTimeZone());
         return true;
     }
 
     @Override
-    public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler,
-                           ModelAndView modelAndView) throws Exception {
-        ThreadLocalContext.getTimezoneThreadLocal().remove();
+    public void postHandle(HttpServletRequest request,
+                           HttpServletResponse response,
+                           Object handler,
+                           ModelAndView modelAndView) {
 
         int code = response.getStatus();
         if (code >= 200 && code < 300) {
@@ -110,5 +111,13 @@ public class LoginHandlerInterceptor implements HandlerInterceptor {
         } else if (code >= 500 && code < 600) {
             ApiServerMetrics.incApiResponse5xxCount();
         }
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request,
+                                HttpServletResponse response,
+                                Object handler,
+                                Exception ex) {
+        ThreadLocalContext.removeTimezone();
     }
 }

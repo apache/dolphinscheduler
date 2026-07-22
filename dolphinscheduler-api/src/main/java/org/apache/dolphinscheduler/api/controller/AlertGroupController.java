@@ -59,9 +59,6 @@ import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
-/**
- * alert group controller
- */
 @Tag(name = "ALERT_GROUP_TAG")
 @RestController
 @RequestMapping("/alert-groups")
@@ -110,22 +107,6 @@ public class AlertGroupController extends BaseController {
     public Result<List<AlertGroup>> list(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
 
         List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(loginUser);
-        return Result.success(alertGroups);
-    }
-
-    /**
-     * normal alert group list
-     *
-     * @param loginUser login user
-     * @return normal alert group list
-     */
-    @Operation(summary = "listNormalAlertGroupById", description = "QUERY_ALERT_GROUP_LIST_NOTES")
-    @GetMapping(value = "/normal-list")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
-    public Result<List<AlertGroup>> normalAlertGroupList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-
-        List<AlertGroup> alertGroups = alertGroupService.queryNormalAlertGroups(loginUser);
         return Result.success(alertGroups);
     }
 
@@ -180,7 +161,7 @@ public class AlertGroupController extends BaseController {
     }
 
     /**
-     * updateProcessInstance alert group
+     * updateWorkflowInstance alert group
      *
      * @param loginUser login user
      * @param id alert group id

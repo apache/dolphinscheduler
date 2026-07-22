@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.mapper.WorkerGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class WorkerGroupResourcePermissionCheckTest {
     private ResourcePermissionCheckServiceImpl.WorkerGroupResourcePermissionCheck workerGroupResourcePermissionCheck;
 
     @Mock
-    private WorkerGroupMapper workerGroupMapper;
+    private WorkerGroupDao workerGroupDao;
 
     @Test
     public void testPermissionCheck() {
@@ -69,7 +69,7 @@ public class WorkerGroupResourcePermissionCheckTest {
         ids.add(workerGroup.getId());
         List<WorkerGroup> workerGroups = Arrays.asList(workerGroup);
 
-        Mockito.when(workerGroupMapper.queryAllWorkerGroup()).thenReturn(workerGroups);
+        Mockito.when(workerGroupDao.queryAllWorkerGroup()).thenReturn(workerGroups);
 
         Assertions.assertEquals(ids,
                 workerGroupResourcePermissionCheck.listAuthorizedResourceIds(user.getId(), logger));

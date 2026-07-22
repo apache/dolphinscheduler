@@ -5,10 +5,10 @@
 在搭建 DolphinScheduler 开发环境之前请确保你已经安装以下软件:
 
 * [Git](https://git-scm.com/downloads)
-* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8.x (当前暂不支持 jdk 11)
+* [JDK](https://www.oracle.com/technetwork/java/javase/downloads/index.html): v1.8+
 * [Maven](http://maven.apache.org/download.cgi): v3.5+
-* [Node](https://nodejs.org/en/download): v16.13+ (dolphinScheduler 版本低于 3.0, 请安装 node v12.20+)
-* [Pnpm](https://pnpm.io/installation): v6.x
+* [Node](https://nodejs.org/en/download): v16.0+
+* [Pnpm](https://pnpm.io/installation): v7.0+ (请确保不同版本的pnpm与Node.js之间是相互兼容的，可参考：[Compatibility](https://pnpm.io/installation#compatibility))
 
 ### 克隆代码库
 
@@ -26,12 +26,12 @@ git clone git@github.com:apache/dolphinscheduler.git
 * MacOS
 * Linux
 
-运行 `mvn clean install -Prelease -Dmaven.test.skip=true`
+运行 `mvn clean install -Pstaging -Dmaven.test.skip=true`
 
-### 代码风格
+### 后端代码风格
 
-DolphinScheduler使用`Spotless`检查并修复代码风格和格式问题。
-您可以执行如下的命令，`Spotless`将会为您自动检查并修复代码风格和格式问题。
+DolphinScheduler使用`Spotless`检查并修复后端代码风格和格式问题。
+您可以执行如下的命令，`Spotless`将会为您自动检查并修复后端代码风格和格式问题。
 
 ```shell
 ./mvnw spotless:apply
@@ -51,20 +51,58 @@ pre-commit install
 
 现在，每次您提交代码时，`pre-commit`都会自动运行`Spotless`来检查代码风格和格式。
 
+### 前端代码风格
+
+DolphinScheduler使用`pnpm`检查并修复前端代码风格和格式问题。
+首先，进入前端项目文件夹：
+
+```shell
+cd dolphinscheduler-ui
+```
+
+然后，运行以下命令来自动修复 ESLint 可修复的问题，并格式化代码。
+
+```shell
+pnpm run lint      # 修复 ESLint 问题
+pnpm run prettier  # 格式化代码
+```
+
+最后，可以运行以下命令来执行完整的 TypeScript 类型检查，提前发现类型异常。
+
+```shell
+pnpm exec vue-tsc --noEmit  # 类型检查
+```
+
+### Helm 模板规范
+
+当您修改了Helm模板相关的文件后， 可以使用如下命令来调试 Helm 模板：
+
+```shell
+helm template ./deploy/kubernetes/dolphinscheduler --debug 
+```
+
+Helm模板调试通过之后，需要使用如下命令来自动更新README.md文件（手动更新很可能格式不符合要求）：
+
+```shell
+./mvnw validate -P helm-doc -pl :dolphinscheduler
+```
+
 ## Docker镜像构建
 
 DolphinScheduler 每次发版都会同时发布 Docker 镜像，你可以在 [Docker Hub](https://hub.docker.com/search?q=DolphinScheduler) 中找到这些镜像
 
 * 如果你想基于源码进行改造，然后在本地构建Docker镜像，可以在代码改造完成后运行
 
+> -Pstaging 包含插件，适合开发和测试以及无网络环境离线部署
+> -Prelease 不包含插件，适合生产环境，有能访问插件的网络可以按需下载
+
 ```shell
 cd dolphinscheduler
 ./mvnw -B clean package \
        -Dmaven.test.skip \
-       -Dmaven.javadoc.skip \
        -Dspotless.skip=true \
        -Ddocker.tag=<TAG> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 当命令运行完了后你可以通过 `docker images` 命令查看刚刚创建的镜像
@@ -75,12 +113,10 @@ cd dolphinscheduler
 cd dolphinscheduler
 ./mvnw -B clean deploy \
        -Dmaven.test.skip \
-       -Dmaven.javadoc.skip \
        -Dspotless.skip = true \
-       -Dmaven.deploy.skip \
        -Ddocker.tag=<TAG> \
        -Ddocker.hub=<HUB_URL> \
-       -Pdocker,release
+       -Pdocker,[release|staging]
 ```
 
 * 如果你不仅需要改造源码，还想要自定义 Docker 镜像打包的依赖，可以在修改源码的同时修改 Dockerfile 的定义。你可以运行以下命令找到所有的 Dockerfile 文件
@@ -113,7 +149,7 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 
 ## DolphinScheduler Standalone快速开发模式
 
-> **_注意：_** 仅供单机开发调试使用，默认使用 H2 Database,Zookeeper Testing Server
+> **_注意：_** 仅供单机开发调试使用，默认使用 H2 Database, Zookeeper Testing Server
 >
 > Standalone 仅在 DolphinScheduler 1.3.9 及以后的版本支持
 
@@ -126,13 +162,23 @@ DolphinScheduler 开发环境配置有两个方式，分别是standalone模式�
 
 ### 启动后端
 
-在 Intellij IDEA 找到并启动类 `org.apache.dolphinscheduler.StandaloneServer` 即可完成后端启动
+在 IntelliJ IDEA 找到并启动类 `org.apache.dolphinscheduler.StandaloneServer` 即可完成后端启动
+
+> 注意：启动前请在启动配置里将 `Add dependencies with "provided" scope to classpath` 选项勾选上，这样可以避免启动时找不到依赖的问题
 
 ### 启动前端
 
 安装前端依赖并运行前端组件
 
-> 注意：你可以在[frontend development](./frontend-development.md)里查看更多前端的相关配置
+> 注意：你可以在[frontend development](https://github.com/apache/dolphinscheduler/blob/dev/dolphinscheduler-ui/README.md)里查看更多前端的相关配置
+
+在运行前端组件前，如果你还没有安装`pnpm`，可以使用以下命令安装：
+
+```shell
+npm install -g pnpm
+```
+
+确保`pnpm`已经安装完成后，运行以下命令：
 
 ```shell
 cd dolphinscheduler-ui
@@ -171,14 +217,14 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
 
 ##### 必要的准备工作
 
-* 打开项目：使用开发工具打开项目，这里以 Intellij IDEA 为例，打开后需要一段时间，让 Intellij IDEA 完成以依赖的下载
+* 打开项目：使用开发工具打开项目，这里以 IntelliJ IDEA 为例，打开后需要一段时间，让 IntelliJ IDEA 完成以依赖的下载
 
 * 必要的修改
 
-  * 如果使用 MySQL 作为元数据库，需要先修改 `dolphinscheduler/pom.xml`，将 `mysql-connector-java` 依赖的 `scope` 改为 `compile`，使用 PostgreSQL 则不需要
+  * 如果使用 MySQL 作为元数据库，需要先修改 `dolphinscheduler-bom/pom.xml`，将 `mysql-connector-j` 依赖的 `scope` 改为 `compile`，使用 PostgreSQL 则不需要
   * 修改 Master 数据库配置，修改 `dolphinscheduler-master/src/main/resources/application.yaml` 文件中的数据库配置
-  * 修改 Worker 数据库配置，修改 `dolphinscheduler-worker/src/main/resources/application.yaml` 文件中的数据库配置
   * 修改 Api 数据库配置，修改 `dolphinscheduler-api/src/main/resources/application.yaml` 文件中的数据库配置
+  * 修改 Alert 数据库配置，修改 `dolphinscheduler-alert/dolphinscheduler-alert-server/src/main/resources/application.yaml` 文件中的数据库配置
 
   本样例以 MySQL 为例，其中数据库名为 dolphinscheduler，账户名密码均为 dolphinscheduler
 
@@ -190,28 +236,15 @@ DolphinScheduler 的元数据存储在关系型数据库中，目前支持的关
       username: dolphinscheduler
       password: dolphinscheduler
   ```
-* 修改日志级别：为以下配置增加一行内容 `<appender-ref ref="STDOUT"/>` 使日志能在命令行中显示
-
-  `dolphinscheduler-master/src/main/resources/logback-spring.xml`
-  `dolphinscheduler-worker/src/main/resources/logback-spring.xml`
-  `dolphinscheduler-api/src/main/resources/logback-spring.xml`
-
-  修改后的结果如下：
-
-  ```diff
-  <root level="INFO">
-  +  <appender-ref ref="STDOUT"/>
-    <appender-ref ref="APILOGFILE"/>
-  </root>
-  ```
 
 ##### 启动服务
 
 我们需要启动三个服务，包括 MasterServer，WorkerServer，ApiApplicationServer
 
-* MasterServer：在 Intellij IDEA 中执行 `org.apache.dolphinscheduler.server.master.MasterServer` 中的 `main` 方法，并配置 *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-* WorkerServer：在 Intellij IDEA 中执行 `org.apache.dolphinscheduler.server.worker.WorkerServer` 中的 `main` 方法，并配置 *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Ddruid.mysql.usePingMethod=false -Dspring.profiles.active=mysql`
-* ApiApplicationServer：在 Intellij IDEA 中执行 `org.apache.dolphinscheduler.api.ApiApplicationServer` 中的 `main` 方法，并配置 *VM Options* `-Dlogging.config=classpath:logback-spring.xml -Dspring.profiles.active=api,mysql`。启动完成可以浏览 Open API 文档，地址为 http://localhost:12345/dolphinscheduler/swagger-ui/index.html
+* MasterServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.server.master.MasterServer` 中的 `main` 方法，并配置 *VM Options* `-DDOCKER=true -Dspring.profiles.active=mysql`
+* WorkerServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.server.worker.WorkerServer` 中的 `main` 方法，并配置 *VM Options* `-DDOCKER=true`
+* AlertServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.alert.AlertServer` 中的 `main` 方法，并配置 *VM Options* `-DDOCKER=true -Dspring.profiles.active=mysql`
+* ApiApplicationServer：在 IntelliJ IDEA 中执行 `org.apache.dolphinscheduler.api.ApiApplicationServer` 中的 `main` 方法，并配置 *VM Options* `-DDOCKER=true -Dspring.profiles.active=mysql`。启动完成可以浏览 Open API 文档，地址为 http://localhost:12345/dolphinscheduler/swagger-ui/index.html
 
 > VM Options `-Dspring.profiles.active=mysql` 中 `mysql` 表示指定的配置文件
 

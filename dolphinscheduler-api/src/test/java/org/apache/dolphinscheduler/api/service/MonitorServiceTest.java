@@ -54,9 +54,6 @@ import org.slf4j.LoggerFactory;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 
-/**
- * monitor service test
- */
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 public class MonitorServiceTest {
@@ -131,7 +128,7 @@ public class MonitorServiceTest {
         Server server = new Server();
         server.setId(1);
         server.setHost("127.0.0.1");
-        server.setZkDirectory("ws/server");
+        server.setServerDirectory("ws/server");
         server.setPort(123);
         server.setCreateTime(new Date());
         server.setLastHeartbeatTime(new Date());

@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.hive.security;
 
-import static org.apache.dolphinscheduler.common.constants.Constants.JAVA_SECURITY_KRB5_CONF;
-
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.StorageType;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
@@ -31,6 +29,7 @@ import org.apache.hadoop.security.UserGroupInformation;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -41,7 +40,7 @@ public class UserGroupInformationFactory {
 
     private static final Map<String, Integer> currentLoginTimesMap = new HashMap<>();
 
-    private static final Map<String, UserGroupInformation> userGroupInformationMap = new HashMap<>();
+    private static final Map<String, UserGroupInformation> userGroupInformationMap = new ConcurrentHashMap<>();
 
     private static final ScheduledExecutorService kerberosRenewalService =
             ThreadUtils.newSingleDaemonScheduledExecutorService("Hive-Kerberos-Renewal-Thread-");
@@ -100,7 +99,7 @@ public class UserGroupInformationFactory {
         String keytab = PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH);
         String principal = PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME);
         if (StringUtils.isNotBlank(krb5File)) {
-            System.setProperty(JAVA_SECURITY_KRB5_CONF, krb5File);
+            System.setProperty(Constants.JAVA_SECURITY_KRB5_CONF, krb5File);
         }
 
         Configuration hadoopConf = new Configuration();

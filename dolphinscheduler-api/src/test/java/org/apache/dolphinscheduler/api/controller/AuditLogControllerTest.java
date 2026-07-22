@@ -34,9 +34,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-/**
- * audit log controller test
- */
 public class AuditLogControllerTest extends AbstractControllerTest {
 
     private static Logger logger = LoggerFactory.getLogger(AuditLogControllerTest.class);

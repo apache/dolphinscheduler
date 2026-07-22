@@ -46,7 +46,7 @@ export function useTable() {
   const router: Router = useRouter()
 
   const projectCode = Number(route.params.projectCode)
-  const processInstanceId = Number(route.query.processInstanceId)
+  const workflowInstanceId = Number(route.query.workflowInstanceId)
   const taskName = route.query.taskName
   const taskCode = route.query.taskCode
 
@@ -56,14 +56,15 @@ export function useTable() {
     tableData: [] as IRecord[],
     page: ref(1),
     pageSize: ref(10),
+    totalCount: ref(0),
     searchVal: ref(taskName || null),
     taskCode: ref(taskCode || null),
-    processInstanceId: ref(processInstanceId ? processInstanceId : null),
+    workflowInstanceId: ref(workflowInstanceId ? workflowInstanceId : null),
     host: ref(null),
     stateType: ref(null),
     datePickerRange: ref(null),
     executorName: ref(null),
-    processInstanceName: ref(null),
+    workflowInstanceName: ref(null),
     totalPage: ref(1),
     showModalRef: ref(false),
     row: {},
@@ -92,14 +93,14 @@ export function useTable() {
       },
       {
         title: t('project.task.workflow_instance'),
-        key: 'processInstanceName',
+        key: 'workflowInstanceName',
         ...COLUMN_WIDTH_CONFIG['linkName'],
         resizable: true,
         minWidth: 300,
         maxWidth: 600,
         render: (row: {
-          processInstanceId: number
-          processInstanceName: string
+          workflowInstanceId: number
+          workflowInstanceName: string
         }) =>
           h(
             ButtonLink,
@@ -107,7 +108,7 @@ export function useTable() {
               onClick: () => {
                 const routeUrl = router.resolve({
                   name: 'workflow-instance-detail',
-                  params: { id: row.processInstanceId },
+                  params: { id: row.workflowInstanceId },
                   query: { code: projectCode }
                 })
                 window.open(routeUrl.href, '_blank')
@@ -120,7 +121,7 @@ export function useTable() {
                   {
                     style: 'max-width: 580px;line-height: 1.5'
                   },
-                  () => row.processInstanceName
+                  () => row.workflowInstanceName
                 )
             }
           )
@@ -297,12 +298,12 @@ export function useTable() {
             : variables.page,
         searchVal: variables.searchVal,
         taskCode: variables.taskCode,
-        processInstanceId: variables.processInstanceId,
+        workflowInstanceId: variables.workflowInstanceId,
         host: variables.host,
         stateType: variables.stateType,
         datePickerRange: variables.datePickerRange,
         executorName: variables.executorName,
-        processInstanceName: variables.processInstanceName
+        workflowInstanceName: variables.workflowInstanceName
       })
     })
   }
@@ -315,7 +316,7 @@ export function useTable() {
       pageNo: params.pageNo,
       searchVal: params.searchVal,
       taskCode: params.taskCode,
-      processInstanceId: params.processInstanceId,
+      workflowInstanceId: params.workflowInstanceId,
       host: params.host,
       stateType: params.stateType,
       startDate: params.datePickerRange
@@ -325,12 +326,13 @@ export function useTable() {
         ? format(parseTime(params.datePickerRange[1]), 'yyyy-MM-dd HH:mm:ss')
         : '',
       executorName: params.executorName,
-      processInstanceName: params.processInstanceName
+      workflowInstanceName: params.workflowInstanceName
     }
 
     const { state } = useAsyncState(
       queryTaskListPaging(data, { projectCode }).then(
         (res: TaskInstancesRes) => {
+          variables.totalCount = res.total
           variables.tableData = res.totalList as IRecord[]
           variables.totalPage = res.totalPage
           variables.loadingRef = false

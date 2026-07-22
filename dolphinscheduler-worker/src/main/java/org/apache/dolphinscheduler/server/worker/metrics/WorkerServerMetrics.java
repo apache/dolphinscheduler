@@ -52,6 +52,11 @@ public class WorkerServerMetrics {
                     .description("worker resource download failure count")
                     .register(Metrics.globalRegistry);
 
+    private final Counter workerHeartBeatCounter =
+            Counter.builder("ds.worker.heartbeat.count")
+                    .description("worker heartbeat count")
+                    .register(Metrics.globalRegistry);
+
     private final Timer workerResourceDownloadDurationTimer =
             Timer.builder("ds.worker.resource.download.duration")
                     .publishPercentiles(0.5, 0.75, 0.95, 0.99)
@@ -81,6 +86,10 @@ public class WorkerServerMetrics {
 
     public void incWorkerResourceDownloadFailureCount() {
         workerResourceDownloadFailCounter.increment();
+    }
+
+    public void incWorkerHeartbeatCount() {
+        workerHeartBeatCounter.increment();
     }
 
     public void recordWorkerResourceDownloadTime(final long milliseconds) {

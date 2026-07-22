@@ -32,16 +32,12 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.text.MessageFormat;
 import java.util.Date;
-import java.util.Map;
 import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * base service impl
- */
 @Slf4j
 public class BaseServiceImpl implements BaseService {
 
@@ -72,23 +68,6 @@ public class BaseServiceImpl implements BaseService {
     }
 
     /**
-     * put message to map
-     *
-     * @param result result code
-     * @param status status
-     * @param statusParams status message
-     */
-    @Override
-    public void putMsg(Map<String, Object> result, Status status, Object... statusParams) {
-        result.put(Constants.STATUS, status);
-        if (statusParams != null && statusParams.length > 0) {
-            result.put(Constants.MSG, MessageFormat.format(status.getMsg(), statusParams));
-        } else {
-            result.put(Constants.MSG, status.getMsg());
-        }
-    }
-
-    /**
      * put message to result object
      *
      * @param result result code
@@ -104,40 +83,6 @@ public class BaseServiceImpl implements BaseService {
             result.setMsg(status.getMsg());
         }
     }
-
-    /**
-     * check
-     *
-     * @param result result
-     * @param bool bool
-     * @param userNoOperationPerm status
-     * @return check result
-     */
-    @Override
-    public boolean check(Map<String, Object> result, boolean bool, Status userNoOperationPerm) {
-        // only admin can operate
-        if (bool) {
-            result.put(Constants.STATUS, userNoOperationPerm);
-            result.put(Constants.MSG, userNoOperationPerm.getMsg());
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * create tenant dir if not exists
-     *
-     * @param tenantCode tenant code
-     * @throws IOException if hdfs operation exception
-     */
-    // @Override
-    // public void createTenantDirIfNotExists(String tenantCode) throws IOException {
-    // String resourcePath = HadoopUtils.getHdfsResDir(tenantCode);
-    // String udfsPath = HadoopUtils.getHdfsUdfDir(tenantCode);
-    // // init resource path and udf path
-    // HadoopUtils.getInstance().mkdir(tenantCode,resourcePath);
-    // HadoopUtils.getInstance().mkdir(tenantCode,udfsPath);
-    // }
 
     /**
      * Verify that the operator has permissions

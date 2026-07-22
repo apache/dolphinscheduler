@@ -31,18 +31,40 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 @Slf4j
 public class ThreadUtils {
 
-    public static ThreadPoolExecutor newDaemonFixedThreadExecutor(String threadName, int threadsNum) {
-        return (ThreadPoolExecutor) Executors.newFixedThreadPool(threadsNum, newDaemonThreadFactory(threadName));
+    /**
+     * Create a daemon fixed thread pool, the thread name will be formatted with the given name.
+     *
+     * @param threadNameFormat the thread name format, e.g. "DemonThread-%d"
+     * @param threadsNum       the number of threads in the pool
+     */
+    public static ThreadPoolExecutor newDaemonFixedThreadExecutor(String threadNameFormat, int threadsNum) {
+        return (ThreadPoolExecutor) Executors.newFixedThreadPool(threadsNum, newDaemonThreadFactory(threadNameFormat));
     }
 
-    public static ScheduledExecutorService newSingleDaemonScheduledExecutorService(String threadName) {
-        return Executors.newSingleThreadScheduledExecutor(newDaemonThreadFactory(threadName));
+    public static ScheduledExecutorService newSingleDaemonScheduledExecutorService(String threadNameFormat) {
+        return Executors.newSingleThreadScheduledExecutor(newDaemonThreadFactory(threadNameFormat));
     }
 
-    public static ThreadFactory newDaemonThreadFactory(String threadName) {
+    /**
+     * Create a daemon scheduler thread pool, the thread name will be formatted with the given name.
+     *
+     * @param threadNameFormat the thread name format, e.g. "DemonThread-%d"
+     * @param threadsNum       the number of threads in the pool
+     */
+    public static ScheduledExecutorService newDaemonScheduledExecutorService(final String threadNameFormat,
+                                                                             final int threadsNum) {
+        return Executors.newScheduledThreadPool(threadsNum, newDaemonThreadFactory(threadNameFormat));
+    }
+
+    /**
+     * Create a daemon thread factory, the thread name will be formatted with the given name.
+     *
+     * @param threadNameFormat the thread name format, e.g. "DS-DemonThread-%d"
+     */
+    public static ThreadFactory newDaemonThreadFactory(String threadNameFormat) {
         return new ThreadFactoryBuilder()
                 .setDaemon(true)
-                .setNameFormat(threadName)
+                .setNameFormat(threadNameFormat)
                 .setUncaughtExceptionHandler(DefaultUncaughtExceptionHandler.getInstance())
                 .build();
     }
@@ -57,5 +79,16 @@ public class ThreadUtils {
             Thread.currentThread().interrupt();
             log.error("Current thread sleep error", interruptedException);
         }
+    }
+
+    public static void rethrowInterruptedException(InterruptedException interruptedException) {
+        Thread.currentThread().interrupt();
+        throw new RuntimeException("Current thread: " + Thread.currentThread().getName() + " is interrupted",
+                interruptedException);
+    }
+
+    public static void consumeInterruptedException(InterruptedException interruptedException) {
+        log.info("Current thread: {} is interrupted", Thread.currentThread().getName(), interruptedException);
+        Thread.currentThread().interrupt();
     }
 }

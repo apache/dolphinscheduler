@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.storage.s3;
 
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
+import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import com.google.auto.service.AutoService;
 
@@ -36,9 +36,9 @@ public class S3StorageOperatorFactory implements StorageOperatorFactory {
 
     private S3StorageProperties getS3StorageProperties() {
         return S3StorageProperties.builder()
-                .bucketName(PropertyUtils.getString(Constants.AWS_S3_BUCKET_NAME))
+                .bucketName(PropertyUtils.getString(StorageConstants.AWS_S3_BUCKET_NAME))
                 .s3Configuration(PropertyUtils.getByPrefix("aws.s3.", ""))
-                .resourceUploadPath(PropertyUtils.getString(Constants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
+                .resourceUploadPath(PropertyUtils.getString(StorageConstants.RESOURCE_UPLOAD_PATH, "/dolphinscheduler"))
                 .build();
     }
 

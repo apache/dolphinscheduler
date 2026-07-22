@@ -26,7 +26,10 @@ import Modal from '@/components/modal'
 import { NForm, NFormItem, NInput, NSelect } from 'naive-ui'
 import { useModal } from './use-modal'
 import { useI18n } from 'vue-i18n'
-import { DATA_TYPES_MAP, DEFAULT_DATA_TYPE } from "@/views/projects/parameter/data_type"
+import {
+  DATA_TYPES_MAP,
+  DEFAULT_DATA_TYPE
+} from '@/views/projects/parameter/data_type'
 
 const ParameterModal = defineComponent({
   name: 'ParameterModal',
@@ -142,13 +145,16 @@ const ParameterModal = defineComponent({
                     v-model={[this.model.projectParameterValue, 'value']}
                   />
                 </NFormItem>
-                <NFormItem label={t('project.parameter.data_type')} path='data_type'>
+                <NFormItem
+                  label={t('project.parameter.data_type')}
+                  path='data_type'
+                >
                   <NSelect
-                      placeholder={t('project.parameter.data_type_tips')}
-                      options={Object.keys(DATA_TYPES_MAP).map((item) => {
-                        return { value: item, label: item }
-                      })}
-                      v-model={[this.model.projectParameterDataType, 'value']}
+                    placeholder={t('project.parameter.data_type_tips')}
+                    options={Object.keys(DATA_TYPES_MAP).map((item) => {
+                      return { value: item, label: item }
+                    })}
+                    v-model={[this.model.projectParameterDataType, 'value']}
                   />
                 </NFormItem>
               </NForm>

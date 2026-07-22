@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
+import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,12 +47,12 @@ public class AccessTokenResourcePermissionCheckTest {
     private ResourcePermissionCheckServiceImpl.AccessTokenResourcePermissionCheck accessTokenResourcePermissionCheck;
 
     @Mock
-    private AccessTokenMapper accessTokenMapper;
+    private AccessTokenDao accessTokenDao;
 
     @Test
     public void testPermissionCheck() {
         User user = getLoginUser();
-        Assertions.assertFalse(accessTokenResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
+        Assertions.assertTrue(accessTokenResourcePermissionCheck.permissionCheck(user.getId(), null, logger));
     }
 
     @Test
@@ -69,7 +69,7 @@ public class AccessTokenResourcePermissionCheckTest {
         ids.add(accessToken.getId());
         List<AccessToken> accessTokens = Arrays.asList(accessToken);
 
-        Mockito.when(accessTokenMapper.listAuthorizedAccessToken(user.getId(), null)).thenReturn(accessTokens);
+        Mockito.when(accessTokenDao.listAuthorizedAccessToken(user.getId(), null)).thenReturn(accessTokens);
 
         Assertions.assertEquals(ids,
                 accessTokenResourcePermissionCheck.listAuthorizedResourceIds(user.getId(), logger));

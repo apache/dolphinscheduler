@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.datasource.api.utils;
 
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOURCE_ENCRYPTION_ENABLE;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOURCE_ENCRYPTION_SALT;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.DATASOURCE_ENCRYPTION_SALT;
+import static org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 
@@ -77,7 +77,7 @@ public class PasswordUtils {
         String salt = PropertyUtils.getString(DATASOURCE_ENCRYPTION_SALT, DATASOURCE_ENCRYPTION_SALT_DEFAULT);
         String passwordWithSalt = new String(BASE64.decode(password), StandardCharsets.UTF_8);
         if (!passwordWithSalt.startsWith(salt)) {
-            log.warn("There is a password and salt mismatch: {} ", password);
+            log.warn("There is a password and salt mismatch");
             return password;
         }
         return new String(BASE64.decode(passwordWithSalt.substring(salt.length())), StandardCharsets.UTF_8);

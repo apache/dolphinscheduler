@@ -68,8 +68,6 @@ public class TaskNode {
      */
     private String runFlag;
 
-    private int isCache;
-
     /**
      * the front field
      */
@@ -85,9 +83,6 @@ public class TaskNode {
      */
     private int retryInterval;
 
-    /**
-     * task group id
-     */
     private int taskGroupId;
     /**
      * task group id
@@ -120,19 +115,10 @@ public class TaskNode {
      */
     private List<Long> depList;
 
-    /**
-     * task instance priority
-     */
     private Priority taskInstancePriority;
 
-    /**
-     * worker group
-     */
     private String workerGroup;
 
-    /**
-     * environment code
-     */
     private Long environmentCode;
 
     /**
@@ -147,9 +133,6 @@ public class TaskNode {
      */
     private int delayTime;
 
-    /**
-     * cpu quota
-     */
     private Integer cpuQuota;
 
     /**
@@ -157,9 +140,6 @@ public class TaskNode {
      */
     private Integer memoryMax;
 
-    /**
-     * task execute type
-     */
     private TaskExecuteType taskExecuteType;
 
     public String getId() {
@@ -244,14 +224,6 @@ public class TaskNode {
 
     public void setRunFlag(String runFlag) {
         this.runFlag = runFlag;
-    }
-
-    public int getIsCache() {
-        return isCache;
-    }
-
-    public void setIsCache(int isCache) {
-        this.isCache = isCache;
     }
 
     public boolean isForbidden() {

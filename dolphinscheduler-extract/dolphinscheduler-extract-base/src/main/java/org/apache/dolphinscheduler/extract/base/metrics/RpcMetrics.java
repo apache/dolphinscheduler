@@ -42,9 +42,9 @@ public class RpcMetrics {
                         .map(ClientSyncExceptionMetrics::getTransporter)
                         .map(Transporter::getHeader)
                         .map(TransporterHeader::getMethodIdentifier)
-                        .orElseGet(() -> "unknown"),
+                        .orElse("unknown"),
                 clientSyncExceptionMetrics.getClientHost(),
-                clientSyncExceptionMetrics.getServerHost());
+                clientSyncExceptionMetrics.getServerAddress());
     }
 
     public static void recordClientSyncRequestException(final Throwable throwable,

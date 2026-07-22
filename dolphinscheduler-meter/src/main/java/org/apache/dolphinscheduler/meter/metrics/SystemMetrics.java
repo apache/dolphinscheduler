@@ -36,6 +36,10 @@ public class SystemMetrics {
     // todo: get pod memory usage
     private double jvmMemoryUsed;
     private double jvmMemoryMax;
+    private double jvmHeapUsed;
+    private double jvmNonHeapUsed;
+    private double jvmHeapMax;
+    private double jvmNonHeapMax;
     private double jvmMemoryUsedPercentage;
 
     // System-Memory

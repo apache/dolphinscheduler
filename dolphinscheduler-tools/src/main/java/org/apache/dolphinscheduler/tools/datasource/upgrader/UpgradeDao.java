@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.tools.datasource.upgrader;
 
 import org.apache.dolphinscheduler.common.sql.SqlScriptRunner;
 import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
-import org.apache.dolphinscheduler.tools.datasource.dao.ResourceDao;
 import org.apache.dolphinscheduler.tools.datasource.utils.SchemaUtils;
 
 import java.io.FileNotFoundException;
@@ -88,21 +87,6 @@ public class UpgradeDao {
     public void upgradeDolphinScheduler(String schemaDir) {
         upgradeDolphinSchedulerDDL(schemaDir, "dolphinscheduler_ddl.sql");
         upgradeDolphinSchedulerDML(schemaDir, "dolphinscheduler_dml.sql");
-    }
-
-    /**
-     * upgrade DolphinScheduler to 2.0.6
-     */
-    public void upgradeDolphinSchedulerResourceFileSize() {
-        ResourceDao resourceDao = new ResourceDao();
-        try (Connection conn = dataSource.getConnection()) {
-            // update the size of the folder that is the type of file.
-            resourceDao.updateResourceFolderSizeByFileType(conn, 0);
-            // update the size of the folder that is the type of udf.
-            resourceDao.updateResourceFolderSizeByFileType(conn, 1);
-        } catch (Exception ex) {
-            log.error("Failed to upgrade because of failing to update the folder's size of resource files.");
-        }
     }
 
     private void upgradeDolphinSchedulerDML(String schemaDir, String scriptFile) {

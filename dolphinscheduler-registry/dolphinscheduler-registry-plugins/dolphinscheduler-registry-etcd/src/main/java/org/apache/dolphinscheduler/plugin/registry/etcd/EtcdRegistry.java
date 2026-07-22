@@ -32,10 +32,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import javax.net.ssl.SSLException;
@@ -80,7 +82,7 @@ public class EtcdRegistry implements Registry {
     public static final String FOLDER_SEPARATOR = "/";
     // save the lock info for thread
     // key:lockKey Value:leaseId
-    private static final ThreadLocal<Map<String, Long>> threadLocalLockMap = new ThreadLocal<>();
+    private static final ThreadLocal<Map<String, LockEntry>> threadLocalLockMap = new ThreadLocal<>();
 
     private final Map<String, Watch.Watcher> watcherMap = new ConcurrentHashMap<>();
 
@@ -158,25 +160,28 @@ public class EtcdRegistry implements Registry {
             watcherMap.computeIfAbsent(path,
                     $ -> client.getWatchClient().watch(watchKey, watchOption, watchResponse -> {
                         for (WatchEvent event : watchResponse.getEvents()) {
-                            listener.notify(new EventAdaptor(event, path));
+                            final String eventPath = event.getKeyValue().getKey().toString(StandardCharsets.UTF_8);
+                            switch (listener.getSubscribeScope()) {
+                                case PATH_ONLY:
+                                    if (eventPath.equals(path)) {
+                                        listener.notify(toEvent(event, path));
+                                    }
+                                    break;
+                                case CHILDREN_ONLY:
+                                    if (!eventPath.equals(path)) {
+                                        listener.notify(toEvent(event, path));
+                                    }
+                                    break;
+                                case ALL:
+                                    listener.notify(toEvent(event, path));
+                                    break;
+                                default:
+                                    throw new RegistryException("Unknown event scope: " + listener.getSubscribeScope());
+                            }
                         }
                     }));
         } catch (Exception e) {
             throw new RegistryException("Failed to subscribe listener for key: " + path, e);
-        }
-    }
-
-    /**
-     * @param path The prefix of the key being listened to
-     * @throws throws an exception if the unsubscribe path does not exist
-     */
-    @Override
-    public void unsubscribe(String path) {
-        try {
-            watcherMap.get(path).close();
-            watcherMap.remove(path);
-        } catch (Exception e) {
-            throw new RegistryException("Failed to unsubscribe listener for key: " + path, e);
         }
     }
 
@@ -293,13 +298,9 @@ public class EtcdRegistry implements Registry {
      * get the lock with a lease
      */
     @Override
-    public boolean acquireLock(String key) {
-        Map<String, Long> leaseIdMap = threadLocalLockMap.get();
-        if (null == leaseIdMap) {
-            leaseIdMap = new HashMap<>();
-            threadLocalLockMap.set(leaseIdMap);
-        }
-        if (leaseIdMap.containsKey(key)) {
+    public boolean acquireLock(String lockKey) {
+        Map<String, LockEntry> threadHeldLocks = getThreadHeldLocks();
+        if (acquireBasedOnThreadHeldLocks(lockKey, threadHeldLocks)) {
             return true;
         }
 
@@ -311,27 +312,41 @@ public class EtcdRegistry implements Registry {
             // keep the lease
             client.getLeaseClient().keepAlive(leaseId, Observers.observer(response -> {
             }));
-            lockClient.lock(byteSequence(key), leaseId).get();
+            lockClient.lock(byteSequence(lockKey), leaseId).get();
 
             // save the leaseId for release Lock
-            leaseIdMap.put(key, leaseId);
+            threadHeldLocks.put(lockKey, new LockEntry(leaseId));
             return true;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             throw new RegistryException("etcd get lock error", e);
         } catch (Exception e) {
-            throw new RegistryException("etcd get lock error, lockKey: " + key, e);
+            throw new RegistryException("etcd get lock error, lockKey: " + lockKey, e);
         }
+    }
+
+    private static boolean acquireBasedOnThreadHeldLocks(String lockKey, Map<String, LockEntry> threadHeldLocks) {
+        LockEntry lockEntry = threadHeldLocks.get(lockKey);
+        if (lockEntry != null) {
+            lockEntry.lockCount.incrementAndGet();
+            return true;
+        }
+        return false;
+    }
+
+    private static Map<String, LockEntry> getThreadHeldLocks() {
+        Map<String, LockEntry> lockEntryMap = threadLocalLockMap.get();
+        if (null == lockEntryMap) {
+            lockEntryMap = new HashMap<>();
+            threadLocalLockMap.set(lockEntryMap);
+        }
+        return lockEntryMap;
     }
 
     @Override
     public boolean acquireLock(String key, long timeout) {
-        Map<String, Long> leaseIdMap = threadLocalLockMap.get();
-        if (null == leaseIdMap) {
-            leaseIdMap = new HashMap<>();
-            threadLocalLockMap.set(leaseIdMap);
-        }
-        if (leaseIdMap.containsKey(key)) {
+        Map<String, LockEntry> threadHeldLocks = getThreadHeldLocks();
+        if (acquireBasedOnThreadHeldLocks(key, threadHeldLocks)) {
             return true;
         }
 
@@ -346,7 +361,7 @@ public class EtcdRegistry implements Registry {
             }));
 
             // save the leaseId for release Lock
-            leaseIdMap.put(key, leaseId);
+            threadHeldLocks.put(key, new LockEntry(leaseId));
             return true;
         } catch (TimeoutException timeoutException) {
             log.debug("Acquire lock: {} in {}/ms timeout", key, timeout);
@@ -365,10 +380,24 @@ public class EtcdRegistry implements Registry {
     @Override
     public boolean releaseLock(String key) {
         try {
-            Long leaseId = threadLocalLockMap.get().get(key);
-            client.getLeaseClient().revoke(leaseId);
-            threadLocalLockMap.get().remove(key);
-            if (threadLocalLockMap.get().isEmpty()) {
+            Map<String, LockEntry> lockEntryMap = threadLocalLockMap.get();
+            if (lockEntryMap == null) {
+                return true;
+            }
+            LockEntry lockEntry = lockEntryMap.get(key);
+            if (lockEntry == null) {
+                return true;
+            }
+            int newLockCount = lockEntry.lockCount.decrementAndGet();
+            if (newLockCount > 0) {
+                return true;
+            }
+            if (newLockCount < 0) {
+                throw new IllegalMonitorStateException("Etcd lock count has gone negative for lock: " + key);
+            }
+            client.getLeaseClient().revoke(lockEntry.leaseId);
+            lockEntryMap.remove(key);
+            if (lockEntryMap.isEmpty()) {
                 threadLocalLockMap.remove();
             }
         } catch (Exception e) {
@@ -387,30 +416,41 @@ public class EtcdRegistry implements Registry {
         return ByteSequence.from(val, StandardCharsets.UTF_8);
     }
 
-    static final class EventAdaptor extends Event {
+    private Event toEvent(final WatchEvent watchEvent, final String watchedPath) {
+        Event.Type eventType = null;
+        switch (watchEvent.getEventType()) {
+            case PUT:
+                if (watchEvent.getPrevKV().getKey().isEmpty()) {
+                    eventType = Event.Type.ADD;
+                } else {
+                    eventType = Event.Type.UPDATE;
+                }
+                break;
+            case DELETE:
+                eventType = Event.Type.REMOVE;
+                break;
+            default:
+                break;
+        }
+        final KeyValue keyValue = watchEvent.getKeyValue();
+        return Event.builder()
+                .type(eventType)
+                .watchedPath(watchedPath)
+                .eventPath(Optional.ofNullable(keyValue).map(kv -> kv.getKey().toString(StandardCharsets.UTF_8))
+                        .orElse(null))
+                .eventData(Optional.ofNullable(keyValue).map(kv -> kv.getValue().toString(StandardCharsets.UTF_8))
+                        .orElse(null))
+                .build();
+    }
 
-        public EventAdaptor(WatchEvent event, String key) {
-            key(key);
+    private static class LockEntry {
 
-            switch (event.getEventType()) {
-                case PUT:
-                    if (event.getPrevKV().getKey().isEmpty()) {
-                        type(Type.ADD);
-                    } else {
-                        type(Type.UPDATE);
-                    }
-                    break;
-                case DELETE:
-                    type(Type.REMOVE);
-                    break;
-                default:
-                    break;
-            }
-            KeyValue keyValue = event.getKeyValue();
-            if (keyValue != null) {
-                path(keyValue.getKey().toString(StandardCharsets.UTF_8));
-                data(keyValue.getValue().toString(StandardCharsets.UTF_8));
-            }
+        final Long leaseId;
+        final AtomicInteger lockCount = new AtomicInteger(1);
+
+        private LockEntry(Long leaseId) {
+            this.leaseId = leaseId;
         }
     }
+
 }

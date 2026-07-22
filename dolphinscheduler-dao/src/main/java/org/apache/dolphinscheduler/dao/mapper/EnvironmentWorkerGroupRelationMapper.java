@@ -25,9 +25,6 @@ import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
-/**
- * environment worker group relation mapper interface
- */
 public interface EnvironmentWorkerGroupRelationMapper extends BaseMapper<EnvironmentWorkerGroupRelation> {
 
     /**

@@ -64,7 +64,7 @@ class YarnClientAspectMocTest {
                     false, 10, null,
                     "type");
             moc.createAppId();
-            ApplicationId applicationId = moc.submitApplication(appContext);
+            moc.submitApplication(appContext);
             String stdoutContent = stdoutStream.toString();
             Assertions.assertTrue(stdoutContent.contains("YarnClientAspectMoc[submitApplication]"),
                     "trigger YarnClientAspectMoc.submitApplication failed");

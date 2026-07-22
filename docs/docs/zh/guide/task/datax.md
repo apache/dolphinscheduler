@@ -4,7 +4,7 @@
 
 DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker 会通过执行 `${DATAX_LAUNCHER}` 来解析传入的 json 文件。
 
-执行 datax 任务前需要在环境变量中配置`PYTHON_LAUNCHER`，部分 datax 发行版只支持 python2.7。
+执行 datax 任务前需要在环境变量或者 `dolphinshceduler_env.sh` 中配置 `PYTHON_LAUNCHER` 和 `DATAX_LAUNCHER`，部分 datax 发行版只支持 python2.7。
 
 ## 创建任务
 
@@ -12,9 +12,6 @@ DataX 任务类型，用于执行 DataX 程序。对于 DataX 节点，worker �
 - 拖动工具栏的<img src="../../../../img/tasks/icons/datax.png" width="15"/> 任务节点到画板中。
 
 ## 任务参数
-
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- 默认参数说明请参考[DolphinScheduler任务参数附录]&#40;appendix.md#默认任务参数&#41;`默认任务参数`一栏。)
 
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
 

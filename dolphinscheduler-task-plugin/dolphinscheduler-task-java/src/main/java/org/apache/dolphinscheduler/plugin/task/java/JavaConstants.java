@@ -29,14 +29,14 @@ public class JavaConstants {
     public static final String JAVA_HOME_VAR = "${JAVA_HOME}";
 
     /**
-     * this constant represents the use of the java command to run a task
+     * This constant represents the use of the java -jar command to run a task
      **/
-    public static final String RUN_TYPE_JAVA = "JAVA";
+    public static final String RUN_TYPE_FAT_JAR = "FAT_JAR";
 
     /**
-     * this constant represents the use of the java -jar command to run a task
+     * This constant represents the use of the java -cp command to run a task
      **/
-    public static final String RUN_TYPE_JAR = "JAR";
+    public static final String RUN_TYPE_NORMAL_JAR = "NORMAL_JAR";
 
     /**
      * This constant is the Classpath or module path delimiter for different operating systems
@@ -48,13 +48,4 @@ public class JavaConstants {
      **/
     public static final String CLASSPATH_CURRENT_DIR = ".";
 
-    /**
-     * This constant is used to construct the pre-pathname of the Java source file
-     **/
-    public static final String JAVA_SOURCE_CODE_NAME_TEMPLATE = "%s/%s.java";
-
-    /**
-     * This constant is the regular expression to get the class name of the source file
-     **/
-    public static final String PUBLIC_CLASS_NAME_REGEX = "(.*\\s*public\\s+class\\s+)([a-zA-Z_]+[//w_]*)([.\\s\\S]*)";
 }

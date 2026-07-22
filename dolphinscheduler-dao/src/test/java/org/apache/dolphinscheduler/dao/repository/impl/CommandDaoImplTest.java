@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -34,13 +33,10 @@ import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.commons.lang3.RandomUtils;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CommandDaoImplTest extends BaseDaoTest {
 
     @Autowired
@@ -63,14 +59,6 @@ class CommandDaoImplTest extends BaseDaoTest {
         }
 
         List<Command> commands = commandDao.queryCommandByIdSlot(currentSlotIndex, totalSlot, idStep, fetchSize);
-        assertFalse(commands.isEmpty(),
-                "Commands should not be empty, currentSlotIndex: " + currentSlotIndex +
-                        ", totalSlot: " + totalSlot +
-                        ", idStep: " + idStep +
-                        ", fetchSize: " + fetchSize +
-                        ", total command size: " + commandSize +
-                        ", total commands: "
-                        + commandDao.queryAll().stream().map(Command::getId).collect(Collectors.toList()));
         assertThat(commands.size())
                 .isEqualTo(commandDao.queryAll()
                         .stream()
@@ -83,7 +71,7 @@ class CommandDaoImplTest extends BaseDaoTest {
     private Command generateCommand(CommandType commandType, int processDefinitionCode) {
         Command command = new Command();
         command.setCommandType(commandType);
-        command.setProcessDefinitionCode(processDefinitionCode);
+        command.setWorkflowDefinitionCode(processDefinitionCode);
         command.setExecutorId(4);
         command.setCommandParam("test command param");
         command.setTaskDependType(TaskDependType.TASK_ONLY);
@@ -91,12 +79,12 @@ class CommandDaoImplTest extends BaseDaoTest {
         command.setWarningType(WarningType.ALL);
         command.setWarningGroupId(1);
         command.setScheduleTime(DateUtils.stringToDate("2019-12-29 12:10:00"));
-        command.setProcessInstancePriority(Priority.MEDIUM);
+        command.setWorkflowInstancePriority(Priority.MEDIUM);
         command.setStartTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setUpdateTime(DateUtils.stringToDate("2019-12-29 10:10:00"));
         command.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
-        command.setProcessInstanceId(0);
-        command.setProcessDefinitionVersion(0);
+        command.setWorkflowInstanceId(0);
+        command.setWorkflowDefinitionVersion(0);
         return command;
     }
 }

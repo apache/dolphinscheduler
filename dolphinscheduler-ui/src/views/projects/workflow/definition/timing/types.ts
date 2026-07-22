@@ -19,6 +19,6 @@ export interface ISearchParam {
   pageSize: number
   pageNo: number
   projectCode: number
-  processDefinitionCode: number
+  workflowDefinitionCode: number
   searchVal: string | undefined
 }

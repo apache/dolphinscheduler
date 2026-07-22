@@ -11,9 +11,6 @@ Dependent nodes are **dependency check nodes**. For example, process A depends o
 
 ## Task Parameter
 
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
-
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 
 |          **Parameter**          |                                                                            **Description**                                                                            |
@@ -43,3 +40,6 @@ And another example is that process A is a weekly report task, processes B and C
 If the weekly report A also needs to be executed successfully last Tuesday:
 
 ![dependent_task03](../../../../img/tasks/demo/dependent_task03.png)
+
+> **Note**: The current week and month in the dependency cycle represent the entire cycle within the natural week and month, that is, the current week is from Monday to Sunday, and this month is from the 1st to the current day, and so on.
+

@@ -17,12 +17,15 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -38,6 +41,8 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties(value = "api")
 public class ApiConfig implements Validator {
 
+    private String baseUrl;
+    private String uiUrl;
     private boolean auditEnable = false;
 
     private TrafficConfiguration trafficControl = new TrafficConfiguration();
@@ -51,10 +56,19 @@ public class ApiConfig implements Validator {
 
     @Override
     public void validate(Object target, Errors errors) {
+        validatePythonGateway(errors);
         printConfig();
     }
 
+    private void validatePythonGateway(Errors errors) {
+        if (pythonGateway.isEnabled() && StringUtils.isEmpty(pythonGateway.getAuthToken())) {
+            errors.rejectValue("pythonGateway.auth-token", null, "should not be empty when enabled is true");
+        }
+    }
+
     private void printConfig() {
+        log.info("API config: baseUrl -> {} ", baseUrl);
+        log.info("API config: uiUrl -> {} ", uiUrl);
         log.info("API config: auditEnable -> {} ", auditEnable);
         log.info("API config: trafficControl -> {} ", trafficControl);
         log.info("API config: pythonGateway -> {} ", pythonGateway);
@@ -72,12 +86,13 @@ public class ApiConfig implements Validator {
         private Map<String, Integer> customizeTenantQpsRate = new HashMap<>();
     }
 
+    @ToString(exclude = "authToken")
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
     public static class PythonGatewayConfiguration {
 
-        private boolean enabled = true;
+        private boolean enabled = false;
         private String gatewayServerAddress = "0.0.0.0";
         private int gatewayServerPort = 25333;
         private String pythonAddress = "127.0.0.1";

@@ -17,20 +17,15 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
-import java.util.Date;
+import java.util.List;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class WorkFlowLineage {
 
-    private long workFlowCode;
-    private String workFlowName;
-    private String workFlowPublishStatus;
-    private Date scheduleStartTime;
-    private Date scheduleEndTime;
-    private String crontab;
-    private int schedulePublishStatus;
-    private String sourceWorkFlowCode;
-
+    private List<WorkFlowRelation> workFlowRelationList;
+    private List<WorkFlowRelationDetail> workFlowRelationDetailList;
 }

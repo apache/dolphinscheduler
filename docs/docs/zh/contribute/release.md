@@ -107,19 +107,29 @@ sub   4096R/A63BC462 2019-11-15
 
 其中 85E11560 为公钥 ID。
 
+gpg2.0版本后格式发生变化
+
+```shell
+pub   rsa4096 2023-07-01 [SC]
+1234ABCD5678EFGH9012IJKL3456MNOP7890QRST
+uid           [ultimate] ${用户名} <{邮件地址}>
+sub   rsa4096 2023-07-01 [E]
+```
+
+其中1234ABCD5678EFGH9012IJKL3456MNOP7890QRST为公钥 ID。
+
 #### 将公钥同步到服务器
 
 命令如下：
 
 ```shell
-gpg --keyserver hkp://pool.sks-keyservers.net --send-key 85E11560
+gpg --keyserver hkp://keyserver.ubuntu.com --send-key 85E11560
 ```
 
-`pool.sks-keyservers.net`为随意挑选的[公钥服务器](https://sks-keyservers.net/status/)，每个服务器之间是自动同步的，选任意一个即可。
+`keyserver.ubuntu.com`为随意挑选的[公钥服务器](https://keyserver.ubuntu.com)，每个服务器之间是自动同步的，选任意一个即可。
 
 注意：如果同步到公钥服务器，可以在服务器上查到新建的公钥
-http://keyserver.ubuntu.com:11371/pks/lookup?search=${用户名}&fingerprint=on&op=index
-备用公钥服务器 gpg --keyserver hkp://keyserver.ubuntu.com --send-key ${公钥 ID}
+http://keyserver.ubuntu.com/pks/lookup?search=${用户名}&fingerprint=on&op=index
 
 ### 配置 Apache Maven Central Repository
 
@@ -189,6 +199,8 @@ SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub 
   - `deploy/kubernetes/dolphinscheduler`:
     - `Chart.yaml`: `appVersion` 和 `version` 版本更新为 x.y.z
     - `values.yaml`: `image.tag` 版本更新为 x.y.z
+  - `config`
+    - `install-plugins.sh`: `version` 版本 `dev-SNAPSHOT` 更新为 x.y.z
 - 修改文档（docs 模块）中的版本号:
   - 将 `docs` 文件夹下文件的占位符 `<version>` (除了 pom.xml 相关的) 修改成 `x.y.z`
   - 新增历史版本
@@ -197,6 +209,12 @@ SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub 
     - `docs/configs/docsdev.js`: 将里面的 `/dev/` 修改成 `/x.y.z/`，**不要**修改文件名称，website 仓库的 shell 脚本会对他进行修改
 
 > 注意：`VERSION` 是一个占位字符串，与我们在 `VERSION=<THE-VERSION-YOU-RELEASE>` 中设置的版本相同。
+
+### 修改NOTICE年份
+
+需要检查NOTICE文件，将第二行中的截止年份修改为当前年份。 需要检查的文件包括
+- `dolphinscheduler-dist/release-docs/NOTICE`
+- `NOTICE`
 
 ### Maven 发布
 
@@ -208,6 +226,7 @@ SVN_DIR=<PATH-TO-SVN-ROOT>  # to keep binary package checkout from SVN, the sub 
 cd "${SOURCE_CODE_DIR}"
 git checkout -b "${VERSION}"-release "${VERSION}"-prepare
 git push "${GH_REMOTE}" "${VERSION}"-release
+export GPG_TTY=$(tty)
 ```
 
 > 注意：如果你在没有源代码的远程主机上发布，你应该先运行 `git clone -b "${VERSION}"-prepare https://github.com/apache/dolphinscheduler.git`
@@ -215,7 +234,7 @@ git push "${GH_REMOTE}" "${VERSION}"-release
 
 ```shell
 # 运行发版校验
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
+mvn release:prepare -Papache-release,release -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DdryRun=true -Dusername="${GH_USERNAME}"
 ```
 
 - `-Prelease`: 选择 release 的 profile，这个 profile 会打包所有源码、jar 文件以及可执行二进制包。
@@ -233,7 +252,7 @@ mvn release:clean
 然后准备执行发布。
 
 ```shell
-mvn release:prepare -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true  -Dspotless.check.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
+mvn release:prepare -Papache-release,release -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true -Dmaven.javadoc.skip=true" -DautoVersionSubmodules=true -DpushChanges=false -Dusername="${GH_USERNAME}"
 ```
 
 和上一步演练的命令基本相同，去掉了 `-DdryRun=true` 参数。
@@ -262,7 +281,7 @@ git push "${GH_REMOTE}" --tags
 #### 部署发布
 
 ```shell
-mvn release:perform -Prelease -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dmaven.javadoc.skip=true -Dspotless.check.skip=true" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
+mvn release:perform -Papache-release,release -Darguments="-Dmaven.test.skip=true -Dspotless.skip=true -Dspotless.check.skip=true -Dmaven.javadoc.skip=true -Dmaven.deploy.skip=false" -DautoVersionSubmodules=true -Dusername="${GH_USERNAME}"
 ```
 
 执行完该命令后，待发布版本会自动上传到 Apache 的临时筹备仓库(staging repository)。你可以通过访问 [apache staging repositories](https://repository.apache.org/#stagingRepositories)
@@ -351,6 +370,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 - 检查源码包是否包含由于包含不必要文件，致使 tarball 过于庞大
 - 存在`LICENSE`和`NOTICE`文件
+- `NOTICE` 文件中的当前年份
 - 只存在文本文件，不存在二进制文件
 - 所有文件的开头都有 ASF 许可证
 - 能够正确编译，单元测试可以通过 (mvn install)
@@ -375,7 +395,7 @@ svn --username="${A_USERNAME}" commit -m "release ${VERSION}"
 
 在 GitHub 中通过 [创建新的 release note](https://github.com/apache/dolphinscheduler/releases/new) 创建一个 release note。 这要在
 投票邮件开始之前完成，因为我们需要在邮件中使用 release note。你可以在 `tools/release` 目录中运行 `python release.py changelog` 自动创建
-changelog.
+changelog.([使用方式](https://github.com/apache/dolphinscheduler/blob/dev/tools/release/README.md))
 
 > 备注： 如果你更加倾向于手动创建 changelog，你可以通过命令 `git log --pretty="- %s" <PREVIOUS-RELEASE-SHA>..<CURRENT-RELEASE-SHA> > changelog.md`
 > 生成 changelog（部分可以不太准确，需要人为过滤一遍），然后将他们分类并粘贴到 GitHub 的 release note 中
@@ -462,7 +482,7 @@ Thanks everyone for taking time to check this release and help us.
 
 ## Announce
 
-### Move Packages to Release
+### 移动发布包
 
 ```shell
 # move to release directory
@@ -471,16 +491,13 @@ svn mv -m "release ${VERSION}" https://dist.apache.org/repos/dist/dev/dolphinsch
 # remove old release directory
 svn delete -m "remove old release" https://dist.apache.org/repos/dist/release/dolphinscheduler/<PREVIOUS-RELEASE-VERSION>
 
-# Remove prepare branch
-cd "${SOURCE_CODE_DIR}"
-git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```
 
 在 [apache staging repositories](https://repository.apache.org/#stagingRepositories) 仓库找到 DolphinScheduler 并点击`Release`
 
 ### 更新文档
 
-官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，当修改 pull requests 被 merge 后就会生效）:
+官网应该在您发送通知邮件之前完成更新，本节将告诉您如何更改网站。假设发版的版本是 `<VERSION>`，需要进行以下更新（注意，请先合并 主仓库的 dev 分支后再合并 website 的 master 分支，当修改 pull requests 被 merge 后就会生效）:
 
 - **apache/dolphinscheduler-website** 仓库：
   - `config/download.json`: 增加 `<VERSION>` 版本发布包的下载
@@ -498,12 +515,12 @@ git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 
 我们有一个 [工作流](../../../../.github/workflows/publish-docker.yaml) 来自动发布 Docker 镜像，
 以及一个 [工作流](../../../../.github/workflows/publish-helm-chart.yaml) 来自动发布 Helm Chart 到 Docker Hub。
-当你将发版从 "pre-release" 改为 "release" 后，这两个工作流就会被触发。你需要做的就是观察上述的工作流，
+当你创建了release node后，这两个工作流就会被触发。你需要做的就是观察上述的工作流，
 当它们完成后，你可以在本地拉取 Docker 镜像并验证它们是否按预期工作。
 
 ### 发送公告邮件通知社区
 
-当完成了上述的发版流程后，需要发送一封公告邮件给社区。你需要将邮件发送到 `dev@dolphinscheduler.apache.org` 并抄送到 `announce@apache.org`。
+当完成了上述的发版流程后，需要发送一封公告邮件给社区。你需要将邮件发送到 `dev@dolphinscheduler.apache.org` 并抄送到 `announce@apache.org`，注意**邮件格式需要使用纯文本格式**。
 
 通知邮件模板如下：
 
@@ -534,6 +551,13 @@ DolphinScheduler Resources:
 - Issue: https://github.com/apache/dolphinscheduler/issues/
 - Mailing list: dev@dolphinscheduler.apache.org
 - Documents: https://dolphinscheduler.apache.org/zh-cn/docs/<VERSION>/about/introduction
+```
+
+## 删除prepare分支
+
+```shell
+cd "${SOURCE_CODE_DIR}"
+git push --delete "${GH_REMOTE}" "${VERSION}-prepare"
 ```
 
 ## News

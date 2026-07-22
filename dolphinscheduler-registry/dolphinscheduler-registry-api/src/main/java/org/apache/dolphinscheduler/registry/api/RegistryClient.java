@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.registry.api;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
@@ -28,10 +26,11 @@ import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -39,14 +38,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Strings;
 
 @Component
 @Slf4j
@@ -59,18 +56,23 @@ public class RegistryClient {
 
     public RegistryClient(Registry registry) {
         this.registry = registry;
-        registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
-        registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
-        registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
+        if (!registry.exists(RegistryNodeType.MASTER.getRegistryPath())) {
+            registry.put(RegistryNodeType.MASTER.getRegistryPath(), EMPTY, false);
+        }
+        if (!registry.exists(RegistryNodeType.WORKER.getRegistryPath())) {
+            registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
+        }
+        if (!registry.exists(RegistryNodeType.ALERT_SERVER.getRegistryPath())) {
+            registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
+        }
+        if (!registry.exists(RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath())) {
+            registry.put(RegistryNodeType.FAILOVER_FINISH_NODES.getRegistryPath(), EMPTY, false);
+        }
     }
 
     public boolean isConnected() {
         return registry.isConnected();
 
-    }
-
-    public void connectUntilTimeout(@NonNull Duration duration) throws RegistryException {
-        registry.connectUntilTimeout(duration);
     }
 
     public List<Server> getServerList(RegistryNodeType registryNodeType) {
@@ -115,12 +117,21 @@ public class RegistryClient {
                     log.warn("unknown registry node type: {}", registryNodeType);
             }
 
-            server.setResInfo(heartBeatJson);
+            server.setHeartBeatInfo(heartBeatJson);
             // todo: add host, port in heartBeat Info, so that we don't need to parse this again
-            server.setZkDirectory(registryNodeType.getRegistryPath() + "/" + serverPath);
+            server.setServerDirectory(registryNodeType.getRegistryPath() + "/" + serverPath);
             serverList.add(server);
         }
         return serverList;
+    }
+
+    public Optional<Server> getRandomServer(final RegistryNodeType registryNodeType) {
+        final List<Server> serverList = getServerList(registryNodeType);
+        if (CollectionUtils.isEmpty(serverList)) {
+            return Optional.empty();
+        }
+        final Server server = serverList.get(RandomUtils.nextInt(0, serverList.size()));
+        return Optional.ofNullable(server);
     }
 
     /**
@@ -146,32 +157,17 @@ public class RegistryClient {
                 .anyMatch(it -> it.contains(host));
     }
 
-    public Collection<String> getMasterNodesDirectly() {
-        return getChildrenKeys(RegistryNodeType.MASTER.getRegistryPath());
-    }
-
-    /**
-     * get host ip:port, path format: parentPath/ip:port
-     *
-     * @param path path
-     * @return host ip:port, string format: parentPath/ip:port
-     */
-    public String getHostByEventDataPath(String path) {
-        checkArgument(!Strings.isNullOrEmpty(path), "path cannot be null or empty");
-
-        final String[] pathArray = path.split(Constants.SINGLE_SLASH);
-
-        checkArgument(pathArray.length >= 1, "cannot parse path: %s", path);
-
-        return pathArray[pathArray.length - 1];
-    }
-
     public void close() throws IOException {
         registry.close();
     }
 
     public void persistEphemeral(String key, String value) {
         registry.put(key, value, true);
+    }
+
+    public void persist(String key, String value) {
+        log.info("persist key: {}, value: {}", key, value);
+        registry.put(key, value, false);
     }
 
     public void remove(String key) {
@@ -194,12 +190,14 @@ public class RegistryClient {
         return registry.exists(key);
     }
 
-    public boolean getLock(String key) {
-        return registry.acquireLock(key);
-    }
-
-    public boolean releaseLock(String key) {
-        return registry.releaseLock(key);
+    public RegistryLock getLock(String key) {
+        if (!registry.isConnected()) {
+            throw new IllegalStateException("The registry is not connected");
+        }
+        if (!registry.acquireLock(key)) {
+            throw new RegistryException("Failed to acquire registry lock: " + key);
+        }
+        return new RegistryLock(registry, key);
     }
 
     public void setStoppable(IStoppable stoppable) {
@@ -208,14 +206,6 @@ public class RegistryClient {
 
     public IStoppable getStoppable() {
         return stoppable;
-    }
-
-    public boolean isMasterPath(String path) {
-        return path != null && path.startsWith(RegistryNodeType.MASTER.getRegistryPath() + Constants.SINGLE_SLASH);
-    }
-
-    public boolean isWorkerPath(String path) {
-        return path != null && path.startsWith(RegistryNodeType.WORKER.getRegistryPath() + Constants.SINGLE_SLASH);
     }
 
     public Collection<String> getChildrenKeys(final String key) {
@@ -233,4 +223,5 @@ public class RegistryClient {
     private Collection<String> getServerNodes(RegistryNodeType nodeType) {
         return getChildrenKeys(nodeType.getRegistryPath());
     }
+
 }

@@ -151,7 +151,7 @@ Create a database environment variables.
 {{- end }}
 - name: SPRING_DATASOURCE_URL
   {{- if .Values.postgresql.enabled }}
-  value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.postgresqlDatabase }}?{{ .Values.postgresql.params }}
+  value: jdbc:postgresql://{{ template "dolphinscheduler.postgresql.fullname" . }}:5432/{{ .Values.postgresql.auth.database }}?{{ .Values.postgresql.params }}
   {{- else if .Values.mysql.enabled }}
   value: jdbc:mysql://{{ template "dolphinscheduler.mysql.fullname" . }}:3306/{{ .Values.mysql.auth.database }}?{{ .Values.mysql.auth.params }}
   {{- else }}
@@ -159,7 +159,7 @@ Create a database environment variables.
   {{- end }}
 - name: SPRING_DATASOURCE_USERNAME
   {{- if .Values.postgresql.enabled }}
-  value: {{ .Values.postgresql.postgresqlUsername }}
+  value: {{ .Values.postgresql.auth.username }}
   {{- else if .Values.mysql.enabled }}
   value: {{ .Values.mysql.auth.username }}
   {{- else }}
@@ -170,7 +170,7 @@ Create a database environment variables.
     secretKeyRef:
       {{- if .Values.postgresql.enabled }}
       name: {{ template "dolphinscheduler.postgresql.fullname" . }}
-      key: postgresql-password
+      key: password
       {{- else if .Values.mysql.enabled }}
       name: {{ template "dolphinscheduler.mysql.fullname" . }}
       key: mysql-password
@@ -195,16 +195,18 @@ Create a security environment variables.
 - name: SECURITY_AUTHENTICATION_TYPE
   value: {{ .Values.security.authentication.type | quote }}
 {{- if eq .Values.security.authentication.type "LDAP" }}
-- name: SECURITY_AUTHENTICATION_LDAP_URLS
-  value: {{ .Values.security.authentication.ldap.urls | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_URL
+  value: {{ .Values.security.authentication.ldap.url | quote }}
 - name: SECURITY_AUTHENTICATION_LDAP_BASE_DN
   value: {{ .Values.security.authentication.ldap.basedn | quote }}
 - name: SECURITY_AUTHENTICATION_LDAP_USERNAME
   value: {{ .Values.security.authentication.ldap.username | quote }}
 - name: SECURITY_AUTHENTICATION_LDAP_PASSWORD
   value: {{ .Values.security.authentication.ldap.password | quote }}
-- name: SECURITY_AUTHENTICATION_LDAP_USER_ADMIN
-  value: {{ .Values.security.authentication.ldap.user.admin | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_ADMIN_USERNAME
+  value: {{ .Values.security.authentication.ldap.user.adminusername | quote }}
+- name: SECURITY_AUTHENTICATION_LDAP_USER_ADMIN_USER_FILTER
+  value: {{ .Values.security.authentication.ldap.user.adminuserfilter | quote }}
 - name: SECURITY_AUTHENTICATION_LDAP_USER_IDENTITY_ATTRIBUTE
   value: {{ .Values.security.authentication.ldap.user.identityattribute | quote }}
 - name: SECURITY_AUTHENTICATION_LDAP_USER_EMAIL_ATTRIBUTE
@@ -397,4 +399,17 @@ Create a ldap ssl volumeMount.
   name: jks-file
   subPath: jks-file
 {{- end -}}
+{{- end -}}
+
+{{/*
+Renders a value that contains template.
+Usage:
+{{ include "dolphinscheduler.tplvalues.render" ( dict "value" .Values.path.to.the.Value "context" $) }}
+*/}}
+{{- define "dolphinscheduler.tplvalues.render" -}}
+    {{- if typeIs "string" .value }}
+        {{- tpl .value .context }}
+    {{- else }}
+        {{- tpl (.value | toYaml) .context }}
+    {{- end }}
 {{- end -}}

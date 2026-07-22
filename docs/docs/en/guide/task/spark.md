@@ -4,9 +4,9 @@
 
 Spark task type for executing Spark application. When executing the Spark task, the worker will submits a job to the Spark cluster by following commands:
 
-(1) `spark submit` method to submit tasks. See [spark-submit](https://spark.apache.org/docs/3.2.1/submitting-applications.html#launching-applications-with-spark-submit) for more details.
+(1) `spark submit` method to submit tasks. See [spark-submit](https://spark.apache.org/docs/latest/submitting-applications.html#launching-applications-with-spark-submit) for more details.
 
-(2) `spark sql` method to submit tasks. See [spark sql](https://spark.apache.org/docs/3.2.1/sql-ref-syntax.html) for more details.
+(2) `spark sql` method to submit tasks. See [spark sql](https://spark.apache.org/docs/latest/sql-distributed-sql-engine-spark-sql-cli.html) for more details.
 
 ## Create Task
 
@@ -14,9 +14,6 @@ Spark task type for executing Spark application. When executing the Spark task, 
 - Drag from the toolbar <img src="../../../../img/tasks/icons/spark.png" width="15"/> to the canvas.
 
 ## Task Parameters
-
-[//]: # (TODO: use the commented anchor below once our website template supports this syntax)
-[//]: # (- Please refer to [DolphinScheduler Task Parameters Appendix]&#40;appendix.md#default-task-parameters&#41; `Default Task Parameters` section for default parameters.)
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
 

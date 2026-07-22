@@ -42,84 +42,45 @@ import com.baomidou.mybatisplus.annotation.TableName;
 @TableName("t_ds_alert")
 public class Alert {
 
-    /**
-     * primary key
-     */
     @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
-    /**
-     * sign
-     */
+
     @TableField(value = "sign")
     private String sign;
-    /**
-     * title
-     */
+
     @TableField(value = "title")
     private String title;
 
-    /**
-     * content
-     */
     @TableField(value = "content")
     private String content;
 
-    /**
-     * alert_status
-     */
     @TableField(value = "alert_status")
     private AlertStatus alertStatus;
 
-    /**
-     * warning_type
-     */
     @TableField(value = "warning_type")
     private WarningType warningType;
 
-    /**
-     * log
-     */
     @TableField(value = "log")
     private String log;
 
-    /**
-     * alertgroup_id
-     */
     @TableField("alertgroup_id")
     private Integer alertGroupId;
 
-    /**
-     * create_time
-     */
     @TableField("create_time")
     private Date createTime;
-    /**
-     * update_time
-     */
+
     @TableField("update_time")
     private Date updateTime;
 
-    /**
-     * project_code
-     */
     @TableField("project_code")
     private Long projectCode;
 
-    /**
-     * process_definition_code
-     */
-    @TableField("process_definition_code")
-    private Long processDefinitionCode;
+    @TableField("workflow_definition_code")
+    private Long workflowDefinitionCode;
 
-    /**
-     * process_instance_id
-     */
-    @TableField("process_instance_id")
-    private Integer processInstanceId;
+    @TableField("workflow_instance_id")
+    private Integer workflowInstanceId;
 
-    /**
-     * alert_type
-     */
     @TableField("alert_type")
     private AlertType alertType;
 

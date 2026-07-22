@@ -38,15 +38,13 @@ import { useI18n } from 'vue-i18n'
 import { useAsyncState } from '@vueuse/core'
 import { queryLog } from '@/service/modules/log'
 import { stateType } from '@/common/common'
-import { useUISettingStore } from '@/store/ui-setting/ui-setting'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
+import totalCount from '@/utils/tableTotalCount'
 
 const BatchTaskInstance = defineComponent({
   name: 'task-instance',
   setup() {
-    const uiSettingStore = useUISettingStore()
-    const logTimer = uiSettingStore.getLogTimer
     const { t, variables, getTableData, createColumns } = useTable()
 
     const requestTableData = () => {
@@ -55,12 +53,12 @@ const BatchTaskInstance = defineComponent({
         pageNo: variables.page,
         searchVal: variables.searchVal,
         taskCode: variables.taskCode,
-        processInstanceId: variables.processInstanceId,
+        workflowInstanceId: variables.workflowInstanceId,
         host: variables.host,
         stateType: variables.stateType,
         datePickerRange: variables.datePickerRange,
         executorName: variables.executorName,
-        processInstanceName: variables.processInstanceName
+        workflowInstanceName: variables.workflowInstanceName
       })
     }
 
@@ -84,8 +82,8 @@ const BatchTaskInstance = defineComponent({
       onSearch()
     }
 
-    const onClearSearchProcessInstanceName = () => {
-      variables.processInstanceName = null
+    const onClearSearchWorkflowInstanceName = () => {
+      variables.workflowInstanceName = null
       onSearch()
     }
 
@@ -113,9 +111,7 @@ const BatchTaskInstance = defineComponent({
       variables.showModalRef = false
     }
 
-    let getLogsID: number
-
-    const getLogs = (row: any, logTimer: number) => {
+    const getLogs = (row: any) => {
       const { state } = useAsyncState(
         queryLog({
           taskInstanceId: Number(row.id),
@@ -124,23 +120,10 @@ const BatchTaskInstance = defineComponent({
         }).then((res: any) => {
           variables.logRef += res.message || ''
           if (res && res.message !== '') {
-            variables.limit += 1000
             variables.skipLineNum += res.lineNum
-            getLogs(row, logTimer)
+            getLogs(row)
           } else {
             variables.logLoadingRef = false
-            if (logTimer !== 0) {
-              if (typeof getLogsID === 'number') {
-                clearTimeout(getLogsID)
-              }
-              getLogsID = setTimeout(() => {
-                variables.logRef = ''
-                variables.limit = 1000
-                variables.skipLineNum = 0
-                variables.logLoadingRef = true
-                getLogs(row, logTimer)
-              }, logTimer * 1000)
-            }
           }
         }),
         {}
@@ -153,7 +136,7 @@ const BatchTaskInstance = defineComponent({
       variables.logRef = ''
       variables.limit = 1000
       variables.skipLineNum = 0
-      getLogs(row, logTimer)
+      getLogs(row)
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
@@ -171,7 +154,7 @@ const BatchTaskInstance = defineComponent({
       () => variables.showModalRef,
       () => {
         if (variables.showModalRef) {
-          getLogs(variables.row, logTimer)
+          getLogs(variables.row)
         } else {
           variables.row = {}
           variables.logRef = ''
@@ -190,7 +173,7 @@ const BatchTaskInstance = defineComponent({
       onSearch,
       onClearSearchTaskCode,
       onClearSearchTaskName,
-      onClearSearchProcessInstanceName,
+      onClearSearchWorkflowInstanceName,
       onClearSearchExecutorName,
       onClearSearchHost,
       onClearSearchStateType,
@@ -233,11 +216,11 @@ const BatchTaskInstance = defineComponent({
             />
             <NInput
               allowInput={this.trim}
-              v-model={[this.processInstanceName, 'value']}
+              v-model={[this.workflowInstanceName, 'value']}
               size='small'
               placeholder={t('project.task.workflow_instance')}
               clearable
-              onClear={this.onClearSearchProcessInstanceName}
+              onClear={this.onClearSearchWorkflowInstanceName}
             />
             <NInput
               allowInput={this.trim}
@@ -283,6 +266,7 @@ const BatchTaskInstance = defineComponent({
         <Card title={t('project.task.batch_task')}>
           <NSpace vertical>
             <NDataTable
+              row-class-name='batch-task-instance-items'
               loading={loadingRef}
               columns={this.columns}
               data={this.tableData}
@@ -292,12 +276,13 @@ const BatchTaskInstance = defineComponent({
               <NPagination
                 v-model:page={this.page}
                 v-model:page-size={this.pageSize}
-                page-count={this.totalPage}
                 show-size-picker
                 page-sizes={[10, 30, 50]}
                 show-quick-jumper
                 onUpdatePage={requestTableData}
                 onUpdatePageSize={onUpdatePageSize}
+                itemCount={this.totalCount}
+                prefix={totalCount}
               />
             </NSpace>
           </NSpace>

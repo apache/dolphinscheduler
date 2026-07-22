@@ -172,7 +172,7 @@ class TaskGroupQueueDaoImplTest extends BaseDaoTest {
                 .taskId(1)
                 .taskName("test")
                 .groupId(1)
-                .processId(1)
+                .workflowInstanceId(1)
                 .priority(0)
                 .forceStart(forceStart.getCode())
                 .inQueue(Flag.YES.getCode())

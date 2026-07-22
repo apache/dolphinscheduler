@@ -16,7 +16,7 @@
  */
 
 import { defineComponent, onMounted, ref, toRefs } from 'vue'
-import { NGrid, NGi, NCard, NNumberAnimation, NSpace, NTag } from 'naive-ui'
+import { NGrid, NGi, NCard, NSpace, NTag } from 'naive-ui'
 import { useI18n } from 'vue-i18n'
 import { useWorker } from './use-worker'
 import styles from './index.module.scss'
@@ -24,16 +24,24 @@ import Card from '@/components/card'
 import Result from '@/components/result'
 import Gauge from '@/components/chart/modules/Gauge'
 import WorkerModal from './worker-modal'
+import RunningTasksModal from './running-tasks-modal'
+import { useUserStore } from '@/store/user/user'
 import type { Ref } from 'vue'
 import type { RowData } from 'naive-ui/es/data-table/src/interface'
 import type { WorkerNode } from '@/service/modules/monitor/types'
+import type { UserInfoRes } from '@/service/modules/users/types'
 import { capitalize } from 'lodash'
 
 const worker = defineComponent({
   name: 'worker',
   setup() {
     const showModalRef = ref(false)
+    const showRunningRef = ref(false)
+    const selectedWorkerAddressRef = ref('')
     const { t } = useI18n()
+    const userStore = useUserStore()
+    const IS_ADMIN =
+      (userStore.getUserInfo as UserInfoRes).userType === 'ADMIN_USER'
     const { variables, getTableWorker } = useWorker()
     const zkDirectoryRef: Ref<Array<RowData>> = ref([])
 
@@ -42,8 +50,17 @@ const worker = defineComponent({
       showModalRef.value = true
     }
 
+    const clickRunningTasks = (item: WorkerNode) => {
+      selectedWorkerAddressRef.value = item.host + ':' + item.port
+      showRunningRef.value = true
+    }
+
     const onConfirmModal = () => {
       showModalRef.value = false
+    }
+
+    const onConfirmRunningModal = () => {
+      showRunningRef.value = false
     }
 
     onMounted(() => {
@@ -54,17 +71,32 @@ const worker = defineComponent({
       t,
       ...toRefs(variables),
       clickDetails,
+      clickRunningTasks,
       onConfirmModal,
+      onConfirmRunningModal,
       showModalRef,
-      zkDirectoryRef
+      showRunningRef,
+      selectedWorkerAddressRef,
+      zkDirectoryRef,
+      IS_ADMIN
     }
   },
   render() {
-    const { t, clickDetails, onConfirmModal, showModalRef, zkDirectoryRef } =
-      this
+    const {
+      t,
+      clickDetails,
+      clickRunningTasks,
+      onConfirmModal,
+      onConfirmRunningModal,
+      showModalRef,
+      showRunningRef,
+      selectedWorkerAddressRef,
+      zkDirectoryRef,
+      IS_ADMIN
+    } = this
 
     const renderNodeServerStatusTag = (item: WorkerNode) => {
-      const serverStatus = JSON.parse(item.resInfo)?.serverStatus
+      const serverStatus = JSON.parse(item.heartBeatInfo)?.serverStatus
 
       if (!serverStatus) return ''
 
@@ -103,10 +135,18 @@ const worker = defineComponent({
                       }`}</span>
                       <span
                         class={styles['link-btn']}
-                        onClick={() => clickDetails(item.zkDirectory)}
+                        onClick={() => clickDetails(item.serverDirectory)}
                       >
                         {t('monitor.worker.directory_detail')}
                       </span>
+                      {IS_ADMIN && (
+                        <span
+                          class={styles['link-btn']}
+                          onClick={() => clickRunningTasks(item)}
+                        >
+                          {t('monitor.worker.running_tasks')}
+                        </span>
+                      )}
                     </NSpace>
                     <NSpace>
                       <span>{`${t('monitor.worker.create_time')}: ${
@@ -118,14 +158,14 @@ const worker = defineComponent({
                     </NSpace>
                   </NSpace>
                 </NCard>
-                <NGrid x-gap='12' cols='5'>
+                <NGrid x-gap='12' cols='4'>
                   <NGi>
                     <Card title={t('monitor.worker.cpu_usage')}>
                       <div class={styles.card}>
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.resInfo).cpuUsage * 100
+                              JSON.parse(item.heartBeatInfo).cpuUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -138,7 +178,7 @@ const worker = defineComponent({
                         {item && (
                           <Gauge
                             data={(
-                              JSON.parse(item.resInfo).memoryUsage * 100
+                              JSON.parse(item.heartBeatInfo).memoryUsage * 100
                             ).toFixed(2)}
                           />
                         )}
@@ -146,54 +186,28 @@ const worker = defineComponent({
                     </Card>
                   </NGi>
                   <NGi>
-                    <Card title={t('monitor.worker.disk_available')}>
-                      <div class={[styles.card, styles['load-average']]}>
+                    <Card title={t('monitor.worker.disk_usage')}>
+                      <div class={[styles.card]}>
                         {item && (
-                          <NNumberAnimation
-                            precision={2}
-                            from={0}
-                            to={JSON.parse(item.resInfo).diskAvailable}
+                          <Gauge
+                            data={(
+                              JSON.parse(item.heartBeatInfo).diskUsage * 100
+                            ).toFixed(2)}
                           />
                         )}
                       </div>
                     </Card>
                   </NGi>
-                  <NGi>
-                    <Card title={t('monitor.worker.load_average')}>
-                      <div class={[styles.card, styles['load-average']]}>
-                        {item && (
-                          <NNumberAnimation
-                            precision={2}
-                            from={0}
-                            to={JSON.parse(item.resInfo).loadAverage}
-                          />
-                        )}
-                      </div>
-                    </Card>
-                  </NGi>
-
                   <NGi>
                     <Card title={t('monitor.worker.thread_pool_usage')}>
-                      <div
-                        class={[styles.card, styles['load-average']]}
-                        style={{
-                          'font-size': '90px'
-                        }}
-                      >
+                      <div class={[styles.card]}>
                         {item && (
-                          <>
-                            <NNumberAnimation
-                              precision={0}
-                              from={0}
-                              to={JSON.parse(item.resInfo).threadPoolUsage}
-                            />
-                            /
-                            <NNumberAnimation
-                              precision={0}
-                              from={0}
-                              to={JSON.parse(item.resInfo).workerHostWeight}
-                            />
-                          </>
+                          <Gauge
+                            data={(
+                              JSON.parse(item.heartBeatInfo).threadPoolUsage *
+                              100
+                            ).toFixed(2)}
+                          />
                         )}
                       </div>
                     </Card>
@@ -207,6 +221,11 @@ const worker = defineComponent({
           showModal={showModalRef}
           data={zkDirectoryRef}
           onConfirmModal={onConfirmModal}
+        />
+        <RunningTasksModal
+          showModal={showRunningRef}
+          serverAddress={selectedWorkerAddressRef}
+          onConfirmModal={onConfirmRunningModal}
         />
       </>
     )

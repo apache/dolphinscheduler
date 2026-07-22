@@ -19,34 +19,17 @@ package org.apache.dolphinscheduler.dao.entity;
 
 import java.util.Objects;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class WorkFlowRelation {
 
     private long sourceWorkFlowCode;
     private long targetWorkFlowCode;
-
-    public long getSourceWorkFlowCode() {
-        return sourceWorkFlowCode;
-    }
-
-    public void setSourceWorkFlowCode(long sourceWorkFlowCode) {
-        this.sourceWorkFlowCode = sourceWorkFlowCode;
-    }
-
-    public long getTargetWorkFlowCode() {
-        return targetWorkFlowCode;
-    }
-
-    public void setTargetWorkFlowCode(long targetWorkFlowCode) {
-        this.targetWorkFlowCode = targetWorkFlowCode;
-    }
-
-    public WorkFlowRelation() {
-    }
-
-    public WorkFlowRelation(long sourceWorkFlowCode, long targetWorkFlowCode) {
-        this.sourceWorkFlowCode = sourceWorkFlowCode;
-        this.targetWorkFlowCode = targetWorkFlowCode;
-    }
 
     @Override
     public boolean equals(Object o) {

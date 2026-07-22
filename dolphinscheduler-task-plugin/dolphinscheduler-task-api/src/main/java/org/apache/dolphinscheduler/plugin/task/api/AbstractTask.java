@@ -23,10 +23,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.Map;
-import java.util.StringJoiner;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -34,10 +31,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class AbstractTask {
-
-    private static String groupName1 = "paramName1";
-    private static String groupName2 = "paramName2";
-    public String rgex = String.format("['\"]\\$\\{(?<%s>.*?)}['\"]|\\$\\{(?<%s>.*?)}", groupName1, groupName2);
 
     @Getter
     @Setter
@@ -145,52 +138,37 @@ public abstract class AbstractTask {
      * @return exit status
      */
     public TaskExecutionStatus getExitStatus() {
-        switch (getExitStatusCode()) {
-            case TaskConstants.EXIT_CODE_SUCCESS:
-                return TaskExecutionStatus.SUCCESS;
-            case TaskConstants.EXIT_CODE_KILL:
-                return TaskExecutionStatus.KILL;
-            default:
-                return TaskExecutionStatus.FAILURE;
+        if (exitStatusCode == TaskConstants.EXIT_CODE_SUCCESS) {
+            return TaskExecutionStatus.SUCCESS;
         }
-    }
-
-    /**
-     * log handle
-     *
-     * @param logs log list
-     */
-    public void logHandle(LinkedBlockingQueue<String> logs) {
-
-        StringJoiner joiner = new StringJoiner("\n\t");
-        while (!logs.isEmpty()) {
-            joiner.add(logs.poll());
+        if (exitStatusCode == TaskConstants.EXIT_CODE_KILL
+                || exitStatusCode == TaskConstants.EXIT_CODE_HARD_KILL
+                || exitStatusCode == TaskConstants.EXIT_CODE_SIGINT_KILL) {
+            return TaskExecutionStatus.KILL;
         }
-        log.info(" -> {}", joiner);
+        return TaskExecutionStatus.FAILURE;
     }
 
     /**
      * regular expressions match the contents between two specified strings
      *
-     * @param content content
-     * @param rgex rgex
-     * @param sqlParamsMap sql params map
+     * @param content        content
+     * @param sqlParamsMap   sql params map
      * @param paramsPropsMap params props map
      */
-    public void setSqlParamsMap(String content, String rgex, Map<Integer, Property> sqlParamsMap,
+    public void setSqlParamsMap(String content, Map<Integer, Property> sqlParamsMap,
                                 Map<String, Property> paramsPropsMap, int taskInstanceId) {
         if (paramsPropsMap == null) {
             return;
         }
 
-        Pattern pattern = Pattern.compile(rgex);
-        Matcher m = pattern.matcher(content);
+        Matcher m = TaskConstants.SQL_PARAMS_PATTERN.matcher(content);
         int index = 1;
         while (m.find()) {
 
-            String paramName = m.group(groupName1);
+            String paramName = m.group(TaskConstants.GROUP_NAME1);
             if (paramName == null) {
-                paramName = m.group(groupName2);
+                paramName = m.group(TaskConstants.GROUP_NAME2);
             }
 
             Property prop = paramsPropsMap.get(paramName);

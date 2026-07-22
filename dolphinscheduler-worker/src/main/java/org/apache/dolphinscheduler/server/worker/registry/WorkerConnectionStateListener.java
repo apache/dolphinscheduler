@@ -20,21 +20,17 @@ package org.apache.dolphinscheduler.server.worker.registry;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.registry.api.ConnectionListener;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
-import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
+import org.apache.dolphinscheduler.registry.api.RegistryClient;
 
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class WorkerConnectionStateListener implements ConnectionListener {
 
-    private final WorkerConfig workerConfig;
-    private final WorkerConnectStrategy workerConnectStrategy;
+    private final RegistryClient registryClient;
 
-    public WorkerConnectionStateListener(@NonNull WorkerConfig workerConfig,
-                                         @NonNull WorkerConnectStrategy workerConnectStrategy) {
-        this.workerConfig = workerConfig;
-        this.workerConnectStrategy = workerConnectStrategy;
+    public WorkerConnectionStateListener(final RegistryClient registryClient) {
+        this.registryClient = registryClient;
     }
 
     @Override
@@ -47,10 +43,10 @@ public class WorkerConnectionStateListener implements ConnectionListener {
             case SUSPENDED:
                 break;
             case RECONNECTED:
-                workerConnectStrategy.reconnect();
+                log.warn("Worker reconnect to registry");
                 break;
             case DISCONNECTED:
-                workerConnectStrategy.disconnect();
+                registryClient.getStoppable().stop("Worker disconnected from registry, will stop myself");
             default:
         }
     }

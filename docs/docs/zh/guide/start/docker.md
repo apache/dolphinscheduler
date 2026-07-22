@@ -10,6 +10,25 @@
 
 需要安装 [Docker](https://docs.docker.com/engine/install/) 1.13.1 以上版本，以及 [Docker Compose](https://docs.docker.com/compose/) 1.28.0 以上版本。
 
+## 下载插件依赖
+
+从 3.3.0 版本开始，二进制包不再提供插件依赖，需要用户自行下载。插件依赖包下载地址：[插件依赖包](https://repo.maven.apache.org/maven2/org/apache/dolphinscheduler)
+你也可以执行以下命令来安装插件依赖:
+
+```shell
+bash ./bin/install-plugins.sh 3.3.0
+```
+
+通常你并不需要所有的连接器插件，可以通过配置 `conf/plugins_config` 来指定你所需要的插件，例如，你只需要 `dolphinscheduler-task-shell` 插件，那么您可以修改配置文件如下：
+
+```
+--task-plugins--
+dolphinscheduler-task-shell
+--end--
+```
+
+> **_注意:_** 插件依赖包通常不包含在二进制包中，如果你在启动服务时遇到 `ClassNotFoundException` 错误，请参考相关插件类型的文档检查是否缺少插件依赖包，例如 `dolphinscheduler-datasource-mysql` 中不包含 `mysql-connector-java.jar`
+
 ## 启动服务
 
 ### 使用 standalone-server 镜像
@@ -31,7 +50,7 @@ $ docker run --name dolphinscheduler-standalone-server -p 12345:12345 -p 25333:2
 
 使用 docker-compose 启动服务相比 standalone-server 的优点是 DolphinScheduler 的各个是独立的容器和进程，相互影响降到最小，且能够在
 服务重启的时候保留元数据（如需要挂载到本地路径需要做指定）。他更健壮，能保证用户体验更加完整的 DolphinScheduler 服务。这种方式需要先安装
-[docker-compose](https://docs.docker.com/compose/install/)，链接适用于 Mac，Linux，Windows。
+[docker-compose](https://docs.docker.com/compose/install/)，链接适用于 Mac，Linux。
 
 确保 docker-compose 顺利安装后，需要获取 `docker-compose.yaml` 文件，通过[下载页面](https://dolphinscheduler.apache.org/en-us/download/<version>)
 下载对应版本源码包可能是最快的方法，当下载完源码后就可以运行命令进行部署了。
@@ -41,7 +60,6 @@ $ DOLPHINSCHEDULER_VERSION=<version>
 $ tar -zxf apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src.tar.gz
 # Mac Linux 用户
 $ cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src/deploy/docker
-# Windows 用户, `cd apache-dolphinscheduler-"${DOLPHINSCHEDULER_VERSION}"-src\deploy\docker`
 
 # 如果需要初始化或者升级数据库结构，需要指定profile为schema
 $ docker-compose --profile schema up -d

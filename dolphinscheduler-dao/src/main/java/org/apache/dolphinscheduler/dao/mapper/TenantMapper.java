@@ -27,9 +27,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
-/**
- * tenant mapper interface
- */
 public interface TenantMapper extends BaseMapper<Tenant> {
 
     /**

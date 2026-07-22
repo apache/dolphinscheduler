@@ -141,14 +141,9 @@ export function useColumns(onCallback: Function) {
                       key: 'authorize_project'
                     },
                     {
-                      label: t('security.user.resource'),
-                      key: 'authorize_resource'
-                    },
-                    {
                       label: t('security.user.datasource'),
                       key: 'authorize_datasource'
                     },
-                    { label: t('security.user.udf'), key: 'authorize_udf' },
                     {
                       label: t('security.user.namespace'),
                       key: 'authorize_namespace'

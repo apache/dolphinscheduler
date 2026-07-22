@@ -85,7 +85,7 @@ export default {
   clientId: 'ClientId',
   clientSecret: 'ClientSecret',
   OAuth_token_endpoint: 'OAuth 2.0 token endpoint',
-  endpoint_tips: 'Please enter OAuth Token',
+  OAuth_token_endpoint_tips: 'Please enter OAuth Token',
   AccessKeyID: 'AccessKeyID',
   AccessKeyID_tips: 'Please input AccessKeyID',
   SecretAccessKey: 'SecretAccessKey',
@@ -97,5 +97,13 @@ export default {
   kubeConfig: 'kubeConfig',
   kubeConfig_tips: 'Please input KubeConfig',
   namespace: 'namespace',
-  namespace_tips: 'Please input namespace'
+  namespace_tips: 'Please input namespace',
+  access_key_id: 'Access Key Id',
+  access_key_id_tips: 'Please enter access key id',
+  access_key_secret: 'Access Key Secret',
+  access_key_secret_tips: 'Please enter access key secret',
+  region_id: 'Region Id',
+  region_id_tips: 'Please enter Region Id',
+  endpoint: 'Endpoint',
+  endpoint_tips: 'Please enter endpoint'
 }

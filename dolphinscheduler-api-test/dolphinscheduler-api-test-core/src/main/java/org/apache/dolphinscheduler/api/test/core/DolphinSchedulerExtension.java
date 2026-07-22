@@ -1,20 +1,18 @@
 /*
- * Licensed to Apache Software Foundation (ASF) under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Apache Software Foundation (ASF) licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.apache.dolphinscheduler.api.test.core;
@@ -27,17 +25,18 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
-import org.slf4j.Logger;
+import org.testcontainers.containers.ContainerState;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Slf4j
 final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback {
+
     private final boolean localMode = Objects.equals(System.getProperty("local"), "true");
 
     private final String serviceName = "dolphinscheduler_1";
@@ -49,6 +48,9 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         if (!localMode) {
             compose = createDockerCompose(context);
             compose.start();
+            compose.getContainerByServiceName(serviceName)
+                    .map(ContainerState::isHealthy)
+                    .orElseThrow(() -> new IllegalStateException("DolphinScheduler service is not healthy"));
         }
     }
 
@@ -63,17 +65,18 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         final Class<?> clazz = context.getRequiredTestClass();
         final DolphinScheduler annotation = clazz.getAnnotation(DolphinScheduler.class);
         final List<File> files = Stream.of(annotation.composeFiles())
-            .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
-            .filter(Objects::nonNull)
-            .map(URL::getPath)
-            .map(File::new)
-            .collect(Collectors.toList());
+                .map(it -> DolphinScheduler.class.getClassLoader().getResource(it))
+                .filter(Objects::nonNull)
+                .map(URL::getPath)
+                .map(File::new)
+                .collect(Collectors.toList());
 
         compose = new DockerComposeContainer<>(files)
-            .withPull(true)
-            .withTailChildContainers(true)
-            .withLogConsumer(serviceName, outputFrame -> log.info(outputFrame.getUtf8String()))
-            .waitingFor(serviceName, Wait.forHealthcheck().withStartupTimeout(Duration.ofSeconds(Constants.DOCKER_COMPOSE_DEFAULT_TIMEOUT)));
+                .withPull(true)
+                .withTailChildContainers(true)
+                .withLogConsumer(serviceName, outputFrame -> log.info(outputFrame.getUtf8String()))
+                .waitingFor(serviceName, Wait.forHealthcheck()
+                        .withStartupTimeout(Duration.ofSeconds(Constants.DOCKER_COMPOSE_DEFAULT_TIMEOUT)));
 
         return compose;
     }

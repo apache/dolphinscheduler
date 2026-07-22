@@ -1,28 +1,28 @@
 /*
- * Licensed to Apache Software Foundation (ASF) under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Apache Software Foundation (ASF) licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.apache.dolphinscheduler.alert.api;
 
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.springframework.context.i18n.LocaleContextHolder;
+import lombok.Getter;
 
+@Getter
 public enum AlertInputTips {
 
     PASSWORD("if enable use authentication, you need input password", "如果开启鉴权校验，则需要输入密码"),
@@ -31,8 +31,6 @@ public enum AlertInputTips {
     URL("input request URL", "请输入请求的URL"),
     HEADER("input request headers as JSON format", "请输入JSON格式的请求头"),
     JSON_BODY("input request body as JSON format", "请输入JSON格式的请求体"),
-    FIELD_NAME("input alert msg field name", "请输入告警信息的内容字段名称"),
-    HTTP_METHOD("input request type POST or GET", "请输入HTTP请求类型POST或GET"),
     CUSTOMIZED_PARAMS("the custom parameters passed when calling scripts", "请输入调用脚本时传入的自定义参数"),
     SCRIPT_PATH("the absolute script path under alert-server, and make sure access rights",
             "请输入alert-server机器的脚本的绝对路径，并确保文件有权接入"),
@@ -68,11 +66,10 @@ public enum AlertInputTips {
         this.zhMsg = zhMsg;
     }
 
-    public String getMsg() {
-        if (Locale.SIMPLIFIED_CHINESE.getLanguage().equals(LocaleContextHolder.getLocale().getLanguage())) {
-            return this.zhMsg;
-        } else {
-            return this.enMsg;
-        }
+    public static Map<String, String> getAllMsg(AlertInputTips alertInputTips) {
+        Map<String, String> allMsgMap = new HashMap<>();
+        allMsgMap.put("zhMsg", alertInputTips.zhMsg);
+        allMsgMap.put("enMsg", alertInputTips.enMsg);
+        return allMsgMap;
     }
 }

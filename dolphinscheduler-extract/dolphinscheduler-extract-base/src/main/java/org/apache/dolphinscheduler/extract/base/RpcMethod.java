@@ -30,4 +30,6 @@ public @interface RpcMethod {
 
     long timeout() default -1;
 
+    RpcMethodRetryStrategy retry() default @RpcMethodRetryStrategy;
+
 }

@@ -14,14 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.apache.dolphinscheduler.plugin.doris.param;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.AbstractDataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
+import org.apache.dolphinscheduler.plugin.datasource.api.datasource.JdbcDriverConnectionProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -29,13 +31,13 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 import org.apache.commons.collections4.MapUtils;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.alibaba.druid.sql.parser.SQLParserUtils;
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
@@ -120,12 +122,15 @@ public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
     }
 
     @Override
-    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
+    public Connection getConnection(ConnectionParam connectionParam) throws SQLException {
         DorisConnectionParam dorisConnectionParam = (DorisConnectionParam) connectionParam;
-        Class.forName(getDatasourceDriver());
-
-        return DriverManager.getConnection(getJdbcUrl(connectionParam), dorisConnectionParam.getUser(),
-                PasswordUtils.decodePassword(dorisConnectionParam.getPassword()));
+        return JdbcDriverConnectionProvider.builder()
+                .jdbcDriverClassName(getDatasourceDriver())
+                .jdbcUrl(getJdbcUrl(dorisConnectionParam))
+                .username(dorisConnectionParam.getUser())
+                .password(PasswordUtils.decodePassword(dorisConnectionParam.getPassword()))
+                .build()
+                .getConnection();
     }
 
     @Override
@@ -136,6 +141,14 @@ public class DorisDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DataSourceProcessor create() {
         return new DorisDataSourceProcessor();
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        // Because doris is highly compatible with mysql syntax,
+        // a mysql-type implementation can be used for comments and statement split.
+        String cleanSQL = SQLParserUtils.removeComment(sql, com.alibaba.druid.DbType.mysql);
+        return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.mysql);
     }
 
     private String transformOther(Map<String, String> paramMap) {

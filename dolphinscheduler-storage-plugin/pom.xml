@@ -36,6 +36,7 @@
         <module>dolphinscheduler-storage-gcs</module>
         <module>dolphinscheduler-storage-abs</module>
         <module>dolphinscheduler-storage-obs</module>
+        <module>dolphinscheduler-storage-cos</module>
     </modules>
 
     <dependencyManagement>

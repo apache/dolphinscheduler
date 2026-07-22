@@ -24,9 +24,7 @@ export type { UserInfoRes } from '@/service/modules/users/types'
 type TUserType = 'GENERAL_USER' | ''
 type TAuthType =
   | 'authorize_project'
-  | 'authorize_resource'
   | 'authorize_datasource'
-  | 'authorize_udf'
   | 'authorize_namespace'
 
 interface IRecord {

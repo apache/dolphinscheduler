@@ -33,23 +33,17 @@ class TaskExecutionContextUtilsTest {
     void createTaskInstanceWorkingDirectory() throws IOException {
         TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
         taskExecutionContext.setTenantCode("tenantCode");
-        taskExecutionContext.setProjectCode(1);
-        taskExecutionContext.setProcessDefineCode(1L);
-        taskExecutionContext.setProcessDefineVersion(1);
-        taskExecutionContext.setProcessInstanceId(1);
+        taskExecutionContext.setWorkflowDefinitionCode(1L);
+        taskExecutionContext.setWorkflowDefinitionVersion(1);
+        taskExecutionContext.setWorkflowInstanceId(1);
         taskExecutionContext.setTaskInstanceId(1);
 
-        String taskWorkingDirectory = FileUtils.getTaskInstanceWorkingDirectory(
-                taskExecutionContext.getTenantCode(),
-                taskExecutionContext.getProjectCode(),
-                taskExecutionContext.getProcessDefineCode(),
-                taskExecutionContext.getProcessDefineVersion(),
-                taskExecutionContext.getProcessInstanceId(),
-                taskExecutionContext.getTaskInstanceId());
+        String taskWorkingDirectory =
+                FileUtils.getTaskInstanceWorkingDirectory(taskExecutionContext.getTaskInstanceId());
         try {
             // Test if the working directory is exist
             // will delete it and recreate
-            FileUtils.createDirectoryWith755(Paths.get(taskWorkingDirectory));
+            FileUtils.createDirectoryWithPermission(Paths.get(taskWorkingDirectory), FileUtils.PERMISSION_775);
             Files.createFile(Paths.get(taskWorkingDirectory, "text.txt"));
             Assertions.assertTrue(Files.exists(Paths.get(taskWorkingDirectory, "text.txt")));
 
@@ -60,5 +54,24 @@ class TaskExecutionContextUtilsTest {
         } finally {
             FileUtils.deleteFile(taskWorkingDirectory);
         }
+    }
+
+    @Test
+    void clearTaskInstanceWorkingDirectory() throws IOException {
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(1);
+
+        TaskExecutionContextUtils.createTaskInstanceWorkingDirectory(taskExecutionContext);
+        String taskWorkingDirectory =
+                FileUtils.getTaskInstanceWorkingDirectory(taskExecutionContext.getTaskInstanceId());
+        Files.createFile(Paths.get(taskWorkingDirectory, "1.sh"));
+
+        // Test delete the working directory
+        TaskExecutionContextUtils.clearTaskInstanceWorkingDirectory(taskExecutionContext);
+        Assertions.assertFalse(Files.exists(Paths.get(taskWorkingDirectory)));
+
+        // Test do nothing if working directory is empty
+        TaskExecutionContext emptyExecPathContext = new TaskExecutionContext();
+        TaskExecutionContextUtils.clearTaskInstanceWorkingDirectory(emptyExecPathContext);
     }
 }

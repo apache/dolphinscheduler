@@ -66,9 +66,6 @@ export default defineComponent({
         variables.di = variables.dataList.filter(
           (item: any) => item.taskCategory === 'DataIntegration'
         )
-        variables.dq = variables.dataList.filter(
-          (item: any) => item.taskCategory === 'DataQuality'
-        )
         variables.ml = variables.dataList.filter(
           (item: any) => item.taskCategory === 'MachineLearning'
         )

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.security.impl.ldap;
 
+import org.apache.dolphinscheduler.api.dto.LdapLoginResult;
 import org.apache.dolphinscheduler.api.security.impl.AbstractAuthenticator;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -30,14 +31,14 @@ public class LdapAuthenticator extends AbstractAuthenticator {
     LdapService ldapService;
 
     @Override
-    public User login(@NonNull String userId, String password) {
+    public User login(@NonNull String userName, String password) {
         User user = null;
-        String ldapEmail = ldapService.ldapLogin(userId, password);
-        if (ldapEmail != null) {
+        LdapLoginResult ldapLoginResult = ldapService.ldapLogin(userName, password);
+        if (ldapLoginResult.isSuccess()) {
             // check if user exist
-            user = userService.getUserByUserName(userId);
+            user = userService.getUserByUserName(userName);
             if (user == null && ldapService.createIfUserNotExists()) {
-                user = userService.createUser(ldapService.getUserType(userId), userId, ldapEmail);
+                user = userService.createUser(ldapLoginResult.getUserType(), userName, ldapLoginResult.getLdapEmail());
             }
         }
         return user;

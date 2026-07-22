@@ -18,7 +18,7 @@
 
 ### 停止 dolphinscheduler 所有服务
 
-根据你部署方式停止 dolphinscheduler 的所有服务，如果你是通过 [集群部署](../installation/cluster.md) 来部署你的 dolphinscheduler 的话，可以通过 `sh ./script/stop-all.sh` 停止全部服务。
+根据你部署方式停止 dolphinscheduler 的所有服务。
 
 ### 数据库升级
 
@@ -53,59 +53,34 @@ jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 - 原 UDF 资源 `x/y.jar` 迁移至 `/dolphinscheduler/abc/udf/.migrate/x/y.jar`。
 - 更新 UDF 函数绑定资源信息。
 
+### 血缘升级
+
+执行脚本：`sh ./tools/bin/migrate-lineage.sh`。
+
+执行结果：
+
+- 原血缘数据迁移至新血缘表 `t_ds_workflow_task_lineage`。
+- 此脚本仅执行 upsert 操作，不执行删除操作，如果需要删除，您可以手动删除。
+
 ### 服务升级
 
-#### 修改 `bin/env/install_env.sh` 配置内容
+#### 修改配置内容
 
 - 伪集群部署请参照[伪集群部署(Pseudo-Cluster)](../installation/pseudo-cluster.md)中的 `修改相关配置`
 - 集群部署请参照[集群部署(Cluster)](../installation/cluster.md)中的 `修改相关配置`
 
-然后运行命令 `sh ./bin/start-all.sh` 重启全部服务。
-
 ## 注意事项
 
-### worker 分组的区别（以 1.3.1 版本为界）
+#### 升级版本限制
 
-创建 worker 分组在 1.3.1 版本之前，与 1.3.1 之后到 2.0.0 之间的版本有不同的设计：
+- 在 3.3.X 以及之后的版本，我们仅支持从 3.0.0 开始进行升级，低于此版本的请下载历史版本升级至 3.0.0。
+- 在 3.3.X 以及之后的版本，二进制包不再默认提供插件依赖，因此第一次使用时，需要自行下载安装。具体请参考请参照[伪集群部署(Pseudo-Cluster)](../installation/pseudo-cluster.md)
 
-- worker 分组在 1.3.1 版本之前是通过 UI 界面创建
-- worker 分组在 1.3.1 到 2.0.0 之前的版本是修改 worker 配置指定
+#### 升级后的注意事项
 
-#### 面对这种区别我应该怎么升级
+在历史版本中可能告警插件会有一些脏数据，升级后请参考一下 SQL 手动清理。
 
-1.3.1 之前的版本升级 1.3.2 时如何设置 worker 分组与之前一致
-
-- 查询已备份的数据库，查看 `t_ds_worker_group` 表记录，重点看下 id、name 和 ip_list 三个字段
-
-| id |   name   |                     ip_list |
-|:---|:--------:|----------------------------:|
-| 1  | service1 |               192.168.xx.10 |
-| 2  | service2 | 192.168.xx.11,192.168.xx.12 |
-
-- 修改 `bin/env/install_env.sh` 中的 workers 参数
-
-假设以下为要部署的 worker 主机名和 ip 的对应关系
-| 主机名 | ip |
-| :--- | :---: |
-| ds1 | 192.168.xx.10 |
-| ds2 | 192.168.xx.11 |
-| ds3 | 192.168.xx.12 |
-
-那么为了保持与之前版本 worker 分组一致，则需要把 workers 参数改为如下
-
-```sh
-# worker服务部署在哪台机器上,并指定此worker属于哪一个worker组
-workers="ds1:service1,ds2:service2,ds3:service2"
+```sql
+delete from t_ds_alertgroup where group_name = 'global alert group' and description = 'global alert group';
 ```
 
-#### 1.3.2 及以后的版本对 worker 分组功能进行增强
-
-1.3.1 以及之前的版本 worker 不能同时属于多个 worker 分组，1.3.2 及之后，2.0.0 之前的版本是可以支持的，所以可以使用如下配置对一台 worker 配置多个分组
-
-```sh
-workers="ds1:service1,ds1:service2"
-```
-
-#### 在 2.0.0 版本之后恢复 UI 创建 worker group
-
-在 2.0.0 以及之后的版本，我们恢复了在 UI 创建 worker group 的功能。

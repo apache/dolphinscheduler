@@ -1,0 +1,52 @@
+{
+  "taskDefinitionJson": [
+    {
+      "code": 152040321402529,
+      "delayTime": "0",
+      "description": "",
+      "environmentCode": -1,
+      "failRetryInterval": "1",
+      "failRetryTimes": "0",
+      "flag": "YES",
+      "name": "grpc_example",
+      "taskParams": {
+        "localParams": [],
+        "resourceList": [],
+        "url": "localhost:50051",
+        "grpcServiceDefinition": "// Copyright 2015 The gRPC Authors\n//\n// Licensed under the Apache License, Version 2.0 (the \"License\");\n// you may not use this file except in compliance with the License.\n// You may obtain a copy of the License at\n//\n//     http://www.apache.org/licenses/LICENSE-2.0\n//\n// Unless required by applicable law or agreed to in writing, software\n// distributed under the License is distributed on an \"AS IS\" BASIS,\n// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n// See the License for the specific language governing permissions and\n// limitations under the License.\nsyntax = \"proto3\";\n\noption java_multiple_files = true;\noption java_package = \"io.grpc.examples.helloworld\";\noption java_outer_classname = \"HelloWorldProto\";\noption objc_class_prefix = \"HLW\";\n\npackage helloworld;\n\n// The greeting service definition.\nservice Greeter {\n  // Sends a greeting\n  rpc SayHello (HelloRequest) returns (HelloReply) {}\n}\n\n// The request message containing the user's name.\nmessage HelloRequest {\n  string name = 1;\n}\n\n// The response message containing the greetings\nmessage HelloReply {\n  string message = 1;\n}",
+        "grpcServiceDefinitionJSON": "{\"options\":{\"java_multiple_files\":true,\"java_package\":\"io.grpc.examples.helloworld\",\"java_outer_classname\":\"HelloWorldProto\",\"objc_class_prefix\":\"HLW\"},\"nested\":{\"helloworld\":{\"nested\":{\"Greeter\":{\"methods\":{\"SayHello\":{\"requestType\":\"HelloRequest\",\"responseType\":\"HelloReply\"}}},\"HelloRequest\":{\"fields\":{\"name\":{\"type\":\"string\",\"id\":1}}},\"HelloReply\":{\"fields\":{\"message\":{\"type\":\"string\",\"id\":1}}}}}}}",
+        "methodName": "Greeter/SayHello",
+        "message": "{\n    \"name\": \"test name\"\n}",
+        "grpcCheckCondition": "STATUS_CODE_DEFAULT",
+        "condition": "",
+        "grpcConnectTimeoutMs": 60000,
+        "socketTimeout": 60000
+      },
+      "taskPriority": "MEDIUM",
+      "taskType": "GRPC",
+      "timeout": 0,
+      "timeoutFlag": "CLOSE",
+      "timeoutNotifyStrategy": "",
+      "workerGroup": "default",
+      "cpuQuota": -1,
+      "memoryMax": -1,
+      "taskExecuteType": "BATCH"
+    }
+  ],
+  "taskRelationJson": [
+    {
+      "name": "",
+      "preTaskCode": 0,
+      "preTaskVersion": 0,
+      "postTaskCode": 152040321402529,
+      "postTaskVersion": 1,
+      "conditionType": "NONE",
+      "conditionParams": {}
+    }
+  ],
+  "name": "grpcSuccessWorkflow",
+  "executionType": "PARALLEL",
+  "description": "",
+  "globalParams": [],
+  "timeout": 0
+}

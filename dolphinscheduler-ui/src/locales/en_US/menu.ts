@@ -32,9 +32,7 @@ export default {
   workflow_timing: 'Workflow Timing',
   task: 'Task',
   task_instance: 'Task Instance',
-  task_definition: 'Task Definition',
   file_manage: 'File Manage',
-  udf_manage: 'UDF Manage',
   resource_manage: 'Resource Manage',
   function_manage: 'Function Manage',
   service_manage: 'Service Manage',
@@ -58,7 +56,6 @@ export default {
   task_group_manage: 'Task Group Manage',
   task_group_option: 'Task Group Option',
   task_group_queue: 'Task Group Queue',
-  data_quality: 'Data Quality',
   task_result: 'Task Result',
   rule: 'Rule management',
   ui_setting: 'UI Setting'

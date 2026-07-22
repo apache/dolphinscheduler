@@ -17,16 +17,19 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.dao.entity.Command;
-import org.apache.dolphinscheduler.dao.entity.ProcessDefinition;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
-import org.apache.dolphinscheduler.service.command.CommandService;
-import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
+import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowScheduleTriggerRequest;
 
 import java.util.Date;
+import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,75 +46,92 @@ import io.micrometer.core.annotation.Timed;
 public class ProcessScheduleTask extends QuartzJobBean {
 
     @Autowired
-    private ProcessService processService;
+    private ScheduleDao scheduleDao;
 
     @Autowired
-    private CommandService commandService;
+    private WorkflowDefinitionDao workflowDefinitionDao;
+
+    @Autowired
+    private IWorkflowControlClient workflowInstanceController;
 
     @Counted(value = "ds.master.quartz.job.executed")
     @Timed(value = "ds.master.quartz.job.execution.time", percentiles = {0.5, 0.75, 0.95, 0.99}, histogram = true)
     @Override
     protected void executeInternal(JobExecutionContext context) {
-        QuartzJobData quartzJobData = QuartzJobData.of(context.getJobDetail().getJobDataMap());
-        int projectId = quartzJobData.getProjectId();
-        int scheduleId = quartzJobData.getScheduleId();
+        final QuartzJobData quartzJobData = QuartzJobData.of(context.getJobDetail().getJobDataMap());
+        final int projectId = quartzJobData.getProjectId();
+        final int scheduleId = quartzJobData.getScheduleId();
 
-        Date scheduledFireTime = context.getScheduledFireTime();
+        final Date scheduledFireTime = context.getScheduledFireTime();
+        final Date fireTime = context.getFireTime();
 
-        Date fireTime = context.getFireTime();
+        log.info("Scheduler: {} fired expect fire time is {}, actual fire time is {}",
+                scheduleId,
+                scheduledFireTime,
+                fireTime);
 
-        log.info("scheduled fire time :{}, fire time :{}, scheduleId :{}", scheduledFireTime, fireTime, scheduleId);
-
-        // query schedule
-        Schedule schedule = processService.querySchedule(scheduleId);
+        // If the schedule does not exist or offline, then delete the corn job
+        final Schedule schedule = scheduleDao.queryById(scheduleId);
         if (schedule == null || ReleaseState.OFFLINE == schedule.getReleaseState()) {
-            log.warn(
-                    "process schedule does not exist in db or process schedule offline，delete schedule job in quartz, projectId:{}, scheduleId:{}",
-                    projectId, scheduleId);
+            log.warn("Scheduler: {} does not exist in db，will delete job in quartz", scheduleId);
             deleteJob(context, projectId, scheduleId);
             return;
         }
 
-        ProcessDefinition processDefinition =
-                processService.findProcessDefinitionByCode(schedule.getProcessDefinitionCode());
-        // release state : online/offline
-        ReleaseState releaseState = processDefinition.getReleaseState();
-        if (releaseState == ReleaseState.OFFLINE) {
+        final Optional<WorkflowDefinition> workflowDefinitionOptional =
+                workflowDefinitionDao.queryByCode(schedule.getWorkflowDefinitionCode());
+        if (!workflowDefinitionOptional.isPresent()) {
             log.warn(
-                    "process definition does not exist in db or offline，need not to create command, projectId:{}, processDefinitionId:{}",
-                    projectId, processDefinition.getId());
+                    "Scheduler: {} bind workflow: {} does not exist in db，will delete the schedule and delete schedule job in quartz",
+                    scheduleId,
+                    schedule.getWorkflowDefinitionCode());
+            scheduleDao.deleteById(scheduleId);
+            deleteJob(context, projectId, scheduleId);
             return;
         }
 
-        Command command = new Command();
-        command.setCommandType(CommandType.SCHEDULER);
-        command.setExecutorId(schedule.getUserId());
-        command.setFailureStrategy(schedule.getFailureStrategy());
-        command.setProcessDefinitionCode(schedule.getProcessDefinitionCode());
-        command.setScheduleTime(scheduledFireTime);
-        command.setStartTime(fireTime);
-        command.setWarningGroupId(schedule.getWarningGroupId());
-        String workerGroup = WorkerGroupUtils.getWorkerGroupOrDefault(schedule.getWorkerGroup());
-        command.setWorkerGroup(workerGroup);
-        command.setTenantCode(schedule.getTenantCode());
-        command.setEnvironmentCode(schedule.getEnvironmentCode());
-        command.setWarningType(schedule.getWarningType());
-        command.setProcessInstancePriority(schedule.getProcessInstancePriority());
-        command.setProcessDefinitionVersion(processDefinition.getVersion());
+        final WorkflowDefinition workflowDefinition = workflowDefinitionOptional.get();
+        if (workflowDefinition.getReleaseState() == ReleaseState.OFFLINE) {
+            log.warn(
+                    "Scheduler: {} bind workflow: {} state is OFFLINE，will update the schedule status to OFFLINE and delete schedule job in quartz",
+                    scheduleId,
+                    schedule.getWorkflowDefinitionCode());
+            schedule.setReleaseState(ReleaseState.OFFLINE);
+            schedule.setUpdateTime(new Date());
+            scheduleDao.updateById(schedule);
+            deleteJob(context, projectId, scheduleId);
+            return;
+        }
 
-        commandService.createCommand(command);
+        final WorkflowScheduleTriggerRequest scheduleTriggerRequest = WorkflowScheduleTriggerRequest.builder()
+                .userId(schedule.getUserId())
+                .scheduleTIme(scheduledFireTime)
+                .timezoneId(schedule.getTimezoneId())
+                .workflowCode(workflowDefinition.getCode())
+                .workflowVersion(workflowDefinition.getVersion())
+                .failureStrategy(schedule.getFailureStrategy())
+                .taskDependType(TaskDependType.TASK_POST)
+                .warningType(schedule.getWarningType())
+                .warningGroupId(schedule.getWarningGroupId())
+                .workflowInstancePriority(schedule.getWorkflowInstancePriority())
+                .workerGroup(WorkerGroupUtils.getWorkerGroupOrDefault(schedule.getWorkerGroup()))
+                .tenantCode(schedule.getTenantCode())
+                .environmentCode(schedule.getEnvironmentCode())
+                .dryRun(Flag.NO)
+                .build();
+        workflowInstanceController.scheduleTriggerWorkflow(scheduleTriggerRequest);
     }
 
     private void deleteJob(JobExecutionContext context, int projectId, int scheduleId) {
         final Scheduler scheduler = context.getScheduler();
-        JobKey jobKey = QuartzJobKey.of(projectId, scheduleId).toJobKey();
+        final JobKey jobKey = QuartzJobKey.of(projectId, scheduleId).toJobKey();
         try {
             if (scheduler.checkExists(jobKey)) {
-                log.info("Try to delete job: {}, projectId: {}, schedulerId", projectId, scheduleId);
+                log.info("Try to delete job: {}, projectId: {}, schedulerId: {}", jobKey, projectId, scheduleId);
                 scheduler.deleteJob(jobKey);
             }
         } catch (Exception e) {
-            log.error("Failed to delete job: {}", jobKey);
+            log.error("Failed to delete job: {}", jobKey, e);
         }
     }
 }

@@ -31,8 +31,8 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceUserMapper;
+import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
+import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -67,18 +67,15 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-/**
- * data source service impl
- */
 @Service
 @Slf4j
 public class DataSourceServiceImpl extends BaseServiceImpl implements DataSourceService {
 
     @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private DataSourceDao dataSourceDao;
 
     @Autowired
-    private DataSourceUserMapper datasourceUserMapper;
+    private DataSourceUserDao datasourceUserDao;
 
     private static final String TABLE = "TABLE";
     private static final String VIEW = "VIEW";
@@ -86,13 +83,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     private static final String TABLE_NAME = "TABLE_NAME";
     private static final String COLUMN_NAME = "COLUMN_NAME";
 
-    /**
-     * create data source
-     *
-     * @param loginUser       login user
-     * @param datasourceParam datasource parameters
-     * @return create result code
-     */
     @Override
     public DataSource createDataSource(User loginUser, BaseDataSourceParamDTO datasourceParam) {
         DataSourceUtils.checkDatasourceParam(datasourceParam);
@@ -122,24 +112,18 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setCreateTime(now);
         dataSource.setUpdateTime(now);
         try {
-            dataSourceMapper.insert(dataSource);
+            dataSourceDao.insert(dataSource);
             return dataSource;
         } catch (DuplicateKeyException ex) {
             throw new ServiceException(Status.DATASOURCE_EXIST);
         }
     }
 
-    /**
-     * updateProcessInstance datasource
-     *
-     * @param loginUser login user
-     * @return update result code
-     */
     @Override
     public DataSource updateDataSource(User loginUser, BaseDataSourceParamDTO dataSourceParam) {
         DataSourceUtils.checkDatasourceParam(dataSourceParam);
         // determine whether the data source exists
-        DataSource dataSource = dataSourceMapper.selectById(dataSourceParam.getId());
+        DataSource dataSource = dataSourceDao.queryById(dataSourceParam.getId());
         if (dataSource == null) {
             throw new ServiceException(Status.RESOURCE_NOT_EXIST);
         }
@@ -176,7 +160,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         dataSource.setConnectionParams(JSONUtils.toJsonString(connectionParam));
         dataSource.setUpdateTime(now);
         try {
-            dataSourceMapper.updateById(dataSource);
+            dataSourceDao.updateById(dataSource);
             return dataSource;
         } catch (DuplicateKeyException ex) {
             throw new ServiceException(Status.DATASOURCE_EXIST);
@@ -184,25 +168,19 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     private boolean checkName(String name) {
-        List<DataSource> queryDataSource = dataSourceMapper.queryDataSourceByName(name.trim());
+        List<DataSource> queryDataSource = dataSourceDao.queryDataSourceByName(name.trim());
         return queryDataSource != null && !queryDataSource.isEmpty();
     }
 
-    /**
-     * updateProcessInstance datasource
-     *
-     * @param id datasource id
-     * @return data source detail
-     */
     @Override
     public BaseDataSourceParamDTO queryDataSource(int id, User loginUser) {
-        DataSource dataSource = dataSourceMapper.selectById(id);
+        DataSource dataSource = dataSourceDao.queryById(id);
         if (dataSource == null) {
             log.error("Datasource does not exist, id:{}.", id);
             throw new ServiceException(Status.RESOURCE_NOT_EXIST);
         }
 
-        if (!canOperatorPermissions(loginUser, new Object[]{dataSource.getId()}, AuthorizationType.DATASOURCE,
+        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.DATASOURCE,
                 ApiFuncIdentificationConstant.DATASOURCE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
@@ -218,15 +196,6 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return baseDataSourceParamDTO;
     }
 
-    /**
-     * query datasource list by keyword
-     *
-     * @param loginUser login user
-     * @param searchVal search value
-     * @param pageNo page number
-     * @param pageSize page size
-     * @return data source list page
-     */
     @Override
     public PageInfo<DataSource> queryDataSourceListPaging(User loginUser, String searchVal, Integer pageNo,
                                                           Integer pageSize) {
@@ -234,14 +203,14 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         Page<DataSource> dataSourcePage = new Page<>(pageNo, pageSize);
         PageInfo<DataSource> pageInfo = new PageInfo<>(pageNo, pageSize);
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            dataSourceList = dataSourceMapper.selectPaging(dataSourcePage, 0, searchVal);
+            dataSourceList = dataSourceDao.queryDataSourcePaging(dataSourcePage, 0, searchVal);
         } else {
             Set<Integer> ids = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), log);
             if (ids.isEmpty()) {
                 return pageInfo;
             }
-            dataSourceList = dataSourceMapper.selectPagingByIds(dataSourcePage, new ArrayList<>(ids), searchVal);
+            dataSourceList = dataSourceDao.queryDataSourcePagingByIds(dataSourcePage, new ArrayList<>(ids), searchVal);
         }
 
         List<DataSource> dataSources = dataSourceList != null ? dataSourceList.getRecords() : new ArrayList<>();
@@ -272,54 +241,33 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return Constants.XXXXXX;
     }
 
-    /**
-     * query data resource list
-     *
-     * @param loginUser login user
-     * @param type data source type
-     * @return data source list page
-     */
     @Override
     public List<DataSource> queryDataSourceList(User loginUser, Integer type) {
 
         List<DataSource> datasourceList;
         if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            datasourceList = dataSourceMapper.queryDataSourceByType(0, type);
+            datasourceList = dataSourceDao.queryDataSourceByType(0, type);
         } else {
             Set<Integer> ids = resourcePermissionCheckService
                     .userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), log);
             if (ids.isEmpty()) {
                 return Collections.emptyList();
             }
-            datasourceList = dataSourceMapper.selectBatchIds(ids).stream()
+            datasourceList = dataSourceDao.queryByIds(ids).stream()
                     .filter(dataSource -> dataSource.getType().getCode() == type).collect(Collectors.toList());
         }
 
         return datasourceList;
     }
 
-    /**
-     * verify datasource exists
-     *
-     * @param name datasource name
-     * @return true if data datasource not exists, otherwise return false
-     */
     @Override
     public void verifyDataSourceName(String name) {
-        List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(name);
+        List<DataSource> dataSourceList = dataSourceDao.queryDataSourceByName(name);
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
             throw new ServiceException(Status.DATASOURCE_EXIST);
         }
     }
 
-    /**
-     * check connection
-     *
-     * @param type            data source type
-     * @param connectionParam connectionParam
-     * @return true if connect successfully, otherwise false
-     * @return true if connect successfully, otherwise false
-     */
     @Override
     public void checkConnection(DbType type, ConnectionParam connectionParam) {
         DataSourceProcessor sshDataSourceProcessor = DataSourceUtils.getDatasourceProcessor(type);
@@ -330,68 +278,58 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         throw new ServiceException(Status.CONNECTION_TEST_FAILURE);
     }
 
-    /**
-     * test connection
-     *
-     * @param id datasource id
-     * @return connect result code
-     */
     @Override
-    public void connectionTest(int id) {
-        DataSource dataSource = dataSourceMapper.selectById(id);
+    public void connectionTest(User loginUser, int id) {
+        DataSource dataSource = dataSourceDao.queryById(id);
+
         if (dataSource == null) {
             throw new ServiceException(Status.RESOURCE_NOT_EXIST);
         }
+
+        if (!canOperatorPermissions(loginUser, new Object[]{id}, AuthorizationType.DATASOURCE,
+                ApiFuncIdentificationConstant.DATASOURCE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
         checkConnection(dataSource.getType(),
                 DataSourceUtils.buildConnectionParams(dataSource.getType(), dataSource.getConnectionParams()));
     }
 
-    /**
-     * delete datasource
-     *
-     * @param loginUser    login user
-     * @param datasourceId data source id
-     * @return delete result code
-     */
     @Override
     @Transactional
     public void delete(User loginUser, int datasourceId) {
         // query datasource by id
-        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+        DataSource dataSource = dataSourceDao.queryById(datasourceId);
+
         if (dataSource == null) {
             throw new ServiceException(Status.RESOURCE_NOT_EXIST);
         }
-        if (!canOperatorPermissions(loginUser, new Object[]{dataSource.getId()}, AuthorizationType.DATASOURCE,
+
+        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
                 DATASOURCE_DELETE)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        dataSourceMapper.deleteById(datasourceId);
-        datasourceUserMapper.deleteByDatasourceId(datasourceId);
+
+        dataSourceDao.deleteById(datasourceId);
+        datasourceUserDao.deleteByDatasourceId(datasourceId);
     }
 
-    /**
-     * unauthorized datasource
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return unauthed data source result code
-     */
     @Override
     public List<DataSource> unAuthDatasource(User loginUser, Integer userId) {
         List<DataSource> datasourceList;
         if (canOperatorPermissions(loginUser, null, AuthorizationType.DATASOURCE, null)) {
             // admin gets all data sources except userId
-            datasourceList = dataSourceMapper.queryDatasourceExceptUserId(userId);
+            datasourceList = dataSourceDao.queryDatasourceExceptUserId(userId);
         } else {
             // non-admins users get their own data sources
-            datasourceList = dataSourceMapper.selectByMap(Collections.singletonMap("user_id", loginUser.getId()));
+            datasourceList = dataSourceDao.queryByUserId(loginUser.getId());
         }
         List<DataSource> resultList = new ArrayList<>();
         Set<DataSource> datasourceSet;
         if (datasourceList != null && !datasourceList.isEmpty()) {
             datasourceSet = new HashSet<>(datasourceList);
 
-            List<DataSource> authedDataSourceList = dataSourceMapper.queryAuthedDatasource(userId);
+            List<DataSource> authedDataSourceList = dataSourceDao.queryAuthedDatasource(userId);
 
             Set<DataSource> authedDataSourceSet;
             if (authedDataSourceList != null && !authedDataSourceList.isEmpty()) {
@@ -403,22 +341,24 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         return resultList;
     }
 
-    /**
-     * authorized datasource
-     *
-     * @param loginUser login user
-     * @param userId user id
-     * @return authorized result code
-     */
     @Override
     public List<DataSource> authedDatasource(User loginUser, Integer userId) {
-        List<DataSource> authedDatasourceList = dataSourceMapper.queryAuthedDatasource(userId);
+        List<DataSource> authedDatasourceList = dataSourceDao.queryAuthedDatasource(userId);
         return authedDatasourceList;
     }
 
     @Override
-    public List<ParamsOptions> getTables(Integer datasourceId, String database) {
-        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+    public List<ParamsOptions> getTables(User loginUser, Integer datasourceId, String database) {
+        DataSource dataSource = dataSourceDao.queryById(datasourceId);
+
+        if (dataSource == null) {
+            throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
+        }
+
+        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
+                ApiFuncIdentificationConstant.DATASOURCE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
 
         List<String> tableList;
         BaseConnectionParam connectionParam =
@@ -477,8 +417,19 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public List<ParamsOptions> getTableColumns(Integer datasourceId, String database, String tableName) {
-        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+    public List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database,
+                                               String tableName) {
+        DataSource dataSource = dataSourceDao.queryById(datasourceId);
+
+        if (dataSource == null) {
+            throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
+        }
+
+        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
+                ApiFuncIdentificationConstant.DATASOURCE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
         BaseConnectionParam connectionParam =
                 (BaseConnectionParam) DataSourceUtils.buildConnectionParams(
                         dataSource.getType(),
@@ -523,12 +474,17 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public List<ParamsOptions> getDatabases(Integer datasourceId) {
+    public List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId) {
 
-        DataSource dataSource = dataSourceMapper.selectById(datasourceId);
+        DataSource dataSource = dataSourceDao.queryById(datasourceId);
 
         if (dataSource == null) {
             throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
+        }
+
+        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
+                ApiFuncIdentificationConstant.DATASOURCE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
         List<String> tableList;

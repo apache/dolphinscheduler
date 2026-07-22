@@ -16,8 +16,7 @@
  */
 export type TaskType =
   | 'SHELL'
-  | 'SUB_PROCESS'
-  | 'DYNAMIC'
+  | 'SUB_WORKFLOW'
   | 'PROCEDURE'
   | 'SQL'
   | 'SPARK'
@@ -25,15 +24,15 @@ export type TaskType =
   | 'MR'
   | 'PYTHON'
   | 'DEPENDENT'
+  | 'GRPC'
   | 'HTTP'
   | 'DATAX'
-  | 'PIGEON'
   | 'SQOOP'
   | 'CONDITIONS'
-  | 'DATA_QUALITY'
   | 'SWITCH'
   | 'SEATUNNEL'
   | 'EMR'
+  | 'EMR_SERVERLESS'
   | 'ZEPPELIN'
   | 'K8S'
   | 'JUPYTER'
@@ -45,7 +44,6 @@ export type TaskType =
   | 'SAGEMAKER'
   | 'CHUNJUN'
   | 'FLINK_STREAM'
-  | 'PYTORCH'
   | 'HIVECLI'
   | 'DMS'
   | 'DATASYNC'
@@ -53,6 +51,7 @@ export type TaskType =
   | 'LINKIS'
   | 'DATA_FACTORY'
   | 'REMOTESHELL'
+  | 'ALIYUN_SERVERLESS_SPARK'
 
 export type TaskExecuteType = 'STREAM' | 'BATCH'
 
@@ -63,11 +62,8 @@ export const TASK_TYPES_MAP = {
   SHELL: {
     alias: 'SHELL'
   },
-  SUB_PROCESS: {
-    alias: 'SUB_PROCESS'
-  },
-  DYNAMIC: {
-    alias: 'DYNAMIC'
+  SUB_WORKFLOW: {
+    alias: 'SUB_WORKFLOW'
   },
   PROCEDURE: {
     alias: 'PROCEDURE'
@@ -91,14 +87,15 @@ export const TASK_TYPES_MAP = {
   DEPENDENT: {
     alias: 'DEPENDENT'
   },
+  GRPC: {
+    alias: 'GRPC',
+    helperLinkDisable: true
+  },
   HTTP: {
     alias: 'HTTP'
   },
   DATAX: {
     alias: 'DataX'
-  },
-  PIGEON: {
-    alias: 'PIGEON'
   },
   SQOOP: {
     alias: 'SQOOP',
@@ -106,10 +103,6 @@ export const TASK_TYPES_MAP = {
   },
   CONDITIONS: {
     alias: 'CONDITIONS'
-  },
-  DATA_QUALITY: {
-    alias: 'DATA_QUALITY',
-    helperLinkDisable: true
   },
   SWITCH: {
     alias: 'SWITCH'
@@ -120,6 +113,10 @@ export const TASK_TYPES_MAP = {
   },
   EMR: {
     alias: 'AmazonEMR',
+    helperLinkDisable: true
+  },
+  EMR_SERVERLESS: {
+    alias: 'AmazonEMRServerless',
     helperLinkDisable: true
   },
   ZEPPELIN: {
@@ -163,10 +160,6 @@ export const TASK_TYPES_MAP = {
     helperLinkDisable: true,
     taskExecuteType: 'STREAM'
   },
-  PYTORCH: {
-    alias: 'Pytorch',
-    helperLinkDisable: true
-  },
   HIVECLI: {
     alias: 'HIVECLI',
     helperLinkDisable: true
@@ -193,6 +186,10 @@ export const TASK_TYPES_MAP = {
   },
   REMOTESHELL: {
     alias: 'REMOTESHELL',
+    helperLinkDisable: true
+  },
+  ALIYUN_SERVERLESS_SPARK: {
+    alias: 'ALIYUN_SERVERLESS_SPARK',
     helperLinkDisable: true
   }
 } as {

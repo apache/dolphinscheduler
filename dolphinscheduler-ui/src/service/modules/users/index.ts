@@ -19,7 +19,6 @@ import { axios } from '@/service/service'
 import {
   UserNameReq,
   UserNamesReq,
-  AlertGroupIdReq,
   UserReq,
   IdReq,
   UserIdReq,
@@ -27,7 +26,6 @@ import {
   GrantResourceReq,
   GrantProject,
   ProjectCodeReq,
-  GrantUDFReq,
   GrantNamespaceReq,
   ListAllReq,
   ListReq,
@@ -39,14 +37,6 @@ export function activateUser(data: UserNameReq): any {
     url: '/users/activate',
     method: 'post',
     data
-  })
-}
-
-export function authorizedUser(params: AlertGroupIdReq): any {
-  return axios({
-    url: '/users/authed-user',
-    method: 'get',
-    params
   })
 }
 
@@ -129,14 +119,6 @@ export function grantProjectByCode(data: ProjectCodeReq & UserIdReq): any {
   })
 }
 
-export function grantUDFFunc(data: GrantUDFReq & UserIdReq) {
-  return axios({
-    url: '/users/grant-udf-func',
-    method: 'post',
-    data
-  })
-}
-
 export function grantNamespaceFunc(data: GrantNamespaceReq & UserIdReq) {
   return axios({
     url: '/users/grant-namespace',
@@ -181,14 +163,6 @@ export function revokeProject(data: ProjectCodeReq & UserIdReq): any {
     url: '/users/revoke-project',
     method: 'post',
     data
-  })
-}
-
-export function unauthorizedUser(params: AlertGroupIdReq): any {
-  return axios({
-    url: '/users/unauth-user',
-    method: 'get',
-    params
   })
 }
 

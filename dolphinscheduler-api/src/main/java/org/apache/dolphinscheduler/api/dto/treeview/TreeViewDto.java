@@ -20,74 +20,19 @@ package org.apache.dolphinscheduler.api.dto.treeview;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * TreeView
- */
+import lombok.Data;
+
+@Data
 public class TreeViewDto {
 
-    /**
-     * name
-     */
     private String name;
 
-    /**
-     * type
-     */
     private String type;
 
-    /**
-     * code
-     */
     private long code;
-
-    /**
-     * instances list
-     */
 
     private List<Instance> instances = new ArrayList<>();
 
-    /**
-     * children
-     */
     private List<TreeViewDto> children = new ArrayList<>();
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public long getCode() {
-        return code;
-    }
-
-    public void setCode(long code) {
-        this.code = code;
-    }
-
-    public List<Instance> getInstances() {
-        return instances;
-    }
-
-    public void setInstances(List<Instance> instances) {
-        this.instances = instances;
-    }
-
-    public List<TreeViewDto> getChildren() {
-        return children;
-    }
-
-    public void setChildren(List<TreeViewDto> children) {
-        this.children = children;
-    }
 }

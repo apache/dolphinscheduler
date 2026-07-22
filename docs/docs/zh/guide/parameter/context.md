@@ -14,16 +14,23 @@ DolphinScheduler 允许在任务间进行参数传递，目前传递方向仅支
 * [SQL](../task/sql.md)
 * [Procedure](../task/stored-procedure.md)
 * [Python](../task/python.md)
-* [SubProcess](../task/sub-process.md)
+* [SubWorkflow](../task/sub-workflow.md)
 * [Kubernetes](../task/kubernetes.md)
+* [Zeppelin](../task/zeppelin.md)
+* [Http](../task/http.md)
 
-当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。如果是 SubProcess 节点无需在【当前节点设置】中设置变量，需要在子流程的工作流定义中设置一个方向是 OUT 的变量。
+当定义上游节点时，如果有需要将该节点的结果传递给有依赖关系的下游节点，需要在【当前节点设置】的【自定义参数】设置一个方向是 OUT 的变量。如果是 SubWorkflow 节点无需在【当前节点设置】中设置变量，需要在子流程的工作流定义中设置一个方向是 OUT 的变量。
 
 上游传递的参数可以在下游节点中被更新，更新方法与[设置参数](#创建-shell-任务并设置参数)相同。
 
 如果定义了同名的传递参数，上游节点的参数将被覆盖。
 
-> 注：若节点之间没有依赖关系，则局部参数无法通过上游传递。
+> 1. 参数传递的行为在3.3.x版本中发生了变化**
+>    在旧版本（≤ 3.2.2）中，下游节点B无需配置IN类型局部变量X即可获取上游节点A的OUT类型输出X；
+>    新版本（≥ 3.3.0）中修改了局部变量的获取逻辑：只有下游节点B配置了IN类型的局部变量X，才可使用上游节点A的OUT类型输出X。
+>    详情参考下文的Node_B 和 Node_mysql 样例
+>
+> 2. 若节点之间没有依赖关系，则局部参数无法通过上游传递。
 
 ### 任务样例
 
@@ -46,11 +53,15 @@ SHELL 节点定义时当日志检测到 ${setValue(output=1)} 的格式时，会
 
 创建 Node_B 任务，主要用于测试输出上游任务 Node_A 传递的参数。
 
+在自定义参数中，添加IN类型的 value 参数 和 output 参数
+
 ![context-parameter02](../../../../img/new_ui/dev/parameter/context_parameter02.png)
 
 #### 创建 SQL 任务并使用参数
 
 完成上述的 SHELL 任务之后，我们可以使用上游所传递的 output 作为 SQL 的查询对象。其中将所查询的 id 重命名为 ID，作为参数输出。
+
+在自定义参数中，添加OUT类型的 ID 参数 和 IN类型的 output 参数
 
 ![context-parameter03](../../../../img/new_ui/dev/parameter/context_parameter03.png)
 
@@ -93,29 +104,29 @@ Node_mysql 运行结果如下：
 
 注意： 当变量 value 中含有 `\n` 标识，如 `value = "hello \n world"`， 则需要将 value 进行特殊进行，需要使用 `print('${setValue(key=%s)}' % repr(value))`, 否则参数无法传递到后面的流程。
 
-#### SubProcess 任务传递参数
+#### SubWorkflow 任务传递参数
 
 在子流程的工作流定义中定义方向是 OUT 的变量作为输出参数，可以将这些参数传递到子流程节点的下游任务。
 
 在子流程的工作流定义中创建 A 任务，在自定义参数中添加 var1 和 var2 参数，并编写如下脚本：
 
-![context-subprocess01](../../../../img/new_ui/dev/parameter/context-subprocess01.png)
+![context-sub-workflow01](../../../../img/new_ui/dev/parameter/context-sub-workflow01.png)
 
-保存 subprocess_example1 工作流，设置全局参数 var1。
+保存 sub-workflow_example1 工作流，设置全局参数 var1。
 
-![context-subprocess02](../../../../img/new_ui/dev/parameter/context-subprocess02.png)
+![context-sub-workflow02](../../../../img/new_ui/dev/parameter/context-sub-workflow02.png)
 
-在新的工作流中创建 sub_process 任务，使用 subprocess_example1 工作流作为子节点。
+在新的工作流中创建 sub_workflow 任务，使用 sub-workflow_example1 工作流作为子节点。
 
-![context-subprocess03](../../../../img/new_ui/dev/parameter/context-subprocess03.png)
+![context-sub-workflow03](../../../../img/new_ui/dev/parameter/context-sub-workflow03.png)
 
-创建一个 shell 任务作为 sub_process 任务的下游任务，并编写如下脚本：
+创建一个 shell 任务作为 sub_workflow 任务的下游任务，并编写如下脚本：
 
-![context-subprocess04](../../../../img/new_ui/dev/parameter/context-subprocess04.png)
+![context-sub-workflow04](../../../../img/new_ui/dev/parameter/context-sub-workflow04.png)
 
 保存该工作流并运行，下游任务运行结果如下：
 
-![context-subprocess05](../../../../img/new_ui/dev/parameter/context-subprocess05.png)
+![context-sub-workflow05](../../../../img/new_ui/dev/parameter/context-sub-workflow05.png)
 
 虽然在 A 任务中输出 var1 和 var2 两个参数，但是工作流定义中只定义了 var1 的 OUT 变量，下游任务成功输出 var1，证明var1 参数参照预期的值在该工作流中传递。
 
@@ -128,3 +139,13 @@ Node_mysql 运行结果如下：
 ![kubernetes_context_param](../../../../img/new_ui/dev/parameter/k8s_context_param.png)
 
 另外需要特别注意的是，并非总是可以收集pod日志，如果用户重定向日志输出流，我们既不能收集日志使用，也不能使用输出参数。
+
+#### Zeppelin 任务传递参数
+
+在自定义参数中，添加一个 IN 类型的 input 参数。
+
+如下图所示：
+
+![zeppelin_parameters](../../../../img/new_ui/dev/parameter/zeppelin_parameters01.png)
+
+注意：JSON 键名必须用双引号括起来。

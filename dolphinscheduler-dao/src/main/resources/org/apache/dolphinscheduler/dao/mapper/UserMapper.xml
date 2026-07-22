@@ -72,14 +72,6 @@
         left join t_ds_queue q on t.queue_id = q.id
         WHERE u.id = #{userId}
     </select>
-    <select id="queryUserListByAlertGroupId" resultType="org.apache.dolphinscheduler.dao.entity.User">
-        select
-        <include refid="baseSqlV2">
-            <property name="alias" value="u"/>
-        </include>
-        from t_ds_user u, t_ds_relation_user_alertgroup rel
-        where u.id = rel.user_id AND rel.alertgroup_id = #{alertgroupId}
-    </select>
     <select id="queryUserListByTenant" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
         <include refid="baseSql"/>
@@ -143,25 +135,25 @@
         from t_ds_user
         where state = 1
     </select>
-    <select id="queryUserWithProcessDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.UserWithProcessDefinitionCode">
+    <select id="queryUserWithWorkflowDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode">
         select
-            dl.code as process_definition_code,
-            pd.version as process_definition_version,
+            dl.code as workflow_definition_code,
+            pd.version as workflow_definition_version,
             u.id as modifier_id,
             u.user_name as modifier_name,
             u2.id as creator_id,
             u2.user_name as creator_name
-        from t_ds_process_definition_log dl
-        inner join t_ds_process_definition pd
+        from t_ds_workflow_definition_log dl
+        inner join t_ds_workflow_definition pd
         on pd.code = dl.code
         and pd.version = dl.version
         inner join t_ds_user u
         on dl.operator = u.id
         inner join t_ds_user u2
         on pd.user_id = u2.id
-        <if test="processDefinitionCodes != null and processDefinitionCodes.size() != 0">
+        <if test="workflowDefinitionCodes != null and workflowDefinitionCodes.size() != 0">
             where dl.code in
-            <foreach item="code" collection="processDefinitionCodes" open="(" separator="," close=")">
+            <foreach item="code" collection="workflowDefinitionCodes" open="(" separator="," close=")">
                 #{code}
             </foreach>
         </if>

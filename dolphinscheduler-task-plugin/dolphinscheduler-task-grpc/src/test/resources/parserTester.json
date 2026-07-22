@@ -1,0 +1,244 @@
+{
+  "nested": {
+    "org": {
+      "nested": {
+        "apache": {
+          "nested": {
+            "dolphinscheduler": {
+              "nested": {
+                "task": {
+                  "nested": {
+                    "grpc": {
+                      "nested": {
+                        "proto": {
+                          "options": {
+                            "java_package": "org.apache.dolphinscheduler.plugin.task.grpc.generated",
+                            "java_multiple_files": true,
+                            "java_outer_classname": "ParserTesterProto"
+                          },
+                          "nested": {
+                            "ParserTester": {
+                              "methods": {
+                                "TestNoneType": {
+                                  "requestType": "NoneRequest",
+                                  "responseType": "NoneReply"
+                                },
+                                "TestBasicType": {
+                                  "requestType": "BasicType",
+                                  "responseType": "NoneReply"
+                                },
+                                "TestEnumType": {
+                                  "requestType": "EnumType",
+                                  "responseType": "NoneReply"
+                                },
+                                "TestBasicMapType": {
+                                  "requestType": "BasicMapType",
+                                  "responseType": "NoneReply"
+                                },
+                                "TestMapType": {
+                                  "requestType": "MapType",
+                                  "responseType": "NoneReply"
+                                },
+                                "TestPrimitiveMapType": {
+                                  "requestType": "PrimitiveMapType",
+                                  "responseType": "NoneReply"
+                                },
+                                "TestOneofType": {
+                                  "requestType": "OneofType",
+                                  "responseType": "NoneReply"
+                                }
+                              }
+                            },
+                            "BasicType": {
+                              "fields": {
+                                "stringVal": {
+                                  "type": "string",
+                                  "id": 1
+                                },
+                                "boolVal": {
+                                  "type": "bool",
+                                  "id": 2
+                                },
+                                "floatVal": {
+                                  "type": "float",
+                                  "id": 3
+                                },
+                                "doubleVal": {
+                                  "type": "double",
+                                  "id": 4
+                                },
+                                "int32Val": {
+                                  "type": "int32",
+                                  "id": 5
+                                },
+                                "int64Val": {
+                                  "type": "int64",
+                                  "id": 6
+                                },
+                                "uint32Val": {
+                                  "type": "uint32",
+                                  "id": 7
+                                },
+                                "uint64Val": {
+                                  "type": "uint64",
+                                  "id": 8
+                                },
+                                "sint32Val": {
+                                  "type": "sint32",
+                                  "id": 9
+                                },
+                                "sint64Val": {
+                                  "type": "sint64",
+                                  "id": 10
+                                },
+                                "sfixed32": {
+                                  "type": "sfixed32",
+                                  "id": 11
+                                },
+                                "sfixed64": {
+                                  "type": "sfixed64",
+                                  "id": 12
+                                },
+                                "bytesVal": {
+                                  "type": "bytes",
+                                  "id": 13
+                                }
+                              }
+                            },
+                            "OneofType": {
+                              "oneofs": {
+                                "_bio": {
+                                  "oneof": [
+                                    "bio"
+                                  ]
+                                },
+                                "_age": {
+                                  "oneof": [
+                                    "age"
+                                  ]
+                                },
+                                "contact": {
+                                  "oneof": [
+                                    "phone",
+                                    "email"
+                                  ]
+                                }
+                              },
+                              "fields": {
+                                "name": {
+                                  "type": "string",
+                                  "id": 1
+                                },
+                                "bio": {
+                                  "type": "string",
+                                  "id": 2,
+                                  "options": {
+                                    "proto3_optional": true
+                                  }
+                                },
+                                "age": {
+                                  "type": "int32",
+                                  "id": 3,
+                                  "options": {
+                                    "proto3_optional": true
+                                  }
+                                },
+                                "phone": {
+                                  "type": "string",
+                                  "id": 4
+                                },
+                                "email": {
+                                  "type": "string",
+                                  "id": 5
+                                }
+                              }
+                            },
+                            "EnumType": {
+                              "fields": {
+                                "what2eat": {
+                                  "type": "Fruits",
+                                  "id": 1
+                                }
+                              }
+                            },
+                            "Int32Only": {
+                              "fields": {
+                                "id": {
+                                  "type": "int32",
+                                  "id": 1
+                                }
+                              }
+                            },
+                            "BasicMapType": {
+                              "fields": {
+                                "seats": {
+                                  "keyType": "string",
+                                  "type": "int32",
+                                  "id": 1
+                                }
+                              }
+                            },
+                            "MapType": {
+                              "fields": {
+                                "bought": {
+                                  "keyType": "string",
+                                  "type": "Fruits",
+                                  "id": 1
+                                },
+                                "cash": {
+                                  "keyType": "string",
+                                  "type": "Int32Only",
+                                  "id": 2
+                                }
+                              }
+                            },
+                            "PrimitiveMapType": {
+                              "fields": {
+                                "bought": {
+                                  "rule": "repeated",
+                                  "type": "MapEntry_bought",
+                                  "id": 1
+                                }
+                              },
+                              "nested": {
+                                "MapEntry_bought": {
+                                  "fields": {
+                                    "key": {
+                                      "type": "string",
+                                      "id": 1
+                                    },
+                                    "value": {
+                                      "type": "Fruits",
+                                      "id": 2
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "Fruits": {
+                              "values": {
+                                "LINGO": 0,
+                                "ICHIGO": 1,
+                                "MOMO": 2
+                              }
+                            },
+                            "NoneRequest": {
+                              "fields": {}
+                            },
+                            "NoneReply": {
+                              "fields": {}
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

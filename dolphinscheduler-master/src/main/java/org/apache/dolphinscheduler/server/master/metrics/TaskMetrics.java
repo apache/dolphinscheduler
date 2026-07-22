@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
 
-import com.facebook.presto.jdbc.internal.guava.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSet;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
@@ -44,7 +44,7 @@ public class TaskMetrics {
                     state,
                     Counter.builder("ds.task.instance.count")
                             .tags("state", state)
-                            .description(String.format("Process instance %s total count", state))
+                            .description(String.format("Workflow instance %s total count", state))
                             .register(Metrics.globalRegistry));
         }
 

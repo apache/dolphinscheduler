@@ -19,9 +19,6 @@ package org.apache.dolphinscheduler.common.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 
-/**
- * user type
- */
 public enum UserType {
 
     /**

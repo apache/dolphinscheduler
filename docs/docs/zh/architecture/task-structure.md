@@ -145,7 +145,6 @@
 5| |type |String | 数据库类型
 6| |datasource |Int | 数据源id
 7| |sql |String | 查询SQL语句
-8| |udfs | String| udf函数|UDF函数id,以逗号分隔.
 9| |sqlType | String| SQL节点类型 |0 查询  , 1 非查询
 10| |title |String | 邮件标题
 11| |receivers |String | 收件人
@@ -179,7 +178,6 @@
         "type":"MYSQL",
         "datasource":1,
         "sql":"select id , namge , age from emp where id =  ${id}",
-        "udfs":"",
         "sqlType":"0",
         "title":"xxxx@xxx.com",
         "receivers":"xxxx@xxx.com",
@@ -920,7 +918,7 @@
 
 ```bash
 {
-            "type":"SUB_PROCESS",
+            "type":"SUB_WORKFLOW",
             "id":"tasks-14806",
             "name":"SubProcessTask",
             "params":{

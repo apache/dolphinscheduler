@@ -32,7 +32,11 @@ import lombok.NoArgsConstructor;
 public class SyncRequestDto {
 
     private Host serverHost;
+
     private Transporter transporter;
+
     private long timeoutMillis;
+
+    private RpcMethodRetryStrategy retryStrategy;
 
 }

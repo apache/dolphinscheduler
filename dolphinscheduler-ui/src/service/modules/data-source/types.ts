@@ -42,6 +42,8 @@ type IDataBase =
   | 'ZEPPELIN'
   | 'SAGEMAKER'
   | 'K8S'
+  | 'ALIYUN_SERVERLESS_SPARK'
+  | 'DOLPHINDB'
 
 type IDataBaseLabel =
   | 'MYSQL'
@@ -65,6 +67,8 @@ type IDataBaseLabel =
   | 'ZEPPELIN'
   | 'SAGEMAKER'
   | 'K8S'
+  | 'ALIYUN_SERVERLESS_SPARK'
+  | 'DOLPHINDB'
 
 interface IDataSource {
   id?: number
@@ -85,15 +89,18 @@ interface IDataSource {
   database?: string
   connectType?: string
   other?: object
-  endpoint?: string
   restEndpoint?: string
   kubeConfig?: string
   namespace?: string
   MSIClientId?: string
   dbUser?: string
   compatibleMode?: string
-  publicKey?: string
+  privateKey?: string
   datawarehouse?: string
+  accessKeyId?: string
+  accessKeySecret?: string
+  regionId?: string
+  endpoint?: string
 }
 
 interface ListReq {

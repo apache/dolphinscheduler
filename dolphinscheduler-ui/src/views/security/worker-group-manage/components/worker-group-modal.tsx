@@ -78,7 +78,9 @@ const WorkerGroupModal = defineComponent({
         } else {
           variables.model.id = props.row.id
           variables.model.name = props.row.name
-          variables.model.addrList = props.row.addrList.split(',')
+          variables.model.addrList = props.row.addrList
+            ? props.row.addrList.split(',')
+            : []
         }
       }
     )
@@ -88,7 +90,9 @@ const WorkerGroupModal = defineComponent({
       () => {
         variables.model.id = props.row.id
         variables.model.name = props.row.name
-        variables.model.addrList = props.row.addrList.split(',')
+        variables.model.addrList = props.row.addrList
+          ? props.row.addrList.split(',')
+          : []
       }
     )
 
@@ -107,7 +111,7 @@ const WorkerGroupModal = defineComponent({
           show={this.showModalRef}
           onCancel={this.cancelModal}
           onConfirm={this.confirmModal}
-          confirmDisabled={!this.model.name || this.model.addrList.length < 1}
+          confirmDisabled={!this.model.name}
           confirmClassName='btn-submit'
           cancelClassName='btn-cancel'
           confirmLoading={this.saving}

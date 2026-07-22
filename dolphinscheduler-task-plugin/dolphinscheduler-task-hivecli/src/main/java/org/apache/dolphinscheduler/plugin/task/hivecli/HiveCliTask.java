@@ -63,13 +63,9 @@ public class HiveCliTask extends AbstractRemoteTask {
 
     private final ShellCommandExecutor shellCommandExecutor;
 
-    private final TaskExecutionContext taskExecutionContext;
-
     public HiveCliTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
-        this.taskExecutionContext = taskExecutionContext;
-
-        this.shellCommandExecutor = new ShellCommandExecutor(this::logHandle, taskExecutionContext);
+        this.shellCommandExecutor = new ShellCommandExecutor(taskExecutionContext);
     }
 
     @Override
@@ -79,9 +75,9 @@ public class HiveCliTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        log.info("hiveCli task params {}", taskExecutionContext.getTaskParams());
+        log.info("hiveCli task params {}", taskRequest.getTaskParams());
 
-        hiveCliParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), HiveCliParameters.class);
+        hiveCliParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), HiveCliParameters.class);
 
         if (!hiveCliParameters.checkParameters()) {
             throw new TaskException("hiveCli task params is not valid");
@@ -138,7 +134,7 @@ public class HiveCliTask extends AbstractRemoteTask {
 
             try {
                 resourceFileName = resourceInfos.get(0).getResourceName();
-                ResourceContext resourceContext = taskExecutionContext.getResourceContext();
+                ResourceContext resourceContext = taskRequest.getResourceContext();
                 sqlContent = FileUtils.readFileToString(
                         new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
                         StandardCharsets.UTF_8);
@@ -150,7 +146,7 @@ public class HiveCliTask extends AbstractRemoteTask {
             sqlContent = hiveCliParameters.getHiveSqlScript();
         }
 
-        final Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        final Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
         sqlContent = ParameterUtils.convertParameterPlaceholders(sqlContent, ParameterUtils.convert(paramsMap));
         log.info("HiveCli sql content: {}", sqlContent);
         String sqlFilePath = generateSqlScriptFile(sqlContent);
@@ -184,8 +180,8 @@ public class HiveCliTask extends AbstractRemoteTask {
     }
 
     protected String generateSqlScriptFile(String rawScript) {
-        String scriptFileName = String.format("%s/%s_node.sql", taskExecutionContext.getExecutePath(),
-                taskExecutionContext.getTaskAppId());
+        String scriptFileName = String.format("%s/%s_node.sql", taskRequest.getExecutePath(),
+                taskRequest.getTaskAppId());
 
         File file = new File(scriptFileName);
         Path path = file.toPath();
