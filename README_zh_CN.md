@@ -58,7 +58,7 @@ DolphinScheduler 的主要特性如下：
 
 ## 社区
 
-欢迎通过以方式加入社区：
+欢迎通过以下方式加入社区：
 
 - 加入 [DolphinScheduler Slack](https://s.apache.org/dolphinscheduler-slack)
 - 关注 [DolphinScheduler Twitter](https://twitter.com/dolphinschedule) 来获取最新消息 <!-- markdown-link-check-disable-line -->
