@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -169,6 +170,18 @@ public class DataxTask extends AbstractTask {
     }
 
     /**
+     * Reads the DataX job definition from the first attached resource file. The worker has
+     * already downloaded resources into the execution directory by the time the task runs.
+     */
+    private String readJsonFromResourceFile() throws Exception {
+        String resourceFileName = dataXParameters.getResourceList().get(0).getResourceName();
+        ResourceContext resourceContext = taskRequest.getResourceContext();
+        return FileUtils.readFileToString(
+                new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
+                StandardCharsets.UTF_8);
+    }
+
+    /**
      * build datax configuration file
      *
      * @return datax json file name
@@ -185,7 +198,16 @@ public class DataxTask extends AbstractTask {
         }
 
         if (dataXParameters.getCustomConfig() == Flag.YES.ordinal()) {
-            json = dataXParameters.getJson().replaceAll("\\r\\n", System.lineSeparator());
+            // An attached resource file is a valid way to supply the job definition. Without
+            // this branch the worker downloads the resource but the plugin runs with the empty
+            // inline json and the job fails (issue #18389).
+            if (StringUtils.isEmpty(dataXParameters.getJson())
+                    && CollectionUtils.isNotEmpty(dataXParameters.getResourceList())) {
+                json = readJsonFromResourceFile();
+            } else {
+                json = dataXParameters.getJson();
+            }
+            json = json.replaceAll("\\r\\n", System.lineSeparator());
         } else {
             ObjectNode job = JSONUtils.createObjectNode();
             job.putArray("content").addAll(buildDataxJobContentJson());

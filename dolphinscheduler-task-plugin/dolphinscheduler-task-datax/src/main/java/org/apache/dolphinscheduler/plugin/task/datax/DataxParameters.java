@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourc
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
@@ -116,7 +117,9 @@ public class DataxParameters extends AbstractParameters {
                     && StringUtils.isNotEmpty(sql)
                     && StringUtils.isNotEmpty(targetTable);
         } else {
-            return StringUtils.isNotEmpty(json);
+            // Custom config is valid with either inline json or an attached resource file
+            // carrying the job definition (issue #18389)
+            return StringUtils.isNotEmpty(json) || CollectionUtils.isNotEmpty(resourceList);
         }
     }
 

@@ -33,6 +33,28 @@ public class DataxParametersTest {
     public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
 
     @Test
+    public void testCheckParametersWithCustomConfig() {
+        DataxParameters withInlineJson = new DataxParameters();
+        withInlineJson.setCustomConfig(1);
+        withInlineJson.setJson("{\"job\":{}}");
+        Assertions.assertTrue(withInlineJson.checkParameters());
+
+        // an attached resource file is a valid alternative to inline json (issue #18389)
+        DataxParameters withResourceFile = new DataxParameters();
+        withResourceFile.setCustomConfig(1);
+        ResourceInfo resource = new ResourceInfo();
+        resource.setResourceName("/datax/job.json");
+        List<ResourceInfo> resources = new ArrayList<>();
+        resources.add(resource);
+        withResourceFile.setResourceList(resources);
+        Assertions.assertTrue(withResourceFile.checkParameters());
+
+        DataxParameters withNeither = new DataxParameters();
+        withNeither.setCustomConfig(1);
+        Assertions.assertFalse(withNeither.checkParameters());
+    }
+
+    @Test
     public void testLoadJvmEnv() {
 
         DataxParameters dataxParameters = new DataxParameters();
