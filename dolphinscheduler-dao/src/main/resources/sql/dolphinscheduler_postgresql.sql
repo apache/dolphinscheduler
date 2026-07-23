@@ -859,6 +859,7 @@ CREATE TABLE t_ds_task_instance (
 ) ;
 
 create index idx_task_instance_code_version on t_ds_task_instance (task_code, task_definition_version);
+create index idx_project_submit_time on t_ds_task_instance (project_code, submit_time DESC);
 
 --
 -- Table structure for t_ds_task_instance_context
