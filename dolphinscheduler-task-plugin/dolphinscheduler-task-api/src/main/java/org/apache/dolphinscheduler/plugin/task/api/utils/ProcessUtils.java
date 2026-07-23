@@ -117,6 +117,12 @@ public final class ProcessUtils {
                 return true;
             }
 
+            // Check if process has already exited naturally
+            if (!isProcessAlive(processId, request.getTenantCode())) {
+                log.info("Task instance process has already exited, processId: {}", processId);
+                return true;
+            }
+
             // Get all child processes
             List<Integer> pidList = getPidList(processId);
 
