@@ -197,14 +197,19 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       span: jsonEditorSpan,
       validate: {
         trigger: ['input', 'trigger'],
-        required: true,
+        required: false,
         validator() {
+          const hasResource =
+            model.resourceList && (model.resourceList as string[]).length > 0
           if (
             model.json === '' ||
             model.json === undefined ||
             model.json === null
           ) {
-            return new Error(t('project.node.sql_empty_tips'))
+            // an attached resource file may carry the job definition instead
+            return hasResource
+              ? undefined
+              : new Error(t('project.node.sql_empty_tips'))
           }
           if (!utils.isJson(model.json)) {
             return new Error(t('project.node.json_format_tips'))

@@ -118,8 +118,10 @@ public class DataxParameters extends AbstractParameters {
                     && StringUtils.isNotEmpty(targetTable);
         } else {
             // Custom config is valid with either inline json or an attached resource file
-            // carrying the job definition (issue #18389)
-            return StringUtils.isNotEmpty(json) || CollectionUtils.isNotEmpty(resourceList);
+            // carrying the job definition (issue #18389). "{}" is the UI placeholder and
+            // does not count as an inline definition.
+            boolean hasInlineJson = StringUtils.isNotBlank(json) && !"{}".equals(json.trim());
+            return hasInlineJson || CollectionUtils.isNotEmpty(resourceList);
         }
     }
 

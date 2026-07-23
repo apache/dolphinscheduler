@@ -37,8 +37,10 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskRunStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -269,6 +271,61 @@ public class DataxTaskTest {
         paramsMap.put("DT", dtProperty);
         paramsMap.put("DS", dsProperty);
         return paramsMap;
+    }
+
+    @Test
+    public void testCustomConfigReadsJobDefinitionFromResourceFile() throws Exception {
+        // a real resource file carrying the job definition, with the UI placeholder "{}" inline
+        String resourceJson = "{\"job\":{\"content\":[{\"reader\":{\"name\":\"mysqlreader\"}}]}}";
+        File resourceFile = File.createTempFile("datax-job", ".json");
+        resourceFile.deleteOnExit();
+        java.nio.file.Files.write(resourceFile.toPath(),
+                resourceJson.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+
+        DataxParameters parameters = new DataxParameters();
+        parameters.setCustomConfig(1);
+        parameters.setJson("{}");
+        parameters.setXms(1);
+        parameters.setXmx(1);
+        ResourceInfo resourceInfo = new ResourceInfo();
+        resourceInfo.setResourceName("/datax/job.json");
+        parameters.setResourceList(java.util.Collections.singletonList(resourceInfo));
+
+        TaskExecutionContext taskExecutionContext = buildTestTaskExecutionContext();
+        // own app id so the generated file cannot collide with other tests' job files
+        taskExecutionContext.setTaskAppId("app-id-resource");
+        taskExecutionContext.setPrepareParamsMap(null);
+        taskExecutionContext.setTaskParams(JSONUtils.toJsonString(parameters));
+        ResourceContext resourceContext = new ResourceContext();
+        resourceContext.addResourceItem(ResourceContext.ResourceItem.builder()
+                .resourceAbsolutePathInStorage("/datax/job.json")
+                .resourceAbsolutePathInLocal(resourceFile.getAbsolutePath())
+                .build());
+        taskExecutionContext.setResourceContext(resourceContext);
+
+        DataxTask dataxTask = new DataxTask(taskExecutionContext);
+        dataxTask.init();
+
+        ShellCommandExecutor shellCommandExecutor = mock(ShellCommandExecutor.class);
+        Field shellCommandExecutorFiled = DataxTask.class.getDeclaredField("shellCommandExecutor");
+        shellCommandExecutorFiled.setAccessible(true);
+        shellCommandExecutorFiled.set(dataxTask, shellCommandExecutor);
+
+        TaskResponse taskResponse = new TaskResponse();
+        taskResponse.setStatus(TaskRunStatus.SUCCESS);
+        taskResponse.setExitStatusCode(0);
+        taskResponse.setProcessId(1);
+        when(shellCommandExecutor.run(any(), eq(taskCallBack))).thenReturn(taskResponse);
+
+        dataxTask.handle(taskCallBack);
+        Assertions.assertEquals(0, dataxTask.getExitStatusCode());
+
+        // the generated job file must carry the resource content, not the "{}" placeholder
+        File jsonFile = new File("/tmp/execution/app-id-resource_job.json");
+        String generated = FileUtils.readFile2Str(Files.newInputStream(jsonFile.toPath()));
+        Assertions.assertTrue(generated.contains("mysqlreader"),
+                "generated job file should contain the resource file definition, was: " + generated);
+        Assertions.assertTrue(jsonFile.delete());
     }
 
     private TaskExecutionContext buildTestTaskExecutionContext() {

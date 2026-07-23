@@ -170,6 +170,15 @@ public class DataxTask extends AbstractTask {
     }
 
     /**
+     * Returns true when no usable inline job definition was provided. The UI historically
+     * stored the placeholder {@code {}} in the json field, so a blank value and the empty
+     * object placeholder are both treated as absent.
+     */
+    static boolean isInlineJsonAbsent(String json) {
+        return StringUtils.isBlank(json) || "{}".equals(json.trim());
+    }
+
+    /**
      * Reads the DataX job definition from the first attached resource file. The worker has
      * already downloaded resources into the execution directory by the time the task runs.
      */
@@ -200,8 +209,9 @@ public class DataxTask extends AbstractTask {
         if (dataXParameters.getCustomConfig() == Flag.YES.ordinal()) {
             // An attached resource file is a valid way to supply the job definition. Without
             // this branch the worker downloads the resource but the plugin runs with the empty
-            // inline json and the job fails (issue #18389).
-            if (StringUtils.isEmpty(dataXParameters.getJson())
+            // inline json and the job fails (issue #18389). Existing tasks created through the
+            // UI carry "{}" as a placeholder, treat it the same as no inline json.
+            if (isInlineJsonAbsent(dataXParameters.getJson())
                     && CollectionUtils.isNotEmpty(dataXParameters.getResourceList())) {
                 json = readJsonFromResourceFile();
             } else {
