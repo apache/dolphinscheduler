@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
 import java.util.Date;
 
@@ -66,15 +67,22 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                     .goToTab(UserPage.class)
                     .update(adminUser);
         }
-        tenantPage
+        WorkerGroupPage workerGroupPage = tenantPage
                 .goToNav(SecurityPage.class)
                 .goToTab(EnvironmentPage.class)
                 .createEnvironmentUntilSuccess(pythonEnvironment.getEnvironmentName(),
                         pythonEnvironment.getEnvironmentConfig(),
                         pythonEnvironment.getEnvironmentDesc(),
-                        pythonEnvironment.getEnvironmentWorkerGroup());
+                        pythonEnvironment.getEnvironmentWorkerGroup())
+                .goToNav(SecurityPage.class)
+                .goToTab(WorkerGroupPage.class);
 
-        tenantPage
+        if (workerGroupPage.workerGroupList().stream()
+                .noneMatch(it -> it.getText().contains("default"))) {
+            workerGroupPage.create("default");
+        }
+
+        workerGroupPage
                 .goToNav(ProjectPage.class)
                 .createProjectUntilSuccess(projectName);
     }

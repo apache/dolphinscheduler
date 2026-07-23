@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
+import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
 import java.util.List;
 
@@ -60,11 +61,20 @@ class WorkflowSwitchE2ETest {
 
     @BeforeAll
     public static void setup() {
-        new LoginPage(browser)
+        WorkerGroupPage workerGroupPage = new LoginPage(browser)
                 .login("admin", "dolphinscheduler123")
                 .goToNav(SecurityPage.class)
                 .goToTab(TenantPage.class)
                 .create(tenant)
+                .goToNav(SecurityPage.class)
+                .goToTab(WorkerGroupPage.class);
+
+        if (workerGroupPage.workerGroupList().stream()
+                .noneMatch(it -> it.getText().contains("default"))) {
+            workerGroupPage.create("default");
+        }
+
+        workerGroupPage
                 .goToNav(ProjectPage.class)
                 .createProjectUntilSuccess(project);
     }

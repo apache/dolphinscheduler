@@ -63,7 +63,16 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                     .update(adminUser);
         }
 
-        tenantPage
+        WorkerGroupPage workerGroupPage = tenantPage
+                .goToNav(SecurityPage.class)
+                .goToTab(WorkerGroupPage.class);
+
+        if (workerGroupPage.workerGroupList().stream()
+                .noneMatch(it -> it.getText().contains("default"))) {
+            workerGroupPage.create("default");
+        }
+
+        workerGroupPage
                 .goToNav(ProjectPage.class)
                 .createProjectUntilSuccess(projectName);
     }

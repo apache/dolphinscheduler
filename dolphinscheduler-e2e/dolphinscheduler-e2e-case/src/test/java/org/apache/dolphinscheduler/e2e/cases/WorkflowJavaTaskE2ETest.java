@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.e2e.pages.security.EnvironmentPage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -206,7 +207,16 @@ public class WorkflowJavaTaskE2ETest {
         WebDriverWaitFactory.createWebDriverWait(userPage.driver())
                 .until(ExpectedConditions.visibilityOfElementLocated(new By.ByClassName("name")));
 
-        userPage.update(user, user, email, phone, tenant)
+        WorkerGroupPage workerGroupPage = userPage.update(user, user, email, phone, tenant)
+                .goToNav(SecurityPage.class)
+                .goToTab(WorkerGroupPage.class);
+
+        if (workerGroupPage.workerGroupList().stream()
+                .noneMatch(it -> it.getText().contains("default"))) {
+            workerGroupPage.create("default");
+        }
+
+        workerGroupPage
                 .goToNav(ProjectPage.class)
                 .createProjectUntilSuccess(project);
 
