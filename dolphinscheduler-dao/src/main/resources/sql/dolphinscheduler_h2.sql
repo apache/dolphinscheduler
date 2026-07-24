@@ -938,6 +938,7 @@ CREATE TABLE t_ds_task_instance
     memory_max              int(11) DEFAULT '-1' NOT NULL,
     PRIMARY KEY (id)
 );
+CREATE INDEX idx_project_submit_time ON t_ds_task_instance (project_code, submit_time);
 
 -- ----------------------------
 -- Records of t_ds_task_instance
