@@ -646,7 +646,8 @@ CREATE TABLE `t_ds_workflow_instance` (
   `restart_time` datetime DEFAULT NULL COMMENT 'workflow instance restart time',
   PRIMARY KEY (`id`),
   KEY `workflow_instance_index` (`workflow_definition_code`,`id`) USING BTREE,
-  KEY `start_time_index` (`start_time`,`end_time`) USING BTREE
+  KEY `start_time_index` (`start_time`,`end_time`) USING BTREE,
+  KEY `idx_project_start_time` (`project_code`, `start_time`) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------

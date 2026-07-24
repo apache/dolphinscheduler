@@ -636,7 +636,8 @@ CREATE TABLE t_ds_workflow_instance
     var_pool                   longtext,
     dry_run                    int NULL DEFAULT 0,
     restart_time               datetime     DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    INDEX idx_project_start_time (project_code, start_time)
 );
 
 -- ----------------------------
