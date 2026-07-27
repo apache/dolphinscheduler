@@ -36,12 +36,6 @@
         flag, retry_interval, max_retry_times, task_instance_priority, worker_group,environment_code , executor_id, executor_name,
         first_submit_time, delay_time, dry_run, task_group_id, cpu_quota, memory_max, task_execute_type
     </sql>
-    <sql id="listSqlV2">
-        ${alias}.id, ${alias}.name, ${alias}.task_type, ${alias}.task_code, ${alias}.task_definition_version, ${alias}.workflow_instance_id, ${alias}.state, ${alias}.submit_time,
-        ${alias}.start_time, ${alias}.end_time, ${alias}.host, ${alias}.alert_flag, ${alias}.retry_times, ${alias}.pid,
-        ${alias}.flag, ${alias}.retry_interval, ${alias}.max_retry_times, ${alias}.task_instance_priority, ${alias}.worker_group,${alias}.environment_code , ${alias}.executor_id,
-        ${alias}.first_submit_time, ${alias}.delay_time, ${alias}.dry_run, ${alias}.task_group_id, ${alias}.task_execute_type
-    </sql>
     <select id="findValidTaskListByWorkflowInstanceId" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
         <include refid="baseSql"/>
