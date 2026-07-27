@@ -210,7 +210,7 @@
     </select>
     <select id="queryLastSchedulerWorkflow" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select t1.* from (select
-        <include refid="listSql"/>
+        <include refid="baseSql"/>
         from t_ds_workflow_instance
         where workflow_definition_code=#{workflowDefinitionCode}
         <if test="startTime != null and endTime != null ">
@@ -228,7 +228,7 @@
         from
         (
             select
-            <include refid="listSql"/>
+            <include refid="baseSql"/>
             from t_ds_workflow_instance
             where
             workflow_definition_code=#{workflowDefinitionCode}
@@ -247,7 +247,7 @@
 
     <select id="queryLastRunningWorkflow" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
-        <include refid="listSql"/>
+        <include refid="baseSql"/>
         from t_ds_workflow_instance
         where workflow_definition_code=#{workflowDefinitionCode}
         <if test="states !=null and states.length != 0">
