@@ -117,6 +117,13 @@ public final class ProcessUtils {
                 return true;
             }
 
+            // Check if process is still alive before getting pid list from pstree
+            // If the process has already exited, pstree will throw an exception
+            if (!isProcessAlive(processId, request.getTenantCode())) {
+                log.info("Process {} has already exited, no need to kill", processId);
+                return true;
+            }
+
             // Get all child processes
             List<Integer> pidList = getPidList(processId);
 
