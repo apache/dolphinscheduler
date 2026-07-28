@@ -32,6 +32,8 @@ import java.util.List;
 
 public class LogServiceImpl implements ILogService {
 
+    private static final int MAX_LOG_QUERY_LIMIT = 10000;
+
     /**
      * Downloads the entire log file for a task instance.
      *
@@ -63,12 +65,15 @@ public class LogServiceImpl implements ILogService {
     public TaskInstanceLogPageQueryResponse pageQueryTaskInstanceLog(TaskInstanceLogPageQueryRequest taskInstanceLogPageQueryRequest) {
         final TaskInstanceLogPageQueryResponse taskInstanceLogPageQueryResponse =
                 new TaskInstanceLogPageQueryResponse();
+        // Clamp limit to prevent excessive memory allocation on worker side
+        int limit = Math.min(Math.max(taskInstanceLogPageQueryRequest.getLimit(), 1), MAX_LOG_QUERY_LIMIT);
+        int skipLineNum = Math.max(taskInstanceLogPageQueryRequest.getSkipLineNum(), 0);
         List<String> lines;
         try {
             lines = LogUtils.readPartFileContentFromLocal(
                     taskInstanceLogPageQueryRequest.getTaskInstanceLogAbsolutePath(),
-                    taskInstanceLogPageQueryRequest.getSkipLineNum(),
-                    taskInstanceLogPageQueryRequest.getLimit());
+                    skipLineNum,
+                    limit);
             taskInstanceLogPageQueryResponse.setLogContent(LogUtils.rollViewLogLines(lines));
         } catch (Exception e) {
             taskInstanceLogPageQueryResponse.setCode(LogResponseStatus.ERROR);

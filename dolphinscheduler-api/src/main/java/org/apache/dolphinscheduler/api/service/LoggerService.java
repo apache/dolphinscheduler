@@ -24,6 +24,11 @@ import org.apache.dolphinscheduler.dao.entity.User;
 public interface LoggerService {
 
     /**
+     * Maximum number of log lines that can be queried in a single request.
+     */
+    int MAX_LOG_QUERY_LIMIT = 10000;
+
+    /**
      * view log
      *
      * @param loginUser   login user

@@ -75,6 +75,9 @@ public class LoggerController extends BaseController {
                                             @RequestParam(value = "taskInstanceId") int taskInstanceId,
                                             @RequestParam(value = "skipLineNum") int skipNum,
                                             @RequestParam(value = "limit") int limit) {
+        // Clamp parameters to prevent excessive memory allocation
+        skipNum = Math.max(skipNum, 0);
+        limit = Math.min(Math.max(limit, 1), LoggerService.MAX_LOG_QUERY_LIMIT);
         return loggerService.queryLog(loginUser, taskInstanceId, skipNum, limit);
     }
 

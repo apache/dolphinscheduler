@@ -180,6 +180,10 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      * @return log string data
      */
     private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
+        // Defensive clamp: even if controller validation is bypassed
+        skipLineNum = Math.max(skipLineNum, 0);
+        limit = Math.min(Math.max(limit, 1), LoggerService.MAX_LOG_QUERY_LIMIT);
+
         final String logPath = taskInstance.getLogPath();
         log.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host: {}, logPath:{}",
                 taskInstance.getId(), taskInstance.getName(), taskInstance.getHost(), logPath);
