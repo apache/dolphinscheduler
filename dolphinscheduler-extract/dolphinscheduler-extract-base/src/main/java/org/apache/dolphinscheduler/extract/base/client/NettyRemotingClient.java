@@ -106,7 +106,8 @@ public class NettyRemotingClient implements AutoCloseable {
                                                 clientConfig.getHeartBeatIntervalMillis(),
                                                 0,
                                                 TimeUnit.MILLISECONDS))
-                                .addLast(new TransporterDecoder(), clientHandler, new TransporterEncoder());
+                                .addLast(new TransporterDecoder(clientConfig.getMaxFrameSize()),
+                                        clientHandler, new TransporterEncoder());
                     }
                 });
         isStarted.compareAndSet(false, true);

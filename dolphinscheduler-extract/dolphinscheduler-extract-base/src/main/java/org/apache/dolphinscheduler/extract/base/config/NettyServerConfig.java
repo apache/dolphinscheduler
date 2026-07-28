@@ -63,6 +63,13 @@ public class NettyServerConfig {
     private int workerThread = Runtime.getRuntime().availableProcessors() * 2;
 
     /**
+     * Maximum allowed frame size in bytes for a single RPC message (header + body).
+     * Frames exceeding this size will be rejected by the decoder to prevent OOM.
+     */
+    @Builder.Default
+    private int maxFrameSize = 64 * 1024 * 1024;
+
+    /**
      * If done's receive any data from a {@link io.netty.channel.Channel} during 180s then will close it.
      */
     @Builder.Default

@@ -24,13 +24,23 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.TooLongFrameException;
 import io.netty.handler.codec.ReplayingDecoder;
 
 @Slf4j
 public class TransporterDecoder extends ReplayingDecoder<TransporterDecoder.State> {
 
+    private static final int DEFAULT_MAX_FRAME_SIZE = 64 * 1024 * 1024;
+
+    private final int maxFrameSize;
+
     public TransporterDecoder() {
+        this(DEFAULT_MAX_FRAME_SIZE);
+    }
+
+    public TransporterDecoder(int maxFrameSize) {
         super(State.MAGIC);
+        this.maxFrameSize = maxFrameSize;
     }
 
     private int headerLength;
@@ -49,6 +59,10 @@ public class TransporterDecoder extends ReplayingDecoder<TransporterDecoder.Stat
                 checkpoint(State.HEADER_LENGTH);
             case HEADER_LENGTH:
                 headerLength = in.readInt();
+                if (headerLength < 0 || headerLength > maxFrameSize) {
+                    throw new TooLongFrameException(
+                            "Header length " + headerLength + " exceeds max frame size " + maxFrameSize);
+                }
                 checkpoint(State.HEADER);
             case HEADER:
                 header = new byte[headerLength];
@@ -56,6 +70,10 @@ public class TransporterDecoder extends ReplayingDecoder<TransporterDecoder.Stat
                 checkpoint(State.BODY_LENGTH);
             case BODY_LENGTH:
                 bodyLength = in.readInt();
+                if (bodyLength < 0 || bodyLength > maxFrameSize) {
+                    throw new TooLongFrameException(
+                            "Body length " + bodyLength + " exceeds max frame size " + maxFrameSize);
+                }
                 checkpoint(State.BODY);
             case BODY:
                 body = new byte[bodyLength];
