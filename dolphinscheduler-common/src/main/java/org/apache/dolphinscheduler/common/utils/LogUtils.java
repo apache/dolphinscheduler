@@ -19,14 +19,17 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,14 +43,33 @@ import ch.qos.logback.classic.LoggerContext;
 @Slf4j
 public class LogUtils {
 
+    /**
+     * Maximum response log size in bytes, used to truncate log content to prevent OOM.
+     */
+    public static final int MAX_RESPONSE_LOG_SIZE = 65535;
+
     public static byte[] getFileContentBytesFromLocal(String filePath) {
+        return getFileContentBytesFromLocal(filePath, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Read file content as byte array with a maximum size limit.
+     * If the file exceeds maxSize, only the first maxSize bytes are returned.
+     */
+    public static byte[] getFileContentBytesFromLocal(String filePath, int maxSize) {
         try (
                 InputStream in = new FileInputStream(filePath);
                 ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            byte[] buf = new byte[1024];
+            byte[] buf = new byte[8192];
             int len;
+            int totalRead = 0;
             while ((len = in.read(buf)) != -1) {
-                bos.write(buf, 0, len);
+                int toWrite = Math.min(len, maxSize - totalRead);
+                if (toWrite <= 0) {
+                    break;
+                }
+                bos.write(buf, 0, toWrite);
+                totalRead += toWrite;
             }
             return bos.toByteArray();
         } catch (IOException e) {
@@ -61,20 +83,43 @@ public class LogUtils {
         return getFileContentBytesFromLocal(filePath);
     }
 
+    /**
+     * Read part of a log file with early termination when accumulated byte size reaches MAX_RESPONSE_LOG_SIZE.
+     * This prevents loading the entire file into memory when only ~64KB is needed.
+     */
     public static List<String> readPartFileContentFromLocal(String filePath,
                                                             int skipLine,
                                                             int limit) {
         File file = new File(filePath);
-        if (file.exists() && file.isFile()) {
-            try (Stream<String> stream = Files.lines(Paths.get(filePath))) {
-                return stream.skip(skipLine).limit(limit).collect(Collectors.toList());
-            } catch (IOException e) {
-                log.error("read file error", e);
-                throw new RuntimeException(String.format("Read file: %s error", filePath), e);
-            }
-        } else {
+        if (!file.exists() || !file.isFile()) {
             throw new RuntimeException("The file path: " + filePath + " not exists");
         }
+        List<String> result = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(
+                new InputStreamReader(new FileInputStream(filePath), StandardCharsets.UTF_8))) {
+            // Skip lines
+            int skipped = 0;
+            while (skipped < skipLine && reader.readLine() != null) {
+                skipped++;
+            }
+            // Read lines with early termination based on accumulated byte size
+            int totalBytes = 0;
+            int read = 0;
+            String line;
+            while (read < limit && (line = reader.readLine()) != null) {
+                int lineBytes = line.getBytes(StandardCharsets.UTF_8).length;
+                if (totalBytes + lineBytes > MAX_RESPONSE_LOG_SIZE && read > 0) {
+                    break;
+                }
+                result.add(line);
+                totalBytes += lineBytes;
+                read++;
+            }
+        } catch (IOException e) {
+            log.error("read file error", e);
+            throw new RuntimeException(String.format("Read file: %s error", filePath), e);
+        }
+        return result;
     }
 
     public static List<String> readPartFileContentFromRemote(String filePath,
@@ -86,22 +131,21 @@ public class LogUtils {
 
     public static String rollViewLogLines(List<String> lines) {
         StringBuilder builder = new StringBuilder();
-        final int MaxResponseLogSize = 65535;
         int totalLogByteSize = 0;
         for (String line : lines) {
             // If a single line of log is exceed max response size, cut off the line
             final int lineByteSize = line.getBytes(StandardCharsets.UTF_8).length;
-            if (lineByteSize >= MaxResponseLogSize) {
-                builder.append(line, 0, MaxResponseLogSize)
+            if (lineByteSize >= MAX_RESPONSE_LOG_SIZE) {
+                builder.append(line, 0, MAX_RESPONSE_LOG_SIZE)
                         .append(" [this line's size ").append(lineByteSize).append(" bytes is exceed ")
-                        .append(MaxResponseLogSize).append(" bytes, so only ")
-                        .append(MaxResponseLogSize).append(" characters are reserved for performance reasons.]")
+                        .append(MAX_RESPONSE_LOG_SIZE).append(" bytes, so only ")
+                        .append(MAX_RESPONSE_LOG_SIZE).append(" characters are reserved for performance reasons.]")
                         .append("\r\n");
             } else {
                 builder.append(line).append("\r\n");
             }
             totalLogByteSize += lineByteSize;
-            if (totalLogByteSize >= MaxResponseLogSize) {
+            if (totalLogByteSize >= MAX_RESPONSE_LOG_SIZE) {
                 break;
             }
         }
