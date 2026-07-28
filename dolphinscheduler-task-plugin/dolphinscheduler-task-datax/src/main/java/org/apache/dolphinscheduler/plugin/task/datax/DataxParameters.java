@@ -33,6 +33,8 @@ import java.util.Objects;
 
 import lombok.Data;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 /**
  * DataX parameter
  */
@@ -118,10 +120,28 @@ public class DataxParameters extends AbstractParameters {
                     && StringUtils.isNotEmpty(targetTable);
         } else {
             // Custom config is valid with either inline json or an attached resource file
-            // carrying the job definition (issue #18389). "{}" is the UI placeholder and
-            // does not count as an inline definition.
-            boolean hasInlineJson = StringUtils.isNotBlank(json) && !"{}".equals(json.trim());
-            return hasInlineJson || CollectionUtils.isNotEmpty(resourceList);
+            // carrying the job definition (issue #18389).
+            return !isInlineJsonAbsent() || CollectionUtils.isNotEmpty(resourceList);
+        }
+    }
+
+    /**
+     * Returns true when the json field carries no usable inline job definition. The UI
+     * historically stored an empty object placeholder in the json field, so a blank value
+     * and any semantically empty JSON object (for example {@code {}}, {@code { }} or a
+     * formatted multi-line empty object) are all treated as absent (issue #18389).
+     */
+    public boolean isInlineJsonAbsent() {
+        if (StringUtils.isBlank(json)) {
+            return true;
+        }
+        try {
+            ObjectNode node = JSONUtils.parseObject(json);
+            return node == null || node.isEmpty();
+        } catch (Exception e) {
+            // not parseable as a JSON object, so there is inline content: downstream
+            // validation reports the malformed definition
+            return false;
         }
     }
 

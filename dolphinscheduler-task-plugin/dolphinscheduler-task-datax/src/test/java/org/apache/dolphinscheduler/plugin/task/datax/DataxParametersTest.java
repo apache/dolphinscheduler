@@ -39,19 +39,52 @@ public class DataxParametersTest {
         withInlineJson.setJson("{\"job\":{}}");
         Assertions.assertTrue(withInlineJson.checkParameters());
 
-        // an attached resource file is a valid alternative to inline json (issue #18389)
-        DataxParameters withResourceFile = new DataxParameters();
-        withResourceFile.setCustomConfig(1);
-        ResourceInfo resource = new ResourceInfo();
-        resource.setResourceName("/datax/job.json");
-        List<ResourceInfo> resources = new ArrayList<>();
-        resources.add(resource);
-        withResourceFile.setResourceList(resources);
-        Assertions.assertTrue(withResourceFile.checkParameters());
+        // a blank json field or any semantically empty JSON object is no inline
+        // definition: invalid without a resource file, valid with one because the
+        // resource then carries the job definition (issue #18389)
+        String[] absentJsonVariants = {null, "", "   ", "{}", "{ }", "{\n\n}", " { } "};
+        for (String variant : absentJsonVariants) {
+            DataxParameters withoutResource = new DataxParameters();
+            withoutResource.setCustomConfig(1);
+            withoutResource.setJson(variant);
+            Assertions.assertTrue(withoutResource.isInlineJsonAbsent(),
+                    "expected inline json to be absent for: [" + variant + "]");
+            Assertions.assertFalse(withoutResource.checkParameters(),
+                    "expected invalid without resource for json: [" + variant + "]");
+
+            DataxParameters withResource = new DataxParameters();
+            withResource.setCustomConfig(1);
+            withResource.setJson(variant);
+            withResource.setResourceList(buildResourceList());
+            Assertions.assertTrue(withResource.checkParameters(),
+                    "expected valid with resource for json: [" + variant + "]");
+        }
+
+        // a non-empty inline definition stays inline even when a resource is attached
+        DataxParameters inlineWithResource = new DataxParameters();
+        inlineWithResource.setCustomConfig(1);
+        inlineWithResource.setJson("{\"job\":{}}");
+        inlineWithResource.setResourceList(buildResourceList());
+        Assertions.assertFalse(inlineWithResource.isInlineJsonAbsent());
+        Assertions.assertTrue(inlineWithResource.checkParameters());
+
+        // malformed json is not treated as absent, downstream validation reports it
+        DataxParameters malformed = new DataxParameters();
+        malformed.setCustomConfig(1);
+        malformed.setJson("{invalid");
+        Assertions.assertFalse(malformed.isInlineJsonAbsent());
 
         DataxParameters withNeither = new DataxParameters();
         withNeither.setCustomConfig(1);
         Assertions.assertFalse(withNeither.checkParameters());
+    }
+
+    private List<ResourceInfo> buildResourceList() {
+        ResourceInfo resource = new ResourceInfo();
+        resource.setResourceName("/datax/job.json");
+        List<ResourceInfo> resources = new ArrayList<>();
+        resources.add(resource);
+        return resources;
     }
 
     @Test

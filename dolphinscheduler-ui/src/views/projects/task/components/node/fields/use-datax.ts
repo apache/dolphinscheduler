@@ -214,6 +214,18 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
           if (!utils.isJson(model.json)) {
             return new Error(t('project.node.json_format_tips'))
           }
+          // A semantically empty object ({}, { }, formatted) is the historical UI
+          // placeholder and does not count as an inline definition. Same rule as
+          // DataxParameters.isInlineJsonAbsent on the backend.
+          const parsed = JSON.parse(model.json)
+          const isEmptyObject =
+            parsed !== null &&
+            typeof parsed === 'object' &&
+            !Array.isArray(parsed) &&
+            Object.keys(parsed).length === 0
+          if (isEmptyObject && !hasResource) {
+            return new Error(t('project.node.sql_empty_tips'))
+          }
         }
       }
     },

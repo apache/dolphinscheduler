@@ -275,7 +275,8 @@ public class DataxTaskTest {
 
     @Test
     public void testCustomConfigReadsJobDefinitionFromResourceFile() throws Exception {
-        // a real resource file carrying the job definition, with the UI placeholder "{}" inline
+        // a real resource file carrying the job definition, with a formatted empty object
+        // placeholder inline (the semantic-absence rule, not a literal "{}" compare)
         String resourceJson = "{\"job\":{\"content\":[{\"reader\":{\"name\":\"mysqlreader\"}}]}}";
         File resourceFile = File.createTempFile("datax-job", ".json");
         resourceFile.deleteOnExit();
@@ -284,7 +285,7 @@ public class DataxTaskTest {
 
         DataxParameters parameters = new DataxParameters();
         parameters.setCustomConfig(1);
-        parameters.setJson("{}");
+        parameters.setJson("{\n  \n}");
         parameters.setXms(1);
         parameters.setXmx(1);
         ResourceInfo resourceInfo = new ResourceInfo();
