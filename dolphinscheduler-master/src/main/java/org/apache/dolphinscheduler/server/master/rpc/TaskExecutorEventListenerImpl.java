@@ -126,10 +126,12 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
 
             if (taskExecutorSuccessLifecycleEvent.isNeedAlert()) {
                 TaskAlertInfo taskAlertInfo = taskExecutorSuccessLifecycleEvent.getTaskAlertInfo();
-                workflowAlertManager.sendTaskResultAlert(
-                        taskAlertInfo,
-                        taskExecution.getTaskExecutionContext().getProjectCode(),
-                        taskExecution.getTaskExecutionContext().getWorkflowInstanceId());
+                if (taskAlertInfo != null) {
+                    workflowAlertManager.sendTaskResultAlert(
+                            taskAlertInfo,
+                            taskExecution.getTaskExecutionContext().getProjectCode(),
+                            taskExecution.getTaskExecutionContext().getWorkflowInstanceId());
+                }
             }
         } finally {
             LogUtils.removeWorkflowInstanceIdMDC();

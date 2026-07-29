@@ -31,4 +31,5 @@ public class TaskAlertInfo {
     private Integer alertGroupId;
 
     private AlertType alertType;
+
 }
