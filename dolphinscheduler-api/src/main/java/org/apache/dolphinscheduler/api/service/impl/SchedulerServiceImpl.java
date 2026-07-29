@@ -32,11 +32,14 @@ import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
 import org.apache.dolphinscheduler.api.vo.ScheduleVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.MisfirePolicy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.ScheduleTriggerType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.IntervalSchedule;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -52,6 +55,7 @@ import org.apache.dolphinscheduler.service.exceptions.CronParseException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -167,11 +171,16 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
-        if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
+        if (!isValidScheduleExpression(scheduleParam)) {
             log.error("Schedule crontab verify failure, crontab:{}.", scheduleParam.getCrontab());
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
         }
         scheduleObj.setCrontab(scheduleParam.getCrontab());
+        scheduleObj.setMisfirePolicy(scheduleParam.getMisfirePolicy() == null
+                ? MisfirePolicy.IGNORE_MISFIRES
+                : scheduleParam.getMisfirePolicy());
+        scheduleObj.setTriggerType(
+                scheduleParam.getTriggerType() == null ? ScheduleTriggerType.CRON : scheduleParam.getTriggerType());
         scheduleObj.setTimezoneId(scheduleParam.getTimezoneId());
         scheduleObj.setWarningType(warningType);
         scheduleObj.setWarningGroupId(warningGroupId);
@@ -387,6 +396,20 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         ZonedDateTime startTime = ZonedDateTime.ofInstant(scheduleParam.getStartTime().toInstant(), zoneId);
         ZonedDateTime endTime = ZonedDateTime.ofInstant(scheduleParam.getEndTime().toInstant(), zoneId);
         startTime = now.isAfter(startTime) ? now : startTime;
+        if (scheduleParam.getTriggerType() == ScheduleTriggerType.INTERVAL) {
+            IntervalSchedule intervalSchedule = IntervalSchedule.parse(scheduleParam.getCrontab());
+            List<ZonedDateTime> fireTimes = new ArrayList<>();
+            int executionLimit = intervalSchedule.getRepeatCount() < 0
+                    ? Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT
+                    : Math.min(intervalSchedule.getRepeatCount() + 1, Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT);
+            for (int i = 0; i < executionLimit && !startTime.isAfter(endTime); i++) {
+                fireTimes.add(startTime);
+                startTime = startTime.plus(Duration.ofMillis(intervalSchedule.getIntervalMilliseconds()));
+            }
+            return fireTimes.stream()
+                    .map(t -> DateUtils.dateToString(t, zoneId))
+                    .collect(Collectors.toList());
+        }
 
         try {
             cron = CronUtils.parse2Cron(scheduleParam.getCrontab());
@@ -401,6 +424,20 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 .collect(Collectors.toList());
     }
 
+    private boolean isValidScheduleExpression(ScheduleParam scheduleParam) {
+        ScheduleTriggerType triggerType = scheduleParam.getTriggerType() == null
+                ? ScheduleTriggerType.CRON
+                : scheduleParam.getTriggerType();
+        if (triggerType == ScheduleTriggerType.CRON) {
+            return CronUtils.isValidExpression(scheduleParam.getCrontab());
+        }
+        try {
+            IntervalSchedule.parse(scheduleParam.getCrontab());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
     /**
      * update workflow definition schedule
      *
@@ -552,11 +589,16 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
             schedule.setStartTime(scheduleParam.getStartTime());
             schedule.setEndTime(scheduleParam.getEndTime());
-            if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
+            if (!isValidScheduleExpression(scheduleParam)) {
                 log.error("Schedule crontab verify failure, crontab:{}.", scheduleParam.getCrontab());
                 throw new ServiceException(Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
             }
             schedule.setCrontab(scheduleParam.getCrontab());
+            schedule.setMisfirePolicy(scheduleParam.getMisfirePolicy() == null
+                    ? MisfirePolicy.IGNORE_MISFIRES
+                    : scheduleParam.getMisfirePolicy());
+            schedule.setTriggerType(
+                    scheduleParam.getTriggerType() == null ? ScheduleTriggerType.CRON : scheduleParam.getTriggerType());
             schedule.setTimezoneId(scheduleParam.getTimezoneId());
         }
 

@@ -135,6 +135,8 @@ export const useForm = () => {
         new Date(year + 100, month, day)
       ],
       crontab: '0 0 * * * ? *',
+      triggerType: 'CRON',
+      misfirePolicy: 'IGNORE_MISFIRES',
       timezoneId: Intl.DateTimeFormat().resolvedOptions().timeZone,
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
