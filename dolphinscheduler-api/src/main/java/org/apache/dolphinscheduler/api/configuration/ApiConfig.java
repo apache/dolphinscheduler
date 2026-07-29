@@ -45,6 +45,12 @@ public class ApiConfig implements Validator {
     private String uiUrl;
     private boolean auditEnable = false;
 
+    /**
+     * Maximum number of log lines that can be queried in a single request.
+     * Used by LoggerController/LoggerServiceImpl to clamp the limit parameter.
+     */
+    private int maxLogQueryLimit = 10000;
+
     private TrafficConfiguration trafficControl = new TrafficConfiguration();
 
     private PythonGatewayConfiguration pythonGateway = new PythonGatewayConfiguration();
@@ -70,6 +76,7 @@ public class ApiConfig implements Validator {
         log.info("API config: baseUrl -> {} ", baseUrl);
         log.info("API config: uiUrl -> {} ", uiUrl);
         log.info("API config: auditEnable -> {} ", auditEnable);
+        log.info("API config: maxLogQueryLimit -> {} ", maxLogQueryLimit);
         log.info("API config: trafficControl -> {} ", trafficControl);
         log.info("API config: pythonGateway -> {} ", pythonGateway);
     }

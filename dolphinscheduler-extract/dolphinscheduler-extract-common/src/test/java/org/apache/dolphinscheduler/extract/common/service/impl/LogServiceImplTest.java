@@ -35,6 +35,7 @@ class LogServiceImplTest {
     @BeforeEach
     void setUp() throws IOException {
         logService = new LogServiceImpl();
+        logService.setMaxLogQueryLimit(10000);
 
         // Create a 100-line test file
         testLogFile = Files.createTempFile("ds-logservice-test", ".log");
@@ -159,5 +160,51 @@ class LogServiceImplTest {
 
         assertEquals(LogResponseStatus.ERROR, response.getCode(),
                 "Should return ERROR for non-existent file");
+    }
+
+    /**
+     * Verify that a custom maxLogQueryLimit is respected.
+     */
+    @Test
+    void pageQueryTaskInstanceLog_customLimit() {
+        logService.setMaxLogQueryLimit(5);
+
+        TaskInstanceLogPageQueryRequest request = TaskInstanceLogPageQueryRequest.builder()
+                .taskInstanceId(1)
+                .taskInstanceLogAbsolutePath(testLogFile.toString())
+                .skipLineNum(0)
+                .limit(Integer.MAX_VALUE)
+                .build();
+
+        TaskInstanceLogPageQueryResponse response =
+                logService.pageQueryTaskInstanceLog(request);
+
+        assertEquals(LogResponseStatus.SUCCESS, response.getCode(),
+                "Should succeed with custom limit");
+        // With limit=5 and 100 lines available, should only get 5 lines worth of content
+        // (well within 64KB so all 5 lines should be present)
+        String content = response.getLogContent();
+        assertTrue(content.contains("line-000"), "Should contain line 0");
+        assertTrue(content.contains("line-004"), "Should contain line 4");
+    }
+
+    /**
+     * Verify that default maxLogQueryLimit is 10000.
+     */
+    @Test
+    void defaultMaxLogQueryLimitIs10000() {
+        LogServiceImpl service = new LogServiceImpl();
+        // With default limit, requesting 100 lines should return all 100
+        TaskInstanceLogPageQueryRequest request = TaskInstanceLogPageQueryRequest.builder()
+                .taskInstanceId(1)
+                .taskInstanceLogAbsolutePath(testLogFile.toString())
+                .skipLineNum(0)
+                .limit(100)
+                .build();
+
+        TaskInstanceLogPageQueryResponse response = service.pageQueryTaskInstanceLog(request);
+        assertEquals(LogResponseStatus.SUCCESS, response.getCode());
+        assertTrue(response.getLogContent().contains("line-099"),
+                "All 100 lines should be returned with default limit of 10000");
     }
 }

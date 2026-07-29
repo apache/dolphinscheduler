@@ -23,6 +23,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.logging.LogClientDelegate;
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -67,6 +68,9 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
     @Autowired
     private LogClientDelegate logClientDelegate;
+
+    @Autowired
+    private ApiConfig apiConfig;
 
     /**
      * view log
@@ -182,7 +186,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
         // Defensive clamp: even if controller validation is bypassed
         skipLineNum = Math.max(skipLineNum, 0);
-        limit = Math.min(Math.max(limit, 1), LoggerService.MAX_LOG_QUERY_LIMIT);
+        limit = Math.min(Math.max(limit, 1), apiConfig.getMaxLogQueryLimit());
 
         final String logPath = taskInstance.getLogPath();
         log.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host: {}, logPath:{}",

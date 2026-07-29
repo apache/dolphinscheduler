@@ -32,7 +32,11 @@ import java.util.List;
 
 public class LogServiceImpl implements ILogService {
 
-    private static final int MAX_LOG_QUERY_LIMIT = 10000;
+    protected int maxLogQueryLimit = 10000;
+
+    public void setMaxLogQueryLimit(int maxLogQueryLimit) {
+        this.maxLogQueryLimit = maxLogQueryLimit;
+    }
 
     /**
      * Downloads the entire log file for a task instance.
@@ -66,7 +70,7 @@ public class LogServiceImpl implements ILogService {
         final TaskInstanceLogPageQueryResponse taskInstanceLogPageQueryResponse =
                 new TaskInstanceLogPageQueryResponse();
         // Clamp limit to prevent excessive memory allocation on worker side
-        int limit = Math.min(Math.max(taskInstanceLogPageQueryRequest.getLimit(), 1), MAX_LOG_QUERY_LIMIT);
+        int limit = Math.min(Math.max(taskInstanceLogPageQueryRequest.getLimit(), 1), maxLogQueryLimit);
         int skipLineNum = Math.max(taskInstanceLogPageQueryRequest.getSkipLineNum(), 0);
         List<String> lines;
         try {
