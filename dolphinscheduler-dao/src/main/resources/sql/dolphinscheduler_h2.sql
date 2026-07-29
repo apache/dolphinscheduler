@@ -858,6 +858,8 @@ CREATE TABLE t_ds_schedules
     end_time                  datetime     NOT NULL,
     timezone_id               varchar(40) DEFAULT NULL,
     crontab                   varchar(255) NOT NULL,
+    misfire_policy            tinyint NOT NULL DEFAULT 2,
+    trigger_type              tinyint NOT NULL DEFAULT 0,
     failure_strategy          tinyint(4) NOT NULL,
     user_id                   int(11) NOT NULL,
     release_state             tinyint(4) NOT NULL,
