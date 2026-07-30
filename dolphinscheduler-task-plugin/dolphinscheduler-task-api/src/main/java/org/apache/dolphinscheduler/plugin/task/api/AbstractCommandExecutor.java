@@ -53,7 +53,7 @@ import io.fabric8.kubernetes.client.dsl.LogWatch;
 @Slf4j
 public abstract class AbstractCommandExecutor {
 
-    protected volatile Map<String, String> taskOutputParams = new HashMap<>();
+    protected volatile Map taskOutputParams = new HashMap<>();
     private Process process;
 
     protected TaskExecutionContext taskRequest;
@@ -101,10 +101,10 @@ public abstract class AbstractCommandExecutor {
         process = iShellInterceptor.execute();
 
         // parse process output
-        final CompletableFuture<Void> collectProcessLogFuture = collectProcessLog(this.process);
+        final CompletableFuture collectProcessLogFuture = collectProcessLog(this.process);
 
         // collect pod log
-        final Optional<CompletableFuture<?>> collectPodLogFuture = collectPodLogIfNeeded();
+        final Optional> collectPodLogFuture = collectPodLogIfNeeded();
 
         int processId = getProcessId(this.process);
 
@@ -161,30 +161,31 @@ public abstract class AbstractCommandExecutor {
 
     }
 
-    public Map<String, String> getTaskOutputParams() {
+    public Map getTaskOutputParams() {
         return taskOutputParams;
     }
 
     public void cancelApplication() throws InterruptedException {
         if (process == null) {
-            return;
-        }
-
-        // Try to kill process tree
-        boolean killed = ProcessUtils.kill(taskRequest);
-        if (killed) {
-            log.info("Process tree for task: {} is killed or already finished, pid: {}",
-                    taskRequest.getTaskAppId(), taskRequest.getProcessId());
+            log.warn("Process is null for task: {}, skip process tree kill, but still try to cancel application",
+                    taskRequest.getTaskAppId());
         } else {
-            log.error("Failed to kill process tree for task: {}, pid: {}",
-                    taskRequest.getTaskAppId(), taskRequest.getProcessId());
+            // Try to kill process tree
+            boolean killed = ProcessUtils.kill(taskRequest);
+            if (killed) {
+                log.info("Process tree for task: {} is killed or already finished, pid: {}",
+                        taskRequest.getTaskAppId(), taskRequest.getProcessId());
+            } else {
+                log.error("Failed to kill process tree for task: {}, pid: {}",
+                        taskRequest.getTaskAppId(), taskRequest.getProcessId());
+            }
         }
 
-        // Try to kill yarn or k8s application
+        // Always try to kill yarn or k8s application, even if process is null
         ProcessUtils.cancelApplication(taskRequest);
     }
 
-    private Optional<CompletableFuture<?>> collectPodLogIfNeeded() {
+    private Optional> collectPodLogIfNeeded() {
         if (null == taskRequest.getK8sTaskExecutionContext()) {
             return Optional.empty();
         }
@@ -192,7 +193,7 @@ public abstract class AbstractCommandExecutor {
         ExecutorService collectPodLogExecutorService = ThreadUtils
                 .newSingleDaemonScheduledExecutorService("CollectPodLogOutput-thread-" + taskRequest.getTaskName());
 
-        final CompletableFuture<Void> collectPodLogFuture = CompletableFuture.runAsync(() -> {
+        final CompletableFuture collectPodLogFuture = CompletableFuture.runAsync(() -> {
             // wait for launching (driver) pod
             ThreadUtils.sleep(SLEEP_TIME_MILLIS * 5L);
             try (
@@ -218,11 +219,11 @@ public abstract class AbstractCommandExecutor {
         return Optional.of(collectPodLogFuture);
     }
 
-    private CompletableFuture<Void> collectProcessLog(Process process) {
+    private CompletableFuture collectProcessLog(Process process) {
         // todo: remove this this thread pool.
         final ExecutorService collectProcessLogService = ThreadUtils.newSingleDaemonScheduledExecutorService(
                 "ResolveOutputLog-thread-" + taskRequest.getTaskName());
-        final CompletableFuture<Void> collectProcessLogFuture = CompletableFuture.runAsync(() -> {
+        final CompletableFuture collectProcessLogFuture = CompletableFuture.runAsync(() -> {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
