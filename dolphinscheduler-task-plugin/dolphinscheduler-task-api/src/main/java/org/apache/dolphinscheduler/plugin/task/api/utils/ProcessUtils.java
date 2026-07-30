@@ -243,7 +243,30 @@ public final class ProcessUtils {
             // If the command executes successfully, the process exists
             return true;
         } catch (Exception e) {
-            // If the command fails, the process does not exist
+            // kill -0 may fail with non-zero stderr when the shell profile emits
+            // readonly variable warnings (ExitCodeException with exitCode 0).
+            if (e instanceof java.io.IOException) {
+                java.io.IOException ioe = (java.io.IOException) e;
+                if (e.getClass().getSimpleName().equals("ExitCodeException")) {
+                    try {
+                        int ec = e.getClass().getDeclaredField("exitCode").getInt(e);
+                        if (ec == 0) {
+                            return true;
+                        }
+                    } catch (Exception ignore) {
+                        // fall through
+                    }
+                }
+            }
+            // kill -0 may fail with "Operation not permitted" when the process exists
+            // but the current user does not have permission to signal it (e.g., root-owned
+            // sudo parent process). In this case, the process is still alive.
+            String message = e.getMessage();
+            if (message != null && message.contains("not permitted")) {
+                return true;
+            }
+            // If the command fails for other reasons (e.g., "No such process"),
+            // the process does not exist
             return false;
         }
     }
