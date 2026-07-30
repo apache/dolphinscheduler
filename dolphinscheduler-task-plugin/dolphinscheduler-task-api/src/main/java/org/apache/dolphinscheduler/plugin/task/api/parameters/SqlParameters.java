@@ -39,6 +39,7 @@ import java.util.Set;
 
 import lombok.Data;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.google.common.collect.Lists;
 
 /**
@@ -76,15 +77,6 @@ public class SqlParameters extends AbstractParameters {
     private int displayRows;
 
     /**
-     * show type
-     * 0 TABLE
-     * 1 TEXT
-     * 2 attachment
-     * 3 TABLE+attachment
-     */
-    private String showType;
-
-    /**
      * SQL connection parameters
      */
     private String connParams;
@@ -94,6 +86,7 @@ public class SqlParameters extends AbstractParameters {
     /**
      * Whether to send alert for SQL query result
      */
+    @JsonAlias("sendEmail")
     private Boolean sendAlert;
 
     /**
@@ -187,7 +180,6 @@ public class SqlParameters extends AbstractParameters {
                 + ", sendAlert=" + sendAlert
                 + ", displayRows=" + displayRows
                 + ", limit=" + limit
-                + ", showType='" + showType + '\''
                 + ", connParams='" + connParams + '\''
                 + ", groupId='" + groupId + '\''
                 + ", title='" + title + '\''

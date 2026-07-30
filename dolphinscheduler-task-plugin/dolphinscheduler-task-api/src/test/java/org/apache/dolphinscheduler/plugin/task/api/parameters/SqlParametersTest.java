@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -42,7 +43,6 @@ public class SqlParametersTest {
     private final int sqlType = 0;
     private final Boolean sendAlert = true;
     private final int displayRows = 10;
-    private final String showType = "TABLE";
     private final String title = "sql test";
     private final int groupId = 0;
 
@@ -65,7 +65,6 @@ public class SqlParametersTest {
         sqlParameters.setSqlType(sqlType);
         sqlParameters.setSendAlert(sendAlert);
         sqlParameters.setDisplayRows(displayRows);
-        sqlParameters.setShowType(showType);
         sqlParameters.setTitle(title);
         sqlParameters.setGroupId(groupId);
 
@@ -75,7 +74,6 @@ public class SqlParametersTest {
         Assertions.assertEquals(sqlType, sqlParameters.getSqlType());
         Assertions.assertEquals(sendAlert, sqlParameters.getSendAlert());
         Assertions.assertEquals(displayRows, sqlParameters.getDisplayRows());
-        Assertions.assertEquals(showType, sqlParameters.getShowType());
         Assertions.assertEquals(title, sqlParameters.getTitle());
         Assertions.assertEquals(groupId, sqlParameters.getGroupId());
 
@@ -144,5 +142,29 @@ public class SqlParametersTest {
         SQLTaskExecutionContext ctx = p.generateExtendedContext(helper);
         Assertions.assertNotNull(ctx);
         Assertions.assertEquals("conn_params", ctx.getConnectionParams());
+    }
+
+    @Test
+    public void testJsonAlias_sendEmail_backwardCompatibility() {
+        String jsonWithSendEmail = "{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select 1\",\"sqlType\":0,"
+                + "\"sendEmail\":true,\"displayRows\":10,\"groupId\":2,\"title\":\"test alert\"}";
+
+        SqlParameters params = JSONUtils.parseObject(jsonWithSendEmail, SqlParameters.class);
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(Boolean.TRUE, params.getSendAlert());
+        Assertions.assertEquals(2, params.getGroupId());
+        Assertions.assertEquals("test alert", params.getTitle());
+    }
+
+    @Test
+    public void testJson_newFieldName_sendAlert() {
+        String jsonWithSendAlert = "{\"type\":\"MYSQL\",\"datasource\":1,\"sql\":\"select 1\",\"sqlType\":0,"
+                + "\"sendAlert\":true,\"displayRows\":10,\"groupId\":3,\"title\":\"new alert\"}";
+
+        SqlParameters params = JSONUtils.parseObject(jsonWithSendAlert, SqlParameters.class);
+        Assertions.assertNotNull(params);
+        Assertions.assertEquals(Boolean.TRUE, params.getSendAlert());
+        Assertions.assertEquals(3, params.getGroupId());
+        Assertions.assertEquals("new alert", params.getTitle());
     }
 }

@@ -124,12 +124,11 @@ public class SqlTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         log.info("Full sql parameters: {}", sqlParameters);
         log.info(
-                "sql type : {}, datasource : {}, sql : {} , localParams : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
+                "sql type : {}, datasource : {}, sql : {} , localParams : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
                 sqlParameters.getSql(),
                 sqlParameters.getLocalParams(),
-                sqlParameters.getShowType(),
                 sqlParameters.getConnParams(),
                 sqlParameters.getVarPool(),
                 sqlParameters.getLimit());
@@ -292,24 +291,7 @@ public class SqlTask extends AbstractTask {
                 : JSONUtils.toJsonString(resultJSONArray);
 
         if (Boolean.TRUE.equals(sqlParameters.getSendAlert())) {
-            // Truncate alert content to avoid oversized payload when query result is large
-            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
-                    : TaskConstants.DEFAULT_DISPLAY_ROWS;
-            String alertContent;
-            if (resultJSONArray.size() > displayRows) {
-                ArrayNode truncatedArray = JSONUtils.createArrayNode();
-                for (int i = 0; i < Math.min(displayRows, resultJSONArray.size()); i++) {
-                    truncatedArray.add(resultJSONArray.get(i));
-                }
-                alertContent = JSONUtils.toJsonString(truncatedArray);
-                log.debug("Alert content truncated to {} rows", displayRows);
-            } else {
-                alertContent = result;
-            }
-
-            prepareTaskResultAlert(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
-                    ? sqlParameters.getTitle()
-                    : taskExecutionContext.getTaskName() + " query result sets", alertContent);
+            prepareTaskResultAlert(resultJSONArray);
         }
         log.debug("execute sql result : {}", result);
         return result;
@@ -336,18 +318,28 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * Prepare task result alert info
+     * Prepare task result alert info.
+     * Truncate the alert content to displayRows to avoid oversized RPC payload.
      *
-     * @param alertGroupId alert group id
-     * @param title   alert title
-     * @param content alert content
+     * @param resultJSONArray the full query result JSON array
      */
-    private void prepareTaskResultAlert(int alertGroupId, String title, String content) {
+    private void prepareTaskResultAlert(ArrayNode resultJSONArray) {
         TaskAlertInfo taskAlertInfo = new TaskAlertInfo();
-        taskAlertInfo.setAlertGroupId(alertGroupId);
-        taskAlertInfo.setContent(content);
-        taskAlertInfo.setTitle(title);
+        taskAlertInfo.setAlertGroupId(sqlParameters.getGroupId());
+        taskAlertInfo.setTitle(StringUtils.isNotEmpty(sqlParameters.getTitle())
+                ? sqlParameters.getTitle()
+                : taskExecutionContext.getTaskName() + " query result sets");
+        // Truncate content to displayRows to avoid oversized RPC payload
+        int alertRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
+                : TaskConstants.DEFAULT_DISPLAY_ROWS;
+        alertRows = Math.min(alertRows, resultJSONArray.size());
+        ArrayNode alertContent = JSONUtils.createArrayNode();
+        for (int i = 0; i < alertRows; i++) {
+            alertContent.add(resultJSONArray.get(i));
+        }
+        taskAlertInfo.setContent(JSONUtils.toJsonString(alertContent));
         taskAlertInfo.setAlertType(AlertType.TASK_RESULT);
+
         taskExecutionContext.setNeedAlert(true);
         taskExecutionContext.setTaskAlertInfo(taskAlertInfo);
     }
