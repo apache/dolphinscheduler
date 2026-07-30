@@ -291,7 +291,10 @@ public class SqlTask extends AbstractTask {
                 : JSONUtils.toJsonString(resultJSONArray);
 
         if (Boolean.TRUE.equals(sqlParameters.getSendAlert())) {
+            log.info("SendAlert is enabled, preparing task result alert");
             prepareTaskResultAlert(resultJSONArray);
+        } else {
+            log.info("SendAlert is not enabled, skip task result alert");
         }
         log.debug("execute sql result : {}", result);
         return result;
@@ -342,6 +345,9 @@ public class SqlTask extends AbstractTask {
 
         taskExecutionContext.setNeedAlert(true);
         taskExecutionContext.setTaskAlertInfo(taskAlertInfo);
+        log.info("Prepare task result alert: title={}, alertGroupId={}, alertType={}, totalRows={}, alertRows={}",
+                taskAlertInfo.getTitle(), taskAlertInfo.getAlertGroupId(), taskAlertInfo.getAlertType(),
+                resultJSONArray.size(), alertRows);
     }
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
