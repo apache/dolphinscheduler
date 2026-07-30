@@ -105,7 +105,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     }
 
     @Override
-    public void start() {
+    public synchronized void start() {
         if (jdbcRegistryServerState != JdbcRegistryServerState.INIT) {
             // The server is already started or stopped, will not start again.
             return;
@@ -167,7 +167,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     }
 
     @Override
-    public JdbcRegistryServerState getServerState() {
+    public synchronized JdbcRegistryServerState getServerState() {
         return jdbcRegistryServerState;
     }
 
@@ -271,7 +271,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
 
     private void purgeInvalidJdbcRegistryMetadata() {
         final StopWatch stopWatch = StopWatch.createStarted();
-        if (jdbcRegistryServerState == JdbcRegistryServerState.STOPPED) {
+        if (getServerState() == JdbcRegistryServerState.STOPPED) {
             return;
         }
         // remove the client which is already dead from the registry, and remove it's related data and lock.
@@ -323,10 +323,11 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         if (CollectionUtils.isEmpty(jdbcRegistryClients)) {
             return;
         }
-        if (jdbcRegistryServerState == JdbcRegistryServerState.STOPPED
-                || jdbcRegistryServerState == JdbcRegistryServerState.DISCONNECTED) {
+        JdbcRegistryServerState currentState = getServerState();
+        if (currentState == JdbcRegistryServerState.STOPPED
+                || currentState == JdbcRegistryServerState.DISCONNECTED) {
             log.warn("The JdbcRegistryServer is {}, will not refresh clients: {} heartbeat.",
-                    jdbcRegistryServerState,
+                    currentState,
                     CollectionUtils.collect(jdbcRegistryClients, IJdbcRegistryClient::getJdbcRegistryClientIdentify));
             return;
         }
@@ -347,30 +348,25 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 clone.setLastHeartbeatTime(now);
                 if (!jdbcRegistryClientRepository.updateById(clone)) {
                     log.error("The client heartbeat has expired: {}", jdbcRegistryClientHeartbeatDTO.getId());
-                    if (transitionToDisconnected()) {
-                        doTriggerOnDisConnectedListener();
-                    }
+                    transitionToDisconnected();
                     return;
                 }
                 jdbcRegistryClientHeartbeatDTO.setLastHeartbeatTime(clone.getLastHeartbeatTime());
             }
-            if (jdbcRegistryServerState == JdbcRegistryServerState.SUSPENDED) {
-                jdbcRegistryServerState = JdbcRegistryServerState.STARTED;
-                doTriggerReconnectedListener();
-            }
+            transitionToStarted();
             lastSuccessHeartbeat = now;
             log.debug("Success refresh clients: {} heartbeat.",
                     CollectionUtils.collect(jdbcRegistryClients, IJdbcRegistryClient::getJdbcRegistryClientIdentify));
         } catch (Exception ex) {
             log.error("Failed to refresh the client's term", ex);
-            switch (jdbcRegistryServerState) {
+            switch (getServerState()) {
                 case STARTED:
-                    jdbcRegistryServerState = JdbcRegistryServerState.SUSPENDED;
+                    transitionToSuspended();
                     break;
                 case SUSPENDED:
                     if (System.currentTimeMillis() - lastSuccessHeartbeat > jdbcRegistryProperties.getSessionTimeout()
-                            .toMillis() && transitionToDisconnected()) {
-                        doTriggerOnDisConnectedListener();
+                            .toMillis()) {
+                        transitionToDisconnected();
                     }
                     break;
                 default:
@@ -379,13 +375,28 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         }
     }
 
-    private synchronized boolean transitionToDisconnected() {
+    private synchronized void transitionToStarted() {
+        if (jdbcRegistryServerState != JdbcRegistryServerState.SUSPENDED) {
+            return;
+        }
+        jdbcRegistryServerState = JdbcRegistryServerState.STARTED;
+        doTriggerReconnectedListener();
+    }
+
+    private synchronized void transitionToSuspended() {
+        if (jdbcRegistryServerState != JdbcRegistryServerState.STARTED) {
+            return;
+        }
+        jdbcRegistryServerState = JdbcRegistryServerState.SUSPENDED;
+    }
+
+    private synchronized void transitionToDisconnected() {
         if (jdbcRegistryServerState != JdbcRegistryServerState.STARTED
                 && jdbcRegistryServerState != JdbcRegistryServerState.SUSPENDED) {
-            return false;
+            return;
         }
         jdbcRegistryServerState = JdbcRegistryServerState.DISCONNECTED;
-        return true;
+        doTriggerOnDisConnectedListener();
     }
 
     private void doTriggerReconnectedListener() {
