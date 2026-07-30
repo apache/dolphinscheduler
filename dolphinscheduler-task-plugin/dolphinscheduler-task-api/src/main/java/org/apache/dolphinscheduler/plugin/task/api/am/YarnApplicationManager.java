@@ -50,8 +50,12 @@ public class YarnApplicationManager implements ApplicationManager<YarnApplicatio
             String cmd = getKerberosInitCommand() + "yarn application -kill " + String.join(Constants.SPACE, appIds);
             execYarnKillCommand(tenantCode, commandFile, cmd);
         } catch (Exception e) {
-            log.error("Kill yarn application [{}] failed", appIds, e);
-            throw new TaskException(e.getMessage());
+            if (isApplicationAlreadyFinished(e)) {
+                log.info("Yarn application [{}] is already finished, no need to kill", appIds);
+            } else {
+                log.error("Kill yarn application [{}] failed", appIds, e);
+                throw new TaskException(e.getMessage());
+            }
         }
 
         return true;
@@ -113,5 +117,25 @@ public class YarnApplicationManager implements ApplicationManager<YarnApplicatio
             log.info("kerberos init command: {}", kerberosCommandBuilder);
         }
         return kerberosCommandBuilder.toString();
+    }
+
+    /**
+     * Check if the exception indicates the Yarn application is already finished/killed.
+     * When stopping a Flink/Spark task, the application may have already completed,
+     * in which case the kill command fails with "application not found" or similar.
+     *
+     * @param e the exception thrown by yarn application -kill
+     * @return true if the application is already finished
+     */
+    private boolean isApplicationAlreadyFinished(Exception e) {
+        String message = e.getMessage();
+        if (message == null) {
+            return false;
+        }
+        return message.contains("doesn't exist")
+            || message.contains("not found")
+            || message.contains("No such process")
+            || message.contains("ApplicationNotFoundException")
+            || message.contains("not running");
     }
 }
