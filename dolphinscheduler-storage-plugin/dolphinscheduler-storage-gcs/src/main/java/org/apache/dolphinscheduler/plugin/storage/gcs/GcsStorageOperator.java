@@ -29,11 +29,12 @@ import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.channels.Channels;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -54,6 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.google.api.gax.paging.Page;
 import com.google.auth.oauth2.ServiceAccountCredentials;
+import com.google.cloud.ReadChannel;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
@@ -165,7 +167,9 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
                 BlobId.of(bucketName, dstPath)).build();
 
         Path srcPath = Paths.get(srcFile);
-        gcsStorage.create(blobInfo, Files.readAllBytes(srcPath));
+        try (InputStream uploadStream = Files.newInputStream(srcPath)) {
+            gcsStorage.create(blobInfo, uploadStream);
+        }
 
         if (deleteSource) {
             Files.delete(srcPath);
@@ -183,8 +187,10 @@ public class GcsStorageOperator extends AbstractStorageOperator implements Close
 
         Blob blob = gcsStorage.get(BlobId.of(bucketName, filePath));
         try (
+                ReadChannel readChannel = blob.reader();
+                InputStream blobStream = Channels.newInputStream(readChannel);
                 BufferedReader bufferedReader =
-                        new BufferedReader(new InputStreamReader(new ByteArrayInputStream(blob.getContent())))) {
+                        new BufferedReader(new InputStreamReader(blobStream, StandardCharsets.UTF_8))) {
             Stream<String> stream = bufferedReader.lines().skip(skipLineNums).limit(limit);
             return stream.collect(Collectors.toList());
         }

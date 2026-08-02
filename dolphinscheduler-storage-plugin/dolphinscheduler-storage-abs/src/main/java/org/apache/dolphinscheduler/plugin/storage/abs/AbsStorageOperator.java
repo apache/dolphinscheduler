@@ -34,6 +34,7 @@ import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -157,7 +158,7 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
         try (
                 BufferedReader bufferedReader =
                         new BufferedReader(new InputStreamReader(
-                                new ByteArrayInputStream(blobClient.downloadContent().toBytes())))) {
+                                blobClient.openInputStream(), StandardCharsets.UTF_8))) {
             Stream<String> stream = bufferedReader.lines().skip(skipLineNums).limit(limit);
             return stream.collect(Collectors.toList());
         }
