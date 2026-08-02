@@ -25,8 +25,12 @@ import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -63,7 +67,10 @@ public class LogUtils {
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
     /**
-     * Maximum log file size to scan for appIds (64MB), to prevent OOM on large yarn logs.
+     * Maximum number of bytes at the head of the log file to scan for appIds. YARN appIds are
+     * emitted when the app is submitted (near the start of the log), so scanning only the head is
+     * enough to find them while bounding work on multi-GB logs — large files are no longer skipped
+     * entirely (which used to drop all appIds for big-log Spark/Flink tasks).
      */
     private static final long MAX_APPID_SCAN_FILE_SIZE = 64L * 1024 * 1024;
 
@@ -175,14 +182,17 @@ public class LogUtils {
         if (!logFile.exists() || !logFile.isFile()) {
             return Collections.emptyList();
         }
-        if (logFile.length() > MAX_APPID_SCAN_FILE_SIZE) {
-            log.warn("Log file size {} exceeds max scan size {}, skipping appId extraction for {}",
-                    logFile.length(), MAX_APPID_SCAN_FILE_SIZE, logPath);
-            return Collections.emptyList();
-        }
         Set<String> appIds = new HashSet<>();
-        try (Stream<String> stream = Files.lines(Paths.get(logPath))) {
-            stream.forEach(line -> {
+        try (
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(new FileInputStream(logFile), StandardCharsets.UTF_8))) {
+            // YARN appIds are emitted when the app is submitted (at the head of the log), so scanning
+            // only the first MAX_APPID_SCAN_FILE_SIZE bytes finds them while bounding work on
+            // multi-GB logs. Reading line-by-line keeps memory flat regardless of file size.
+            long bytesScanned = 0;
+            String line;
+            while ((line = reader.readLine()) != null) {
+                bytesScanned += line.getBytes(StandardCharsets.UTF_8).length + 1;
                 Matcher matcher = APPLICATION_REGEX.matcher(line);
                 if (matcher.find()) {
                     String appId = matcher.group();
@@ -190,7 +200,10 @@ public class LogUtils {
                         log.info("Find appId: {} from {}", appId, logPath);
                     }
                 }
-            });
+                if (bytesScanned >= MAX_APPID_SCAN_FILE_SIZE) {
+                    break;
+                }
+            }
             return new ArrayList<>(appIds);
         } catch (IOException e) {
             log.error("Get appId from log file error, logPath: {}", logPath, e);

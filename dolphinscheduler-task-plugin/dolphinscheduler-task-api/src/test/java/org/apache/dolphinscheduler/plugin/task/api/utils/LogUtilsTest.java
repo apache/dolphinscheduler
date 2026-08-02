@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,6 +72,36 @@ public class LogUtilsTest {
                     "Should only return first 10000 lines");
         } finally {
             Files.deleteIfExists(tempFile);
+        }
+    }
+
+    /**
+     * Regression: a log file larger than the head-scan limit (64MB) must NOT be skipped — the appId
+     * emitted at the head (when the app is submitted) must still be extracted, so Spark/Flink app
+     * tracking and kill keep working for large-log tasks.
+     */
+    @Test
+    public void getAppIdsFromLogFile_extractsAppIdFromHeadOfOversizedFile() throws IOException {
+        Path bigLog = Files.createTempFile("ds-appid-big", ".log");
+        try {
+            String appId = "application_1700000000000_0001";
+            Files.write(bigLog, ("Submitting YARN app " + appId + "\n").getBytes(StandardCharsets.UTF_8));
+            // Pad with 1MB newline-terminated lines until the file exceeds 64MB.
+            byte[] chunk = new byte[1024 * 1024];
+            Arrays.fill(chunk, (byte) 'x');
+            chunk[chunk.length - 1] = '\n';
+            try (FileOutputStream fos = new FileOutputStream(bigLog.toFile(), true)) {
+                for (int i = 0; i < 65; i++) {
+                    fos.write(chunk);
+                }
+            }
+            Assertions.assertTrue(Files.size(bigLog) > 64L * 1024 * 1024, "precondition: file > 64MB");
+
+            List<String> appIds = LogUtils.getAppIdsFromLogFile(bigLog.toString());
+            Assertions.assertTrue(appIds.contains(appId),
+                    "appId at head of >64MB log must be extracted, got: " + appIds);
+        } finally {
+            Files.deleteIfExists(bigLog);
         }
     }
 }
