@@ -17,8 +17,15 @@
 
 package org.apache.dolphinscheduler.api.executor.logging;
 
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkResponse;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import java.io.File;
 
 import org.springframework.stereotype.Component;
 
@@ -34,6 +41,37 @@ public class RemoteLogClient {
      */
     public byte[] getWholeLog(TaskInstance taskInstance) {
         return LogUtils.getFileContentBytesFromRemote(taskInstance.getLogPath());
+    }
+
+    /**
+     * Fetch a single bounded chunk of the task instance log from remote storage. The remote object
+     * is first synced to a local file (idempotent), then a range of that local file is read, so
+     * memory stays bounded regardless of total log size.
+     */
+    public TaskInstanceLogFileChunkResponse getLogChunk(final TaskInstance taskInstance, final long offset,
+                                                        final int length) {
+        final TaskInstanceLogFileChunkResponse response = new TaskInstanceLogFileChunkResponse();
+        try {
+            final String logPath = taskInstance.getLogPath();
+            RemoteLogUtils.getRemoteLog(logPath);
+            final File localFile = new File(logPath);
+            if (!localFile.exists() || !localFile.isFile()) {
+                response.setCode(LogResponseStatus.LOG_FILE_NOT_FOUND);
+                response.setMessage("Remote log file: " + logPath + " not exists locally after sync");
+                return response;
+            }
+            final long fileSize = localFile.length();
+            final int len = Math.min(Math.max(length, 1), LogUtils.MAX_LOG_CHUNK_SIZE);
+            final long off = Math.max(offset, 0);
+            final byte[] bytes = LogUtils.readFileRange(logPath, off, len);
+            response.setBytes(bytes);
+            response.setFileSize(fileSize);
+            response.setEof(off + bytes.length >= fileSize);
+        } catch (Exception e) {
+            response.setCode(LogResponseStatus.ERROR);
+            response.setMessage(ExceptionUtils.getRootCauseMessage(e));
+        }
+        return response;
     }
 
     /**

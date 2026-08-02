@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -99,14 +100,18 @@ public class LoggerController extends BaseController {
     @GetMapping(value = "/download-log")
     @ResponseBody
     @ApiException(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR)
-    public ResponseEntity downloadTaskLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @RequestParam(value = "taskInstanceId") int taskInstanceId) {
-        byte[] logBytes = loggerService.getLogBytes(loginUser, taskInstanceId);
+    public ResponseEntity<StreamingResponseBody> downloadTaskLog(
+                                                                 @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                 @RequestParam(value = "taskInstanceId") int taskInstanceId) {
+        // Stream the log in bounded chunks instead of buffering the whole file into a byte[],
+        // so an oversized task log can be downloaded without OOM-ing the API server.
+        final StreamingResponseBody body =
+                outputStream -> loggerService.streamLogBytes(loginUser, taskInstanceId, outputStream);
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
-                .body(logBytes);
+                .body(body);
     }
 
 }

@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
@@ -92,6 +94,12 @@ public class LocalLogClientTest {
                 }
 
                 return new TaskInstanceLogPageQueryResponse();
+            }
+
+            @Override
+            public TaskInstanceLogFileChunkResponse getTaskInstanceLogFileChunk(
+                                                                                TaskInstanceLogFileChunkRequest taskInstanceLogFileChunkRequest) {
+                return new TaskInstanceLogFileChunkResponse(new byte[0], true, 0, LogResponseStatus.SUCCESS, null);
             }
 
             @Override

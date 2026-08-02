@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 import lombok.extern.slf4j.Slf4j;
@@ -236,6 +237,32 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         try {
             logBytes = logClientDelegate.getWholeLogBytes(taskInstance);
             return Bytes.concat(head, logBytes);
+        } catch (Exception ex) {
+            log.error("Download TaskInstance: {} Log Error", taskInstance.getName(), ex);
+            throw new ServiceException(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);
+        }
+    }
+
+    /**
+     * Stream the task instance log to {@code outputStream} in bounded chunks. Unlike
+     * {@link #getLogBytes(User, int)}, this never holds the whole log file in memory, so downloading
+     * an oversized log cannot OOM the API server.
+     */
+    @Override
+    public void streamLogBytes(final User loginUser, final int taskInstId, final OutputStream outputStream) {
+        final TaskInstance taskInstance = taskInstanceDao.queryById(taskInstId);
+        if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
+            throw new ServiceException("task instance is null or host is null");
+        }
+        final Project project = projectDao.queryProjectByTaskInstanceId(taskInstId);
+        projectService.checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
+        try {
+            final byte[] head = String.format(LOG_HEAD_FORMAT,
+                    taskInstance.getLogPath(),
+                    taskInstance.getHost(),
+                    Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
+            outputStream.write(head);
+            logClientDelegate.streamWholeLog(taskInstance, outputStream);
         } catch (Exception ex) {
             log.error("Download TaskInstance: {} Log Error", taskInstance.getName(), ex);
             throw new ServiceException(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);

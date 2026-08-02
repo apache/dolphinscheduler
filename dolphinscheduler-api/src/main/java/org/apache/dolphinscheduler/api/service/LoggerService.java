@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
+import java.io.OutputStream;
+
 public interface LoggerService {
 
     /**
@@ -42,6 +44,16 @@ public interface LoggerService {
      * @return log byte array
      */
     byte[] getLogBytes(User loginUser, int taskInstId);
+
+    /**
+     * Stream the task instance log to the given output stream in bounded chunks, so that downloading
+     * a very large task log never loads the whole file into memory (no OOM, no truncation).
+     *
+     * @param loginUser    login user
+     * @param taskInstId   task instance id
+     * @param outputStream sink the log content is streamed to
+     */
+    void streamLogBytes(User loginUser, int taskInstId, OutputStream outputStream);
 
     /**
      * query log

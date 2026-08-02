@@ -314,8 +314,8 @@ public class ResourcesController extends BaseController {
         FetchFileContentRequest fetchFileContentRequest = FetchFileContentRequest.builder()
                 .loginUser(loginUser)
                 .resourceFileAbsolutePath(resourceAbsoluteFilePath)
-                .limit(limit == -1 ? Integer.MAX_VALUE : limit)
-                .skipLineNum(skipLineNum)
+                .limit(Math.min(Math.max(limit, 1), 10000))
+                .skipLineNum(Math.max(skipLineNum, 0))
                 .build();
         return Result.success(resourceService.fetchResourceFileContent(fetchFileContentRequest));
     }

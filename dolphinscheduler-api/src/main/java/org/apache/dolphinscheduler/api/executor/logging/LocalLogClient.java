@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.api.executor.logging;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.common.ILogService;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
@@ -64,6 +66,21 @@ public class LocalLogClient {
                 taskInstance.getId(),
                 taskInstance.getLogPath());
         return getProxyLogService(taskInstance).getTaskInstanceWholeLogFileBytes(request);
+    }
+
+    /**
+     * Fetch a single bounded chunk {@code [offset, offset + length)} of the task instance log from
+     * the worker that hosts it. Used by the streaming download path.
+     */
+    public TaskInstanceLogFileChunkResponse getLogChunk(final TaskInstance taskInstance, final long offset,
+                                                        final int length) {
+        final TaskInstanceLogFileChunkRequest request = TaskInstanceLogFileChunkRequest.builder()
+                .taskInstanceId(taskInstance.getId())
+                .taskInstanceLogAbsolutePath(taskInstance.getLogPath())
+                .offset(offset)
+                .length(length)
+                .build();
+        return getProxyLogService(taskInstance).getTaskInstanceLogFileChunk(request);
     }
 
     private TaskInstanceLogPageQueryResponse getLocalPartLog(TaskInstance taskInstance, int skipLineNum,

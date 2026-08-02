@@ -21,15 +21,21 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+
+import java.io.ByteArrayOutputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -148,5 +154,67 @@ public class LogClientDelegateTest {
 
         byte[] result = logClientDelegate.getWholeLogBytes(taskInstance);
         assertArrayEquals("remoteLogBytes".getBytes(), result);
+    }
+
+    @Test
+    public void testStreamWholeLogConcatenatesWorkerChunks() throws Exception {
+        TaskInstance taskInstance = newTaskInstance("SHELL");
+        byte[] full = "0123456789ABCDEFGHIJ".getBytes(StandardCharsets.UTF_8);
+
+        when(registryClient.checkNodeExists(eq(taskInstance.getHost()), any())).thenReturn(true);
+        when(localLogClient.getLogChunk(eq(taskInstance), anyLong(), anyInt()))
+                .thenReturn(chunk(full, 0, 10, 20, false))
+                .thenReturn(chunk(full, 10, 10, 20, true));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        logClientDelegate.streamWholeLog(taskInstance, out);
+
+        assertArrayEquals(full, out.toByteArray());
+    }
+
+    @Test
+    public void testStreamWholeLogFallsBackToRemoteWhenWorkerFails() throws Exception {
+        TaskInstance taskInstance = newTaskInstance("SHELL");
+        byte[] full = "REMOTE-CONTENT".getBytes(StandardCharsets.UTF_8);
+
+        when(registryClient.checkNodeExists(eq(taskInstance.getHost()), any())).thenReturn(true);
+        when(localLogClient.getLogChunk(eq(taskInstance), anyLong(), anyInt()))
+                .thenReturn(new TaskInstanceLogFileChunkResponse(null, false, 0, LogResponseStatus.ERROR, "down"));
+        when(remoteLogClient.getLogChunk(eq(taskInstance), anyLong(), anyInt()))
+                .thenReturn(chunk(full, 0, full.length, full.length, true));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        logClientDelegate.streamWholeLog(taskInstance, out);
+
+        assertArrayEquals(full, out.toByteArray());
+    }
+
+    @Test
+    public void testStreamWholeLogNodeGoneStreamsFromRemote() throws Exception {
+        TaskInstance taskInstance = newTaskInstance("SHELL");
+        byte[] full = "DIRECT-REMOTE".getBytes(StandardCharsets.UTF_8);
+
+        when(registryClient.checkNodeExists(eq(taskInstance.getHost()), any())).thenReturn(false);
+        when(remoteLogClient.getLogChunk(eq(taskInstance), anyLong(), anyInt()))
+                .thenReturn(chunk(full, 0, full.length, full.length, true));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        logClientDelegate.streamWholeLog(taskInstance, out);
+
+        assertArrayEquals(full, out.toByteArray());
+    }
+
+    private static TaskInstance newTaskInstance(String taskType) {
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setHost("localhost");
+        taskInstance.setTaskType(taskType);
+        return taskInstance;
+    }
+
+    private static TaskInstanceLogFileChunkResponse chunk(byte[] full, int off, int len, int size, boolean eof) {
+        byte[] b = new byte[len];
+        System.arraycopy(full, off, b, 0, len);
+        return new TaskInstanceLogFileChunkResponse(b, eof, size, LogResponseStatus.SUCCESS, null);
     }
 }

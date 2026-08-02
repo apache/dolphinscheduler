@@ -17,13 +17,18 @@
 
 package org.apache.dolphinscheduler.api.executor.logging;
 
+import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -86,6 +91,77 @@ public class LogClientDelegate {
             }
         } else {
             return remoteLogClient.getWholeLog(taskInstance);
+        }
+    }
+
+    /**
+     * Stream the entire task instance log to {@code outputStream} in fixed-size chunks, keeping
+     * memory bounded regardless of total log size. Prefers the worker (RPC chunked); if the worker
+     * node is gone or chunking fails, falls back to remote storage, then to the legacy whole-file
+     * byte[] read as a last resort — so behavior never regresses below the pre-fix baseline.
+     */
+    public void streamWholeLog(final TaskInstance taskInstance, final OutputStream outputStream) throws IOException {
+        checkArgs(taskInstance);
+        if (checkNodeExists(taskInstance)) {
+            if (streamFromLocalWorker(taskInstance, outputStream)) {
+                outputStream.flush();
+                return;
+            }
+            log.warn("Streaming from worker failed for task instance {}, falling back to remote storage",
+                    taskInstance.getId());
+        }
+        if (!streamFromRemote(taskInstance, outputStream)) {
+            log.warn("Streaming from remote failed for task instance {}, falling back to legacy whole-file read",
+                    taskInstance.getId());
+            final byte[] bytes = getWholeLogBytes(taskInstance);
+            outputStream.write(bytes);
+        }
+        outputStream.flush();
+    }
+
+    private boolean streamFromLocalWorker(final TaskInstance taskInstance,
+                                          final OutputStream outputStream) throws IOException {
+        long offset = 0;
+        while (true) {
+            final TaskInstanceLogFileChunkResponse chunk = localLogClient.getLogChunk(taskInstance, offset,
+                    LogUtils.MAX_LOG_CHUNK_SIZE);
+            if (chunk.getCode() != LogResponseStatus.SUCCESS) {
+                log.warn("Worker chunk request failed for task instance {}; reason: {}",
+                        taskInstance.getId(), chunk.getMessage());
+                return false;
+            }
+            final byte[] bytes = chunk.getBytes();
+            if (bytes == null || bytes.length == 0) {
+                return true; // empty file or EOF
+            }
+            outputStream.write(bytes);
+            offset += bytes.length;
+            if (chunk.isEof()) {
+                return true;
+            }
+        }
+    }
+
+    private boolean streamFromRemote(final TaskInstance taskInstance,
+                                     final OutputStream outputStream) throws IOException {
+        long offset = 0;
+        while (true) {
+            final TaskInstanceLogFileChunkResponse chunk = remoteLogClient.getLogChunk(taskInstance, offset,
+                    LogUtils.MAX_LOG_CHUNK_SIZE);
+            if (chunk.getCode() != LogResponseStatus.SUCCESS) {
+                log.warn("Remote chunk request failed for task instance {}; reason: {}",
+                        taskInstance.getId(), chunk.getMessage());
+                return false;
+            }
+            final byte[] bytes = chunk.getBytes();
+            if (bytes == null || bytes.length == 0) {
+                return true;
+            }
+            outputStream.write(bytes);
+            offset += bytes.length;
+            if (chunk.isEof()) {
+                return true;
+            }
         }
     }
 
