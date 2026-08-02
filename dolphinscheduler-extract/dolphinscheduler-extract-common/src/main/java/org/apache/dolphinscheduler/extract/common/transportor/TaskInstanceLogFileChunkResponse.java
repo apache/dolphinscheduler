@@ -18,18 +18,26 @@
 package org.apache.dolphinscheduler.extract.common.transportor;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * One chunk of a task instance log file. {@code bytes} is at most {@code LogUtils.MAX_LOG_CHUNK_SIZE};
+ * {@code eof} is true when this chunk reaches the end of the file, signalling the caller to stop.
+ * {@code fileSize} lets the caller report total size without an extra round-trip.
+ */
 @Data
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskInstanceLogFileDownloadRequest {
+public class TaskInstanceLogFileChunkResponse {
 
-    private long taskInstanceId;
+    private byte[] bytes;
 
-    private String taskInstanceLogAbsolutePath;
+    private boolean eof;
 
+    private long fileSize;
+
+    private LogResponseStatus code = LogResponseStatus.SUCCESS;
+
+    private String message;
 }

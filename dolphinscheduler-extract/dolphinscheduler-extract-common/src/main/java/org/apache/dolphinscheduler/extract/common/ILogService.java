@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.extract.common;
 
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
@@ -32,6 +34,14 @@ public interface ILogService {
 
     @RpcMethod
     TaskInstanceLogPageQueryResponse pageQueryTaskInstanceLog(TaskInstanceLogPageQueryRequest taskInstanceLogPageQueryRequest);
+
+    /**
+     * Read a single bounded chunk {@code [offset, offset + length)} of a task instance log file.
+     * Enables streaming download of arbitrarily large log files without OOM: the caller loops,
+     * advancing {@code offset} by the number of bytes returned, until {@code eof} is true.
+     */
+    @RpcMethod
+    TaskInstanceLogFileChunkResponse getTaskInstanceLogFileChunk(TaskInstanceLogFileChunkRequest taskInstanceLogFileChunkRequest);
 
     @RpcMethod
     void removeTaskInstanceLog(String taskInstanceLogAbsolutePath);

@@ -22,14 +22,29 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Request a single bounded chunk {@code [offset, offset + length)} of a task instance log file, used
+ * by the streaming download path so the caller can page through an arbitrarily large log without
+ * loading it all into memory in one RPC round-trip.
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TaskInstanceLogFileDownloadRequest {
+public class TaskInstanceLogFileChunkRequest {
 
     private long taskInstanceId;
 
     private String taskInstanceLogAbsolutePath;
 
+    /**
+     * Start byte offset within the log file (>= 0).
+     */
+    private long offset;
+
+    /**
+     * Maximum number of bytes to return in this chunk (> 0). The server clamps this to
+     * {@code LogUtils.MAX_LOG_CHUNK_SIZE}.
+     */
+    private int length;
 }

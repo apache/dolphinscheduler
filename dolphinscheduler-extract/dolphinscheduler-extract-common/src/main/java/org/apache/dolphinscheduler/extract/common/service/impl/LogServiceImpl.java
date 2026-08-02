@@ -21,6 +21,8 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkRequest;
+import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryRequest;
@@ -28,6 +30,7 @@ import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPag
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.io.File;
 import java.util.List;
 
 public class LogServiceImpl implements ILogService {
@@ -49,14 +52,59 @@ public class LogServiceImpl implements ILogService {
         final TaskInstanceLogFileDownloadResponse taskInstanceLogFileDownloadResponse =
                 new TaskInstanceLogFileDownloadResponse();
         try {
-            byte[] bytes = LogUtils
-                    .getFileContentBytesFromLocal(taskInstanceLogFileDownloadRequest.getTaskInstanceLogAbsolutePath());
+            String logPath = taskInstanceLogFileDownloadRequest.getTaskInstanceLogAbsolutePath();
+            File logFile = new File(logPath);
+            if (!logFile.exists() || !logFile.isFile()) {
+                taskInstanceLogFileDownloadResponse.setCode(LogResponseStatus.ERROR);
+                taskInstanceLogFileDownloadResponse.setMessage("Log file: " + logPath + " not exists");
+                return taskInstanceLogFileDownloadResponse;
+            }
+            if (logFile.length() > LogUtils.MAX_LOG_DOWNLOAD_SIZE) {
+                taskInstanceLogFileDownloadResponse.setCode(LogResponseStatus.ERROR);
+                taskInstanceLogFileDownloadResponse.setMessage(
+                        "Log file size " + logFile.length() + " exceeds maximum download size "
+                                + LogUtils.MAX_LOG_DOWNLOAD_SIZE);
+                return taskInstanceLogFileDownloadResponse;
+            }
+            byte[] bytes = LogUtils.getFileContentBytesFromLocal(logPath);
             taskInstanceLogFileDownloadResponse.setLogBytes(bytes);
         } catch (Exception e) {
             taskInstanceLogFileDownloadResponse.setCode(LogResponseStatus.ERROR);
             taskInstanceLogFileDownloadResponse.setMessage(ExceptionUtils.getRootCauseMessage(e));
         }
         return taskInstanceLogFileDownloadResponse;
+    }
+
+    /**
+     * Streams a single bounded chunk of the log file. The caller drives the loop: advance
+     * {@code offset} by the returned {@code bytes.length} until {@code eof} is true. Each chunk is
+     * capped at {@link LogUtils#MAX_LOG_CHUNK_SIZE}, so a multi-GB log is transferred as many small
+     * RPCs instead of one giant one — neither this worker nor the API server holds the whole file.
+     */
+    @Override
+    public TaskInstanceLogFileChunkResponse getTaskInstanceLogFileChunk(
+                                                                        final TaskInstanceLogFileChunkRequest request) {
+        final TaskInstanceLogFileChunkResponse response = new TaskInstanceLogFileChunkResponse();
+        try {
+            final String logPath = request.getTaskInstanceLogAbsolutePath();
+            final File logFile = new File(logPath);
+            if (!logFile.exists() || !logFile.isFile()) {
+                response.setCode(LogResponseStatus.LOG_FILE_NOT_FOUND);
+                response.setMessage("Log file: " + logPath + " not exists");
+                return response;
+            }
+            final long fileSize = logFile.length();
+            final long offset = Math.max(request.getOffset(), 0);
+            final int length = Math.min(Math.max(request.getLength(), 1), LogUtils.MAX_LOG_CHUNK_SIZE);
+            final byte[] bytes = LogUtils.readFileRange(logPath, offset, length);
+            response.setBytes(bytes);
+            response.setFileSize(fileSize);
+            response.setEof(offset + bytes.length >= fileSize);
+        } catch (Exception e) {
+            response.setCode(LogResponseStatus.ERROR);
+            response.setMessage(ExceptionUtils.getRootCauseMessage(e));
+        }
+        return response;
     }
 
     /**
