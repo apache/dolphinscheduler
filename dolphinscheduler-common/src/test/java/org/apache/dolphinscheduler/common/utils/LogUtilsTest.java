@@ -17,13 +17,16 @@
 
 package org.apache.dolphinscheduler.common.utils;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -248,5 +251,71 @@ class LogUtilsTest {
     void maxResponseLogSizeIs65535() {
         assertEquals(65535, LogUtils.MAX_RESPONSE_LOG_SIZE,
                 "MAX_RESPONSE_LOG_SIZE should be 65535");
+    }
+
+    /**
+     * Verify the MAX_LOG_DOWNLOAD_SIZE constant is 64MB.
+     */
+    @Test
+    void maxLogDownloadSizeIs64MB() {
+        assertEquals(64 * 1024 * 1024, LogUtils.MAX_LOG_DOWNLOAD_SIZE,
+                "MAX_LOG_DOWNLOAD_SIZE should be 64MB (67108864 bytes)");
+    }
+
+    /**
+     * Verify that the single-arg getFileContentBytesFromLocal reads a small file fully
+     * (backward compatibility with the new 64MB default cap).
+     */
+    @Test
+    void getFileContentBytesFromLocal_singleArgReadsSmallFile() throws Exception {
+        Path tempFile = Files.createTempFile("ds-logutils-test", ".log");
+        try {
+            String content = "hello world\nthis is a test\n";
+            Files.write(tempFile, content.getBytes(StandardCharsets.UTF_8));
+
+            byte[] result = LogUtils.getFileContentBytesFromLocal(tempFile.toString());
+            assertEquals(content.getBytes(StandardCharsets.UTF_8).length, result.length,
+                    "Single-arg should read entire small file");
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
+    }
+
+    /**
+     * readFileRange must return exactly [offset, offset+length) and never load the whole file.
+     */
+    @Test
+    void readFileRange_returnsBoundedRange() throws IOException {
+        final Path file = Files.createTempFile("ds-log-utils-range", ".log");
+        try {
+            final byte[] content = new byte[250];
+            for (int i = 0; i < content.length; i++) {
+                content[i] = (byte) i;
+            }
+            Files.write(file, content);
+
+            // full file (length larger than file)
+            assertArrayEquals(content, LogUtils.readFileRange(file.toString(), 0, 1000));
+            // first 100 bytes
+            assertArrayEquals(Arrays.copyOfRange(content, 0, 100),
+                    LogUtils.readFileRange(file.toString(), 0, 100));
+            // middle chunk
+            assertArrayEquals(Arrays.copyOfRange(content, 100, 200),
+                    LogUtils.readFileRange(file.toString(), 100, 100));
+            // partial at EOF (requested 100, only 50 remain)
+            assertArrayEquals(Arrays.copyOfRange(content, 200, 250),
+                    LogUtils.readFileRange(file.toString(), 200, 100));
+            // at/over EOF -> empty
+            assertEquals(0, LogUtils.readFileRange(file.toString(), 250, 100).length);
+            assertEquals(0, LogUtils.readFileRange(file.toString(), 999, 100).length);
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
+    @Test
+    void readFileRange_nonExistentFileThrows() {
+        assertThrows(RuntimeException.class,
+                () -> LogUtils.readFileRange("/nonexistent/range.log", 0, 100));
     }
 }

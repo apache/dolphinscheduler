@@ -23,7 +23,9 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Closeable;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -89,7 +91,9 @@ public class GcsRemoteLogHandler implements RemoteLogHandler, Closeable {
             BlobInfo blobInfo = BlobInfo.newBuilder(
                     BlobId.of(bucketName, objectName)).build();
 
-            gcsStorage.create(blobInfo, Files.readAllBytes(Paths.get(logPath)));
+            try (InputStream logInputStream = new FileInputStream(logPath)) {
+                gcsStorage.create(blobInfo, logInputStream);
+            }
         } catch (Exception e) {
             log.error("error while sending remote log {} to GCS {}", logPath, objectName, e);
         }

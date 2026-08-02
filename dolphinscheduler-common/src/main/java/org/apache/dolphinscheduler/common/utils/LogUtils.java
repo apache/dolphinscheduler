@@ -26,6 +26,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,8 +45,20 @@ public class LogUtils {
      */
     public static final int MAX_RESPONSE_LOG_SIZE = 65535;
 
+    /**
+     * Maximum download log file size in bytes (64MB), to prevent OOM when downloading entire log files.
+     */
+    public static final int MAX_LOG_DOWNLOAD_SIZE = 64 * 1024 * 1024;
+
+    /**
+     * Maximum chunk size in bytes (1MB) for streaming log downloads. Each RPC round-trip carries at
+     * most this many bytes, which is well under the 64MB RPC frame limit, so arbitrarily large log
+     * files can be downloaded as a sequence of bounded chunks without OOM on either side.
+     */
+    public static final int MAX_LOG_CHUNK_SIZE = 1024 * 1024;
+
     public static byte[] getFileContentBytesFromLocal(String filePath) {
-        return getFileContentBytesFromLocal(filePath, Integer.MAX_VALUE);
+        return getFileContentBytesFromLocal(filePath, MAX_LOG_DOWNLOAD_SIZE);
     }
 
     /**
@@ -77,6 +90,37 @@ public class LogUtils {
     public static byte[] getFileContentBytesFromRemote(String filePath) {
         RemoteLogUtils.getRemoteLog(filePath);
         return getFileContentBytesFromLocal(filePath);
+    }
+
+    /**
+     * Read a byte range {@code [offset, offset + length)} from a file using random access, without
+     * loading the whole file into memory. Used by the chunked/streaming log download path so that
+     * worker and API memory stay bounded regardless of total log size.
+     *
+     * @param filePath absolute path to the log file
+     * @param offset   start byte offset (>= 0); if >= file size, an empty array is returned
+     * @param length   maximum number of bytes to read (> 0); the returned array may be shorter at EOF
+     * @return the bytes actually read
+     */
+    public static byte[] readFileRange(final String filePath, final long offset, final int length) {
+        final File file = new File(filePath);
+        if (!file.exists() || !file.isFile()) {
+            throw new RuntimeException("The file path: " + filePath + " not exists");
+        }
+        final long fileSize = file.length();
+        if (offset < 0 || length <= 0 || offset >= fileSize) {
+            return new byte[0];
+        }
+        final int toRead = (int) Math.min(length, fileSize - offset);
+        final byte[] bytes = new byte[toRead];
+        try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
+            randomAccessFile.seek(offset);
+            randomAccessFile.readFully(bytes);
+        } catch (IOException e) {
+            log.error("read file range error, path: {}, offset: {}, length: {}", filePath, offset, length, e);
+            throw new RuntimeException(String.format("Read file: %s error", filePath), e);
+        }
+        return bytes;
     }
 
     /**
