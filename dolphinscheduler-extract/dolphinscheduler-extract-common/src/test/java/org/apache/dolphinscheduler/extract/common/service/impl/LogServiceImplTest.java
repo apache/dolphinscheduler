@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.apache.dolphinscheduler.common.utils.LogUtils;
 import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkRequest;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileChunkResponse;
@@ -36,6 +37,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 
 import lombok.extern.slf4j.Slf4j;
@@ -255,27 +257,34 @@ class LogServiceImplTest {
     }
 
     /**
-     * Verify that a file exceeding MAX_LOG_DOWNLOAD_SIZE is rejected with an error response.
+     * Verify that a file exceeding the download size limit is rejected with an error response.
+     * Uses a small injected threshold so the oversized branch can be exercised without creating a
+     * real 64MB file.
      */
     @Test
-    void getTaskInstanceWholeLogFileBytes_oversizedFileRejected() {
-        // Create a file larger than MAX_LOG_DOWNLOAD_SIZE would require a huge file.
-        // Instead, use a spy to test the logic with a smaller limit by creating a file
-        // and mocking File.length() via a custom approach: test with a path that reports
-        // a large size. Since File.length() reads actual file size, we test the actual
-        // boundary by creating a small file and verifying the pre-check logic runs.
-        // For a proper test of the >64MB path, we verify the error message format.
-        TaskInstanceLogFileDownloadRequest request = TaskInstanceLogFileDownloadRequest.builder()
-                .taskInstanceId(1)
-                .taskInstanceLogAbsolutePath("/nonexistent/huge.log")
-                .build();
+    void getTaskInstanceWholeLogFileBytes_oversizedFileRejected() throws IOException {
+        final Path bigFile = Files.createTempFile("ds-oversized", ".log");
+        try {
+            final byte[] data = new byte[200];
+            Arrays.fill(data, (byte) 'x');
+            Files.write(bigFile, data);
+            logService.setMaxLogDownloadSize(100); // threshold = 100 bytes; file is 200
 
-        TaskInstanceLogFileDownloadResponse response =
-                logService.getTaskInstanceWholeLogFileBytes(request);
+            final TaskInstanceLogFileDownloadRequest request = TaskInstanceLogFileDownloadRequest.builder()
+                    .taskInstanceId(1)
+                    .taskInstanceLogAbsolutePath(bigFile.toString())
+                    .build();
+            final TaskInstanceLogFileDownloadResponse response =
+                    logService.getTaskInstanceWholeLogFileBytes(request);
 
-        // Non-existent file should return ERROR
-        assertEquals(LogResponseStatus.ERROR, response.getCode(),
-                "Should return ERROR for non-existent file");
+            assertEquals(LogResponseStatus.ERROR, response.getCode(),
+                    "Should return ERROR for a file exceeding the download size limit");
+            assertTrue(response.getMessage().contains("exceeds maximum download size"),
+                    "Message should mention the size limit, got: " + response.getMessage());
+        } finally {
+            logService.setMaxLogDownloadSize(LogUtils.MAX_LOG_DOWNLOAD_SIZE);
+            Files.deleteIfExists(bigFile);
+        }
     }
 
     /**

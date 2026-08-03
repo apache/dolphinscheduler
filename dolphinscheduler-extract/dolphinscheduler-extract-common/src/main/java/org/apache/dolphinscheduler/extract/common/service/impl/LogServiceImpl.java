@@ -42,6 +42,17 @@ public class LogServiceImpl implements ILogService {
     }
 
     /**
+     * Maximum size (bytes) of a log file that {@link #getTaskInstanceWholeLogFileBytes} will read in
+     * one shot. Defaults to {@link LogUtils#MAX_LOG_DOWNLOAD_SIZE}; overridable (mainly for tests so
+     * the oversized-rejection branch can be exercised without creating a real 64MB file).
+     */
+    protected long maxLogDownloadSize = LogUtils.MAX_LOG_DOWNLOAD_SIZE;
+
+    public void setMaxLogDownloadSize(final long maxLogDownloadSize) {
+        this.maxLogDownloadSize = maxLogDownloadSize;
+    }
+
+    /**
      * Downloads the entire log file for a task instance.
      *
      * @param taskInstanceLogFileDownloadRequest Request object containing the path to the task instance log file.
@@ -59,11 +70,11 @@ public class LogServiceImpl implements ILogService {
                 taskInstanceLogFileDownloadResponse.setMessage("Log file: " + logPath + " not exists");
                 return taskInstanceLogFileDownloadResponse;
             }
-            if (logFile.length() > LogUtils.MAX_LOG_DOWNLOAD_SIZE) {
+            if (logFile.length() > maxLogDownloadSize) {
                 taskInstanceLogFileDownloadResponse.setCode(LogResponseStatus.ERROR);
                 taskInstanceLogFileDownloadResponse.setMessage(
                         "Log file size " + logFile.length() + " exceeds maximum download size "
-                                + LogUtils.MAX_LOG_DOWNLOAD_SIZE);
+                                + maxLogDownloadSize);
                 return taskInstanceLogFileDownloadResponse;
             }
             byte[] bytes = LogUtils.getFileContentBytesFromLocal(logPath);
