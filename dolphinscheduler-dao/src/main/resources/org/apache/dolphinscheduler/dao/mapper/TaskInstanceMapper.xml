@@ -32,13 +32,13 @@
     </sql>
     <sql id="listSql">
         id, name, task_type, workflow_instance_id, workflow_instance_name, project_code, task_code, task_definition_version, state, submit_time,
-        start_time, end_time, host, alert_flag, retry_times, pid,
+        start_time, end_time, host, alert_flag, retry_times, pid, app_link,
         flag, retry_interval, max_retry_times, task_instance_priority, worker_group,environment_code , executor_id, executor_name,
         first_submit_time, delay_time, dry_run, task_group_id, cpu_quota, memory_max, task_execute_type
     </sql>
     <sql id="listSqlV2">
         ${alias}.id, ${alias}.name, ${alias}.task_type, ${alias}.workflow_instance_id, ${alias}.workflow_instance_name, ${alias}.project_code, ${alias}.task_code, ${alias}.task_definition_version, ${alias}.state, ${alias}.submit_time,
-        ${alias}.start_time, ${alias}.end_time, ${alias}.host, ${alias}.alert_flag, ${alias}.retry_times, ${alias}.pid,
+        ${alias}.start_time, ${alias}.end_time, ${alias}.host, ${alias}.alert_flag, ${alias}.retry_times, ${alias}.pid, ${alias}.app_link,
         ${alias}.flag, ${alias}.retry_interval, ${alias}.max_retry_times, ${alias}.task_instance_priority, ${alias}.worker_group, ${alias}.environment_code, ${alias}.executor_id, ${alias}.executor_name,
         ${alias}.first_submit_time, ${alias}.delay_time, ${alias}.dry_run, ${alias}.task_group_id, ${alias}.cpu_quota, ${alias}.memory_max, ${alias}.task_execute_type
     </sql>
