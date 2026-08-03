@@ -97,70 +97,99 @@ public class LogClientDelegate {
     /**
      * Stream the entire task instance log to {@code outputStream} in fixed-size chunks, keeping
      * memory bounded regardless of total log size. Prefers the worker (RPC chunked); if the worker
-     * node is gone or chunking fails, falls back to remote storage, then to the legacy whole-file
-     * byte[] read as a last resort — so behavior never regresses below the pre-fix baseline.
+     * node is gone, falls back to remote storage, then to the legacy whole-file byte[] read.
+     *
+     * <p>If a streaming source fails <b>after</b> bytes have already been written to the output, no
+     * fallback is attempted — restarting from offset 0 would duplicate the prefix and corrupt the
+     * downloaded file. Instead an {@link IOException} is thrown so the caller can surface the
+     * truncation. Fallback only happens when nothing has been written yet (e.g. the worker is
+     * unreachable on the first chunk).
      */
     public void streamWholeLog(final TaskInstance taskInstance, final OutputStream outputStream) throws IOException {
         checkArgs(taskInstance);
         if (checkNodeExists(taskInstance)) {
-            if (streamFromLocalWorker(taskInstance, outputStream)) {
+            final long[] written = {0};
+            try {
+                streamFromLocalWorker(taskInstance, outputStream, written);
                 outputStream.flush();
                 return;
+            } catch (IOException | RuntimeException e) {
+                if (written[0] > 0) {
+                    throw new IOException("Worker streaming failed after " + written[0]
+                            + " bytes written; cannot fall back without corrupting the stream", e);
+                }
+                log.warn("Streaming from worker failed before any byte was written for task instance {}, "
+                        + "falling back to remote storage", taskInstance.getId(), e);
             }
-            log.warn("Streaming from worker failed for task instance {}, falling back to remote storage",
-                    taskInstance.getId());
         }
-        if (!streamFromRemote(taskInstance, outputStream)) {
-            log.warn("Streaming from remote failed for task instance {}, falling back to legacy whole-file read",
-                    taskInstance.getId());
-            final byte[] bytes = getWholeLogBytes(taskInstance);
-            outputStream.write(bytes);
+        final long[] written = {0};
+        try {
+            streamFromRemote(taskInstance, outputStream, written);
+            outputStream.flush();
+            return;
+        } catch (IOException | RuntimeException e) {
+            if (written[0] > 0) {
+                throw new IOException("Remote streaming failed after " + written[0]
+                        + " bytes written; cannot fall back to legacy whole-file read without corrupting the stream",
+                        e);
+            }
+            log.warn("Streaming from remote failed before any byte was written for task instance {}, "
+                    + "falling back to legacy whole-file read", taskInstance.getId(), e);
         }
+        final byte[] bytes = getWholeLogBytes(taskInstance);
+        outputStream.write(bytes);
         outputStream.flush();
     }
 
-    private boolean streamFromLocalWorker(final TaskInstance taskInstance,
-                                          final OutputStream outputStream) throws IOException {
+    private void streamFromLocalWorker(final TaskInstance taskInstance, final OutputStream outputStream,
+                                       final long[] written) throws IOException {
         long offset = 0;
         while (true) {
             final TaskInstanceLogFileChunkResponse chunk = localLogClient.getLogChunk(taskInstance, offset,
                     LogUtils.MAX_LOG_CHUNK_SIZE);
             if (chunk.getCode() != LogResponseStatus.SUCCESS) {
-                log.warn("Worker chunk request failed for task instance {}; reason: {}",
-                        taskInstance.getId(), chunk.getMessage());
-                return false;
+                throw new IOException("Worker chunk request failed for task instance " + taskInstance.getId()
+                        + "; reason: " + chunk.getMessage());
             }
             final byte[] bytes = chunk.getBytes();
             if (bytes == null || bytes.length == 0) {
-                return true; // empty file or EOF
+                return; // empty file or EOF
             }
             outputStream.write(bytes);
+            written[0] += bytes.length;
             offset += bytes.length;
             if (chunk.isEof()) {
-                return true;
+                return;
             }
         }
     }
 
-    private boolean streamFromRemote(final TaskInstance taskInstance,
-                                     final OutputStream outputStream) throws IOException {
+    private void streamFromRemote(final TaskInstance taskInstance, final OutputStream outputStream,
+                                  final long[] written) throws IOException {
+        // Sync the remote object to a local file exactly once, then read ranges of that local file,
+        // instead of re-syncing the whole remote object on every chunk (a 1GB log / 1MB chunk would
+        // otherwise re-download the entire object 1024 times).
+        final java.io.File localFile = remoteLogClient.prepareLocalLog(taskInstance);
+        if (localFile == null) {
+            throw new IOException("Remote log prepare failed for task instance " + taskInstance.getId());
+        }
         long offset = 0;
         while (true) {
-            final TaskInstanceLogFileChunkResponse chunk = remoteLogClient.getLogChunk(taskInstance, offset,
-                    LogUtils.MAX_LOG_CHUNK_SIZE);
+            final TaskInstanceLogFileChunkResponse chunk =
+                    remoteLogClient.getLocalLogChunk(localFile, offset, LogUtils.MAX_LOG_CHUNK_SIZE);
             if (chunk.getCode() != LogResponseStatus.SUCCESS) {
-                log.warn("Remote chunk request failed for task instance {}; reason: {}",
-                        taskInstance.getId(), chunk.getMessage());
-                return false;
+                throw new IOException(
+                        "Remote chunk read failed at offset " + offset + ": " + chunk.getMessage());
             }
             final byte[] bytes = chunk.getBytes();
             if (bytes == null || bytes.length == 0) {
-                return true;
+                return;
             }
             outputStream.write(bytes);
+            written[0] += bytes.length;
             offset += bytes.length;
             if (chunk.isEof()) {
-                return true;
+                return;
             }
         }
     }

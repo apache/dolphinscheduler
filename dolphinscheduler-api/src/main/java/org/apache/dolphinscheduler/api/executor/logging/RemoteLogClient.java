@@ -27,8 +27,11 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.File;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class RemoteLogClient {
 
@@ -44,26 +47,41 @@ public class RemoteLogClient {
     }
 
     /**
-     * Fetch a single bounded chunk of the task instance log from remote storage. The remote object
-     * is first synced to a local file (idempotent), then a range of that local file is read, so
-     * memory stays bounded regardless of total log size.
+     * Sync the remote log object to its local path exactly once for a streaming session, and return
+     * the local {@link File}. Returns {@code null} if the file is absent after sync or sync fails.
+     * Subsequent chunk reads should use {@link #getLocalLogChunk(File, long, int)} so the remote
+     * object is not re-downloaded on every chunk (a 1GB log / 1MB chunk would otherwise re-download
+     * the whole object 1024 times).
      */
-    public TaskInstanceLogFileChunkResponse getLogChunk(final TaskInstance taskInstance, final long offset,
-                                                        final int length) {
-        final TaskInstanceLogFileChunkResponse response = new TaskInstanceLogFileChunkResponse();
+    public File prepareLocalLog(final TaskInstance taskInstance) {
+        final String logPath = taskInstance.getLogPath();
         try {
-            final String logPath = taskInstance.getLogPath();
             RemoteLogUtils.getRemoteLog(logPath);
             final File localFile = new File(logPath);
             if (!localFile.exists() || !localFile.isFile()) {
-                response.setCode(LogResponseStatus.LOG_FILE_NOT_FOUND);
-                response.setMessage("Remote log file: " + logPath + " not exists locally after sync");
-                return response;
+                log.warn("Remote log file: {} not exists locally after sync", logPath);
+                return null;
             }
+            return localFile;
+        } catch (Exception e) {
+            log.error("prepareLocalLog failed for {}", logPath, e);
+            return null;
+        }
+    }
+
+    /**
+     * Read a single bounded chunk from an already-synced local file (no remote sync). Used in a loop
+     * after {@link #prepareLocalLog(TaskInstance)} so a multi-GB log is pulled from remote storage
+     * only once.
+     */
+    public TaskInstanceLogFileChunkResponse getLocalLogChunk(final File localFile, final long offset,
+                                                             final int length) {
+        final TaskInstanceLogFileChunkResponse response = new TaskInstanceLogFileChunkResponse();
+        try {
             final long fileSize = localFile.length();
             final int len = Math.min(Math.max(length, 1), LogUtils.MAX_LOG_CHUNK_SIZE);
             final long off = Math.max(offset, 0);
-            final byte[] bytes = LogUtils.readFileRange(logPath, off, len);
+            final byte[] bytes = LogUtils.readFileRange(localFile.getAbsolutePath(), off, len);
             response.setBytes(bytes);
             response.setFileSize(fileSize);
             response.setEof(off + bytes.length >= fileSize);
@@ -72,6 +90,23 @@ public class RemoteLogClient {
             response.setMessage(ExceptionUtils.getRootCauseMessage(e));
         }
         return response;
+    }
+
+    /**
+     * Fetch a single bounded chunk from remote storage. Convenience method that syncs then reads one
+     * chunk; for multi-chunk streaming use {@link #prepareLocalLog} + {@link #getLocalLogChunk} to
+     * avoid re-syncing on every chunk.
+     */
+    public TaskInstanceLogFileChunkResponse getLogChunk(final TaskInstance taskInstance, final long offset,
+                                                        final int length) {
+        final File localFile = prepareLocalLog(taskInstance);
+        if (localFile == null) {
+            final TaskInstanceLogFileChunkResponse response = new TaskInstanceLogFileChunkResponse();
+            response.setCode(LogResponseStatus.LOG_FILE_NOT_FOUND);
+            response.setMessage("Remote log file not exists locally after sync");
+            return response;
+        }
+        return getLocalLogChunk(localFile, offset, length);
     }
 
     /**
