@@ -63,6 +63,16 @@ public class LogUtils {
     private static final Pattern APPLICATION_REGEX = Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
     /**
+     * Maximum log file size to scan for appIds (64MB), to prevent OOM on large yarn logs.
+     */
+    private static final long MAX_APPID_SCAN_FILE_SIZE = 64L * 1024 * 1024;
+
+    /**
+     * Maximum number of lines to read from appInfo file.
+     */
+    private static final int MAX_APPINFO_LINES = 10000;
+
+    /**
      * Get application_id from log file.
      *
      * @param logPath     log file path
@@ -152,7 +162,7 @@ public class LogUtils {
         }
         List<String> appIds = new ArrayList<>();
         try (Stream<String> stream = Files.lines(Paths.get(appInfoPath))) {
-            stream.forEach(appIds::add);
+            stream.limit(MAX_APPINFO_LINES).forEach(appIds::add);
             return new ArrayList<>(appIds);
         } catch (IOException e) {
             log.error("Get appId from appInfo file error, appInfoPath: {}", appInfoPath, e);
@@ -163,6 +173,11 @@ public class LogUtils {
     public List<String> getAppIdsFromLogFile(@NonNull String logPath) {
         File logFile = new File(logPath);
         if (!logFile.exists() || !logFile.isFile()) {
+            return Collections.emptyList();
+        }
+        if (logFile.length() > MAX_APPID_SCAN_FILE_SIZE) {
+            log.warn("Log file size {} exceeds max scan size {}, skipping appId extraction for {}",
+                    logFile.length(), MAX_APPID_SCAN_FILE_SIZE, logPath);
             return Collections.emptyList();
         }
         Set<String> appIds = new HashSet<>();

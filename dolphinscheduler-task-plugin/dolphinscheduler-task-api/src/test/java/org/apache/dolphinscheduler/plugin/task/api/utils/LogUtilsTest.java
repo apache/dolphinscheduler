@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,5 +47,29 @@ public class LogUtilsTest {
         List<String> appIds = LogUtils.getAppIds(APP_ID_FILE, APP_INFO_FILE, "aop");
         appIds = appIds.stream().filter(a -> a.contains("application")).collect(Collectors.toList());
         Assertions.assertEquals(Lists.newArrayList("application_1548381669007_1234"), appIds);
+    }
+
+    @Test
+    public void getAppIdsFromLogFile_nonExistentFile() {
+        List<String> appIds = LogUtils.getAppIdsFromLogFile("/nonexistent/file.log");
+        Assertions.assertTrue(appIds.isEmpty(), "Should return empty list for non-existent file");
+    }
+
+    @Test
+    public void getAppIdsFromAppInfoFile_moreThan10000Lines() throws IOException {
+        Path tempFile = Files.createTempFile("ds-appinfo-test", ".log");
+        try {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 15000; i++) {
+                sb.append("application_").append(i).append("\n");
+            }
+            Files.write(tempFile, sb.toString().getBytes(StandardCharsets.UTF_8));
+
+            List<String> appIds = LogUtils.getAppIdsFromAppInfoFile(tempFile.toString());
+            Assertions.assertEquals(10000, appIds.size(),
+                    "Should only return first 10000 lines");
+        } finally {
+            Files.deleteIfExists(tempFile);
+        }
     }
 }
