@@ -16,4 +16,5 @@
 */
 
 ALTER TABLE `t_ds_task_instance` ADD INDEX idx_project_submit_time (project_code ASC, submit_time DESC);
+ALTER TABLE `t_ds_workflow_instance` ADD INDEX idx_project_start_time (project_code ASC, start_time DESC);
 
