@@ -55,6 +55,9 @@ public class NettyClientConfig {
     private int receiveBufferSize = 65535;
 
     @Builder.Default
+    private int maxFrameSize = 100 * 1024 * 1024;
+
+    @Builder.Default
     private int connectTimeoutMillis = 3000;
 
     /**

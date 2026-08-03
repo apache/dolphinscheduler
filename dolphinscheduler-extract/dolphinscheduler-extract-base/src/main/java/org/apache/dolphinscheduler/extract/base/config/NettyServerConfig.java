@@ -56,6 +56,9 @@ public class NettyServerConfig {
     @Builder.Default
     private int receiveBufferSize = 65535;
 
+    @Builder.Default
+    private int maxFrameSize = 100 * 1024 * 1024;
+
     /**
      * worker threads，default get machine cpus
      */

@@ -29,8 +29,15 @@ import io.netty.handler.codec.ReplayingDecoder;
 @Slf4j
 public class TransporterDecoder extends ReplayingDecoder<TransporterDecoder.State> {
 
+    private final int maxFrameSize;
+
     public TransporterDecoder() {
+        this(100 * 1024 * 1024);  // default 100MB
+    }
+
+    public TransporterDecoder(int maxFrameSize) {
         super(State.MAGIC);
+        this.maxFrameSize = maxFrameSize;
     }
 
     private int headerLength;
@@ -56,6 +63,10 @@ public class TransporterDecoder extends ReplayingDecoder<TransporterDecoder.Stat
                 checkpoint(State.BODY_LENGTH);
             case BODY_LENGTH:
                 bodyLength = in.readInt();
+                if (bodyLength > maxFrameSize) {
+                    throw new IllegalArgumentException(
+                            "body length " + bodyLength + " exceeds max frame size " + maxFrameSize);
+                }
                 checkpoint(State.BODY);
             case BODY:
                 body = new byte[bodyLength];
