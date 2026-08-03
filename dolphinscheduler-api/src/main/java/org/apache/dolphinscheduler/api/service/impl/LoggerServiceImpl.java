@@ -38,7 +38,9 @@ import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -264,8 +266,20 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             outputStream.write(head);
             logClientDelegate.streamWholeLog(taskInstance, outputStream);
         } catch (Exception ex) {
-            log.error("Download TaskInstance: {} Log Error", taskInstance.getName(), ex);
-            throw new ServiceException(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);
+            // Response is already committed (HTTP 200 + head written); cannot change status.
+            // Log the root cause server-side and append a visible trailer so the client knows the
+            // download was truncated. Do NOT rethrow — it cannot change the status and only adds
+            // a confusing error-log entry.
+            log.error("Download TaskInstance: {} Log Error (stream truncated)", taskInstance.getName(), ex);
+            try {
+                final String trailer = "\n\n[LOG-DOWNLOAD-ERROR] download failed: "
+                        + ExceptionUtils.getRootCauseMessage(ex)
+                        + " (stream truncated)\n";
+                outputStream.write(trailer.getBytes(StandardCharsets.UTF_8));
+                outputStream.flush();
+            } catch (IOException ioe) {
+                log.warn("Failed to write error trailer for task instance {}", taskInstance.getId(), ioe);
+            }
         }
     }
 }
