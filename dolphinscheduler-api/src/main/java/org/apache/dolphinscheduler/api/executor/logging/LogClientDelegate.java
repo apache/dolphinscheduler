@@ -97,7 +97,7 @@ public class LogClientDelegate {
     /**
      * Stream the entire task instance log to {@code outputStream} in fixed-size chunks, keeping
      * memory bounded regardless of total log size. Prefers the worker (RPC chunked); if the worker
-     * node is gone, falls back to remote storage, then to the legacy whole-file byte[] read.
+     * node is gone, falls back to remote storage. If both fail, the exception is propagated.
      *
      * <p>If a streaming source fails <b>after</b> bytes have already been written to the output, no
      * fallback is attempted — restarting from offset 0 would duplicate the prefix and corrupt the
@@ -130,15 +130,10 @@ public class LogClientDelegate {
         } catch (IOException | RuntimeException e) {
             if (written[0] > 0) {
                 throw new IOException("Remote streaming failed after " + written[0]
-                        + " bytes written; cannot fall back to legacy whole-file read without corrupting the stream",
-                        e);
+                        + " bytes written; cannot fall back without corrupting the stream", e);
             }
-            log.warn("Streaming from remote failed before any byte was written for task instance {}, "
-                    + "falling back to legacy whole-file read", taskInstance.getId(), e);
+            throw new IOException("Log streaming failed for task instance " + taskInstance.getId(), e);
         }
-        final byte[] bytes = getWholeLogBytes(taskInstance);
-        outputStream.write(bytes);
-        outputStream.flush();
     }
 
     private void streamFromLocalWorker(final TaskInstance taskInstance, final OutputStream outputStream,
