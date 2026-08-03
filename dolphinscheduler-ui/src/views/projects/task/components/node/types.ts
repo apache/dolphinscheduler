@@ -305,6 +305,8 @@ interface ITaskParams {
   type?: string
   datasource?: string
   sql?: string
+  sqlSource?: string
+  sqlResource?: string
   sqlType?: string
   sendEmail?: boolean
   displayRows?: number
