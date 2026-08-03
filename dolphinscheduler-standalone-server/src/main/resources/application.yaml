@@ -70,6 +70,8 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
+    async:
+      request-timeout: 600000
   cloud.discovery.client.composite-indicator.enabled: false
 
 scheduler-plugin:

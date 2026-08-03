@@ -78,6 +78,11 @@ spring:
       matching-strategy: ANT_PATH_MATCHER
     static-path-pattern: /static/**
     dispatch-trace-request: false
+    # Streaming log download (download-log) runs as an async StreamingResponseBody and may take
+    # minutes for multi-GB logs. The default async timeout (Jetty 30s) would cut large downloads
+    # off mid-stream. 600000ms = 10 min covers large logs; does not affect non-async requests.
+    async:
+      request-timeout: 600000
   cloud.discovery.client.composite-indicator.enabled: false
 
 springdoc:
