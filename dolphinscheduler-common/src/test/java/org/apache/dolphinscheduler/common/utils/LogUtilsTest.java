@@ -318,4 +318,24 @@ class LogUtilsTest {
         assertThrows(RuntimeException.class,
                 () -> LogUtils.readFileRange("/nonexistent/range.log", 0, 100));
     }
+
+    /**
+     * A length larger than MAX_LOG_CHUNK_SIZE must be clamped by readFileRange itself (self-defense),
+     * so a caller cannot trigger a multi-GB allocation against a large file.
+     */
+    @Test
+    void readFileRange_clampsOversizedLengthToMaxLogChunkSize() throws IOException {
+        final Path file = Files.createTempFile("ds-range-clamp", ".log");
+        try {
+            final byte[] data = new byte[LogUtils.MAX_LOG_CHUNK_SIZE + 1024];
+            Arrays.fill(data, (byte) 'x');
+            Files.write(file, data);
+
+            final byte[] got = LogUtils.readFileRange(file.toString(), 0, Integer.MAX_VALUE);
+            assertEquals(LogUtils.MAX_LOG_CHUNK_SIZE, got.length,
+                    "readFileRange must clamp length to MAX_LOG_CHUNK_SIZE");
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
 }

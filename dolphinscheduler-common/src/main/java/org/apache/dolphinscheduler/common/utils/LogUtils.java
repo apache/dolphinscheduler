@@ -99,7 +99,7 @@ public class LogUtils {
      *
      * @param filePath absolute path to the log file
      * @param offset   start byte offset (>= 0); if >= file size, an empty array is returned
-     * @param length   maximum number of bytes to read (> 0); the returned array may be shorter at EOF
+     * @param length   maximum number of bytes to read (&gt; 0); capped at {@link #MAX_LOG_CHUNK_SIZE}; the returned array may be shorter at EOF
      * @return the bytes actually read
      */
     public static byte[] readFileRange(final String filePath, final long offset, final int length) {
@@ -111,7 +111,10 @@ public class LogUtils {
         if (offset < 0 || length <= 0 || offset >= fileSize) {
             return new byte[0];
         }
-        final int toRead = (int) Math.min(length, fileSize - offset);
+        // Self-defense: clamp to MAX_LOG_CHUNK_SIZE so a caller passing length=Integer.MAX_VALUE
+        // against a multi-GB file cannot trigger new byte[~2GB] and OOM. All current callers already
+        // clamp, but this method is public.
+        final int toRead = (int) Math.min(Math.min(length, fileSize - offset), MAX_LOG_CHUNK_SIZE);
         final byte[] bytes = new byte[toRead];
         try (RandomAccessFile randomAccessFile = new RandomAccessFile(file, "r")) {
             randomAccessFile.seek(offset);
