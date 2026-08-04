@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.api.dto;
 
+import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
+
 import java.util.Date;
 
 import lombok.Data;
@@ -31,6 +33,7 @@ public class ScheduleParam {
     private Date endTime;
     private String crontab;
     private String timezoneId;
+    private ScheduleMissedFirePolicy missedFirePolicy = ScheduleMissedFirePolicy.FIRE_ONCE_NOW;
 
     public ScheduleParam() {
     }

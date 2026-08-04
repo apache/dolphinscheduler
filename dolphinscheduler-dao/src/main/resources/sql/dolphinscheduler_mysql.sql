@@ -859,6 +859,7 @@ CREATE TABLE `t_ds_schedules` (
   `end_time` datetime NOT NULL COMMENT 'end time',
   `timezone_id` varchar(40) DEFAULT NULL COMMENT 'schedule timezone id',
   `crontab` varchar(255) NOT NULL COMMENT 'crontab description',
+  `missed_fire_policy` tinyint NOT NULL DEFAULT '1' COMMENT 'missed fire policy: 0 skip missed, 1 fire once now, 2 fire all missed',
   `failure_strategy` tinyint(4) NOT NULL COMMENT 'failure strategy. 0:end,1:continue',
   `user_id` int(11) NOT NULL COMMENT 'user id',
   `release_state` tinyint(4) NOT NULL COMMENT 'release state. 0:offline,1:online ',

@@ -136,6 +136,7 @@ export const useForm = () => {
       ],
       crontab: '0 0 * * * ? *',
       timezoneId: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      missedFirePolicy: 'FIRE_ONCE_NOW',
       failureStrategy: 'CONTINUE',
       warningType: 'NONE',
       workflowInstancePriority: 'MEDIUM',
