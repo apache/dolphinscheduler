@@ -27,7 +27,7 @@ interface CronScheduleBuilderFactory {
 
     static CronScheduleBuilderFactory getFactory(ScheduleMissedFirePolicy missedFirePolicy) {
         ScheduleMissedFirePolicy effectivePolicy = missedFirePolicy == null
-                ? ScheduleMissedFirePolicy.FIRE_ONCE_NOW
+                ? ScheduleMissedFirePolicy.FIRE_ALL_MISSED
                 : missedFirePolicy;
         switch (effectivePolicy) {
             case SKIP_MISSED:

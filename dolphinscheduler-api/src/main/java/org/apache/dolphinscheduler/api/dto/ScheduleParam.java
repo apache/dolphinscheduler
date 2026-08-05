@@ -33,7 +33,7 @@ public class ScheduleParam {
     private Date endTime;
     private String crontab;
     private String timezoneId;
-    private ScheduleMissedFirePolicy missedFirePolicy = ScheduleMissedFirePolicy.FIRE_ONCE_NOW;
+    private ScheduleMissedFirePolicy missedFirePolicy = ScheduleMissedFirePolicy.FIRE_ALL_MISSED;
 
     public ScheduleParam() {
     }

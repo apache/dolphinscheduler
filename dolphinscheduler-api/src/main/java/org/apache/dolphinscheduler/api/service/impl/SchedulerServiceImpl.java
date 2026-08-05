@@ -32,9 +32,9 @@ import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
 import org.apache.dolphinscheduler.api.vo.ScheduleVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
-import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -404,7 +404,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     private ScheduleMissedFirePolicy defaultMissedFirePolicy(ScheduleMissedFirePolicy missedFirePolicy) {
-        return missedFirePolicy == null ? ScheduleMissedFirePolicy.FIRE_ONCE_NOW : missedFirePolicy;
+        return missedFirePolicy == null ? ScheduleMissedFirePolicy.FIRE_ALL_MISSED : missedFirePolicy;
     }
 
     /**

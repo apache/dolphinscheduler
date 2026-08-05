@@ -785,7 +785,7 @@ CREATE TABLE t_ds_schedules (
   end_time timestamp NOT NULL ,
   timezone_id varchar(40) default NULL ,
   crontab varchar(255) NOT NULL ,
-  missed_fire_policy smallint NOT NULL DEFAULT 1,
+  missed_fire_policy smallint NOT NULL DEFAULT 2,
   failure_strategy int NOT NULL ,
   user_id int NOT NULL ,
   release_state int NOT NULL ,

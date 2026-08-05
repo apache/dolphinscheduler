@@ -55,11 +55,11 @@ class CronScheduleBuilderFactoryTest {
     }
 
     @Test
-    void shouldCreateFireOnceNowCronScheduleBuilderByDefault() {
+    void shouldCreateFireAllMissedCronScheduleBuilderByDefault() {
         assertFactoryAndMisfireInstruction(
                 null,
-                FireOnceNowCronScheduleBuilderFactory.class,
-                CronTrigger.MISFIRE_INSTRUCTION_FIRE_ONCE_NOW);
+                FireAllMissedCronScheduleBuilderFactory.class,
+                Trigger.MISFIRE_INSTRUCTION_IGNORE_MISFIRE_POLICY);
     }
 
     private void assertFactoryAndMisfireInstruction(
