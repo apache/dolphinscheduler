@@ -81,9 +81,9 @@ public class QuartzCornTriggerBuilder implements QuartzTriggerBuilder {
         JobKey jobKey = QuartzJobKey.of(projectId, schedule.getId()).toJobKey();
 
         TriggerKey triggerKey = TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup());
-        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(schedule.getCrontab())
+        CronScheduleBuilder scheduleBuilder = CronScheduleBuilderFactory.getFactory(schedule.getMissedFirePolicy())
+                .createCronScheduleBuilder(schedule.getCrontab())
                 .inTimeZone(DateUtils.getTimezone(schedule.getTimezoneId()));
-        QuartzScheduleMissedFirePolicyApplier.apply(scheduleBuilder, schedule.getMissedFirePolicy());
 
         return TriggerBuilder.newTrigger()
                 .withIdentity(triggerKey)

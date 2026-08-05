@@ -148,7 +148,7 @@ export default {
     start_time: '开始时间',
     end_time: '结束时间',
     crontab: 'Crontab',
-    missed_fire_policy: '错过触发策略',
+    missed_fire_policy: '定时错过策略',
     skip_missed: '跳过错过的执行，等待下一次调度',
     fire_once_now: '立即补触发一次，之后按正常节奏继续调度',
     fire_all_missed: '补触发所有错过的执行，之后按正常节奏继续调度',

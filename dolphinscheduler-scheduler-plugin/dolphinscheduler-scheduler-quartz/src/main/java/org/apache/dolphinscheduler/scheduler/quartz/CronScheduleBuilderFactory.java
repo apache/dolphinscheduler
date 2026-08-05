@@ -21,29 +21,23 @@ import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
 
 import org.quartz.CronScheduleBuilder;
 
-final class QuartzScheduleMissedFirePolicyApplier {
+interface CronScheduleBuilderFactory {
 
-    private QuartzScheduleMissedFirePolicyApplier() {
-        throw new IllegalStateException("Utility class");
-    }
+    CronScheduleBuilder createCronScheduleBuilder(String cronExpression);
 
-    static void apply(CronScheduleBuilder scheduleBuilder, ScheduleMissedFirePolicy missedFirePolicy) {
-        switch (effectivePolicy(missedFirePolicy)) {
+    static CronScheduleBuilderFactory getFactory(ScheduleMissedFirePolicy missedFirePolicy) {
+        ScheduleMissedFirePolicy effectivePolicy = missedFirePolicy == null
+                ? ScheduleMissedFirePolicy.FIRE_ONCE_NOW
+                : missedFirePolicy;
+        switch (effectivePolicy) {
             case SKIP_MISSED:
-                scheduleBuilder.withMisfireHandlingInstructionDoNothing();
-                return;
+                return new SkipMissedCronScheduleBuilderFactory();
             case FIRE_ONCE_NOW:
-                scheduleBuilder.withMisfireHandlingInstructionFireAndProceed();
-                return;
+                return new FireOnceNowCronScheduleBuilderFactory();
             case FIRE_ALL_MISSED:
-                scheduleBuilder.withMisfireHandlingInstructionIgnoreMisfires();
-                return;
+                return new FireAllMissedCronScheduleBuilderFactory();
             default:
-                throw new IllegalStateException("Unsupported schedule missed fire policy: " + missedFirePolicy);
+                throw new IllegalArgumentException("Unsupported schedule missed fire policy: " + missedFirePolicy);
         }
-    }
-
-    private static ScheduleMissedFirePolicy effectivePolicy(ScheduleMissedFirePolicy missedFirePolicy) {
-        return missedFirePolicy == null ? ScheduleMissedFirePolicy.FIRE_ONCE_NOW : missedFirePolicy;
     }
 }
