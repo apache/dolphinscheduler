@@ -17,13 +17,17 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+
 import org.quartz.CronScheduleBuilder;
 
 final class FireAllMissedCronScheduleBuilderFactory implements CronScheduleBuilderFactory {
 
     @Override
-    public CronScheduleBuilder createCronScheduleBuilder(String cronExpression) {
-        return CronScheduleBuilder.cronSchedule(cronExpression)
-                .withMisfireHandlingInstructionIgnoreMisfires();
+    public CronScheduleBuilder createCronScheduleBuilder(Schedule schedule) {
+        return CronScheduleBuilder.cronSchedule(schedule.getCrontab())
+                .withMisfireHandlingInstructionIgnoreMisfires()
+                .inTimeZone(DateUtils.getTimezone(schedule.getTimezoneId()));
     }
 }

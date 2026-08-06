@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 
 import org.junit.jupiter.api.Test;
 import org.quartz.CronTrigger;
@@ -29,6 +30,8 @@ import org.quartz.Trigger;
 class CronScheduleBuilderFactoryTest {
 
     private static final String CRON_EXPRESSION = "0 0 * * * ?";
+
+    private static final String TIMEZONE_ID = "Asia/Shanghai";
 
     @Test
     void shouldCreateSkipMissedCronScheduleBuilder() {
@@ -66,10 +69,14 @@ class CronScheduleBuilderFactoryTest {
                                                     ScheduleMissedFirePolicy policy,
                                                     Class<? extends CronScheduleBuilderFactory> expectedFactoryClass,
                                                     int expectedMisfireInstruction) {
+        Schedule schedule = new Schedule();
+        schedule.setCrontab(CRON_EXPRESSION);
+        schedule.setTimezoneId(TIMEZONE_ID);
         CronScheduleBuilderFactory factory = CronScheduleBuilderFactory.getFactory(policy);
         assertInstanceOf(expectedFactoryClass, factory);
-        assertEquals(
-                expectedMisfireInstruction,
-                factory.createCronScheduleBuilder(CRON_EXPRESSION).build().getMisfireInstruction());
+        Trigger trigger = factory.createCronScheduleBuilder(schedule).build();
+        CronTrigger cronTrigger = assertInstanceOf(CronTrigger.class, trigger);
+        assertEquals(expectedMisfireInstruction, cronTrigger.getMisfireInstruction());
+        assertEquals(TIMEZONE_ID, cronTrigger.getTimeZone().getID());
     }
 }

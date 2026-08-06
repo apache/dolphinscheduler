@@ -18,12 +18,13 @@
 package org.apache.dolphinscheduler.scheduler.quartz;
 
 import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 
 import org.quartz.CronScheduleBuilder;
 
 interface CronScheduleBuilderFactory {
 
-    CronScheduleBuilder createCronScheduleBuilder(String cronExpression);
+    CronScheduleBuilder createCronScheduleBuilder(Schedule schedule);
 
     static CronScheduleBuilderFactory getFactory(ScheduleMissedFirePolicy missedFirePolicy) {
         ScheduleMissedFirePolicy effectivePolicy = missedFirePolicy == null
