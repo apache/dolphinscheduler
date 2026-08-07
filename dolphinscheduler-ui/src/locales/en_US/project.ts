@@ -409,7 +409,7 @@ export default {
     image: 'Image',
     image_tips: 'Please enter image',
     image_pull_policy: 'Image pull policy',
-    image_pull_policy_tips: 'Please select a image pull policy (required)',
+    image_pull_policy_tips: 'Please select an image pull policy (required)',
     pull_secret: 'Pull secret',
     pull_secret_tips: 'Please enter pull secret',
     command: 'Command',
