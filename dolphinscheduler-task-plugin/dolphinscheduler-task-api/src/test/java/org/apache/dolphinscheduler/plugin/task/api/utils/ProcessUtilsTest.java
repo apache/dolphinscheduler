@@ -263,4 +263,27 @@ public class ProcessUtilsTest {
         // Assert
         Assertions.assertTrue(result);
     }
+
+    @Test
+    void testKillAlreadyExitedProcessBeforePstree() {
+        // Arrange: processId is still cached but the OS process has already exited
+        TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
+        Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
+
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.matches("kill -0.*")))
+                .thenReturn("kill -0 12345");
+        mockedOSUtils.when(() -> OSUtils.exeCmd(Mockito.matches(".*kill -0.*")))
+                .thenThrow(new RuntimeException("No such process"));
+
+        // Act
+        boolean result = ProcessUtils.kill(taskRequest);
+
+        // Assert: already-exited process should be treated as successful kill
+        Assertions.assertTrue(result);
+
+        // pstree must not be required when the root process is already gone
+        String pstreeCmd = SystemUtils.IS_OS_MAC ? "pstree -sp 12345" : "pstree -p 12345";
+        mockedOSUtils.verify(() -> OSUtils.exeCmd(pstreeCmd), Mockito.never());
+    }
 }
