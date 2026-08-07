@@ -2,6 +2,10 @@
 
 This document records the incompatible updates between each version. You need to check this document before you upgrade to related version.
 
+## dev
+
+* The workflow instance list APIs (`GET /projects/{projectCode}/workflow-instances`, `GET /projects/{projectCode}/workflow-instances/top-n`, `GET /projects/{projectCode}/workflow-instances/trigger`) no longer return the following fields in the response body: `commandParam`, `globalParams`, `historyCmd`, `varPool`, `stateHistory`. To obtain these fields, use the detail API `GET /projects/{projectCode}/workflow-instances/{id}` instead.
+
 ## 3.0.0
 
 * Copy and import workflow without 'copy' suffix [#10607](https://github.com/apache/dolphinscheduler/pull/10607)

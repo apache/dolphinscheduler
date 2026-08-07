@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -253,5 +255,61 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    public void testWorkflowInstanceQueryDTO_omitsHeavyFields() {
+        // Verify via reflection that WorkflowInstanceQueryDTO does NOT declare
+        // the 5 fields that were removed from the list API response contract.
+        List<String> omittedFields = java.util.Arrays.asList(
+                "commandParam", "globalParams", "historyCmd", "varPool", "stateHistory");
+        for (String field : omittedFields) {
+            Assertions.assertThrows(NoSuchFieldException.class,
+                    () -> WorkflowInstanceQueryDTO.class.getDeclaredField(field),
+                    "WorkflowInstanceQueryDTO should NOT declare field '" + field
+                            + "' — it was intentionally removed from the list API response contract");
+        }
+    }
+
+    @Test
+    public void testWorkflowInstanceQueryDTO_includesRequiredFields() {
+        // Verify that all fields present in listSql are also declared in the DTO.
+        List<String> requiredFields = java.util.Arrays.asList(
+                "id", "name", "workflowDefinitionCode", "workflowDefinitionVersion",
+                "projectCode", "state", "recovery", "startTime", "endTime",
+                "runTimes", "host", "commandType", "taskDependType",
+                "maxTryTimes", "failureStrategy", "warningType", "warningGroupId",
+                "scheduleTime", "commandStartTime",
+                "isSubWorkflow", "executorId", "workflowInstancePriority",
+                "workerGroup", "environmentCode", "timeout", "tenantCode",
+                "dryRun", "nextWorkflowInstanceId", "restartTime", "duration",
+                "executorName");
+        for (String field : requiredFields) {
+            Assertions.assertDoesNotThrow(() -> WorkflowInstanceQueryDTO.class.getDeclaredField(field),
+                    "WorkflowInstanceQueryDTO should declare field '" + field
+                            + "' — it must be present in the list API response contract");
+        }
+    }
+
+    @Test
+    public void testFromEntity_MapsAllDtoFields() {
+        // Build a minimal WorkflowInstance and ensure fromEntity maps without error
+        // and every DTO field is non-null where expected.
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setId(1);
+        instance.setName("test-workflow");
+        instance.setWorkflowDefinitionCode(123456L);
+        instance.setWorkflowDefinitionVersion(1);
+        instance.setProjectCode(789L);
+        instance.setState(WorkflowExecutionStatus.SUCCESS);
+        instance.setExecutorName("admin");
+
+        WorkflowInstanceQueryDTO dto = WorkflowInstanceQueryDTO.fromEntity(instance);
+
+        Assertions.assertEquals(1, dto.getId());
+        Assertions.assertEquals("test-workflow", dto.getName());
+        Assertions.assertEquals(123456L, dto.getWorkflowDefinitionCode());
+        Assertions.assertEquals(WorkflowExecutionStatus.SUCCESS, dto.getState());
+        Assertions.assertEquals("admin", dto.getExecutorName());
     }
 }

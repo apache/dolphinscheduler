@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -233,13 +234,14 @@ public class WorkflowInstanceController extends BaseController {
     @GetMapping(value = "/top-n")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.QUERY_WORKFLOW_INSTANCE_BY_ID_ERROR)
-    public Result<List<WorkflowInstance>> queryTopNLongestRunningWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                                  @RequestParam("size") Integer size,
-                                                                                  @RequestParam(value = "startTime", required = true) String startTime,
-                                                                                  @RequestParam(value = "endTime", required = true) String endTime) {
-        List<WorkflowInstance> workflowInstances = workflowInstanceService.queryTopNLongestRunningWorkflowInstance(
-                loginUser, projectCode, size, startTime, endTime);
+    public Result<List<WorkflowInstanceQueryDTO>> queryTopNLongestRunningWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                                          @RequestParam("size") Integer size,
+                                                                                          @RequestParam(value = "startTime", required = true) String startTime,
+                                                                                          @RequestParam(value = "endTime", required = true) String endTime) {
+        List<WorkflowInstanceQueryDTO> workflowInstances =
+                workflowInstanceService.queryTopNLongestRunningWorkflowInstance(
+                        loginUser, projectCode, size, startTime, endTime);
         return Result.success(workflowInstances);
     }
 
@@ -432,10 +434,10 @@ public class WorkflowInstanceController extends BaseController {
     @GetMapping("/trigger")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR)
-    public Result<List<WorkflowInstance>> queryWorkflowInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                              @PathVariable long projectCode,
-                                                                              @RequestParam(value = "triggerCode") Long triggerCode) {
-        List<WorkflowInstance> workflowInstances =
+    public Result<List<WorkflowInstanceQueryDTO>> queryWorkflowInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                      @PathVariable long projectCode,
+                                                                                      @RequestParam(value = "triggerCode") Long triggerCode) {
+        List<WorkflowInstanceQueryDTO> workflowInstances =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, triggerCode);
         return Result.success(workflowInstances);
     }

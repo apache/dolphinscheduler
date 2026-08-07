@@ -27,6 +27,11 @@
         workflow_instance_priority, worker_group,environment_code, timeout, tenant_code, var_pool,
         dry_run, next_workflow_instance_id, restart_time, state_history
     </sql>
+    <!--
+      Lightweight column projection for list/scan queries (internal + API).
+      Intentionally omits: commandParam, globalParams, historyCmd, varPool, stateHistory.
+      These 5 columns are large and only needed for detail views or internal processing.
+    -->
     <sql id="listSql">
         id
         , name, workflow_definition_version, workflow_definition_code, project_code, state, recovery, start_time, end_time, run_times,host,
