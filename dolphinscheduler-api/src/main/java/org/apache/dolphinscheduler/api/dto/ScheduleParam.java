@@ -23,6 +23,8 @@ import java.util.Date;
 
 import lombok.Data;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * schedule parameters
  */
@@ -35,6 +37,9 @@ public class ScheduleParam {
     private String timezoneId;
     private ScheduleMissedFirePolicy missedFirePolicy = ScheduleMissedFirePolicy.FIRE_ALL_MISSED;
 
+    @JsonIgnore
+    private boolean missedFirePolicySet;
+
     public ScheduleParam() {
     }
 
@@ -43,6 +48,15 @@ public class ScheduleParam {
         this.endTime = endTime;
         this.timezoneId = timezoneId;
         this.crontab = crontab;
+    }
+
+    public void setMissedFirePolicy(ScheduleMissedFirePolicy missedFirePolicy) {
+        this.missedFirePolicy = missedFirePolicy;
+        this.missedFirePolicySet = true;
+    }
+
+    public boolean isMissedFirePolicySet() {
+        return missedFirePolicySet;
     }
 
     @Override

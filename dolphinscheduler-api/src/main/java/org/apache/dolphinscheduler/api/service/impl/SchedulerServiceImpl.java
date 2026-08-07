@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -172,7 +173,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
         }
         scheduleObj.setCrontab(scheduleParam.getCrontab());
-        scheduleObj.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
+        ScheduleMissedFirePolicy missedFirePolicy = scheduleParam.getMissedFirePolicy();
+        scheduleObj.setMissedFirePolicy(missedFirePolicy == null
+                ? ScheduleMissedFirePolicy.FIRE_ALL_MISSED
+                : missedFirePolicy);
         scheduleObj.setTimezoneId(scheduleParam.getTimezoneId());
         scheduleObj.setWarningType(warningType);
         scheduleObj.setWarningGroupId(warningGroupId);
@@ -558,7 +562,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 throw new ServiceException(Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
             }
             schedule.setCrontab(scheduleParam.getCrontab());
-            schedule.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
+            if (scheduleParam.isMissedFirePolicySet() && scheduleParam.getMissedFirePolicy() != null) {
+                schedule.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
+            }
             schedule.setTimezoneId(scheduleParam.getTimezoneId());
         }
 
