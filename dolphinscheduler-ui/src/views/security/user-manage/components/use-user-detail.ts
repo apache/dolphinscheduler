@@ -95,7 +95,7 @@ export function useUserDetail() {
             value
           )
         ) {
-          return new Error(t('security.user.emial_correct_tips'))
+          return new Error(t('security.user.email_correct_tips'))
         }
       }
     },
