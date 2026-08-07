@@ -128,7 +128,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(null);
         Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
                 .thenReturn(Optional.of(workflowDefinition));
-        Mockito.when(scheduleDao.queryById(Mockito.anyInt())).thenReturn(insertedSchedule);
+        Mockito.when(scheduleDao.queryById(Mockito.any())).thenReturn(insertedSchedule);
 
         Schedule result = schedulerService.insertSchedule(
                 user, projectCode, processDefinitionCode, scheduleExpression(missedFirePolicy), WarningType.NONE, 0,
