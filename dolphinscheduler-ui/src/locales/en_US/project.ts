@@ -820,7 +820,7 @@ export default {
     mlflow_dataPath: 'Data Path',
     mlflow_dataPath_tips:
       ' The absolute path of the file or folder. Ends with .csv for file or contain train.csv and test.csv for folder',
-    mlflow_dataPath_error_tips: ' data data can not be empty ',
+    mlflow_dataPath_error_tips: 'Data path can not be empty',
     mlflow_experimentName: 'Experiment Name',
     mlflow_experimentName_tips: 'experiment_001',
     mlflow_registerModel: 'Register Model',
