@@ -505,7 +505,7 @@ public enum Status {
     UPDATE_CLUSTER_WORKFLOW_DEFINITION_RELATION_ERROR(1200032,
             "You can't modify the workflow definition, because the workflow definition [{0}] and this cluster [{1}] already be used in the task [{2}]",
             "您不能修改集群选项，因为该工作流组 [{0}] 和 该集群 [{1}] 已经被用在任务 [{2}] 中"),
-    CLUSTER_NOT_EXISTS(120033, "this cluster can not found in db.", "集群配置数据库里查询不到为空"),
+    CLUSTER_NOT_EXISTS(120033, "this cluster cannot be found in db.", "集群配置数据库里查询不到为空"),
     DELETE_CLUSTER_RELATED_NAMESPACE_EXISTS(120034, "this cluster has been used in namespace,so you can't delete it.",
             "该集群已经被命名空间使用，所以不能删除该集群信息"),
 
