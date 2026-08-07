@@ -180,8 +180,18 @@ export default defineComponent({
       ]
     }
 
-    const updateWorkerGroup = () => {
-      timingState.timingForm.environmentCode = null
+    const updateWorkerGroup = (workerGroup: string) => {
+      const current = timingState.timingForm.environmentCode
+      if (!current) {
+        return
+      }
+      const stillValid = variables.environmentList.some(
+        (item: any) =>
+          item.value === current && item.workerGroups?.includes(workerGroup)
+      )
+      if (!stillValid) {
+        timingState.timingForm.environmentCode = null
+      }
     }
 
     const handlePreview = () => {

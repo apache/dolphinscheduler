@@ -249,8 +249,18 @@ export default defineComponent({
       }
     }
 
-    const updateWorkerGroup = () => {
-      startState.startForm.environmentCode = null
+    const updateWorkerGroup = (workerGroup: string) => {
+      const current = startState.startForm.environmentCode
+      if (!current) {
+        return
+      }
+      const stillValid = variables.environmentList.some(
+        (item: any) =>
+          item.value === current && item.workerGroups?.includes(workerGroup)
+      )
+      if (!stillValid) {
+        startState.startForm.environmentCode = null
+      }
     }
 
     const addStartParams = () => {
