@@ -225,7 +225,7 @@ export default {
     project_name: 'Project Name',
     project_tips: 'Please select project name',
     workflow_relation_no_data_result_title:
-      'Can not find any relations of workflows.',
+      'Cannot find any relations of workflows.',
     workflow_relation_no_data_result_desc:
       'There is not any workflows. Please create a workflow, and then visit this page again.',
     failover: 'Failover',
