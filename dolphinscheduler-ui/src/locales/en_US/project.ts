@@ -892,7 +892,7 @@ export default {
     please_enter_statistics_execute_sql: 'Please enter statistics execute sql',
     please_enter_threshold_number_is_needed:
       'Please enter threshold number is needed',
-    please_enter_comparison_title: 'please select comparison title',
+    please_enter_comparison_title: 'Please select comparison title',
     custom_config: 'Custom Config',
     engine: 'engine',
     engine_tips: 'Please select engine',
