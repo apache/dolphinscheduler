@@ -148,7 +148,7 @@ public enum Status {
             "查询工作流实例甘特图数据错误"),
     QUERY_WORKFLOW_DEFINITION_LIST_PAGING_ERROR(10122, "query workflow definition list paging error", "分页查询工作流定义列表错误"),
     SIGN_OUT_ERROR(10123, "sign out error", "退出错误"),
-    OS_TENANT_CODE_HAS_ALREADY_EXISTS(10124, "os tenant code has already exists", "操作系统租户已存在"),
+    OS_TENANT_CODE_HAS_ALREADY_EXISTS(10124, "os tenant code already exists", "操作系统租户已存在"),
     IP_IS_EMPTY(10125, "ip is empty", "IP地址不能为空"),
     SCHEDULE_CRON_REALEASE_NEED_NOT_CHANGE(10126, "schedule release is already {0}", "调度配置上线错误[{0}]"),
     CREATE_QUEUE_ERROR(10127, "create queue error", "创建队列错误"),
