@@ -891,7 +891,7 @@ export default {
     please_enter_comparison_execute_sql: 'Please enter comparison execute sql',
     please_enter_statistics_execute_sql: 'Please enter statistics execute sql',
     please_enter_threshold_number_is_needed:
-      'Please enter threshold number is needed',
+      'Please enter a threshold number',
     please_enter_comparison_title: 'please select comparison title',
     custom_config: 'Custom Config',
     engine: 'engine',
