@@ -377,7 +377,12 @@ public class DataxTask extends AbstractTask {
         }
         StringBuilder customParameters = new StringBuilder("-p \"");
         for (Map.Entry<String, Property> entry : paramsMap.entrySet()) {
-            customParameters.append(String.format(CUSTOM_PARAM, entry.getKey(), entry.getValue().getValue()));
+            String value = entry.getValue().getValue();
+            // Escape single quotes for shell safety: ' -> '\'' (bash standard escape)
+            // Prevents shell quoting conflicts when value contains single quotes, e.g.
+            // AND create_data > '2026-05-06 10:59:09' -> AND create_data > '\''2026-05-06 10:59:09'\''
+            String escapedValue = value == null ? "" : value.replace("'", "'\\''");
+            customParameters.append(String.format(CUSTOM_PARAM, entry.getKey(), escapedValue));
         }
         customParameters.replace(4, 5, "");
         customParameters.append("\"");

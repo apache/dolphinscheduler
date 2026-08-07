@@ -166,6 +166,24 @@ public class DataxTaskTest {
     }
 
     @Test
+    public void testBuildCommandEscapesSingleQuotesInCustomParameters() {
+        Map<String, Property> paramsMap = new HashMap<>();
+        Property conditionProperty = new Property();
+        conditionProperty.setProp("ds_incr_condition");
+        conditionProperty.setDirect(Direct.IN);
+        conditionProperty.setType(DataType.VARCHAR);
+        conditionProperty.setValue("AND create_data > '2026-05-06 10:59:09'");
+        paramsMap.put("ds_incr_condition", conditionProperty);
+
+        String command = dataxTask.buildCommand("/tmp/execution/app-id_job.json", paramsMap);
+        Assertions.assertEquals(
+                "${PYTHON_LAUNCHER} ${DATAX_LAUNCHER} --jvm=\"-Xms1G -Xmx1G\" "
+                        + "-p \"-Dds_incr_condition='AND create_data > '\\''2026-05-06 10:59:09'\\'''\" "
+                        + "/tmp/execution/app-id_job.json",
+                command);
+    }
+
+    @Test
     public void testHandleInterruptedException() throws Exception {
         String parameters = JSONUtils.toJsonString(createDataxParameters());
         TaskExecutionContext taskExecutionContext = buildTestTaskExecutionContext();
