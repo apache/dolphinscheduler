@@ -874,14 +874,14 @@ export default {
     please_select_source_connector_type: 'Please select source connector type',
     please_select_source_datasource_id: 'Please select source datasource id',
     please_select_source_database: 'Please select source database',
-    please_enter_source_table_name: 'Please select source table name',
+    please_enter_source_table_name: 'Please enter source table name',
     please_enter_filter_expression: 'Please enter filter expression',
     please_enter_column_only_single_column_is_supported:
       'Please select column, only single column is supported',
     please_select_target_connector_type: 'Please select target connector type',
     please_select_target_datasource: 'Please select target datasource id',
     please_select_target_database: 'Please select target database',
-    please_enter_target_table: 'Please select target table name',
+    please_enter_target_table: 'Please enter target table name',
     please_enter_target_filter_expression:
       'Please enter target filter expression',
     please_enter_comparison_name_the_alias_in_comparison_execute_sql:
