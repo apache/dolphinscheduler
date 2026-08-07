@@ -176,7 +176,7 @@ export default {
     queue_tips: 'Please select a queue',
     email: 'Email',
     email_empty_tips: 'Please enter email',
-    emial_correct_tips: 'Please enter the correct email format',
+    email_correct_tips: 'Please enter the correct email format',
     phone: 'Phone',
     phone_empty_tips: 'Please enter phone number',
     phone_correct_tips: 'Please enter the correct mobile phone format',

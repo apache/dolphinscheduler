@@ -172,7 +172,7 @@ export default {
     queue_tips: '默认为租户关联队列',
     email: '邮件',
     email_empty_tips: '请输入邮箱',
-    emial_correct_tips: '请输入正确的邮箱格式',
+    email_correct_tips: '请输入正确的邮箱格式',
     phone: '手机',
     phone_empty_tips: '请输入手机号码',
     phone_correct_tips: '请输入正确的手机格式',
