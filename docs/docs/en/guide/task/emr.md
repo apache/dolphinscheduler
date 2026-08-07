@@ -100,6 +100,43 @@ stepsDefineJson example
 }
 ```
 
+## AWS Authentication Configuration
+
+The Amazon EMR task (EMR on EC2) reads AWS credentials from the DolphinScheduler Worker `aws.yaml` configuration file, under the `aws.emr` section at `conf/aws.yaml`.
+
+Without valid credentials, task submission fails with errors such as:
+
+```text
+AmazonElasticMapReduceException: The security token included in the request is invalid
+(Error Code: UnrecognizedClientException)
+```
+
+### Using IAM Role (Recommended)
+
+If the DolphinScheduler Worker node runs on an EC2 instance with an attached IAM Role that can call EMR APIs:
+
+```yaml
+aws:
+  emr:
+    credentials.provider.type: InstanceProfileCredentialsProvider
+    region: us-east-1
+```
+
+### Using Access Key
+
+If you need to authenticate using AK/SK:
+
+```yaml
+aws:
+  emr:
+    credentials.provider.type: AWSStaticCredentialsProvider
+    access.key.id: your-access-key-id
+    access.key.secret: your-secret-access-key
+    region: us-east-1
+```
+
+> **Note**: The `aws.emr` section is shared by both EMR on EC2 and EMR Serverless task types. See also [Amazon EMR Serverless](emr-serverless.md).
+
 ## Notice
 
 - Failover on EMR Task type has not been implemented. In this time, DolphinScheduler only supports failover on yarn task type . Other task type, such as EMR task, k8s task not ready yet.
