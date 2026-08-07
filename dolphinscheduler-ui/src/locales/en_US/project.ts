@@ -225,9 +225,9 @@ export default {
     project_name: 'Project Name',
     project_tips: 'Please select project name',
     workflow_relation_no_data_result_title:
-      'Can not find any relations of workflows.',
+      'No workflow relations found',
     workflow_relation_no_data_result_desc:
-      'There is not any workflows. Please create a workflow, and then visit this page again.',
+      'Workflow Relation only shows workflows that are ONLINE and have an ONLINE schedule. Create or online a workflow and its schedule, then visit this page again.',
     failover: 'Failover',
     confirm_to_online: 'Confirm to make the workflow online?',
     confirm_to_offline: 'Confirm to make the workflow offline?',

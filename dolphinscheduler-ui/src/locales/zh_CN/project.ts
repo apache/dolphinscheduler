@@ -222,9 +222,9 @@ export default {
     related_items: '关联项目',
     project_name: '项目名称',
     project_tips: '请选择项目',
-    workflow_relation_no_data_result_title: '工作流关系不存在',
+    workflow_relation_no_data_result_title: '未找到工作流关系',
     workflow_relation_no_data_result_desc:
-      '目前没有任何工作流，请先创建工作流，再访问该页面',
+      '工作流关系仅展示已上线且存在已上线定时的工作流。请创建或上线工作流及其定时后，再访问该页面。',
     failover: '恢复容错',
     confirm_to_online: '是否确定上线该工作流?',
     confirm_to_offline: '是否确定下线该工作流?',
