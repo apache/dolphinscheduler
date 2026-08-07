@@ -885,9 +885,9 @@ export default {
     please_enter_target_filter_expression:
       'Please enter target filter expression',
     please_enter_comparison_name_the_alias_in_comparison_execute_sql:
-      'Please enter comparison name the alias in comparison execute sql',
+      'Please enter comparison name',
     please_enter_statistics_name_the_alias_in_statistics_execute_sql:
-      'Please enter statistics name the alias in statistics execute sql',
+      'Please enter statistics name',
     please_enter_comparison_execute_sql: 'Please enter comparison execute sql',
     please_enter_statistics_execute_sql: 'Please enter statistics execute sql',
     please_enter_threshold_number_is_needed:
