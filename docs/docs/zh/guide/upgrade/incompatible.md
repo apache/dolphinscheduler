@@ -10,7 +10,6 @@
 * Remove the spark version of spark task ([#11860](https://github.com/apache/dolphinscheduler/pull/11860)).
 * Change the default unix shell executor from sh to bash ([#12180](https://github.com/apache/dolphinscheduler/pull/12180)).
 * Remove `deleteSource` in `download()` of `StorageOperate` ([#14084](https://github.com/apache/dolphinscheduler/pull/14084))
-* 工作流实例列表接口（`GET /projects/{projectCode}/workflow-instances`、`GET /projects/{projectCode}/workflow-instances/top-n`、`GET /projects/{projectCode}/workflow-instances/trigger`）的响应体不再返回以下字段：`commandParam`、`globalParams`、`historyCmd`、`varPool`、`stateHistory`。如需获取这些字段，请使用详情接口 `GET /projects/{projectCode}/workflow-instances/{id}`。
 
 ## 3.2.0
 
@@ -48,4 +47,8 @@
 ## 3.4.1
 
 * 移除导入导出工作流([#17940])(https://github.com/apache/dolphinscheduler/issues/17940)
+
+## 3.5.0
+
+* 工作流实例列表接口的响应体不再返回以下字段：`commandParam`、`globalParams`、`historyCmd`、`varPool`、`stateHistory`。如需获取这些字段，请使用详情接口 `GET /projects/{projectCode}/workflow-instances/{id}`([#18444])(https://github.com/apache/dolphinscheduler/pull/18444)
 
