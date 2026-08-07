@@ -418,7 +418,7 @@ public enum Status {
             "批量修改工作流任务关系错误"),
     UPSTREAM_TASK_NOT_EXISTS(50071, "upstream task want to set dependence do not exists {0}", "指定的上游任务 {0} 不存在"),
 
-    WORKFLOW_INSTANCE_IS_NOT_FINISHED(50071, "the workflow instance is not finished, can not do this operation",
+    WORKFLOW_INSTANCE_IS_NOT_FINISHED(50071, "the workflow instance is not finished, cannot do this operation",
             "工作流实例未结束，不能执行此操作"),
 
     TASK_PARALLELISM_PARAMS_ERROR(50080, "task parallelism parameter is not valid", "任务并行度参数无效"),
