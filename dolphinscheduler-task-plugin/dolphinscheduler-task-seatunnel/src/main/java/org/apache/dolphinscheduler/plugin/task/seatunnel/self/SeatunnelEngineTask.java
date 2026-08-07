@@ -23,7 +23,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.Constants;
 import org.apache.dolphinscheduler.plugin.task.seatunnel.SeatunnelTask;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -71,7 +70,7 @@ public class SeatunnelEngineTask extends SeatunnelTask {
             return Arrays.asList(getAppIds().split(","));
         }
         List<String> jobIds = findSeaTunnelJobIdsFromLog();
-        if (CollectionUtils.isNotEmpty(jobIds)) {
+        if (jobIds != null && !jobIds.isEmpty()) {
             setAppIds(String.join(",", jobIds));
         }
         return jobIds == null ? Collections.emptyList() : jobIds;
@@ -95,7 +94,7 @@ public class SeatunnelEngineTask extends SeatunnelTask {
 
         // Also cancel the engine job explicitly. Needed when the client is already gone,
         // --async was used, or process kill alone did not stop a cluster streaming job.
-        if (CollectionUtils.isNotEmpty(jobIds)) {
+        if (jobIds != null && !jobIds.isEmpty()) {
             for (String jobId : jobIds) {
                 cancelSeaTunnelJob(jobId);
             }
