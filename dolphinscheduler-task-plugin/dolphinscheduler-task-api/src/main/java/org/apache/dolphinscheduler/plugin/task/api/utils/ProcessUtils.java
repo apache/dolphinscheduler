@@ -117,6 +117,14 @@ public final class ProcessUtils {
                 return true;
             }
 
+            // Process may have already exited before stop is handled (common for Flink client).
+            // Calling pstree on a dead PID fails with "No such process" and would incorrectly
+            // report kill failure; treat already-exited as success.
+            if (!isProcessAlive(processId, request.getTenantCode())) {
+                log.info("Process already exited, treat kill as success, processId: {}", processId);
+                return true;
+            }
+
             // Get all child processes
             List<Integer> pidList = getPidList(processId);
 
@@ -146,6 +154,11 @@ public final class ProcessUtils {
             return forceKillSuccess;
 
         } catch (Exception e) {
+            // Race: process exited between the alive check and pstree/kill
+            if (!isProcessAlive(request.getProcessId(), request.getTenantCode())) {
+                log.info("Process already exited, treat kill as success, processId: {}", request.getProcessId());
+                return true;
+            }
             log.error("Kill task instance error, processId: {}", request.getProcessId(), e);
             return false;
         }
