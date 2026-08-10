@@ -76,6 +76,9 @@ class FailedRecoverTaskInstanceFactoryTest {
         assertThat(taskInstance.getExecutePath()).isNull();
         assertThat(taskInstance.getVarPool()).isNull();
         assertThat(taskInstance.getPid()).isEqualTo(0);
+        // Otherwise a task extending AbstractRemoteTask tracks the previous remote application
+        // instead of submitting a new one, because TaskExecutionContext#appIds is not empty.
+        assertThat(taskInstance.getAppLink()).isNull();
         assertThat(taskInstance.getAlertFlag()).isEqualTo(Flag.NO);
         assertThat(taskInstance.getSubmitTime()).isNotNull();
     }
@@ -115,6 +118,7 @@ class FailedRecoverTaskInstanceFactoryTest {
         taskInstance.setExecutePath("/tmp/exec/A");
         taskInstance.setVarPool("[]");
         taskInstance.setPid(1234);
+        taskInstance.setAppLink("application_1717430400000_0001");
         taskInstance.setAlertFlag(Flag.YES);
         return taskInstance;
     }
