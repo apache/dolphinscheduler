@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
