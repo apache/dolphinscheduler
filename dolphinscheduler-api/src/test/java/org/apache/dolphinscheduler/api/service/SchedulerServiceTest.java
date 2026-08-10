@@ -158,6 +158,16 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
                 scheduleCaptor.getValue().getMissedFirePolicy());
     }
 
+    @Test
+    public void testInsertScheduleRejectsExplicitNullMissedFirePolicy() {
+        assertInsertScheduleRejectsInvalidMissedFirePolicy("null");
+    }
+
+    @Test
+    public void testInsertScheduleRejectsUnknownMissedFirePolicy() {
+        assertInsertScheduleRejectsInvalidMissedFirePolicy("\"FIRE_ONCE_NWO\"");
+    }
+
     @ParameterizedTest
     @EnumSource(ScheduleMissedFirePolicy.class)
     public void testUpdateScheduleWithMissedFirePolicy(ScheduleMissedFirePolicy missedFirePolicy) {
@@ -194,8 +204,65 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(ScheduleMissedFirePolicy.SKIP_MISSED, schedule.getMissedFirePolicy());
     }
 
+    @Test
+    public void testUpdateScheduleRejectsExplicitNullMissedFirePolicy() {
+        assertUpdateScheduleRejectsInvalidMissedFirePolicy("null");
+    }
+
+    @Test
+    public void testUpdateScheduleRejectsUnknownMissedFirePolicy() {
+        assertUpdateScheduleRejectsInvalidMissedFirePolicy("\"FIRE_ONCE_NWO\"");
+    }
+
+    private void assertInsertScheduleRejectsInvalidMissedFirePolicy(String missedFirePolicyValue) {
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(null);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(this.getProcessDefinition()));
+
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.insertSchedule(
+                        user, projectCode, processDefinitionCode,
+                        scheduleExpressionWithPolicyValue(missedFirePolicyValue),
+                        WarningType.NONE, 0, FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode",
+                        environmentCode));
+
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
+        Mockito.verify(scheduleDao, Mockito.never()).insert(Mockito.any());
+    }
+
+    private void assertUpdateScheduleRejectsInvalidMissedFirePolicy(String missedFirePolicyValue) {
+        Schedule schedule = this.getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setMissedFirePolicy(ScheduleMissedFirePolicy.SKIP_MISSED);
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(this.getProcessDefinition()));
+
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.updateSchedule(
+                        user, projectCode, scheduleId, scheduleExpressionWithPolicyValue(missedFirePolicyValue),
+                        WarningType.NONE, 0, FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode",
+                        environmentCode));
+
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ScheduleMissedFirePolicy.SKIP_MISSED, schedule.getMissedFirePolicy());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any());
+    }
+
     private String scheduleExpression(ScheduleMissedFirePolicy missedFirePolicy) {
         String policy = missedFirePolicy == null ? "" : ",\"missedFirePolicy\":\"" + missedFirePolicy.name() + "\"";
+        return scheduleExpressionWithPolicy(policy);
+    }
+
+    private String scheduleExpressionWithPolicyValue(String missedFirePolicyValue) {
+        return scheduleExpressionWithPolicy(",\"missedFirePolicy\":" + missedFirePolicyValue);
+    }
+
+    private String scheduleExpressionWithPolicy(String policy) {
         return "{\"startTime\":\"2019-12-16 00:00:00\",\"endTime\":\"2019-12-17 00:00:00\","
                 + "\"crontab\":\"0 0 6 * * ? *\",\"timezoneId\":\"Asia/Shanghai\"" + policy + "}";
     }
