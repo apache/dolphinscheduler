@@ -76,9 +76,9 @@ class FailedRecoverTaskInstanceFactoryTest {
         assertThat(taskInstance.getExecutePath()).isNull();
         assertThat(taskInstance.getVarPool()).isNull();
         assertThat(taskInstance.getPid()).isEqualTo(0);
-        // Otherwise a task extending AbstractRemoteTask tracks the previous remote application
-        // instead of submitting a new one, because TaskExecutionContext#appIds is not empty.
-        assertThat(taskInstance.getAppLink()).isNull();
+        // The appLink is deliberately kept: SubWorkflowLogicTask stores its runtime context there and needs it
+        // to recover the existing sub workflow instance instead of triggering a new one.
+        assertThat(taskInstance.getAppLink()).isEqualTo("application_1717430400000_0001");
         assertThat(taskInstance.getAlertFlag()).isEqualTo(Flag.NO);
         assertThat(taskInstance.getSubmitTime()).isNotNull();
     }

@@ -56,10 +56,6 @@ public class FailedRecoverTaskInstanceFactory
         taskInstance.setLogPath(null);
         taskInstance.setExecutePath(null);
         taskInstance.setPid(0);
-        // The appLink is passed to the executor as TaskExecutionContext#appIds. A task extending
-        // AbstractRemoteTask skips submitApplication() when appIds is not empty, so keeping the appLink of the
-        // failed attempt would make the new attempt track the previous remote application instead of submitting.
-        taskInstance.setAppLink(null);
         // The recreated task instance is a new attempt, it should get the whole retry budget back, otherwise a task
         // which already exhausted its retry times will never be retried again in the recovered workflow.
         taskInstance.setRetryTimes(0);
