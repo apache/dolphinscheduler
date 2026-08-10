@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -63,6 +64,26 @@ class TaskInstanceDaoImplTest extends BaseDaoTest {
                 .findFirst().orElse(null);
         assertNotNull(extractResult);
         assertEquals(later.getTime() / 1000, extractResult.getEndTime().getTime() / 1000);
+    }
+
+    @Test
+    void queryLastTaskInstanceListIntervalInWorkflowInstanceWhenAttemptsShareTheSameEndTime() {
+        Date sameEndTime = new Date();
+
+        // A failed attempt and the retry which replaced it, both finishing within the same second. On MySQL
+        // t_ds_task_instance.end_time is a datetime without fractional seconds, so the two attempts end up
+        // with exactly the same end_time.
+        insertTaskInstance(EXTRACT_TASK, TaskExecutionStatus.FAILURE, sameEndTime);
+        insertTaskInstance(EXTRACT_TASK, TaskExecutionStatus.SUCCESS, sameEndTime);
+
+        Set<Long> taskCodes = new HashSet<>(Collections.singletonList(EXTRACT_TASK));
+        List<TaskInstance> result = taskInstanceDao.queryLastTaskInstanceListIntervalInWorkflowInstance(
+                WORKFLOW_INSTANCE_ID, taskCodes);
+
+        // Only the last attempt should be returned, otherwise callers which key the result by taskCode,
+        // e.g. DependentExecute, fail with "IllegalStateException: Duplicate key".
+        assertEquals(1, result.size());
+        assertEquals(TaskExecutionStatus.SUCCESS, result.get(0).getState());
     }
 
     @Test
