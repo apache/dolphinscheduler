@@ -1,4 +1,4 @@
-﻿# Incompatible
+# Incompatible
 
 This document records the incompatible updates between each version. You need to check this document before you upgrade to related version.
 
