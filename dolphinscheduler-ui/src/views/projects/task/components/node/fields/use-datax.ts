@@ -199,17 +199,25 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['input', 'trigger'],
         required: false,
         validator() {
-          const hasResource =
-            model.resourceList && (model.resourceList as string[]).length > 0
+          // When the inline json is absent the job definition must come from exactly one
+          // attached .json resource. resourceList is multi-select and also carries auxiliary
+          // files such as keytabs and xml, so the same rule as the backend
+          // DataxParameters.getJobDefinitionResource applies here (issue #18389).
+          const resourceList = (model.resourceList as string[]) || []
+          const hasSingleJsonResource =
+            resourceList.filter(
+              (fullName) =>
+                typeof fullName === 'string' &&
+                fullName.toLowerCase().endsWith('.json')
+            ).length === 1
           if (
             model.json === '' ||
             model.json === undefined ||
             model.json === null
           ) {
-            // an attached resource file may carry the job definition instead
-            return hasResource
+            return hasSingleJsonResource
               ? undefined
-              : new Error(t('project.node.sql_empty_tips'))
+              : new Error(t('project.node.datax_custom_json_resource_tips'))
           }
           if (!utils.isJson(model.json)) {
             return new Error(t('project.node.json_format_tips'))
@@ -223,8 +231,8 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
             typeof parsed === 'object' &&
             !Array.isArray(parsed) &&
             Object.keys(parsed).length === 0
-          if (isEmptyObject && !hasResource) {
-            return new Error(t('project.node.sql_empty_tips'))
+          if (isEmptyObject && !hasSingleJsonResource) {
+            return new Error(t('project.node.datax_custom_json_resource_tips'))
           }
         }
       }
