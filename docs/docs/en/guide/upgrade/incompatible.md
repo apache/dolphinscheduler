@@ -46,5 +46,9 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.5.0
 
-* The workflow instance list APIs no longer return the following fields in the response body: `commandParam`, `globalParams`, `historyCmd`, `varPool`, `stateHistory`. To obtain these fields, use the detail API `GET /projects/{projectCode}/workflow-instances/{id}` instead.([#18444])(https://github.com/apache/dolphinscheduler/pull/18444)
+* The workflow instance list APIs (`GET /projects/{projectCode}/workflow-instances`, `GET /projects/{projectCode}/workflow-instances/top-n`, `GET /projects/{projectCode}/workflow-instances/trigger`) no longer return the following properties in the response body:
+  * **Removed heavy fields**: `commandParam`, `globalParams`, `historyCmd`, `varPool`, `stateHistory`
+  * **Removed transient fields**: `stateDescList`, `workflowDefinition`, `dagData`, `queue`, `locations`, `dependenceScheduleTimes`
+  * **Removed derived properties**: `cmdTypeIfComplement`, `complementData` (related to complement-data executions; use the detail API to obtain them)
+  * To obtain any of these fields, use the detail API `GET /projects/{projectCode}/workflow-instances/{id}` instead, which continues to return the full `WorkflowInstance` object. ([#18444])(https://github.com/apache/dolphinscheduler/pull/18444)
 

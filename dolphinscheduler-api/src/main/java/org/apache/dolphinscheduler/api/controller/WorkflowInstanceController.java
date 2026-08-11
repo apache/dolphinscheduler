@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVari
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -105,18 +106,18 @@ public class WorkflowInstanceController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR)
-    public Result queryWorkflowInstanceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                            @RequestParam(value = "workflowDefinitionCode", required = false, defaultValue = "0") long workflowDefinitionCode,
-                                            @RequestParam(value = "searchVal", required = false) String searchVal,
-                                            @RequestParam(value = "executorName", required = false) String executorName,
-                                            @RequestParam(value = "stateType", required = false) WorkflowExecutionStatus stateType,
-                                            @RequestParam(value = "host", required = false) String host,
-                                            @RequestParam(value = "startDate", required = false) String startTime,
-                                            @RequestParam(value = "endDate", required = false) String endTime,
-                                            @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
-                                            @RequestParam("pageNo") Integer pageNo,
-                                            @RequestParam("pageSize") Integer pageSize) {
+    public Result<PageInfo<WorkflowInstanceQueryDTO>> queryWorkflowInstanceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                                @RequestParam(value = "workflowDefinitionCode", required = false, defaultValue = "0") long workflowDefinitionCode,
+                                                                                @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                                                @RequestParam(value = "executorName", required = false) String executorName,
+                                                                                @RequestParam(value = "stateType", required = false) WorkflowExecutionStatus stateType,
+                                                                                @RequestParam(value = "host", required = false) String host,
+                                                                                @RequestParam(value = "startDate", required = false) String startTime,
+                                                                                @RequestParam(value = "endDate", required = false) String endTime,
+                                                                                @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
+                                                                                @RequestParam("pageNo") Integer pageNo,
+                                                                                @RequestParam("pageSize") Integer pageSize) {
 
         checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);

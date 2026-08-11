@@ -37,13 +37,15 @@ import io.swagger.v3.oas.annotations.media.Schema;
  * Lightweight response DTO for workflow instance list / top-N / trigger queries.
  *
  * <p>Unlike {@link WorkflowInstance}, this DTO intentionally omits heavy columns
- * ({@code commandParam}, {@code globalParams}, {@code historyCmd}, {@code varPool},
- * {@code stateHistory}) that are only needed for detail views or internal processing.
- * This allows the corresponding DAO queries to use the optimized {@code listSql}
- * projection instead of the full {@code baseSql}.
+ * that are only needed for detail views or internal processing. This allows the
+ * corresponding DAO queries to use the optimized {@code listSql} projection
+ * instead of the full {@code baseSql}.
  *
- * <p><b>Incompatible API change (documented):</b> The following fields that were
- * previously present in list/topN/trigger API responses are no longer returned:
+ * <p><b>Incompatible API change (documented):</b> The following properties that
+ * were previously present in list/topN/trigger API responses are no longer
+ * returned:
+ *
+ * <p><b>Heavy DB-backed fields removed from the SQL projection:</b>
  * <ul>
  *   <li>{@code commandParam}</li>
  *   <li>{@code globalParams}</li>
@@ -51,7 +53,29 @@ import io.swagger.v3.oas.annotations.media.Schema;
  *   <li>{@code varPool}</li>
  *   <li>{@code stateHistory}</li>
  * </ul>
- * Consumers that require these fields should call the detail endpoint
+ *
+ * <p><b>Transient (non-DB) fields removed from the entity that were always
+ * {@code null} in list responses:</b>
+ * <ul>
+ *   <li>{@code stateDescList}</li>
+ *   <li>{@code workflowDefinition} (deprecated)</li>
+ *   <li>{@code dagData}</li>
+ *   <li>{@code queue}</li>
+ *   <li>{@code locations}</li>
+ *   <li>{@code dependenceScheduleTimes}</li>
+ * </ul>
+ *
+ * <p><b>Derived getter properties removed:</b>
+ * <ul>
+ *   <li>{@code cmdTypeIfComplement} — previously returned
+ *       {@link CommandType#COMPLEMENT_DATA} for complement-data executions;
+ *       consumers should inspect {@code commandType} on the detail endpoint
+ *       instead</li>
+ *   <li>{@code complementData} — previously returned {@code true} for
+ *       complement-data executions; no longer available in list responses</li>
+ * </ul>
+ *
+ * <p>Consumers that require any of these fields should call the detail endpoint
  * {@code GET /projects/{projectCode}/workflow-instances/{id}} instead, which
  * continues to return the full {@link WorkflowInstance}.
  */
