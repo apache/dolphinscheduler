@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
@@ -170,11 +171,11 @@ public class DataxTask extends AbstractTask {
     }
 
     /**
-     * Reads the DataX job definition from the first attached resource file. The worker has
+     * Reads the DataX job definition from the designated json resource file. The worker has
      * already downloaded resources into the execution directory by the time the task runs.
      */
-    private String readJsonFromResourceFile() throws Exception {
-        String resourceFileName = dataXParameters.getResourceList().get(0).getResourceName();
+    private String readJsonFromResourceFile(ResourceInfo jobResource) throws Exception {
+        String resourceFileName = jobResource.getResourceName();
         ResourceContext resourceContext = taskRequest.getResourceContext();
         return FileUtils.readFileToString(
                 new File(resourceContext.getResourceItem(resourceFileName).getResourceAbsolutePathInLocal()),
@@ -202,9 +203,15 @@ public class DataxTask extends AbstractTask {
             // this branch the worker downloads the resource but the plugin runs with the empty
             // inline json and the job fails (issue #18389). Existing tasks created through the
             // UI carry an empty object placeholder, treat it the same as no inline json.
-            if (dataXParameters.isInlineJsonAbsent()
-                    && CollectionUtils.isNotEmpty(dataXParameters.getResourceList())) {
-                json = readJsonFromResourceFile();
+            if (dataXParameters.isInlineJsonAbsent()) {
+                // the job definition is the single attached .json resource, never the first
+                // entry in resourceList, which may be an auxiliary keytab or xml (issue #18389)
+                ResourceInfo jobResource = dataXParameters.getJobDefinitionResource();
+                if (jobResource == null) {
+                    throw new TaskException(
+                            "DataX job definition is missing, provide inline json or attach exactly one .json resource file");
+                }
+                json = readJsonFromResourceFile(jobResource);
             } else {
                 json = dataXParameters.getJson();
             }

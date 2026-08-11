@@ -30,6 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import lombok.Data;
 
@@ -119,10 +120,31 @@ public class DataxParameters extends AbstractParameters {
                     && StringUtils.isNotEmpty(sql)
                     && StringUtils.isNotEmpty(targetTable);
         } else {
-            // Custom config is valid with either inline json or an attached resource file
-            // carrying the job definition (issue #18389).
-            return !isInlineJsonAbsent() || CollectionUtils.isNotEmpty(resourceList);
+            // Custom config is valid with either inline json or an attached resource file that
+            // unambiguously carries the job definition, identified as the single .json resource
+            // (issue #18389). resourceList is multi-select and also holds auxiliary files, so a
+            // non-empty list on its own is not enough.
+            return !isInlineJsonAbsent() || getJobDefinitionResource() != null;
         }
+    }
+
+    /**
+     * When the inline json is absent the job definition must come from an attached resource file.
+     * resourceList is multi-select and also carries auxiliary files such as Kerberos keytabs and
+     * xml configs, so the job definition is identified as the single resource whose name ends with
+     * {@code .json} rather than the first entry in the list (issue #18389). Returns that resource,
+     * or {@code null} when there is not exactly one json resource, which the caller treats as a
+     * missing or ambiguous job definition.
+     */
+    public ResourceInfo getJobDefinitionResource() {
+        if (CollectionUtils.isEmpty(resourceList)) {
+            return null;
+        }
+        List<ResourceInfo> jsonResources = resourceList.stream()
+                .filter(Objects::nonNull)
+                .filter(resource -> StringUtils.endsWithIgnoreCase(resource.getResourceName(), ".json"))
+                .collect(Collectors.toList());
+        return jsonResources.size() == 1 ? jsonResources.get(0) : null;
     }
 
     /**

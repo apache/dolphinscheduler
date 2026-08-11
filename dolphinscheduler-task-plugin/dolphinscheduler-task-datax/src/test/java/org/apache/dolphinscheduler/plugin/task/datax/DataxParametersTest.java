@@ -88,6 +88,53 @@ public class DataxParametersTest {
     }
 
     @Test
+    public void testJobDefinitionResourceIsTheSingleJsonResource() {
+        // resourceList is multi-select and also carries auxiliary files, so the job definition
+        // is identified as the single .json resource, not resourceList.get(0) (issue #18389)
+
+        // only an auxiliary keytab and no json: no job definition, invalid
+        DataxParameters onlyAuxiliary = new DataxParameters();
+        onlyAuxiliary.setCustomConfig(1);
+        onlyAuxiliary.setResourceList(resources("/datax/hdfs.keytab"));
+        Assertions.assertNull(onlyAuxiliary.getJobDefinitionResource());
+        Assertions.assertFalse(onlyAuxiliary.checkParameters(),
+                "a task carrying only auxiliary resources has no job definition");
+
+        // a keytab listed before the job file: the .json is chosen, not the first entry
+        DataxParameters auxiliaryBeforeJob = new DataxParameters();
+        auxiliaryBeforeJob.setCustomConfig(1);
+        auxiliaryBeforeJob.setResourceList(resources("/datax/hdfs.keytab", "/datax/job.json"));
+        Assertions.assertEquals("/datax/job.json",
+                auxiliaryBeforeJob.getJobDefinitionResource().getResourceName());
+        Assertions.assertTrue(auxiliaryBeforeJob.checkParameters());
+
+        // two json resources are ambiguous: no single job definition, invalid
+        DataxParameters twoJson = new DataxParameters();
+        twoJson.setCustomConfig(1);
+        twoJson.setResourceList(resources("/datax/a.json", "/datax/b.json"));
+        Assertions.assertNull(twoJson.getJobDefinitionResource());
+        Assertions.assertFalse(twoJson.checkParameters());
+
+        // exactly one json resource is the job definition
+        DataxParameters singleJson = new DataxParameters();
+        singleJson.setCustomConfig(1);
+        singleJson.setResourceList(resources("/datax/job.json"));
+        Assertions.assertEquals("/datax/job.json",
+                singleJson.getJobDefinitionResource().getResourceName());
+        Assertions.assertTrue(singleJson.checkParameters());
+    }
+
+    private List<ResourceInfo> resources(String... names) {
+        List<ResourceInfo> list = new ArrayList<>();
+        for (String name : names) {
+            ResourceInfo resource = new ResourceInfo();
+            resource.setResourceName(name);
+            list.add(resource);
+        }
+        return list;
+    }
+
+    @Test
     public void testLoadJvmEnv() {
 
         DataxParameters dataxParameters = new DataxParameters();
