@@ -43,7 +43,7 @@ public class TaskRetryLifecycleEvent extends AbstractTaskLifecycleEvent {
     public static TaskRetryLifecycleEvent of(final ITaskExecution taskExecution) {
         final TaskInstance taskInstance = taskExecution.getTaskInstance();
         checkState(taskInstance != null, "The task instance must be initialized before retrying.");
-        final int delayTime = taskInstance.getRetryInterval();
+        final int retryInterval = taskInstance.getRetryInterval();
 
         final int retryTimes = taskInstance.getRetryTimes();
         final int maxRetryTimes = taskInstance.getMaxRetryTimes();
@@ -51,8 +51,11 @@ public class TaskRetryLifecycleEvent extends AbstractTaskLifecycleEvent {
                 "The task retry times: %s must smaller then maxRetryTimes: %s.",
                 retryTimes,
                 maxRetryTimes);
-        final long remainingTime =
-                TimeUnit.MINUTES.toMillis(delayTime) + System.currentTimeMillis() - taskInstance.getEndTime().getTime();
+        // The task should be retried at (endTime + retryInterval), so the remaining delay is the retry interval
+        // minus the time which has already elapsed since the task ended. When the retry interval has already
+        // passed, e.g. the event is created during failover, the task should be retried immediately.
+        final long elapsedTime = System.currentTimeMillis() - taskInstance.getEndTime().getTime();
+        final long remainingTime = Math.max(0, TimeUnit.MINUTES.toMillis(retryInterval) - elapsedTime);
         return new TaskRetryLifecycleEvent(taskExecution, remainingTime);
     }
 
