@@ -124,13 +124,18 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
                     .build();
             taskExecution.getWorkflowEventBus().publish(taskSuccessEvent);
 
+            // Handle task result alert
             if (taskExecutorSuccessLifecycleEvent.isNeedAlert()) {
                 TaskAlertInfo taskAlertInfo = taskExecutorSuccessLifecycleEvent.getTaskAlertInfo();
-                if (taskAlertInfo != null) {
+                if (taskAlertInfo != null && taskAlertInfo.getAlertGroupId() != null
+                        && taskAlertInfo.getAlertGroupId() > 0) {
                     workflowAlertManager.sendTaskResultAlert(
-                            taskAlertInfo,
-                            taskExecution.getTaskExecutionContext().getProjectCode(),
-                            taskExecution.getTaskExecutionContext().getWorkflowInstanceId());
+                            taskExecution.getWorkflowInstance(),
+                            taskExecution.getTaskInstance(),
+                            taskAlertInfo);
+                } else {
+                    log.warn("Task: {} need alert but alertGroupId is invalid, skip sending alert",
+                            taskExecution.getName());
                 }
             }
         } finally {

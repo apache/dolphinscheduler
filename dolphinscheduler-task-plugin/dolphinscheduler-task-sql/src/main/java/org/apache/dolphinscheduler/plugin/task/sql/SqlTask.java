@@ -287,12 +287,19 @@ public class SqlTask extends AbstractTask {
             }
         }
 
-        String result = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
-                : JSONUtils.toJsonString(resultJSONArray);
+        String result;
+        ArrayNode alertArray = resultJSONArray;
+        if (resultJSONArray.isEmpty()) {
+            ArrayNode emptyRow = generateEmptyRow(resultSet);
+            result = JSONUtils.toJsonString(emptyRow);
+            alertArray = emptyRow;
+        } else {
+            result = JSONUtils.toJsonString(resultJSONArray);
+        }
 
         if (Boolean.TRUE.equals(sqlParameters.getSendAlert())) {
             log.info("SendAlert is enabled, preparing task result alert");
-            prepareTaskResultAlert(resultJSONArray);
+            prepareTaskResultAlert(alertArray);
         } else {
             log.info("SendAlert is not enabled, skip task result alert");
         }

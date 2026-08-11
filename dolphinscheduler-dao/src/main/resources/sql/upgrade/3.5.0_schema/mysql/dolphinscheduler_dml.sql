@@ -17,22 +17,22 @@
 
 UPDATE t_ds_task_definition
 SET task_params = JSON_REMOVE(
-    JSON_INSERT(
-        task_params,
-        '$.sendAlert',
-        JSON_EXTRACT(task_params, '$.sendEmail')
-    ),
-    '$.sendEmail'
+   JSON_SET(
+       task_params,
+       '$.sendAlert',
+       JSON_EXTRACT(task_params, '$.sendEmail')
+   ),
+   '$.sendEmail'
 )
 WHERE task_params IS NOT NULL AND JSON_EXTRACT(task_params, '$.sendEmail') IS NOT NULL;
 
 UPDATE t_ds_task_definition_log
 SET task_params = JSON_REMOVE(
-    JSON_INSERT(
-        task_params,
-        '$.sendAlert',
-        JSON_EXTRACT(task_params, '$.sendEmail')
-    ),
-    '$.sendEmail'
+   JSON_SET(
+       task_params,
+       '$.sendAlert',
+       JSON_EXTRACT(task_params, '$.sendEmail')
+   ),
+   '$.sendEmail'
 )
 WHERE task_params IS NOT NULL AND JSON_EXTRACT(task_params, '$.sendEmail') IS NOT NULL;

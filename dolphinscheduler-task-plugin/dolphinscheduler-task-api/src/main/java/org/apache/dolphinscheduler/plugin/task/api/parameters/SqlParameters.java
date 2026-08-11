@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.google.common.collect.Lists;
@@ -46,6 +47,7 @@ import com.google.common.collect.Lists;
  * Sql/Hql parameter
  */
 @Data
+@EqualsAndHashCode(callSuper = true)
 public class SqlParameters extends AbstractParameters {
 
     /**
@@ -80,7 +82,9 @@ public class SqlParameters extends AbstractParameters {
      * SQL connection parameters
      */
     private String connParams;
+
     private List<String> preStatements;
+
     private List<String> postStatements;
 
     /**

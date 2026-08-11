@@ -210,27 +210,33 @@ public class WorkflowAlertManager {
     }
 
     /**
-     * Send task result alert
+     * send task result alert
      *
-     * @param taskAlertInfo task alert info
-     * @param projectCode project code
-     * @param workflowInstanceId workflow instance id
+     * @param workflowInstance workflow instance
+     * @param taskInstance     task instance
+     * @param taskAlertInfo    task alert info
      */
-    public void sendTaskResultAlert(TaskAlertInfo taskAlertInfo, Long projectCode, Integer workflowInstanceId) {
+    public void sendTaskResultAlert(WorkflowInstance workflowInstance,
+                                    TaskInstance taskInstance,
+                                    TaskAlertInfo taskAlertInfo) {
         if (taskAlertInfo == null || taskAlertInfo.getAlertGroupId() == null) {
             return;
         }
+
         Alert alert = new Alert();
         alert.setTitle(taskAlertInfo.getTitle());
         alert.setContent(taskAlertInfo.getContent());
-        alert.setAlertGroupId(taskAlertInfo.getAlertGroupId());
-        alert.setAlertType(taskAlertInfo.getAlertType());
         alert.setWarningType(WarningType.SUCCESS);
         alert.setCreateTime(new Date());
-        alert.setProjectCode(projectCode);
-        alert.setWorkflowInstanceId(workflowInstanceId);
+        alert.setAlertGroupId(taskAlertInfo.getAlertGroupId());
+        alert.setProjectCode(workflowInstance.getProjectCode());
+        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
+        alert.setWorkflowInstanceId(workflowInstance.getId());
+        alert.setAlertType(taskAlertInfo.getAlertType() != null
+                ? taskAlertInfo.getAlertType()
+                : AlertType.TASK_RESULT);
         alertDao.addAlert(alert);
-        log.info("Added task result alert for workflow instance: {}", workflowInstanceId);
+        log.info("Send task result alert for task: {} in workflow: {}",
+                taskInstance.getName(), workflowInstance.getName());
     }
-
 }
