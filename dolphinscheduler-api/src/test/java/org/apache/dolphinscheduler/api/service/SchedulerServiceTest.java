@@ -17,10 +17,17 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.SchedulerServiceImpl;
+import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
+import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -28,6 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 
 import java.util.Optional;
 
@@ -35,6 +43,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -61,6 +72,15 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     @Mock
     private ProjectService projectService;
 
+    @Mock
+    private ExecutorService executorService;
+
+    @Mock
+    private TenantExistValidator tenantExistValidator;
+
+    @Mock
+    private SchedulerApi schedulerApi;
+
     protected static User user;
     protected Exception exception;
     private static final String userName = "userName";
@@ -78,6 +98,173 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         user = new User();
         user.setUserName(userName);
         user.setId(userId);
+    }
+
+    @Test
+    public void testScheduleParamMissedFirePolicyPresence() {
+        String scheduleWithoutPolicy = "{\"startTime\":\"2019-12-16 00:00:00\","
+                + "\"endTime\":\"2019-12-17 00:00:00\",\"crontab\":\"0 0 6 * * ? *\"}";
+        String scheduleWithPolicy = "{\"startTime\":\"2019-12-16 00:00:00\","
+                + "\"endTime\":\"2019-12-17 00:00:00\",\"crontab\":\"0 0 6 * * ? *\","
+                + "\"missedFirePolicy\":\"SKIP_MISSED\"}";
+
+        ScheduleParam withoutPolicy = JSONUtils.parseObject(scheduleWithoutPolicy, ScheduleParam.class);
+        ScheduleParam withPolicy = JSONUtils.parseObject(scheduleWithPolicy, ScheduleParam.class);
+
+        Assertions.assertEquals(ScheduleMissedFirePolicy.FIRE_ALL_MISSED, withoutPolicy.getMissedFirePolicy());
+        Assertions.assertFalse(withoutPolicy.isMissedFirePolicySet());
+        Assertions.assertEquals(ScheduleMissedFirePolicy.SKIP_MISSED, withPolicy.getMissedFirePolicy());
+        Assertions.assertTrue(withPolicy.isMissedFirePolicySet());
+    }
+
+    @ParameterizedTest
+    @EnumSource(ScheduleMissedFirePolicy.class)
+    public void testInsertScheduleWithMissedFirePolicy(ScheduleMissedFirePolicy missedFirePolicy) {
+        Project project = this.getProject();
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
+        Schedule insertedSchedule = new Schedule();
+        insertedSchedule.setId(scheduleId);
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(null);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+        Mockito.when(scheduleDao.queryById(Mockito.any())).thenReturn(insertedSchedule);
+
+        Schedule result = schedulerService.insertSchedule(
+                user, projectCode, processDefinitionCode, scheduleExpression(missedFirePolicy), WarningType.NONE, 0,
+                FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode);
+
+        ArgumentCaptor<Schedule> scheduleCaptor = ArgumentCaptor.forClass(Schedule.class);
+        Mockito.verify(scheduleDao).insert(scheduleCaptor.capture());
+        Assertions.assertEquals(missedFirePolicy, scheduleCaptor.getValue().getMissedFirePolicy());
+        Assertions.assertSame(insertedSchedule, result);
+    }
+
+    @Test
+    public void testInsertScheduleDefaultsMissedFirePolicy() {
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(null);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(this.getProcessDefinition()));
+        Mockito.when(scheduleDao.queryById(Mockito.anyInt())).thenReturn(new Schedule());
+
+        schedulerService.insertSchedule(
+                user, projectCode, processDefinitionCode, scheduleExpression(null), WarningType.NONE, 0,
+                FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode);
+
+        ArgumentCaptor<Schedule> scheduleCaptor = ArgumentCaptor.forClass(Schedule.class);
+        Mockito.verify(scheduleDao).insert(scheduleCaptor.capture());
+        Assertions.assertEquals(ScheduleMissedFirePolicy.FIRE_ALL_MISSED,
+                scheduleCaptor.getValue().getMissedFirePolicy());
+    }
+
+    @Test
+    public void testInsertScheduleRejectsExplicitNullMissedFirePolicy() {
+        assertInsertScheduleRejectsInvalidMissedFirePolicy("null");
+    }
+
+    @Test
+    public void testInsertScheduleRejectsUnknownMissedFirePolicy() {
+        assertInsertScheduleRejectsInvalidMissedFirePolicy("\"FIRE_ONCE_NWO\"");
+    }
+
+    @ParameterizedTest
+    @EnumSource(ScheduleMissedFirePolicy.class)
+    public void testUpdateScheduleWithMissedFirePolicy(ScheduleMissedFirePolicy missedFirePolicy) {
+        Schedule schedule = this.getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+
+        schedulerService.updateSchedule(
+                user, projectCode, scheduleId, scheduleExpression(missedFirePolicy), WarningType.NONE, 0,
+                FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode);
+
+        Assertions.assertEquals(missedFirePolicy, schedule.getMissedFirePolicy());
+    }
+
+    @Test
+    public void testUpdateSchedulePreservesMissedFirePolicyWhenOmitted() {
+        Schedule schedule = this.getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setMissedFirePolicy(ScheduleMissedFirePolicy.SKIP_MISSED);
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+
+        schedulerService.updateSchedule(
+                user, projectCode, scheduleId, scheduleExpression(null), WarningType.NONE, 0,
+                FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode);
+
+        Assertions.assertEquals(ScheduleMissedFirePolicy.SKIP_MISSED, schedule.getMissedFirePolicy());
+    }
+
+    @Test
+    public void testUpdateScheduleRejectsExplicitNullMissedFirePolicy() {
+        assertUpdateScheduleRejectsInvalidMissedFirePolicy("null");
+    }
+
+    @Test
+    public void testUpdateScheduleRejectsUnknownMissedFirePolicy() {
+        assertUpdateScheduleRejectsInvalidMissedFirePolicy("\"FIRE_ONCE_NWO\"");
+    }
+
+    private void assertInsertScheduleRejectsInvalidMissedFirePolicy(String missedFirePolicyValue) {
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(null);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(this.getProcessDefinition()));
+
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.insertSchedule(
+                        user, projectCode, processDefinitionCode,
+                        scheduleExpressionWithPolicyValue(missedFirePolicyValue),
+                        WarningType.NONE, 0, FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode",
+                        environmentCode));
+
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
+        Mockito.verify(scheduleDao, Mockito.never()).insert(Mockito.any());
+    }
+
+    private void assertUpdateScheduleRejectsInvalidMissedFirePolicy(String missedFirePolicyValue) {
+        Schedule schedule = this.getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setMissedFirePolicy(ScheduleMissedFirePolicy.SKIP_MISSED);
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(this.getProcessDefinition()));
+
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.updateSchedule(
+                        user, projectCode, scheduleId, scheduleExpressionWithPolicyValue(missedFirePolicyValue),
+                        WarningType.NONE, 0, FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode",
+                        environmentCode));
+
+        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode(),
+                ((ServiceException) exception).getCode());
+        Assertions.assertEquals(ScheduleMissedFirePolicy.SKIP_MISSED, schedule.getMissedFirePolicy());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any());
+    }
+
+    private String scheduleExpression(ScheduleMissedFirePolicy missedFirePolicy) {
+        String policy = missedFirePolicy == null ? "" : ",\"missedFirePolicy\":\"" + missedFirePolicy.name() + "\"";
+        return scheduleExpressionWithPolicy(policy);
+    }
+
+    private String scheduleExpressionWithPolicyValue(String missedFirePolicyValue) {
+        return scheduleExpressionWithPolicy(",\"missedFirePolicy\":" + missedFirePolicyValue);
+    }
+
+    private String scheduleExpressionWithPolicy(String policy) {
+        return "{\"startTime\":\"2019-12-16 00:00:00\",\"endTime\":\"2019-12-17 00:00:00\","
+                + "\"crontab\":\"0 0 6 * * ? *\",\"timezoneId\":\"Asia/Shanghai\"" + policy + "}";
     }
 
     @Test
