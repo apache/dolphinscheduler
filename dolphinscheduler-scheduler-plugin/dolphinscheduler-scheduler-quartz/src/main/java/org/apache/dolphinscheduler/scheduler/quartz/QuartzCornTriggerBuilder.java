@@ -81,15 +81,14 @@ public class QuartzCornTriggerBuilder implements QuartzTriggerBuilder {
         JobKey jobKey = QuartzJobKey.of(projectId, schedule.getId()).toJobKey();
 
         TriggerKey triggerKey = TriggerKey.triggerKey(jobKey.getName(), jobKey.getGroup());
-        CronScheduleBuilder scheduleBuilder = CronScheduleBuilder.cronSchedule(schedule.getCrontab())
-                .inTimeZone(DateUtils.getTimezone(schedule.getTimezoneId()));
-        QuartzMisfirePolicyApplier.apply(scheduleBuilder, schedule.getMisfirePolicy());
-
         return TriggerBuilder.newTrigger()
                 .withIdentity(triggerKey)
                 .startAt(startDate)
                 .endAt(endDate)
-                .withSchedule(scheduleBuilder)
+                .withSchedule(
+                        CronScheduleBuilder.cronSchedule(schedule.getCrontab())
+                                .withMisfireHandlingInstructionIgnoreMisfires()
+                                .inTimeZone(DateUtils.getTimezone(schedule.getTimezoneId())))
                 .build();
     }
 

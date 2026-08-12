@@ -213,30 +213,6 @@ export function useTable() {
         width: 140
       },
       {
-        title: t('project.workflow.trigger_type'),
-        key: 'triggerType',
-        width: 120,
-        render: (row: any) =>
-          row.triggerType === 'INTERVAL'
-            ? t('project.workflow.interval_trigger')
-            : t('project.workflow.cron_trigger')
-      },
-      {
-        title: t('project.workflow.misfire_policy'),
-        key: 'misfirePolicy',
-        width: 180,
-        render: (row: any) => {
-          const labels: Record<string, string> = {
-            DO_NOTHING: t('project.workflow.do_nothing'),
-            FIRE_AND_PROCEED: t('project.workflow.fire_and_proceed'),
-            IGNORE_MISFIRES: t('project.workflow.ignore_misfires')
-          }
-          return (
-            labels[row.misfirePolicy] || t('project.workflow.ignore_misfires')
-          )
-        }
-      },
-      {
         title: t('project.workflow.failure_strategy'),
         key: 'failureStrategy',
         render: (row: any) => {

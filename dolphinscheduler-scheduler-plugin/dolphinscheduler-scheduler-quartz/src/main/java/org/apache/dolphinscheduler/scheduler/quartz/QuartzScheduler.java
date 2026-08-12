@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.dolphinscheduler.common.enums.ScheduleTriggerType;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerException;
@@ -25,10 +24,10 @@ import org.apache.dolphinscheduler.scheduler.quartz.exception.QuartzSchedulerExc
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.quartz.CronTrigger;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
-import org.quartz.Trigger;
 
 import com.google.common.collect.Sets;
 
@@ -53,21 +52,16 @@ public class QuartzScheduler implements SchedulerApi {
     @Override
     public void insertOrUpdateScheduleTask(int projectId, Schedule schedule) throws SchedulerException {
         try {
-            Trigger trigger = schedule.getTriggerType() == ScheduleTriggerType.INTERVAL
-                    ? QuartzSimpleTriggerBuilder.newBuilder()
-                            .withProjectId(projectId)
-                            .withSchedule(schedule)
-                            .build()
-                    : QuartzCornTriggerBuilder.newBuilder()
-                            .withProjectId(projectId)
-                            .withSchedule(schedule)
-                            .build();
+            CronTrigger cornTrigger = QuartzCornTriggerBuilder.newBuilder()
+                    .withProjectId(projectId)
+                    .withSchedule(schedule)
+                    .build();
             JobDetail jobDetail = QuartzJobDetailBuilder.newBuilder()
                     .withProjectId(projectId)
                     .withSchedule(schedule.getId())
                     .build();
-            scheduler.scheduleJob(jobDetail, Sets.newHashSet(trigger), true);
-            log.info("Success scheduleJob: {} with trigger: {} at quartz", jobDetail, trigger);
+            scheduler.scheduleJob(jobDetail, Sets.newHashSet(cornTrigger), true);
+            log.info("Success scheduleJob: {} with trigger: {} at quartz", jobDetail, cornTrigger);
         } catch (Exception e) {
             log.error("Failed to add scheduler task, projectId: {}, scheduler: {}", projectId, schedule, e);
             throw new SchedulerException(QuartzSchedulerExceptionEnum.QUARTZ_UPSERT_JOB_ERROR, e);

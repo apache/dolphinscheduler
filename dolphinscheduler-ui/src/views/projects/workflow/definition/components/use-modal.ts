@@ -180,8 +180,6 @@ export function useModal(
         startTime: start,
         endTime: end,
         crontab: state.timingForm.crontab,
-        triggerType: state.timingForm.triggerType,
-        misfirePolicy: state.timingForm.misfirePolicy,
         timezoneId: state.timingForm.timezoneId
       }),
       failureStrategy: state.timingForm.failureStrategy,
@@ -265,8 +263,6 @@ export function useModal(
           startTime: start,
           endTime: end,
           crontab: state.timingForm.crontab,
-          triggerType: state.timingForm.triggerType,
-          misfirePolicy: state.timingForm.misfirePolicy,
           timezoneId: state.timingForm.timezoneId
         })
         previewSchedule({ schedule }, projectCode).then((res: any) => {
