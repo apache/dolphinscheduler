@@ -13,9 +13,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-CREATE INDEX idx_project_submit_time ON t_ds_task_instance (project_code ASC, submit_time DESC);
-CREATE INDEX idx_project_start_time ON t_ds_workflow_instance (project_code ASC, start_time DESC);
-ALTER TABLE t_ds_schedules
-    ADD COLUMN missed_fire_policy smallint NOT NULL DEFAULT 2;
+package org.apache.dolphinscheduler.scheduler.quartz;
+
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+
+import org.quartz.CronScheduleBuilder;
+
+final class FireAllMissedCronScheduleBuilderFactory implements CronScheduleBuilderFactory {
+
+    @Override
+    public CronScheduleBuilder createCronScheduleBuilder(Schedule schedule) {
+        return CronScheduleBuilder.cronSchedule(schedule.getCrontab())
+                .withMisfireHandlingInstructionIgnoreMisfires()
+                .inTimeZone(DateUtils.getTimezone(schedule.getTimezoneId()));
+    }
+}
