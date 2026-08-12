@@ -488,7 +488,7 @@ export default defineComponent({
                     <NInputNumber min={0} max={59} v-model:value={this.intervalSeconds} style={{ width: '100%' }} />
                   </NFormItem>
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'end', gap: '12px', marginTop: '4px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr)), alignItems: 'end', gap: '12px', marginTop: '4px' }}>
                   <NFormItem label={t('project.workflow.repeat')} showFeedback={false}>
                     <NInputNumber min={-1} v-model:value={this.intervalRepeat} style={{ width: '100%' }} />
                   </NFormItem>
