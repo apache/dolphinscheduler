@@ -476,41 +476,29 @@ export default defineComponent({
             </NFormItem>
           ) : (
             <NFormItem label={t('project.workflow.interval')} path='crontab'>
-              <div>
-                <NSpace align='center'>
-                  <NInputNumber
-                    min={0}
-                    v-model:value={this.intervalHours}
-                    style={{ width: '120px' }}
-                  />
-                  <span>{t('project.workflow.hours')}</span>
-                  <NInputNumber
-                    min={0}
-                    max={59}
-                    v-model:value={this.intervalMinutes}
-                    style={{ width: '120px' }}
-                  />
-                  <span>{t('project.workflow.minutes')}</span>
-                  <NInputNumber
-                    min={0}
-                    max={59}
-                    v-model:value={this.intervalSeconds}
-                    style={{ width: '120px' }}
-                  />
-                  <span>{t('project.workflow.seconds')}</span>
-                </NSpace>
-                <NSpace align='center' style={{ marginTop: '12px' }}>
-                  <span>{t('project.workflow.repeat')}</span>
-                  <NInputNumber
-                    min={-1}
-                    v-model:value={this.intervalRepeat}
-                    style={{ width: '120px' }}
-                  />
-                  <span>{t('project.workflow.unlimited_repeat_tip')}</span>
+              <div style={{ width: '100%' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px' }}>
+                  <NFormItem label={t('project.workflow.hours')} showFeedback={false}>
+                    <NInputNumber min={0} v-model:value={this.intervalHours} style={{ width: '100%' }} />
+                  </NFormItem>
+                  <NFormItem label={t('project.workflow.minutes')} showFeedback={false}>
+                    <NInputNumber min={0} max={59} v-model:value={this.intervalMinutes} style={{ width: '100%' }} />
+                  </NFormItem>
+                  <NFormItem label={t('project.workflow.seconds')} showFeedback={false}>
+                    <NInputNumber min={0} max={59} v-model:value={this.intervalSeconds} style={{ width: '100%' }} />
+                  </NFormItem>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) auto', alignItems: 'end', gap: '12px', marginTop: '4px' }}>
+                  <NFormItem label={t('project.workflow.repeat')} showFeedback={false}>
+                    <NInputNumber min={-1} v-model:value={this.intervalRepeat} style={{ width: '100%' }} />
+                  </NFormItem>
                   <NButton type='primary' ghost onClick={this.handlePreview}>
                     {t('project.workflow.execute_time')}
                   </NButton>
-                </NSpace>
+                </div>
+                <div style={{ color: '#999', fontSize: '12px', marginTop: '-4px' }}>
+                  {t('project.workflow.unlimited_repeat_tip')}
+                </div>
               </div>
             </NFormItem>
           )}
