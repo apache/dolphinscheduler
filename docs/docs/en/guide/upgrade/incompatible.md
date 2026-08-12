@@ -47,5 +47,5 @@ This document records the incompatible updates between each version. You need to
 ## 3.5.0
 
 * Add the `missed_fire_policy` column to `t_ds_schedules`. Existing schedules default to `FIRE_ALL_MISSED` to preserve the previous Quartz `IgnoreMisfires` behavior. ([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
-* Rename the `sendEmail` field in SQL task parameters to `sendAlert`. The data migration script will automatically migrate `sendEmail` to `sendAlert` in the `t_ds_task_definition` and `t_ds_task_definition_log` tables.([#17854])(https://github.com/apache/dolphinscheduler/issues/17854)
+* Rename the `sendEmail` field in SQL task parameters to `sendAlert`. The data migration script will automatically migrate `sendEmail` to `sendAlert` in the `t_ds_task_definition` and `t_ds_task_definition_log` tables.([#18549])(https://github.com/apache/dolphinscheduler/pull/18549)
 
