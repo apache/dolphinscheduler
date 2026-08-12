@@ -72,9 +72,10 @@ class TaskInstanceDaoImplTest extends BaseDaoTest {
 
         // A failed attempt and the retry which replaced it, both finishing within the same second. On MySQL
         // t_ds_task_instance.end_time is a datetime without fractional seconds, so the two attempts end up
-        // with exactly the same end_time.
-        insertTaskInstance(EXTRACT_TASK, TaskExecutionStatus.FAILURE, sameEndTime);
-        insertTaskInstance(EXTRACT_TASK, TaskExecutionStatus.SUCCESS, sameEndTime);
+        // with exactly the same end_time. This is exactly the state RetryTaskInstanceFactory leaves behind:
+        // the superseded attempt is flagged invalid and the new attempt is the only valid one.
+        insertTaskInstance(EXTRACT_TASK, TaskExecutionStatus.FAILURE, sameEndTime, Flag.NO);
+        insertTaskInstance(EXTRACT_TASK, TaskExecutionStatus.SUCCESS, sameEndTime, Flag.YES);
 
         Set<Long> taskCodes = new HashSet<>(Collections.singletonList(EXTRACT_TASK));
         List<TaskInstance> result = taskInstanceDao.queryLastTaskInstanceListIntervalInWorkflowInstance(
@@ -101,6 +102,10 @@ class TaskInstanceDaoImplTest extends BaseDaoTest {
     }
 
     private void insertTaskInstance(long taskCode, TaskExecutionStatus state, Date endTime) {
+        insertTaskInstance(taskCode, state, endTime, Flag.YES);
+    }
+
+    private void insertTaskInstance(long taskCode, TaskExecutionStatus state, Date endTime, Flag flag) {
         TaskInstance ti = TaskInstance.builder()
                 .name("shell-task-" + taskCode)
                 .taskType("SHELL")
@@ -109,7 +114,7 @@ class TaskInstanceDaoImplTest extends BaseDaoTest {
                 .taskCode(taskCode)
                 .taskDefinitionVersion(1)
                 .state(state)
-                .flag(Flag.YES)
+                .flag(flag)
                 .submitTime(new Date())
                 .firstSubmitTime(new Date())
                 .startTime(new Date())
