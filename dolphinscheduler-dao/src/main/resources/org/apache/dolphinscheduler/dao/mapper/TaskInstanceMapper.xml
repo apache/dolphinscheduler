@@ -258,6 +258,7 @@
         where 1=1
         and workflow_instance_id = #{workflowInstanceId}
         and state != 8
+        and flag = 1
         and end_time is not null
         <if test="taskCodes != null and taskCodes.size() != 0">
             and task_code in
