@@ -149,6 +149,10 @@ export default {
     start_time: 'Start Time',
     end_time: 'End Time',
     crontab: 'Crontab',
+    missed_fire_policy: 'Missed Fire Policy',
+    skip_missed: 'Skip missed executions',
+    fire_once_now: 'Fire once immediately',
+    fire_all_missed: 'Fire all missed executions',
     delete_confirm: 'Delete?',
     delete_confirm_with_name: 'Delete "{name}"?',
     delete_irreversible:
