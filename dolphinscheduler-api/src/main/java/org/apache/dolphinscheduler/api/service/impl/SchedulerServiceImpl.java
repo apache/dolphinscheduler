@@ -177,7 +177,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setCrontab(scheduleParam.getCrontab());
         validateMissedFirePolicy(scheduleParam);
         scheduleObj.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
-        scheduleObj.setTriggerType(`r`n                scheduleParam.getTriggerType() == null ? ScheduleTriggerType.CRON : scheduleParam.getTriggerType());
+        scheduleObj.setTriggerType(scheduleParam.getTriggerType() == null ? ScheduleTriggerType.CRON : scheduleParam.getTriggerType());
         scheduleObj.setTimezoneId(scheduleParam.getTimezoneId());
         scheduleObj.setWarningType(warningType);
         scheduleObj.setWarningGroupId(warningGroupId);
@@ -595,7 +595,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             if (scheduleParam.isMissedFirePolicySet() && scheduleParam.getMissedFirePolicy() != null) {
                 schedule.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
             }
-            schedule.setTriggerType(`r`n                    scheduleParam.getTriggerType() == null ? ScheduleTriggerType.CRON : scheduleParam.getTriggerType());
+            schedule.setTriggerType(scheduleParam.getTriggerType() == null ? ScheduleTriggerType.CRON : scheduleParam.getTriggerType());
             schedule.setTimezoneId(scheduleParam.getTimezoneId());
         }
 
