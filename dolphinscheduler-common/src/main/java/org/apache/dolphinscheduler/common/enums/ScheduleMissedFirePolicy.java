@@ -13,9 +13,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-CREATE INDEX idx_project_submit_time ON t_ds_task_instance (project_code ASC, submit_time DESC);
-CREATE INDEX idx_project_start_time ON t_ds_workflow_instance (project_code ASC, start_time DESC);
-ALTER TABLE t_ds_schedules
-    ADD COLUMN missed_fire_policy smallint NOT NULL DEFAULT 2;
+package org.apache.dolphinscheduler.common.enums;
+
+import lombok.Getter;
+
+import com.baomidou.mybatisplus.annotation.EnumValue;
+
+@Getter
+public enum ScheduleMissedFirePolicy {
+
+    SKIP_MISSED(0),
+    FIRE_ONCE_NOW(1),
+    FIRE_ALL_MISSED(2);
+
+    @EnumValue
+    private final int code;
+
+    ScheduleMissedFirePolicy(int code) {
+        this.code = code;
+    }
+}
