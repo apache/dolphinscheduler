@@ -135,6 +135,11 @@ export const useForm = () => {
         new Date(year + 100, month, day)
       ],
       crontab: '0 0 * * * ? *',
+      triggerType: 'CRON',
+      intervalHour: 0,
+      intervalMinute: 0,
+      intervalSecond: 0,
+      intervalRepeat: -1,
       timezoneId: Intl.DateTimeFormat().resolvedOptions().timeZone,
       missedFirePolicy: 'FIRE_ALL_MISSED',
       failureStrategy: 'CONTINUE',

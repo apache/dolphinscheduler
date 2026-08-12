@@ -860,6 +860,7 @@ CREATE TABLE `t_ds_schedules` (
   `timezone_id` varchar(40) DEFAULT NULL COMMENT 'schedule timezone id',
   `crontab` varchar(255) NOT NULL COMMENT 'crontab description',
   `missed_fire_policy` tinyint NOT NULL DEFAULT '2' COMMENT 'missed fire policy: 0 skip missed, 1 fire once now, 2 fire all missed',
+  `trigger_type` tinyint NOT NULL DEFAULT '0' COMMENT 'schedule trigger type: 0 cron, 1 interval',
   `failure_strategy` tinyint(4) NOT NULL COMMENT 'failure strategy. 0:end,1:continue',
   `user_id` int(11) NOT NULL COMMENT 'user id',
   `release_state` tinyint(4) NOT NULL COMMENT 'release state. 0:offline,1:online ',

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.dto;
 
 import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
+import org.apache.dolphinscheduler.common.enums.ScheduleTriggerType;
 
 import java.util.Date;
 
@@ -36,6 +37,7 @@ public class ScheduleParam {
     private String crontab;
     private String timezoneId;
     private ScheduleMissedFirePolicy missedFirePolicy = ScheduleMissedFirePolicy.FIRE_ALL_MISSED;
+    private ScheduleTriggerType triggerType = ScheduleTriggerType.CRON;
 
     @JsonIgnore
     private boolean missedFirePolicySet;
