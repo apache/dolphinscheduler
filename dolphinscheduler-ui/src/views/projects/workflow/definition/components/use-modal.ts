@@ -180,7 +180,8 @@ export function useModal(
         startTime: start,
         endTime: end,
         crontab: state.timingForm.crontab,
-        timezoneId: state.timingForm.timezoneId
+        timezoneId: state.timingForm.timezoneId,
+        missedFirePolicy: state.timingForm.missedFirePolicy
       }),
       failureStrategy: state.timingForm.failureStrategy,
       warningType: state.timingForm.warningType,
