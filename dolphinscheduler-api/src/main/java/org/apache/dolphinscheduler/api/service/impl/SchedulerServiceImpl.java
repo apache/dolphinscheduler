@@ -177,6 +177,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
         }
         scheduleObj.setCrontab(scheduleParam.getCrontab());
+        validateMissedFirePolicy(scheduleParam);
+        scheduleObj.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
         scheduleObj.setTimezoneId(scheduleParam.getTimezoneId());
         scheduleObj.setWarningType(warningType);
         scheduleObj.setWarningGroupId(warningGroupId);
@@ -568,6 +570,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 throw new ServiceException(Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
             }
             schedule.setCrontab(scheduleParam.getCrontab());
+            validateMissedFirePolicy(scheduleParam);
+            if (scheduleParam.isMissedFirePolicySet() && scheduleParam.getMissedFirePolicy() != null) {
+                schedule.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
+            }
             schedule.setTimezoneId(scheduleParam.getTimezoneId());
         }
 
@@ -599,6 +605,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         log.info("Schedule update complete, projectCode:{}, workflowDefinitionCode:{}, scheduleId:{}.",
                 workflowDefinition.getProjectCode(), workflowDefinition.getCode(), schedule.getId());
         return schedule;
+    }
+
+    private void validateMissedFirePolicy(ScheduleParam scheduleParam) {
+        if (scheduleParam.isMissedFirePolicySet() && scheduleParam.getMissedFirePolicy() == null) {
+            log.warn("Schedule missed fire policy is invalid.");
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "missedFirePolicy");
+        }
     }
 
 }
