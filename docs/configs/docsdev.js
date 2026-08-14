@@ -511,6 +511,10 @@ export default {
                         title: 'integration',
                         children: [
                             {
+                                title: 'Community MCP Integrations',
+                                link: '/en-us/docs/dev/user_doc/guide/integration/mcp.html',
+                            },
+                            {
                                 title: 'Rainbond Deployment',
                                 link: '/en-us/docs/dev/user_doc/guide/integration/rainbond.html',
                             },
@@ -1222,6 +1226,10 @@ export default {
                     {
                         title: '集成',
                         children: [
+                            {
+                                title: '社区 MCP 集成',
+                                link: '/zh-cn/docs/dev/user_doc/guide/integration/mcp.html',
+                            },
                             {
                                 title: '基于Rainbond部署(Cluster)',
                                 link: '/zh-cn/docs/dev/user_doc/guide/integration/rainbond.html',
