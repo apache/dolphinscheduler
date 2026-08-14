@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: 'e01c22d1-119f-42d0-9027-8ee822ee6fa7'
+  PropagateID: 'e01c22d1-119f-42d0-9027-8ee822ee6fa7'
+  ReservedCode1: 'e99cdbc1-b610-4b6f-a39f-19aed3cfc159'
+  ReservedCode2: 'e99cdbc1-b610-4b6f-a39f-19aed3cfc159'
+---
+
 # Incompatible
 
 This document records the incompatible updates between each version. You need to check this document before you upgrade to related version.
@@ -46,6 +57,6 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.5.0
 
-* Add the `missed_fire_policy` column to `t_ds_schedules`. Existing schedules default to `FIRE_ALL_MISSED` to preserve the previous Quartz `IgnoreMisfires` behavior. ([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
-* Rename the `sendEmail` field in SQL task parameters to `sendAlert`. The data migration script will automatically migrate `sendEmail` to `sendAlert` in the `t_ds_task_definition` and `t_ds_task_definition_log` tables.([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
+* Add the `missed_fire_policy` column to `t_d_schedules`. Existing schedules default to `FIRE_ALL_MISSED` to preserve the previous Quartz `IgnoreMisfires` behavior. ([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
 
+> AI生成

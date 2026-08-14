@@ -38,16 +38,13 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-import com.fasterxml.jackson.annotation.JsonAlias;
 import com.google.common.collect.Lists;
 
 /**
  * Sql/Hql parameter
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
 public class SqlParameters extends AbstractParameters {
 
     /**
@@ -76,31 +73,26 @@ public class SqlParameters extends AbstractParameters {
      */
     private int sqlType;
 
+    private Boolean sendEmail;
+
     private int displayRows;
 
+    /**
+     * show type
+     * 0 TABLE
+     * 1 TEXT
+     * 2 attachment
+     * 3 TABLE+attachment
+     */
+    private String showType;
     /**
      * SQL connection parameters
      */
     private String connParams;
-
     private List<String> preStatements;
-
     private List<String> postStatements;
 
-    /**
-     * Whether to send alert for SQL query result
-     */
-    @JsonAlias("sendEmail")
-    private Boolean sendAlert;
-
-    /**
-     * Alert group id
-     */
     private int groupId;
-
-    /**
-     * Alert title
-     */
     private String title;
 
     private int limit;
@@ -181,9 +173,10 @@ public class SqlParameters extends AbstractParameters {
                 + ", sqlSource='" + sqlSource + '\''
                 + ", sqlResource='" + sqlResource + '\''
                 + ", sqlType=" + sqlType
-                + ", sendAlert=" + sendAlert
+                + ", sendEmail=" + sendEmail
                 + ", displayRows=" + displayRows
                 + ", limit=" + limit
+                + ", showType='" + showType + '\''
                 + ", connParams='" + connParams + '\''
                 + ", groupId='" + groupId + '\''
                 + ", title='" + title + '\''

@@ -124,11 +124,12 @@ public class SqlTask extends AbstractTask {
     public void handle(TaskCallBack taskCallBack) throws TaskException {
         log.info("Full sql parameters: {}", sqlParameters);
         log.info(
-                "sql type : {}, datasource : {}, sql : {} , localParams : {},connParams : {},varPool : {} ,query max result limit  {}",
+                "sql type : {}, datasource : {}, sql : {} , localParams : {},showType : {},connParams : {},varPool : {} ,query max result limit  {}",
                 sqlParameters.getType(),
                 sqlParameters.getDatasource(),
                 sqlParameters.getSql(),
                 sqlParameters.getLocalParams(),
+                sqlParameters.getShowType(),
                 sqlParameters.getConnParams(),
                 sqlParameters.getVarPool(),
                 sqlParameters.getLimit());
@@ -297,7 +298,7 @@ public class SqlTask extends AbstractTask {
             result = JSONUtils.toJsonString(resultJSONArray);
         }
 
-        if (Boolean.TRUE.equals(sqlParameters.getSendAlert())) {
+        if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
             log.info("SendAlert is enabled, preparing task result alert");
             prepareTaskResultAlert(alertArray);
         } else {

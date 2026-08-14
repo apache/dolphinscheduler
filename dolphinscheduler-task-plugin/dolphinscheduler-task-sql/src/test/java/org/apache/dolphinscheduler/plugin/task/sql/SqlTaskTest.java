@@ -492,13 +492,13 @@ class SqlTaskTest {
     }
 
     /**
-     * Helper: create a SqlTask with sendAlert enabled, invoke prepareTaskResultAlert via reflection,
+     * Helper: create a SqlTask with sendEmail enabled, invoke prepareTaskResultAlert via reflection,
      * and return the TaskExecutionContext for assertions.
      */
     private TaskExecutionContext createSqlTaskWithAlert(ArrayNode resultArray, int displayRows, String title,
                                                         int groupId) {
         String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\""
-                + ",\"sendAlert\":true"
+                + ",\"sendEmail\":true"
                 + ",\"displayRows\":" + displayRows
                 + ",\"groupId\":" + groupId
                 + (title != null ? ",\"title\":\"" + title + "\"" : "")
@@ -522,7 +522,7 @@ class SqlTaskTest {
     }
 
     /**
-     * When sendAlert is true, prepareTaskResultAlert should set needAlert on TaskExecutionContext
+     * When sendEmail is true, prepareTaskResultAlert should set needAlert on TaskExecutionContext
      * and populate TaskAlertInfo with correct alertGroupId, title, alertType and truncated content.
      */
     @Test
@@ -533,7 +533,7 @@ class SqlTaskTest {
 
         TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "My Alert Title", 5);
 
-        Assertions.assertTrue(ctx.isNeedAlert(), "needAlert should be true when sendAlert is enabled");
+        Assertions.assertTrue(ctx.isNeedAlert(), "needAlert should be true when sendEmail is enabled");
 
         TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
         Assertions.assertNotNull(alertInfo, "taskAlertInfo should not be null");
@@ -622,12 +622,12 @@ class SqlTaskTest {
     }
 
     /**
-     * When sendAlert is false, resultProcess should NOT set needAlert or taskAlertInfo.
+     * When sendEmail is false, resultProcess should NOT set needAlert or taskAlertInfo.
      */
     @Test
-    void testResultProcess_sendAlertDisabled_doesNotSetNeedAlert() throws Exception {
-        // Build a SqlTask with sendAlert = false
-        String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\",\"sendAlert\":false}";
+    void testResultProcess_sendEmailDisabled_doesNotSetNeedAlert() throws Exception {
+        // Build a SqlTask with sendEmail = false
+        String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\",\"sendEmail\":false}";
 
         TaskExecutionContext ctx = new TaskExecutionContext();
         ctx.setTaskParams(taskParams);
@@ -648,8 +648,8 @@ class SqlTaskTest {
         resultProcessMethod.setAccessible(true);
         resultProcessMethod.invoke(task, mockResultSet);
 
-        Assertions.assertFalse(ctx.isNeedAlert(), "needAlert should remain false when sendAlert is disabled");
-        Assertions.assertNull(ctx.getTaskAlertInfo(), "taskAlertInfo should remain null when sendAlert is disabled");
+        Assertions.assertFalse(ctx.isNeedAlert(), "needAlert should remain false when sendEmail is disabled");
+        Assertions.assertNull(ctx.getTaskAlertInfo(), "taskAlertInfo should remain null when sendEmail is disabled");
     }
 
     /**
@@ -659,7 +659,7 @@ class SqlTaskTest {
     @Test
     void testResultProcess_emptyResultSet_prepareAlertWithEmptyRow() throws Exception {
         String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\""
-                + ",\"sendAlert\":true,\"displayRows\":10,\"groupId\":3,\"title\":\"empty result\"}";
+                + ",\"sendEmail\":true,\"displayRows\":10,\"groupId\":3,\"title\":\"empty result\"}";
 
         TaskExecutionContext ctx = new TaskExecutionContext();
         ctx.setTaskParams(taskParams);
