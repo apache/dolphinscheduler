@@ -41,8 +41,7 @@ public class AlertOperatorImpl implements IAlertOperator {
         AlertSendResponse alertSendResponse = alertSender.syncHandler(
                 alertSendRequest.getGroupId(),
                 alertSendRequest.getTitle(),
-                alertSendRequest.getContent(),
-                alertSendRequest.getAlertType());
+                alertSendRequest.getContent());
         log.info("Handle AlertSendRequest finish: {}", alertSendResponse);
         return alertSendResponse;
     }

@@ -1,14 +1,3 @@
----
-AIGC:
-  ContentProducer: '001191110102MAD55U9H0F10002'
-  ContentPropagator: '001191110102MAD55U9H0F10002'
-  Label: '1'
-  ProduceID: '0f42b663-53c1-4f98-ae46-0c8879f2a3d9'
-  PropagateID: '0f42b663-53c1-4f98-ae46-0c8879f2a3d9'
-  ReservedCode1: '840b53b9-f732-40dd-8e74-1a0c2fcf4622'
-  ReservedCode2: '840b53b9-f732-40dd-8e74-1a0c2fcf4622'
----
-
 # 不向前兼容的更新
 
 本文档记录了各版本之间不兼容的更新内容。在升级到相关版本前，请检查本文档。
@@ -59,4 +48,3 @@ AIGC:
 
 * 为 `t_ds_schedules` 表新增 `missed_fire_policy` 字段。现有定时默认使用 `FIRE_ALL_MISSED`，以保持原有 Quartz `IgnoreMisfires` 行为。([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
 
-> AI生成

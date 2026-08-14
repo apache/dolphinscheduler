@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
-import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 import org.apache.dolphinscheduler.dao.entity.AlertPluginInstance;
@@ -56,15 +55,13 @@ public class AlertSender extends AbstractEventSender<Alert> {
      * @param alertGroupId alertGroupId
      * @param title        title
      * @param content      content
-     * @param alertType    alertType
      * @return AlertSendResponseCommand
      */
-    public AlertSendResponse syncHandler(int alertGroupId, String title, String content, AlertType alertType) {
+    public AlertSendResponse syncHandler(int alertGroupId, String title, String content) {
         List<AlertPluginInstance> alertInstanceList = alertDao.listInstanceByAlertGroupId(alertGroupId);
         AlertData alertData = AlertData.builder()
                 .content(content)
                 .title(title)
-                .alertType(alertType.getCode())
                 .build();
 
         boolean sendResponseStatus = true;

@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.extract.alert.request;
 
-import org.apache.dolphinscheduler.common.enums.AlertType;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,6 +32,6 @@ public class AlertSendRequest {
 
     private String content;
 
-    private AlertType alertType;
+    private int warnType;
 
 }
