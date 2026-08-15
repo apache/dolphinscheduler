@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -112,6 +113,42 @@ public class LogUtils {
     public static String getLocalLogBaseDir() {
         LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
         return loggerContext.getProperty("log.base.ctx");
+    }
+
+    /**
+     * Read a byte range [offset, offset+length) from a local file using random access, without
+     * loading the whole file into memory. Used by the chunked log download RPC.
+     *
+     * <p>Single-stat contract: the caller passes the file it already observed (together with
+     * the length it saw); this method never stats the file itself. Statting again would open a
+     * race between the two observations (log rotation/shrink in between) that could misclassify
+     * the read. If the file vanished after the observation, the {@link RandomAccessFile}
+     * constructor throws {@link java.io.FileNotFoundException}; if it shrank below the observed
+     * length, {@code readFully} throws an explicit EOF instead of silently returning a short
+     * chunk — callers can distinguish the two failure types by catching them.
+     *
+     * @param file         the log file, already existence-checked and length-observed by the caller
+     * @param offset       start byte offset (>= 0); if >= observedFileLength, an empty array is
+     *                     returned (clean EOF)
+     * @param length       maximum number of bytes to read (> 0)
+     * @param observedFileLength the file length observed by the caller immediately before
+     *                     this call
+     * @return the bytes actually read; if fewer than {@code length}, the caller is at EOF
+     * @throws java.io.FileNotFoundException if the file disappeared since the caller's check
+     * @throws EOFException if the file shrank below the observed length mid-read
+     */
+    public static byte[] readFileRange(final File file, final long offset,
+                                       final int length, final long observedFileLength) throws IOException {
+        if (offset >= observedFileLength || length <= 0) {
+            return new byte[0];
+        }
+        final int toRead = (int) Math.min(length, observedFileLength - offset);
+        final byte[] buf = new byte[toRead];
+        try (RandomAccessFile raf = new RandomAccessFile(file, "r")) {
+            raf.seek(offset);
+            raf.readFully(buf);
+        }
+        return buf;
     }
 
 }

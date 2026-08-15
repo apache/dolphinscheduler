@@ -71,10 +71,10 @@ public class LocalLogClientTest {
             @Override
             public TaskInstanceLogFileDownloadResponse getTaskInstanceWholeLogFileBytes(TaskInstanceLogFileDownloadRequest taskInstanceLogFileDownloadRequest) {
                 if (taskInstanceLogFileDownloadRequest.getTaskInstanceId() == 1) {
-                    return new TaskInstanceLogFileDownloadResponse(new byte[0], LogResponseStatus.SUCCESS, "");
+                    return new TaskInstanceLogFileDownloadResponse(new byte[0], LogResponseStatus.SUCCESS, "", true);
                 } else if (taskInstanceLogFileDownloadRequest.getTaskInstanceId() == 10) {
                     return new TaskInstanceLogFileDownloadResponse("log content".getBytes(), LogResponseStatus.SUCCESS,
-                            "");
+                            "", true);
                 }
 
                 throw new ServiceException("download error");
@@ -97,6 +97,12 @@ public class LocalLogClientTest {
             @Override
             public void removeTaskInstanceLog(String taskInstanceLogAbsolutePath) {
 
+            }
+
+            @Override
+            public TaskInstanceLogFileDownloadResponse getTaskInstanceLogFileChunk(
+                                                                                   TaskInstanceLogFileDownloadRequest request) {
+                return new TaskInstanceLogFileDownloadResponse();
             }
         });
         springServerMethodInvokerDiscovery.start();

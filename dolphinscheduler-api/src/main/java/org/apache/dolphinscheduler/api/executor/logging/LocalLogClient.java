@@ -66,6 +66,16 @@ public class LocalLogClient {
         return getProxyLogService(taskInstance).getTaskInstanceWholeLogFileBytes(request);
     }
 
+    /**
+     * Fetch a single bounded chunk of the task instance log from the worker via chunked RPC.
+     */
+    public TaskInstanceLogFileDownloadResponse getLogChunk(final TaskInstance taskInstance,
+                                                           final long offset, final int length) {
+        final TaskInstanceLogFileDownloadRequest request = new TaskInstanceLogFileDownloadRequest(
+                taskInstance.getId(), taskInstance.getLogPath(), offset, length);
+        return getProxyLogService(taskInstance).getTaskInstanceLogFileChunk(request);
+    }
+
     private TaskInstanceLogPageQueryResponse getLocalPartLog(TaskInstance taskInstance, int skipLineNum,
                                                              int limit) {
         TaskInstanceLogPageQueryRequest request = TaskInstanceLogPageQueryRequest

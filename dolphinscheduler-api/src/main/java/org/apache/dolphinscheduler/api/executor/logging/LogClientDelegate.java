@@ -25,14 +25,23 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import java.io.IOException;
+import java.io.OutputStream;
+
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import io.netty.handler.codec.TooLongFrameException;
+
 @Slf4j
 @Component
 public class LogClientDelegate {
+
+    private static final int LOG_CHUNK_SIZE = 8 * 1024 * 1024; // 8 MB
 
     @Autowired
     private LocalLogClient localLogClient;
@@ -107,6 +116,108 @@ public class LogClientDelegate {
             log.warn("Node {} does not exist for task instance {}", taskInstance.getHost(), taskInstance.getId());
         }
         return exists;
+    }
+
+    /**
+     * Stream the entire task instance log to {@code outputStream} using chunked RPC.
+     *
+     * <p>Strategy:
+     * <ul>
+     *   <li>If the worker node is gone, read straight from remote log storage (archive).</li>
+     *   <li>Otherwise try the chunk RPC. If it fails before any byte is written (e.g. an old worker
+     *       that does not implement {@code getTaskInstanceLogFileChunk}), fall back to the legacy
+     *       whole-file worker RPC; if that also fails, fall back to remote storage.</li>
+     *   <li>If the failure happens mid-stream (bytes already written), throw IOException to avoid
+     *       corrupting the download.</li>
+     * </ul>
+     */
+    public void streamWholeLog(final TaskInstance taskInstance, final OutputStream outputStream) throws IOException {
+        checkArgs(taskInstance);
+        if (!checkNodeExists(taskInstance)) {
+            remoteLogClient.streamWholeLog(taskInstance, outputStream);
+            return;
+        }
+        long offset = 0;
+        boolean needFallback = false;
+        try {
+            while (true) {
+                final TaskInstanceLogFileDownloadResponse chunk =
+                        localLogClient.getLogChunk(taskInstance, offset, LOG_CHUNK_SIZE);
+                if (chunk.getCode() != LogResponseStatus.SUCCESS) {
+                    if (offset == 0) {
+                        if (chunk.getCode() == LogResponseStatus.LOG_FILE_NOT_FOUND) {
+                            // A NEW worker authoritatively reports the file is gone (an old
+                            // worker cannot: it lacks the chunk method and fails the RPC
+                            // instead). Skip the redundant legacy probe on the same worker and
+                            // go straight to the remote archive.
+                            log.warn("Log file not found on worker for task instance {}, "
+                                    + "fetching from remote storage", taskInstance.getId());
+                            remoteLogClient.streamWholeLog(taskInstance, outputStream);
+                            return;
+                        }
+                        log.warn("First chunk failed for task instance {}: {}, falling back to legacy whole-file RPC",
+                                taskInstance.getId(), chunk.getMessage());
+                        needFallback = true;
+                        break;
+                    }
+                    throw new IOException("Worker chunk failed at offset " + offset + ": " + chunk.getMessage());
+                }
+                final byte[] data = chunk.getLogBytes();
+                if (data != null && data.length > 0) {
+                    outputStream.write(data);
+                    offset += data.length;
+                }
+                if (chunk.isEof() || (data == null || data.length == 0)) {
+                    return;
+                }
+            }
+        } catch (Exception e) {
+            if (offset > 0) {
+                throw new IOException("Log streaming failed at offset " + offset, e);
+            }
+            log.warn("Chunked streaming failed before any byte written for task instance {}, "
+                    + "falling back to legacy whole-file RPC", taskInstance.getId(), e);
+            needFallback = true;
+        }
+        // Fallback OUTSIDE the try — its exceptions propagate directly, no re-entry.
+        if (needFallback) {
+            writeLocalLegacy(taskInstance, outputStream);
+        }
+    }
+
+    /**
+     * Fall back to the legacy whole-file worker RPC ({@code getTaskInstanceWholeLogFileBytes}),
+     * bounded by the TransporterDecoder maxFrameSize guard (64 MB). If the log exceeds that limit,
+     * the RPC response is rejected and this method throws an explicit {@link IOException} rather
+     * than falling through to remote storage, so the caller does not see a misleading
+     * "log not available" error. If the RPC fails for other reasons or returns nothing, fall
+     * through to remote log storage (streamed, also bounded).
+     */
+    private void writeLocalLegacy(final TaskInstance taskInstance,
+                                  final OutputStream outputStream) throws IOException {
+        try {
+            final TaskInstanceLogFileDownloadResponse response = localLogClient.getWholeLog(taskInstance);
+            if (response != null && response.getCode() == LogResponseStatus.SUCCESS) {
+                // SUCCESS is the worker's authoritative answer: an EMPTY body is a valid
+                // terminal state ("task produced no output"), not a reason to fall through to
+                // remote storage — falling through would turn a legitimate empty log into an
+                // error once no archive exists. Only an explicit non-SUCCESS keeps the
+                // fallback chain going.
+                final byte[] bytes = response.getLogBytes();
+                outputStream.write(bytes == null ? new byte[0] : bytes);
+                outputStream.flush();
+                return;
+            }
+        } catch (Exception e) {
+            if (ExceptionUtils.throwableOfType(e, TooLongFrameException.class) != null) {
+                throw new IOException("Log file for task instance " + taskInstance.getId()
+                        + " exceeds the maximum legacy download size; "
+                        + "enable remote log archiving or increase the RPC maxFrameSize", e);
+            }
+            log.warn("Legacy whole-file RPC failed for task instance {}, falling back to remote storage",
+                    taskInstance.getId(), e);
+        }
+        remoteLogClient.streamWholeLog(taskInstance, outputStream);
     }
 
 }

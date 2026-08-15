@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.extract.base.config;
 
+import org.apache.dolphinscheduler.extract.base.protocal.TransporterDecoder;
+
 import java.time.Duration;
 
 import lombok.AllArgsConstructor;
@@ -61,6 +63,15 @@ public class NettyServerConfig {
      */
     @Builder.Default
     private int workerThread = Runtime.getRuntime().availableProcessors() * 2;
+
+    /**
+     * Maximum allowed frame size in bytes for a single RPC message (header + body).
+     * Frames exceeding this size will be rejected by the decoder to prevent OOM.
+     * Defaults to {@link TransporterDecoder#DEFAULT_MAX_FRAME_SIZE} — see its javadoc for the
+     * lower-bound rationale before lowering this.
+     */
+    @Builder.Default
+    private int maxFrameSize = TransporterDecoder.DEFAULT_MAX_FRAME_SIZE;
 
     /**
      * If done's receive any data from a {@link io.netty.channel.Channel} during 180s then will close it.
