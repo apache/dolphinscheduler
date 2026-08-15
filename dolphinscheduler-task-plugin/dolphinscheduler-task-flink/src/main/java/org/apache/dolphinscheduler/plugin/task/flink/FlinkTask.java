@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -116,5 +118,48 @@ public class FlinkTask extends AbstractYarnTask {
             return str.substring(6);
         }
         return null;
+    }
+
+    /**
+     * Cancel the Flink application.
+     * <p>
+     * This method first attempts to gracefully cancel the Flink job using the
+     * {@code flink cancel} command with the application ID. This ensures that
+     * the Flink job is properly stopped and resources are released. If the
+     * graceful cancel fails (e.g., the Flink CLI is unavailable or the job
+     * is already terminated), it falls back to the parent class's
+     * {@link #cancelApplication()} which uses process-level kill signals.
+     *
+     * @throws TaskException if both the Flink cancel and the fallback kill fail
+     */
+    @Override
+    public void cancelApplication() throws TaskException {
+        try {
+            String appIds = String.join(TaskConstants.COMMA, getApplicationIds());
+            if (StringUtils.isNotBlank(appIds)) {
+                log.info("Attempting to gracefully cancel Flink job with appId(s): {}", appIds);
+                List<String> cancelCommand = FlinkArgsUtils.buildCancelCommandLine(taskExecutionContext);
+                String command = String.join(" ", cancelCommand);
+                log.info("Executing Flink cancel command: {}", command);
+                ProcessBuilder processBuilder = new ProcessBuilder("/bin/sh", "-c", command);
+                Process cancelProcess = processBuilder.start();
+                boolean finished = cancelProcess.waitFor(30, java.util.concurrent.TimeUnit.SECONDS);
+                if (finished && cancelProcess.exitValue() == 0) {
+                    log.info("Flink job cancelled successfully via flink cancel command, appId(s): {}", appIds);
+                    return;
+                } else {
+                    log.warn("Flink cancel command did not succeed (exit code: {}, finished: {}), "
+                            + "falling back to process kill", 
+                            finished ? cancelProcess.exitValue() : -1, finished);
+                    cancelProcess.destroyForcibly();
+                }
+            } else {
+                log.info("No appIds found for Flink task, skipping flink cancel, falling back to process kill");
+            }
+        } catch (Exception e) {
+            log.warn("Failed to gracefully cancel Flink job, falling back to process kill", e);
+        }
+        // Fall back to the default process-level kill
+        super.cancelApplication();
     }
 }
