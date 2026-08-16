@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.datavines.utils.RequestUtils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.Collections;
 import java.util.List;
 
@@ -202,10 +204,13 @@ public class DatavinesTask extends AbstractRemoteTask {
     @Override
     public void cancelApplication() throws TaskException {
         String address = this.datavinesParameters.getAddress();
-        log.info("trying terminate datavines task, taskId: {}, address: {}, taskId: {}",
-                this.taskExecutionContext.getTaskInstanceId(),
-                address,
-                jobExecutionId);
+        if (StringUtils.isEmpty(jobExecutionId)) {
+            log.warn("datavines task has no job execution id, skip killing, taskId: {}, address: {}",
+                    this.taskExecutionContext.getTaskInstanceId(), address);
+            return;
+        }
+        log.info("trying terminate datavines task, taskId: {}, address: {}, jobExecutionId: {}",
+                this.taskExecutionContext.getTaskInstanceId(), address, jobExecutionId);
         RequestUtils.killJobExecution(address, jobExecutionId, this.datavinesParameters.getToken());
         log.warn("datavines task terminated, taskId: {}, address: {}, jobExecutionId: {}",
                 this.taskExecutionContext.getTaskInstanceId(),

@@ -160,13 +160,29 @@ class DatavinesTaskTest {
     }
 
     @Test
-    void cancelApplicationTerminatesJobSuccessfully() {
+    void cancelApplicationTerminatesJobSuccessfully() throws NoSuchFieldException, IllegalAccessException {
+        try (MockedStatic<RequestUtils> requestUtilsStatic = Mockito.mockStatic(RequestUtils.class)) {
+            when(taskExecutionContext.getTaskParams())
+                    .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
+            datavinesTask.init();
+            Field jobExecutionIdField = DatavinesTask.class.getDeclaredField("jobExecutionId");
+            jobExecutionIdField.setAccessible(true);
+            jobExecutionIdField.set(datavinesTask, "1");
+            assertDoesNotThrow(() -> datavinesTask.cancelApplication());
+            requestUtilsStatic.verify(() -> RequestUtils.killJobExecution("http://localhost", "1", "token"));
+        }
+    }
+
+    @Test
+    void cancelApplicationWithoutJobExecutionIdSkipsKill() {
         try (MockedStatic<RequestUtils> requestUtilsStatic = Mockito.mockStatic(RequestUtils.class)) {
             when(taskExecutionContext.getTaskParams())
                     .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
             datavinesTask.init();
             assertDoesNotThrow(() -> datavinesTask.cancelApplication());
-            requestUtilsStatic.verify(() -> RequestUtils.killJobExecution("http://localhost", null, "token"));
+            requestUtilsStatic.verify(
+                    () -> RequestUtils.killJobExecution(Mockito.any(), Mockito.any(), Mockito.any()),
+                    Mockito.never());
         }
     }
 
