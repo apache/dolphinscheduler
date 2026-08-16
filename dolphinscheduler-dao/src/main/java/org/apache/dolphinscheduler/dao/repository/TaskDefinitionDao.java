@@ -36,6 +36,16 @@ public interface TaskDefinitionDao extends IDao<TaskDefinition> {
      */
     List<TaskDefinition> getTaskDefinitionListByDefinition(long workflowDefinitionCode);
 
+    /**
+     * Query task definition by code and version
+     * @param taskCode task code
+     * @param taskDefinitionVersion task definition version
+     * @return task definition
+     */
+    TaskDefinition findTaskDefinition(long taskCode, int taskDefinitionVersion);
+
+    void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
+
     void deleteByTaskDefinitionCodes(Set<Long> needToDeleteTaskDefinitionCodes);
 
     List<TaskDefinition> queryByCodes(Collection<Long> taskDefinitionCodes);
@@ -46,6 +56,14 @@ public interface TaskDefinitionDao extends IDao<TaskDefinition> {
      * @return task definition
      */
     TaskDefinition queryByCode(long taskCode);
+
+    TaskDefinition queryByName(long projectCode, long workflowDefinitionCode, String taskName);
+
+    List<TaskDefinition> queryByWorkerGroup(String workerGroup);
+
+    long countByEnvironmentCode(long environmentCode);
+
+    List<TaskDefinition> queryByEnvironmentCodeAndWorkerGroup(long environmentCode, String workerGroup);
 
     List<String> queryAllTaskDefinitionWorkerGroups(long projectCode);
 }

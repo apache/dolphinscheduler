@@ -17,11 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.User;
 
-import java.util.Map;
+import java.util.List;
 
 public interface EnvironmentService {
 
@@ -41,14 +42,14 @@ public interface EnvironmentService {
      *
      * @param name environment name
      */
-    Map<String, Object> queryEnvironmentByName(String name);
+    EnvironmentDto queryEnvironmentByName(String name);
 
     /**
      * query environment
      *
      * @param code environment code
      */
-    Map<String, Object> queryEnvironmentByCode(Long code);
+    EnvironmentDto queryEnvironmentByCode(Long code);
 
     /**
      * delete environment
@@ -56,7 +57,7 @@ public interface EnvironmentService {
      * @param loginUser login user
      * @param code environment code
      */
-    Map<String, Object> deleteEnvironmentByCode(User loginUser, Long code);
+    void deleteEnvironmentByCode(User loginUser, Long code);
 
     /**
      * update environment
@@ -85,16 +86,14 @@ public interface EnvironmentService {
      * query all environment
      *
      * @param loginUser
-     * @return all environment list
      */
-    Map<String, Object> queryAllEnvironmentList(User loginUser);
+    List<EnvironmentDto> queryAllEnvironmentList(User loginUser);
 
     /**
      * verify environment name
      *
      * @param environmentName environment name
-     * @return true if the environment name not exists, otherwise return false
      */
-    Map<String, Object> verifyEnvironment(String environmentName);
+    void verifyEnvironment(String environmentName);
 
 }

@@ -23,6 +23,7 @@ services:
     environment:
       MASTER_MAX_CPU_LOAD_AVG: 400
       MASTER_RESERVED_MEMORY: 0.01
+      MASTER_KILL_APPLICATION_WHEN_TASK_FAILOVER: 'true'
       WORKER_TENANT_AUTO_CREATE: 'true'
     ports:
       - "12345:12345"

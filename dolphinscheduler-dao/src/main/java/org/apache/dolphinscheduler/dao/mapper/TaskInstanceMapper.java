@@ -19,8 +19,10 @@ package org.apache.dolphinscheduler.dao.mapper;
 
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import org.apache.ibatis.annotations.Param;
 
@@ -56,6 +58,41 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     List<TaskInstanceStatusCountDto> countTaskInstanceStateByProjectCodes(@Param("startTime") Date startTime,
                                                                           @Param("endTime") Date endTime,
                                                                           @Param("projectCodes") Collection<Long> projectCodes);
+
+    /**
+     * Statistics task instance group by given project ids list by start time
+     * <p>
+     * We only need project ids to determine whether the task instance belongs to the user or not.
+     *
+     * @param startTime    Statistics start time
+     * @param endTime      Statistics end time
+     * @param projectIds Project ids list to filter
+     * @return List of ExecuteStatusCount
+     */
+    List<ExecuteStatusCount> countTaskInstanceStateByProjectIdsV2(@Param("startTime") Date startTime,
+                                                                  @Param("endTime") Date endTime,
+                                                                  @Param("projectIds") Set<Integer> projectIds);
+
+    /**
+     * Statistics task instance group by given project codes list by submit time
+     * <p>
+     * We only need project codes to determine whether the task instance belongs to the user or not.
+     *
+     * @param startTime    Statistics start time
+     * @param endTime      Statistics end time
+     * @param projectCode  projectCode
+     * @param model model
+     * @param projectIds projectIds
+     * @return List of ExecuteStatusCount
+     */
+    List<ExecuteStatusCount> countTaskInstanceStateByProjectCodesAndStatesBySubmitTimeV2(@Param("startTime") Date startTime,
+                                                                                         @Param("endTime") Date endTime,
+                                                                                         @Param("projectCode") Long projectCode,
+                                                                                         @Param("workflowCode") Long workflowCode,
+                                                                                         @Param("taskCode") Long taskCode,
+                                                                                         @Param("model") Integer model,
+                                                                                         @Param("projectIds") Set<Integer> projectIds,
+                                                                                         @Param("states") List<TaskExecutionStatus> states);
 
     IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
                                                     @Param("projectCode") Long projectCode,

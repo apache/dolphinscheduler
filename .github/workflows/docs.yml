@@ -17,6 +17,7 @@
 name: Docs
 
 on:
+  workflow_dispatch:
   pull_request:
   schedule:
     - cron: '0 18 * * *'  # TimeZone: UTC 0

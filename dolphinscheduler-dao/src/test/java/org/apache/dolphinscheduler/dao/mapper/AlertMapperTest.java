@@ -25,6 +25,9 @@ import org.apache.dolphinscheduler.dao.entity.Alert;
 
 import org.apache.commons.codec.digest.DigestUtils;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +91,23 @@ public class AlertMapperTest extends BaseDaoTest {
         Alert actualAlert = alertMapper.selectById(expectedAlert.getId());
 
         Assertions.assertNull(actualAlert);
+    }
+
+    /**
+     * create alert map
+     *
+     * @param count       alert count
+     * @param alertStatus alert status
+     * @return alert map
+     */
+    private Map<Integer, Alert> createAlertMap(Integer count, AlertStatus alertStatus) {
+        Map<Integer, Alert> alertMap = new HashMap<>();
+
+        for (int i = 0; i < count; i++) {
+            Alert alert = createAlert(alertStatus);
+            alertMap.put(alert.getId(), alert);
+        }
+        return alertMap;
     }
 
     /**

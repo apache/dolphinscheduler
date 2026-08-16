@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_ENVIRONMENT_ER
 
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
+import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -34,7 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
-import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -127,7 +128,6 @@ public class EnvironmentController extends BaseController {
      * query environment details by code
      *
      * @param environmentCode environment code
-     * @return environment detail information
      */
     @Operation(summary = "queryEnvironmentByCode", description = "QUERY_ENVIRONMENT_BY_CODE_NOTES")
     @Parameters({
@@ -136,11 +136,10 @@ public class EnvironmentController extends BaseController {
     @GetMapping(value = "/query-by-code")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ENVIRONMENT_BY_CODE_ERROR)
-    public Result queryEnvironmentByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                         @RequestParam("environmentCode") Long environmentCode) {
-
-        Map<String, Object> result = environmentService.queryEnvironmentByCode(environmentCode);
-        return returnDataList(result);
+    public Result<EnvironmentDto> queryEnvironmentByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                         @RequestParam("environmentCode") Long environmentCode) {
+        EnvironmentDto dto = environmentService.queryEnvironmentByCode(environmentCode);
+        return Result.success(dto);
     }
 
     /**
@@ -175,7 +174,6 @@ public class EnvironmentController extends BaseController {
      *
      * @param loginUser login user
      * @param environmentCode environment code
-     * @return delete result code
      */
     @Operation(summary = "deleteEnvironmentByCode", description = "DELETE_ENVIRONMENT_BY_CODE_NOTES")
     @Parameters({
@@ -185,26 +183,24 @@ public class EnvironmentController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(DELETE_ENVIRONMENT_ERROR)
     @OperatorLog(auditType = AuditType.ENVIRONMENT_DELETE)
-    public Result deleteEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @RequestParam("environmentCode") Long environmentCode) {
-
-        Map<String, Object> result = environmentService.deleteEnvironmentByCode(loginUser, environmentCode);
-        return returnDataList(result);
+    public Result<Void> deleteEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @RequestParam("environmentCode") Long environmentCode) {
+        environmentService.deleteEnvironmentByCode(loginUser, environmentCode);
+        return Result.success();
     }
 
     /**
      * query all environment list
      *
      * @param loginUser login user
-     * @return all environment list
      */
     @Operation(summary = "queryAllEnvironmentList", description = "QUERY_ALL_ENVIRONMENT_LIST_NOTES")
     @GetMapping(value = "/query-environment-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ENVIRONMENT_ERROR)
-    public Result queryAllEnvironmentList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        Map<String, Object> result = environmentService.queryAllEnvironmentList(loginUser);
-        return returnDataList(result);
+    public Result<List<EnvironmentDto>> queryAllEnvironmentList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+        List<EnvironmentDto> dtos = environmentService.queryAllEnvironmentList(loginUser);
+        return Result.success(dtos);
     }
 
     /**
@@ -212,7 +208,6 @@ public class EnvironmentController extends BaseController {
      *
      * @param loginUser login user
      * @param environmentName environment name
-     * @return true if the environment name not exists, otherwise return false
      */
     @Operation(summary = "verifyEnvironment", description = "VERIFY_ENVIRONMENT_NOTES")
     @Parameters({
@@ -221,9 +216,9 @@ public class EnvironmentController extends BaseController {
     @PostMapping(value = "/verify-environment")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_ENVIRONMENT_ERROR)
-    public Result verifyEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                    @RequestParam(value = "environmentName") String environmentName) {
-        Map<String, Object> result = environmentService.verifyEnvironment(environmentName);
-        return returnDataList(result);
+    public Result<Void> verifyEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                          @RequestParam(value = "environmentName") String environmentName) {
+        environmentService.verifyEnvironment(environmentName);
+        return Result.success();
     }
 }

@@ -51,8 +51,15 @@ public class FailedRecoverTaskInstanceFactory
         taskInstance.setHost(null);
         taskInstance.setVarPool(null);
         taskInstance.setSubmitTime(new Date());
+        taskInstance.setStartTime(null);
+        taskInstance.setEndTime(null);
         taskInstance.setLogPath(null);
         taskInstance.setExecutePath(null);
+        taskInstance.setPid(0);
+        // The recreated task instance is a new attempt, it should get the whole retry budget back, otherwise a task
+        // which already exhausted its retry times will never be retried again in the recovered workflow.
+        taskInstance.setRetryTimes(0);
+        taskInstance.setAlertFlag(Flag.NO);
         taskInstanceDao.insert(taskInstance);
 
         needRecoverTaskInstance.setFlag(Flag.NO);

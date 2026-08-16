@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.python;
 
 import org.apache.dolphinscheduler.api.configuration.ApiConfig;
-import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.dto.resources.ResourceComponent;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -51,12 +50,12 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectUserMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.spi.enums.ResourceType;
 
@@ -94,7 +93,7 @@ public class PythonGateway {
     private static final int ADMIN_USER_ID = 1;
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Autowired
     private ProjectService projectService;
@@ -121,25 +120,25 @@ public class PythonGateway {
     private ResourcesService resourceService;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
+    private TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
     private SchedulerService schedulerService;
 
     @Autowired
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Autowired
-    private DataSourceMapper dataSourceMapper;
+    private DataSourceDao dataSourceDao;
 
     @Autowired
     private ApiConfig apiConfig;
 
     @Autowired
-    private ProjectUserMapper projectUserMapper;
+    private ProjectUserDao projectUserDao;
 
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
@@ -158,12 +157,22 @@ public class PythonGateway {
     // TODO Should we import package in python client side? utils package can but service can not, why
     // Core api
     public Map<String, Object> genTaskCodeList(Integer genNum) {
-        return taskDefinitionService.genTaskCodeList(genNum);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            List<Long> taskCodes = taskDefinitionService.genTaskCodeList(genNum);
+            result.put(Constants.STATUS, Status.SUCCESS);
+            result.put(Constants.MSG, Status.SUCCESS.getMsg());
+            result.put(Constants.DATA_LIST, taskCodes);
+        } catch (ServiceException e) {
+            result.put(Constants.STATUS, Status.DATA_IS_NOT_VALID);
+            result.put(Constants.MSG, e.getMessage());
+        }
+        return result;
     }
 
     public Map<String, Long> getCodeAndVersion(String projectName, String workflowDefinitionName,
                                                String taskName) {
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectDao.queryByName(projectName);
         Map<String, Long> result = new HashMap<>();
         // project do not exists, mean task not exists too, so we should directly return init value
         if (project == null) {
@@ -173,7 +182,7 @@ public class PythonGateway {
         }
 
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowDefinitionName);
+                workflowDefinitionDao.queryByDefineName(project.getCode(), workflowDefinitionName);
         // In the case project exists, but current workflow still not created, we should also return the init
         // version of it
         if (workflowDefinition == null) {
@@ -183,7 +192,7 @@ public class PythonGateway {
         }
 
         TaskDefinition taskDefinition =
-                taskDefinitionMapper.queryByName(project.getCode(), workflowDefinition.getCode(), taskName);
+                taskDefinitionDao.queryByName(project.getCode(), workflowDefinition.getCode(), taskName);
         if (taskDefinition == null) {
             result.put("code", CodeGenerateUtils.genCode());
             result.put("version", 0L);
@@ -238,7 +247,7 @@ public class PythonGateway {
             throw new RuntimeException("Can not create or update workflow for user who not related to any tenant.");
         }
 
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectDao.queryByName(projectName);
         long projectCode = project.getCode();
 
         WorkflowDefinition workflowDefinition = getWorkflow(user, projectCode, name);
@@ -254,15 +263,10 @@ public class PythonGateway {
                     null, timeout, taskRelationJson, taskDefinitionJson,
                     executionTypeEnum);
         } else {
-            Map<String, Object> result = workflowDefinitionService.createWorkflowDefinition(user, projectCode, name,
+            workflowDefinition = workflowDefinitionService.createWorkflowDefinition(user, projectCode, name,
                     description, globalParams,
                     null, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson,
                     executionTypeEnum);
-            if (result.get(Constants.STATUS) != Status.SUCCESS) {
-                log.error(result.get(Constants.MSG).toString());
-                throw new ServiceException(result.get(Constants.MSG).toString());
-            }
-            workflowDefinition = (WorkflowDefinition) result.get(Constants.DATA_LIST);
             workflowDefinitionCode = workflowDefinition.getCode();
         }
 
@@ -288,21 +292,16 @@ public class PythonGateway {
      * @param workflowName workflow name
      */
     private WorkflowDefinition getWorkflow(User user, long projectCode, String workflowName) {
-        Map<String, Object> verifyWorkflowDefinitionExists =
-                workflowDefinitionService.verifyWorkflowDefinitionName(user, projectCode, workflowName, 0);
-        Status verifyStatus = (Status) verifyWorkflowDefinitionExists.get(Constants.STATUS);
-
-        WorkflowDefinition workflowDefinition = null;
-        if (verifyStatus == Status.WORKFLOW_DEFINITION_NAME_EXIST) {
-            workflowDefinition = workflowDefinitionMapper.queryByDefineName(projectCode, workflowName);
-        } else if (verifyStatus != Status.SUCCESS) {
-            String msg =
-                    "Verify workflow exists status is invalid, neither SUCCESS or WORKFLOW_NAME_EXIST.";
-            log.error(msg);
-            throw new RuntimeException(msg);
+        try {
+            workflowDefinitionService.verifyWorkflowDefinitionName(user, projectCode, workflowName, 0);
+            // name available -> workflow does not exist yet
+            return null;
+        } catch (ServiceException e) {
+            if (e.getCode() == Status.WORKFLOW_DEFINITION_NAME_EXIST.getCode()) {
+                return workflowDefinitionDao.queryByDefineName(projectCode, workflowName);
+            }
+            throw e;
         }
-
-        return workflowDefinition;
     }
 
     /**
@@ -327,16 +326,16 @@ public class PythonGateway {
                                         String workerGroup,
                                         String warningType,
                                         int warningGroupId) {
-        Schedule scheduleObj = scheduleMapper.queryByWorkflowDefinitionCode(workflowCode);
+        Schedule scheduleObj = scheduleDao.queryByWorkflowDefinitionCode(workflowCode);
         // create or update schedule
         int scheduleId;
         if (scheduleObj == null) {
             workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, workflowCode);
-            Map<String, Object> result = schedulerService.insertSchedule(user, projectCode, workflowCode,
+            Schedule createdSchedule = schedulerService.insertSchedule(user, projectCode, workflowCode,
                     schedule, WarningType.valueOf(warningType),
                     warningGroupId, DEFAULT_FAILURE_STRATEGY, DEFAULT_PRIORITY, workerGroup, user.getTenantCode(),
                     DEFAULT_ENVIRONMENT_CODE);
-            scheduleId = (int) result.get("scheduleId");
+            scheduleId = createdSchedule.getId();
         } else {
             scheduleId = scheduleObj.getId();
             workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, workflowCode);
@@ -358,15 +357,16 @@ public class PythonGateway {
                                      String warningType,
                                      Integer warningGroupId) {
         User user = usersService.queryUser(userName);
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectDao.queryByName(projectName);
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByDefineName(project.getCode(), workflowName);
+                workflowDefinitionDao.queryByDefineName(project.getCode(), workflowName);
 
         // make sure workflow online
         workflowDefinitionService.onlineWorkflowDefinition(user, project.getCode(), workflowDefinition.getCode());
 
         WorkflowTriggerRequest workflowTriggerRequest = WorkflowTriggerRequest.builder()
                 .loginUser(user)
+                .projectCode(project.getCode())
                 .workflowDefinitionCode(workflowDefinition.getCode())
                 .workerGroup(workerGroup)
                 .warningType(WarningType.of(warningType))
@@ -391,7 +391,7 @@ public class PythonGateway {
         projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
         projectUser.setCreateTime(now);
         projectUser.setUpdateTime(now);
-        return projectUserMapper.insert(projectUser);
+        return projectUserDao.insert(projectUser);
     }
 
     /*
@@ -402,11 +402,11 @@ public class PythonGateway {
         User user = usersService.queryUser(userName);
 
         Project project;
-        project = projectMapper.queryByName(name);
+        project = projectDao.queryByName(name);
         if (project == null) {
             projectService.createProject(user, name, desc);
         } else if (project.getUserId() != user.getId()) {
-            ProjectUser projectUser = projectUserMapper.queryProjectRelation(project.getId(), user.getId());
+            ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), user.getId());
             if (projectUser == null) {
                 grantProjectToUser(project, user);
             }
@@ -415,7 +415,7 @@ public class PythonGateway {
 
     public Project queryProjectByName(String userName, String projectName) {
         User user = usersService.queryUser(userName);
-        return (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
+        return projectService.queryByName(user, projectName);
     }
 
     public void updateProject(String userName, Long projectCode, String projectName, String desc) {
@@ -433,7 +433,7 @@ public class PythonGateway {
     }
 
     public Tenant queryTenantByCode(String tenantCode) {
-        return (Tenant) tenantService.queryByTenantCode(tenantCode).get(Constants.DATA_LIST);
+        return tenantService.queryByTenantCode(tenantCode);
     }
 
     public void updateTenant(String userName, int id, String tenantCode, int queueId, String desc) throws Exception {
@@ -484,7 +484,7 @@ public class PythonGateway {
      */
     public DataSource getDatasource(String datasourceName, String type) {
 
-        List<DataSource> dataSourceList = dataSourceMapper.queryDataSourceByName(datasourceName);
+        List<DataSource> dataSourceList = dataSourceDao.queryDataSourceByName(datasourceName);
         if (dataSourceList == null || dataSourceList.isEmpty()) {
             String msg = String.format("Can not find any datasource by name %s", datasourceName);
             log.error(msg);
@@ -522,7 +522,7 @@ public class PythonGateway {
         Map<String, Object> result = new HashMap<>();
 
         User user = usersService.queryUser(userName);
-        Project project = (Project) projectService.queryByName(user, projectName).get(Constants.DATA_LIST);
+        Project project = projectService.queryByName(user, projectName);
         long projectCode = project.getCode();
         WorkflowDefinition workflowDefinition = getWorkflow(user, projectCode, workflowName);
         // get workflow info
@@ -552,7 +552,7 @@ public class PythonGateway {
     public Map<String, Object> getDependentInfo(String projectName, String workflowName, String taskName) {
         Map<String, Object> result = new HashMap<>();
 
-        Project project = projectMapper.queryByName(projectName);
+        Project project = projectDao.queryByName(projectName);
         if (project == null) {
             String msg = String.format("Can not find valid project by name %s", projectName);
             log.error(msg);
@@ -562,7 +562,7 @@ public class PythonGateway {
         result.put("projectCode", projectCode);
 
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByDefineName(projectCode, workflowName);
+                workflowDefinitionDao.queryByDefineName(projectCode, workflowName);
         if (workflowDefinition == null) {
             String msg = String.format("Can not find valid workflow by name %s", workflowName);
             log.error(msg);
@@ -572,7 +572,7 @@ public class PythonGateway {
 
         if (taskName != null) {
             TaskDefinition taskDefinition =
-                    taskDefinitionMapper.queryByName(projectCode, workflowDefinition.getCode(), taskName);
+                    taskDefinitionDao.queryByName(projectCode, workflowDefinition.getCode(), taskName);
             result.put("taskDefinitionCode", taskDefinition.getCode());
         }
         return result;
@@ -609,15 +609,13 @@ public class PythonGateway {
      * @param environmentName name of the environment
      */
     public Long getEnvironmentInfo(String environmentName) {
-        Map<String, Object> result = environmentService.queryEnvironmentByName(environmentName);
-
-        if (result.get("data") == null) {
+        try {
+            return environmentService.queryEnvironmentByName(environmentName).getCode();
+        } catch (ServiceException e) {
             String msg = String.format("Can not find valid environment by name %s", environmentName);
             log.error(msg);
             throw new IllegalArgumentException(msg);
         }
-        EnvironmentDto environmentDto = EnvironmentDto.class.cast(result.get("data"));
-        return environmentDto.getCode();
     }
 
     /**

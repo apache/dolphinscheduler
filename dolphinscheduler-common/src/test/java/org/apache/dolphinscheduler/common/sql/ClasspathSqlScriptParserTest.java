@@ -49,4 +49,13 @@ class ClasspathSqlScriptParserTest {
         List<String> allSql = classpathSqlScriptParser.getAllSql();
         Assertions.assertEquals("ALTER TABLE t_ds_workflow_definition DROP tenant_id;", allSql.get(0));
     }
+
+    @Test
+    void testIndentedLicenseHeaderSql() throws IOException {
+        ClasspathSqlScriptParser classpathSqlScriptParser =
+                new ClasspathSqlScriptParser("sql/indented_license_header.sql");
+        List<String> allSql = classpathSqlScriptParser.getAllSql();
+        Assertions.assertEquals(1, allSql.size());
+        Assertions.assertEquals("SELECT 1;", allSql.get(0));
+    }
 }

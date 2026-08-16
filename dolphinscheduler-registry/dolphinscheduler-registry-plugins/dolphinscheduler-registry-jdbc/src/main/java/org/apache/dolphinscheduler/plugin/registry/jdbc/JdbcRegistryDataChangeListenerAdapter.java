@@ -46,13 +46,14 @@ public class JdbcRegistryDataChangeListenerAdapter implements JdbcRegistryDataCh
     }
 
     @Override
-    public void onJdbcRegistryDataDeleted(String eventPath) {
+    public void onJdbcRegistryDataDeleted(String eventPath, String value) {
         if (!isPathMatch(watchedPath, eventPath, listener.getSubscribeScope())) {
             return;
         }
         final Event event = Event.builder()
                 .watchedPath(watchedPath)
                 .eventPath(eventPath)
+                .eventData(value)
                 .type(Event.Type.REMOVE)
                 .build();
         listener.notify(event);

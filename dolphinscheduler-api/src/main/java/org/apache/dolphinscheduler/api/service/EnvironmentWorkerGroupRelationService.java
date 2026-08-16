@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import java.util.Map;
+import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
+
+import java.util.List;
 
 public interface EnvironmentWorkerGroupRelationService {
 
@@ -26,12 +28,12 @@ public interface EnvironmentWorkerGroupRelationService {
      *
      * @param environmentCode environment code
      */
-    Map<String, Object> queryEnvironmentWorkerGroupRelation(Long environmentCode);
+    List<EnvironmentWorkerGroupRelation> queryEnvironmentWorkerGroupRelation(Long environmentCode);
 
     /**
      * query all environment worker group relation
      *
      * @return all relation list
      */
-    Map<String, Object> queryAllEnvironmentWorkerGroupRelationList();
+    List<EnvironmentWorkerGroupRelation> queryAllEnvironmentWorkerGroupRelationList();
 }

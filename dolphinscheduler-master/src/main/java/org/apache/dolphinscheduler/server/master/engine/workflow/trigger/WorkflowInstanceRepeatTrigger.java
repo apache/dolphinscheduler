@@ -46,6 +46,7 @@ public class WorkflowInstanceRepeatTrigger
                 .workflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode())
                 .workflowDefinitionVersion(workflowInstance.getWorkflowDefinitionVersion())
                 .executorId(repeatRunningRequest.getUserId())
+                .workerGroup(workflowInstance.getWorkerGroup())
                 .startTime(new Date())
                 .updateTime(new Date())
                 .build();

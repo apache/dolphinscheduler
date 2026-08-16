@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.AuditModelType;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
+import org.apache.dolphinscheduler.dao.entity.Project;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,6 +40,9 @@ public class AuditLogMapperTest extends BaseDaoTest {
     @Autowired
     private AuditLogMapper logMapper;
 
+    @Autowired
+    private ProjectMapper projectMapper;
+
     private void insertOne(AuditModelType objectType) {
         AuditLog auditLog = new AuditLog();
         auditLog.setUserId(1);
@@ -53,6 +57,17 @@ public class AuditLogMapperTest extends BaseDaoTest {
         logMapper.insert(auditLog);
     }
 
+    private Project insertProject() {
+        Project project = new Project();
+        project.setName("ut project");
+        project.setUserId(111);
+        project.setCode(1L);
+        project.setCreateTime(new Date());
+        project.setUpdateTime(new Date());
+        projectMapper.insert(project);
+        return project;
+    }
+
     /**
      * test page query
      */
@@ -65,7 +80,15 @@ public class AuditLogMapperTest extends BaseDaoTest {
         List<String> operationTypeList = Lists.newArrayList(AuditOperationType.CREATE.getName());
 
         IPage<AuditLog> logIPage =
-                logMapper.queryAuditLog(page, objectTypeList, operationTypeList, "", "", null, null);
+                logMapper.queryAuditLog(page, objectTypeList, operationTypeList, null, "", "", null, null);
         Assertions.assertNotEquals(0, logIPage.getTotal());
+
+        IPage<AuditLog> userLogPage =
+                logMapper.queryAuditLog(new Page<>(1, 3), objectTypeList, operationTypeList, 1, "", "", null, null);
+        Assertions.assertNotEquals(0, userLogPage.getTotal());
+
+        IPage<AuditLog> otherUserLogPage =
+                logMapper.queryAuditLog(new Page<>(1, 3), objectTypeList, operationTypeList, 2, "", "", null, null);
+        Assertions.assertEquals(0, otherUserLogPage.getTotal());
     }
 }

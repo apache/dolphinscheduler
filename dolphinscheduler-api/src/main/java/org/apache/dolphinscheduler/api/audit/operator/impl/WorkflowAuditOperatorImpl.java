@@ -24,7 +24,7 @@ import org.apache.dolphinscheduler.api.audit.operator.BaseAuditOperator;
 import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.dao.entity.AuditLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import java.util.List;
 import java.util.Map;
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Service;
 public class WorkflowAuditOperatorImpl extends BaseAuditOperator {
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Override
     public void modifyAuditOperationType(AuditType auditType, Map<String, Object> paramsMap,
@@ -71,7 +71,7 @@ public class WorkflowAuditOperatorImpl extends BaseAuditOperator {
             return "";
         }
 
-        WorkflowDefinition obj = workflowDefinitionMapper.queryByCode(objId);
+        WorkflowDefinition obj = workflowDefinitionDao.queryByCode(objId).orElse(null);
         return obj == null ? "" : obj.getName();
     }
 }

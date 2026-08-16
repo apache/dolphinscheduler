@@ -48,13 +48,12 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -89,13 +88,10 @@ import com.google.common.collect.Lists;
 public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDefinitionService {
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
     private ProjectService projectService;
-
-    @Autowired
-    private TaskDefinitionMapper taskDefinitionMapper;
 
     @Autowired
     private TaskDefinitionDao taskDefinitionDao;
@@ -104,7 +100,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Autowired
-    private WorkflowTaskRelationMapper workflowTaskRelationMapper;
+    private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Autowired
     private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;
@@ -113,7 +109,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private WorkflowTaskRelationService workflowTaskRelationService;
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Autowired
     private ProcessService processService;
@@ -130,32 +126,25 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param taskName    task name
      */
     @Override
-    public Map<String, Object> queryTaskDefinitionByName(User loginUser, long projectCode, long workflowDefinitionCode,
-                                                         String taskName) {
-        Project project = projectMapper.queryByCode(projectCode);
+    public TaskDefinition queryTaskDefinitionByName(User loginUser, long projectCode, long workflowDefinitionCode,
+                                                    String taskName) {
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
 
         TaskDefinition taskDefinition =
-                taskDefinitionMapper.queryByName(project.getCode(), workflowDefinitionCode, taskName);
+                taskDefinitionDao.queryByName(project.getCode(), workflowDefinitionCode, taskName);
         if (taskDefinition == null) {
             log.error("Task definition does not exist, taskName:{}.", taskName);
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, taskName);
-        } else {
-            result.put(Constants.DATA_LIST, taskDefinition);
-            putMsg(result, Status.SUCCESS);
+            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskName);
         }
-        return result;
+        return taskDefinition;
     }
 
     public void updateDag(User loginUser, long workflowDefinitionCode,
                           List<WorkflowTaskRelation> workflowTaskRelationList,
                           List<TaskDefinitionLog> taskDefinitionLogs) {
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         if (workflowDefinition == null) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", workflowDefinitionCode);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST);
@@ -196,38 +185,40 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Override
     public TaskDefinition getTaskDefinition(User loginUser,
                                             long taskCode) {
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskCode);
         if (taskDefinition == null) {
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCode);
         }
-        Project project = projectMapper.queryByCode(taskDefinition.getProjectCode());
+        Project project = projectDao.queryByCode(taskDefinition.getProjectCode());
         projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
         return taskDefinition;
     }
 
-    private TaskDefinitionLog updateTask(User loginUser, long projectCode, long taskCode, String taskDefinitionJsonObj,
-                                         Map<String, Object> result) {
-        Project project = projectMapper.queryByCode(projectCode);
+    /**
+     * Update the task body and cascade through workflow task relations.
+     *
+     * @return the persisted {@link TaskDefinitionLog}, or {@code null} when the
+     *         task body is unchanged (callers may still need to apply upstream
+     *         changes). All other failure modes throw {@link ServiceException}.
+     */
+    private TaskDefinitionLog updateTask(User loginUser, long projectCode, long taskCode,
+                                         String taskDefinitionJsonObj) {
+        Project project = projectDao.queryByCode(projectCode);
 
         // check if user have write perm for project
-        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return null;
-        }
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskCode);
         if (taskDefinition == null) {
             log.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
-            return null;
+            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
         }
         if (processService.isTaskOnline(taskCode) && taskDefinition.getFlag() == Flag.YES) {
             // if stream, can update task definition without online check
             if (taskDefinition.getTaskExecuteType() != TaskExecuteType.STREAM) {
                 log.warn("Only {} type task can be updated without online check, taskDefinitionCode:{}.",
                         TaskExecuteType.STREAM, taskCode);
-                putMsg(result, Status.NOT_SUPPORT_UPDATE_TASK_DEFINITION);
-                return null;
+                throw new ServiceException(Status.NOT_SUPPORT_UPDATE_TASK_DEFINITION);
             }
         }
         TaskDefinitionLog taskDefinitionToUpdate =
@@ -237,24 +228,20 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         if (taskDefinition.equals(taskDefinitionToUpdate)) {
             log.warn("Task definition does not need update because no change, taskDefinitionCode:{}.", taskCode);
-            putMsg(result, Status.TASK_DEFINITION_NOT_MODIFY_ERROR, String.valueOf(taskCode));
             return null;
         }
         if (taskDefinitionToUpdate == null) {
             log.warn("Parameter taskDefinitionJson is invalid.");
-            putMsg(result, Status.DATA_IS_NOT_VALID, taskDefinitionJsonObj);
-            return null;
+            throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionJsonObj);
         }
         if (!checkTaskParameters(taskDefinitionToUpdate.getTaskType(), taskDefinitionToUpdate.getTaskParams())) {
-            putMsg(result, Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionToUpdate.getName());
-            return null;
+            throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionToUpdate.getName());
         }
         Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskCode);
         if (version == null || version == 0) {
             log.error("Max version task definitionLog can not be found in database, taskDefinitionCode:{}.",
                     taskCode);
-            putMsg(result, Status.DATA_IS_NOT_VALID, taskCode);
-            return null;
+            throw new ServiceException(Status.DATA_IS_NOT_VALID, taskCode);
         }
         Date now = new Date();
         taskDefinitionToUpdate.setCode(taskCode);
@@ -264,23 +251,22 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         taskDefinitionToUpdate.setVersion(++version);
         taskDefinitionToUpdate.setTaskType(taskDefinitionToUpdate.getTaskType().toUpperCase());
         taskDefinitionToUpdate.setUpdateTime(now);
-        int update = taskDefinitionMapper.updateById(taskDefinitionToUpdate);
+        boolean updateSuccess = taskDefinitionDao.updateById(taskDefinitionToUpdate);
         taskDefinitionToUpdate.setOperator(loginUser.getId());
         taskDefinitionToUpdate.setOperateTime(now);
         taskDefinitionToUpdate.setCreateTime(now);
         taskDefinitionToUpdate.setId(null);
         int insert = taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
-        if ((update & insert) != 1) {
+        if (!updateSuccess || insert != 1) {
             log.error("Update task definition or definitionLog error, projectCode:{}, taskDefinitionCode:{}.",
                     projectCode, taskCode);
-            putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
-        } else
-            log.info(
-                    "Update task definition and definitionLog complete, projectCode:{}, taskDefinitionCode:{}, newTaskVersion:{}.",
-                    projectCode, taskCode, taskDefinitionToUpdate.getVersion());
+        }
+        log.info(
+                "Update task definition and definitionLog complete, projectCode:{}, taskDefinitionCode:{}, newTaskVersion:{}.",
+                projectCode, taskCode, taskDefinitionToUpdate.getVersion());
         // update workflow task relation
-        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationMapper
+        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationDao
                 .queryWorkflowTaskRelationByTaskCodeAndTaskVersion(taskDefinitionToUpdate.getCode(),
                         taskDefinition.getVersion());
         if (CollectionUtils.isNotEmpty(workflowTaskRelations)) {
@@ -300,12 +286,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                         workflowTaskRelation.setPostTaskVersion(version);
                     }
                     workflowTaskRelation.setWorkflowDefinitionVersion(workflowDefinitionVersion);
-                    int updateWorkflowDefinitionVersionCount =
-                            workflowTaskRelationMapper.updateWorkflowTaskRelationTaskVersion(workflowTaskRelation);
-                    if (updateWorkflowDefinitionVersionCount != 1) {
+                    if (!workflowTaskRelationDao.updateWorkflowTaskRelationTaskVersion(workflowTaskRelation)) {
                         log.error("batch update workflow task relation error, projectCode:{}, taskDefinitionCode:{}.",
                                 projectCode, taskCode);
-                        putMsg(result, Status.WORKFLOW_TASK_RELATION_BATCH_UPDATE_ERROR);
                         throw new ServiceException(Status.WORKFLOW_TASK_RELATION_BATCH_UPDATE_ERROR);
                     }
                     WorkflowTaskRelationLog workflowTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
@@ -316,23 +299,22 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     if (insertWorkflowTaskRelationLogCount != 1) {
                         log.error("batch update workflow task relation error, projectCode:{}, taskDefinitionCode:{}.",
                                 projectCode, taskCode);
-                        putMsg(result, Status.CREATE_WORKFLOW_TASK_RELATION_LOG_ERROR);
                         throw new ServiceException(Status.CREATE_WORKFLOW_TASK_RELATION_LOG_ERROR);
                     }
                 }
-                WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+                WorkflowDefinition workflowDefinition =
+                        workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
                 workflowDefinition.setVersion(workflowDefinitionVersion);
                 workflowDefinition.setUpdateTime(now);
                 workflowDefinition.setUserId(loginUser.getId());
                 // update workflow definition
-                int updateWorkflowDefinitionCount = workflowDefinitionMapper.updateById(workflowDefinition);
+                boolean updateWorkflowDefinitionSuccess = workflowDefinitionDao.updateById(workflowDefinition);
                 WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
                 workflowDefinitionLog.setOperateTime(now);
                 workflowDefinitionLog.setId(null);
                 workflowDefinitionLog.setOperator(loginUser.getId());
                 int insertWorkflowDefinitionLogCount = workflowDefinitionLogMapper.insert(workflowDefinitionLog);
-                if ((updateWorkflowDefinitionCount & insertWorkflowDefinitionLogCount) != 1) {
-                    putMsg(result, Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
+                if (!updateWorkflowDefinitionSuccess || insertWorkflowDefinitionLogCount != 1) {
                     throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
                 }
             }
@@ -348,16 +330,15 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param taskCode              task definition code
      * @param taskDefinitionJsonObj task definition json object
      * @param upstreamCodes         upstream task codes, sep comma
-     * @return update result code
+     * @return updated task code
      */
     @Override
-    public Map<String, Object> updateTaskWithUpstream(User loginUser, long projectCode, long taskCode,
-                                                      String taskDefinitionJsonObj, String upstreamCodes) {
-        Map<String, Object> result = new HashMap<>();
+    public Long updateTaskWithUpstream(User loginUser, long projectCode, long taskCode,
+                                       String taskDefinitionJsonObj, String upstreamCodes) {
         TaskDefinitionLog taskDefinitionToUpdate =
-                updateTask(loginUser, projectCode, taskCode, taskDefinitionJsonObj, result);
+                updateTask(loginUser, projectCode, taskCode, taskDefinitionJsonObj);
         List<WorkflowTaskRelation> upstreamTaskRelations =
-                workflowTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
+                workflowTaskRelationDao.queryUpstreamByCode(projectCode, taskCode);
         Set<Long> upstreamCodeSet =
                 upstreamTaskRelations.stream().map(WorkflowTaskRelation::getPreTaskCode).collect(Collectors.toSet());
         Set<Long> upstreamTaskCodes = Collections.emptySet();
@@ -366,12 +347,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     .collect(Collectors.toSet());
         }
         if (CollectionUtils.isEqualCollection(upstreamCodeSet, upstreamTaskCodes) && taskDefinitionToUpdate == null) {
-            putMsg(result, Status.SUCCESS);
-            return result;
+            return taskCode;
         }
         Map<Long, TaskDefinition> queryUpStreamTaskCodeMap;
         if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
-            List<TaskDefinition> upstreamTaskDefinitionList = taskDefinitionMapper.queryByCodeList(upstreamTaskCodes);
+            List<TaskDefinition> upstreamTaskDefinitionList = taskDefinitionDao.queryByCodes(upstreamTaskCodes);
             queryUpStreamTaskCodeMap = upstreamTaskDefinitionList.stream()
                     .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinition -> taskDefinition));
             // upstreamTaskCodes - queryUpStreamTaskCodeMap.keySet
@@ -380,8 +360,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 String notExistTaskCodes = StringUtils.join(upstreamTaskCodes, Constants.COMMA);
                 log.error("Some task definitions in parameter upstreamTaskCodes do not exist, notExistTaskCodes:{}.",
                         notExistTaskCodes);
-                putMsg(result, Status.TASK_DEFINE_NOT_EXIST, notExistTaskCodes);
-                return result;
+                throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, notExistTaskCodes);
             }
         } else {
             queryUpStreamTaskCodeMap = new HashMap<>();
@@ -389,7 +368,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         if (MapUtils.isNotEmpty(queryUpStreamTaskCodeMap)) {
             WorkflowTaskRelation taskRelation = upstreamTaskRelations.get(0);
             List<WorkflowTaskRelation> workflowTaskRelations =
-                    workflowTaskRelationMapper.queryByWorkflowDefinitionCode(taskRelation.getWorkflowDefinitionCode());
+                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(taskRelation.getWorkflowDefinitionCode());
 
             // set upstream code list
             updateUpstreamTask(new HashSet<>(queryUpStreamTaskCodeMap.keySet()),
@@ -422,15 +401,13 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         log.info(
                 "Update task with upstream tasks complete, projectCode:{}, taskDefinitionCode:{}, upstreamTaskCodes:{}.",
                 projectCode, taskCode, upstreamTaskCodes);
-        result.put(Constants.DATA_LIST, taskCode);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return taskCode;
     }
 
     private void updateUpstreamTask(Set<Long> allPreTaskCodeSet, long taskCode, long projectCode,
                                     long workflowDefinitionCode, User loginUser) {
         // query all workflow task relation
-        List<WorkflowTaskRelation> hadWorkflowTaskRelationList = workflowTaskRelationMapper
+        List<WorkflowTaskRelation> hadWorkflowTaskRelationList = workflowTaskRelationDao
                 .queryUpstreamByCode(projectCode, taskCode);
         // remove pre
         Set<Long> removePreTaskSet = new HashSet<>();
@@ -466,11 +443,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         // get add task code map
         allPreTaskCodeSet.add(Long.valueOf(taskCode));
-        List<TaskDefinition> taskDefinitionList = taskDefinitionMapper.queryByCodeList(allPreTaskCodeSet);
+        List<TaskDefinition> taskDefinitionList = taskDefinitionDao.queryByCodes(allPreTaskCodeSet);
         Map<Long, TaskDefinition> taskCodeMap = taskDefinitionList.stream().collect(Collectors
                 .toMap(TaskDefinition::getCode, Function.identity(), (a, b) -> a));
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         TaskDefinition taskDefinition = taskCodeMap.get(taskCode);
 
         for (Long preTaskCode : addPreTaskSet) {
@@ -487,11 +464,11 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         int log = 0;
         // insert workflow task relation table data
         if (CollectionUtils.isNotEmpty(addPreTaskList)) {
-            insert = workflowTaskRelationMapper.batchInsert(addPreTaskList);
+            insert = workflowTaskRelationDao.batchInsert(addPreTaskList);
         }
         if (CollectionUtils.isNotEmpty(removePreTaskList)) {
             for (WorkflowTaskRelation workflowTaskRelation : removePreTaskList) {
-                remove += workflowTaskRelationMapper.updateById(workflowTaskRelation);
+                remove += workflowTaskRelationDao.updateById(workflowTaskRelation) ? 1 : 0;
             }
         }
         if (CollectionUtils.isNotEmpty(workflowTaskRelationLogList)) {
@@ -523,56 +500,48 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      */
     @Transactional
     @Override
-    public Map<String, Object> switchVersion(User loginUser, long projectCode, long taskCode, int version) {
-        Project project = projectMapper.queryByCode(projectCode);
+    public void switchVersion(User loginUser, long projectCode, long taskCode, int version) {
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, WORKFLOW_SWITCH_TO_THIS_VERSION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_SWITCH_TO_THIS_VERSION);
+
         if (processService.isTaskOnline(taskCode)) {
             log.warn(
                     "Task definition version can not be switched due to workflow definition is {}, taskDefinitionCode:{}.",
                     ReleaseState.ONLINE.getDescp(), taskCode);
-            putMsg(result, Status.WORKFLOW_DEFINE_STATE_ONLINE);
-            return result;
+            throw new ServiceException(Status.WORKFLOW_DEFINE_STATE_ONLINE);
         }
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskCode);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
             log.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
-            return result;
+            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
         }
         TaskDefinitionLog taskDefinitionUpdate =
                 taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
         taskDefinitionUpdate.setUserId(loginUser.getId());
         taskDefinitionUpdate.setUpdateTime(new Date());
         taskDefinitionUpdate.setId(taskDefinition.getId());
-        int switchVersion = taskDefinitionMapper.updateById(taskDefinitionUpdate);
-        if (switchVersion > 0) {
-            List<WorkflowTaskRelation> taskRelationList =
-                    workflowTaskRelationMapper.queryUpstreamByCode(projectCode, taskCode);
-            if (CollectionUtils.isNotEmpty(taskRelationList)) {
-                log.info(
-                        "Task definition has upstream tasks, start handle them after switch task, taskDefinitionCode:{}.",
-                        taskCode);
-                long workflowDefinitionCode = taskRelationList.get(0).getWorkflowDefinitionCode();
-                List<WorkflowTaskRelation> workflowTaskRelations =
-                        workflowTaskRelationMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
-                updateDag(loginUser, workflowDefinitionCode, workflowTaskRelations,
-                        Lists.newArrayList(taskDefinitionUpdate));
-            } else {
-                log.info(
-                        "Task definition version switch complete, switch task version to {}, taskDefinitionCode:{}.",
-                        version, taskCode);
-                putMsg(result, Status.SUCCESS);
-            }
-        } else {
+        boolean switchSuccess = taskDefinitionDao.updateById(taskDefinitionUpdate);
+        if (!switchSuccess) {
             log.error("Task definition version switch error, taskDefinitionCode:{}.", taskCode);
-            putMsg(result, Status.SWITCH_TASK_DEFINITION_VERSION_ERROR);
+            throw new ServiceException(Status.SWITCH_TASK_DEFINITION_VERSION_ERROR);
         }
-        return result;
+        List<WorkflowTaskRelation> taskRelationList =
+                workflowTaskRelationDao.queryUpstreamByCode(projectCode, taskCode);
+        if (CollectionUtils.isNotEmpty(taskRelationList)) {
+            log.info(
+                    "Task definition has upstream tasks, start handle them after switch task, taskDefinitionCode:{}.",
+                    taskCode);
+            long workflowDefinitionCode = taskRelationList.get(0).getWorkflowDefinitionCode();
+            List<WorkflowTaskRelation> workflowTaskRelations =
+                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
+            updateDag(loginUser, workflowDefinitionCode, workflowTaskRelations,
+                    Lists.newArrayList(taskDefinitionUpdate));
+        } else {
+            log.info(
+                    "Task definition version switch complete, switch task version to {}, taskDefinitionCode:{}.",
+                    version, taskCode);
+        }
     }
 
     @Override
@@ -582,15 +551,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                               int pageNo,
                                               int pageSize) {
         Result result = new Result();
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> checkResult =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_VERSION_VIEW);
-        Status resultStatus = (Status) checkResult.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            putMsg(result, resultStatus);
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_VERSION_VIEW);
+
         PageInfo<TaskDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<TaskDefinitionLog> page = new Page<>(pageNo, pageSize);
         IPage<TaskDefinitionLog> taskDefinitionVersionsPaging =
@@ -605,89 +569,66 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     }
 
     @Override
-    public Map<String, Object> deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
-        Project project = projectMapper.queryByCode(projectCode);
+    public void deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
+        Project project = projectDao.queryByCode(projectCode);
         // check if user have write perm for project
-        Map<String, Object> result = new HashMap<>();
-        boolean hasProjectAndWritePerm = projectService.hasProjectAndWritePerm(loginUser, project, result);
-        if (!hasProjectAndWritePerm) {
-            return result;
-        }
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
-        if (taskDefinition == null) {
-            log.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
-        } else {
-            if (taskDefinition.getVersion() == version) {
-                log.warn(
-                        "Task definition can not be deleted due to version is being used, projectCode:{}, taskDefinitionCode:{}, version:{}.",
-                        projectCode, taskCode, version);
-                putMsg(result, Status.MAIN_TABLE_USING_VERSION);
-                return result;
-            }
-            int delete = taskDefinitionLogMapper.deleteByCodeAndVersion(taskCode, version);
-            if (delete > 0) {
-                log.info(
-                        "Task definition version delete complete, projectCode:{}, taskDefinitionCode:{}, version:{}.",
-                        projectCode, taskCode, version);
-                putMsg(result, Status.SUCCESS);
-            } else {
-                log.error("Task definition version delete error, projectCode:{}, taskDefinitionCode:{}, version:{}.",
-                        projectCode, taskCode, version);
-                putMsg(result, Status.DELETE_TASK_DEFINITION_VERSION_ERROR);
-            }
-        }
-        return result;
-    }
-
-    @Override
-    public Map<String, Object> queryTaskDefinitionDetail(User loginUser, long projectCode, long taskCode) {
-        Project project = projectMapper.queryByCode(projectCode);
-        // check user access for project
-        Map<String, Object> result =
-                projectService.checkProjectAndAuth(loginUser, project, projectCode, TASK_DEFINITION);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
-
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(taskCode);
+        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskCode);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
             log.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
-        } else {
-            List<WorkflowTaskRelation> taskRelationList = workflowTaskRelationMapper
-                    .queryByCode(projectCode, 0, 0, taskCode);
-            if (CollectionUtils.isNotEmpty(taskRelationList)) {
-                taskRelationList = taskRelationList.stream()
-                        .filter(v -> v.getPreTaskCode() != 0).collect(Collectors.toList());
-            }
-            TaskDefinitionVO taskDefinitionVo = TaskDefinitionVO.fromTaskDefinition(taskDefinition);
-            taskDefinitionVo.setWorkflowTaskRelationList(taskRelationList);
-            result.put(Constants.DATA_LIST, taskDefinitionVo);
-            putMsg(result, Status.SUCCESS);
+            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
         }
-        return result;
+        if (taskDefinition.getVersion() == version) {
+            log.warn(
+                    "Task definition can not be deleted due to version is being used, projectCode:{}, taskDefinitionCode:{}, version:{}.",
+                    projectCode, taskCode, version);
+            throw new ServiceException(Status.MAIN_TABLE_USING_VERSION);
+        }
+        int delete = taskDefinitionLogMapper.deleteByCodeAndVersion(taskCode, version);
+        if (delete <= 0) {
+            log.error("Task definition version delete error, projectCode:{}, taskDefinitionCode:{}, version:{}.",
+                    projectCode, taskCode, version);
+            throw new ServiceException(Status.DELETE_TASK_DEFINITION_VERSION_ERROR);
+        }
+        log.info(
+                "Task definition version delete complete, projectCode:{}, taskDefinitionCode:{}, version:{}.",
+                projectCode, taskCode, version);
     }
 
     @Override
-    public Map<String, Object> genTaskCodeList(Integer genNum) {
-        Map<String, Object> result = new HashMap<>();
+    public TaskDefinitionVO queryTaskDefinitionDetail(User loginUser, long projectCode, long taskCode) {
+        Project project = projectDao.queryByCode(projectCode);
+        // check user access for project
+        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
+
+        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskCode);
+        if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
+            log.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
+            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
+        }
+        List<WorkflowTaskRelation> taskRelationList = workflowTaskRelationDao
+                .queryByCode(projectCode, 0, 0, taskCode);
+        if (CollectionUtils.isNotEmpty(taskRelationList)) {
+            taskRelationList = taskRelationList.stream()
+                    .filter(v -> v.getPreTaskCode() != 0).collect(Collectors.toList());
+        }
+        TaskDefinitionVO taskDefinitionVo = TaskDefinitionVO.fromTaskDefinition(taskDefinition);
+        taskDefinitionVo.setWorkflowTaskRelationList(taskRelationList);
+        return taskDefinitionVo;
+    }
+
+    @Override
+    public List<Long> genTaskCodeList(Integer genNum) {
         if (genNum == null || genNum < 1 || genNum > 100) {
             log.warn("Parameter genNum must be great than 1 and less than 100.");
-            putMsg(result, Status.DATA_IS_NOT_VALID, genNum);
-            return result;
+            throw new ServiceException(Status.DATA_IS_NOT_VALID, genNum);
         }
         List<Long> taskCodes = new ArrayList<>();
-
         for (int i = 0; i < genNum; i++) {
             taskCodes.add(CodeGenerateUtils.genCode());
         }
-
-        putMsg(result, Status.SUCCESS);
-        // return workflowDefinitionCode
-        result.put(Constants.DATA_LIST, taskCodes);
-        return result;
+        return taskCodes;
     }
 
     /**
@@ -697,34 +638,26 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
      * @param projectCode  project code
      * @param code         task definition code
      * @param releaseState releaseState
-     * @return update result code
      */
     @Transactional
     @Override
-    public Map<String, Object> releaseTaskDefinition(User loginUser, long projectCode, long code,
-                                                     ReleaseState releaseState) {
-        Project project = projectMapper.queryByCode(projectCode);
+    public void releaseTaskDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        Status resultStatus = (Status) result.get(Constants.STATUS);
-        if (resultStatus != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
+
         if (null == releaseState) {
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);
-            return result;
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);
         }
-        TaskDefinition taskDefinition = taskDefinitionMapper.queryByCode(code);
+        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(code);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(code));
-            return result;
+            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, String.valueOf(code));
         }
         TaskDefinitionLog taskDefinitionLog =
                 taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, taskDefinition.getVersion());
         if (taskDefinitionLog == null) {
             log.error("Task definition does not exist, taskDefinitionCode:{}.", code);
-            putMsg(result, Status.TASK_DEFINE_NOT_EXIST, String.valueOf(code));
-            return result;
+            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, String.valueOf(code));
         }
         switch (releaseState) {
             case OFFLINE:
@@ -742,8 +675,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                         permissionCheck.checkPermission();
                     } catch (Exception e) {
                         log.error("Resources permission check error, resourceIds:{}.", resourceIds, e);
-                        putMsg(result, Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
-                        return result;
+                        throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
                     }
                 }
                 taskDefinition.setFlag(Flag.YES);
@@ -751,20 +683,16 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 break;
             default:
                 log.warn("Parameter releaseState is invalid.");
-                putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);
-                return result;
+                throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);
         }
-        int update = taskDefinitionMapper.updateById(taskDefinition);
+        boolean updateSuccess = taskDefinitionDao.updateById(taskDefinition);
         int updateLog = taskDefinitionLogMapper.updateById(taskDefinitionLog);
-        if ((update == 0 && updateLog == 1) || (update == 1 && updateLog == 0)) {
+        if (updateSuccess != (updateLog == 1)) {
             log.error("Update taskDefinition state or taskDefinitionLog state error, taskDefinitionCode:{}.", code);
-            putMsg(result, Status.UPDATE_TASK_DEFINITION_ERROR);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
-        log.error("Update taskDefinition state or taskDefinitionLog state to complete, taskDefinitionCode:{}.",
+        log.info("Update taskDefinition state or taskDefinitionLog state to complete, taskDefinitionCode:{}.",
                 code);
-        putMsg(result, Status.SUCCESS);
-        return result;
     }
 
     @Override

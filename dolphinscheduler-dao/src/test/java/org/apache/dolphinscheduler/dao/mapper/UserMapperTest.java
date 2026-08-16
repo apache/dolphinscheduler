@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
+import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -115,6 +116,23 @@ public class UserMapperTest extends BaseDaoTest {
         user.setUpdateTime(new Date());
         userMapper.insert(user);
         return user;
+    }
+
+    /**
+     * insert one AlertGroup
+     *
+     * @return AlertGroup
+     */
+    private AlertGroup insertOneAlertGroup() {
+        // insertOne
+        AlertGroup alertGroup = new AlertGroup();
+        alertGroup.setGroupName("alert group 1");
+        alertGroup.setDescription("alert test1");
+
+        alertGroup.setCreateTime(new Date());
+        alertGroup.setUpdateTime(new Date());
+        alertGroupMapper.insert(alertGroup);
+        return alertGroup;
     }
 
     /**

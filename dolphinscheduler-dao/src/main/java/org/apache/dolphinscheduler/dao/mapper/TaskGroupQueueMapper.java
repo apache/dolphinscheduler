@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -35,6 +36,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  * @since 2021-08-07
  */
 public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
+
+    /**
+     * select task group queues by some conditions
+     *
+     * @param page    page
+     * @param groupId group id
+     * @return task group queue list
+     */
+    IPage<TaskGroupQueue> queryTaskGroupQueuePaging(IPage<TaskGroupQueue> page,
+                                                    @Param("groupId") int groupId);
+
+    TaskGroupQueue queryByTaskId(@Param("taskId") int taskId);
 
     /**
      * query by status
@@ -61,6 +74,24 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
      */
     int updateStatusByTaskId(@Param("taskId") int taskId, @Param("status") int status);
 
+    /**
+     * Query the {@link TaskGroupQueue}, who's priority > the given <code>priority</code>
+     */
+    List<TaskGroupQueue> queryHighPriorityTasks(@Param("groupId") int groupId, @Param("priority") int priority,
+                                                @Param("status") int status);
+
+    TaskGroupQueue queryTheHighestPriorityTasks(@Param("groupId") int groupId, @Param("status") int status,
+                                                @Param("forceStart") int forceStart, @Param("inQueue") int inQueue);
+
+    void updateInQueue(@Param("inQueue") int inQueue, @Param("id") int id);
+
+    void updateForceStart(@Param("queueId") int queueId, @Param("forceStart") int forceStart);
+
+    int updateInQueueLimit1(@Param("oldValue") int oldValue, @Param("newValue") int newValue, @Param("groupId") int id,
+                            @Param("status") int status);
+
+    int updateInQueueCAS(@Param("oldValue") int oldValue, @Param("newValue") int newValue, @Param("id") int id);
+
     void modifyPriority(@Param("queueId") int queueId, @Param("priority") int priority);
 
     IPage<TaskGroupQueue> queryTaskGroupQueueByTaskGroupIdPaging(Page<TaskGroupQueue> page,
@@ -70,11 +101,16 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
                                                                  @Param("groupId") int groupId,
                                                                  @Param("projects") List<Project> projects);
 
+    void deleteByTaskInstanceIds(@Param("taskInstanceIds") List<Integer> taskInstanceIds);
+
     void deleteByWorkflowInstanceId(@Param("workflowInstanceId") Integer workflowInstanceId);
 
     void deleteByWorkflowInstanceIds(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds);
 
     void deleteByTaskGroupIds(@Param("taskGroupIds") List<Integer> taskGroupIds);
+
+    void updateTaskGroupPriorityByTaskInstanceId(@Param("taskInstanceId") Integer taskInstanceId,
+                                                 @Param("priority") int taskGroupPriority);
 
     List<TaskGroupQueue> queryAllInQueueTaskGroupQueueByGroupId(@Param("taskGroupId") Integer taskGroupId,
                                                                 @Param("inQueue") int inQueue);
@@ -82,6 +118,16 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
     List<TaskGroupQueue> queryAllTaskGroupQueueByInQueue(@Param("inQueue") int inQueue);
 
     List<TaskGroupQueue> queryByTaskInstanceId(@Param("taskInstanceId") Integer taskInstanceId);
+
+    int acquireTaskGroupQueue(@Param("id") Integer id,
+                              @Param("waitingStatus") int waitingStatus,
+                              @Param("acquiredStatus") int acquiredStatus,
+                              @Param("inQueue") int inQueue,
+                              @Param("forceStart") int forceStart,
+                              @Param("updateTime") Date updateTime);
+
+    int deleteByTaskInstanceIdAndStatus(@Param("taskInstanceId") Integer taskInstanceId,
+                                        @Param("status") int status);
 
     List<TaskGroupQueue> queryUsingTaskGroupQueueByGroupId(@Param("taskGroupId") Integer taskGroupId,
                                                            @Param("status") int status,

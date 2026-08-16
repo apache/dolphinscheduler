@@ -42,9 +42,9 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.ScheduleMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.exceptions.CronParseException;
@@ -57,9 +57,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -85,13 +83,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     private ExecutorService executorService;
 
     @Autowired
-    private ScheduleMapper scheduleMapper;
+    private ScheduleDao scheduleDao;
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Autowired
     private SchedulerApi schedulerApi;
@@ -113,44 +111,38 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param workerGroup             worker group
      * @param tenantCode              tenant code
      * @param environmentCode         environment code
-     * @return create result code
      */
     @Override
     @Transactional
-    public Map<String, Object> insertSchedule(User loginUser,
-                                              long projectCode,
-                                              long workflowDefinitionCode,
-                                              String schedule,
-                                              WarningType warningType,
-                                              int warningGroupId,
-                                              FailureStrategy failureStrategy,
-                                              Priority workflowInstancePriority,
-                                              String workerGroup,
-                                              String tenantCode,
-                                              Long environmentCode) {
+    public Schedule insertSchedule(User loginUser,
+                                   long projectCode,
+                                   long workflowDefinitionCode,
+                                   String schedule,
+                                   WarningType warningType,
+                                   int warningGroupId,
+                                   FailureStrategy failureStrategy,
+                                   Priority workflowInstancePriority,
+                                   String workerGroup,
+                                   String tenantCode,
+                                   Long environmentCode) {
 
-        Map<String, Object> result = new HashMap<>();
-
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
         // check workflow define release state
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         executorService.checkWorkflowDefinitionValid(projectCode, workflowDefinition, workflowDefinitionCode,
                 workflowDefinition.getVersion());
 
         Schedule scheduleExists =
-                scheduleMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
+                scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         if (scheduleExists != null) {
             log.error("Schedule already exist, scheduleId:{}, workflowDefinitionCode:{}", scheduleExists.getId(),
                     workflowDefinitionCode);
-            putMsg(result, Status.SCHEDULE_ALREADY_EXISTS, workflowDefinitionCode, scheduleExists.getId());
-            return result;
+            throw new ServiceException(Status.SCHEDULE_ALREADY_EXISTS, workflowDefinitionCode,
+                    scheduleExists.getId());
         }
 
         Schedule scheduleObj = new Schedule();
@@ -166,23 +158,22 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
         if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
             log.warn("The start time must not be the same as the end or time can not be null.");
-            putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
-            return result;
+            throw new ServiceException(Status.SCHEDULE_START_TIME_END_TIME_SAME);
         }
         if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
             log.warn("The start time must smaller than end time");
-            putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
-            return result;
+            throw new ServiceException(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
         }
 
         scheduleObj.setStartTime(scheduleParam.getStartTime());
         scheduleObj.setEndTime(scheduleParam.getEndTime());
         if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
             log.error("Schedule crontab verify failure, crontab:{}.", scheduleParam.getCrontab());
-            putMsg(result, Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
-            return result;
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, scheduleParam.getCrontab());
         }
         scheduleObj.setCrontab(scheduleParam.getCrontab());
+        validateMissedFirePolicy(scheduleParam);
+        scheduleObj.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
         scheduleObj.setTimezoneId(scheduleParam.getTimezoneId());
         scheduleObj.setWarningType(warningType);
         scheduleObj.setWarningGroupId(warningGroupId);
@@ -195,29 +186,25 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setWorkflowInstancePriority(workflowInstancePriority);
         scheduleObj.setWorkerGroup(workerGroup);
         scheduleObj.setEnvironmentCode(environmentCode);
-        scheduleMapper.insert(scheduleObj);
+        scheduleDao.insert(scheduleObj);
 
         /**
          * updateWorkflowInstance receivers and cc by workflow definition id
          */
         workflowDefinition.setWarningGroupId(warningGroupId);
-        workflowDefinitionMapper.updateById(workflowDefinition);
+        workflowDefinitionDao.updateById(workflowDefinition);
 
-        // return scheduler object with ID
-        result.put(Constants.DATA_LIST, scheduleMapper.selectById(scheduleObj.getId()));
-        putMsg(result, Status.SUCCESS);
         log.info("Schedule create complete, projectCode:{}, workflowDefinitionCode:{}, scheduleId:{}.",
                 projectCode, workflowDefinitionCode, scheduleObj.getId());
-        result.put("scheduleId", scheduleObj.getId());
-        return result;
+        return scheduleDao.queryById(scheduleObj.getId());
     }
 
     protected void projectPermCheckByWorkflowCode(User loginUser, long workflowDefinitionCode) {
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         if (workflowDefinition == null) {
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode);
         }
-        Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
+        Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
         // check project auth
         this.projectService.checkProjectAndAuthThrowException(loginUser, project, null);
     }
@@ -236,52 +223,45 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param tenantCode              tenant code
      * @param environmentCode         environment code
      * @param workflowInstancePriority workflow instance priority
-     * @return update result code
      */
     @Override
     @Transactional
-    public Map<String, Object> updateSchedule(User loginUser,
-                                              long projectCode,
-                                              Integer id,
-                                              String scheduleExpression,
-                                              WarningType warningType,
-                                              int warningGroupId,
-                                              FailureStrategy failureStrategy,
-                                              Priority workflowInstancePriority,
-                                              String workerGroup,
-                                              String tenantCode,
-                                              Long environmentCode) {
-        Map<String, Object> result = new HashMap<>();
+    public Schedule updateSchedule(User loginUser,
+                                   long projectCode,
+                                   Integer id,
+                                   String scheduleExpression,
+                                   WarningType warningType,
+                                   int warningGroupId,
+                                   FailureStrategy failureStrategy,
+                                   Priority workflowInstancePriority,
+                                   String workerGroup,
+                                   String tenantCode,
+                                   Long environmentCode) {
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
         // check schedule exists
-        Schedule schedule = scheduleMapper.selectById(id);
+        Schedule schedule = scheduleDao.queryById(id);
 
         if (schedule == null) {
             log.error("Schedule does not exist, scheduleId:{}.", id);
-            putMsg(result, Status.SCHEDULE_NOT_EXISTS, id);
-            return result;
+            throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, id);
         }
 
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode());
+                workflowDefinitionDao.queryByCode(schedule.getWorkflowDefinitionCode()).orElse(null);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.",
                     schedule.getWorkflowDefinitionCode());
-            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(schedule.getWorkflowDefinitionCode()));
-            return result;
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                    String.valueOf(schedule.getWorkflowDefinitionCode()));
         }
 
-        updateSchedule(result, schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
+        return updateSchedule(schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
                 failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode);
-        return result;
     }
 
     /**
@@ -300,16 +280,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                 Integer pageNo, Integer pageSize) {
         Result result = new Result();
 
-        Project project = projectMapper.queryByCode(projectCode);
+        Project project = projectDao.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, PROJECT);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
 
         if (workflowDefinitionCode != 0) {
-            WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+            WorkflowDefinition workflowDefinition =
+                    workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
             if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
                 log.error("workflow definition does not exist, workflowDefinitionCode:{}.", workflowDefinitionCode);
                 putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(workflowDefinitionCode));
@@ -320,7 +298,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Page<Schedule> page = new Page<>(pageNo, pageSize);
 
         IPage<Schedule> schedulePage =
-                scheduleMapper.queryByProjectAndWorkflowDefinitionCodePaging(page, projectCode, workflowDefinitionCode,
+                scheduleDao.queryByProjectAndWorkflowDefinitionCodePaging(page, projectCode, workflowDefinitionCode,
                         searchVal);
 
         List<ScheduleVO> scheduleList = new ArrayList<>();
@@ -340,7 +318,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (CollectionUtils.isEmpty(workflowDefinitionCodes)) {
             return Collections.emptyList();
         }
-        return scheduleMapper.querySchedulesByWorkflowDefinitionCodes(workflowDefinitionCodes);
+        return scheduleDao.querySchedulesByWorkflowDefinitionCodes(workflowDefinitionCodes);
     }
 
     /**
@@ -351,43 +329,18 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @return schedule list
      */
     @Override
-    public Map<String, Object> queryScheduleList(User loginUser, long projectCode) {
-        Map<String, Object> result = new HashMap<>();
-        Project project = projectMapper.queryByCode(projectCode);
+    public List<ScheduleVO> queryScheduleList(User loginUser, long projectCode) {
+        Project project = projectDao.queryByCode(projectCode);
 
         // check project auth
-        boolean hasProjectAndPerm = projectService.hasProjectAndPerm(loginUser, project, result, null);
-        if (!hasProjectAndPerm) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
 
-        List<Schedule> schedules = scheduleMapper.querySchedulerListByProjectName(project.getName());
+        List<Schedule> schedules = scheduleDao.querySchedulerListByProjectName(project.getName());
         List<ScheduleVO> scheduleList = new ArrayList<>();
         for (Schedule schedule : schedules) {
             scheduleList.add(new ScheduleVO(schedule));
         }
-
-        result.put(Constants.DATA_LIST, scheduleList);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
-    }
-
-    /**
-     * check valid
-     *
-     * @param result result
-     * @param bool   bool
-     * @param status status
-     * @return check result code
-     */
-    private boolean checkValid(Map<String, Object> result, boolean bool, Status status) {
-        // timeout is valid
-        if (bool) {
-            putMsg(result, status);
-            return true;
-        }
-        return false;
+        return scheduleList;
     }
 
     /**
@@ -398,7 +351,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      */
     @Override
     public void deleteSchedulesById(User loginUser, Integer scheduleId) {
-        Schedule schedule = scheduleMapper.selectById(scheduleId);
+        Schedule schedule = scheduleDao.queryById(scheduleId);
         if (schedule == null) {
             throw new ServiceException(Status.SCHEDULE_NOT_EXISTS, scheduleId);
         }
@@ -412,8 +365,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         this.projectPermCheckByWorkflowCode(loginUser, schedule.getWorkflowDefinitionCode());
-        int delete = scheduleMapper.deleteById(scheduleId);
-        if (delete <= 0) {
+        boolean delete = scheduleDao.deleteById(scheduleId);
+        if (!delete) {
             throw new ServiceException(Status.DELETE_SCHEDULE_BY_ID_ERROR);
         }
     }
@@ -426,8 +379,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @return the next five fire time
      */
     @Override
-    public Map<String, Object> previewSchedule(User loginUser, String schedule) {
-        Map<String, Object> result = new HashMap<>();
+    public List<String> previewSchedule(User loginUser, String schedule) {
         Cron cron;
         ScheduleParam scheduleParam = JSONUtils.parseObject(schedule, ScheduleParam.class);
 
@@ -442,16 +394,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             cron = CronUtils.parse2Cron(scheduleParam.getCrontab());
         } catch (CronParseException e) {
             log.error("Parse cron to cron expression error, crontab:{}.", scheduleParam.getCrontab(), e);
-            putMsg(result, Status.PARSE_TO_CRON_EXPRESSION_ERROR);
-            return result;
+            throw new ServiceException(Status.PARSE_TO_CRON_EXPRESSION_ERROR);
         }
         List<ZonedDateTime> selfFireDateList =
                 CronUtils.getSelfFireDateList(startTime, endTime, cron, Constants.PREVIEW_SCHEDULE_EXECUTE_COUNT);
-        List<String> previewDateList =
-                selfFireDateList.stream().map(t -> DateUtils.dateToString(t, zoneId)).collect(Collectors.toList());
-        result.put(Constants.DATA_LIST, previewDateList);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return selfFireDateList.stream()
+                .map(t -> DateUtils.dateToString(t, zoneId))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -467,59 +416,54 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
      * @param workerGroup             worker group
      * @param tenantCode              tenant code
      * @param workflowInstancePriority workflow instance priority
-     * @return update result code
      */
     @Override
-    public Map<String, Object> updateScheduleByWorkflowDefinitionCode(User loginUser,
-                                                                      long projectCode,
-                                                                      long workflowDefinitionCode,
-                                                                      String scheduleExpression,
-                                                                      WarningType warningType,
-                                                                      int warningGroupId,
-                                                                      FailureStrategy failureStrategy,
-                                                                      Priority workflowInstancePriority,
-                                                                      String workerGroup,
-                                                                      String tenantCode,
-                                                                      long environmentCode) {
-        Project project = projectMapper.queryByCode(projectCode);
+    public Schedule updateScheduleByWorkflowDefinitionCode(User loginUser,
+                                                           long projectCode,
+                                                           long workflowDefinitionCode,
+                                                           String scheduleExpression,
+                                                           WarningType warningType,
+                                                           int warningGroupId,
+                                                           FailureStrategy failureStrategy,
+                                                           Priority workflowInstancePriority,
+                                                           String workerGroup,
+                                                           String tenantCode,
+                                                           long environmentCode) {
+        Project project = projectDao.queryByCode(projectCode);
         // check user access for project
-        Map<String, Object> result = projectService.checkProjectAndAuth(loginUser, project, projectCode, null);
-        if (result.get(Constants.STATUS) != Status.SUCCESS) {
-            return result;
-        }
+        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
+
         // check schedule exists
-        Schedule schedule = scheduleMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
+        Schedule schedule = scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         if (schedule == null) {
             log.error("Schedule of workflow definition does not exist, workflowDefinitionCode:{}.",
                     workflowDefinitionCode);
-            putMsg(result, Status.SCHEDULE_CRON_NOT_EXISTS, workflowDefinitionCode);
-            return result;
+            throw new ServiceException(Status.SCHEDULE_CRON_NOT_EXISTS, workflowDefinitionCode);
         }
 
-        WorkflowDefinition workflowDefinition = workflowDefinitionMapper.queryByCode(workflowDefinitionCode);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
         if (workflowDefinition == null || projectCode != workflowDefinition.getProjectCode()) {
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", workflowDefinitionCode);
-            putMsg(result, Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(workflowDefinitionCode));
-            return result;
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                    String.valueOf(workflowDefinitionCode));
         }
 
-        updateSchedule(result, schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
+        return updateSchedule(schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
                 failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode);
-        return result;
     }
 
     @Transactional
     @Override
     public void onlineScheduler(User loginUser, Long projectCode, Integer schedulerId) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
-        Schedule schedule = scheduleMapper.selectById(schedulerId);
+        Schedule schedule = scheduleDao.queryById(schedulerId);
         doOnlineScheduler(schedule);
     }
 
     @Transactional
     @Override
     public void onlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
-        Schedule schedule = scheduleMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
+        Schedule schedule = scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         doOnlineScheduler(schedule);
     }
 
@@ -532,16 +476,16 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             return;
         }
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode());
+                workflowDefinitionDao.queryByCode(schedule.getWorkflowDefinitionCode()).orElse(null);
         if (!ReleaseState.ONLINE.equals(workflowDefinition.getReleaseState())) {
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_RELEASE, workflowDefinition.getName());
         }
 
         schedule.setReleaseState(ReleaseState.ONLINE);
         schedule.setUpdateTime(new Date());
-        scheduleMapper.updateById(schedule);
+        scheduleDao.updateById(schedule);
 
-        Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
+        Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
         schedulerApi.insertOrUpdateScheduleTask(project.getId(), schedule);
     }
 
@@ -549,14 +493,14 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Override
     public void offlineScheduler(User loginUser, Long projectCode, Integer schedulerId) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
-        Schedule schedule = scheduleMapper.selectById(schedulerId);
+        Schedule schedule = scheduleDao.queryById(schedulerId);
         doOfflineScheduler(schedule);
     }
 
     @Transactional
     @Override
     public void offlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
-        Schedule schedule = scheduleMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode);
+        Schedule schedule = scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         doOfflineScheduler(schedule);
     }
 
@@ -570,23 +514,21 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
         schedule.setUpdateTime(new Date());
         schedule.setReleaseState(ReleaseState.OFFLINE);
-        scheduleMapper.updateById(schedule);
+        scheduleDao.updateById(schedule);
         WorkflowDefinition workflowDefinition =
-                workflowDefinitionMapper.queryByCode(schedule.getWorkflowDefinitionCode());
-        Project project = projectMapper.queryByCode(workflowDefinition.getProjectCode());
+                workflowDefinitionDao.queryByCode(schedule.getWorkflowDefinitionCode()).orElse(null);
+        Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
         schedulerApi.deleteScheduleTask(project.getId(), schedule.getId());
     }
 
-    private void updateSchedule(Map<String, Object> result, Schedule schedule, WorkflowDefinition workflowDefinition,
-                                String scheduleExpression, WarningType warningType, int warningGroupId,
-                                FailureStrategy failureStrategy, Priority workflowInstancePriority, String workerGroup,
-                                String tenantCode,
-                                long environmentCode) {
-        if (checkValid(result, schedule.getReleaseState() == ReleaseState.ONLINE,
-                Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE)) {
+    private Schedule updateSchedule(Schedule schedule, WorkflowDefinition workflowDefinition,
+                                    String scheduleExpression, WarningType warningType, int warningGroupId,
+                                    FailureStrategy failureStrategy, Priority workflowInstancePriority,
+                                    String workerGroup, String tenantCode, long environmentCode) {
+        if (schedule.getReleaseState() == ReleaseState.ONLINE) {
             log.warn("Schedule can not be updated due to schedule is {}, scheduleId:{}.",
                     ReleaseState.ONLINE.getDescp(), schedule.getId());
-            return;
+            throw new ServiceException(Status.SCHEDULE_CRON_ONLINE_FORBID_UPDATE);
         }
 
         Date now = new Date();
@@ -599,28 +541,28 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             ScheduleParam scheduleParam = JSONUtils.parseObject(scheduleExpression, ScheduleParam.class);
             if (scheduleParam == null) {
                 log.warn("Parameter scheduleExpression is invalid, so parse cron error.");
-                putMsg(result, Status.PARSE_TO_CRON_EXPRESSION_ERROR);
-                return;
+                throw new ServiceException(Status.PARSE_TO_CRON_EXPRESSION_ERROR);
             }
             if (DateUtils.differSec(scheduleParam.getStartTime(), scheduleParam.getEndTime()) == 0) {
                 log.warn("The start time must not be the same as the end or time can not be null.");
-                putMsg(result, Status.SCHEDULE_START_TIME_END_TIME_SAME);
-                return;
+                throw new ServiceException(Status.SCHEDULE_START_TIME_END_TIME_SAME);
             }
             if (scheduleParam.getStartTime().getTime() > scheduleParam.getEndTime().getTime()) {
                 log.warn("The start time must smaller than end time");
-                putMsg(result, Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
-                return;
+                throw new ServiceException(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR);
             }
 
             schedule.setStartTime(scheduleParam.getStartTime());
             schedule.setEndTime(scheduleParam.getEndTime());
             if (!CronUtils.isValidExpression(scheduleParam.getCrontab())) {
                 log.error("Schedule crontab verify failure, crontab:{}.", scheduleParam.getCrontab());
-                putMsg(result, Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
-                return;
+                throw new ServiceException(Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
             }
             schedule.setCrontab(scheduleParam.getCrontab());
+            validateMissedFirePolicy(scheduleParam);
+            if (scheduleParam.isMissedFirePolicySet() && scheduleParam.getMissedFirePolicy() != null) {
+                schedule.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
+            }
             schedule.setTimezoneId(scheduleParam.getTimezoneId());
         }
 
@@ -638,16 +580,22 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         schedule.setEnvironmentCode(environmentCode);
         schedule.setUpdateTime(now);
         schedule.setWorkflowInstancePriority(workflowInstancePriority);
-        scheduleMapper.updateById(schedule);
+        scheduleDao.updateById(schedule);
 
         workflowDefinition.setWarningGroupId(warningGroupId);
 
-        workflowDefinitionMapper.updateById(workflowDefinition);
+        workflowDefinitionDao.updateById(workflowDefinition);
 
         log.info("Schedule update complete, projectCode:{}, workflowDefinitionCode:{}, scheduleId:{}.",
                 workflowDefinition.getProjectCode(), workflowDefinition.getCode(), schedule.getId());
-        result.put(Constants.DATA_LIST, schedule);
-        putMsg(result, Status.SUCCESS);
+        return schedule;
+    }
+
+    private void validateMissedFirePolicy(ScheduleParam scheduleParam) {
+        if (scheduleParam.isMissedFirePolicySet() && scheduleParam.getMissedFirePolicy() == null) {
+            log.warn("Schedule missed fire policy is invalid.");
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "missedFirePolicy");
+        }
     }
 
 }

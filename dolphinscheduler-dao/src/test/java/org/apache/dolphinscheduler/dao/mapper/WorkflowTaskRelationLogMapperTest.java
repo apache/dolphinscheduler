@@ -54,7 +54,7 @@ public class WorkflowTaskRelationLogMapperTest extends BaseDaoTest {
 
     @Test
     public void testQueryByWorkflowCodeAndVersion() {
-        insertOne();
+        WorkflowTaskRelationLog processTaskRelationLog = insertOne();
         List<WorkflowTaskRelationLog> processTaskRelationLogs = workflowTaskRelationLogMapper
                 .queryByWorkflowCodeAndVersion(1L, 1);
         Assertions.assertNotEquals(0, processTaskRelationLogs.size());

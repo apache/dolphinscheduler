@@ -122,14 +122,4 @@ public class WorkflowInstanceMetrics {
                 String.valueOf(workflowDefinitionCode));
     }
 
-    public void cleanUpWorkflowInstanceCountMetricsByDefinitionCode(final Long workflowDefinitionCode) {
-        for (final String state : workflowInstanceStates) {
-            final Counter counter = Metrics.globalRegistry.counter(
-                    "ds.workflow.instance.count",
-                    "state", state,
-                    "workflow.definition.code", String.valueOf(workflowDefinitionCode));
-            Metrics.globalRegistry.remove(counter);
-        }
-    }
-
 }

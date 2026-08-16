@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.api.service;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_UPDATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,9 +37,8 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.AccessTokenMapper;
+import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -69,7 +67,7 @@ public class AccessTokenServiceTest {
     private AccessTokenServiceImpl accessTokenService;
 
     @Mock
-    private AccessTokenMapper accessTokenMapper;
+    private AccessTokenDao accessTokenDao;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -78,16 +76,16 @@ public class AccessTokenServiceTest {
     @SuppressWarnings("unchecked")
     public void testQueryAccessTokenList() {
         IPage<AccessToken> tokenPage = new Page<>();
-        tokenPage.setRecords(getList());
+        tokenPage.setRecords(Lists.newArrayList(getEntity()));
         User user = new User();
         user.setId(1);
         user.setUserType(UserType.ADMIN_USER);
-        when(accessTokenMapper.selectAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
+        when(accessTokenDao.queryAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
         PageInfo<AccessToken> pageInfo = accessTokenService.queryAccessTokenList(user, "zhangsan", 1, 10);
         assertEquals(0, (int) pageInfo.getTotal());
 
         tokenPage.setTotal(1L);
-        when(accessTokenMapper.selectAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
+        when(accessTokenDao.queryAccessTokenPage(any(Page.class), eq("zhangsan"), eq(0))).thenReturn(tokenPage);
         pageInfo = accessTokenService.queryAccessTokenList(user, "zhangsan", 1, 10);
         assertTrue(pageInfo.getTotal() > 0);
     }
@@ -101,7 +99,7 @@ public class AccessTokenServiceTest {
 
         user.setUserType(UserType.ADMIN_USER);
         List<AccessToken> accessTokenList = Lists.newArrayList(this.getEntity());
-        when(this.accessTokenMapper.queryAccessTokenByUser(Mockito.anyInt())).thenReturn(accessTokenList);
+        when(this.accessTokenDao.queryAccessTokenByUser(Mockito.anyInt())).thenReturn(accessTokenList);
         assertDoesNotThrow(() -> accessTokenService.queryAccessTokenByUser(user, 1));
     }
 
@@ -109,10 +107,14 @@ public class AccessTokenServiceTest {
     public void testCreateToken() {
         User user = getLoginUser();
 
-        // Throw ServiceException when user has no permission
+        user.setUserType(UserType.GENERAL_USER);
+
+        // Throw ServiceException when general user creates token for another user
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
                 () -> accessTokenService.createToken(user, 2, getDate(), "AccessTokenServiceTest"));
+        Mockito.verify(accessTokenDao, Mockito.never()).insert(any(AccessToken.class));
 
+        user.setUserType(UserType.ADMIN_USER);
         user.setId(0);
 
         // Throw ServiceException when user is invalid
@@ -122,7 +124,7 @@ public class AccessTokenServiceTest {
         user.setId(1);
 
         // Given Token
-        when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(2);
+        when(accessTokenDao.insert(any(AccessToken.class))).thenReturn(2);
         assertDoesNotThrow(() -> {
             accessTokenService.createToken(user, 1, getDate(), "AccessTokenServiceTest");
         });
@@ -132,9 +134,19 @@ public class AccessTokenServiceTest {
                 () -> accessTokenService.createToken(user, 1, getDate(), null));
 
         // Throw Service Exception when insert failed
-        when(accessTokenMapper.insert(any(AccessToken.class))).thenReturn(0);
+        when(accessTokenDao.insert(any(AccessToken.class))).thenReturn(0);
         assertThrowsServiceException(Status.CREATE_ACCESS_TOKEN_ERROR,
                 () -> accessTokenService.createToken(user, 1, getDate(), "AccessTokenServiceTest"));
+    }
+
+    @Test
+    public void testCreateTokenForOtherUserDeniedForGeneralUser() {
+        User user = getGeneralUser();
+        when(accessTokenDao.insert(any(AccessToken.class))).thenReturn(1);
+
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> accessTokenService.createToken(user, 2, getDate(), "AccessTokenServiceTest"));
+        Mockito.verify(accessTokenDao, Mockito.never()).insert(any(AccessToken.class));
     }
 
     @Test
@@ -150,7 +162,7 @@ public class AccessTokenServiceTest {
     public void testDelAccessTokenById() {
         AccessToken accessToken = getEntity();
 
-        when(accessTokenMapper.selectById(1)).thenReturn(accessToken);
+        when(accessTokenDao.queryById(1)).thenReturn(accessToken);
         User userLogin = new User();
         userLogin.setId(1);
         userLogin.setUserType(UserType.ADMIN_USER);
@@ -184,19 +196,9 @@ public class AccessTokenServiceTest {
 
     @Test
     public void testUpdateToken() {
-        // operation perm check
-        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1,
-                ACCESS_TOKEN_UPDATE, baseServiceLogger)).thenReturn(false);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> accessTokenService.updateToken(getLoginUser(), 1, 1, getDate(), "token"));
-
-        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1,
-                ACCESS_TOKEN_UPDATE, baseServiceLogger)).thenReturn(true);
-        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
-                baseServiceLogger)).thenReturn(true);
         // Given Token
-        when(accessTokenMapper.selectById(1)).thenReturn(getEntity());
-        when(accessTokenMapper.updateById(any())).thenReturn(1);
+        when(accessTokenDao.queryById(1)).thenReturn(getEntity());
+        when(accessTokenDao.updateById(any())).thenReturn(true);
         AccessToken accessToken =
                 accessTokenService.updateToken(getLoginUser(), 1, Integer.MAX_VALUE, getDate(), "token");
         assertEquals("token", accessToken.getToken());
@@ -211,28 +213,42 @@ public class AccessTokenServiceTest {
         assertThrowsServiceException(Status.ACCESS_TOKEN_NOT_EXIST,
                 () -> accessTokenService.updateToken(getLoginUser(), 2, Integer.MAX_VALUE, getDate(), "token"));
 
-        // resource perm check
+        // old token owner check
         User user = getLoginUser();
         user.setUserType(UserType.GENERAL_USER);
         user.setId(2);
-        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 2,
-                ACCESS_TOKEN_UPDATE, baseServiceLogger)).thenReturn(true);
-        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 2,
-                baseServiceLogger)).thenReturn(true);
 
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
                 () -> accessTokenService.updateToken(user, 1, Integer.MAX_VALUE, getDate(), "token"));
 
         // Throw Service Exception when update failed
-        when(accessTokenMapper.updateById(any(AccessToken.class))).thenReturn(0);
+        when(accessTokenDao.updateById(any(AccessToken.class))).thenReturn(false);
         assertThrowsServiceException(Status.ACCESS_TOKEN_NOT_EXIST,
                 () -> accessTokenService.updateToken(getLoginUser(), 1, Integer.MAX_VALUE, getDate(), "token"));
+    }
+
+    @Test
+    public void testUpdateTokenToOtherUserDeniedForGeneralUser() {
+        User user = getGeneralUser();
+        when(accessTokenDao.queryById(1)).thenReturn(getEntity());
+        when(accessTokenDao.updateById(any(AccessToken.class))).thenReturn(true);
+
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> accessTokenService.updateToken(user, 1, 2, getDate(), "token"));
+        Mockito.verify(accessTokenDao, Mockito.never()).updateById(any(AccessToken.class));
     }
 
     private User getLoginUser() {
         User loginUser = new User();
         loginUser.setId(1);
         loginUser.setUserType(UserType.ADMIN_USER);
+        return loginUser;
+    }
+
+    private User getGeneralUser() {
+        User loginUser = new User();
+        loginUser.setId(1);
+        loginUser.setUserType(UserType.GENERAL_USER);
         return loginUser;
     }
 
@@ -247,16 +263,6 @@ public class AccessTokenServiceTest {
         Date date = DateUtils.add(new Date(), Calendar.DAY_OF_MONTH, 30);
         accessToken.setExpireTime(date);
         return accessToken;
-    }
-
-    /**
-     * entity list
-     */
-    private List<AccessToken> getList() {
-
-        List<AccessToken> list = new ArrayList<>();
-        list.add(getEntity());
-        return list;
     }
 
     /**

@@ -18,8 +18,4 @@
 FROM apache/dolphinscheduler-standalone-server:ci
 
 RUN apt update \
-    && apt install -y software-properties-common \
-    && add-apt-repository ppa:deadsnakes/ppa \
-    && apt update \
-    && apt-get install -y python3.8 libpython3.8-dev python3.8-dev python3.8-distutils \
-    && rm -rf /var/lib/apt/lists/*
+    && apt install -y --no-install-recommends python3

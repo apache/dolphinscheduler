@@ -72,14 +72,6 @@
         left join t_ds_queue q on t.queue_id = q.id
         WHERE u.id = #{userId}
     </select>
-    <select id="queryUserListByAlertGroupId" resultType="org.apache.dolphinscheduler.dao.entity.User">
-        select
-        <include refid="baseSqlV2">
-            <property name="alias" value="u"/>
-        </include>
-        from t_ds_user u, t_ds_relation_user_alertgroup rel
-        where u.id = rel.user_id AND rel.alertgroup_id = #{alertgroupId}
-    </select>
     <select id="queryUserListByTenant" resultType="org.apache.dolphinscheduler.dao.entity.User">
         select
         <include refid="baseSql"/>

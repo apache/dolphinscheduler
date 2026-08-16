@@ -36,13 +36,13 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.CommandMapper;
 import org.apache.dolphinscheduler.dao.mapper.ErrorCommandMapper;
-import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
-import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -70,16 +70,16 @@ import com.google.common.collect.Lists;
 public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnalysisService {
 
     @Autowired
-    private ProjectMapper projectMapper;
+    private ProjectDao projectDao;
 
     @Autowired
     private ProjectService projectService;
 
     @Autowired
-    private WorkflowInstanceMapper workflowInstanceMapper;
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
-    private WorkflowDefinitionMapper workflowDefinitionMapper;
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Autowired
     private CommandMapper commandMapper;
@@ -88,7 +88,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     private ErrorCommandMapper errorCommandMapper;
 
     @Autowired
-    private TaskInstanceMapper taskInstanceMapper;
+    private TaskInstanceDao taskInstanceDao;
 
     @Override
     public TaskInstanceCountVO getTaskInstanceStateCountByProject(User loginUser,
@@ -99,7 +99,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
         List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
-                taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
+                taskInstanceDao.countTaskInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
         return TaskInstanceCountVO.of(taskInstanceStatusCounts);
     }
 
@@ -114,7 +114,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
         List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
-                taskInstanceMapper.countTaskInstanceStateByProjectCodes(start, end, projectCodes);
+                taskInstanceDao.countTaskInstanceStateByProjectCodes(start, end, projectCodes);
         return TaskInstanceCountVO.of(taskInstanceStatusCounts);
     }
 
@@ -126,7 +126,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
-        List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos = workflowInstanceMapper
+        List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos = workflowInstanceDao
                 .countWorkflowInstanceStateByProjectCodes(start, end, Lists.newArrayList(projectCode));
         return WorkflowInstanceCountVO.of(workflowInstanceStatusCountDtos);
     }
@@ -143,7 +143,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         Date end = endDate == null ? null : transformDate(endDate);
 
         List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos =
-                workflowInstanceMapper.countWorkflowInstanceStateByProjectCodes(start, end, projectCodes);
+                workflowInstanceDao.countWorkflowInstanceStateByProjectCodes(start, end, projectCodes);
         return WorkflowInstanceCountVO.of(workflowInstanceStatusCountDtos);
     }
 
@@ -151,7 +151,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     public WorkflowDefinitionCountVO getWorkflowDefinitionCountByProject(User loginUser, Long projectCode) {
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
         List<WorkflowDefinitionCountDto> workflowDefinitionCounts =
-                workflowDefinitionMapper.countDefinitionByProjectCodes(Lists.newArrayList(projectCode));
+                workflowDefinitionDao.countDefinitionByProjectCodes(Lists.newArrayList(projectCode));
         return WorkflowDefinitionCountVO.of(workflowDefinitionCounts);
     }
 
@@ -161,7 +161,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         if (CollectionUtils.isEmpty(projectCodes)) {
             return WorkflowDefinitionCountVO.empty();
         }
-        return WorkflowDefinitionCountVO.of(workflowDefinitionMapper.countDefinitionByProjectCodes(projectCodes));
+        return WorkflowDefinitionCountVO.of(workflowDefinitionDao.countDefinitionByProjectCodes(projectCodes));
     }
 
     @Override
@@ -250,7 +250,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
         if (CollectionUtils.isEmpty(projectIds)) {
             return Collections.emptyList();
         }
-        List<Long> projectCodes = projectMapper.selectBatchIds(projectIds)
+        List<Long> projectCodes = projectDao.queryByIds(projectIds)
                 .stream()
                 .map(Project::getCode)
                 .collect(Collectors.toList());
@@ -263,7 +263,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
             projectCodes = Collections.singletonList(projectCode);
         }
 
-        return workflowDefinitionMapper.queryDefinitionCodeListByProjectCodes(projectCodes);
+        return workflowDefinitionDao.queryDefinitionCodeListByProjectCodes(projectCodes);
     }
 
 }

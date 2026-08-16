@@ -259,14 +259,14 @@ export default defineComponent({
           timingForm.environmentCode = projectPreferences.value.environmentCode
         }
       }
-      if (projectPreferences.value?.alertGroup && variables?.alertGroups) {
+      if (projectPreferences.value?.alertGroups && variables?.alertGroups) {
         if (
           containValueInOptions(
             variables.alertGroups,
-            projectPreferences.value.alertGroup
+            projectPreferences.value.alertGroups
           )
         ) {
-          timingForm.warningGroupId = projectPreferences.value.alertGroup
+          timingForm.warningGroupId = projectPreferences.value.alertGroups
         }
       }
     }
@@ -295,6 +295,8 @@ export default defineComponent({
         ]
         timingState.timingForm.crontab = props.row.crontab
         timingState.timingForm.timezoneId = props.row.timezoneId
+        timingState.timingForm.missedFirePolicy =
+          props.row.missedFirePolicy || 'FIRE_ALL_MISSED'
         timingState.timingForm.failureStrategy = props.row.failureStrategy
         timingState.timingForm.warningType = props.row.warningType
         timingState.timingForm.workflowInstancePriority =
@@ -409,6 +411,28 @@ export default defineComponent({
                 </NListItem>
               ) : null}
             </NList>
+          </NFormItem>
+          <NFormItem
+            label={t('project.workflow.missed_fire_policy')}
+            path='missedFirePolicy'
+          >
+            <NSelect
+              options={[
+                {
+                  value: 'SKIP_MISSED',
+                  label: t('project.workflow.skip_missed')
+                },
+                {
+                  value: 'FIRE_ONCE_NOW',
+                  label: t('project.workflow.fire_once_now')
+                },
+                {
+                  value: 'FIRE_ALL_MISSED',
+                  label: t('project.workflow.fire_all_missed')
+                }
+              ]}
+              v-model:value={this.timingForm.missedFirePolicy}
+            />
           </NFormItem>
           <NFormItem
             label={t('project.workflow.failure_strategy')}

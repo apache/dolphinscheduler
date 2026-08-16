@@ -55,20 +55,12 @@ public final class AlertPluginManager {
 
     public void start() {
         log.info("AlertPluginManager start...");
-        checkAlertPluginExist();
         installAlertPlugin();
         log.info("AlertPluginManager started...");
     }
 
     public Optional<AlertChannel> getAlertChannel(int id) {
         return Optional.ofNullable(alertPluginMap.get(id));
-    }
-
-    private void checkAlertPluginExist() {
-        if (!pluginDao.checkPluginDefineTableExist()) {
-            log.error("Plugin Define Table t_ds_plugin_define Not Exist. Please Create it First!");
-            System.exit(1);
-        }
     }
 
     private void installAlertPlugin() {

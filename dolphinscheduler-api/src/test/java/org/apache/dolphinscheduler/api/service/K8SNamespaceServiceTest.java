@@ -20,23 +20,22 @@ package org.apache.dolphinscheduler.api.service;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.impl.K8SNamespaceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.ClusterMapper;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceMapper;
+import org.apache.dolphinscheduler.dao.repository.ClusterDao;
+import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -63,10 +62,13 @@ public class K8SNamespaceServiceTest {
     private K8SNamespaceServiceImpl k8sNamespaceService;
 
     @Mock
-    private K8sNamespaceMapper k8sNamespaceMapper;
+    private K8sNamespaceDao k8sNamespaceDao;
 
     @Mock
-    private ClusterMapper clusterMapper;
+    private ClusterDao clusterDao;
+
+    @Mock
+    private K8sClientService k8sClientService;
 
     private String namespace = "default";
     private Long clusterCode = 100L;
@@ -76,7 +78,7 @@ public class K8SNamespaceServiceTest {
         IPage<K8sNamespace> page = new Page<>(1, 10);
         page.setTotal(1L);
         page.setRecords(getNamespaceList());
-        Mockito.when(k8sNamespaceMapper.queryK8sNamespacePaging(Mockito.any(Page.class), Mockito.eq(namespace)))
+        Mockito.when(k8sNamespaceDao.queryK8sNamespacePaging(Mockito.any(Page.class), Mockito.eq(namespace)))
                 .thenReturn(page);
         Result result = k8sNamespaceService.queryListPaging(getLoginUser(), namespace, 1, 10);
         logger.info(result.toString());
@@ -87,25 +89,23 @@ public class K8SNamespaceServiceTest {
     @Test
     public void createK8sNamespace() {
         // namespace is null
-        Map<String, Object> result =
-                k8sNamespaceService.registerK8sNamespace(getLoginUser(), null, clusterCode);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> k8sNamespaceService.registerK8sNamespace(getLoginUser(), null, clusterCode));
         // k8s is null
-        result = k8sNamespaceService.registerK8sNamespace(getLoginUser(), namespace, null);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.REQUEST_PARAMS_NOT_VALID_ERROR, result.get(Constants.STATUS));
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> k8sNamespaceService.registerK8sNamespace(getLoginUser(), namespace, null));
         // correct
-        Mockito.when(clusterMapper.queryByClusterCode(Mockito.anyLong())).thenReturn(getCluster());
-        result = k8sNamespaceService.registerK8sNamespace(getLoginUser(), namespace, clusterCode);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Mockito.when(clusterDao.queryByClusterCode(Mockito.anyLong())).thenReturn(getCluster());
+        K8sNamespace created = k8sNamespaceService.registerK8sNamespace(getLoginUser(), namespace, clusterCode);
+        Assertions.assertNotNull(created);
+        Assertions.assertEquals(namespace, created.getNamespace());
+        Assertions.assertEquals(clusterCode, created.getClusterCode());
     }
 
     @Test
     public void verifyNamespaceK8s() {
 
-        Mockito.when(k8sNamespaceMapper.existNamespace(namespace, clusterCode)).thenReturn(true);
+        Mockito.when(k8sNamespaceDao.existNamespace(namespace, clusterCode)).thenReturn(true);
 
         // namespace null
         Result result = k8sNamespaceService.verifyNamespaceK8s(null, clusterCode);
@@ -130,25 +130,21 @@ public class K8SNamespaceServiceTest {
 
     @Test
     public void deleteNamespaceById() {
-        Mockito.when(k8sNamespaceMapper.deleteById(Mockito.<Serializable>any())).thenReturn(1);
-        Mockito.when(k8sNamespaceMapper.selectById(1)).thenReturn(getNamespace());
+        Mockito.when(k8sNamespaceDao.deleteById(Mockito.<Serializable>any())).thenReturn(true);
+        Mockito.when(k8sNamespaceDao.queryById(1)).thenReturn(getNamespace());
 
-        Map<String, Object> result = k8sNamespaceService.deleteNamespaceById(getLoginUser(), 1);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS, result.get(Constants.STATUS));
+        Assertions.assertDoesNotThrow(() -> k8sNamespaceService.deleteNamespaceById(getLoginUser(), 1));
     }
 
     @Test
     public void testQueryAuthorizedNamespace() {
-        Mockito.when(k8sNamespaceMapper.queryAuthedNamespaceListByUserId(2)).thenReturn(getNamespaceList());
+        Mockito.when(k8sNamespaceDao.queryAuthedNamespaceListByUserId(2)).thenReturn(getNamespaceList());
 
         User loginUser = getLoginUser();
 
         // test admin user
         loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2);
-        logger.info(result.toString());
-        List<K8sNamespace> namespaces = (List<K8sNamespace>) result.get(Constants.DATA_LIST);
+        List<K8sNamespace> namespaces = k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(namespaces));
 
         // test non-admin user
@@ -160,15 +156,13 @@ public class K8SNamespaceServiceTest {
 
     @Test
     public void testQueryUnAuthorizedNamespace() {
-        Mockito.when(k8sNamespaceMapper.queryAuthedNamespaceListByUserId(2)).thenReturn(new ArrayList<>());
-        Mockito.when(k8sNamespaceMapper.selectList(Mockito.any())).thenReturn(getNamespaceList());
+        Mockito.when(k8sNamespaceDao.queryAuthedNamespaceListByUserId(2)).thenReturn(new ArrayList<>());
+        Mockito.when(k8sNamespaceDao.queryAll()).thenReturn(getNamespaceList());
 
         // test admin user
         User loginUser = new User();
         loginUser.setUserType(UserType.ADMIN_USER);
-        Map<String, Object> result = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 2);
-        logger.info(result.toString());
-        List<K8sNamespace> namespaces = (List<K8sNamespace>) result.get(Constants.DATA_LIST);
+        List<K8sNamespace> namespaces = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 2);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(namespaces));
 
         // test non-admin user
@@ -191,8 +185,8 @@ public class K8SNamespaceServiceTest {
         cluster.setName("test");
         clusters.add(cluster);
 
-        Mockito.when(k8sNamespaceMapper.selectList(Mockito.any())).thenReturn(k8sNamespaces);
-        Mockito.when(clusterMapper.queryAllClusterList()).thenReturn(clusters);
+        Mockito.when(k8sNamespaceDao.queryAll()).thenReturn(k8sNamespaces);
+        Mockito.when(clusterDao.queryAllClusterList()).thenReturn(clusters);
         List<K8sNamespace> result = k8sNamespaceService.queryNamespaceAvailable(getLoginUser());
         Assertions.assertEquals(result.get(0).getClusterName(), cluster.getName());
     }

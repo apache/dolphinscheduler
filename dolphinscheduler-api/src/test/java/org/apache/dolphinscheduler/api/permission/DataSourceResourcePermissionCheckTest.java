@@ -21,7 +21,7 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.DataSourceMapper;
+import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -47,7 +47,7 @@ public class DataSourceResourcePermissionCheckTest {
     private ResourcePermissionCheckServiceImpl.DataSourceResourcePermissionCheck dataSourceResourcePermissionCheck;
 
     @Mock
-    private DataSourceMapper dataSourceMapper;
+    private DataSourceDao dataSourceDao;
 
     @Test
     public void testPermissionCheck() {
@@ -69,7 +69,7 @@ public class DataSourceResourcePermissionCheckTest {
         ids.add(dataSource.getId());
         List<DataSource> dataSources = Arrays.asList(dataSource);
 
-        Mockito.when(dataSourceMapper.listAuthorizedDataSource(user.getId(), null)).thenReturn(dataSources);
+        Mockito.when(dataSourceDao.listAuthorizedDataSource(user.getId(), null)).thenReturn(dataSources);
 
         Assertions.assertEquals(ids, dataSourceResourcePermissionCheck.listAuthorizedResourceIds(user.getId(), logger));
     }
