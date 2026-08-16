@@ -59,10 +59,13 @@ public class DatavinesTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         this.datavinesParameters = JSONUtils.parseObject(taskParams, DatavinesParameters.class);
-        log.info("initialize datavines task params : {}", JSONUtils.toPrettyJsonString(datavinesParameters));
         if (this.datavinesParameters == null || !this.datavinesParameters.checkParameters()) {
             throw new DatavinesTaskException("datavines task params is not valid");
         }
+        log.info("initialize datavines task, address: {}, jobId: {}, failureBlock: {}",
+                datavinesParameters.getAddress(),
+                datavinesParameters.getJobId(),
+                datavinesParameters.isFailureBlock());
     }
 
     @Override
@@ -87,7 +90,6 @@ public class DatavinesTask extends AbstractRemoteTask {
                 executionStatus = true;
             }
         } catch (Exception ex) {
-            Thread.currentThread().interrupt();
             log.error(DatavinesTaskConstants.SUBMIT_FAILED_MSG, ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException(DatavinesTaskConstants.SUBMIT_FAILED_MSG, ex);
@@ -97,9 +99,9 @@ public class DatavinesTask extends AbstractRemoteTask {
     public void trackApplicationStatusInner() throws TaskException {
         try {
             String address = this.datavinesParameters.getAddress();
-            if (executionStatus && jobExecutionId == null) {
-                // Use address-taskId as app id
-                setAppIds(String.format(DatavinesTaskConstants.APPIDS_FORMAT, address, this.jobExecutionId));
+            if (!executionStatus || jobExecutionId == null) {
+                setAppIds(String.format(DatavinesTaskConstants.APPIDS_FORMAT, address,
+                        this.datavinesParameters.getJobId()));
                 setExitStatusCode(mapStatusToExitCode(false));
                 log.info("datavines task failed.");
                 return;
@@ -121,6 +123,7 @@ public class DatavinesTask extends AbstractRemoteTask {
                                 RequestUtils.getJobExecutionResult(address, jobExecutionId,
                                         this.datavinesParameters.getToken());
                         if (!checkResult(jobExecutionResult)) {
+                            finishFlag = true;
                             break;
                         }
 
@@ -171,7 +174,8 @@ public class DatavinesTask extends AbstractRemoteTask {
         if (result == null
                 || result instanceof MissingNode
                 || result instanceof NullNode
-                || !result.hasNonNull(DatavinesTaskConstants.API_RESULT_CODE)) {
+                || !result.hasNonNull(DatavinesTaskConstants.API_RESULT_CODE)
+                || !result.hasNonNull(DatavinesTaskConstants.API_RESULT_DATA)) {
             errorHandle(DatavinesTaskConstants.API_ERROR_MSG);
             isCorrect = false;
         } else if (result.get(DatavinesTaskConstants.API_RESULT_CODE)

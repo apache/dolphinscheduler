@@ -133,15 +133,41 @@ class DatavinesTaskTest {
                     .thenReturn(failureStatus);
             datavinesTask.trackApplicationStatus();
             Assertions.assertEquals(EXIT_CODE_FAILURE, datavinesTask.getExitStatusCode());
+            requestUtilsStatic.verify(
+                    () -> RequestUtils.getJobExecutionStatus(Mockito.any(), Mockito.any(), Mockito.any()),
+                    Mockito.never());
+        }
+    }
+
+    @Test
+    void trackApplicationStatusMissingExecutionIdSetsExitCodeFailure() throws TaskException {
+        JsonNode executeJobResult = RequestUtils.parse("{\"code\":200}");
+        try (MockedStatic<RequestUtils> requestUtilsStatic = Mockito.mockStatic(RequestUtils.class)) {
+            when(taskExecutionContext.getTaskParams())
+                    .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
+            datavinesTask.init();
+            requestUtilsStatic.when(() -> RequestUtils.executeJob(Mockito.any(), Mockito.any(), Mockito.any()))
+                    .thenReturn(executeJobResult);
+
+            datavinesTask.submitApplication();
+            datavinesTask.trackApplicationStatus();
+
+            Assertions.assertEquals(EXIT_CODE_FAILURE, datavinesTask.getExitStatusCode());
+            requestUtilsStatic.verify(
+                    () -> RequestUtils.getJobExecutionStatus(Mockito.any(), Mockito.any(), Mockito.any()),
+                    Mockito.never());
         }
     }
 
     @Test
     void cancelApplicationTerminatesJobSuccessfully() {
-        when(taskExecutionContext.getTaskParams())
-                .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
-        datavinesTask.init();
-        assertDoesNotThrow(() -> datavinesTask.cancelApplication());
+        try (MockedStatic<RequestUtils> requestUtilsStatic = Mockito.mockStatic(RequestUtils.class)) {
+            when(taskExecutionContext.getTaskParams())
+                    .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
+            datavinesTask.init();
+            assertDoesNotThrow(() -> datavinesTask.cancelApplication());
+            requestUtilsStatic.verify(() -> RequestUtils.killJobExecution("http://localhost", null, "token"));
+        }
     }
 
     @Test
@@ -303,7 +329,6 @@ class DatavinesTaskTest {
         JsonNode executeJobResult = RequestUtils.parse("{\"code\":200,\"data\":\"1\"}");
         JsonNode successStatus = RequestUtils.parse("{\"code\":200,\"data\":\"SUCCESS\"}");
         JsonNode errorResult = RequestUtils.parse("{\"code\":500,\"msg\":\"error\",\"data\":\"error\"}");
-        JsonNode killStatus = RequestUtils.parse("{\"code\":200,\"data\":\"KILL\"}");
         try (MockedStatic<RequestUtils> requestUtilsStatic = Mockito.mockStatic(RequestUtils.class)) {
             when(taskExecutionContext.getTaskParams())
                     .thenReturn("{\"address\":\"http://localhost\",\"jobId\":\"1\",\"token\":\"token\"}");
@@ -313,17 +338,18 @@ class DatavinesTaskTest {
                     .thenReturn(executeJobResult);
             datavinesTask.submitApplication();
 
-            // First call to getJobExecutionStatus returns SUCCESS; second call returns KILL to exit the loop
             requestUtilsStatic
                     .when(() -> RequestUtils.getJobExecutionStatus(Mockito.any(), Mockito.any(), Mockito.any()))
-                    .thenReturn(successStatus, killStatus);
-            // getJobExecutionResult returns an API error, checkResult fails, break from switch
+                    .thenReturn(successStatus);
             requestUtilsStatic
                     .when(() -> RequestUtils.getJobExecutionResult(Mockito.any(), Mockito.any(), Mockito.any()))
                     .thenReturn(errorResult);
 
             datavinesTask.trackApplicationStatus();
             Assertions.assertEquals(EXIT_CODE_FAILURE, datavinesTask.getExitStatusCode());
+            requestUtilsStatic.verify(
+                    () -> RequestUtils.getJobExecutionStatus(Mockito.any(), Mockito.any(), Mockito.any()),
+                    Mockito.times(1));
         }
     }
 

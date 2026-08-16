@@ -40,7 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junitpioneer.jupiter.DisableIfTestFails;
 
-@TestMethodOrder(MethodOrderer.MethodName.class)
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DolphinScheduler(composeFiles = "docker/datavines-task/docker-compose.yaml")
 @DisableIfTestFails
 public class DatavinesTaskE2ETest extends BaseWorkflowE2ETest {
@@ -125,7 +125,7 @@ public class DatavinesTaskE2ETest extends BaseWorkflowE2ETest {
                 .createWorkflow()
                 .<DatavinesTaskForm>addTask(WorkflowForm.TaskType.DATAVINES)
                 .address(mockServerAddress)
-                .jobId(jobId)
+                .jobId("3")
                 .token(token)
                 .name(taskName)
                 .submit()
