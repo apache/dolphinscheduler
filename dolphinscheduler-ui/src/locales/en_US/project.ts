@@ -975,6 +975,7 @@ export default {
     cloud: 'Cloud',
     logic: 'Logic',
     di: 'Data Integration',
+    dq: 'Data Quality',
     ml: 'Machine Learning',
     other: 'Other'
   },
