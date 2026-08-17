@@ -178,6 +178,7 @@ export function useModal(
     const data = {
       triggerType: state.timingForm.triggerType,
       schedule: JSON.stringify({
+        triggerType: state.timingForm.triggerType,
         startTime: start,
         endTime: end,
         crontab: state.timingForm.crontab,
