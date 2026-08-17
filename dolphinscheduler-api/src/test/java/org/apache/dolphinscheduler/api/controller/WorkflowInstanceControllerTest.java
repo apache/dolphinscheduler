@@ -40,16 +40,21 @@ import java.util.Collections;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @MockBean
     private WorkflowInstanceService workflowInstanceService;
+
+    @Autowired
+    private RequestMappingHandlerMapping requestMappingHandlerMapping;
 
     @Test
     public void testQueryWorkflowInstanceList() throws Exception {
@@ -189,6 +194,15 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.WORKFLOW_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE.getCode(),
                 result.getCode().intValue());
+    }
+
+    @Test
+    public void testQueryDynamicSubWorkflowsIsNotExposed() {
+        boolean endpointExposed = requestMappingHandlerMapping.getHandlerMethods().keySet().stream()
+                .flatMap(requestMappingInfo -> requestMappingInfo.getPatternValues().stream())
+                .anyMatch("/projects/{projectCode}/workflow-instances/query-dynamic-sub-workflows"::equals);
+
+        Assertions.assertFalse(endpointExposed);
     }
 
     @Test
