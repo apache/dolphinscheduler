@@ -225,16 +225,18 @@ public class UsersServiceTest {
     @Test
     public void testQueryUserList() {
         User user = new User();
-        user.setUserType(UserType.ADMIN_USER);
+        user.setUserType(UserType.GENERAL_USER);
         user.setId(1);
 
+        // Access token permission must not grant general users access to the user list.
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1,
                 USER_MANAGER, serviceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
-                serviceLogger)).thenReturn(false);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 1,
+                serviceLogger)).thenReturn(true);
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> usersService.queryUserList(user));
 
         // success
+        user.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
                 serviceLogger)).thenReturn(true);
         when(userDao.queryEnabledUsers()).thenReturn(getUserList());
