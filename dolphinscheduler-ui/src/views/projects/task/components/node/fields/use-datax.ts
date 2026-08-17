@@ -210,11 +210,15 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
                 typeof fullName === 'string' &&
                 fullName.toLowerCase().endsWith('.json')
             ).length === 1
-          if (
-            model.json === '' ||
+          // Treat a whitespace-only value as absent too, matching the backend
+          // DataxParameters.isInlineJsonAbsent which uses StringUtils.isBlank. Otherwise a
+          // blank inline json would reach utils.isJson below and be rejected even when exactly
+          // one valid .json resource is attached, a configuration the worker would have accepted.
+          const inlineJsonAbsent =
             model.json === undefined ||
-            model.json === null
-          ) {
+            model.json === null ||
+            (model.json as string).trim() === ''
+          if (inlineJsonAbsent) {
             return hasSingleJsonResource
               ? undefined
               : new Error(t('project.node.datax_custom_json_resource_tips'))
