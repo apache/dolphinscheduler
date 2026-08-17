@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.UserSimpleInfoVO;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
@@ -239,9 +240,12 @@ public class UsersServiceTest {
         user.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
                 serviceLogger)).thenReturn(true);
-        when(userDao.queryEnabledUsers()).thenReturn(getUserList());
-        List<User> users = usersService.queryUserList(user);
-        Assertions.assertFalse(users.isEmpty());
+        User enabledUser = getGeneralUser();
+        enabledUser.setId(2);
+        when(userDao.queryEnabledUsers()).thenReturn(Lists.newArrayList(enabledUser));
+        List<UserSimpleInfoVO> users = usersService.queryUserList(user);
+        Assertions.assertEquals(2, users.get(0).getId());
+        Assertions.assertEquals("userTest0001", users.get(0).getUserName());
     }
 
     @Test
