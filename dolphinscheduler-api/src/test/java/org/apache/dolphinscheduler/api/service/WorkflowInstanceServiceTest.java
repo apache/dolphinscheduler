@@ -541,6 +541,7 @@ public class WorkflowInstanceServiceTest {
 
         // process instance null
         WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(projectCode);
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         doNothing()
                 .when(projectService)
@@ -614,6 +615,20 @@ public class WorkflowInstanceServiceTest {
                     taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", Boolean.FALSE, "", "", 0);
             Assertions.assertNotNull(successRes);
         }
+    }
+
+    @Test
+    public void testUpdateWorkflowInstanceWithMismatchedProjectCode() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(2L);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
+
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
+                () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                        shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0));
+        Mockito.verifyNoInteractions(workflowDefinitionDao);
     }
 
     @Test

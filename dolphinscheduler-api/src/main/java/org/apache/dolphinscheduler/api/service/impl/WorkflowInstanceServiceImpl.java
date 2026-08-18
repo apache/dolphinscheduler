@@ -373,11 +373,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
         // check workflow instance exists in project
-        WorkflowDefinition workflowDefinition0 =
-                workflowDefinitionDao.queryByCode(workflowInstance.getWorkflowDefinitionCode()).orElse(null);
-        if (workflowDefinition0 != null && projectCode != workflowDefinition0.getProjectCode()) {
-            log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
-                    workflowInstance.getWorkflowDefinitionCode());
+        if (workflowInstance.getProjectCode() != projectCode) {
+            log.error("workflow instance does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
+                    workflowInstanceId);
             throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
         // check workflow instance status
