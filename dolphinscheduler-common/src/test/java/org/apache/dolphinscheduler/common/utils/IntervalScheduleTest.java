@@ -35,7 +35,15 @@ class IntervalScheduleTest {
 
     @Test
     void rejectInvalidIntervalSchedule() {
-        assertThrows(IllegalArgumentException.class, () -> IntervalSchedule.parse("{\"second\":0}"));
-        assertThrows(IllegalArgumentException.class, () -> IntervalSchedule.parse("{\"second\":-1}"));
+        assertThrows(IllegalArgumentException.class,
+                () -> IntervalSchedule.parse("{\"second\":0}"));
+        assertThrows(IllegalArgumentException.class,
+                () -> IntervalSchedule.parse("{\"second\":-1,\"repeat\":-1}"));
+        assertThrows(IllegalArgumentException.class,
+                () -> IntervalSchedule.parse("{\"minute\":60,\"repeat\":1}"));
+        assertThrows(IllegalArgumentException.class,
+                () -> IntervalSchedule.parse("{\"second\":60,\"repeat\":1}"));
+        assertThrows(IllegalArgumentException.class,
+                () -> IntervalSchedule.parse("{\"second\":1}"));
     }
 }

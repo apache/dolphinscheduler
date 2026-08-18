@@ -176,6 +176,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
         scheduleObj.setCrontab(scheduleParam.getCrontab());
         validateMissedFirePolicy(scheduleParam);
+        validateTriggerType(scheduleParam);
         scheduleObj.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
         scheduleObj.setTriggerType(
                 scheduleParam.getTriggerType() == null ? ScheduleTriggerType.CRON : scheduleParam.getTriggerType());
@@ -426,6 +427,10 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         ScheduleTriggerType triggerType = scheduleParam.getTriggerType() == null
                 ? ScheduleTriggerType.CRON
                 : scheduleParam.getTriggerType();
+        return isValidScheduleExpression(scheduleParam, triggerType);
+    }
+
+    private boolean isValidScheduleExpression(ScheduleParam scheduleParam, ScheduleTriggerType triggerType) {
         if (triggerType == ScheduleTriggerType.CRON) {
             return CronUtils.isValidExpression(scheduleParam.getCrontab());
         }
@@ -587,17 +592,26 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
             schedule.setStartTime(scheduleParam.getStartTime());
             schedule.setEndTime(scheduleParam.getEndTime());
-            if (!isValidScheduleExpression(scheduleParam)) {
-                log.error("Schedule crontab verify failure, crontab:{}.", scheduleParam.getCrontab());
+            ScheduleTriggerType effectiveTriggerType = schedule.getTriggerType() == null
+                    ? ScheduleTriggerType.CRON
+                    : schedule.getTriggerType();
+            if (scheduleParam.isTriggerTypeSet() && scheduleParam.getTriggerType() != null) {
+                effectiveTriggerType = scheduleParam.getTriggerType();
+            }
+            if (!isValidScheduleExpression(scheduleParam, effectiveTriggerType)) {
+                log.error("Schedule expression validation failure, triggerType:{}, expression:{}.",
+                        effectiveTriggerType, scheduleParam.getCrontab());
                 throw new ServiceException(Status.SCHEDULE_CRON_CHECK_FAILED, scheduleParam.getCrontab());
             }
             schedule.setCrontab(scheduleParam.getCrontab());
             validateMissedFirePolicy(scheduleParam);
+            validateTriggerType(scheduleParam);
             if (scheduleParam.isMissedFirePolicySet() && scheduleParam.getMissedFirePolicy() != null) {
                 schedule.setMissedFirePolicy(scheduleParam.getMissedFirePolicy());
             }
-            schedule.setTriggerType(
-                    scheduleParam.getTriggerType() == null ? ScheduleTriggerType.CRON : scheduleParam.getTriggerType());
+            if (scheduleParam.isTriggerTypeSet() && scheduleParam.getTriggerType() != null) {
+                schedule.setTriggerType(scheduleParam.getTriggerType());
+            }
             schedule.setTimezoneId(scheduleParam.getTimezoneId());
         }
 
@@ -630,6 +644,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         if (scheduleParam.isMissedFirePolicySet() && scheduleParam.getMissedFirePolicy() == null) {
             log.warn("Schedule missed fire policy is invalid.");
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "missedFirePolicy");
+        }
+    }
+
+    private void validateTriggerType(ScheduleParam scheduleParam) {
+        if (scheduleParam.isTriggerTypeSet() && scheduleParam.getTriggerType() == null) {
+            log.warn("Schedule trigger type is invalid.");
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "triggerType");
         }
     }
 

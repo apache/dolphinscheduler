@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
+import org.apache.dolphinscheduler.common.enums.ScheduleTriggerType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -115,6 +116,17 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Assertions.assertFalse(withoutPolicy.isMissedFirePolicySet());
         Assertions.assertEquals(ScheduleMissedFirePolicy.SKIP_MISSED, withPolicy.getMissedFirePolicy());
         Assertions.assertTrue(withPolicy.isMissedFirePolicySet());
+
+        ScheduleParam withoutTriggerType = JSONUtils.parseObject(scheduleWithoutPolicy, ScheduleParam.class);
+        ScheduleParam withTriggerType = JSONUtils.parseObject(
+                scheduleWithoutPolicy.replace("}", ",\"triggerType\":\"INTERVAL\"}"), ScheduleParam.class);
+        ScheduleParam withNullTriggerType = JSONUtils.parseObject(
+                scheduleWithoutPolicy.replace("}", ",\"triggerType\":null}"), ScheduleParam.class);
+        Assertions.assertFalse(withoutTriggerType.isTriggerTypeSet());
+        Assertions.assertTrue(withTriggerType.isTriggerTypeSet());
+        Assertions.assertEquals(ScheduleTriggerType.INTERVAL, withTriggerType.getTriggerType());
+        Assertions.assertTrue(withNullTriggerType.isTriggerTypeSet());
+        Assertions.assertNull(withNullTriggerType.getTriggerType());
     }
 
     @ParameterizedTest
@@ -156,6 +168,23 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Mockito.verify(scheduleDao).insert(scheduleCaptor.capture());
         Assertions.assertEquals(ScheduleMissedFirePolicy.FIRE_ALL_MISSED,
                 scheduleCaptor.getValue().getMissedFirePolicy());
+    }
+
+    @Test
+    public void testInsertScheduleDefaultsTriggerType() {
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(null);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(this.getProcessDefinition()));
+        Mockito.when(scheduleDao.queryById(Mockito.anyInt())).thenReturn(new Schedule());
+
+        schedulerService.insertSchedule(
+                user, projectCode, processDefinitionCode, scheduleExpression(null), WarningType.NONE, 0,
+                FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode);
+
+        ArgumentCaptor<Schedule> scheduleCaptor = ArgumentCaptor.forClass(Schedule.class);
+        Mockito.verify(scheduleDao).insert(scheduleCaptor.capture());
+        Assertions.assertEquals(ScheduleTriggerType.CRON, scheduleCaptor.getValue().getTriggerType());
     }
 
     @Test
@@ -202,6 +231,73 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
                 FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode);
 
         Assertions.assertEquals(ScheduleMissedFirePolicy.SKIP_MISSED, schedule.getMissedFirePolicy());
+    }
+
+    @Test
+    public void testUpdateSchedulePreservesTriggerTypeWhenOmitted() {
+        Schedule schedule = this.getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setTriggerType(ScheduleTriggerType.INTERVAL);
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+
+        schedulerService.updateSchedule(
+                user, projectCode, scheduleId,
+                "{\"startTime\":\"2019-12-16 00:00:00\",\"endTime\":\"2019-12-17 00:00:00\","
+                        + "\"crontab\":\"{\\\"second\\\":10,\\\"repeat\\\":-1}\","
+                        + "\"timezoneId\":\"Asia/Shanghai\"}",
+                WarningType.NONE, 0, FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode",
+                environmentCode);
+
+        Assertions.assertEquals(ScheduleTriggerType.INTERVAL, schedule.getTriggerType());
+        Assertions.assertEquals("{\"second\":10,\"repeat\":-1}", schedule.getCrontab());
+    }
+
+    @Test
+    public void testUpdateScheduleChangesTriggerTypeWhenProvided() {
+        Schedule schedule = this.getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setTriggerType(ScheduleTriggerType.INTERVAL);
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+
+        schedulerService.updateSchedule(
+                user, projectCode, scheduleId,
+                "{\"startTime\":\"2019-12-16 00:00:00\",\"endTime\":\"2019-12-17 00:00:00\","
+                        + "\"crontab\":\"0 0 6 * * ? *\",\"timezoneId\":\"Asia/Shanghai\","
+                        + "\"triggerType\":\"CRON\"}",
+                WarningType.NONE, 0, FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode",
+                environmentCode);
+
+        Assertions.assertEquals(ScheduleTriggerType.CRON, schedule.getTriggerType());
+    }
+
+    @Test
+    public void testUpdateScheduleRejectsExplicitNullTriggerType() {
+        Schedule schedule = this.getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setTriggerType(ScheduleTriggerType.INTERVAL);
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+
+        Assertions.assertThrows(ServiceException.class, () -> schedulerService.updateSchedule(
+                user, projectCode, scheduleId,
+                "{\"startTime\":\"2019-12-16 00:00:00\",\"endTime\":\"2019-12-17 00:00:00\","
+                        + "\"crontab\":\"{\\\"second\\\":10,\\\"repeat\\\":-1}\","
+                        + "\"timezoneId\":\"Asia/Shanghai\",\"triggerType\":null}",
+                WarningType.NONE, 0, FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode",
+                environmentCode));
+        Assertions.assertEquals(ScheduleTriggerType.INTERVAL, schedule.getTriggerType());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any());
     }
 
     @Test

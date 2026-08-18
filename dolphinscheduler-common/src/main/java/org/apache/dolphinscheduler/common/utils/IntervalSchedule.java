@@ -42,12 +42,15 @@ public class IntervalSchedule {
             throw new IllegalArgumentException("Interval schedule expression must not be null");
         }
 
-        int hours = valueOf(values, "hour");
-        int minutes = valueOf(values, "minute");
-        int seconds = valueOf(values, "second");
-        int repeat = valueOf(values, "repeat");
+        int hours = valueOf(values, "hour", false);
+        int minutes = valueOf(values, "minute", false);
+        int seconds = valueOf(values, "second", false);
+        int repeat = valueOf(values, "repeat", true);
         if (hours < 0 || minutes < 0 || seconds < 0 || repeat < -1) {
             throw new IllegalArgumentException("Interval duration values must not be negative");
+        }
+        if (minutes > 59 || seconds > 59) {
+            throw new IllegalArgumentException("Interval minutes and seconds must be between 0 and 59");
         }
 
         long intervalMilliseconds = Math.addExact(
@@ -59,8 +62,11 @@ public class IntervalSchedule {
         return new IntervalSchedule(intervalMilliseconds, repeat);
     }
 
-    private static int valueOf(ObjectNode values, String key) {
+    private static int valueOf(ObjectNode values, String key, boolean required) {
         if (!values.has(key)) {
+            if (required) {
+                throw new IllegalArgumentException("Interval schedule field is required: " + key);
+            }
             return 0;
         }
         if (!values.get(key).isInt()) {

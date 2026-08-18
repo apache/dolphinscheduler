@@ -42,6 +42,9 @@ public class ScheduleParam {
     @JsonIgnore
     private boolean missedFirePolicySet;
 
+    @JsonIgnore
+    private boolean triggerTypeSet;
+
     public ScheduleParam() {
     }
 
@@ -59,6 +62,15 @@ public class ScheduleParam {
 
     public boolean isMissedFirePolicySet() {
         return missedFirePolicySet;
+    }
+
+    public void setTriggerType(ScheduleTriggerType triggerType) {
+        this.triggerType = triggerType;
+        this.triggerTypeSet = true;
+    }
+
+    public boolean isTriggerTypeSet() {
+        return triggerTypeSet;
     }
 
     @Override

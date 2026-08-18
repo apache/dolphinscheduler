@@ -124,7 +124,8 @@ public class SchedulerAPITest {
         HttpResponse queryScheduleListResponse = schedulerPage.queryScheduleList(loginUser, projectCode);
         Assertions.assertTrue(queryScheduleListResponse.getBody().getSuccess());
         Assertions.assertTrue(queryScheduleListResponse.getBody().getData().toString().contains("2019-08-08"));
-        Assertions.assertTrue(queryScheduleListResponse.getBody().getData().toString().contains("triggerType=INTERVAL"));
+        Assertions.assertTrue(
+                queryScheduleListResponse.getBody().getData().toString().contains("triggerType=INTERVAL"));
         scheduleId = (int) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryScheduleListResponse.getBody()
                 .getData()).get(0)).get("id");
     }
@@ -165,7 +166,8 @@ public class SchedulerAPITest {
         HttpResponse queryScheduleListResponse = schedulerPage.queryScheduleList(loginUser, projectCode);
         Assertions.assertTrue(queryScheduleListResponse.getBody().getSuccess());
         Assertions.assertTrue(queryScheduleListResponse.getBody().getData().toString().contains("1996-08-08"));
-        Assertions.assertTrue(queryScheduleListResponse.getBody().getData().toString().contains("triggerType=INTERVAL"));
+        Assertions.assertTrue(
+                queryScheduleListResponse.getBody().getData().toString().contains("triggerType=INTERVAL"));
     }
 
     @Test
