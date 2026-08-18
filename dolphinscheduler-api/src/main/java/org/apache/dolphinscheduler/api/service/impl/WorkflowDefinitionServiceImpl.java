@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowDefinitionVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
@@ -209,6 +210,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Autowired
     private GlobalParamsValidator globalParamsValidator;
 
+    @Autowired
+    private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
+
     /**
      * create workflow definition
      *
@@ -271,6 +275,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                  List<WorkflowTaskRelationLog> taskRelationList,
                                                  WorkflowDefinition workflowDefinition,
                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
+        taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         int saveTaskResult = processService.saveTaskDefine(loginUser, workflowDefinition.getProjectCode(),
                 taskDefinitionLogs, Boolean.TRUE);
         if (saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
@@ -694,6 +699,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                  WorkflowDefinition workflowDefinition,
                                                  WorkflowDefinition workflowDefinitionDeepCopy,
                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
+        taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         int saveTaskResult = processService.saveTaskDefine(loginUser, workflowDefinition.getProjectCode(),
                 taskDefinitionLogs, Boolean.TRUE);
         if (saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
@@ -1585,14 +1591,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     Status.SWITCH_WORKFLOW_DEFINITION_VERSION_NOT_EXIST_WORKFLOW_DEFINITION_VERSION_ERROR,
                     workflowDefinition.getCode(), version);
         }
-        int switchVersion = processService.switchVersion(workflowDefinition, workflowDefinitionLog);
-        if (switchVersion <= 0) {
-            log.error(
-                    "Switch workflow definition version error, projectCode:{}, workflowDefinitionCode:{}, version:{}.",
-                    projectCode, code, version);
-            throw new ServiceException(Status.SWITCH_WORKFLOW_DEFINITION_VERSION_ERROR);
-        }
-
         List<WorkflowTaskRelation> workflowTaskRelationList = workflowTaskRelationDao
                 .queryWorkflowTaskRelationsByWorkflowDefinitionCode(workflowDefinitionLog.getCode(),
                         workflowDefinitionLog.getVersion());
@@ -1605,6 +1603,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                             taskDefinitionLog.setVersion(taskCodeVersionDto.getVersion());
                             return Stream.of(taskDefinitionLog);
                         }).collect(Collectors.toList()));
+        taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogList);
+
+        int switchVersion = processService.switchVersion(workflowDefinition, workflowDefinitionLog);
+        if (switchVersion <= 0) {
+            log.error(
+                    "Switch workflow definition version error, projectCode:{}, workflowDefinitionCode:{}, version:{}.",
+                    projectCode, code, version);
+            throw new ServiceException(Status.SWITCH_WORKFLOW_DEFINITION_VERSION_ERROR);
+        }
+
         saveWorkflowLineage(workflowDefinitionLog.getProjectCode(), workflowDefinitionLog.getCode(),
                 workflowDefinitionLog.getVersion(), taskDefinitionLogList);
 
@@ -1747,7 +1755,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return;
         }
 
-        checkWorkflowDefinitionIsValidated(workflowDefinition.getCode());
+        checkWorkflowDefinitionIsValidated(loginUser, workflowDefinition.getCode());
         checkAllSubWorkflowDefinitionIsOnline(workflowDefinition.getCode());
 
         workflowDefinition.setReleaseState(ReleaseState.ONLINE);
@@ -1840,13 +1848,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         return localUserDefParams;
     }
 
-    private void checkWorkflowDefinitionIsValidated(Long workflowDefinitionCode) {
+    private void checkWorkflowDefinitionIsValidated(User loginUser, Long workflowDefinitionCode) {
         // todo: build dag check if the dag is validated
         List<WorkflowTaskRelation> workflowTaskRelations =
                 workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         if (CollectionUtils.isEmpty(workflowTaskRelations)) {
             throw new ServiceException(Status.WORKFLOW_DAG_IS_EMPTY);
         }
+        List<TaskDefinitionLog> taskDefinitionLogs =
+                taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
+        taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         // todo : check Workflow is validate
     }
 
