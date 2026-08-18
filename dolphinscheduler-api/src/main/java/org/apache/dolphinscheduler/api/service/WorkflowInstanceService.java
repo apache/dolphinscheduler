@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
@@ -107,9 +106,6 @@ public interface WorkflowInstanceService {
     Map<String, Integer> querySubWorkflowInstanceByTaskId(User loginUser,
                                                           long projectCode,
                                                           Integer taskId);
-
-    List<DynamicSubWorkflowDto> queryDynamicSubWorkflowInstances(User loginUser,
-                                                                 Integer taskId);
 
     /**
      * update workflow instance
