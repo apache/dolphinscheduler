@@ -47,4 +47,5 @@ This document records the incompatible updates between each version. You need to
 ## 3.5.0
 
 * Add the `missed_fire_policy` column to `t_ds_schedules`. Existing schedules default to `FIRE_ALL_MISSED` to preserve the previous Quartz `IgnoreMisfires` behavior. ([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
+* Remove the obsolete Dynamic Task query API. ([#18556](https://github.com/apache/dolphinscheduler/issues/18556))
 
