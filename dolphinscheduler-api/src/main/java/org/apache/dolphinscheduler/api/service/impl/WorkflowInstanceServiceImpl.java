@@ -29,7 +29,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.chec
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
-import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryDTO;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceSummaryDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -163,9 +163,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     private TaskInstanceContextDao taskInstanceContextDao;
 
     @Override
-    public List<WorkflowInstanceQueryDTO> queryTopNLongestRunningWorkflowInstance(User loginUser, long projectCode,
-                                                                                  int size,
-                                                                                  String startTime, String endTime) {
+    public List<WorkflowInstanceSummaryDTO> queryTopNLongestRunningWorkflowInstance(User loginUser, long projectCode,
+                                                                                    int size,
+                                                                                    String startTime, String endTime) {
         Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
@@ -191,7 +191,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         return workflowInstanceDao.queryTopNWorkflowInstance(size, start, end, WorkflowExecutionStatus.SUCCESS,
                 projectCode)
                 .stream()
-                .map(WorkflowInstanceQueryDTO::fromEntity)
+                .map(WorkflowInstanceSummaryDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 
@@ -218,18 +218,18 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     }
 
     @Override
-    public Result<PageInfo<WorkflowInstanceQueryDTO>> queryWorkflowInstanceList(User loginUser,
-                                                                                long projectCode,
-                                                                                long workflowDefinitionCode,
-                                                                                String startDate,
-                                                                                String endDate,
-                                                                                String searchVal,
-                                                                                String executorName,
-                                                                                WorkflowExecutionStatus stateType,
-                                                                                String host,
-                                                                                String otherParamsJson,
-                                                                                Integer pageNo,
-                                                                                Integer pageSize) {
+    public Result<PageInfo<WorkflowInstanceSummaryDTO>> queryWorkflowInstanceList(User loginUser,
+                                                                                  long projectCode,
+                                                                                  long workflowDefinitionCode,
+                                                                                  String startDate,
+                                                                                  String endDate,
+                                                                                  String searchVal,
+                                                                                  String executorName,
+                                                                                  WorkflowExecutionStatus stateType,
+                                                                                  String host,
+                                                                                  String otherParamsJson,
+                                                                                  Integer pageNo,
+                                                                                  Integer pageSize) {
 
         Result result = new Result();
         // check user access for project
@@ -245,7 +245,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         Date end = checkAndParseDateParameters(endDate);
 
         Page<WorkflowInstance> page = new Page<>(pageNo, pageSize);
-        PageInfo<WorkflowInstanceQueryDTO> pageInfo = new PageInfo<>(pageNo, pageSize);
+        PageInfo<WorkflowInstanceSummaryDTO> pageInfo = new PageInfo<>(pageNo, pageSize);
 
         IPage<WorkflowInstance> workflowInstanceList = workflowInstanceDao.queryWorkflowInstanceListPaging(
                 page,
@@ -279,7 +279,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         pageInfo.setTotal((int) workflowInstanceList.getTotal());
         pageInfo.setTotalList(workflowInstances.stream()
-                .map(WorkflowInstanceQueryDTO::fromEntity)
+                .map(WorkflowInstanceSummaryDTO::fromEntity)
                 .collect(Collectors.toList()));
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -723,7 +723,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     }
 
     @Override
-    public List<WorkflowInstanceQueryDTO> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode) {
+    public List<WorkflowInstanceSummaryDTO> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode) {
 
         Project project = projectDao.queryByCode(projectCode);
         // check user access for project
@@ -734,7 +734,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         }
         return workflowInstanceDao.queryByTriggerCode(triggerCode)
                 .stream()
-                .map(WorkflowInstanceQueryDTO::fromEntity)
+                .map(WorkflowInstanceSummaryDTO::fromEntity)
                 .collect(Collectors.toList());
     }
 

@@ -22,7 +22,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_INSTAN
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
-import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryDTO;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceSummaryDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -105,18 +105,18 @@ public class WorkflowInstanceController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR)
-    public Result<PageInfo<WorkflowInstanceQueryDTO>> queryWorkflowInstanceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                                @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                                @RequestParam(value = "workflowDefinitionCode", required = false, defaultValue = "0") long workflowDefinitionCode,
-                                                                                @RequestParam(value = "searchVal", required = false) String searchVal,
-                                                                                @RequestParam(value = "executorName", required = false) String executorName,
-                                                                                @RequestParam(value = "stateType", required = false) WorkflowExecutionStatus stateType,
-                                                                                @RequestParam(value = "host", required = false) String host,
-                                                                                @RequestParam(value = "startDate", required = false) String startTime,
-                                                                                @RequestParam(value = "endDate", required = false) String endTime,
-                                                                                @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
-                                                                                @RequestParam("pageNo") Integer pageNo,
-                                                                                @RequestParam("pageSize") Integer pageSize) {
+    public Result<PageInfo<WorkflowInstanceSummaryDTO>> queryWorkflowInstanceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                                  @RequestParam(value = "workflowDefinitionCode", required = false, defaultValue = "0") long workflowDefinitionCode,
+                                                                                  @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                                                  @RequestParam(value = "executorName", required = false) String executorName,
+                                                                                  @RequestParam(value = "stateType", required = false) WorkflowExecutionStatus stateType,
+                                                                                  @RequestParam(value = "host", required = false) String host,
+                                                                                  @RequestParam(value = "startDate", required = false) String startTime,
+                                                                                  @RequestParam(value = "endDate", required = false) String endTime,
+                                                                                  @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
+                                                                                  @RequestParam("pageNo") Integer pageNo,
+                                                                                  @RequestParam("pageSize") Integer pageSize) {
 
         checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
@@ -234,12 +234,12 @@ public class WorkflowInstanceController extends BaseController {
     @GetMapping(value = "/top-n")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.QUERY_WORKFLOW_INSTANCE_BY_ID_ERROR)
-    public Result<List<WorkflowInstanceQueryDTO>> queryTopNLongestRunningWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                                          @RequestParam("size") Integer size,
-                                                                                          @RequestParam(value = "startTime", required = true) String startTime,
-                                                                                          @RequestParam(value = "endTime", required = true) String endTime) {
-        List<WorkflowInstanceQueryDTO> workflowInstances =
+    public Result<List<WorkflowInstanceSummaryDTO>> queryTopNLongestRunningWorkflowInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                                            @RequestParam("size") Integer size,
+                                                                                            @RequestParam(value = "startTime", required = true) String startTime,
+                                                                                            @RequestParam(value = "endTime", required = true) String endTime) {
+        List<WorkflowInstanceSummaryDTO> workflowInstances =
                 workflowInstanceService.queryTopNLongestRunningWorkflowInstance(
                         loginUser, projectCode, size, startTime, endTime);
         return Result.success(workflowInstances);
@@ -413,10 +413,10 @@ public class WorkflowInstanceController extends BaseController {
     @GetMapping("/trigger")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKFLOW_INSTANCE_LIST_PAGING_ERROR)
-    public Result<List<WorkflowInstanceQueryDTO>> queryWorkflowInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                                      @PathVariable long projectCode,
-                                                                                      @RequestParam(value = "triggerCode") Long triggerCode) {
-        List<WorkflowInstanceQueryDTO> workflowInstances =
+    public Result<List<WorkflowInstanceSummaryDTO>> queryWorkflowInstancesByTriggerCode(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                        @PathVariable long projectCode,
+                                                                                        @RequestParam(value = "triggerCode") Long triggerCode) {
+        List<WorkflowInstanceSummaryDTO> workflowInstances =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, triggerCode);
         return Result.success(workflowInstances);
     }

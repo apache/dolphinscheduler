@@ -26,7 +26,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceQueryDTO;
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceSummaryDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -311,12 +311,12 @@ public class WorkflowInstanceServiceTest {
         // project auth success, trigger code null returns empty list
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
                 WORKFLOW_INSTANCE);
-        List<WorkflowInstanceQueryDTO> nullTriggerRes =
+        List<WorkflowInstanceSummaryDTO> nullTriggerRes =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, null);
         Assertions.assertTrue(nullTriggerRes.isEmpty());
 
         when(workflowInstanceDao.queryByTriggerCode(999L)).thenReturn(new ArrayList<>());
-        List<WorkflowInstanceQueryDTO> emptyRes =
+        List<WorkflowInstanceSummaryDTO> emptyRes =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
         Assertions.assertTrue(emptyRes.isEmpty());
     }
@@ -346,7 +346,7 @@ public class WorkflowInstanceServiceTest {
         when(workflowInstanceDao.queryTopNWorkflowInstance(Mockito.eq(size), Mockito.any(), Mockito.any(),
                 Mockito.eq(WorkflowExecutionStatus.SUCCESS), Mockito.eq(projectCode)))
                         .thenReturn(new ArrayList<>());
-        List<WorkflowInstanceQueryDTO> successRes =
+        List<WorkflowInstanceSummaryDTO> successRes =
                 workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser,
                         projectCode, size, startTime, endTime);
 
