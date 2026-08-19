@@ -700,4 +700,15 @@ public final class DateUtils {
         return String.valueOf(System.currentTimeMillis());
     }
 
+    /**
+     * @param timeMillis         timeMillis like System.currentTimeMillis()
+     * @param dateTimeFormatter  expect formatter, like yyyy-MM-dd HH:mm:ss
+     * @return formatted string
+     */
+    public static String formatTimeStamp(long timeMillis, DateTimeFormatter dateTimeFormatter) {
+        java.util.Objects.requireNonNull(dateTimeFormatter);
+        return dateTimeFormatter.format(LocalDateTime.ofInstant(Instant.ofEpochMilli(timeMillis),
+                ZoneId.systemDefault()));
+    }
+
 }

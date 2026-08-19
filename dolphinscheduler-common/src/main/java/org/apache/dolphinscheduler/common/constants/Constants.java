@@ -391,4 +391,11 @@ public final class Constants {
     public static final String RELEASE_STATE = "releaseState";
     public static final String EXECUTE_TYPE = "executeType";
 
+    /**
+     * File parameter transfer
+     */
+    public static final String CRC_SUFFIX = ".crc";
+    public static final String DOWNLOAD_TMP = ".DT_TMP";
+    public static final String PACK_SUFFIX = "_ds_pack.zip";
+    public static final String RESOURCE_TAG = "DATA_TRANSFER";
 }

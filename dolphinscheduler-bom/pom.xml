@@ -131,6 +131,7 @@
         <error.prone.annotations.version>2.11.0</error.prone.annotations.version>
         <emr-serverless-spark.version>2.4.1</emr-serverless-spark.version>
         <credentials-java.version>1.0.1</credentials-java.version>
+        <zt-zip.version>1.17</zt-zip.version>
     </properties>
 
     <dependencyManagement>
@@ -971,6 +972,12 @@
                 <groupId>com.aliyun</groupId>
                 <artifactId>credentials-java</artifactId>
                 <version>${credentials-java.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.zeroturnaround</groupId>
+                <artifactId>zt-zip</artifactId>
+                <version>${zt-zip.version}</version>
             </dependency>
 
             <!-- test dependencies on TestContainers -->
