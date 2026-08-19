@@ -17,11 +17,9 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION_MOVE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_BATCH_COPY;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -474,14 +472,14 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ex.getCode());
 
         // project check auth success, target project name not equal project name
-        Mockito.doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(user, project, WORKFLOW_BATCH_COPY);
         Project project1 = getProject(projectCodeOther);
         when(projectDao.queryByCode(projectCodeOther)).thenReturn(project1);
         Mockito.doNothing().when(projectService)
                 .checkProjectAndAuthThrowException(user, project1, WORKFLOW_BATCH_COPY);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
 
         WorkflowDefinition definition = getWorkflowDefinition();
+        definition.setProjectCode(projectCodeOther);
         List<WorkflowDefinition> workflowDefinitionList = new ArrayList<>();
         workflowDefinitionList.add(definition);
         Set<Long> definitionCodes = new HashSet<>();
@@ -508,10 +506,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Project project2 = getProject(projectCodeOther);
         when(projectDao.queryByCode(projectCodeOther)).thenReturn(project2);
 
-        Mockito.doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(user, project1, TASK_DEFINITION_MOVE);
-        Mockito.doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(user, project2, TASK_DEFINITION_MOVE);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project1);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project2);
 
         WorkflowDefinition definition = getWorkflowDefinition();
         definition.setVersion(1);
@@ -537,6 +533,91 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testBatchCopyWorkflowDefinitionRequiresTargetProjectWritePermission() {
+        Project sourceProject = getProject(projectCode);
+        Project targetProject = getProject(projectCodeOther);
+        when(projectDao.queryByCode(projectCode)).thenReturn(sourceProject);
+        when(projectDao.queryByCode(projectCodeOther)).thenReturn(targetProject);
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, sourceProject, WORKFLOW_BATCH_COPY);
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(user, targetProject);
+
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchCopyWorkflowDefinition(
+                        user, projectCode, String.valueOf(processDefinitionCode), projectCodeOther));
+
+        Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
+        verify(workflowDefinitionDao, Mockito.never()).queryByCodes(Mockito.anySet());
+    }
+
+    @Test
+    public void testBatchMoveWorkflowDefinitionRejectsDefinitionOutsideSourceProject() {
+        Project sourceProject = getProject(projectCode);
+        Project targetProject = getProject(projectCodeOther);
+        when(projectDao.queryByCode(projectCode)).thenReturn(sourceProject);
+        when(projectDao.queryByCode(projectCodeOther)).thenReturn(targetProject);
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, sourceProject);
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, targetProject);
+
+        WorkflowDefinition definition = getWorkflowDefinition();
+        definition.setProjectCode(3L);
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(definition));
+
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchMoveWorkflowDefinition(
+                        user, projectCode, String.valueOf(processDefinitionCode), projectCodeOther));
+
+        Assertions.assertEquals(Status.MOVE_WORKFLOW_DEFINITION_ERROR.getCode(), ex.getCode());
+        verify(workflowTaskRelationDao, Mockito.never()).queryByWorkflowDefinitionCode(Mockito.anyLong());
+    }
+
+    @Test
+    public void testReadOnlyUserCannotSwitchOrReleaseWorkflowDefinition() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(user, projectCode);
+
+        ServiceException switchEx = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.switchWorkflowDefinitionVersion(
+                        user, projectCode, processDefinitionCode, 1));
+        ServiceException onlineEx = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.onlineWorkflowDefinition(
+                        user, projectCode, processDefinitionCode));
+        ServiceException offlineEx = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.offlineWorkflowDefinition(
+                        user, projectCode, processDefinitionCode));
+
+        Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), switchEx.getCode());
+        Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), onlineEx.getCode());
+        Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), offlineEx.getCode());
+        verify(workflowDefinitionDao, Mockito.never()).updateById(Mockito.any());
+    }
+
+    @Test
+    public void testProjectCodeCannotAuthorizeWorkflowDefinitionFromAnotherProject() {
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        workflowDefinition.setProjectCode(projectCodeOther);
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+
+        ServiceException onlineEx = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.onlineWorkflowDefinition(
+                        user, projectCode, processDefinitionCode));
+        ServiceException offlineEx = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.offlineWorkflowDefinition(
+                        user, projectCode, processDefinitionCode));
+
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(), onlineEx.getCode());
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(), offlineEx.getCode());
+        verify(workflowDefinitionDao, Mockito.never()).updateById(Mockito.any());
+    }
+
+    @Test
     public void deleteWorkflowDefinitionByCodeTest() {
         when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
 
@@ -550,15 +631,14 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
         // project check auth fail
         when(workflowDefinitionDao.queryByCode(6L)).thenReturn(Optional.of(getWorkflowDefinition()));
-        doThrow(new ServiceException(Status.PROJECT_NOT_FOUND)).when(projectService)
-                .checkProjectAndAuthThrowException(user, project, WORKFLOW_DEFINITION_DELETE);
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
+                .checkHasProjectWritePermissionThrowException(user, project);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> workflowDefinitionService.deleteWorkflowDefinitionByCode(user, 6L));
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), ((ServiceException) exception).getCode());
+        Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ((ServiceException) exception).getCode());
 
         // project check auth success, instance not exist
-        doNothing().when(projectService).checkProjectAndAuthThrowException(user, project,
-                WORKFLOW_DEFINITION_DELETE);
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
         when(workflowDefinitionDao.queryByCode(1L)).thenReturn(Optional.empty());
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> workflowDefinitionService.deleteWorkflowDefinitionByCode(user, 1L));
