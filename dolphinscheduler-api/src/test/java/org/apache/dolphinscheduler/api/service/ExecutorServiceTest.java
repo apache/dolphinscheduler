@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.RERUN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
@@ -28,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowBackFillRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
+import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.workflow.BackfillWorkflowExecutorDelegate;
@@ -41,9 +41,17 @@ import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowReques
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowRequestTransformer;
+import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.service.process.ProcessService;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -85,6 +93,15 @@ public class ExecutorServiceTest {
     @Mock
     private BackfillWorkflowExecutorDelegate backfillWorkflowExecutorDelegate;
 
+    @Mock
+    private WorkflowInstanceDao workflowInstanceDao;
+
+    @Mock
+    private TaskGroupQueueMapper taskGroupQueueMapper;
+
+    @Mock
+    private ProcessService processService;
+
     private User getLoginUser() {
         User user = new User();
         user.setId(1);
@@ -94,7 +111,7 @@ public class ExecutorServiceTest {
     }
 
     @Test
-    public void testTriggerWorkflowDefinition_userHasNoProjectPermission() {
+    public void testTriggerWorkflowDefinition_userHasNoProjectWritePermission() {
         long projectCode = 100L;
         long workflowDefinitionCode = 200L;
         User loginUser = getLoginUser();
@@ -105,14 +122,14 @@ public class ExecutorServiceTest {
                 .workflowDefinitionCode(workflowDefinitionCode)
                 .build();
 
-        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
                 loginUser.getUserName(), projectCode))
                         .when(projectService)
-                        .checkProjectAndAuthThrowException(loginUser, projectCode, RERUN);
+                        .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
 
         ServiceException ex = assertThrows(ServiceException.class,
                 () -> executorService.triggerWorkflowDefinition(request));
-        assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), ex.getCode());
+        assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
 
         verify(triggerWorkflowRequestTransformer, never()).transform(Mockito.any());
         verify(triggerWorkflowDTOValidator, never()).validate(Mockito.any());
@@ -132,7 +149,7 @@ public class ExecutorServiceTest {
                 .build();
 
         doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, RERUN);
+                .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(workflowDefinitionCode);
@@ -151,7 +168,7 @@ public class ExecutorServiceTest {
     }
 
     @Test
-    public void testBackfillWorkflowDefinition_userHasNoProjectPermission() {
+    public void testBackfillWorkflowDefinition_userHasNoProjectWritePermission() {
         long projectCode = 100L;
         long workflowDefinitionCode = 200L;
         User loginUser = getLoginUser();
@@ -162,14 +179,14 @@ public class ExecutorServiceTest {
                 .workflowDefinitionCode(workflowDefinitionCode)
                 .build();
 
-        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
                 loginUser.getUserName(), projectCode))
                         .when(projectService)
-                        .checkProjectAndAuthThrowException(loginUser, projectCode, RERUN);
+                        .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
 
         ServiceException ex = assertThrows(ServiceException.class,
                 () -> executorService.backfillWorkflowDefinition(request));
-        assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), ex.getCode());
+        assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
 
         verify(backfillWorkflowRequestTransformer, never()).transform(Mockito.any());
         verify(backfillWorkflowDTOValidator, never()).validate(Mockito.any());
@@ -189,7 +206,7 @@ public class ExecutorServiceTest {
                 .build();
 
         doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, RERUN);
+                .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(workflowDefinitionCode);
@@ -205,5 +222,60 @@ public class ExecutorServiceTest {
         assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(), ex.getCode());
 
         verify(backfillWorkflowDTOValidator, never()).validate(Mockito.any());
+    }
+
+    @Test
+    public void testControlWorkflowInstance_userHasNoProjectWritePermission() {
+        long projectCode = 100L;
+        int workflowInstanceId = 1;
+        User loginUser = getLoginUser();
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setProjectCode(projectCode);
+        when(workflowInstanceDao.queryOptionalById(workflowInstanceId)).thenReturn(Optional.of(workflowInstance));
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+
+        ServiceException ex = assertThrows(ServiceException.class,
+                () -> executorService.controlWorkflowInstance(
+                        loginUser, workflowInstanceId, ExecuteType.REPEAT_RUNNING));
+
+        assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
+        Mockito.verifyNoInteractions(executorClient);
+    }
+
+    @Test
+    public void testExecuteTask_userHasNoProjectWritePermission() {
+        long projectCode = 100L;
+        User loginUser = getLoginUser();
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+
+        ServiceException ex = assertThrows(ServiceException.class,
+                () -> executorService.executeTask(loginUser, projectCode, 1, "1", TaskDependType.TASK_POST));
+
+        assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
+        Mockito.verifyNoInteractions(processService);
+    }
+
+    @Test
+    public void testForceStartTaskInstance_userHasNoProjectWritePermission() {
+        long projectCode = 100L;
+        int workflowInstanceId = 1;
+        int queueId = 2;
+        User loginUser = getLoginUser();
+        TaskGroupQueue taskGroupQueue = new TaskGroupQueue();
+        taskGroupQueue.setWorkflowInstanceId(workflowInstanceId);
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setProjectCode(projectCode);
+        when(taskGroupQueueMapper.selectById(queueId)).thenReturn(taskGroupQueue);
+        when(workflowInstanceDao.queryOptionalById(workflowInstanceId)).thenReturn(Optional.of(workflowInstance));
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+
+        ServiceException ex = assertThrows(ServiceException.class,
+                () -> executorService.forceStartTaskInstance(loginUser, queueId));
+
+        assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
+        verify(taskGroupQueueMapper, never()).updateById(Mockito.any());
     }
 }

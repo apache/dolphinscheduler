@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -169,8 +168,7 @@ public class TaskDefinitionServiceImplTest {
     public void switchVersion() {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
-        Mockito.doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(user, project, WORKFLOW_SWITCH_TO_THIS_VERSION);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
 
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
                 .thenReturn(new TaskDefinitionLog());
@@ -255,7 +253,7 @@ public class TaskDefinitionServiceImplTest {
     public void testReleaseTaskDefinition() {
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(getProject());
         Project project = getProject();
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, null);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
 
         // check task dose not exist
         assertThrowsServiceException(Status.TASK_DEFINE_NOT_EXIST,
@@ -285,6 +283,22 @@ public class TaskDefinitionServiceImplTest {
         assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
                 () -> taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE,
                         ReleaseState.getEnum(2)));
+    }
+
+    @Test
+    public void testReadOnlyUserCannotChangeTaskDefinition() {
+        Project project = getProject();
+        when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+
+        assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
+                () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
+        assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
+                () -> taskDefinitionService.releaseTaskDefinition(
+                        user, PROJECT_CODE, TASK_CODE, ReleaseState.ONLINE));
+
+        Mockito.verifyNoInteractions(taskDefinitionDao, taskDefinitionLogMapper);
     }
 
     @Test
