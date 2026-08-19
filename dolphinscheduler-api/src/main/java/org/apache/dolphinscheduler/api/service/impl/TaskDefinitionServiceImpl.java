@@ -367,7 +367,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                         notExistTaskCodes);
                 throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, notExistTaskCodes);
             }
-            taskDatasourcePermissionChecker.checkPermission(loginUser, upstreamTaskDefinitionList);
         } else {
             queryUpStreamTaskCodeMap = new HashMap<>();
         }

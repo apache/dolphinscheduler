@@ -409,7 +409,7 @@ public class TaskDefinitionServiceImplTest {
             Long updatedTaskCode = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE,
                     taskDefinitionJson, UPSTREAM_CODE);
             assertEquals(TASK_CODE, updatedTaskCode);
-            Mockito.verify(taskDatasourcePermissionChecker, Mockito.times(2)).checkPermission(eq(user), anyList());
+            Mockito.verify(taskDatasourcePermissionChecker).checkPermission(eq(user), anyList());
             user.setUserType(UserType.GENERAL_USER);
         }
     }
