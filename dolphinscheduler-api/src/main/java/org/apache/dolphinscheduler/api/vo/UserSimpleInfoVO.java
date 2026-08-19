@@ -15,27 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.api.vo;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-
-import java.util.Map;
+import org.apache.dolphinscheduler.dao.entity.User;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-public class DynamicSubWorkflowDto {
+public class UserSimpleInfoVO {
 
-    private long workflowInstanceId;
+    private Integer id;
 
-    private String name;
+    private String userName;
 
-    private long index;
-
-    private Map<String, String> parameters;
-
-    private WorkflowExecutionStatus state;
-
+    public UserSimpleInfoVO(User user) {
+        this.id = user.getId();
+        this.userName = user.getUserName();
+    }
 }
