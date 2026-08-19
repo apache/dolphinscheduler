@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidationContext;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidator;
 import org.apache.dolphinscheduler.api.vo.ScheduleVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -95,6 +97,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
     @Autowired
     private TenantExistValidator tenantExistValidator;
+
+    @Autowired
+    private WorkerGroupValidator workerGroupValidator;
 
     /**
      * save schedule
@@ -182,6 +187,12 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         scheduleObj.setUserName(loginUser.getUserName());
         scheduleObj.setReleaseState(ReleaseState.OFFLINE);
         scheduleObj.setWorkflowInstancePriority(workflowInstancePriority);
+
+        WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
+                .workerGroup(workerGroup)
+                .projectCode(projectCode)
+                .build();
+        workerGroupValidator.validate(workerGroupContext);
         scheduleObj.setWorkerGroup(workerGroup);
         scheduleObj.setEnvironmentCode(environmentCode);
         scheduleDao.insert(scheduleObj);
@@ -584,6 +595,11 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             schedule.setFailureStrategy(failureStrategy);
         }
 
+        WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
+                .workerGroup(workerGroup)
+                .projectCode(workflowDefinition.getProjectCode())
+                .build();
+        workerGroupValidator.validate(workerGroupContext);
         schedule.setWorkerGroup(workerGroup);
         schedule.setEnvironmentCode(environmentCode);
         schedule.setUpdateTime(now);

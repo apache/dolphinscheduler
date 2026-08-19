@@ -39,12 +39,12 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -194,6 +194,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private GlobalParamsValidator globalParamsValidator;
+
+    @Mock
+    private WorkerGroupValidator workerGroupValidator;
 
     @Mock
     private UserDao userDao;
@@ -916,6 +919,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 eq(Boolean.TRUE))).thenReturn(1);
         when(processService.saveTaskRelation(eq(user), eq(projectCode), anyLong(), eq(1), anyList(), anyList(),
                 eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+        doNothing().when(workerGroupValidator).validate(anyList(), anyLong());
 
         WorkflowDefinition workflowDefinition = workflowDefinitionService.createWorkflowDefinition(
                 user, projectCode, name, description, "[]", "[]", timeout,
@@ -942,6 +946,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(Collections.emptyList());
         when(processService.saveTaskRelation(eq(user), eq(projectCode), eq(processDefinitionCode), eq(2), anyList(),
                 anyList(), eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+        doNothing().when(workerGroupValidator).validate(anyList(), anyLong());
 
         WorkflowDefinition resultDefinition = workflowDefinitionService.updateWorkflowDefinition(
                 user, projectCode, name, processDefinitionCode, description, "[]", "[]", timeout,
@@ -1070,7 +1075,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         schedule.setUserId(1);
         schedule.setReleaseState(ReleaseState.OFFLINE);
         schedule.setWorkflowInstancePriority(Priority.MEDIUM);
-        schedule.setWarningType(WarningType.NONE);
+        schedule.setWarningType(null);
         schedule.setWarningGroupId(1);
         schedule.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         return schedule;

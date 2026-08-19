@@ -94,6 +94,11 @@ public class WorkflowDefinitionAPITest {
 
             projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
                     .getBody().getData()).get(0)).get("code");
+
+            HttpResponse assignWorkerGroupsResponse =
+                    projectPage.assignWorkerGroups(loginUser, projectCode, new String[]{"default"});
+            Assertions.assertTrue(assignWorkerGroupsResponse.getBody().getSuccess());
+
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
             HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage

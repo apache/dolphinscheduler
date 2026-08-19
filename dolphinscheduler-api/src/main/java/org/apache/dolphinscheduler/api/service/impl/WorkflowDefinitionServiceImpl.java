@@ -48,6 +48,7 @@ import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -206,6 +207,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Autowired
     private GlobalParamsValidator globalParamsValidator;
 
+    @Autowired
+    private WorkerGroupValidator workerGroupValidator;
+
     /**
      * create workflow definition
      *
@@ -253,6 +257,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         globalParamsValidator.validate(globalParams);
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
+
+        // Validate worker groups in task definitions
+        validateTaskWorkerGroups(projectCode, taskDefinitionLogs);
+
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
         long workflowDefinitionCode = CodeGenerateUtils.genCode();
@@ -376,6 +384,21 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.error("Generate task definition list failed, meet an unknown exception", e);
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR);
         }
+    }
+
+    /**
+     * Validate worker groups in task definitions
+     */
+    private void validateTaskWorkerGroups(long projectCode, List<TaskDefinitionLog> taskDefinitionLogs) {
+        if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
+            return;
+        }
+
+        List<String> workerGroups = taskDefinitionLogs.stream()
+                .map(TaskDefinitionLog::getWorkerGroup)
+                .collect(Collectors.toList());
+
+        workerGroupValidator.validate(workerGroups, projectCode);
     }
 
     private List<WorkflowTaskRelationLog> generateTaskRelationList(String taskRelationJson,
@@ -623,6 +646,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         globalParamsValidator.validate(globalParams);
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
+
+        // Validate worker groups in task definitions
+        validateTaskWorkerGroups(projectCode, taskDefinitionLogs);
+
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
@@ -1641,7 +1668,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      *
      * @param srcProjectCode    srcProjectCode
      * @param targetProjectCode targetProjectCode
-     * @param result            result
      * @param failedWorkflowList failedWorkflowList
      * @param isCopy            isCopy
      */
