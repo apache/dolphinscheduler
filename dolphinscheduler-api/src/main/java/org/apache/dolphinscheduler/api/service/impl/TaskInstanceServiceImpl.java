@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.FORCED_SUCCESS;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
 
 import org.apache.dolphinscheduler.api.enums.Status;
@@ -196,8 +195,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Transactional
     @Override
     public void forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, FORCED_SUCCESS);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
 
         TaskInstance task = taskInstanceDao.queryOptionalById(taskInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.TASK_INSTANCE_NOT_FOUND));
@@ -235,11 +233,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Result result = new Result();
 
         Project project = projectDao.queryByCode(projectCode);
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, FORCED_SUCCESS);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         TaskInstance taskInstance = taskInstanceDao.queryById(taskInstanceId);
-        if (taskInstance == null) {
+        if (taskInstance == null || taskInstance.getProjectCode() != projectCode) {
             log.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
                     taskInstanceId);
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
@@ -259,11 +256,10 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Result result = new Result();
 
         Project project = projectDao.queryByCode(projectCode);
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, FORCED_SUCCESS);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         TaskInstance taskInstance = taskInstanceDao.queryById(taskInstanceId);
-        if (taskInstance == null) {
+        if (taskInstance == null || taskInstance.getProjectCode() != projectCode) {
             log.error("Task definition can not be found, projectCode:{}, taskInstanceId:{}.", projectCode,
                     taskInstanceId);
             putMsg(result, Status.TASK_INSTANCE_NOT_FOUND);
