@@ -22,9 +22,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_BATCH_COPY;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION_DELETE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_ONLINE_OFFLINE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_SWITCH_TO_THIS_VERSION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_TREE_VIEW;
 import static org.apache.dolphinscheduler.api.enums.Status.WORKFLOW_DEFINITION_NOT_EXIST;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE;
@@ -902,8 +899,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 .orElseThrow(() -> new ServiceException(WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code)));
 
         Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION_DELETE);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         // Determine if the login user is the owner of the workflow definition
         if (loginUser.getId() != workflowDefinition.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
@@ -1304,9 +1300,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                             long projectCode,
                                             String codes,
                                             long targetProjectCode) {
-        checkParams(loginUser, projectCode, codes, targetProjectCode, WORKFLOW_BATCH_COPY);
+        checkParams(loginUser, projectCode, codes, targetProjectCode, WORKFLOW_BATCH_COPY, false);
         List<String> failedWorkflowList = new ArrayList<>();
-        doBatchOperateWorkflowDefinition(loginUser, targetProjectCode, failedWorkflowList, codes, true);
+        doBatchOperateWorkflowDefinition(loginUser, projectCode, targetProjectCode, failedWorkflowList, codes, true);
         checkBatchOperateResult(projectCode, targetProjectCode, failedWorkflowList, true);
     }
 
@@ -1325,24 +1321,29 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                             long projectCode,
                                             String codes,
                                             long targetProjectCode) {
-        checkParams(loginUser, projectCode, codes, targetProjectCode, TASK_DEFINITION_MOVE);
+        checkParams(loginUser, projectCode, codes, targetProjectCode, TASK_DEFINITION_MOVE, true);
         if (projectCode == targetProjectCode) {
             log.warn("Project code is same as target project code, projectCode:{}.", projectCode);
             return;
         }
 
         List<String> failedWorkflowList = new ArrayList<>();
-        doBatchOperateWorkflowDefinition(loginUser, targetProjectCode, failedWorkflowList, codes, false);
+        doBatchOperateWorkflowDefinition(loginUser, projectCode, targetProjectCode, failedWorkflowList, codes, false);
         checkBatchOperateResult(projectCode, targetProjectCode, failedWorkflowList, false);
     }
 
     private void checkParams(User loginUser,
                              long projectCode,
                              String workflowDefinitionCodes,
-                             long targetProjectCode, String perm) {
+                             long targetProjectCode,
+                             String perm,
+                             boolean requireSourceWritePermission) {
         Project project = projectDao.queryByCode(projectCode);
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, perm);
+        if (requireSourceWritePermission) {
+            projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        } else {
+            projectService.checkProjectAndAuthThrowException(loginUser, project, perm);
+        }
 
         if (StringUtils.isEmpty(workflowDefinitionCodes)) {
             log.error("Parameter workflowDefinitionCodes is empty, projectCode is {}.", projectCode);
@@ -1351,12 +1352,14 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         if (projectCode != targetProjectCode) {
             Project targetProject = projectDao.queryByCode(targetProjectCode);
-            // check user access for project
-            projectService.checkProjectAndAuthThrowException(loginUser, targetProject, perm);
+            projectService.checkHasProjectWritePermissionThrowException(loginUser, targetProject);
+        } else if (!requireSourceWritePermission) {
+            projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
         }
     }
 
     protected void doBatchOperateWorkflowDefinition(User loginUser,
+                                                    long sourceProjectCode,
                                                     long targetProjectCode,
                                                     List<String> failedWorkflowList,
                                                     String workflowDefinitionCodes,
@@ -1364,13 +1367,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Set<Long> definitionCodes = Arrays.stream(workflowDefinitionCodes.split(Constants.COMMA)).map(Long::parseLong)
                 .collect(Collectors.toSet());
         List<WorkflowDefinition> workflowDefinitionList = workflowDefinitionDao.queryByCodes(definitionCodes);
-        Set<Long> queryCodes =
-                workflowDefinitionList.stream().map(WorkflowDefinition::getCode).collect(Collectors.toSet());
+        List<WorkflowDefinition> sourceWorkflowDefinitionList = workflowDefinitionList.stream()
+                .filter(workflowDefinition -> workflowDefinition.getProjectCode() == sourceProjectCode)
+                .collect(Collectors.toList());
+        Set<Long> queryCodes = sourceWorkflowDefinitionList.stream().map(WorkflowDefinition::getCode)
+                .collect(Collectors.toSet());
         // definitionCodes - queryCodes
         Set<Long> diffCode =
                 definitionCodes.stream().filter(code -> !queryCodes.contains(code)).collect(Collectors.toSet());
         diffCode.forEach(code -> failedWorkflowList.add(code + "[null]"));
-        for (WorkflowDefinition workflowDefinition : workflowDefinitionList) {
+        for (WorkflowDefinition workflowDefinition : sourceWorkflowDefinitionList) {
             List<WorkflowTaskRelation> workflowTaskRelations =
                     workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
             List<WorkflowTaskRelationLog> taskRelationList =
@@ -1603,8 +1609,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     public void switchWorkflowDefinitionVersion(User loginUser, long projectCode, long code,
                                                 int version) {
         Project project = projectDao.queryByCode(projectCode);
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_SWITCH_TO_THIS_VERSION);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
         if (Objects.isNull(workflowDefinition) || projectCode != workflowDefinition.getProjectCode()) {
@@ -1777,10 +1782,13 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Transactional
     @Override
     public void onlineWorkflowDefinition(User loginUser, Long projectCode, Long workflowDefinitionCode) {
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
 
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode));
+        if (projectCode != workflowDefinition.getProjectCode()) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode);
+        }
 
         if (ReleaseState.ONLINE.equals(workflowDefinition.getReleaseState())) {
             // do nothing if the workflow is already online
@@ -1797,10 +1805,13 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Transactional
     @Override
     public void offlineWorkflowDefinition(User loginUser, Long projectCode, Long workflowDefinitionCode) {
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_ONLINE_OFFLINE);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
 
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode));
+        if (projectCode != workflowDefinition.getProjectCode()) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode);
+        }
 
         if (ReleaseState.OFFLINE.equals(workflowDefinition.getReleaseState())) {
             // do nothing if the workflow is already offline

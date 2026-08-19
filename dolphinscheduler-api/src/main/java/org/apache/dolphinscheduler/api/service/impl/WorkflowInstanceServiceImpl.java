@@ -26,7 +26,6 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SUBWORKFLOW
 import static org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
-import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
@@ -375,18 +374,14 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                                                      Boolean syncDefine,
                                                      String globalParams,
                                                      String locations, int timeout) {
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
-                ApiFuncIdentificationConstant.INSTANCE_UPDATE);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
         // check workflow instance exists
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
         // check workflow instance exists in project
-        WorkflowDefinition workflowDefinition0 =
-                workflowDefinitionDao.queryByCode(workflowInstance.getWorkflowDefinitionCode()).orElse(null);
-        if (workflowDefinition0 != null && projectCode != workflowDefinition0.getProjectCode()) {
-            log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
-                    workflowInstance.getWorkflowDefinitionCode());
+        if (workflowInstance.getProjectCode() != projectCode) {
+            log.error("workflow instance does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
+                    workflowInstanceId);
             throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
         // check workflow instance status
@@ -550,9 +545,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
 
         Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project,
-                ApiFuncIdentificationConstant.INSTANCE_DELETE);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
         // check workflow instance status
         if (!workflowInstance.getState().isFinalState()) {
             log.warn("workflow Instance state is {} so can not delete workflow instance, workflowInstanceId:{}.",
