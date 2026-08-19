@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 
 import java.util.Date;
 
@@ -179,40 +180,40 @@ public class WorkflowInstanceSummaryDTO {
     private String duration;
 
     /**
-     * Create a {@link WorkflowInstanceSummaryDTO} from a {@link WorkflowInstance} entity.
+     * Create a {@link WorkflowInstanceSummaryDTO} from a {@link WorkflowInstanceSummaryDto} DAO DTO.
      */
-    public static WorkflowInstanceSummaryDTO fromEntity(WorkflowInstance instance) {
+    public static WorkflowInstanceSummaryDTO fromSummaryDto(WorkflowInstanceSummaryDto dto) {
         return new WorkflowInstanceSummaryDTO(
-                instance.getId(),
-                instance.getWorkflowDefinitionCode(),
-                instance.getWorkflowDefinitionVersion(),
-                instance.getProjectCode(),
-                instance.getState(),
-                instance.getRecovery(),
-                instance.getStartTime(),
-                instance.getEndTime(),
-                instance.getRunTimes(),
-                instance.getName(),
-                instance.getHost(),
-                instance.getCommandType(),
-                instance.getTaskDependType(),
-                instance.getMaxTryTimes(),
-                instance.getFailureStrategy(),
-                instance.getWarningType(),
-                instance.getWarningGroupId(),
-                instance.getScheduleTime(),
-                instance.getCommandStartTime(),
-                instance.getIsSubWorkflow(),
-                instance.getExecutorId(),
-                instance.getExecutorName(),
-                instance.getWorkflowInstancePriority(),
-                instance.getWorkerGroup(),
-                instance.getEnvironmentCode(),
-                instance.getTimeout(),
-                instance.getTenantCode(),
-                instance.getDryRun(),
-                instance.getNextWorkflowInstanceId(),
-                instance.getRestartTime(),
-                instance.getDuration());
+                dto.getId(),
+                dto.getWorkflowDefinitionCode(),
+                dto.getWorkflowDefinitionVersion(),
+                dto.getProjectCode(),
+                dto.getState(),
+                dto.getRecovery(),
+                dto.getStartTime(),
+                dto.getEndTime(),
+                dto.getRunTimes(),
+                dto.getName(),
+                dto.getHost(),
+                dto.getCommandType(),
+                dto.getTaskDependType(),
+                dto.getMaxTryTimes(),
+                dto.getFailureStrategy(),
+                dto.getWarningType(),
+                dto.getWarningGroupId(),
+                dto.getScheduleTime(),
+                dto.getCommandStartTime(),
+                dto.getIsSubWorkflow(),
+                dto.getExecutorId(),
+                dto.getExecutorName(),
+                dto.getWorkflowInstancePriority(),
+                dto.getWorkerGroup(),
+                dto.getEnvironmentCode(),
+                dto.getTimeout(),
+                dto.getTenantCode(),
+                dto.getDryRun(),
+                dto.getNextWorkflowInstanceId(),
+                dto.getRestartTime(),
+                dto.getDuration());
     }
 }

@@ -48,7 +48,7 @@
         from t_ds_workflow_instance
         where id = #{id}
     </select>
-    <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance
@@ -75,7 +75,7 @@
         </if>
     </select>
 
-    <select id="queryTopNWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryTopNWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance
@@ -89,7 +89,7 @@
         limit #{size}
     </select>
 
-    <select id="queryByTenantCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByTenantCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance
@@ -105,7 +105,7 @@
         </if>
         order by id asc
     </select>
-    <select id="queryByWorkerGroupNameAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByWorkerGroupNameAndStatus" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance
@@ -122,7 +122,7 @@
         order by id asc
     </select>
 
-    <select id="queryWorkflowInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryWorkflowInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance
@@ -206,7 +206,7 @@
         group by state
     </select>
 
-    <select id="queryByWorkflowDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByWorkflowDefinitionCode" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance
@@ -267,7 +267,7 @@
         </if>
         order by start_time desc limit 1
     </select>
-    <select id="queryFirstScheduleWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryFirstScheduleWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance
@@ -275,7 +275,7 @@
         order by schedule_time
         limit 1
     </select>
-    <select id="queryFirstStartWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryFirstStartWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance
@@ -284,7 +284,7 @@
         limit 1
     </select>
 
-    <select id="queryByWorkflowDefinitionCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByWorkflowDefinitionCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance
@@ -297,7 +297,7 @@
         </if>
         order by id asc
     </select>
-    <select id="queryByWorkflowCodeVersionStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByWorkflowCodeVersionStatus" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance
@@ -311,7 +311,7 @@
         </if>
     </select>
 
-    <select id="queryWorkflowInstanceListV2Paging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryWorkflowInstanceListV2Paging" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         SELECT
         <include refid="listSql"/>
         FROM t_ds_workflow_instance
@@ -365,7 +365,7 @@
     </select>
 
 <!-- There are some columns with the same names in both tables, we use a sub-query here to avoid ambiguity-->
-    <select id="queryByTriggerCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByTriggerCode" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
         <include refid="listSql"/>
         from t_ds_workflow_instance a

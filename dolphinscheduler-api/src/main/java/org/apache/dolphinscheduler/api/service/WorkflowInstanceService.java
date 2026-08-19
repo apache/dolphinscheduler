@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 
 import java.util.List;
 import java.util.Map;
@@ -182,8 +183,8 @@ public interface WorkflowInstanceService {
      * @param states                states array
      * @return workflow instance list
      */
-    List<WorkflowInstance> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode,
-                                                                  int[] states);
+    List<WorkflowInstanceSummaryDto> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode,
+                                                                            int[] states);
 
     /**
      * query workflow instance by workflowDefinitionCode and stateArray
@@ -193,9 +194,9 @@ public interface WorkflowInstanceService {
      * @param states                    states array
      * @return workflow instance list
      */
-    List<WorkflowInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
-                                                            int workflowDefinitionVersion,
-                                                            int[] states);
+    List<WorkflowInstanceSummaryDto> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
+                                                                      int workflowDefinitionVersion,
+                                                                      int[] states);
 
     /**
      * query workflow instance by workflowDefinitionCode
@@ -204,8 +205,8 @@ public interface WorkflowInstanceService {
      * @param size                  size
      * @return workflow instance list
      */
-    List<WorkflowInstance> queryByWorkflowDefinitionCode(Long workflowDefinitionCode,
-                                                         int size);
+    List<WorkflowInstanceSummaryDto> queryByWorkflowDefinitionCode(Long workflowDefinitionCode,
+                                                                   int size);
 
     /**
      * query workflow instance list by trigger code

@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -351,24 +352,24 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testFromEntity_MapsAllDtoFields() {
-        // Build a minimal WorkflowInstance and ensure fromEntity maps without error
-        // and every DTO field is non-null where expected.
-        WorkflowInstance instance = new WorkflowInstance();
-        instance.setId(1);
-        instance.setName("test-workflow");
-        instance.setWorkflowDefinitionCode(123456L);
-        instance.setWorkflowDefinitionVersion(1);
-        instance.setProjectCode(789L);
-        instance.setState(WorkflowExecutionStatus.SUCCESS);
-        instance.setExecutorName("admin");
+    public void testFromSummaryDto_MapsAllFields() {
+        WorkflowInstanceSummaryDto dto = new WorkflowInstanceSummaryDto();
+        dto.setId(1);
+        dto.setName("test-workflow");
+        dto.setWorkflowDefinitionCode(123456L);
+        dto.setWorkflowDefinitionVersion(1);
+        dto.setProjectCode(789L);
+        dto.setState(WorkflowExecutionStatus.SUCCESS);
+        dto.setExecutorName("admin");
+        dto.setDuration("1h 2m");
 
-        WorkflowInstanceSummaryDTO dto = WorkflowInstanceSummaryDTO.fromEntity(instance);
+        WorkflowInstanceSummaryDTO result = WorkflowInstanceSummaryDTO.fromSummaryDto(dto);
 
-        Assertions.assertEquals(1, dto.getId());
-        Assertions.assertEquals("test-workflow", dto.getName());
-        Assertions.assertEquals(123456L, dto.getWorkflowDefinitionCode());
-        Assertions.assertEquals(WorkflowExecutionStatus.SUCCESS, dto.getState());
-        Assertions.assertEquals("admin", dto.getExecutorName());
+        Assertions.assertEquals(1, result.getId());
+        Assertions.assertEquals("test-workflow", result.getName());
+        Assertions.assertEquals(123456L, result.getWorkflowDefinitionCode());
+        Assertions.assertEquals(WorkflowExecutionStatus.SUCCESS, result.getState());
+        Assertions.assertEquals("admin", result.getExecutorName());
+        Assertions.assertEquals("1h 2m", result.getDuration());
     }
 }

@@ -59,6 +59,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
@@ -212,9 +213,10 @@ public class WorkflowInstanceServiceTest {
         Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
         Date end = DateUtils.stringToDate("2020-01-02 00:00:00");
         WorkflowInstance workflowInstance = getProcessInstance();
-        List<WorkflowInstance> workflowInstanceList = new ArrayList<>();
-        Page<WorkflowInstance> pageReturn = new Page<>(1, 10);
-        workflowInstanceList.add(workflowInstance);
+        WorkflowInstanceSummaryDto summaryDto = getWorkflowInstanceSummaryDto();
+        List<WorkflowInstanceSummaryDto> workflowInstanceList = new ArrayList<>();
+        Page<WorkflowInstanceSummaryDto> pageReturn = new Page<>(1, 10);
+        workflowInstanceList.add(summaryDto);
         pageReturn.setRecords(workflowInstanceList);
 
         // data parameter check
@@ -940,6 +942,17 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setStartTime(new Date());
         workflowInstance.setEndTime(new Date());
         return workflowInstance;
+    }
+
+    private WorkflowInstanceSummaryDto getWorkflowInstanceSummaryDto() {
+        WorkflowInstanceSummaryDto dto = new WorkflowInstanceSummaryDto();
+        dto.setId(1);
+        dto.setName("test_process_instance");
+        dto.setWorkflowDefinitionCode(46L);
+        dto.setWorkflowDefinitionVersion(1);
+        dto.setStartTime(new Date());
+        dto.setEndTime(new Date());
+        return dto;
     }
 
     /**
