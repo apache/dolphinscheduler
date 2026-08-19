@@ -18,6 +18,8 @@
 
 ### 使用案例
 
+以下示例中，请将 `{API_SERVER_IP}` 替换为您的 DolphinScheduler API 服务器地址，`{TOKEN}` 替换为您生成的令牌。
+
 #### 查询项目列表信息
 
 1. 打开 API 文档页面
@@ -30,7 +32,15 @@
 
 > projects/list
 
-3. 打开 Postman，填写接口地址，并在 Headers 中填写 Token，发送请求后即可查看结果
+3. 使用 `curl` 命令查询项目列表：
+
+   ```bash
+   curl -X GET \
+     http://{API_SERVER_IP}:12345/dolphinscheduler/projects/list \
+     -H "token: {TOKEN}"
+   ```
+
+4. 也可以使用 Postman，填写接口地址，并在 Headers 中填写 Token，发送请求后即可查看结果
 
    ```
    token: 刚刚生成的 Token
@@ -49,6 +59,19 @@
 然后再 Body 中配置所需的 projectName 和 description 参数。
 
 ![create-project02](../../../../img/new_ui/dev/open-api/create_project02.png)
+
+使用 `curl` 命令创建项目：
+
+```bash
+curl -X POST \
+  http://{API_SERVER_IP}:12345/dolphinscheduler/projects \
+  -H "token: {TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "projectName": "my-project",
+    "description": "My project description"
+  }'
+```
 
 检查 post 请求结果。
 

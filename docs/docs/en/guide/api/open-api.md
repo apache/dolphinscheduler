@@ -18,6 +18,8 @@ Generally, projects and processes are created through pages, but considering the
 
 ### Examples
 
+In the following examples, replace `{API_SERVER_IP}` with your DolphinScheduler API server address, and `{TOKEN}` with the token you generated.
+
 #### Query project list
 
 1. Open the API documentation
@@ -30,7 +32,15 @@ Generally, projects and processes are created through pages, but considering the
 
    > projects/list
 
-3. Open `Postman`, fill in the API address, enter the `Token` in `Headers`, and then send the request to view the result:
+3. Use `curl` command to query the project list:
+
+   ```bash
+   curl -X GET \
+     http://{API_SERVER_IP}:12345/dolphinscheduler/projects/list \
+     -H "token: {TOKEN}"
+   ```
+
+4. Or use `Postman`, fill in the API address, enter the `Token` in `Headers`, and then send the request to view the result:
 
    ```
    token: The Token just generated
@@ -49,6 +59,19 @@ By consulting the api documentation, configure the KEY as Accept and VALUE as th
 And then configure the required projectName and description parameters in Body.
 
 ![create-project02](../../../../img/new_ui/dev/open-api/create_project02.png)
+
+Use `curl` command to create a project:
+
+```bash
+curl -X POST \
+  http://{API_SERVER_IP}:12345/dolphinscheduler/projects \
+  -H "token: {TOKEN}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "projectName": "my-project",
+    "description": "My project description"
+  }'
+```
 
 Check the post request result.
 
