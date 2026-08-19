@@ -165,4 +165,40 @@ class MasterSlotManagerTest {
         assertThat(tMasterSlotManager.getCurrentMasterSlot()).isEqualTo(0);
         assertThat(tMasterSlotManager.getTotalMasterSlots()).isEqualTo(2);
     }
+
+    @Test
+    void doNotInvalidateSlotWhenCurrentMasterIsBusy() {
+        // Simulate: the current master becomes BUSY and is excluded from normalMasterServers.
+        // The slot should be preserved to avoid self-starvation deadlock.
+        // First, set up a known slot state.
+        MasterSlotManager tMasterSlotManager = new MasterSlotManager(masterConfig);
+        MasterServerMetadata normalMaster = MasterServerMetadata.builder()
+                .address(masterConfig.getMasterAddress())
+                .serverStatus(ServerStatus.NORMAL)
+                .build();
+        MasterServerMetadata otherNormalMaster = MasterServerMetadata.builder()
+                .address("127.0.0.2:5679")
+                .serverStatus(ServerStatus.NORMAL)
+                .build();
+
+        List<MasterServerMetadata> normalMasterServers = new ArrayList<>();
+        normalMasterServers.add(normalMaster);
+        normalMasterServers.add(otherNormalMaster);
+        tMasterSlotManager.doReBalance(normalMasterServers);
+
+        // Verify that the slot is valid
+        assertThat(tMasterSlotManager.checkSlotValid()).isTrue();
+        int preservedSlot = tMasterSlotManager.getCurrentMasterSlot();
+        int preservedTotalSlots = tMasterSlotManager.getTotalMasterSlots();
+
+        // Now simulate the current master becoming BUSY: only the other master is in the NORMAL list
+        List<MasterServerMetadata> busyMasterServers = new ArrayList<>();
+        busyMasterServers.add(otherNormalMaster);
+        tMasterSlotManager.doReBalance(busyMasterServers);
+
+        // The slot should NOT be invalidated — it should be preserved
+        assertThat(tMasterSlotManager.checkSlotValid()).isTrue();
+        assertThat(tMasterSlotManager.getCurrentMasterSlot()).isEqualTo(preservedSlot);
+        assertThat(tMasterSlotManager.getTotalMasterSlots()).isEqualTo(preservedTotalSlots);
+    }
 }

@@ -73,9 +73,12 @@ public class MasterSlotManager implements IMasterSlotReBalancer {
         }
         if (tmpCurrentSlot == -1) {
             log.warn(
-                    "Do rebalance failed, cannot found the current master: {} in the normal master clusters: {}. Please check the current master server status",
-                    masterConfig.getMasterAddress(), normalMasterServers);
-            currentSlot = -1;
+                    "Do rebalance failed, cannot found the current master: {} in the normal master clusters: {}. "
+                            + "The current master may be in BUSY state, keep the existing slot ({} -> {}) to avoid self-starvation deadlock.",
+                    masterConfig.getMasterAddress(), normalMasterServers, currentSlot, totalSlots);
+            // Keep the existing slot instead of setting to -1 to avoid self-starvation.
+            // The load protection at CommandEngine level already throttles
+            // command consumption when the server is overloaded.
             return;
         }
 
