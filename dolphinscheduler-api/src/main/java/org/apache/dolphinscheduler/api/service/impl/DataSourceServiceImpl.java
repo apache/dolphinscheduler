@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.vo.DataSourceSimpleInfoVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -315,15 +316,11 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public List<DataSource> unAuthDatasource(User loginUser, Integer userId) {
-        List<DataSource> datasourceList;
-        if (canOperatorPermissions(loginUser, null, AuthorizationType.DATASOURCE, null)) {
-            // admin gets all data sources except userId
-            datasourceList = dataSourceDao.queryDatasourceExceptUserId(userId);
-        } else {
-            // non-admins users get their own data sources
-            datasourceList = dataSourceDao.queryByUserId(loginUser.getId());
+    public List<DataSourceSimpleInfoVO> unAuthDatasource(User loginUser, Integer userId) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
+        List<DataSource> datasourceList = dataSourceDao.queryDatasourceExceptUserId(userId);
         List<DataSource> resultList = new ArrayList<>();
         Set<DataSource> datasourceSet;
         if (datasourceList != null && !datasourceList.isEmpty()) {
@@ -338,13 +335,16 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             }
             resultList = new ArrayList<>(datasourceSet);
         }
-        return resultList;
+        return resultList.stream().map(DataSourceSimpleInfoVO::new).collect(Collectors.toList());
     }
 
     @Override
-    public List<DataSource> authedDatasource(User loginUser, Integer userId) {
+    public List<DataSourceSimpleInfoVO> authedDatasource(User loginUser, Integer userId) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         List<DataSource> authedDatasourceList = dataSourceDao.queryAuthedDatasource(userId);
-        return authedDatasourceList;
+        return authedDatasourceList.stream().map(DataSourceSimpleInfoVO::new).collect(Collectors.toList());
     }
 
     @Override

@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.DataSourceSimpleInfoVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -286,7 +287,7 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param userId user id
-     * @return a list of unauthorized DataSource objects
+     * @return a list of unauthorized data source summaries
      */
     @Operation(summary = "unauthorizedDatasource", description = "UNAUTHORIZED_DATA_SOURCE_NOTES")
     @Parameters({
@@ -295,10 +296,10 @@ public class DataSourceController extends BaseController {
     @GetMapping(value = "/unauth-datasource")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(UNAUTHORIZED_DATASOURCE)
-    public Result<Object> getUnauthorizedDatasourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                        @RequestParam("userId") Integer userId) {
+    public Result<List<DataSourceSimpleInfoVO>> getUnauthorizedDatasourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                              @RequestParam("userId") Integer userId) {
 
-        List<DataSource> unAuthDatasourceList = dataSourceService.unAuthDatasource(loginUser, userId);
+        List<DataSourceSimpleInfoVO> unAuthDatasourceList = dataSourceService.unAuthDatasource(loginUser, userId);
         return Result.success(unAuthDatasourceList);
     }
 
@@ -307,7 +308,7 @@ public class DataSourceController extends BaseController {
      *
      * @param loginUser login user
      * @param userId user id
-     * @return a list of authorized DataSource objects
+     * @return a list of authorized data source summaries
      */
     @Operation(summary = "authedDatasource", description = "AUTHORIZED_DATA_SOURCE_NOTES")
     @Parameters({
@@ -316,9 +317,9 @@ public class DataSourceController extends BaseController {
     @GetMapping(value = "/authed-datasource")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(AUTHORIZED_DATA_SOURCE)
-    public Result<Object> getAuthorizedDatasourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                      @RequestParam("userId") Integer userId) {
-        List<DataSource> authedDatasourceList = dataSourceService.authedDatasource(loginUser, userId);
+    public Result<List<DataSourceSimpleInfoVO>> getAuthorizedDatasourceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                            @RequestParam("userId") Integer userId) {
+        List<DataSourceSimpleInfoVO> authedDatasourceList = dataSourceService.authedDatasource(loginUser, userId);
         return Result.success(authedDatasourceList);
     }
 
