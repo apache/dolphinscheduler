@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.INSTANCE_UPDATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
@@ -531,21 +530,22 @@ public class WorkflowInstanceServiceTest {
         User loginUser = getAdminUser();
         Project project = getProject(projectCode);
 
-        // project auth fail
+        // project write permission fail
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
-        doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, projectCode))
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, projectCode))
                 .when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, INSTANCE_UPDATE);
-        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
+                .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
                 () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
                         shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0));
 
         // process instance null
         WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(projectCode);
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         doNothing()
                 .when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, INSTANCE_UPDATE);
+                .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.empty());
         assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
                 () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
@@ -615,6 +615,20 @@ public class WorkflowInstanceServiceTest {
                     taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", Boolean.FALSE, "", "", 0);
             Assertions.assertNotNull(successRes);
         }
+    }
+
+    @Test
+    public void testUpdateWorkflowInstanceWithMismatchedProjectCode() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(2L);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
+
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
+                () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                        shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0));
+        Mockito.verifyNoInteractions(workflowDefinitionDao);
     }
 
     @Test
@@ -699,6 +713,28 @@ public class WorkflowInstanceServiceTest {
 
         when(processService.deleteWorkflowInstanceById(1)).thenReturn(0);
         Assertions.assertDoesNotThrow(() -> workflowInstanceService.deleteWorkflowInstanceById(loginUser, 1));
+    }
+
+    @Test
+    public void testReadOnlyUserCannotDeleteWorkflowInstance() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setWorkflowDefinitionCode(46L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
+        WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog();
+        workflowDefinitionLog.setProjectCode(projectCode);
+        Project project = getProject(projectCode);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
+        when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(46L, 1))
+                .thenReturn(workflowDefinitionLog);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkHasProjectWritePermissionThrowException(loginUser, project);
+
+        assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
+                () -> workflowInstanceService.deleteWorkflowInstanceById(loginUser, 1));
+        Mockito.verify(processService, Mockito.never()).deleteWorkflowInstanceById(Mockito.anyInt());
     }
 
     @Test
