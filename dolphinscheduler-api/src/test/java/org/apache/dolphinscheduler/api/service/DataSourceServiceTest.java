@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.vo.DataSourceSimpleInfoVO;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -50,8 +51,6 @@ import org.apache.dolphinscheduler.plugin.datasource.postgresql.param.PostgreSQL
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbConnectType;
 import org.apache.dolphinscheduler.spi.enums.DbType;
-
-import org.apache.commons.collections4.CollectionUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
@@ -447,50 +446,39 @@ public class DataSourceServiceTest {
 
     @Test
     public void testUnAuthDatasource() {
-        User loginUser = getAdminUser();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.ADMIN_USER);
         int userId = 3;
-        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.DATASOURCE,
-                loginUser.getId(), null, baseServiceLogger)).thenReturn(true);
-        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.DATASOURCE, null, 0,
-                baseServiceLogger)).thenReturn(true);
-        // test admin user
+
+        User generalUser = getGeneralUser();
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> dataSourceService.unAuthDatasource(generalUser, userId));
+        Mockito.verifyNoInteractions(dataSourceDao);
+
+        User adminUser = getAdminUser();
         when(dataSourceDao.queryAuthedDatasource(userId)).thenReturn(getSingleDataSourceList());
         when(dataSourceDao.queryDatasourceExceptUserId(userId)).thenReturn(getDataSourceList());
-        List<DataSource> dataSources = dataSourceService.unAuthDatasource(loginUser, userId);
-        logger.info(dataSources.toString());
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(dataSources));
+        List<DataSourceSimpleInfoVO> dataSources = dataSourceService.unAuthDatasource(adminUser, userId);
 
-        // test non-admin user
-        loginUser.setId(2);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        when(dataSourceDao.queryByUserId(loginUser.getId()))
-                .thenReturn(getDataSourceList());
-        dataSources = dataSourceService.unAuthDatasource(loginUser, userId);
-        logger.info(dataSources.toString());
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(dataSources));
+        Assertions.assertEquals(2, dataSources.size());
+        Assertions.assertTrue(dataSources.stream().noneMatch(dataSource -> dataSource.getId() == 3));
+        dataSources.forEach(this::assertDataSourceSimpleInfo);
     }
 
     @Test
     public void testAuthedDatasource() {
-        User loginUser = getAdminUser();
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.ADMIN_USER);
         int userId = 3;
 
-        // test admin user
-        when(dataSourceDao.queryAuthedDatasource(userId)).thenReturn(getSingleDataSourceList());
-        List<DataSource> dataSources = dataSourceService.authedDatasource(loginUser, userId);
-        logger.info(dataSources.toString());
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(dataSources));
+        User generalUser = getGeneralUser();
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> dataSourceService.authedDatasource(generalUser, userId));
+        Mockito.verifyNoInteractions(dataSourceDao);
 
-        // test non-admin user
-        loginUser.setId(2);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        dataSources = dataSourceService.authedDatasource(loginUser, userId);
-        logger.info(dataSources.toString());
-        Assertions.assertNotNull(dataSources);
+        User adminUser = getAdminUser();
+        when(dataSourceDao.queryAuthedDatasource(userId)).thenReturn(getSingleDataSourceList());
+        List<DataSourceSimpleInfoVO> dataSources = dataSourceService.authedDatasource(adminUser, userId);
+
+        Assertions.assertEquals(1, dataSources.size());
+        Assertions.assertEquals(3, dataSources.get(0).getId());
+        assertDataSourceSimpleInfo(dataSources.get(0));
     }
 
     @Test
@@ -569,6 +557,12 @@ public class DataSourceServiceTest {
 
     private List<DataSource> getSingleDataSourceList() {
         return Collections.singletonList(getOracleDataSource(3));
+    }
+
+    private void assertDataSourceSimpleInfo(DataSourceSimpleInfoVO dataSource) {
+        Assertions.assertNotNull(dataSource.getId());
+        Assertions.assertEquals("test", dataSource.getName());
+        Assertions.assertEquals(2, JSONUtils.parseObject(JSONUtils.toJsonString(dataSource)).size());
     }
 
     private DataSource getOracleDataSource() {
