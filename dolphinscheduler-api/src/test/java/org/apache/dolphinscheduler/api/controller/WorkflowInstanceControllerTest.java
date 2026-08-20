@@ -24,13 +24,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceSummaryDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -57,7 +57,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     /**
      * All properties that were present on {@link WorkflowInstance} but are
-     * intentionally removed from {@link WorkflowInstanceSummaryDTO} and thus from
+     * intentionally removed from {@link WorkflowInstanceSummaryVO} and thus from
      * the list/topN/trigger API response. This list must stay in sync with the
      * incompatible-change documentation in incompatible.md (version 3.5.0).
      */
@@ -72,14 +72,14 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryWorkflowInstanceList() throws Exception {
-        WorkflowInstanceSummaryDTO dto = new WorkflowInstanceSummaryDTO();
+        WorkflowInstanceSummaryVO dto = new WorkflowInstanceSummaryVO();
         dto.setId(1);
         dto.setName("test-workflow");
-        PageInfo<WorkflowInstanceSummaryDTO> pageInfo = new PageInfo<>(1, 10);
+        PageInfo<WorkflowInstanceSummaryVO> pageInfo = new PageInfo<>(1, 10);
         pageInfo.setTotalList(java.util.Collections.singletonList(dto));
         pageInfo.setTotal(1);
 
-        Result<PageInfo<WorkflowInstanceSummaryDTO>> mockResult = new Result<>();
+        Result<PageInfo<WorkflowInstanceSummaryVO>> mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
         mockResult.setData(pageInfo);
         Mockito.when(workflowInstanceService
@@ -122,7 +122,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         for (String removed : REMOVED_RESPONSE_PROPERTIES) {
             Assertions.assertFalse(jsonKeys.contains(removed),
                     "List endpoint response JSON should not contain key '" + removed
-                            + "' — it is removed from WorkflowInstanceSummaryDTO");
+                            + "' — it is removed from WorkflowInstanceSummaryVO");
         }
 
         // Positive assertion: verify all expected DTO fields are present in the response.
@@ -318,21 +318,21 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testWorkflowInstanceSummaryDTO_omitsRemovedProperties() {
-        // Verify via reflection that WorkflowInstanceSummaryDTO does NOT declare
+    public void testWorkflowInstanceSummaryVO_omitsRemovedProperties() {
+        // Verify via reflection that WorkflowInstanceSummaryVO does NOT declare
         // the 5 heavy DB-backed fields removed from the list API response contract.
         List<String> heavyFields = java.util.Arrays.asList(
                 "commandParam", "globalParams", "historyCmd", "varPool", "stateHistory");
         for (String field : heavyFields) {
             Assertions.assertThrows(NoSuchFieldException.class,
-                    () -> WorkflowInstanceSummaryDTO.class.getDeclaredField(field),
-                    "WorkflowInstanceSummaryDTO should NOT declare field '" + field
+                    () -> WorkflowInstanceSummaryVO.class.getDeclaredField(field),
+                    "WorkflowInstanceSummaryVO should NOT declare field '" + field
                             + "' — it was intentionally removed from the list API response contract");
         }
     }
 
     @Test
-    public void testWorkflowInstanceSummaryDTO_includesRequiredFields() {
+    public void testWorkflowInstanceSummaryVO_includesRequiredFields() {
         // Verify that all fields present in listSql are also declared in the DTO.
         List<String> requiredFields = java.util.Arrays.asList(
                 "id", "name", "workflowDefinitionCode", "workflowDefinitionVersion",
@@ -345,8 +345,8 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
                 "dryRun", "nextWorkflowInstanceId", "restartTime", "duration",
                 "executorName");
         for (String field : requiredFields) {
-            Assertions.assertDoesNotThrow(() -> WorkflowInstanceSummaryDTO.class.getDeclaredField(field),
-                    "WorkflowInstanceSummaryDTO should declare field '" + field
+            Assertions.assertDoesNotThrow(() -> WorkflowInstanceSummaryVO.class.getDeclaredField(field),
+                    "WorkflowInstanceSummaryVO should declare field '" + field
                             + "' — it must be present in the list API response contract");
         }
     }
@@ -363,7 +363,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         dto.setExecutorName("admin");
         dto.setDuration("1h 2m");
 
-        WorkflowInstanceSummaryDTO result = WorkflowInstanceSummaryDTO.fromSummaryDto(dto);
+        WorkflowInstanceSummaryVO result = WorkflowInstanceSummaryVO.fromSummaryDto(dto);
 
         Assertions.assertEquals(1, result.getId());
         Assertions.assertEquals("test-workflow", result.getName());

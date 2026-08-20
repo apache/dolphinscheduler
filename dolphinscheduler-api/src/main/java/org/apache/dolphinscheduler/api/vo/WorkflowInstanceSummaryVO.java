@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.workflowInstance;
+package org.apache.dolphinscheduler.api.vo;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -35,9 +35,9 @@ import lombok.NoArgsConstructor;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
- * Lightweight response DTO for workflow instance list / top-N / trigger queries.
+ * Lightweight response VO for workflow instance list / top-N / trigger queries.
  *
- * <p>Unlike {@link WorkflowInstance}, this DTO intentionally omits heavy columns
+ * <p>Unlike {@link WorkflowInstance}, this VO intentionally omits heavy columns
  * that are only needed for detail views or internal processing. This allows the
  * corresponding DAO queries to use the optimized {@code listSql} projection
  * instead of the full {@code baseSql}.
@@ -84,7 +84,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 @NoArgsConstructor
 @AllArgsConstructor
 @Schema(name = "WORKFLOW_INSTANCE_QUERY_RESPONSE")
-public class WorkflowInstanceSummaryDTO {
+public class WorkflowInstanceSummaryVO {
 
     @Schema(description = "workflow instance id")
     private Integer id;
@@ -180,10 +180,10 @@ public class WorkflowInstanceSummaryDTO {
     private String duration;
 
     /**
-     * Create a {@link WorkflowInstanceSummaryDTO} from a {@link WorkflowInstanceSummaryDto} DAO DTO.
+     * Create a {@link WorkflowInstanceSummaryVO} from a {@link WorkflowInstanceSummaryDto} DAO DTO.
      */
-    public static WorkflowInstanceSummaryDTO fromSummaryDto(WorkflowInstanceSummaryDto dto) {
-        return new WorkflowInstanceSummaryDTO(
+    public static WorkflowInstanceSummaryVO fromSummaryDto(WorkflowInstanceSummaryDto dto) {
+        return new WorkflowInstanceSummaryVO(
                 dto.getId(),
                 dto.getWorkflowDefinitionCode(),
                 dto.getWorkflowDefinitionVersion(),

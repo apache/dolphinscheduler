@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
-import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceSummaryDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -37,11 +37,11 @@ public interface WorkflowInstanceService {
     /**
      * return top n SUCCESS workflow instance order by running time which started between startTime and endTime
      */
-    List<WorkflowInstanceSummaryDTO> queryTopNLongestRunningWorkflowInstance(User loginUser,
-                                                                             long projectCode,
-                                                                             int size,
-                                                                             String startTime,
-                                                                             String endTime);
+    List<WorkflowInstanceSummaryVO> queryTopNLongestRunningWorkflowInstance(User loginUser,
+                                                                            long projectCode,
+                                                                            int size,
+                                                                            String startTime,
+                                                                            String endTime);
 
     /**
      * query workflow instance by id
@@ -71,18 +71,18 @@ public interface WorkflowInstanceService {
      * @param otherParamsJson   otherParamsJson handle other params
      * @return workflow instance list
      */
-    Result<PageInfo<WorkflowInstanceSummaryDTO>> queryWorkflowInstanceList(User loginUser,
-                                                                           long projectCode,
-                                                                           long workflowDefinitionCode,
-                                                                           String startDate,
-                                                                           String endDate,
-                                                                           String searchVal,
-                                                                           String executorName,
-                                                                           WorkflowExecutionStatus stateType,
-                                                                           String host,
-                                                                           String otherParamsJson,
-                                                                           Integer pageNo,
-                                                                           Integer pageSize);
+    Result<PageInfo<WorkflowInstanceSummaryVO>> queryWorkflowInstanceList(User loginUser,
+                                                                          long projectCode,
+                                                                          long workflowDefinitionCode,
+                                                                          String startDate,
+                                                                          String endDate,
+                                                                          String searchVal,
+                                                                          String executorName,
+                                                                          WorkflowExecutionStatus stateType,
+                                                                          String host,
+                                                                          String otherParamsJson,
+                                                                          Integer pageNo,
+                                                                          Integer pageSize);
 
     /**
      * query task list by workflow instance id
@@ -216,7 +216,7 @@ public interface WorkflowInstanceService {
      * @param triggerCode trigger code (nullable)
      * @return workflow instances triggered by the given trigger code
      */
-    List<WorkflowInstanceSummaryDTO> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode);
+    List<WorkflowInstanceSummaryVO> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode);
 
     void deleteWorkflowInstanceByWorkflowDefinitionCode(long workflowDefinitionCode);
 
