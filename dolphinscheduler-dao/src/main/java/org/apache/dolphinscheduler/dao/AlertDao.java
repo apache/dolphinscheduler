@@ -109,6 +109,33 @@ public class AlertDao {
     }
 
     /**
+     * Insert a task-result alert idempotently. If an alert with the same sign,
+     * workflow instance id and alert type already exists, the insert is skipped.
+     * <p>This guards against duplicate inserts caused by at-least-once delivery
+     * of task success lifecycle events.
+     *
+     * @param alert alert, must have sign, workflowInstanceId and alertType set
+     * @return insert count (1 if inserted, 0 if skipped)
+     */
+    public int addTaskResultAlert(Alert alert) {
+        if (null == alert.getAlertGroupId() || NumberUtils.INTEGER_ZERO.equals(alert.getAlertGroupId())) {
+            log.warn("the value of alertGroupId is null or 0 ");
+            return 0;
+        }
+
+        String sign = generateSign(alert);
+        alert.setSign(sign);
+        int count = alertMapper.insertTaskResultAlertIfAbsent(alert);
+        if (count > 0) {
+            log.info("add task result alert to db , alert: {}", alert);
+        } else {
+            log.info("skip duplicate task result alert, sign: {}, workflowInstanceId: {}", sign,
+                    alert.getWorkflowInstanceId());
+        }
+        return count;
+    }
+
+    /**
      * update alert sending(execution) status
      *
      * @param alertStatus alertStatus

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.client.TaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
@@ -24,18 +25,26 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifec
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
 import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
+import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class TaskSuccessLifecycleEventHandler extends AbstractTaskLifecycleEventHandler<TaskSuccessLifecycleEvent> {
 
     private final TaskExecutorClient taskExecutorClient;
 
-    public TaskSuccessLifecycleEventHandler(final TaskExecutorClient taskExecutorClient) {
+    private final WorkflowAlertManager workflowAlertManager;
+
+    public TaskSuccessLifecycleEventHandler(final TaskExecutorClient taskExecutorClient,
+                                            final WorkflowAlertManager workflowAlertManager) {
         this.taskExecutorClient = taskExecutorClient;
+        this.workflowAlertManager = workflowAlertManager;
     }
 
     @Override
@@ -43,7 +52,25 @@ public class TaskSuccessLifecycleEventHandler extends AbstractTaskLifecycleEvent
                        final IWorkflowExecution workflowExecution,
                        final ITaskExecution taskExecution,
                        final TaskSuccessLifecycleEvent taskSuccessEvent) {
+        // 1. State transition + DB persistence (may throw if state mismatch)
         taskStateAction.onSucceedEvent(workflowExecution, taskExecution, taskSuccessEvent);
+
+        // 2. Persist task-result alert only after the success state transition is confirmed
+        if (taskSuccessEvent.isNeedAlert()) {
+            final TaskAlertInfo taskAlertInfo = taskSuccessEvent.getTaskAlertInfo();
+            if (taskAlertInfo != null && taskAlertInfo.getAlertGroupId() != null
+                    && taskAlertInfo.getAlertGroupId() > 0) {
+                workflowAlertManager.sendTaskResultAlert(
+                        taskExecution.getWorkflowInstance(),
+                        taskExecution.getTaskInstance(),
+                        taskAlertInfo);
+            } else {
+                log.warn("Task: {} need alert but alertGroupId is invalid, skip sending alert",
+                        taskExecution.getName());
+            }
+        }
+
+        // 3. ACK the worker — only after state transition and alert persistence are done
         taskExecutorClient.ackTaskExecutorLifecycleEvent(
                 taskExecution,
                 new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(

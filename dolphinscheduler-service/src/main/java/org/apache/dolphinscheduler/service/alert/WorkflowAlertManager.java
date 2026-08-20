@@ -235,7 +235,7 @@ public class WorkflowAlertManager {
         alert.setAlertType(taskAlertInfo.getAlertType() != null
                 ? taskAlertInfo.getAlertType()
                 : AlertType.TASK_RESULT);
-        alertDao.addAlert(alert);
+        alertDao.addTaskResultAlert(alert);
         log.info("Send task result alert for task: {} in workflow: {}",
                 taskInstance.getName(), workflowInstance.getName());
     }

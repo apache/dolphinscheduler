@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
+import org.apache.dolphinscheduler.common.enums.AlertType;
+import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Alert;
@@ -63,6 +65,47 @@ class AlertDaoTest extends BaseDaoTest {
         long count = alertDao.listPendingAlerts(-1)
                 .stream()
                 .filter(alert -> alert.getContent().contains(host))
+                .count();
+        Assertions.assertEquals(1L, count);
+    }
+
+    @Test
+    void testAddTaskResultAlertIdempotent() {
+        String content = "[{\"taskName\":\"sql-task-1\",\"result\":\"ok\"}]";
+        int workflowInstanceId = 999999;
+
+        Alert alert = new Alert();
+        alert.setTitle("SQL Task Result");
+        alert.setContent(content);
+        alert.setWarningType(WarningType.SUCCESS);
+        alert.setAlertGroupId(1);
+        alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+        alert.setWorkflowInstanceId(workflowInstanceId);
+        alert.setAlertType(AlertType.TASK_RESULT);
+        alert.setCreateTime(new java.util.Date());
+
+        // First insert should succeed
+        int firstCount = alertDao.addTaskResultAlert(alert);
+        Assertions.assertEquals(1, firstCount);
+
+        // Second insert with the same content + workflowInstanceId + alertType should be skipped
+        Alert duplicateAlert = new Alert();
+        duplicateAlert.setTitle("SQL Task Result");
+        duplicateAlert.setContent(content);
+        duplicateAlert.setWarningType(WarningType.SUCCESS);
+        duplicateAlert.setAlertGroupId(1);
+        duplicateAlert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+        duplicateAlert.setWorkflowInstanceId(workflowInstanceId);
+        duplicateAlert.setAlertType(AlertType.TASK_RESULT);
+        duplicateAlert.setCreateTime(new java.util.Date());
+
+        int secondCount = alertDao.addTaskResultAlert(duplicateAlert);
+        Assertions.assertEquals(0, secondCount);
+
+        // Verify only one alert row exists for this workflow instance
+        long count = alertDao.listAlerts(workflowInstanceId)
+                .stream()
+                .filter(a -> a.getAlertType() == AlertType.TASK_RESULT)
                 .count();
         Assertions.assertEquals(1L, count);
     }

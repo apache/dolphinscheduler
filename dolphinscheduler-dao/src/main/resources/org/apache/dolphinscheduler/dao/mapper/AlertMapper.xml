@@ -51,6 +51,34 @@
         having count(*) = 0
     </insert>
 
+    <!--
+        Idempotent insert for task-result alerts.  Only inserts a row when no alert
+        with the same sign, workflow_instance_id and alert_type already exists.
+        This guards against duplicate inserts caused by at-least-once event delivery.
+    -->
+    <insert id="insertTaskResultAlertIfAbsent">
+        insert into t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id, create_time,
+                               update_time, project_code, workflow_definition_code, workflow_instance_id, alert_type)
+        SELECT #{alert.sign},
+               #{alert.title},
+               #{alert.content},
+               #{alert.alertStatus.code},
+               #{alert.warningType.code},
+               #{alert.log},
+               #{alert.alertGroupId},
+               #{alert.createTime},
+               #{alert.updateTime},
+               #{alert.projectCode},
+               #{alert.workflowDefinitionCode},
+               #{alert.workflowInstanceId},
+               #{alert.alertType.code}
+        from t_ds_alert
+        where sign = #{alert.sign}
+          and workflow_instance_id = #{alert.workflowInstanceId}
+          and alert_type = #{alert.alertType.code}
+        having count(*) = 0
+    </insert>
+
     <select id="listingAlertByStatus" resultType="org.apache.dolphinscheduler.dao.entity.Alert">
         select
         <include refid="baseSql"/>
