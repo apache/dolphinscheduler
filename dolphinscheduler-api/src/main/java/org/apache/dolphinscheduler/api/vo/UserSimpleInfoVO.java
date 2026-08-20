@@ -15,20 +15,21 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.dao.mapper;
+package org.apache.dolphinscheduler.api.vo;
 
-import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
+import org.apache.dolphinscheduler.dao.entity.User;
 
-import org.apache.ibatis.annotations.Param;
+import lombok.Data;
 
-import java.util.List;
+@Data
+public class UserSimpleInfoVO {
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+    private Integer id;
 
-public interface RelationSubWorkflowMapper extends BaseMapper<RelationSubWorkflow> {
+    private String userName;
 
-    int batchInsert(@Param("relationSubWorkflows") List<RelationSubWorkflow> relationSubWorkflows);
-
-    RelationSubWorkflow queryParentWorkflowInstance(@Param("subWorkflowInstanceId") Long subWorkflowInstanceId);
-
+    public UserSimpleInfoVO(User user) {
+        this.id = user.getId();
+        this.userName = user.getUserName();
+    }
 }

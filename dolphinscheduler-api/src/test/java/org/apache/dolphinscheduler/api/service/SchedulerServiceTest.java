@@ -303,16 +303,17 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         // error project permissions
         Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
                 .thenReturn(Optional.of(this.getProcessDefinition()));
-        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
-        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
-                .checkProjectAndAuthThrowException(user, this.getProject(), null);
+        Project project = this.getProject();
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
+                .checkHasProjectWritePermissionThrowException(user, project);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
+        Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(),
                 ((ServiceException) exception).getCode());
 
         // error delete mapper
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(user, this.getProject(), null);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
         Mockito.when(scheduleDao.deleteById(scheduleId)).thenReturn(false);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
@@ -321,6 +322,56 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         // success
         Mockito.when(scheduleDao.deleteById(scheduleId)).thenReturn(true);
         Assertions.assertDoesNotThrow(() -> schedulerService.deleteSchedulesById(user, scheduleId));
+    }
+
+    @Test
+    public void testReadOnlyUserCannotChangeSchedule() {
+        Project project = this.getProject();
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
+                .checkHasProjectWritePermissionThrowException(user, project);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
+                .checkHasProjectWritePermissionThrowException(user, projectCode);
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.insertSchedule(
+                        user, projectCode, processDefinitionCode, scheduleExpression(null), WarningType.NONE, 0,
+                        FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode));
+        Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.updateSchedule(
+                        user, projectCode, scheduleId, scheduleExpression(null), WarningType.NONE, 0,
+                        FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode));
+        Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.updateScheduleByWorkflowDefinitionCode(
+                        user, projectCode, processDefinitionCode, scheduleExpression(null), WarningType.NONE, 0,
+                        FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode));
+        Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.onlineScheduler(user, projectCode, scheduleId));
+        Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.offlineScheduler(user, projectCode, scheduleId));
+
+        Mockito.verify(scheduleDao, Mockito.never()).insert(Mockito.any());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any());
+    }
+
+    @Test
+    public void testProjectCodeCannotAuthorizeScheduleFromAnotherProject() {
+        Schedule schedule = this.getSchedule();
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
+        workflowDefinition.setProjectCode(2L);
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+
+        ServiceException onlineEx = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.onlineScheduler(user, projectCode, scheduleId));
+        ServiceException offlineEx = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.offlineScheduler(user, projectCode, scheduleId));
+
+        Assertions.assertEquals(Status.SCHEDULE_NOT_EXISTS.getCode(), onlineEx.getCode());
+        Assertions.assertEquals(Status.SCHEDULE_NOT_EXISTS.getCode(), offlineEx.getCode());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any());
+        Mockito.verifyNoInteractions(schedulerApi);
     }
 
     private Project getProject() {

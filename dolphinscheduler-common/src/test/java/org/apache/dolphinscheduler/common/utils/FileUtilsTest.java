@@ -94,6 +94,21 @@ public class FileUtilsTest {
     }
 
     @Test
+    public void testWriteContent2FileWithoutParentDirectory() throws IOException {
+        Path filePath = Paths.get("write-content-" + folder.getFileName() + ".txt");
+        String content = "test content";
+
+        try {
+            Assertions.assertTrue(FileUtils.writeContent2File(content, filePath.toString()));
+            try (InputStream inputStream = Files.newInputStream(filePath)) {
+                Assertions.assertEquals(content, FileUtils.readFile2Str(inputStream));
+            }
+        } finally {
+            Files.deleteIfExists(filePath);
+        }
+    }
+
+    @Test
     public void testDirectoryTraversal() {
         // test case which do not directory traversal
         String path;
