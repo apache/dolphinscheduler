@@ -236,8 +236,7 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
 
         final List<Property> paramList = mergeParams(asList(
                 new ArrayList<>(deserializeVarPool(workflowInstance.getGlobalParams())),
-                commandParam.getCommandParams(),
-                new ArrayList<>(deserializeVarPool(workflowInstance.getVarPool()))));
+                commandParam.getCommandParams()));
 
         final WorkflowManualTriggerRequest workflowManualTriggerRequest = WorkflowManualTriggerRequest.builder()
                 .userId(taskExecutionContext.getExecutorId())
