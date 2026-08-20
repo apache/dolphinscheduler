@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.UserSimpleInfoVO;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
@@ -226,21 +227,26 @@ public class UsersServiceTest {
     @Test
     public void testQueryUserList() {
         User user = new User();
-        user.setUserType(UserType.ADMIN_USER);
+        user.setUserType(UserType.GENERAL_USER);
         user.setId(1);
 
+        // Access token permission must not grant general users access to the user list.
         Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ACCESS_TOKEN, 1,
                 USER_MANAGER, serviceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
-                serviceLogger)).thenReturn(false);
+        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 1,
+                serviceLogger)).thenReturn(true);
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> usersService.queryUserList(user));
 
         // success
+        user.setUserType(UserType.ADMIN_USER);
         Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
                 serviceLogger)).thenReturn(true);
-        when(userDao.queryEnabledUsers()).thenReturn(getUserList());
-        List<User> users = usersService.queryUserList(user);
-        Assertions.assertFalse(users.isEmpty());
+        User enabledUser = getGeneralUser();
+        enabledUser.setId(2);
+        when(userDao.queryEnabledUsers()).thenReturn(Lists.newArrayList(enabledUser));
+        List<UserSimpleInfoVO> users = usersService.queryUserList(user);
+        Assertions.assertEquals(2, users.get(0).getId());
+        Assertions.assertEquals("userTest0001", users.get(0).getUserName());
     }
 
     @Test

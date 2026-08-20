@@ -94,7 +94,15 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
                             .getPredecessors(taskExecution.getName())
                             .stream())
                     .allMatch(workflowExecutionGraph::isTaskExecutionInActive);
-            if (isAllCandidateTaskPredecessorsInActive) {
+            final boolean isAllTaskExecutionChainFinish = workflowExecutionGraph.isAllTaskExecutionChainFinish();
+            if (isAllCandidateTaskPredecessorsInActive || isAllTaskExecutionChainFinish) {
+                log.debug("No candidate task can be triggered in workflow: {}, check whether the workflow can finish, "
+                        + "allCandidateTaskPredecessorsInActive: {}, allTaskExecutionChainFinish: {}, "
+                        + "candidateTasks: {}",
+                        workflowExecution.getName(),
+                        isAllCandidateTaskPredecessorsInActive,
+                        isAllTaskExecutionChainFinish,
+                        triggerCandidateTasks.stream().map(ITaskExecution::getName).collect(Collectors.toList()));
                 emitWorkflowFinishedEventIfApplicable(workflowExecution);
             }
             return;
