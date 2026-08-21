@@ -191,8 +191,7 @@ public class TaskDefinitionServiceImplTest {
     public void switchVersionShouldRejectUnauthorizedDatasource() {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
-        Mockito.doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(user, project, WORKFLOW_SWITCH_TO_THIS_VERSION);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
