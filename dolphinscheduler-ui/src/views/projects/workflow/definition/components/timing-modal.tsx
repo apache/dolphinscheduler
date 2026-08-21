@@ -496,7 +496,7 @@ export default defineComponent({
                     {t('project.workflow.execute_time')}
                   </NButton>
                 </div>
-                <div style={{ color: '#999', fontSize: '12px', marginTop: '-4px' }}>
+                <div style={{ color: '#999', fontSize: '12px', marginTop: '4px' }}>
                   {t('project.workflow.unlimited_repeat_tip')}
                 </div>
               </div>
