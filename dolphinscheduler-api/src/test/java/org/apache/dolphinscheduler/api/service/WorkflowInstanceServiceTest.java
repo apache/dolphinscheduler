@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTask
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowInstanceServiceImpl;
@@ -139,6 +140,9 @@ public class WorkflowInstanceServiceTest {
 
     @Mock
     TaskDefinitionDao taskDefinitionDao;
+
+    @Mock
+    TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
 
     @Mock
     private TaskInstanceContextDao taskInstanceContextDao;
@@ -615,6 +619,8 @@ public class WorkflowInstanceServiceTest {
                     taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", Boolean.FALSE, "", "", 0);
             Assertions.assertNotNull(successRes);
         }
+        Mockito.verify(taskDatasourcePermissionChecker, Mockito.times(3))
+                .checkPermission(eq(loginUser), Mockito.anyList());
     }
 
     @Test
