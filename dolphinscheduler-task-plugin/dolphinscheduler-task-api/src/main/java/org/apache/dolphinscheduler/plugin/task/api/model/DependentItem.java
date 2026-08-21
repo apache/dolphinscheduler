@@ -44,6 +44,15 @@ public class DependentItem {
 
     public DependentItem fromKey(String key) {
         String[] parts = key.split("-");
+        if (parts.length == 5 && parts[1].isEmpty()) {
+            // depTaskCode is negative (e.g., -1 for DEPENDENT_ALL_TASK_CODE)
+            // key format: "2001--1-day-today" → ["2001", "", "1", "day", "today"]
+            setDefinitionCode(Long.parseLong(parts[0]));
+            setDepTaskCode(-Long.parseLong(parts[2]));
+            setCycle(parts[3]);
+            setDateValue(parts[4]);
+            return this;
+        }
         if (parts.length != 4) {
             throw new IllegalArgumentException("Invalid key format");
         }
