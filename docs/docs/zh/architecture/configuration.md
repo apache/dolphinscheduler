@@ -174,7 +174,7 @@ DolphinScheduler默认使用Zookeeper进行集群管理、容错、事件监听�
 | registry.zookeeper.session-timeout              | 30s              | session超时时间                                                                                                                                                |
 | registry.zookeeper.connection-timeout           | 30s              | 连接超时时间                                                                                                                                                     |
 | registry.zookeeper.block-until-connected        | 600ms            | 阻塞直到连接成功的等待时间                                                                                                                                              |
-| registry.zookeeper.digest                       | {用户名:密码}         | 如果zookeeper打开了acl，则需要填写认证信息访问znode，认证信息格式为{用户名}:{密码}。关于Zookeeper ACL详见[https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html](Apache Zookeeper官方文档) |
+| registry.zookeeper.digest                       | {用户名:密码}         | 如果zookeeper打开了acl，则需要填写认证信息访问znode，认证信息格式为{用户名}:{密码}。关于Zookeeper ACL详见[Apache Zookeeper官方文档](https://zookeeper.apache.org/doc/r3.4.14/zookeeperAdmin.html) |
 
 DolphinScheduler同样可以通过`bin/env/dolphinscheduler_env.sh`进行Zookeeper相关的配置。
 
