@@ -35,6 +35,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -57,6 +58,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
@@ -179,6 +181,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private TaskDefinitionLogMapper taskDefinitionLogMapper;
+
+    @Mock
+    private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
 
     @Mock
     private TaskDefinitionService taskDefinitionService;
@@ -923,6 +928,75 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
         Assertions.assertNotNull(workflowDefinition);
         Assertions.assertEquals(1, workflowDefinition.getVersion());
+    }
+
+    @Test
+    public void testCreateWorkflowDefinitionShouldRejectUnauthorizedDatasource() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
+        when(workflowDefinitionDao.verifyByDefineName(projectCode, name)).thenReturn(null);
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskDatasourcePermissionChecker).checkPermission(eq(user), anyList());
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.createWorkflowDefinition(
+                        user, projectCode, name, description, "[]", "[]", timeout,
+                        taskRelationJson, taskDefinitionJson, null, WorkflowExecutionTypeEnum.PARALLEL));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Mockito.verify(processService, Mockito.never())
+                .saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE));
+    }
+
+    @Test
+    public void testSwitchWorkflowDefinitionVersionShouldRejectUnauthorizedDatasource() {
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog();
+        workflowDefinitionLog.setCode(processDefinitionCode);
+        workflowDefinitionLog.setProjectCode(projectCode);
+        workflowDefinitionLog.setVersion(1);
+        WorkflowTaskRelation workflowTaskRelation =
+                getWorkflowTaskRelation(1, 1, projectCode, processDefinitionCode, 0, 0, 123456789L, 1);
+
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(workflowDefinitionLog);
+        when(workflowTaskRelationDao.queryWorkflowTaskRelationsByWorkflowDefinitionCode(processDefinitionCode, 1))
+                .thenReturn(Collections.singletonList(workflowTaskRelation));
+        when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
+                .thenReturn(Collections.singletonList(new TaskDefinitionLog()));
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskDatasourcePermissionChecker).checkPermission(eq(user), anyList());
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.switchWorkflowDefinitionVersion(
+                        user, projectCode, processDefinitionCode, 1));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Mockito.verify(processService, Mockito.never())
+                .switchVersion(any(WorkflowDefinition.class), any(WorkflowDefinitionLog.class));
+    }
+
+    @Test
+    public void testOnlineWorkflowDefinitionShouldRejectUnauthorizedDatasource() {
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        WorkflowTaskRelation workflowTaskRelation =
+                getWorkflowTaskRelation(1, 1, projectCode, processDefinitionCode, 0, 0, 123456789L, 1);
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(Collections.singletonList(workflowTaskRelation));
+        when(taskDefinitionLogDao.queryTaskDefineLogList(anyList()))
+                .thenReturn(Collections.singletonList(new TaskDefinitionLog()));
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskDatasourcePermissionChecker).checkPermission(eq(user), anyList());
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, processDefinitionCode));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Mockito.verify(workflowDefinitionDao, Mockito.never()).updateById(any(WorkflowDefinition.class));
     }
 
     @Test
