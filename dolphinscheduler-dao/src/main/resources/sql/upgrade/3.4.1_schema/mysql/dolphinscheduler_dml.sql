@@ -14,3 +14,5 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+INSERT IGNORE INTO t_ds_worker_group (name, addr_list, create_time, update_time, description) VALUES ('default', NULL, NOW(), NOW(), 'default worker group');

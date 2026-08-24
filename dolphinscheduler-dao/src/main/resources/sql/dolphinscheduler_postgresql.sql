@@ -1101,6 +1101,9 @@ VALUES (NULL, 1, 'default admin warning group', 'default admin warning group', '
 INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
 VALUES ('default', 'default', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
+-- Records of t_ds_worker_group, default worker name : default
+INSERT INTO t_ds_worker_group (name, addr_list, create_time, update_time, description) VALUES ('default', NULL, now(), now(), 'default worker group');
+
 -- Records of t_ds_queue,default queue name : default
 INSERT INTO t_ds_version(version) VALUES ('3.3.0');
 

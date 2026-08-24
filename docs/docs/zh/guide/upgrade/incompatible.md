@@ -43,6 +43,7 @@
 ## 3.4.1
 
 * 移除导入导出工作流([#17940])(https://github.com/apache/dolphinscheduler/issues/17940)
+* 在数据库中持久化 `default` 工作组 ([#17929])(https://github.com/apache/dolphinscheduler/issues/17929)
 
 ## 3.5.0
 

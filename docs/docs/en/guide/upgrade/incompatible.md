@@ -43,6 +43,7 @@ This document records the incompatible updates between each version. You need to
 ## 3.4.1
 
 * Remove import and export of workflow definition. ([#17940])(https://github.com/apache/dolphinscheduler/issues/17940)
+* Persist `default` worker group at database. ([#17929])(https://github.com/apache/dolphinscheduler/issues/17929)
 
 ## 3.5.0
 

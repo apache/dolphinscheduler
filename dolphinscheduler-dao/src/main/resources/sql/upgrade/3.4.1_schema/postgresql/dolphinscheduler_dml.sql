@@ -14,3 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
 */
+
+-- Insert default worker group if not exists
+INSERT INTO t_ds_worker_group (name, addr_list, create_time, update_time, description)
+VALUES ('default', NULL, now(), now(), 'default worker group')
+ON CONFLICT (name) DO NOTHING;
