@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -141,7 +142,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             log.error("Task definition does not exist, taskName:{}.", taskName);
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskName);
         }
-        return taskDefinition;
+        return SensitivePropertyUtils.maskTaskDefinition(taskDefinition);
     }
 
     public void updateDag(User loginUser, long workflowDefinitionCode,
@@ -194,7 +195,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         Project project = projectDao.queryByCode(taskDefinition.getProjectCode());
         projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
-        return taskDefinition;
+        return SensitivePropertyUtils.maskTaskDefinition(taskDefinition);
     }
 
     /**
@@ -230,6 +231,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             log.warn("Parameter taskDefinitionJson is invalid.");
             throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionJsonObj);
         }
+        taskDefinitionToUpdate.setTaskParams(SensitivePropertyUtils.mergeLocalParamsInTaskParams(
+                taskDefinitionToUpdate.getTaskParams(), taskDefinition.getTaskParams()));
         if (!checkTaskParameters(taskDefinitionToUpdate.getTaskType(), taskDefinitionToUpdate.getTaskParams())) {
             throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionToUpdate.getName());
         }
@@ -617,7 +620,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             taskRelationList = taskRelationList.stream()
                     .filter(v -> v.getPreTaskCode() != 0).collect(Collectors.toList());
         }
-        TaskDefinitionVO taskDefinitionVo = TaskDefinitionVO.fromTaskDefinition(taskDefinition);
+        TaskDefinitionVO taskDefinitionVo =
+                TaskDefinitionVO.fromTaskDefinition(SensitivePropertyUtils.maskTaskDefinition(taskDefinition));
         taskDefinitionVo.setWorkflowTaskRelationList(taskRelationList);
         return taskDefinitionVo;
     }

@@ -48,6 +48,7 @@ import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -97,6 +98,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -258,6 +260,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
+        validateSensitiveParamsOnCreate(globalParams, taskDefinitionLogs);
 
         long workflowDefinitionCode = CodeGenerateUtils.genCode();
         WorkflowDefinition workflowDefinition =
@@ -447,7 +450,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
         List<WorkflowDefinition> resourceList = workflowDefinitionDao.queryAllDefinitionList(projectCode);
-        return resourceList.stream().map(processService::genDagData).collect(Collectors.toList());
+        return resourceList.stream()
+                .map(processService::genDagData)
+                .map(SensitivePropertyUtils::maskDagData)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -523,6 +529,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             Schedule schedule = scheduleMap.get(pd.getCode());
             pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
             pd.setSchedule(schedule);
+            SensitivePropertyUtils.maskWorkflowDefinition(pd);
         }
 
         PageInfo<WorkflowDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -551,7 +558,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
         }
-        return processService.genDagData(workflowDefinition);
+        return SensitivePropertyUtils.maskDagData(processService.genDagData(workflowDefinition));
     }
 
     @Override
@@ -585,7 +592,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.error("workflow definition does not exist, projectCode:{}.", projectCode);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, name);
         }
-        return processService.genDagData(workflowDefinition);
+        return SensitivePropertyUtils.maskDagData(processService.genDagData(workflowDefinition));
     }
 
     /**
@@ -651,12 +658,47 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, name);
             }
         }
+        globalParams = SensitivePropertyUtils.mergeGlobalParams(globalParams, workflowDefinition.getGlobalParams());
+        mergeSensitiveLocalParams(taskDefinitionLogs);
         WorkflowDefinition workflowDefinitionDeepCopy =
                 JSONUtils.parseObject(JSONUtils.toJsonString(workflowDefinition), WorkflowDefinition.class);
         workflowDefinition.set(projectCode, name, description, globalParams, locations, timeout);
         workflowDefinition.setExecutionType(executionType);
         return updateDagDefine(loginUser, taskRelationList, workflowDefinition, workflowDefinitionDeepCopy,
                 taskDefinitionLogs);
+    }
+
+    private void validateSensitiveParamsOnCreate(String globalParams, List<TaskDefinitionLog> taskDefinitionLogs) {
+        SensitivePropertyUtils.validateSensitivePlaceholders(
+                GlobalParameterUtils.deserializeGlobalParameter(globalParams), Collections.emptyList());
+        if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
+            return;
+        }
+        taskDefinitionLogs.forEach(taskDefinitionLog -> SensitivePropertyUtils.validateSensitivePlaceholders(
+                SensitivePropertyUtils.getLocalParams(taskDefinitionLog.getTaskParams()), Collections.emptyList()));
+    }
+
+    private void mergeSensitiveLocalParams(List<TaskDefinitionLog> taskDefinitionLogs) {
+        if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
+            return;
+        }
+        Set<Long> taskDefinitionCodes = taskDefinitionLogs.stream()
+                .map(TaskDefinitionLog::getCode)
+                .filter(taskCode -> taskCode > 0)
+                .collect(Collectors.toSet());
+        if (CollectionUtils.isEmpty(taskDefinitionCodes)) {
+            taskDefinitionLogs.forEach(taskDefinitionLog -> SensitivePropertyUtils.validateSensitivePlaceholders(
+                    SensitivePropertyUtils.getLocalParams(taskDefinitionLog.getTaskParams()),
+                    Collections.emptyList()));
+            return;
+        }
+        Map<Long, String> existingTaskParamsMap = taskDefinitionDao.queryByCodes(taskDefinitionCodes)
+                .stream()
+                .collect(Collectors.toMap(TaskDefinition::getCode, TaskDefinition::getTaskParams, (a, b) -> a));
+        taskDefinitionLogs.forEach(taskDefinitionLog -> taskDefinitionLog.setTaskParams(
+                SensitivePropertyUtils.mergeLocalParamsInTaskParams(
+                        taskDefinitionLog.getTaskParams(),
+                        existingTaskParamsMap.get(taskDefinitionLog.getCode()))));
     }
 
     /**
@@ -984,7 +1026,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
         }
-        DagData dagData = processService.genDagData(workflowDefinition);
+        DagData dagData = SensitivePropertyUtils.maskDagData(processService.genDagData(workflowDefinition));
         return dagData.getTaskDefinitionList();
     }
 
@@ -1023,7 +1065,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         Map<Long, List<TaskDefinition>> taskNodeMap = new HashMap<>();
         for (WorkflowDefinition workflowDefinition : workflowDefinitionListInProject) {
-            DagData dagData = processService.genDagData(workflowDefinition);
+            DagData dagData =
+                    SensitivePropertyUtils.maskDagData(processService.genDagData(workflowDefinition));
             taskNodeMap.put(workflowDefinition.getCode(), dagData.getTaskDefinitionList());
         }
         return taskNodeMap;
@@ -1043,7 +1086,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
 
         List<WorkflowDefinition> workflowDefinitions = workflowDefinitionDao.queryAllDefinitionList(projectCode);
-        return workflowDefinitions.stream().map(processService::genDagData).collect(Collectors.toList());
+        return workflowDefinitions.stream()
+                .map(processService::genDagData)
+                .map(SensitivePropertyUtils::maskDagData)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -1817,7 +1863,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         // global params
-        List<Property> globalParams = workflowDefinition.getGlobalParamList();
+        List<Property> globalParams =
+                SensitivePropertyUtils.maskSensitiveValues(workflowDefinition.getGlobalParamList());
 
         Map<String, Map<String, Object>> localUserDefParams = getLocalParams(workflowDefinition);
 
@@ -1847,7 +1894,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     Map<String, Object> localParamsMap = new HashMap<>();
                     String localParams = JSONUtils.getNodeString(taskDefinition.getTaskParams(), LOCAL_PARAMS);
                     if (!StringUtils.isEmpty(localParams)) {
-                        List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
+                        List<Property> localParamsList =
+                                SensitivePropertyUtils.maskSensitiveValues(
+                                        JSONUtils.toList(localParams, Property.class));
                         localParamsMap.put(TASK_TYPE, taskDefinition.getTaskType());
                         localParamsMap.put(LOCAL_PARAMS_LIST, localParamsList);
                         if (CollectionUtils.isNotEmpty(localParamsList)) {

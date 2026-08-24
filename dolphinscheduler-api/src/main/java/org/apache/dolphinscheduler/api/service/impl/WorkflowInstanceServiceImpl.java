@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -75,6 +76,7 @@ import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
@@ -89,6 +91,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -211,7 +214,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowInstanceId);
         }
         workflowInstance.setLocations(workflowDefinition.getLocations());
-        workflowInstance.setDagData(processService.genDagData(workflowDefinition));
+        workflowInstance
+                .setGlobalParams(SensitivePropertyUtils.maskGlobalParams(workflowInstance.getGlobalParams()));
+        workflowInstance.setDagData(
+                SensitivePropertyUtils.maskDagData(processService.genDagData(workflowDefinition)));
         return workflowInstance;
     }
 
@@ -398,6 +404,8 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             timezoneId = commandParam.getTimeZone();
         }
 
+        globalParams =
+                SensitivePropertyUtils.mergeGlobalParams(globalParams, workflowInstance.getGlobalParams());
         setWorkflowInstance(workflowInstance, scheduleTime, globalParams, timeout, timezoneId);
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         if (taskDefinitionLogs.isEmpty()) {
@@ -410,6 +418,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
             }
         }
+        mergeSensitiveLocalParams(taskDefinitionLogs);
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs, syncDefine);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
@@ -465,6 +474,29 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 "Update workflow instance complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}, workflowInstanceId:{}",
                 projectCode, workflowDefinition.getCode(), insertVersion, workflowInstanceId);
         return workflowDefinition;
+    }
+
+    private void mergeSensitiveLocalParams(List<TaskDefinitionLog> taskDefinitionLogs) {
+        if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
+            return;
+        }
+        Set<Long> taskDefinitionCodes = taskDefinitionLogs.stream()
+                .map(TaskDefinitionLog::getCode)
+                .filter(taskCode -> taskCode > 0)
+                .collect(Collectors.toSet());
+        if (CollectionUtils.isEmpty(taskDefinitionCodes)) {
+            taskDefinitionLogs.forEach(taskDefinitionLog -> SensitivePropertyUtils.validateSensitivePlaceholders(
+                    SensitivePropertyUtils.getLocalParams(taskDefinitionLog.getTaskParams()),
+                    Collections.emptyList()));
+            return;
+        }
+        Map<Long, String> existingTaskParamsMap = taskDefinitionDao.queryByCodes(taskDefinitionCodes)
+                .stream()
+                .collect(Collectors.toMap(TaskDefinition::getCode, TaskDefinition::getTaskParams, (a, b) -> a));
+        taskDefinitionLogs.forEach(taskDefinitionLog -> taskDefinitionLog.setTaskParams(
+                SensitivePropertyUtils.mergeLocalParamsInTaskParams(
+                        taskDefinitionLog.getTaskParams(),
+                        existingTaskParamsMap.get(taskDefinitionLog.getCode()))));
     }
 
     /**
@@ -595,7 +627,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 }
             }
         }
-        return finalGlobalParams;
+        return PropertySensitiveUtils.maskSensitiveValues(finalGlobalParams);
     }
 
     /**
@@ -622,7 +654,8 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             if (!StringUtils.isEmpty(localParams)) {
                 // Replace placeholders and deserialize
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, parameterMap);
-                List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
+                List<Property> localParamsList = PropertySensitiveUtils.maskSensitiveValues(
+                        JSONUtils.toList(localParams, Property.class));
 
                 Map<String, Object> localParamsMap = new HashMap<>();
                 localParamsMap.put(TASK_TYPE, taskDefinitionLog.getTaskType());

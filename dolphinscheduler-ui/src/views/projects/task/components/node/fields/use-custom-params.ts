@@ -44,7 +44,7 @@ export function useCustomParams({
         {
           type: 'input',
           field: 'prop',
-          span: 6,
+          span: 5,
           class: 'input-param-key',
           props: {
             placeholder: t('project.node.prop_tips'),
@@ -81,7 +81,7 @@ export function useCustomParams({
         {
           type: 'select',
           field: 'type',
-          span: 6,
+          span: 5,
           options: TYPE_LIST,
           value: 'VARCHAR',
           props: {
@@ -91,12 +91,19 @@ export function useCustomParams({
         {
           type: 'input',
           field: 'value',
-          span: 6,
+          span: 5,
           class: 'input-param-value',
           props: {
             placeholder: t('project.node.value_tips'),
             maxLength: 256
           }
+        },
+        {
+          type: 'checkbox',
+          field: 'sensitive',
+          name: t('project.node.sensitive'),
+          span: 3,
+          value: false
         }
       ]
     }
