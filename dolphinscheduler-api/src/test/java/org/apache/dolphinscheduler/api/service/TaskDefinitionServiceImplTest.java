@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServi
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.doNothing;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
@@ -109,6 +111,9 @@ public class TaskDefinitionServiceImplTest {
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Mock
+    private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
+
+    @Mock
     private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     @Mock
@@ -180,6 +185,26 @@ public class TaskDefinitionServiceImplTest {
 
         Assertions.assertDoesNotThrow(
                 () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
+    }
+
+    @Test
+    public void switchVersionShouldRejectUnauthorizedDatasource() {
+        Project project = getProject();
+        when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(PROJECT_CODE);
+        when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
+                .thenReturn(new TaskDefinitionLog());
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskDatasourcePermissionChecker).checkPermission(eq(user), anyList());
+
+        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION,
+                () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
+
+        Mockito.verify(taskDefinitionDao, Mockito.never()).updateById(any(TaskDefinition.class));
     }
 
     @Test
@@ -397,6 +422,7 @@ public class TaskDefinitionServiceImplTest {
             Long updatedTaskCode = taskDefinitionService.updateTaskWithUpstream(user, PROJECT_CODE, TASK_CODE,
                     taskDefinitionJson, UPSTREAM_CODE);
             assertEquals(TASK_CODE, updatedTaskCode);
+            Mockito.verify(taskDatasourcePermissionChecker).checkPermission(eq(user), anyList());
             user.setUserType(UserType.GENERAL_USER);
         }
     }
