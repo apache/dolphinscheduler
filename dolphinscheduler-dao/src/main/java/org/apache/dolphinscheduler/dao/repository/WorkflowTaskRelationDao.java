@@ -36,11 +36,7 @@ public interface WorkflowTaskRelationDao extends IDao<WorkflowTaskRelation> {
 
     List<WorkflowTaskRelation> queryDownstreamByWorkflowDefinitionCode(long workflowDefinitionCode);
 
-    boolean updateWorkflowTaskRelationTaskVersion(WorkflowTaskRelation workflowTaskRelation);
-
     void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
-
-    List<WorkflowTaskRelation> queryWorkflowTaskRelationByTaskCodeAndTaskVersion(long taskCode, long postTaskVersion);
 
     List<WorkflowTaskRelation> queryByCode(long projectCode, long workflowDefinitionCode, long preTaskCode,
                                            long postTaskCode);
