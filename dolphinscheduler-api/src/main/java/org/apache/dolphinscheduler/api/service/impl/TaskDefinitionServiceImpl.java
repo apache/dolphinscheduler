@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.chec
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.PermissionCheck;
+import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowTaskRelationService;
@@ -115,6 +116,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     @Autowired
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
+
+    @Autowired
+    private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
 
     /**
      * query task definition
@@ -222,19 +226,20 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinitionLog taskDefinitionToUpdate =
                 JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
-        if (TimeoutFlag.CLOSE == taskDefinition.getTimeoutFlag()) {
-            taskDefinition.setTimeoutNotifyStrategy(null);
-        }
-        if (taskDefinition.equals(taskDefinitionToUpdate)) {
-            log.warn("Task definition does not need update because no change, taskDefinitionCode:{}.", taskCode);
-            return null;
-        }
         if (taskDefinitionToUpdate == null) {
             log.warn("Parameter taskDefinitionJson is invalid.");
             throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionJsonObj);
         }
         if (!checkTaskParameters(taskDefinitionToUpdate.getTaskType(), taskDefinitionToUpdate.getTaskParams())) {
             throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionToUpdate.getName());
+        }
+        taskDatasourcePermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinitionToUpdate));
+        if (TimeoutFlag.CLOSE == taskDefinition.getTimeoutFlag()) {
+            taskDefinition.setTimeoutNotifyStrategy(null);
+        }
+        if (taskDefinition.equals(taskDefinitionToUpdate)) {
+            log.warn("Task definition does not need update because no change, taskDefinitionCode:{}.", taskCode);
+            return null;
         }
         Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskCode);
         if (version == null || version == 0) {
@@ -516,6 +521,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinitionLog taskDefinitionUpdate =
                 taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
+        taskDatasourcePermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinitionUpdate));
         taskDefinitionUpdate.setUserId(loginUser.getId());
         taskDefinitionUpdate.setUpdateTime(new Date());
         taskDefinitionUpdate.setId(taskDefinition.getId());
@@ -662,6 +668,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 taskDefinitionLog.setFlag(Flag.NO);
                 break;
             case ONLINE:
+                taskDatasourcePermissionChecker.checkPermission(loginUser,
+                        Collections.singletonList(taskDefinitionLog));
                 String resourceIds = taskDefinition.getResourceIds();
                 if (StringUtils.isNotBlank(resourceIds)) {
                     Integer[] resourceIdArray =
