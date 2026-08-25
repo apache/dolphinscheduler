@@ -397,7 +397,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             try {
                 schema = metaData.getConnection().getSchema();
             } catch (SQLException e) {
-                log.error("Cant not get the schema, datasourceId:{}.", datasourceId, e);
+                log.error("Can not get the schema, datasourceId:{}.", datasourceId, e);
                 throw new ServiceException(Status.GET_DATASOURCE_TABLES_ERROR);
             }
 
