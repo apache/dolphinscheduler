@@ -48,6 +48,7 @@ This document records the incompatible updates between each version. You need to
 
 * Add the `missed_fire_policy` column to `t_ds_schedules`. Existing schedules default to `FIRE_ALL_MISSED` to preserve the previous Quartz `IgnoreMisfires` behavior. ([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
 * Remove the obsolete Dynamic Task query API. ([#18556](https://github.com/apache/dolphinscheduler/issues/18556))
+* Remove the obsolete task update-with-upstream API `PUT /projects/{projectCode}/task-definition/{code}/with-upstream`. ([#18568](https://github.com/apache/dolphinscheduler/issues/18568))
 * The workflow instance list APIs (`GET /projects/{projectCode}/workflow-instances`, `GET /projects/{projectCode}/workflow-instances/top-n`, `GET /projects/{projectCode}/workflow-instances/trigger`) no longer return the following properties in the response body:
   * **Removed heavy fields**: `commandParam`, `globalParams`, `historyCmd`, `varPool`, `stateHistory`
   * **Removed transient fields**: `stateDescList`, `workflowDefinition`, `dagData`, `queue`, `locations`, `dependenceScheduleTimes`
