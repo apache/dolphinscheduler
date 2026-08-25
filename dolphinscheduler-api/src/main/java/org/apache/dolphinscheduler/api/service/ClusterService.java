@@ -47,9 +47,10 @@ public interface ClusterService {
     /**
      * query cluster
      *
-     * @param code cluster code
+     * @param loginUser login user
+     * @param code      cluster code
      */
-    ClusterDto queryClusterByCode(Long code);
+    ClusterDto queryClusterByCode(User loginUser, Long code);
 
     /**
      * delete cluster
@@ -73,26 +74,29 @@ public interface ClusterService {
     /**
      * query cluster paging
      *
+     * @param loginUser login user
      * @param pageNo    page number
      * @param searchVal search value
      * @param pageSize  page size
      * @return cluster list page
      */
-    PageInfo<ClusterDto> queryClusterListPaging(Integer pageNo, Integer pageSize, String searchVal);
+    PageInfo<ClusterDto> queryClusterListPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal);
 
     /**
      * query all cluster
      *
+     * @param loginUser login user
      * @return all cluster list
      */
-    List<ClusterDto> queryAllClusterList();
+    List<ClusterDto> queryAllClusterList(User loginUser);
 
     /**
      * verify cluster name
      *
+     * @param loginUser   login user
      * @param clusterName cluster name
      * @return true if the cluster name not exists, otherwise return false
      */
-    void verifyCluster(String clusterName);
+    void verifyCluster(User loginUser, String clusterName);
 
 }
