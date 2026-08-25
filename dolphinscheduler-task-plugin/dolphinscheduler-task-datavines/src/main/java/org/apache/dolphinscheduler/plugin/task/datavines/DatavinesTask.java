@@ -90,6 +90,7 @@ public class DatavinesTask extends AbstractRemoteTask {
             if (checkResult(result)) {
                 jobExecutionId = result.get(apiResultDataKey).asText();
                 executionStatus = true;
+                setAppIds(String.format(DatavinesTaskConstants.APPIDS_FORMAT, address, jobExecutionId));
             }
         } catch (Exception ex) {
             log.error(DatavinesTaskConstants.SUBMIT_FAILED_MSG, ex);
@@ -101,6 +102,7 @@ public class DatavinesTask extends AbstractRemoteTask {
     public void trackApplicationStatusInner() throws TaskException {
         try {
             String address = this.datavinesParameters.getAddress();
+            restoreJobExecutionId();
             if (!executionStatus || jobExecutionId == null) {
                 setAppIds(String.format(DatavinesTaskConstants.APPIDS_FORMAT, address,
                         this.datavinesParameters.getJobId()));
@@ -142,6 +144,9 @@ public class DatavinesTask extends AbstractRemoteTask {
                         break;
                     case DatavinesTaskConstants.STATUS_FAILURE:
                     case DatavinesTaskConstants.STATUS_KILL:
+                    case DatavinesTaskConstants.STATUS_PAUSE:
+                    case DatavinesTaskConstants.STATUS_STOP:
+                    case DatavinesTaskConstants.STATUS_NEED_FAULT_TOLERANCE:
                         errorHandle("task execution status: " + jobExecutionStatusStr);
                         finishFlag = true;
                         break;
@@ -155,6 +160,25 @@ public class DatavinesTask extends AbstractRemoteTask {
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException(DatavinesTaskConstants.TRACK_FAILED_MSG, ex);
         }
+    }
+
+    /**
+     * Restore the remote job execution id from the persisted app id after the worker recovers.
+     * The app id is stored as {@code address-jobExecutionId}, see {@link DatavinesTaskConstants#APPIDS_FORMAT}.
+     */
+    private void restoreJobExecutionId() {
+        if (jobExecutionId != null || StringUtils.isEmpty(taskRequest.getAppIds())) {
+            return;
+        }
+        String appId = taskRequest.getAppIds();
+        int separatorIndex = appId.lastIndexOf('-');
+        if (separatorIndex < 0 || separatorIndex == appId.length() - 1) {
+            log.warn("invalid datavines app id: {}", appId);
+            return;
+        }
+        jobExecutionId = appId.substring(separatorIndex + 1);
+        executionStatus = true;
+        log.info("restored datavines job execution id: {}", jobExecutionId);
     }
 
     /**
@@ -211,10 +235,16 @@ public class DatavinesTask extends AbstractRemoteTask {
         }
         log.info("trying terminate datavines task, taskId: {}, address: {}, jobExecutionId: {}",
                 this.taskExecutionContext.getTaskInstanceId(), address, jobExecutionId);
-        RequestUtils.killJobExecution(address, jobExecutionId, this.datavinesParameters.getToken());
-        log.warn("datavines task terminated, taskId: {}, address: {}, jobExecutionId: {}",
-                this.taskExecutionContext.getTaskInstanceId(),
-                address,
-                jobExecutionId);
+        try {
+            RequestUtils.killJobExecution(address, jobExecutionId, this.datavinesParameters.getToken());
+            log.warn("datavines task terminated, taskId: {}, address: {}, jobExecutionId: {}",
+                    this.taskExecutionContext.getTaskInstanceId(),
+                    address,
+                    jobExecutionId);
+        } catch (Exception ex) {
+            log.error("datavines task kill failed, taskId: {}, address: {}, jobExecutionId: {}",
+                    this.taskExecutionContext.getTaskInstanceId(), address, jobExecutionId, ex);
+            throw new TaskException(DatavinesTaskConstants.KILL_FAILED_MSG, ex);
+        }
     }
 }

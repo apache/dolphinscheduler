@@ -40,9 +40,13 @@ public class DatavinesTaskConstants {
     public static final String STATUS_SUCCESS = "SUCCESS";
     public static final String STATUS_KILL = "KILL";
     public static final String STATUS_FAILURE = "FAILURE";
+    public static final String STATUS_PAUSE = "PAUSE";
+    public static final String STATUS_STOP = "STOP";
+    public static final String STATUS_NEED_FAULT_TOLERANCE = "NEED_FAULT_TOLERANCE";
 
     public static final String SUBMIT_FAILED_MSG = "Submit datavinesTask failed:";
     public static final String TRACK_FAILED_MSG = "Track datavinesTask failed:";
+    public static final String KILL_FAILED_MSG = "Kill datavinesTask failed:";
     public static final String APPIDS_FORMAT = "%s-%s";
 
     public static final long SLEEP_MILLIS = 3000;

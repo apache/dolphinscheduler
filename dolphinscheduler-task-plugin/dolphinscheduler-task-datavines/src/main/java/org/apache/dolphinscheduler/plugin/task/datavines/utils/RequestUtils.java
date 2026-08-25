@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.datavines.utils;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.datavines.DatavinesTaskConstants;
 
 import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -38,7 +40,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 @Slf4j
 public class RequestUtils {
 
-    private static final CloseableHttpClient HTTP_CLIENT = HttpClientBuilder.create().build();
+    private static final RequestConfig REQUEST_CONFIG = RequestConfig.custom()
+            .setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
+            .setSocketTimeout(Constants.SOCKET_TIMEOUT)
+            .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
+            .build();
+
+    private static final CloseableHttpClient HTTP_CLIENT = HttpClientBuilder.create()
+            .setDefaultRequestConfig(REQUEST_CONFIG)
+            .build();
 
     private RequestUtils() {
         throw new IllegalStateException("Utility class");
@@ -57,7 +67,39 @@ public class RequestUtils {
     }
 
     public static void killJobExecution(String address, String jobExecutionId, String token) {
-        parse(doPost(address + DatavinesTaskConstants.JOB_EXECUTION_KILL + jobExecutionId, token));
+        String url = address + DatavinesTaskConstants.JOB_EXECUTION_KILL + jobExecutionId;
+        HttpPost httpPost = new HttpPost(url);
+        try {
+            httpPost.setHeader("Authorization", "Bearer " + token);
+            log.info("access url: {}", url);
+            try (CloseableHttpResponse response = HTTP_CLIENT.execute(httpPost)) {
+                String body = response.getEntity() == null ? "" : EntityUtils.toString(response.getEntity());
+                int statusCode = response.getStatusLine().getStatusCode();
+                log.info("kill datavines task, url: {}, status: {}, response: {}", url, statusCode, body);
+                validateKillResponse(statusCode, body);
+            }
+        } catch (IllegalStateException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("kill datavines task error: ", e);
+            throw new IllegalStateException("kill datavines task failed", e);
+        } finally {
+            httpPost.releaseConnection();
+        }
+    }
+
+    public static void validateKillResponse(int statusCode, String body) {
+        if (statusCode != HttpStatus.SC_OK) {
+            throw new IllegalStateException(
+                    "kill datavines task failed, http status: " + statusCode + ", response: " + body);
+        }
+        JsonNode result = parse(body);
+        if (result == null
+                || !result.hasNonNull(DatavinesTaskConstants.API_RESULT_CODE)
+                || result.get(DatavinesTaskConstants.API_RESULT_CODE)
+                        .asInt() != DatavinesTaskConstants.API_RESULT_CODE_SUCCESS) {
+            throw new IllegalStateException("kill datavines task failed, invalid response: " + body);
+        }
     }
 
     public static JsonNode parse(String res) {
