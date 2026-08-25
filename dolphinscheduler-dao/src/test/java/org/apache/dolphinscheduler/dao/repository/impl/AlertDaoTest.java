@@ -73,6 +73,7 @@ class AlertDaoTest extends BaseDaoTest {
     void testAddTaskResultAlertIdempotent() {
         String content = "[{\"taskName\":\"sql-task-1\",\"result\":\"ok\"}]";
         int workflowInstanceId = 999999;
+        int taskInstanceId = 5001;
 
         Alert alert = new Alert();
         alert.setTitle("SQL Task Result");
@@ -81,6 +82,7 @@ class AlertDaoTest extends BaseDaoTest {
         alert.setAlertGroupId(1);
         alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         alert.setWorkflowInstanceId(workflowInstanceId);
+        alert.setTaskInstanceId(taskInstanceId);
         alert.setAlertType(AlertType.TASK_RESULT);
         alert.setCreateTime(new java.util.Date());
 
@@ -88,7 +90,7 @@ class AlertDaoTest extends BaseDaoTest {
         int firstCount = alertDao.addTaskResultAlert(alert);
         Assertions.assertEquals(1, firstCount);
 
-        // Second insert with the same content + workflowInstanceId + alertType should be skipped
+        // Second insert with the same content + workflowInstanceId + taskInstanceId + alertType should be skipped
         Alert duplicateAlert = new Alert();
         duplicateAlert.setTitle("SQL Task Result");
         duplicateAlert.setContent(content);
@@ -96,6 +98,7 @@ class AlertDaoTest extends BaseDaoTest {
         duplicateAlert.setAlertGroupId(1);
         duplicateAlert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         duplicateAlert.setWorkflowInstanceId(workflowInstanceId);
+        duplicateAlert.setTaskInstanceId(taskInstanceId);
         duplicateAlert.setAlertType(AlertType.TASK_RESULT);
         duplicateAlert.setCreateTime(new java.util.Date());
 
@@ -108,5 +111,50 @@ class AlertDaoTest extends BaseDaoTest {
                 .filter(a -> a.getAlertType() == AlertType.TASK_RESULT)
                 .count();
         Assertions.assertEquals(1L, count);
+    }
+
+    /**
+     * Two different tasks in the same workflow instance returning identical results
+     * must NOT be treated as duplicates — each task should get its own alert.
+     */
+    @Test
+    void testAddTaskResultAlertDifferentTaskSameContentNotDuplicate() {
+        String content = "[{\"result\":\"ok\"}]";
+        int workflowInstanceId = 999998;
+
+        // First task alert
+        Alert alert1 = new Alert();
+        alert1.setTitle("SQL Task A Result");
+        alert1.setContent(content);
+        alert1.setWarningType(WarningType.SUCCESS);
+        alert1.setAlertGroupId(1);
+        alert1.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+        alert1.setWorkflowInstanceId(workflowInstanceId);
+        alert1.setTaskInstanceId(6001);
+        alert1.setAlertType(AlertType.TASK_RESULT);
+        alert1.setCreateTime(new java.util.Date());
+        int firstCount = alertDao.addTaskResultAlert(alert1);
+        Assertions.assertEquals(1, firstCount);
+
+        // Second task alert — same content, same workflow instance, but different task instance
+        Alert alert2 = new Alert();
+        alert2.setTitle("SQL Task B Result");
+        alert2.setContent(content);
+        alert2.setWarningType(WarningType.SUCCESS);
+        alert2.setAlertGroupId(2);
+        alert2.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+        alert2.setWorkflowInstanceId(workflowInstanceId);
+        alert2.setTaskInstanceId(6002);
+        alert2.setAlertType(AlertType.TASK_RESULT);
+        alert2.setCreateTime(new java.util.Date());
+        int secondCount = alertDao.addTaskResultAlert(alert2);
+        Assertions.assertEquals(1, secondCount);
+
+        // Verify two alert rows exist for this workflow instance
+        long count = alertDao.listAlerts(workflowInstanceId)
+                .stream()
+                .filter(a -> a.getAlertType() == AlertType.TASK_RESULT)
+                .count();
+        Assertions.assertEquals(2L, count);
     }
 }

@@ -72,6 +72,7 @@ class WorkflowAlertManagerTest {
         workflowInstance.setWorkflowDefinitionCode(3001L);
 
         TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(5001);
         taskInstance.setName("sql-query-task");
 
         TaskAlertInfo taskAlertInfo = new TaskAlertInfo();
@@ -100,6 +101,8 @@ class WorkflowAlertManagerTest {
         Assertions.assertEquals(3001L, captured.getWorkflowDefinitionCode());
         Assertions.assertEquals(1, captured.getAlertGroupId());
         Assertions.assertNotNull(captured.getCreateTime());
+        Assertions.assertEquals(5001, captured.getTaskInstanceId(),
+                "Task instance ID must be set on the alert for idempotency key differentiation");
     }
 
     /**

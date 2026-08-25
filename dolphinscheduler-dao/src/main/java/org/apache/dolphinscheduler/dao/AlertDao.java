@@ -159,6 +159,13 @@ public class AlertDao {
      * @return sign's str
      */
     private String generateSign(Alert alert) {
+        // Task-result alerts include the task instance ID in the sign so that two
+        // different tasks returning identical results are not treated as duplicates.
+        // For other alert types taskInstanceId is null and the sign falls back to
+        // content-only, preserving the original behaviour.
+        if (alert.getTaskInstanceId() != null) {
+            return DigestUtils.sha1Hex(alert.getTaskInstanceId() + "|" + alert.getContent()).toLowerCase();
+        }
         return Optional.of(alert)
                 .map(Alert::getContent)
                 .map(DigestUtils::sha1Hex)
