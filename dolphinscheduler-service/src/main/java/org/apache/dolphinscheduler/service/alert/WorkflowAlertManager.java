@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.alert;
 
+import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -227,6 +228,7 @@ public class WorkflowAlertManager {
         alert.setTitle(taskAlertInfo.getTitle());
         alert.setContent(taskAlertInfo.getContent());
         alert.setWarningType(WarningType.SUCCESS);
+        alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
         alert.setCreateTime(new Date());
         alert.setAlertGroupId(taskAlertInfo.getAlertGroupId());
         alert.setProjectCode(workflowInstance.getProjectCode());
