@@ -22,31 +22,36 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.3.0
 
-* Remove the `udf-manage` function from the `resource center` ([#16209])(https://github.com/apache/dolphinscheduler/pull/16209)
-* Remove the `Pigeon` from the `Task Plugin` ([#16218])(https://github.com/apache/dolphinscheduler/pull/16218)
-* Uniformly name `process` in code as `workflow` ([#16515])(https://github.com/apache/dolphinscheduler/pull/16515)
-* Deprecated upgrade code of 1.x and 2.x ([#16543])(https://github.com/apache/dolphinscheduler/pull/16543)
-* Remove the `Data Quality` module ([#16794])(https://github.com/apache/dolphinscheduler/pull/16794)
-* Remove the `registry-disconnect-strategy` in `application.yaml` ([#16821])(https://github.com/apache/dolphinscheduler/pull/16821)
-* Remove `exec-threads` in worker's `application.yaml`, please use `physical-task-config`;Remove `master-async-task-executor-thread-pool-size` in master's `application.yaml`, please use `logic-task-config` ([#16790])(https://github.com/apache/dolphinscheduler/pull/16790)
-* Drop unused column `other_params_json` in `t_ds_worker_group` ([#16860])(https://github.com/apache/dolphinscheduler/pull/16860)
-* Remove the `Dynamic` from the `Task Plugin` ([#16482])(https://github.com/apache/dolphinscheduler/pull/16842)
+* Remove the `udf-manage` function from the `resource center` ([#16209](https://github.com/apache/dolphinscheduler/pull/16209))
+* Remove the `Pigeon` from the `Task Plugin` ([#16218](https://github.com/apache/dolphinscheduler/pull/16218))
+* Uniformly name `process` in code as `workflow` ([#16515](https://github.com/apache/dolphinscheduler/pull/16515))
+* Deprecated upgrade code of 1.x and 2.x ([#16543](https://github.com/apache/dolphinscheduler/pull/16543))
+* Remove the `Data Quality` module ([#16794](https://github.com/apache/dolphinscheduler/pull/16794))
+* Remove the `registry-disconnect-strategy` in `application.yaml` ([#16821](https://github.com/apache/dolphinscheduler/pull/16821))
+* Remove `exec-threads` in worker's `application.yaml`, please use `physical-task-config`;Remove `master-async-task-executor-thread-pool-size` in master's `application.yaml`, please use `logic-task-config` ([#16790](https://github.com/apache/dolphinscheduler/pull/16790))
+* Drop unused column `other_params_json` in `t_ds_worker_group` ([#16860](https://github.com/apache/dolphinscheduler/pull/16860))
+* Remove the `Dynamic` from the `Task Plugin` ([#16482](https://github.com/apache/dolphinscheduler/pull/16842))
 
 ## 3.4.0
 
-* Renamed the publicKey field to privateKey in the SSH connection parameters under the datasource configuration. ([#17666])(https://github.com/apache/dolphinscheduler/pull/17666)
-* Add table t_ds_serial_command. ([#17531])(https://github.com/apache/dolphinscheduler/pull/17531)
-* Remove the default value of `python-gateway.auth-token` at `api-server/application.yaml`. ([#17801])(https://github.com/apache/dolphinscheduler/pull/17801)
-* Refactor the task plugins which use ShellCommandExecutor ([#17790])(https://github.com/apache/dolphinscheduler/pull/17790)
-* Remove the `Pytorch` from the `Task Plugin` ([#17808])(https://github.com/apache/dolphinscheduler/pull/17808), if you are still using this task type, please delete the data with `task_type = 'PYTORCH'` in `t_ds_task_definition` and `t_ds_task_definition_log` before upgrading.
+* Renamed the publicKey field to privateKey in the SSH connection parameters under the datasource configuration. ([#17666](https://github.com/apache/dolphinscheduler/pull/17666))
+* Add table t_ds_serial_command. ([#17531](https://github.com/apache/dolphinscheduler/pull/17531))
+* Remove the default value of `python-gateway.auth-token` at `api-server/application.yaml`. ([#17801](https://github.com/apache/dolphinscheduler/pull/17801))
+* Refactor the task plugins which use ShellCommandExecutor ([#17790](https://github.com/apache/dolphinscheduler/pull/17790))
+* Remove the `Pytorch` from the `Task Plugin` ([#17808](https://github.com/apache/dolphinscheduler/pull/17808)), if you are still using this task type, please delete the data with `task_type = 'PYTORCH'` in `t_ds_task_definition` and `t_ds_task_definition_log` before upgrading.
 
 ## 3.4.1
 
-* Remove import and export of workflow definition. ([#17940])(https://github.com/apache/dolphinscheduler/issues/17940)
+* Remove import and export of workflow definition. ([#17940](https://github.com/apache/dolphinscheduler/issues/17940))
 
 ## 3.5.0
 
 * Add the `missed_fire_policy` column to `t_ds_schedules`. Existing schedules default to `FIRE_ALL_MISSED` to preserve the previous Quartz `IgnoreMisfires` behavior. ([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
 * Remove the obsolete Dynamic Task query API. ([#18556](https://github.com/apache/dolphinscheduler/issues/18556))
 * Remove the obsolete task update-with-upstream API `PUT /projects/{projectCode}/task-definition/{code}/with-upstream`. ([#18568](https://github.com/apache/dolphinscheduler/issues/18568))
+* The workflow instance list APIs (`GET /projects/{projectCode}/workflow-instances`, `GET /projects/{projectCode}/workflow-instances/top-n`, `GET /projects/{projectCode}/workflow-instances/trigger`) no longer return the following properties in the response body:
+  * **Removed heavy fields**: `commandParam`, `globalParams`, `historyCmd`, `varPool`, `stateHistory`
+  * **Removed transient fields**: `stateDescList`, `workflowDefinition`, `dagData`, `queue`, `locations`, `dependenceScheduleTimes`
+  * **Removed derived properties**: `cmdTypeIfComplement`, `complementData` (related to complement-data executions; use the detail API to obtain them)
+  * To obtain any of these fields, use the detail API `GET /projects/{projectCode}/workflow-instances/{id}` instead, which continues to return the full `WorkflowInstance` object. ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
 

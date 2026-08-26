@@ -71,7 +71,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
@@ -79,6 +78,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
@@ -844,8 +844,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         // check workflow instances is already running
-        List<WorkflowInstance> workflowInstances = workflowInstanceService.queryByWorkflowDefinitionCodeAndStatus(
-                workflowDefinition.getCode(), WorkflowExecutionStatus.NOT_TERMINAL_STATES);
+        List<WorkflowInstanceSummaryDto> workflowInstances =
+                workflowInstanceService.queryByWorkflowDefinitionCodeAndStatus(
+                        workflowDefinition.getCode(), WorkflowExecutionStatus.NOT_TERMINAL_STATES);
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
             throw new ServiceException(Status.DELETE_WORKFLOW_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
         }
@@ -1120,7 +1121,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Map<Long, List<TreeViewDto>> waitingRunningNodeMap = new ConcurrentHashMap<>();
 
         // List of workflow instances
-        List<WorkflowInstance> workflowInstanceList =
+        List<WorkflowInstanceSummaryDto> workflowInstanceList =
                 workflowInstanceService.queryByWorkflowDefinitionCode(code, limit);
         workflowInstanceList.forEach(workflowInstance -> workflowInstance
                 .setDuration(
@@ -1143,7 +1144,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         parentTreeViewDto.setCode(0L);
         // Specify the workflow definition, because it is a TreeView for a workflow definition
         for (int i = limit - 1; i >= 0; i--) {
-            WorkflowInstance workflowInstance = workflowInstanceList.get(i);
+            WorkflowInstanceSummaryDto workflowInstance = workflowInstanceList.get(i);
             Date endTime = workflowInstance.getEndTime() == null ? new Date() : workflowInstance.getEndTime();
             parentTreeViewDto.getInstances()
                     .add(new Instance(workflowInstance.getId(), workflowInstance.getName(),
@@ -1175,7 +1176,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 treeViewDto.setName(taskNode.getName());
                 // set treeViewDto instances
                 for (int i = limit - 1; i >= 0; i--) {
-                    WorkflowInstance workflowInstance = workflowInstanceList.get(i);
+                    WorkflowInstanceSummaryDto workflowInstance = workflowInstanceList.get(i);
                     TaskInstance taskInstance =
                             taskInstanceDao.queryByWorkflowInstanceIdAndTaskCode(workflowInstance.getId(), nodeCode);
                     if (taskInstance == null) {
@@ -1730,7 +1731,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.MAIN_TABLE_USING_VERSION);
         }
         // check whether there exist running workflow instance under the workflow definition
-        List<WorkflowInstance> workflowInstances = workflowInstanceService.queryByWorkflowCodeVersionStatus(
+        List<WorkflowInstanceSummaryDto> workflowInstances = workflowInstanceService.queryByWorkflowCodeVersionStatus(
                 code,
                 version,
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES);
