@@ -100,12 +100,26 @@ public class AlertSender extends AbstractEventSender<Alert> {
 
     @Override
     public AlertData getAlertData(Alert event) {
+        // During a rolling upgrade, an old Alert Server may receive an alert whose
+        // alert_type value (e.g. TASK_RESULT) was introduced by a newer Master and
+        // is not yet present in the old AlertType enum. MyBatis-Plus maps unknown
+        // enum values to null, so we must guard against a NullPointerException here.
+        // Falling back to 0 (WORKFLOW_INSTANCE_FAILURE) keeps the alert deliverable
+        // while logging a warning so operators can detect the version mismatch.
+        int alertTypeCode = 0;
+        if (event.getAlertType() != null) {
+            alertTypeCode = event.getAlertType().getCode();
+        } else {
+            log.warn("Alert {} has null alertType, falling back to 0 (WORKFLOW_INSTANCE_FAILURE). "
+                    + "This may indicate an Alert Server version older than the Master that created the alert.",
+                    event.getId());
+        }
         return AlertData.builder()
                 .id(event.getId())
                 .content(event.getContent())
                 .log(event.getLog())
                 .title(event.getTitle())
-                .alertType(event.getAlertType().getCode())
+                .alertType(alertTypeCode)
                 .build();
     }
 

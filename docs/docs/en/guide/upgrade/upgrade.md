@@ -75,6 +75,14 @@ Execution result:
 - After version 3.3.X and later, we only support upgrading from 3.0.0. For versions lower than this, please download the historical version and upgrade to 3.0.0.
 - After version 3.3.X and later, binary packages no longer provide plugins dependencies by default, so when you use them for the first time, you need to download and install them yourself. For more information, please refer to [Pseudo-Cluster](../installation/pseudo-cluster.md).
 
+#### Rolling Upgrade Order
+
+When performing a rolling upgrade, **the Alert Server must be upgraded before Master/Worker**.
+
+Starting from 3.5.0, the Master may persist new `alert_type` enum values (e.g. `TASK_RESULT`) into the `t_ds_alert` table. If the Alert Server has not yet been upgraded to a version that includes the new enum value, MyBatis will deserialize the unknown value as `null`, causing `AlertSender` to throw a `NullPointerException` while building the alert data. The alert will remain stuck in `WAIT_EXECUTION` and never be delivered.
+
+Upgrading in the order "Alert Server → Master → Worker" eliminates this risk.
+
 #### Precautions after the upgrade
 
 The alert plugin may have some dirty data. After the upgrade, clear it manually by referring to SQL.
@@ -82,4 +90,3 @@ The alert plugin may have some dirty data. After the upgrade, clear it manually 
 ```sql
 delete from t_ds_alertgroup where group_name = 'global alert group' and description = 'global alert group';
 ```
-
