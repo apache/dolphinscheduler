@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.Map;
@@ -102,6 +103,48 @@ public abstract class AbstractTask {
 
     public void setAppIds(String appIds) {
         this.appIds = appIds;
+    }
+
+    /**
+     * @deprecated Use {@link TaskExecutionContext#isNeedAlert()} on the
+     *             {@code taskRequest} field instead.  This method is retained as a
+     *             compatibility bridge so that third-party task plugins compiled
+     *             against the previous AbstractTask API continue to work.
+     */
+    @Deprecated
+    public boolean getNeedAlert() {
+        return taskRequest != null && taskRequest.isNeedAlert();
+    }
+
+    /**
+     * @deprecated Use {@link TaskExecutionContext#setNeedAlert(boolean)} on the
+     *             {@code taskRequest} field instead.
+     */
+    @Deprecated
+    public void setNeedAlert(boolean needAlert) {
+        if (taskRequest != null) {
+            taskRequest.setNeedAlert(needAlert);
+        }
+    }
+
+    /**
+     * @deprecated Use {@link TaskExecutionContext#getTaskAlertInfo()} on the
+     *             {@code taskRequest} field instead.
+     */
+    @Deprecated
+    public TaskAlertInfo getTaskAlertInfo() {
+        return taskRequest != null ? taskRequest.getTaskAlertInfo() : null;
+    }
+
+    /**
+     * @deprecated Use {@link TaskExecutionContext#setTaskAlertInfo(TaskAlertInfo)}
+     *             on the {@code taskRequest} field instead.
+     */
+    @Deprecated
+    public void setTaskAlertInfo(TaskAlertInfo taskAlertInfo) {
+        if (taskRequest != null) {
+            taskRequest.setTaskAlertInfo(taskAlertInfo);
+        }
     }
 
     /**
