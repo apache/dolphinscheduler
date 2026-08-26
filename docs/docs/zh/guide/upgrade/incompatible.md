@@ -1,3 +1,4 @@
+
 # 不向前兼容的更新
 
 本文档记录了各版本之间不兼容的更新内容。在升级到相关版本前，请检查本文档。
@@ -54,4 +55,5 @@
   * **移除的非数据库字段**：`stateDescList`、`workflowDefinition`、`dagData`、`queue`、`locations`、`dependenceScheduleTimes`
   * **移除的派生属性**：`cmdTypeIfComplement`、`complementData`（补数执行相关，如需获取请使用详情接口）
   * 如需获取这些字段，请使用详情接口 `GET /projects/{projectCode}/workflow-instances/{id}`，该接口仍返回完整的 `WorkflowInstance` 对象 ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
+* 为 `t_ds_alert` 表的 `(sign, workflow_instance_id, alert_type)` 新增唯一约束 `uk_alert_dedup`。升级脚本会自动清理已存在的重复行（保留 id 最大的一条），之后添加唯一索引。该约束确保任务结果告警在并发投递时数据库层面幂等。
 

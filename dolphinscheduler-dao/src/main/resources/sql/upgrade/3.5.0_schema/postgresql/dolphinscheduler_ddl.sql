@@ -19,3 +19,15 @@ CREATE INDEX idx_project_submit_time ON t_ds_task_instance (project_code ASC, su
 CREATE INDEX idx_project_start_time ON t_ds_workflow_instance (project_code ASC, start_time DESC);
 ALTER TABLE t_ds_schedules
     ADD COLUMN missed_fire_policy smallint NOT NULL DEFAULT 2;
+
+-- Enforce idempotent task-result alerts at the database level.
+-- Allows INSERT IGNORE (MySQL) / ON CONFLICT DO NOTHING (PostgreSQL) to atomically
+-- prevent duplicates without check-then-insert race conditions.
+-- Clean up any existing duplicate rows before adding the unique constraint.
+DELETE FROM t_ds_alert a
+USING t_ds_alert b
+WHERE a.id < b.id
+  AND a.sign = b.sign
+  AND a.workflow_instance_id = b.workflow_instance_id
+  AND a.alert_type = b.alert_type;
+CREATE UNIQUE INDEX IF NOT EXISTS uk_alert_dedup ON t_ds_alert (sign, workflow_instance_id, alert_type);

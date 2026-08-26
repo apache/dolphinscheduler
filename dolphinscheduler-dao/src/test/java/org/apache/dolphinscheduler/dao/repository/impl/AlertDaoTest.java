@@ -24,7 +24,13 @@ import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Alert;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -156,5 +162,80 @@ class AlertDaoTest extends BaseDaoTest {
                 .filter(a -> a.getAlertType() == AlertType.TASK_RESULT)
                 .count();
         Assertions.assertEquals(2L, count);
+    }
+
+    /**
+     * Verifies that concurrent calls to {@code addTaskResultAlert} with the same
+     * deduplication key result in exactly one inserted row.
+     * <p>
+     * Without the database-level unique constraint, the old INSERT ... SELECT ...
+     * HAVING count(*) = 0 pattern allowed a race condition where two transactions
+     * could both observe a count of zero and insert duplicate alerts.  The unique
+     * index uk_alert_dedup plus INSERT IGNORE / ON CONFLICT DO NOTHING ensures
+     * atomicity: only one insert succeeds, the rest are silently skipped.
+     */
+    @Test
+    void testConcurrentAddTaskResultAlertIdempotent() throws Exception {
+        String content = "[{\"taskName\":\"sql-concurrent\",\"result\":\"ok\"}]";
+        int workflowInstanceId = 999997;
+        int taskInstanceId = 7001;
+        int threadCount = 8;
+
+        CountDownLatch startLatch = new CountDownLatch(1);
+        CountDownLatch doneLatch = new CountDownLatch(threadCount);
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        AtomicInteger successCount = new AtomicInteger(0);
+
+        List<Future<?>> futures = new ArrayList<>();
+        for (int i = 0; i < threadCount; i++) {
+            futures.add(executor.submit(() -> {
+                try {
+                    startLatch.await();
+
+                    Alert alert = new Alert();
+                    alert.setTitle("SQL Task Result");
+                    alert.setContent(content);
+                    alert.setWarningType(WarningType.SUCCESS);
+                    alert.setAlertGroupId(1);
+                    alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+                    alert.setWorkflowInstanceId(workflowInstanceId);
+                    alert.setTaskInstanceId(taskInstanceId);
+                    alert.setAlertType(AlertType.TASK_RESULT);
+                    alert.setCreateTime(new java.util.Date());
+
+                    int inserted = alertDao.addTaskResultAlert(alert);
+                    if (inserted > 0) {
+                        successCount.incrementAndGet();
+                    }
+                } catch (Exception e) {
+                    // Exceptions are acceptable for losing threads; the winner inserts
+                } finally {
+                    doneLatch.countDown();
+                }
+            }));
+        }
+
+        startLatch.countDown();
+        doneLatch.await();
+        executor.shutdown();
+
+        // Check for unexpected exceptions
+        for (Future<?> f : futures) {
+            if (!f.isDone()) {
+                Assertions.fail("A concurrent task did not complete");
+            }
+        }
+
+        // Exactly one thread should have successfully inserted
+        Assertions.assertEquals(1, successCount.get(),
+                "Exactly one concurrent insert should succeed, but got " + successCount.get());
+
+        // Verify only one alert row exists in the database
+        long dbCount = alertDao.listAlerts(workflowInstanceId)
+                .stream()
+                .filter(a -> a.getAlertType() == AlertType.TASK_RESULT)
+                .count();
+        Assertions.assertEquals(1L, dbCount,
+                "Exactly one alert row should exist in the database, but found " + dbCount);
     }
 }

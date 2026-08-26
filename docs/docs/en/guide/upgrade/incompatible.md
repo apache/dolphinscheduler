@@ -1,3 +1,4 @@
+
 # Incompatible
 
 This document records the incompatible updates between each version. You need to check this document before you upgrade to related version.
@@ -54,4 +55,5 @@ This document records the incompatible updates between each version. You need to
   * **Removed transient fields**: `stateDescList`, `workflowDefinition`, `dagData`, `queue`, `locations`, `dependenceScheduleTimes`
   * **Removed derived properties**: `cmdTypeIfComplement`, `complementData` (related to complement-data executions; use the detail API to obtain them)
   * To obtain any of these fields, use the detail API `GET /projects/{projectCode}/workflow-instances/{id}` instead, which continues to return the full `WorkflowInstance` object. ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
+* Add a unique constraint `uk_alert_dedup` on `(sign, workflow_instance_id, alert_type)` to the `t_ds_alert` table. The upgrade script automatically cleans up existing duplicate rows (keeping the one with the largest id) before adding the unique index. This constraint ensures database-level idempotency for task-result alerts under concurrent delivery.
 
