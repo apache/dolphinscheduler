@@ -141,19 +141,26 @@ public class ClusterServiceTest {
 
     @Test
     public void testQueryAllClusterList() {
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> clusterService.queryAllClusterList(getGeneralUser()));
+
         when(clusterDao.queryAllClusterList()).thenReturn(Lists.newArrayList(getCluster()));
-        List<ClusterDto> clusterDtos = clusterService.queryAllClusterList();
+        List<ClusterDto> clusterDtos = clusterService.queryAllClusterList(getAdminUser());
         Assertions.assertEquals(clusterDtos.size(), 1);
     }
 
     @Test
     public void testQueryClusterListPaging() {
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> clusterService.queryClusterListPaging(getGeneralUser(), 1, 10, clusterName));
+
         IPage<Cluster> page = new Page<>(1, 10);
         page.setRecords(getList());
         page.setTotal(1L);
         when(clusterDao.queryClusterListPaging(Mockito.any(Page.class), Mockito.eq(clusterName))).thenReturn(page);
 
-        PageInfo<ClusterDto> clusterDtoPageInfo = clusterService.queryClusterListPaging(1, 10, clusterName);
+        PageInfo<ClusterDto> clusterDtoPageInfo = clusterService.queryClusterListPaging(getAdminUser(), 1, 10,
+                clusterName);
         Assertions.assertTrue(CollectionUtils.isNotEmpty(clusterDtoPageInfo.getTotalList()));
     }
 
@@ -170,11 +177,15 @@ public class ClusterServiceTest {
 
     @Test
     public void testQueryClusterByCode() {
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> clusterService.queryClusterByCode(getGeneralUser(), 1L));
+
         when(clusterDao.queryByClusterCode(1L)).thenReturn(null);
-        assertThrowsServiceException(Status.QUERY_CLUSTER_BY_CODE_ERROR, () -> clusterService.queryClusterByCode(1L));
+        assertThrowsServiceException(Status.QUERY_CLUSTER_BY_CODE_ERROR,
+                () -> clusterService.queryClusterByCode(getAdminUser(), 1L));
 
         when(clusterDao.queryByClusterCode(1L)).thenReturn(getCluster());
-        ClusterDto clusterDto = clusterService.queryClusterByCode(1L);
+        ClusterDto clusterDto = clusterService.queryClusterByCode(getAdminUser(), 1L);
         assertNotNull(clusterDto);
     }
 
@@ -196,10 +207,15 @@ public class ClusterServiceTest {
 
     @Test
     public void testVerifyCluster() {
-        assertThrowsServiceException(Status.CLUSTER_NAME_IS_NULL, () -> clusterService.verifyCluster(""));
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> clusterService.verifyCluster(getGeneralUser(), clusterName));
+
+        assertThrowsServiceException(Status.CLUSTER_NAME_IS_NULL,
+                () -> clusterService.verifyCluster(getAdminUser(), ""));
 
         when(clusterDao.queryByClusterName(clusterName)).thenReturn(getCluster());
-        assertThrowsServiceException(Status.CLUSTER_NAME_EXISTS, () -> clusterService.verifyCluster(clusterName));
+        assertThrowsServiceException(Status.CLUSTER_NAME_EXISTS,
+                () -> clusterService.verifyCluster(getAdminUser(), clusterName));
     }
 
     private Cluster getCluster() {
