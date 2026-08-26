@@ -40,6 +40,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermission;
 import java.nio.file.attribute.PosixFilePermissions;
+import java.util.Optional;
 import java.util.Set;
 import java.util.zip.CRC32;
 import java.util.zip.CheckedInputStream;
@@ -293,27 +294,24 @@ public class FileUtils {
         if (paths.length == 0) {
             throw new IllegalArgumentException("At least one path should be provided");
         }
-        StringBuilder finalPath = new StringBuilder(paths[0]);
-        if (StringUtils.isEmpty(finalPath)) {
-            throw new IllegalArgumentException("The path should not be empty");
-        }
+        StringBuilder firstPath = new StringBuilder(Optional.ofNullable(paths[0]).orElse(StringUtils.EMPTY));
         String separator = File.separator;
         for (int i = 1; i < paths.length; i++) {
             String path = paths[i];
             if (StringUtils.isEmpty(path)) {
-                throw new IllegalArgumentException("The path should not be empty");
-            }
-            if (finalPath.toString().endsWith(separator) && path.startsWith(separator)) {
-                finalPath.append(path.substring(separator.length()));
                 continue;
             }
-            if (!finalPath.toString().endsWith(separator) && !path.startsWith(separator)) {
-                finalPath.append(separator).append(path);
+            if (firstPath.toString().endsWith(separator) && path.startsWith(separator)) {
+                firstPath.append(path.substring(separator.length()));
                 continue;
             }
-            finalPath.append(path);
+            if (!firstPath.toString().endsWith(separator) && !path.startsWith(separator)) {
+                firstPath.append(separator).append(path);
+                continue;
+            }
+            firstPath.append(path);
         }
-        return finalPath.toString();
+        return firstPath.toString();
     }
 
     /**
@@ -323,4 +321,23 @@ public class FileUtils {
     public static void copyInputStreamToFile(InputStream inputStream, String destFilename) {
         org.apache.commons.io.FileUtils.copyInputStreamToFile(inputStream, new File(destFilename));
     }
+
+    /**
+     * get parent Path
+     * @param pathStr pathStr
+     * @return Path
+     */
+    public static Path getParentPath(String pathStr) {
+        return getParentPath(Paths.get(pathStr));
+    }
+
+    /**
+     * get parent Path
+     * @param path pth
+     * @return Path
+     */
+    public static Path getParentPath(Path path) {
+        return Optional.ofNullable(path.getParent()).orElse(Paths.get(StringUtils.EMPTY));
+    }
+
 }

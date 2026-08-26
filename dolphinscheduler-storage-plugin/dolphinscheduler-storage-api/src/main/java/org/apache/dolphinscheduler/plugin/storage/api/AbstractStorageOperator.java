@@ -50,7 +50,7 @@ public abstract class AbstractStorageOperator implements StorageOperator {
                 .isDirectory(Files.getFileExtension(resourceAbsolutePath).isEmpty())
                 .tenant(segments[0])
                 .resourceType(ResourceType.FILE)
-                .resourceRelativePath(segments.length == 2 ? "/" : segments[2])
+                .resourceRelativePath(segments.length == 2 ? segments[1] : segments[2])
                 .resourceParentAbsolutePath(StringUtils.substringBeforeLast(resourceAbsolutePath, File.separator))
                 .build();
     }

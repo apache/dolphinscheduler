@@ -72,6 +72,7 @@ dolphinscheduler-storage-hdfs
 dolphinscheduler-storage-obs
 dolphinscheduler-storage-oss
 dolphinscheduler-storage-s3
+dolphinscheduler-storage-gitlab
 --end--
 
 --task-plugins--

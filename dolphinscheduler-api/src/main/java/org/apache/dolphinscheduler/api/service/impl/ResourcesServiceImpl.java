@@ -163,7 +163,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public void createDirectory(CreateDirectoryRequest createDirectoryRequest) {
         CreateDirectoryDto createDirectoryDto = createDirectoryRequestTransformer.transform(createDirectoryRequest);
-        createDirectoryDtoValidator.validate(createDirectoryDto);
+        createDirectoryDtoValidator.doValidate(createDirectoryDto);
 
         storageOperator.createStorageDir(createDirectoryDto.getDirectoryAbsolutePath());
         log.info("Success create directory: {}", createDirectoryRequest.getParentAbsoluteDirectory());
@@ -172,7 +172,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public void createFile(CreateFileRequest createFileRequest) {
         CreateFileDto createFileDto = createFileRequestTransformer.transform(createFileRequest);
-        createFileDtoValidator.validate(createFileDto);
+        createFileDtoValidator.doValidate(createFileDto);
 
         // todo: use storage proxy
         MultipartFile file = createFileDto.getFile();
@@ -193,7 +193,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public void createFileFromContent(CreateFileFromContentRequest createFileFromContentRequest) {
         CreateFileFromContentDto createFileFromContentDto =
                 createFileFromContentRequestTransformer.transform(createFileFromContentRequest);
-        createFileFromContentDtoValidator.validate(createFileFromContentDto);
+        createFileFromContentDtoValidator.doValidate(createFileFromContentDto);
 
         // todo: use storage proxy
         String fileContent = createFileFromContentDto.getFileContent();
@@ -213,7 +213,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public void renameDirectory(RenameDirectoryRequest renameDirectoryRequest) {
         RenameDirectoryDto renameDirectoryDto = renameDirectoryRequestTransformer.transform(renameDirectoryRequest);
-        renameDirectoryDtoValidator.validate(renameDirectoryDto);
+        renameDirectoryDtoValidator.doValidate(renameDirectoryDto);
 
         String originDirectoryAbsolutePath = renameDirectoryDto.getOriginDirectoryAbsolutePath();
         String targetDirectoryAbsolutePath = renameDirectoryDto.getTargetDirectoryAbsolutePath();
@@ -224,7 +224,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public void renameFile(RenameFileRequest renameFileRequest) {
         RenameFileDto renameFileDto = renameFileRequestTransformer.transform(renameFileRequest);
-        renameFileDtoValidator.validate(renameFileDto);
+        renameFileDtoValidator.doValidate(renameFileDto);
 
         String originFileAbsolutePath = renameFileDto.getOriginFileAbsolutePath();
         String targetFileAbsolutePath = renameFileDto.getTargetFileAbsolutePath();
@@ -235,7 +235,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     @Override
     public void updateFile(UpdateFileRequest updateFileRequest) {
         UpdateFileDto updateFileDto = updateFileRequestTransformer.transform(updateFileRequest);
-        updateFileDtoValidator.validate(updateFileDto);
+        updateFileDtoValidator.doValidate(updateFileDto);
 
         String srcLocalTmpFileAbsolutePath = copyFileToLocal(updateFileDto.getFile());
         try {
@@ -259,6 +259,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
         }
 
         for (String resourceAbsolutePath : resourceAbsolutePaths) {
+            if (createDirectoryDtoValidator.ignoreValid()) {
+                continue;
+            }
             createDirectoryDtoValidator.exceptionResourceAbsolutePathInvalidated(resourceAbsolutePath);
             createDirectoryDtoValidator.exceptionUserNoResourcePermission(pagingResourceItemRequest.getLoginUser(),
                     resourceAbsolutePath);
@@ -305,7 +308,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 .loginUser(deleteResourceRequest.getLoginUser())
                 .resourceAbsolutePath(deleteResourceRequest.getResourceAbsolutePath())
                 .build();
-        deleteResourceDtoValidator.validate(deleteResourceDto);
+        deleteResourceDtoValidator.doValidate(deleteResourceDto);
         storageOperator.delete(deleteResourceDto.getResourceAbsolutePath(), true);
     }
 
@@ -317,7 +320,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 .skipLineNum(fetchFileContentRequest.getSkipLineNum())
                 .limit(fetchFileContentRequest.getLimit())
                 .build();
-        fetchFileContentDtoValidator.validate(fetchFileContentDto);
+        fetchFileContentDtoValidator.doValidate(fetchFileContentDto);
 
         String content = storageOperator
                 .fetchFileContent(
@@ -338,7 +341,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
     public void updateFileFromContent(UpdateFileFromContentRequest updateFileContentRequest) {
         UpdateFileFromContentDto updateFileFromContentDto =
                 updateFileFromContentRequestTransformer.transform(updateFileContentRequest);
-        updateFileFromContentDtoValidator.validate(updateFileFromContentDto);
+        updateFileFromContentDtoValidator.doValidate(updateFileFromContentDto);
 
         String srcLocalTmpFileAbsolutePath = copyFileToLocal(updateFileFromContentDto.getFileContent());
         try {
@@ -346,6 +349,9 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                     true);
             ApiServerMetrics.recordApiResourceUploadSize(updateFileFromContentDto.getFileContent().length());
             log.info("Success upload resource file: {} complete.", updateFileFromContentDto.getFileAbsolutePath());
+        } catch (UnsupportedOperationException unsupportedOperationException) {
+            // the resource file managed by gitlab throw this exception
+            throw unsupportedOperationException;
         } catch (Exception ex) {
             // If exception, clear the tmp path
             FileUtils.deleteFile(srcLocalTmpFileAbsolutePath);
@@ -360,7 +366,7 @@ public class ResourcesServiceImpl extends BaseServiceImpl implements ResourcesSe
                 .loginUser(downloadFileRequest.getLoginUser())
                 .fileAbsolutePath(downloadFileRequest.getFileAbsolutePath())
                 .build();
-        downloadFileDtoValidator.validate(downloadFileDto);
+        downloadFileDtoValidator.doValidate(downloadFileDto);
 
         String fileName = new File(downloadFileDto.getFileAbsolutePath()).getName();
         String localTmpFileAbsolutePath = FileUtils.getDownloadFilename(fileName);

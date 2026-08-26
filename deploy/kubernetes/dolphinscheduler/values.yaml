@@ -296,6 +296,18 @@ conf:
     # -- You need to set this parameter when private cloud s3. If S3 uses public cloud, you only need to set resource.aws.region or set to the endpoint of a public cloud such as S3.cn-north-1.amazonaws.com.cn
     aws.s3.endpoint: http://minio:9000
 
+    # -- gitlab resource storage, host
+    resource.gitlab.storage.host: ""
+
+    # --gitlab resource storage, private-token
+    resource.gitlab.storage.private-token: ""
+
+    # --gitlab resource storage, project-id
+    resource.gitlab.storage.project-id: ""
+
+    # --gitlab resource storage, branch-ref
+    resource.gitlab.storage.branch-ref: ""
+
     # -- alibaba cloud access key id, required if you set resource.storage.type=OSS
     resource.alibaba.cloud.access.key.id: <your-access-key-id>
 

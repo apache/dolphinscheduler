@@ -78,3 +78,16 @@ resource:
         bucket:
           name: dolphinscheduler
         endpoint: obs.cn-southwest-2.huaweicloud.com
+
+  # Gitlab Storage (GITLAB), required if you set resource.storage.type=GITLAB
+  gitlab:
+    storage:
+      # GitLab server host url, e.g. https://gitlab.example.com
+      host:
+      # GitLab personal/project access token, sent as the PRIVATE-TOKEN header.
+      private-token:
+      # GitLab project id (e.g. 123).
+      project-id:
+      # branch used to list the repository tree.
+      branch-ref:
+

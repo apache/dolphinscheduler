@@ -67,6 +67,9 @@ public class PagingResourceItemRequestTransformer implements ITransformer<Paging
             List<String> resourceAbsolutePaths = tenantDao.queryAll()
                     .stream()
                     .map(tenant -> storageOperator.getStorageBaseDirectory(tenant.getTenantCode(), resourceType))
+                    // GitLab does not support tenant-based isolation of resource files，all tenant users base directory
+                    // are same，need distinct
+                    .distinct()
                     .collect(Collectors.toList());
             return QueryResourceDto.builder()
                     .resourceAbsolutePaths(resourceAbsolutePaths)

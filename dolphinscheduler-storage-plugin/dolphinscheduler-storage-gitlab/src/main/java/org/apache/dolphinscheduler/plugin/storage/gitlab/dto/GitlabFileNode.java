@@ -15,27 +15,44 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.plugin.storage.api;
+package org.apache.dolphinscheduler.plugin.storage.gitlab.dto;
 
-import java.util.Optional;
+import lombok.Data;
 
-public enum StorageType {
+/**
+ * A single node returned by the GitLab repository tree API
+ * {@code GET /api/v4/projects/:id/repository/tree}.
+ *
+ * <pre>
+ * [
+ *   {
+ *     "id": "a1e8f8d7...",
+ *     "name": "src",
+ *     "type": "tree",        // "tree" (directory) or "blob" (file)
+ *     "path": "src",
+ *     "mode": "040000"
+ *   }
+ * ]
+ * </pre>
+ */
+@Data
+public class GitlabFileNode {
 
-    LOCAL,
-    HDFS,
-    OSS,
-    S3,
-    GITLAB,
-    GCS,
-    ABS,
-    OBS,
-    COS;
+    private String id;
 
-    public static Optional<StorageType> getStorageType(String name) {
-        try {
-            return Optional.of(StorageType.valueOf(name));
-        } catch (IllegalArgumentException | NullPointerException ex) {
-            return Optional.empty();
-        }
+    private String name;
+
+    // tree is directory, blob is file
+    private String type;
+
+    private String path;
+
+    private String mode;
+
+    private boolean directory;
+
+    public boolean isDirectory() {
+        return type.equals("tree");
     }
+
 }

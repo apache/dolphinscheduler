@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.gitlab.GitlabStorageOperator;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -53,8 +54,28 @@ public abstract class AbstractResourceValidator<T> implements IValidator<T> {
         this.tenantDao = tenantDao;
     }
 
+    /**
+     * if the resource files managed by GitLab, the validation can ignore, because Gitlab resourceAbsolutePath is blank
+     * @return bool
+     */
+    public boolean ignoreValid() {
+        return storageOperator instanceof GitlabStorageOperator;
+    }
+
+    /**
+     * check ignoreValid
+     * @param t t
+     */
+    public void doValidate(T t) {
+        if (!ignoreValid()) {
+            validate(t);
+        }
+    }
+
     public void exceptionResourceAbsolutePathInvalidated(String resourceAbsolutePath) {
         if (StringUtils.isBlank(resourceAbsolutePath)) {
+            // if the resource files managed by GitLab, the validation can ignore, because Gitlab resourceAbsolutePath
+            // is blank
             throw new ServiceException("The resource path is null");
         }
         if (!resourceAbsolutePath.startsWith(storageOperator.getStorageBaseDirectory())) {
@@ -86,7 +107,7 @@ public abstract class AbstractResourceValidator<T> implements IValidator<T> {
 
     public void exceptionResourceNotExists(String resourceAbsolutePath) {
         if (!storageOperator.exists(resourceAbsolutePath)) {
-            throw new ServiceException("Thr resource is not exists: " + resourceAbsolutePath);
+            throw new ServiceException("The resource is not exists: " + resourceAbsolutePath);
         }
     }
 

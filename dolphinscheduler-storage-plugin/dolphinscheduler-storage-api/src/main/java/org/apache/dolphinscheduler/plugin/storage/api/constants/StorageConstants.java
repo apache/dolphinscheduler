@@ -66,4 +66,9 @@ public final class StorageConstants {
     public static final String HUAWEI_CLOUD_OBS_BUCKET_NAME = "resource.huawei.cloud.obs.bucket.name";
     public static final String HUAWEI_CLOUD_OBS_END_POINT = "resource.huawei.cloud.obs.endpoint";
 
+    public static final String GITLAB_STORAGE_HOST = "resource.gitlab.storage.host";
+    public static final String GITLAB_STORAGE_PRIVATE_TOKEN = "resource.gitlab.storage.private-token";
+    public static final String GITLAB_STORAGE_PROJECT_ID = "resource.gitlab.storage.project-id";
+    public static final String GITLAB_STORAGE_BRANCH_REF = "resource.gitlab.storage.branch-ref";
+
 }
