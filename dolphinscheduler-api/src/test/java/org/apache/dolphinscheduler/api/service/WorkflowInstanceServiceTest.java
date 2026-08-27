@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ContextType;
@@ -58,6 +59,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
@@ -214,9 +216,10 @@ public class WorkflowInstanceServiceTest {
         Date start = DateUtils.stringToDate("2020-01-01 00:00:00");
         Date end = DateUtils.stringToDate("2020-01-02 00:00:00");
         WorkflowInstance workflowInstance = getProcessInstance();
-        List<WorkflowInstance> workflowInstanceList = new ArrayList<>();
-        Page<WorkflowInstance> pageReturn = new Page<>(1, 10);
-        workflowInstanceList.add(workflowInstance);
+        WorkflowInstanceSummaryDto summaryDto = getWorkflowInstanceSummaryDto();
+        List<WorkflowInstanceSummaryDto> workflowInstanceList = new ArrayList<>();
+        Page<WorkflowInstanceSummaryDto> pageReturn = new Page<>(1, 10);
+        workflowInstanceList.add(summaryDto);
         pageReturn.setRecords(workflowInstanceList);
 
         // data parameter check
@@ -313,12 +316,13 @@ public class WorkflowInstanceServiceTest {
         // project auth success, trigger code null returns empty list
         Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
                 WORKFLOW_INSTANCE);
-        List<WorkflowInstance> nullTriggerRes =
+        List<WorkflowInstanceSummaryVO> nullTriggerRes =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, null);
         Assertions.assertTrue(nullTriggerRes.isEmpty());
 
         when(workflowInstanceDao.queryByTriggerCode(999L)).thenReturn(new ArrayList<>());
-        List<WorkflowInstance> emptyRes = workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
+        List<WorkflowInstanceSummaryVO> emptyRes =
+                workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L);
         Assertions.assertTrue(emptyRes.isEmpty());
     }
 
@@ -347,8 +351,9 @@ public class WorkflowInstanceServiceTest {
         when(workflowInstanceDao.queryTopNWorkflowInstance(Mockito.eq(size), Mockito.any(), Mockito.any(),
                 Mockito.eq(WorkflowExecutionStatus.SUCCESS), Mockito.eq(projectCode)))
                         .thenReturn(new ArrayList<>());
-        List<WorkflowInstance> successRes = workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser,
-                projectCode, size, startTime, endTime);
+        List<WorkflowInstanceSummaryVO> successRes =
+                workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser,
+                        projectCode, size, startTime, endTime);
 
         Assertions.assertNotNull(successRes);
     }
@@ -979,6 +984,17 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setStartTime(new Date());
         workflowInstance.setEndTime(new Date());
         return workflowInstance;
+    }
+
+    private WorkflowInstanceSummaryDto getWorkflowInstanceSummaryDto() {
+        WorkflowInstanceSummaryDto dto = new WorkflowInstanceSummaryDto();
+        dto.setId(1);
+        dto.setName("test_process_instance");
+        dto.setWorkflowDefinitionCode(46L);
+        dto.setWorkflowDefinitionVersion(1);
+        dto.setStartTime(new Date());
+        dto.setEndTime(new Date());
+        return dto;
     }
 
     /**
