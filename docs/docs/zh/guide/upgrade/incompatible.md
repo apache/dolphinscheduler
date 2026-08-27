@@ -54,4 +54,5 @@
   * **移除的非数据库字段**：`stateDescList`、`workflowDefinition`、`dagData`、`queue`、`locations`、`dependenceScheduleTimes`
   * **移除的派生属性**：`cmdTypeIfComplement`、`complementData`（补数执行相关，如需获取请使用详情接口）
   * 如需获取这些字段，请使用详情接口 `GET /projects/{projectCode}/workflow-instances/{id}`，该接口仍返回完整的 `WorkflowInstance` 对象 ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
+* 任务实例列表接口（`GET /projects/{projectCode}/task-instances`、`GET /projects/{projectCode}/task-instances/visual`）的响应体不再返回大字段 `taskParams`、`varPool` 和 `logPath`。如需获取这些字段，请通过工作流实例详情接口获取任务详情，该接口仍返回完整的 `TaskInstance` 对象 ([#18595](https://github.com/apache/dolphinscheduler/pull/18595))
 

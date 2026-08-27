@@ -54,4 +54,5 @@ This document records the incompatible updates between each version. You need to
   * **Removed transient fields**: `stateDescList`, `workflowDefinition`, `dagData`, `queue`, `locations`, `dependenceScheduleTimes`
   * **Removed derived properties**: `cmdTypeIfComplement`, `complementData` (related to complement-data executions; use the detail API to obtain them)
   * To obtain any of these fields, use the detail API `GET /projects/{projectCode}/workflow-instances/{id}` instead, which continues to return the full `WorkflowInstance` object. ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
+* The task instance list APIs (`GET /projects/{projectCode}/task-instances`, `GET /projects/{projectCode}/task-instances/visual`) no longer return the heavy fields `taskParams`, `varPool`, and `logPath` in the response body. To obtain these fields, use the task detail obtained from the workflow instance detail API, which continues to return the full `TaskInstance` object. ([#18595](https://github.com/apache/dolphinscheduler/pull/18595))
 

@@ -30,9 +30,9 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
@@ -58,19 +58,20 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryTaskListPaging() {
 
-        Result result = new Result();
         Integer pageNo = 1;
         Integer pageSize = 20;
-        PageInfo pageInfo = new PageInfo<TaskInstance>(pageNo, pageSize);
-        result.setData(pageInfo);
-        result.setCode(Status.SUCCESS.getCode());
-        result.setMsg(Status.SUCCESS.getMsg());
+        PageInfo<TaskInstanceSummaryVO> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Result<PageInfo<TaskInstanceSummaryVO>> mockResult = new Result<>();
+        mockResult.setData(pageInfo);
+        mockResult.setCode(Status.SUCCESS.getCode());
+        mockResult.setMsg(Status.SUCCESS.getMsg());
 
         when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(1), eq(""), eq(""), eq(""), any(), eq(""), any(),
                 any(),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
-                        .thenReturn(result);
-        Result taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "", "", "",
+                        .thenReturn(mockResult);
+        Result<PageInfo<TaskInstanceSummaryVO>> taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "",
+                "", "",
                 "", 1L, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00",
                 TaskExecuteType.BATCH, pageNo, pageSize);
         Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());

@@ -64,6 +64,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.model.TaskInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
@@ -674,11 +675,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         List<Task> taskList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(nodeList)) {
-            List<TaskInstance> taskInstances = taskInstanceDao.queryByWorkflowInstanceIdsAndTaskCodes(
+            List<TaskInstanceSummaryDto> taskInstances = taskInstanceDao.queryByWorkflowInstanceIdsAndTaskCodes(
                     Collections.singletonList(workflowInstanceId), nodeList);
             for (Long node : nodeList) {
-                TaskInstance taskInstance = null;
-                for (TaskInstance instance : taskInstances) {
+                TaskInstanceSummaryDto taskInstance = null;
+                for (TaskInstanceSummaryDto instance : taskInstances) {
                     if (instance.getWorkflowInstanceId() == workflowInstanceId && instance.getTaskCode() == node) {
                         taskInstance = instance;
                         break;
