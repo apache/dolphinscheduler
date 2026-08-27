@@ -30,7 +30,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -168,11 +167,12 @@ class AlertDaoTest extends BaseDaoTest {
      * Verifies that concurrent calls to {@code addTaskResultAlert} with the same
      * deduplication key result in exactly one inserted row.
      * <p>
-     * Without the database-level unique constraint, the old INSERT ... SELECT ...
-     * HAVING count(*) = 0 pattern allowed a race condition where two transactions
-     * could both observe a count of zero and insert duplicate alerts.  The unique
-     * index uk_alert_dedup plus INSERT IGNORE / ON CONFLICT DO NOTHING ensures
-     * atomicity: only one insert succeeds, the rest are silently skipped.
+     * The database-level unique constraint uk_alert_dedup plus the dialect-specific
+     * idempotent INSERT (ON DUPLICATE KEY UPDATE / ON CONFLICT DO NOTHING) ensures
+     * atomicity: only one insert succeeds, the rest return zero without throwing.
+     * <p>
+     * Each losing thread must return 0, not throw an exception. If any thread throws,
+     * {@link Future#get()} will propagate the exception and fail the test.
      */
     @Test
     void testConcurrentAddTaskResultAlertIdempotent() throws Exception {
@@ -182,55 +182,44 @@ class AlertDaoTest extends BaseDaoTest {
         int threadCount = 8;
 
         CountDownLatch startLatch = new CountDownLatch(1);
-        CountDownLatch doneLatch = new CountDownLatch(threadCount);
         ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-        AtomicInteger successCount = new AtomicInteger(0);
 
-        List<Future<?>> futures = new ArrayList<>();
+        List<Future<Integer>> futures = new ArrayList<>();
         for (int i = 0; i < threadCount; i++) {
             futures.add(executor.submit(() -> {
-                try {
-                    startLatch.await();
+                startLatch.await();
 
-                    Alert alert = new Alert();
-                    alert.setTitle("SQL Task Result");
-                    alert.setContent(content);
-                    alert.setWarningType(WarningType.SUCCESS);
-                    alert.setAlertGroupId(1);
-                    alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
-                    alert.setWorkflowInstanceId(workflowInstanceId);
-                    alert.setTaskInstanceId(taskInstanceId);
-                    alert.setAlertType(AlertType.TASK_RESULT);
-                    alert.setCreateTime(new java.util.Date());
+                Alert alert = new Alert();
+                alert.setTitle("SQL Task Result");
+                alert.setContent(content);
+                alert.setWarningType(WarningType.SUCCESS);
+                alert.setAlertGroupId(1);
+                alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+                alert.setWorkflowInstanceId(workflowInstanceId);
+                alert.setTaskInstanceId(taskInstanceId);
+                alert.setAlertType(AlertType.TASK_RESULT);
+                alert.setCreateTime(new java.util.Date());
 
-                    int inserted = alertDao.addTaskResultAlert(alert);
-                    if (inserted > 0) {
-                        successCount.incrementAndGet();
-                    }
-                } catch (Exception e) {
-                    // Exceptions are acceptable for losing threads; the winner inserts
-                } finally {
-                    doneLatch.countDown();
-                }
+                return alertDao.addTaskResultAlert(alert);
             }));
         }
 
         startLatch.countDown();
-        doneLatch.await();
         executor.shutdown();
 
-        // Check for unexpected exceptions
-        for (Future<?> f : futures) {
-            if (!f.isDone()) {
-                Assertions.fail("A concurrent task did not complete");
+        int successCount = 0;
+        for (Future<Integer> f : futures) {
+            // Future.get() propagates any exception thrown by the task.
+            // A losing thread must return 0, not throw.
+            int inserted = f.get();
+            if (inserted > 0) {
+                successCount++;
             }
         }
 
-        // Exactly one thread should have successfully inserted
-        Assertions.assertEquals(1, successCount.get(),
-                "Exactly one concurrent insert should succeed, but got " + successCount.get());
+        Assertions.assertEquals(1, successCount,
+                "Exactly one concurrent insert should succeed, but got " + successCount);
 
-        // Verify only one alert row exists in the database
         long dbCount = alertDao.listAlerts(workflowInstanceId)
                 .stream()
                 .filter(a -> a.getAlertType() == AlertType.TASK_RESULT)

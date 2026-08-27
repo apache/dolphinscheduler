@@ -55,30 +55,32 @@
         Idempotent insert for task-result alerts.
         Uses database-level unique constraint uk_alert_dedup (sign, workflow_instance_id, alert_type)
         to atomically prevent duplicates.  Dialect-specific syntax is selected via databaseId:
-        - MySQL / H2: INSERT IGNORE silently skips on duplicate key
+        - MySQL / H2: ON DUPLICATE KEY UPDATE id = id silently skips on duplicate key
         - PostgreSQL: ON CONFLICT DO NOTHING
         Fallback (no databaseId): plain INSERT for environments where the provider is not configured.
     -->
 
     <!-- MySQL, H2 -->
     <insert id="insertTaskResultAlertIfAbsent" databaseId="mysql">
-        INSERT IGNORE INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
+        INSERT INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
                                       create_time, update_time, project_code, workflow_definition_code,
                                       workflow_instance_id, alert_type)
         VALUES (#{alert.sign}, #{alert.title}, #{alert.content}, #{alert.alertStatus.code},
                 #{alert.warningType.code}, #{alert.log}, #{alert.alertGroupId}, #{alert.createTime},
                 #{alert.updateTime}, #{alert.projectCode}, #{alert.workflowDefinitionCode},
                 #{alert.workflowInstanceId}, #{alert.alertType.code})
+        ON DUPLICATE KEY UPDATE id = id
     </insert>
 
     <insert id="insertTaskResultAlertIfAbsent" databaseId="h2">
-        INSERT IGNORE INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
+        INSERT INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
                                       create_time, update_time, project_code, workflow_definition_code,
                                       workflow_instance_id, alert_type)
         VALUES (#{alert.sign}, #{alert.title}, #{alert.content}, #{alert.alertStatus.code},
                 #{alert.warningType.code}, #{alert.log}, #{alert.alertGroupId}, #{alert.createTime},
                 #{alert.updateTime}, #{alert.projectCode}, #{alert.workflowDefinitionCode},
                 #{alert.workflowInstanceId}, #{alert.alertType.code})
+        ON DUPLICATE KEY UPDATE id = id
     </insert>
 
     <!-- PostgreSQL -->
