@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.storage.api;
 
+import org.apache.dolphinscheduler.common.enums.StorageType;
+
 public interface StorageOperatorFactory {
 
     StorageOperator createStorageOperate();

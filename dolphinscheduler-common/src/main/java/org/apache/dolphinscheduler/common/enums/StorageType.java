@@ -17,9 +17,28 @@
 
 package org.apache.dolphinscheduler.common.enums;
 
+import java.util.Optional;
+
 /**
  * data base types
  */
 public enum StorageType {
-    LOCAL, HDFS, S3, OSS, GCS, ABS, OBS
+
+    LOCAL,
+    HDFS,
+    OSS,
+    S3,
+    GCS,
+    ABS,
+    OBS,
+    COS;
+
+    public static Optional<StorageType> getStorageType(String name) {
+        try {
+            return Optional.of(StorageType.valueOf(name));
+        } catch (IllegalArgumentException | NullPointerException ex) {
+            return Optional.empty();
+        }
+    }
+
 }

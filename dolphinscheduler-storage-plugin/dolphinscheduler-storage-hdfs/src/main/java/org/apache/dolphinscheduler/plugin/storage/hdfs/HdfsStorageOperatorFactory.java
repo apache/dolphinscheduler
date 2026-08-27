@@ -23,7 +23,7 @@ import static org.apache.dolphinscheduler.plugin.storage.api.constants.StorageCo
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperatorFactory;
-import org.apache.dolphinscheduler.plugin.storage.api.StorageType;
+import org.apache.dolphinscheduler.common.enums.StorageType;
 import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
 
 import java.util.Map;
