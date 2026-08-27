@@ -78,6 +78,19 @@ public class TaskSubWorkflowPermissionCheckerTest {
     }
 
     @Test
+    public void shouldRejectWhenSubWorkflowQueryReturnsNull() {
+        Mockito.when(workflowDefinitionDao.queryByCodes(Mockito.anyCollection()))
+                .thenReturn(null);
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> taskSubWorkflowPermissionChecker.checkPermission(
+                        loginUser, Collections.singletonList(getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE))));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Mockito.verifyNoInteractions(projectService);
+    }
+
+    @Test
     public void shouldRejectUnavailableSubWorkflowProject() {
         Mockito.when(workflowDefinitionDao.queryByCodes(Mockito.anyCollection()))
                 .thenReturn(Collections.singletonList(getWorkflowDefinition(SUB_WORKFLOW_CODE)));

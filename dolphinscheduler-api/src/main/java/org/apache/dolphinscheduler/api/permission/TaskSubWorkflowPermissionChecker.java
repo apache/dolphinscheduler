@@ -74,9 +74,12 @@ public class TaskSubWorkflowPermissionChecker {
 
         List<WorkflowDefinition> subWorkflowDefinitions =
                 workflowDefinitionDao.queryByCodes(subWorkflowDefinitionCodes);
-        Set<Long> existingSubWorkflowDefinitionCodes = subWorkflowDefinitions == null
-                ? new HashSet<>()
-                : subWorkflowDefinitions.stream().map(WorkflowDefinition::getCode).collect(Collectors.toSet());
+        if (subWorkflowDefinitions == null) {
+            log.warn("Referenced sub workflow is unavailable, userId:{}.", loginUser.getId());
+            throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+        }
+        Set<Long> existingSubWorkflowDefinitionCodes =
+                subWorkflowDefinitions.stream().map(WorkflowDefinition::getCode).collect(Collectors.toSet());
         if (!existingSubWorkflowDefinitionCodes.containsAll(subWorkflowDefinitionCodes)) {
             log.warn("Referenced sub workflow is unavailable, userId:{}.", loginUser.getId());
             throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
