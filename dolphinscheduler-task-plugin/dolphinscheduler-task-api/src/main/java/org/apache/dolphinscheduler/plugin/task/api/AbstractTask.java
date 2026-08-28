@@ -57,6 +57,24 @@ public abstract class AbstractTask {
     protected volatile int exitStatusCode = -1;
 
     /**
+     * @deprecated Use {@link TaskExecutionContext#isNeedAlert()} on the
+     *             {@code taskRequest} field instead.  Retained for binary
+     *             compatibility with third-party plugins compiled against
+     *             the previous AbstractTask API.
+     */
+    @Deprecated
+    protected boolean needAlert = false;
+
+    /**
+     * @deprecated Use {@link TaskExecutionContext#getTaskAlertInfo()} on the
+     *             {@code taskRequest} field instead.  Retained for binary
+     *             compatibility with third-party plugins compiled against
+     *             the previous AbstractTask API.
+     */
+    @Deprecated
+    protected TaskAlertInfo taskAlertInfo;
+
+    /**
      * constructor
      *
      * @param taskExecutionContext taskExecutionContext
