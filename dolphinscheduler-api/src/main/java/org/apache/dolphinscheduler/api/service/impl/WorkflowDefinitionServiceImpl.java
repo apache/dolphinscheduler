@@ -1744,6 +1744,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         IPage<WorkflowDefinitionLog> workflowDefinitionLogIPage =
                 workflowDefinitionLogMapper.queryWorkflowDefinitionVersionsPaging(page, code, projectCode);
         List<WorkflowDefinitionLog> workflowDefinitionLogs = workflowDefinitionLogIPage.getRecords();
+        if (CollectionUtils.isNotEmpty(workflowDefinitionLogs)) {
+            workflowDefinitionLogs.forEach(SensitivePropertyUtils::maskWorkflowDefinition);
+        }
 
         pageInfo.setTotalList(workflowDefinitionLogs);
         pageInfo.setTotal((int) workflowDefinitionLogIPage.getTotal());

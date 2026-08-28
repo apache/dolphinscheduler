@@ -93,7 +93,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -489,23 +488,20 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
             return;
         }
-        Set<Long> taskDefinitionCodes = taskDefinitionLogs.stream()
-                .map(TaskDefinitionLog::getCode)
-                .filter(taskCode -> taskCode > 0)
-                .collect(Collectors.toSet());
-        if (CollectionUtils.isEmpty(taskDefinitionCodes)) {
-            taskDefinitionLogs.forEach(taskDefinitionLog -> SensitivePropertyUtils.validateSensitivePlaceholders(
-                    SensitivePropertyUtils.getLocalParams(taskDefinitionLog.getTaskParams()),
-                    Collections.emptyList()));
-            return;
-        }
-        Map<Long, String> existingTaskParamsMap = taskDefinitionDao.queryByCodes(taskDefinitionCodes)
-                .stream()
-                .collect(Collectors.toMap(TaskDefinition::getCode, TaskDefinition::getTaskParams, (a, b) -> a));
-        taskDefinitionLogs.forEach(taskDefinitionLog -> taskDefinitionLog.setTaskParams(
-                SensitivePropertyUtils.mergeLocalParamsInTaskParams(
-                        taskDefinitionLog.getTaskParams(),
-                        existingTaskParamsMap.get(taskDefinitionLog.getCode()))));
+        taskDefinitionLogs.forEach(taskDefinitionLog -> {
+            if (taskDefinitionLog.getCode() <= 0 || taskDefinitionLog.getVersion() <= 0) {
+                SensitivePropertyUtils.validateSensitivePlaceholders(
+                        SensitivePropertyUtils.getLocalParams(taskDefinitionLog.getTaskParams()),
+                        Collections.emptyList());
+                return;
+            }
+            TaskDefinitionLog existingLog = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(
+                    taskDefinitionLog.getCode(), taskDefinitionLog.getVersion());
+            taskDefinitionLog.setTaskParams(
+                    SensitivePropertyUtils.mergeLocalParamsInTaskParams(
+                            taskDefinitionLog.getTaskParams(),
+                            existingLog == null ? null : existingLog.getTaskParams()));
+        });
     }
 
     /**

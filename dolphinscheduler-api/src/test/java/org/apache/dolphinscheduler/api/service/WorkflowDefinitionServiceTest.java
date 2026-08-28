@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VERSION_LIST;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_BATCH_COPY;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_CREATE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
@@ -39,6 +40,7 @@ import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecke
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -74,6 +76,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentItem;
 import org.apache.dolphinscheduler.plugin.task.api.model.ConditionDependentTaskModel;
 import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
@@ -118,6 +121,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
 @ExtendWith(MockitoExtension.class)
@@ -419,6 +424,31 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(getWorkflowDefinition()));
         DagData successRes = workflowDefinitionService.queryWorkflowDefinitionByCode(user, projectCode, 46L);
         Assertions.assertNotNull(successRes);
+    }
+
+    @Test
+    public void testQueryWorkflowDefinitionVersionsShouldMaskSensitiveGlobalParams() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, VERSION_LIST);
+
+        WorkflowDefinitionLog versionLog = new WorkflowDefinitionLog();
+        versionLog.setCode(processDefinitionCode);
+        versionLog.setVersion(1);
+        versionLog.setGlobalParams(
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"Secret123\",\"sensitive\":true}]");
+        IPage<WorkflowDefinitionLog> paging = new Page<>(1, 10);
+        paging.setRecords(Collections.singletonList(versionLog));
+        paging.setTotal(1);
+        when(workflowDefinitionLogMapper.queryWorkflowDefinitionVersionsPaging(any(Page.class),
+                eq(processDefinitionCode), eq(projectCode))).thenReturn(paging);
+
+        Result result = workflowDefinitionService.queryWorkflowDefinitionVersions(user, projectCode, 1, 10,
+                processDefinitionCode);
+        PageInfo<WorkflowDefinitionLog> pageInfo = (PageInfo<WorkflowDefinitionLog>) result.getData();
+        WorkflowDefinitionLog masked = pageInfo.getTotalList().get(0);
+        Assertions.assertTrue(masked.getGlobalParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(masked.getGlobalParams().contains("Secret123"));
     }
 
     @Test
