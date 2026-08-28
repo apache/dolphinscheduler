@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_CLUSTER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_CLUSTER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CLUSTER_BY_CODE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CLUSTER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_CLUSTER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_CLUSTER_ERROR;
@@ -118,26 +117,6 @@ public class ClusterController extends BaseController {
                                          @RequestParam(value = "description", required = false) String description) {
         Cluster cluster = clusterService.updateClusterByCode(loginUser, code, name, config, description);
         return Result.success(cluster);
-    }
-
-    /**
-     * query cluster details by code
-     *
-     * @param clusterCode cluster code
-     * @return cluster detail information
-     */
-    @Operation(summary = "queryClusterByCode", description = "QUERY_CLUSTER_BY_CODE_NOTES")
-    @Parameters({
-            @Parameter(name = "clusterCode", description = "CLUSTER_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
-    })
-    @GetMapping(value = "/query-by-code")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_CLUSTER_BY_CODE_ERROR)
-    public Result<ClusterDto> queryClusterByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                 @RequestParam("clusterCode") Long clusterCode) {
-
-        ClusterDto clusterDto = clusterService.queryClusterByCode(loginUser, clusterCode);
-        return Result.success(clusterDto);
     }
 
     /**
