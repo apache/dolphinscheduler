@@ -60,7 +60,7 @@
         Fallback (no databaseId): plain INSERT for environments where the provider is not configured.
     -->
 
-    <!-- MySQL, H2 -->
+    <!-- MySQL -->
     <insert id="insertTaskResultAlertIfAbsent" databaseId="mysql">
         INSERT INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
                                       create_time, update_time, project_code, workflow_definition_code,
@@ -72,15 +72,16 @@
         ON DUPLICATE KEY UPDATE id = id
     </insert>
 
+    <!-- H2 -->
     <insert id="insertTaskResultAlertIfAbsent" databaseId="h2">
-        INSERT INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
-                                      create_time, update_time, project_code, workflow_definition_code,
-                                      workflow_instance_id, alert_type)
+        MERGE INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
+        create_time, update_time, project_code, workflow_definition_code,
+        workflow_instance_id, alert_type)
+        KEY(sign, workflow_instance_id, alert_type)
         VALUES (#{alert.sign}, #{alert.title}, #{alert.content}, #{alert.alertStatus.code},
-                #{alert.warningType.code}, #{alert.log}, #{alert.alertGroupId}, #{alert.createTime},
-                #{alert.updateTime}, #{alert.projectCode}, #{alert.workflowDefinitionCode},
-                #{alert.workflowInstanceId}, #{alert.alertType.code})
-        ON DUPLICATE KEY UPDATE id = id
+        #{alert.warningType.code}, #{alert.log}, #{alert.alertGroupId}, #{alert.createTime},
+        #{alert.updateTime}, #{alert.projectCode}, #{alert.workflowDefinitionCode},
+        #{alert.workflowInstanceId}, #{alert.alertType.code})
     </insert>
 
     <!-- PostgreSQL -->
@@ -93,17 +94,6 @@
                 #{alert.updateTime}, #{alert.projectCode}, #{alert.workflowDefinitionCode},
                 #{alert.workflowInstanceId}, #{alert.alertType.code})
         ON CONFLICT (sign, workflow_instance_id, alert_type) DO NOTHING
-    </insert>
-
-    <!-- Fallback: plain INSERT for environments without databaseId provider -->
-    <insert id="insertTaskResultAlertIfAbsent">
-        INSERT INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
-                               create_time, update_time, project_code, workflow_definition_code,
-                               workflow_instance_id, alert_type)
-        VALUES (#{alert.sign}, #{alert.title}, #{alert.content}, #{alert.alertStatus.code},
-                #{alert.warningType.code}, #{alert.log}, #{alert.alertGroupId}, #{alert.createTime},
-                #{alert.updateTime}, #{alert.projectCode}, #{alert.workflowDefinitionCode},
-                #{alert.workflowInstanceId}, #{alert.alertType.code})
     </insert>
 
     <select id="listingAlertByStatus" resultType="org.apache.dolphinscheduler.dao.entity.Alert">
