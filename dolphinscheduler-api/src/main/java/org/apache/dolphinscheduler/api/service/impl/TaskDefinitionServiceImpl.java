@@ -250,7 +250,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 taskDefinitionLogMapper.queryTaskDefinitionVersionsPaging(page, taskCode, projectCode);
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionVersionsPaging.getRecords();
         if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
-            taskDefinitionLogs.forEach(SensitivePropertyUtils::maskTaskDefinition);
+            taskDefinitionLogs = taskDefinitionLogs.stream()
+                    .map(SensitivePropertyUtils::copyAndMaskTaskDefinition)
+                    .collect(Collectors.toList());
         }
 
         pageInfo.setTotalList(taskDefinitionLogs);

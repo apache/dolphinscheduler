@@ -680,7 +680,7 @@ public class WorkflowInstanceServiceTest {
         version1Log.setVersion(1);
         version1Log.setTaskParams(
                 "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"old-secret\",\"sensitive\":true}],\"rawScript\":\"echo 1\"}");
-        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(4254862762304L, 1)).thenReturn(version1Log);
+        when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(Collections.singletonList(version1Log));
 
         TaskDefinition currentTask = new TaskDefinition();
         currentTask.setCode(4254862762304L);
@@ -718,6 +718,8 @@ public class WorkflowInstanceServiceTest {
         Assertions.assertFalse(merged.getTaskParams().contains("new-secret"));
         Assertions.assertFalse(merged.getTaskParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
         verify(taskDefinitionDao, never()).queryByCodes(any());
+        verify(taskDefinitionLogMapper, never()).queryByDefinitionCodeAndVersion(Mockito.anyLong(), Mockito.anyInt());
+        verify(taskDefinitionLogMapper).queryByTaskDefinitions(any());
     }
 
     @Test

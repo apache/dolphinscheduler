@@ -449,6 +449,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         WorkflowDefinitionLog masked = pageInfo.getTotalList().get(0);
         Assertions.assertTrue(masked.getGlobalParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
         Assertions.assertFalse(masked.getGlobalParams().contains("Secret123"));
+        Assertions.assertTrue(versionLog.getGlobalParams().contains("Secret123"));
+        Assertions.assertNotSame(versionLog, masked);
     }
 
     @Test

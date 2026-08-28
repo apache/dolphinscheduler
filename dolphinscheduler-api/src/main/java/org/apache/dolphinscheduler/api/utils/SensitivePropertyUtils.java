@@ -92,6 +92,8 @@ public class SensitivePropertyUtils {
                         GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams()));
         workflowDefinition.setGlobalParams(GlobalParameterUtils.serializeGlobalParameter(globalParams));
         workflowDefinition.setGlobalParamList(globalParams);
+        // setGlobalParams does not rebuild the cached map; drop it so getters re-read masked values
+        workflowDefinition.setGlobalParamMap(null);
         return workflowDefinition;
     }
 
@@ -100,7 +102,40 @@ public class SensitivePropertyUtils {
             return null;
         }
         taskDefinition.setTaskParams(maskLocalParamsInTaskParams(taskDefinition.getTaskParams()));
+        taskDefinition.setTaskParamMap(null);
         return taskDefinition;
+    }
+
+    /**
+     * JSON deep-copy then mask, so MyBatis-mapped entities (e.g. version list records) stay unchanged.
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends WorkflowDefinition> T copyAndMaskWorkflowDefinition(T workflowDefinition) {
+        if (workflowDefinition == null) {
+            return null;
+        }
+        T copy = JSONUtils.parseObject(JSONUtils.toJsonString(workflowDefinition),
+                (Class<T>) workflowDefinition.getClass());
+        if (copy == null) {
+            return (T) maskWorkflowDefinition(workflowDefinition);
+        }
+        return (T) maskWorkflowDefinition(copy);
+    }
+
+    /**
+     * JSON deep-copy then mask, so MyBatis-mapped entities (e.g. version list records) stay unchanged.
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends TaskDefinition> T copyAndMaskTaskDefinition(T taskDefinition) {
+        if (taskDefinition == null) {
+            return null;
+        }
+        T copy = JSONUtils.parseObject(JSONUtils.toJsonString(taskDefinition),
+                (Class<T>) taskDefinition.getClass());
+        if (copy == null) {
+            return (T) maskTaskDefinition(taskDefinition);
+        }
+        return (T) maskTaskDefinition(copy);
     }
 
     public String mergeLocalParamsInTaskParams(String submittedTaskParams, String existingTaskParams) {
