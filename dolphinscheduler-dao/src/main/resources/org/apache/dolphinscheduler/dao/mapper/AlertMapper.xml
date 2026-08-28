@@ -51,15 +51,6 @@
         having count(*) = 0
     </insert>
 
-    <!--
-        Idempotent insert for task-result alerts.
-        Uses database-level unique constraint uk_alert_dedup (sign, workflow_instance_id, alert_type)
-        to atomically prevent duplicates.  Dialect-specific syntax is selected via databaseId:
-        - MySQL / H2: ON DUPLICATE KEY UPDATE id = id silently skips on duplicate key
-        - PostgreSQL: ON CONFLICT DO NOTHING
-        Fallback (no databaseId): plain INSERT for environments where the provider is not configured.
-    -->
-
     <!-- MySQL -->
     <insert id="insertTaskResultAlertIfAbsent" databaseId="mysql">
         INSERT INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
