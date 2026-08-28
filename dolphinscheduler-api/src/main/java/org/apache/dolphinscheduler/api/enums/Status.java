@@ -493,7 +493,6 @@ public enum Status {
     DELETE_CLUSTER_RELATED_TASK_EXISTS(120026, "this cluster has been used in tasks,so you can't delete it.",
             "该集群已经被任务使用，所以不能删除该集群信息"),
     QUERY_CLUSTER_BY_NAME_ERROR(1200027, "not found cluster [{0}] ", "查询集群名称[{0}]信息不存在"),
-    QUERY_CLUSTER_BY_CODE_ERROR(1200028, "not found cluster [{0}] ", "查询集群编码[{0}]不存在"),
     QUERY_CLUSTER_ERROR(1200029, "login user query cluster error", "分页查询集群列表错误"),
     VERIFY_CLUSTER_ERROR(1200030, "verify cluster error", "验证集群信息错误"),
     CLUSTER_WORKFLOW_DEFINITIONS_IS_INVALID(1200031, "cluster worker groups is invalid format", "集群关联的工作组参数解析错误"),

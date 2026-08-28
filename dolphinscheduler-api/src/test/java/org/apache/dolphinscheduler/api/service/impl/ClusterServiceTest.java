@@ -176,20 +176,6 @@ public class ClusterServiceTest {
     }
 
     @Test
-    public void testQueryClusterByCode() {
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> clusterService.queryClusterByCode(getGeneralUser(), 1L));
-
-        when(clusterDao.queryByClusterCode(1L)).thenReturn(null);
-        assertThrowsServiceException(Status.QUERY_CLUSTER_BY_CODE_ERROR,
-                () -> clusterService.queryClusterByCode(getAdminUser(), 1L));
-
-        when(clusterDao.queryByClusterCode(1L)).thenReturn(getCluster());
-        ClusterDto clusterDto = clusterService.queryClusterByCode(getAdminUser(), 1L);
-        assertNotNull(clusterDto);
-    }
-
-    @Test
     public void testDeleteClusterByCode() {
         assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, () -> {
             User loginUser = getGeneralUser();

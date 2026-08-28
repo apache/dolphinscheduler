@@ -45,14 +45,6 @@ public interface ClusterService {
     ClusterDto queryClusterByName(String name);
 
     /**
-     * query cluster
-     *
-     * @param loginUser login user
-     * @param code      cluster code
-     */
-    ClusterDto queryClusterByCode(User loginUser, Long code);
-
-    /**
      * delete cluster
      *
      * @param loginUser login user

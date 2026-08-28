@@ -167,28 +167,6 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     /**
      * query cluster
      *
-     * @param loginUser login user
-     * @param code      cluster code
-     */
-    @Override
-    public ClusterDto queryClusterByCode(User loginUser, Long code) {
-        if (isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-
-        Cluster cluster = clusterDao.queryByClusterCode(code);
-
-        if (cluster == null) {
-            throw new ServiceException(Status.QUERY_CLUSTER_BY_CODE_ERROR, code);
-        }
-        ClusterDto dto = new ClusterDto();
-        BeanUtils.copyProperties(cluster, dto);
-        return dto;
-    }
-
-    /**
-     * query cluster
-     *
      * @param name cluster name
      */
     @Override
