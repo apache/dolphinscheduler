@@ -216,7 +216,8 @@ class AlertSenderTest {
      * Simulates a mixed-version rolling upgrade scenario: an old Alert Server that
      * does not yet know about a new AlertType enum value (e.g. TASK_RESULT) will
      * have MyBatis map the unknown value to null. {@link AlertSender#getAlertData}
-     * must not throw NPE and should degrade gracefully.
+     * must refuse to send rather than silently relabeling the alert as a
+     * workflow-instance failure.
      */
     @Test
     void testGetAlertDataWithNullAlertType() {
@@ -229,12 +230,9 @@ class AlertSenderTest {
         // Simulate old Alert Server where unknown alert_type is deserialized as null
         alert.setAlertType(null);
 
-        AlertData alertData = alertSender.getAlertData(alert);
-        Assertions.assertNotNull(alertData);
-        Assertions.assertEquals(1, alertData.getId());
-        Assertions.assertEquals(TITLE, alertData.getTitle());
-        Assertions.assertEquals(CONTENT, alertData.getContent());
-        Assertions.assertEquals(0, alertData.getAlertType());
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> alertSender.getAlertData(alert),
+                "getAlertData should refuse to build AlertData with null alertType");
     }
 
     /**
