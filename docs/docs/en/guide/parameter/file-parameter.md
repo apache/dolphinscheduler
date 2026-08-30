@@ -1,11 +1,19 @@
 # FILE Parameter
 
+> **Current status (important):** FILE parameter transfer between upstream and downstream tasks is **not available** in current releases (including 3.4.x).
+>
+> After the varPool refactor, the runtime upload/download path (`TaskFilesTransferUtils` / resource-center `DATA_TRANSFER` transfer) is no longer wired. Configuring custom parameters with type `FILE` will **not** transfer files to downstream tasks.
+>
+> Tracking issue: [#18166](https://github.com/apache/dolphinscheduler/issues/18166). Parameter passing currently supports data values; file transfer is pending redesign/restoration.
+>
+> The sections below describe the **historical** behavior and are kept for reference until the feature returns. Do not rely on the demo workflow on current releases.
+
 Use the file parameter to pass files (or folders, hereinafter referred to as **files**) in the working directory of the upstream task to the downstream task in the same workflow instance. The following scenarios may be used
 
 - In the ETL task, pass the data files processed by multiple upstream tasks to a specific downstream task.
 - In the machine learning scenario, pass the data set file of the upstream data preparation task to the downstream model training task.
 
-## Usage
+## Usage (historical — not available in current releases)
 
 ### Configure file parameter
 
@@ -46,9 +54,9 @@ The configuration in the figure below indicates that the task gets the file iden
 
 ## Other
 
-### Note
+### Note (historical)
 
-- The file transfer between upstream and downstream tasks is based on the resource center as a transfer, and the data is saved in the `DATA_TRANSFER` directory of the resource center. Therefore, **the resource center function must be enabled**, please refer to [Resource Center Configuration Details](../resource/configuration.md) for details, otherwise the file parameter function cannot be used.
+- When the feature was available, file transfer between upstream and downstream tasks used the resource center as a transfer, and the data was saved in the `DATA_TRANSFER` directory of the resource center. Therefore, **the resource center function must be enabled**, please refer to [Resource Center Configuration Details](../resource/configuration.md) for details, otherwise the file parameter function cannot be used.
 - The file naming rule is `DATA_TRANSFER/DATE/ProcessDefineCode/ProcessDefineVersion_ProcessInstanceID/TaskName_TaskInstanceID_FileName`
 - If the transferred file data is a folder, it will be packaged into a compressed file with a suffix of `.zip` and uploaded. The downstream task will unzip and save it in the corresponding directory after receiving it
 - If you need to delete the file data, you can delete the corresponding folder in the `DATA_TRANSFER` directory of the resource center. If you delete the date subdirectory directly, all the file data under that date will be deleted. You can also use the [Open API interface](../api/open-api.md) (`resources/data-transfer`) to delete the corresponding file data (delete data N days ago).
@@ -56,7 +64,9 @@ The configuration in the figure below indicates that the task gets the file iden
 - Support one-to-many transmission and many-to-one transmission
 - If you frequently transfer a large number of files, it is obvious that the system IO performance will be affected by the amount of transferred data
 
-### Example
+### Example (historical — will not transfer files on current releases)
+
+> The following demo matches the historical FILE parameter design. On current releases it will not upload/download files via `DATA_TRANSFER`; downstream tasks will not receive the files.
 
 You can save the following YAML file locally and then execute `pydolphinscheduler yaml -f data-transfer.yaml` to run the Demo.
 
