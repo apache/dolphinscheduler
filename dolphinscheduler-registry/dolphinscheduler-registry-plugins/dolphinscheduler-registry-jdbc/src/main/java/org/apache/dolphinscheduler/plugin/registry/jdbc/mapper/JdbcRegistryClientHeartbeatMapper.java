@@ -29,5 +29,4 @@ public interface JdbcRegistryClientHeartbeatMapper extends BaseMapper<JdbcRegist
 
     @Select("select * from t_ds_jdbc_registry_client_heartbeat")
     List<JdbcRegistryClientHeartbeat> selectAll();
-
 }
