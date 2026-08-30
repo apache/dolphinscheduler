@@ -17,15 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.metrics;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
+
 import java.util.function.Supplier;
 
 import lombok.experimental.UtilityClass;
-
-import com.google.common.collect.ImmutableSet;
-
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.Metrics;
@@ -33,21 +29,13 @@ import io.micrometer.core.instrument.Metrics;
 @UtilityClass
 public class TaskMetrics {
 
-    private final Map<String, Counter> taskInstanceCounters = new HashMap<>();
-
-    private final Set<String> taskInstanceStates = ImmutableSet.of(
-            "submit", "timeout", "finish", "failover", "retry", "dispatch", "success", "kill", "fail", "stop");
-
     static {
-        for (final String state : taskInstanceStates) {
-            taskInstanceCounters.put(
-                    state,
-                    Counter.builder("ds.task.instance.count")
-                            .tags("state", state)
-                            .description(String.format("Workflow instance %s total count", state))
-                            .register(Metrics.globalRegistry));
+        for (final TaskLifecycleEventType eventType : TaskLifecycleEventType.values()) {
+            Counter.builder("ds.task.instance.count")
+                    .tags("state", eventType.name())
+                    .description(String.format("Task instance %s total count", eventType.name()))
+                    .register(Metrics.globalRegistry);
         }
-
     }
 
     private final Counter taskDispatchCounter =
@@ -83,11 +71,14 @@ public class TaskMetrics {
         taskDispatchCounter.increment();
     }
 
-    public void incTaskInstanceByState(final String state) {
-        if (taskInstanceCounters.get(state) == null) {
+    public void incTaskInstanceByLifecycleEvent(final TaskLifecycleEventType eventType) {
+        if (eventType == null) {
             return;
         }
-        taskInstanceCounters.get(state).increment();
+        Metrics.globalRegistry.counter(
+                "ds.task.instance.count",
+                "state", eventType.name())
+                .increment();
     }
 
 }

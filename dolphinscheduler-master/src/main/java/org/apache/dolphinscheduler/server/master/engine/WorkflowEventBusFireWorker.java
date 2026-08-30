@@ -25,8 +25,10 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.WorkflowEventFireException;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFatalLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
+import org.apache.dolphinscheduler.server.master.metrics.TaskMetrics;
 import org.apache.dolphinscheduler.server.master.runner.IWorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.utils.ExceptionUtils;
 
@@ -156,6 +158,16 @@ public class WorkflowEventBusFireWorker {
             throw new RuntimeException("No EventHandler found for event: " + event.getEventType());
         }
         lifecycleEventHandler.handle(workflowExecution, event);
+        recordTaskInstanceMetrics(event);
+    }
+
+    private void recordTaskInstanceMetrics(AbstractLifecycleEvent event) {
+        final ILifecycleEventType eventType = event.getEventType();
+        if (!(eventType instanceof TaskLifecycleEventType)) {
+            return;
+        }
+        final TaskLifecycleEventType taskLifecycleEventType = (TaskLifecycleEventType) eventType;
+        TaskMetrics.incTaskInstanceByLifecycleEvent(taskLifecycleEventType);
     }
 
 }
