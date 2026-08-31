@@ -48,15 +48,21 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class SeatunnelTask extends AbstractRemoteTask {
 
-    private static final String SEATUNNEL_BIN_DIR = "${SEATUNNEL_HOME}/bin/";
+    protected static final String SEATUNNEL_BIN_DIR = "${SEATUNNEL_HOME}/bin/";
+
+    private static final Pattern SEATUNNEL_JOB_ID_PATTERN = Pattern.compile(Constants.SEATUNNEL_JOB_ID_REGEX);
 
     private SeatunnelParameters seatunnelParameters;
 
@@ -121,10 +127,58 @@ public class SeatunnelTask extends AbstractRemoteTask {
     public void cancelApplication() throws TaskException {
         // cancel process
         try {
-            shellCommandExecutor.cancelApplication();
+            cancelShellProcess();
         } catch (Exception e) {
             throw new TaskException("cancel application error", e);
         }
+    }
+
+    protected void cancelShellProcess() throws Exception {
+        shellCommandExecutor.cancelApplication();
+    }
+
+    /**
+     * Extract SeaTunnel Engine job id from a log line.
+     *
+     * @param line log line
+     * @return job id or null
+     */
+    public static String findSeaTunnelJobId(String line) {
+        if (line == null) {
+            return null;
+        }
+        Matcher matcher = SEATUNNEL_JOB_ID_PATTERN.matcher(line);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        return null;
+    }
+
+    /**
+     * Parse SeaTunnel Engine job ids from the task log file.
+     */
+    protected List<String> findSeaTunnelJobIdsFromLog() {
+        String logPath = taskRequest.getLogPath();
+        if (logPath == null || logPath.isEmpty()) {
+            return Collections.emptyList();
+        }
+        File logFile = new File(logPath);
+        if (!logFile.exists() || !logFile.isFile()) {
+            return Collections.emptyList();
+        }
+        Set<String> jobIds = new HashSet<>();
+        try {
+            for (String line : Files.readAllLines(Paths.get(logPath), StandardCharsets.UTF_8)) {
+                String jobId = findSeaTunnelJobId(line);
+                if (jobId != null) {
+                    jobIds.add(jobId);
+                }
+            }
+        } catch (IOException e) {
+            log.error("Failed to parse SeaTunnel job id from log: {}", logPath, e);
+            return Collections.emptyList();
+        }
+        return new ArrayList<>(jobIds);
     }
 
     private String buildCommand() throws Exception {
