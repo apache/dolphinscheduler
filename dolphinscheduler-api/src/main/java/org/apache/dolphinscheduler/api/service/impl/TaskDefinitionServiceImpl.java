@@ -19,11 +19,12 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_VERSION_VIEW;
-import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.PermissionCheck;
+import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowTaskRelationService;
@@ -32,44 +33,33 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.ConditionType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
-import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
-import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
-import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
-import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationLogDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -102,9 +92,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Autowired
-    private WorkflowTaskRelationLogDao workflowTaskRelationLogDao;
-
-    @Autowired
     private WorkflowTaskRelationService workflowTaskRelationService;
 
     @Autowired
@@ -114,7 +101,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private ProcessService processService;
 
     @Autowired
-    private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
+    private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
+
+    @Autowired
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
 
     /**
      * query task definition
@@ -194,302 +184,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     }
 
     /**
-     * Update the task body and cascade through workflow task relations.
-     *
-     * @return the persisted {@link TaskDefinitionLog}, or {@code null} when the
-     *         task body is unchanged (callers may still need to apply upstream
-     *         changes). All other failure modes throw {@link ServiceException}.
-     */
-    private TaskDefinitionLog updateTask(User loginUser, long projectCode, long taskCode,
-                                         String taskDefinitionJsonObj) {
-        Project project = projectDao.queryByCode(projectCode);
-
-        // check if user have write perm for project
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
-
-        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskCode);
-        if (taskDefinition == null) {
-            log.error("Task definition does not exist, taskDefinitionCode:{}.", taskCode);
-            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
-        }
-        if (processService.isTaskOnline(taskCode) && taskDefinition.getFlag() == Flag.YES) {
-            // if stream, can update task definition without online check
-            if (taskDefinition.getTaskExecuteType() != TaskExecuteType.STREAM) {
-                log.warn("Only {} type task can be updated without online check, taskDefinitionCode:{}.",
-                        TaskExecuteType.STREAM, taskCode);
-                throw new ServiceException(Status.NOT_SUPPORT_UPDATE_TASK_DEFINITION);
-            }
-        }
-        TaskDefinitionLog taskDefinitionToUpdate =
-                JSONUtils.parseObject(taskDefinitionJsonObj, TaskDefinitionLog.class);
-        if (TimeoutFlag.CLOSE == taskDefinition.getTimeoutFlag()) {
-            taskDefinition.setTimeoutNotifyStrategy(null);
-        }
-        if (taskDefinition.equals(taskDefinitionToUpdate)) {
-            log.warn("Task definition does not need update because no change, taskDefinitionCode:{}.", taskCode);
-            return null;
-        }
-        if (taskDefinitionToUpdate == null) {
-            log.warn("Parameter taskDefinitionJson is invalid.");
-            throw new ServiceException(Status.DATA_IS_NOT_VALID, taskDefinitionJsonObj);
-        }
-        if (!checkTaskParameters(taskDefinitionToUpdate.getTaskType(), taskDefinitionToUpdate.getTaskParams())) {
-            throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionToUpdate.getName());
-        }
-        Integer version = taskDefinitionLogMapper.queryMaxVersionForDefinition(taskCode);
-        if (version == null || version == 0) {
-            log.error("Max version task definitionLog can not be found in database, taskDefinitionCode:{}.",
-                    taskCode);
-            throw new ServiceException(Status.DATA_IS_NOT_VALID, taskCode);
-        }
-        Date now = new Date();
-        taskDefinitionToUpdate.setCode(taskCode);
-        taskDefinitionToUpdate.setId(taskDefinition.getId());
-        taskDefinitionToUpdate.setProjectCode(projectCode);
-        taskDefinitionToUpdate.setUserId(taskDefinition.getUserId());
-        taskDefinitionToUpdate.setVersion(++version);
-        taskDefinitionToUpdate.setTaskType(taskDefinitionToUpdate.getTaskType().toUpperCase());
-        taskDefinitionToUpdate.setUpdateTime(now);
-        boolean updateSuccess = taskDefinitionDao.updateById(taskDefinitionToUpdate);
-        taskDefinitionToUpdate.setOperator(loginUser.getId());
-        taskDefinitionToUpdate.setOperateTime(now);
-        taskDefinitionToUpdate.setCreateTime(now);
-        taskDefinitionToUpdate.setId(null);
-        int insert = taskDefinitionLogMapper.insert(taskDefinitionToUpdate);
-        if (!updateSuccess || insert != 1) {
-            log.error("Update task definition or definitionLog error, projectCode:{}, taskDefinitionCode:{}.",
-                    projectCode, taskCode);
-            throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
-        }
-        log.info(
-                "Update task definition and definitionLog complete, projectCode:{}, taskDefinitionCode:{}, newTaskVersion:{}.",
-                projectCode, taskCode, taskDefinitionToUpdate.getVersion());
-        // update workflow task relation
-        List<WorkflowTaskRelation> workflowTaskRelations = workflowTaskRelationDao
-                .queryWorkflowTaskRelationByTaskCodeAndTaskVersion(taskDefinitionToUpdate.getCode(),
-                        taskDefinition.getVersion());
-        if (CollectionUtils.isNotEmpty(workflowTaskRelations)) {
-            Map<Long, List<WorkflowTaskRelation>> workflowTaskRelationGroupList = workflowTaskRelations.stream()
-                    .collect(Collectors.groupingBy(WorkflowTaskRelation::getWorkflowDefinitionCode));
-            for (Map.Entry<Long, List<WorkflowTaskRelation>> workflowTaskRelationMap : workflowTaskRelationGroupList
-                    .entrySet()) {
-                Long workflowDefinitionCode = workflowTaskRelationMap.getKey();
-                int workflowDefinitionVersion =
-                        workflowDefinitionLogMapper.queryMaxVersionForDefinition(workflowDefinitionCode)
-                                + 1;
-                List<WorkflowTaskRelation> workflowTaskRelationList = workflowTaskRelationMap.getValue();
-                for (WorkflowTaskRelation workflowTaskRelation : workflowTaskRelationList) {
-                    if (taskCode == workflowTaskRelation.getPreTaskCode()) {
-                        workflowTaskRelation.setPreTaskVersion(version);
-                    } else if (taskCode == workflowTaskRelation.getPostTaskCode()) {
-                        workflowTaskRelation.setPostTaskVersion(version);
-                    }
-                    workflowTaskRelation.setWorkflowDefinitionVersion(workflowDefinitionVersion);
-                    if (!workflowTaskRelationDao.updateWorkflowTaskRelationTaskVersion(workflowTaskRelation)) {
-                        log.error("batch update workflow task relation error, projectCode:{}, taskDefinitionCode:{}.",
-                                projectCode, taskCode);
-                        throw new ServiceException(Status.WORKFLOW_TASK_RELATION_BATCH_UPDATE_ERROR);
-                    }
-                    WorkflowTaskRelationLog workflowTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
-                    workflowTaskRelationLog.setOperator(loginUser.getId());
-                    workflowTaskRelationLog.setId(null);
-                    workflowTaskRelationLog.setOperateTime(now);
-                    int insertWorkflowTaskRelationLogCount = workflowTaskRelationLogDao.insert(workflowTaskRelationLog);
-                    if (insertWorkflowTaskRelationLogCount != 1) {
-                        log.error("batch update workflow task relation error, projectCode:{}, taskDefinitionCode:{}.",
-                                projectCode, taskCode);
-                        throw new ServiceException(Status.CREATE_WORKFLOW_TASK_RELATION_LOG_ERROR);
-                    }
-                }
-                WorkflowDefinition workflowDefinition =
-                        workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
-                workflowDefinition.setVersion(workflowDefinitionVersion);
-                workflowDefinition.setUpdateTime(now);
-                workflowDefinition.setUserId(loginUser.getId());
-                // update workflow definition
-                boolean updateWorkflowDefinitionSuccess = workflowDefinitionDao.updateById(workflowDefinition);
-                WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog(workflowDefinition);
-                workflowDefinitionLog.setOperateTime(now);
-                workflowDefinitionLog.setId(null);
-                workflowDefinitionLog.setOperator(loginUser.getId());
-                int insertWorkflowDefinitionLogCount = workflowDefinitionLogMapper.insert(workflowDefinitionLog);
-                if (!updateWorkflowDefinitionSuccess || insertWorkflowDefinitionLogCount != 1) {
-                    throw new ServiceException(Status.UPDATE_WORKFLOW_DEFINITION_ERROR);
-                }
-            }
-        }
-        return taskDefinitionToUpdate;
-    }
-
-    /**
-     * update task definition and upstream
-     *
-     * @param loginUser             login user
-     * @param projectCode           project code
-     * @param taskCode              task definition code
-     * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes         upstream task codes, sep comma
-     * @return updated task code
-     */
-    @Override
-    public Long updateTaskWithUpstream(User loginUser, long projectCode, long taskCode,
-                                       String taskDefinitionJsonObj, String upstreamCodes) {
-        TaskDefinitionLog taskDefinitionToUpdate =
-                updateTask(loginUser, projectCode, taskCode, taskDefinitionJsonObj);
-        List<WorkflowTaskRelation> upstreamTaskRelations =
-                workflowTaskRelationDao.queryUpstreamByCode(projectCode, taskCode);
-        Set<Long> upstreamCodeSet =
-                upstreamTaskRelations.stream().map(WorkflowTaskRelation::getPreTaskCode).collect(Collectors.toSet());
-        Set<Long> upstreamTaskCodes = Collections.emptySet();
-        if (StringUtils.isNotEmpty(upstreamCodes)) {
-            upstreamTaskCodes = Arrays.stream(upstreamCodes.split(Constants.COMMA)).map(Long::parseLong)
-                    .collect(Collectors.toSet());
-        }
-        if (CollectionUtils.isEqualCollection(upstreamCodeSet, upstreamTaskCodes) && taskDefinitionToUpdate == null) {
-            return taskCode;
-        }
-        Map<Long, TaskDefinition> queryUpStreamTaskCodeMap;
-        if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
-            List<TaskDefinition> upstreamTaskDefinitionList = taskDefinitionDao.queryByCodes(upstreamTaskCodes);
-            queryUpStreamTaskCodeMap = upstreamTaskDefinitionList.stream()
-                    .collect(Collectors.toMap(TaskDefinition::getCode, taskDefinition -> taskDefinition));
-            // upstreamTaskCodes - queryUpStreamTaskCodeMap.keySet
-            upstreamTaskCodes.removeAll(queryUpStreamTaskCodeMap.keySet());
-            if (CollectionUtils.isNotEmpty(upstreamTaskCodes)) {
-                String notExistTaskCodes = StringUtils.join(upstreamTaskCodes, Constants.COMMA);
-                log.error("Some task definitions in parameter upstreamTaskCodes do not exist, notExistTaskCodes:{}.",
-                        notExistTaskCodes);
-                throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, notExistTaskCodes);
-            }
-        } else {
-            queryUpStreamTaskCodeMap = new HashMap<>();
-        }
-        if (MapUtils.isNotEmpty(queryUpStreamTaskCodeMap)) {
-            WorkflowTaskRelation taskRelation = upstreamTaskRelations.get(0);
-            List<WorkflowTaskRelation> workflowTaskRelations =
-                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(taskRelation.getWorkflowDefinitionCode());
-
-            // set upstream code list
-            updateUpstreamTask(new HashSet<>(queryUpStreamTaskCodeMap.keySet()),
-                    taskCode, projectCode, taskRelation.getWorkflowDefinitionCode(), loginUser);
-
-            List<WorkflowTaskRelation> workflowTaskRelationList = Lists.newArrayList(workflowTaskRelations);
-            List<WorkflowTaskRelation> relationList = Lists.newArrayList();
-            for (WorkflowTaskRelation workflowTaskRelation : workflowTaskRelationList) {
-                if (workflowTaskRelation.getPostTaskCode() == taskCode) {
-                    if (queryUpStreamTaskCodeMap.containsKey(workflowTaskRelation.getPreTaskCode())
-                            && workflowTaskRelation.getPreTaskCode() != 0L) {
-                        queryUpStreamTaskCodeMap.remove(workflowTaskRelation.getPreTaskCode());
-                    } else {
-                        workflowTaskRelation.setPreTaskCode(0L);
-                        workflowTaskRelation.setPreTaskVersion(0);
-                        relationList.add(workflowTaskRelation);
-                    }
-                }
-            }
-            workflowTaskRelationList.removeAll(relationList);
-            for (Map.Entry<Long, TaskDefinition> queryUpStreamTask : queryUpStreamTaskCodeMap.entrySet()) {
-                taskRelation.setPreTaskCode(queryUpStreamTask.getKey());
-                taskRelation.setPreTaskVersion(queryUpStreamTask.getValue().getVersion());
-                workflowTaskRelationList.add(taskRelation);
-            }
-            if (MapUtils.isEmpty(queryUpStreamTaskCodeMap) && CollectionUtils.isNotEmpty(workflowTaskRelationList)) {
-                workflowTaskRelationList.add(workflowTaskRelationList.get(0));
-            }
-        }
-        log.info(
-                "Update task with upstream tasks complete, projectCode:{}, taskDefinitionCode:{}, upstreamTaskCodes:{}.",
-                projectCode, taskCode, upstreamTaskCodes);
-        return taskCode;
-    }
-
-    private void updateUpstreamTask(Set<Long> allPreTaskCodeSet, long taskCode, long projectCode,
-                                    long workflowDefinitionCode, User loginUser) {
-        // query all workflow task relation
-        List<WorkflowTaskRelation> hadWorkflowTaskRelationList = workflowTaskRelationDao
-                .queryUpstreamByCode(projectCode, taskCode);
-        // remove pre
-        Set<Long> removePreTaskSet = new HashSet<>();
-        List<WorkflowTaskRelation> removePreTaskList = new ArrayList<>();
-        // add pre
-        Set<Long> addPreTaskSet = new HashSet<>();
-        List<WorkflowTaskRelation> addPreTaskList = new ArrayList<>();
-
-        List<WorkflowTaskRelationLog> workflowTaskRelationLogList = new ArrayList<>();
-
-        // filter all workflow task relation
-        if (CollectionUtils.isNotEmpty(hadWorkflowTaskRelationList)) {
-            for (WorkflowTaskRelation workflowTaskRelation : hadWorkflowTaskRelationList) {
-                if (workflowTaskRelation.getPreTaskCode() == 0) {
-                    continue;
-                }
-                // had
-                if (allPreTaskCodeSet.contains(workflowTaskRelation.getPreTaskCode())) {
-                    allPreTaskCodeSet.remove(workflowTaskRelation.getPreTaskCode());
-                } else {
-                    // remove
-                    removePreTaskSet.add(workflowTaskRelation.getPreTaskCode());
-                    workflowTaskRelation.setPreTaskCode(0);
-                    workflowTaskRelation.setPreTaskVersion(0);
-                    removePreTaskList.add(workflowTaskRelation);
-                    workflowTaskRelationLogList.add(createWorkflowTaskRelationLog(loginUser, workflowTaskRelation));
-                }
-            }
-        }
-        // add
-        if (allPreTaskCodeSet.size() != 0) {
-            addPreTaskSet.addAll(allPreTaskCodeSet);
-        }
-        // get add task code map
-        allPreTaskCodeSet.add(Long.valueOf(taskCode));
-        List<TaskDefinition> taskDefinitionList = taskDefinitionDao.queryByCodes(allPreTaskCodeSet);
-        Map<Long, TaskDefinition> taskCodeMap = taskDefinitionList.stream().collect(Collectors
-                .toMap(TaskDefinition::getCode, Function.identity(), (a, b) -> a));
-
-        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
-        TaskDefinition taskDefinition = taskCodeMap.get(taskCode);
-
-        for (Long preTaskCode : addPreTaskSet) {
-            TaskDefinition preTaskRelation = taskCodeMap.get(preTaskCode);
-            WorkflowTaskRelation workflowTaskRelation = new WorkflowTaskRelation(
-                    null, workflowDefinition.getVersion(), projectCode, workflowDefinition.getCode(),
-                    preTaskRelation.getCode(), preTaskRelation.getVersion(),
-                    taskDefinition.getCode(), taskDefinition.getVersion(), ConditionType.NONE, "{}");
-            addPreTaskList.add(workflowTaskRelation);
-            workflowTaskRelationLogList.add(createWorkflowTaskRelationLog(loginUser, workflowTaskRelation));
-        }
-        int insert = 0;
-        int remove = 0;
-        int log = 0;
-        // insert workflow task relation table data
-        if (CollectionUtils.isNotEmpty(addPreTaskList)) {
-            insert = workflowTaskRelationDao.batchInsert(addPreTaskList);
-        }
-        if (CollectionUtils.isNotEmpty(removePreTaskList)) {
-            for (WorkflowTaskRelation workflowTaskRelation : removePreTaskList) {
-                remove += workflowTaskRelationDao.updateById(workflowTaskRelation) ? 1 : 0;
-            }
-        }
-        if (CollectionUtils.isNotEmpty(workflowTaskRelationLogList)) {
-            log = workflowTaskRelationLogDao.batchInsert(workflowTaskRelationLogList);
-        }
-        if (insert + remove != log) {
-            throw new RuntimeException("updateUpstreamTask error");
-        }
-    }
-
-    private WorkflowTaskRelationLog createWorkflowTaskRelationLog(User loginUser,
-                                                                  WorkflowTaskRelation workflowTaskRelation) {
-        Date now = new Date();
-        WorkflowTaskRelationLog workflowTaskRelationLog = new WorkflowTaskRelationLog(workflowTaskRelation);
-        workflowTaskRelationLog.setOperator(loginUser.getId());
-        workflowTaskRelationLog.setOperateTime(now);
-        workflowTaskRelationLog.setCreateTime(now);
-        workflowTaskRelationLog.setUpdateTime(now);
-        return workflowTaskRelationLog;
-    }
-
-    /**
      * switch task definition
      *
      * @param loginUser   login user
@@ -516,6 +210,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinitionLog taskDefinitionUpdate =
                 taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
+        taskDatasourcePermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinitionUpdate));
+        taskSubWorkflowPermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinitionUpdate));
         taskDefinitionUpdate.setUserId(loginUser.getId());
         taskDefinitionUpdate.setUpdateTime(new Date());
         taskDefinitionUpdate.setId(taskDefinition.getId());
@@ -662,6 +358,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 taskDefinitionLog.setFlag(Flag.NO);
                 break;
             case ONLINE:
+                taskDatasourcePermissionChecker.checkPermission(loginUser,
+                        Collections.singletonList(taskDefinitionLog));
+                taskSubWorkflowPermissionChecker.checkPermission(loginUser,
+                        Collections.singletonList(taskDefinitionLog));
                 String resourceIds = taskDefinition.getResourceIds();
                 if (StringUtils.isNotBlank(resourceIds)) {
                     Integer[] resourceIdArray =
