@@ -33,6 +33,108 @@ public class DataxParametersTest {
     public static final String JVM_PARAM = " --jvm=\"-Xms%sG -Xmx%sG\" ";
 
     @Test
+    public void testCheckParametersWithCustomConfig() {
+        DataxParameters withInlineJson = new DataxParameters();
+        withInlineJson.setCustomConfig(1);
+        withInlineJson.setJson("{\"job\":{}}");
+        Assertions.assertTrue(withInlineJson.checkParameters());
+
+        // a blank json field or any semantically empty JSON object is no inline
+        // definition: invalid without a resource file, valid with one because the
+        // resource then carries the job definition (issue #18389)
+        String[] absentJsonVariants = {null, "", "   ", "{}", "{ }", "{\n\n}", " { } "};
+        for (String variant : absentJsonVariants) {
+            DataxParameters withoutResource = new DataxParameters();
+            withoutResource.setCustomConfig(1);
+            withoutResource.setJson(variant);
+            Assertions.assertTrue(withoutResource.isInlineJsonAbsent(),
+                    "expected inline json to be absent for: [" + variant + "]");
+            Assertions.assertFalse(withoutResource.checkParameters(),
+                    "expected invalid without resource for json: [" + variant + "]");
+
+            DataxParameters withResource = new DataxParameters();
+            withResource.setCustomConfig(1);
+            withResource.setJson(variant);
+            withResource.setResourceList(buildResourceList());
+            Assertions.assertTrue(withResource.checkParameters(),
+                    "expected valid with resource for json: [" + variant + "]");
+        }
+
+        // a non-empty inline definition stays inline even when a resource is attached
+        DataxParameters inlineWithResource = new DataxParameters();
+        inlineWithResource.setCustomConfig(1);
+        inlineWithResource.setJson("{\"job\":{}}");
+        inlineWithResource.setResourceList(buildResourceList());
+        Assertions.assertFalse(inlineWithResource.isInlineJsonAbsent());
+        Assertions.assertTrue(inlineWithResource.checkParameters());
+
+        // malformed json is not treated as absent, downstream validation reports it
+        DataxParameters malformed = new DataxParameters();
+        malformed.setCustomConfig(1);
+        malformed.setJson("{invalid");
+        Assertions.assertFalse(malformed.isInlineJsonAbsent());
+
+        DataxParameters withNeither = new DataxParameters();
+        withNeither.setCustomConfig(1);
+        Assertions.assertFalse(withNeither.checkParameters());
+    }
+
+    private List<ResourceInfo> buildResourceList() {
+        ResourceInfo resource = new ResourceInfo();
+        resource.setResourceName("/datax/job.json");
+        List<ResourceInfo> resources = new ArrayList<>();
+        resources.add(resource);
+        return resources;
+    }
+
+    @Test
+    public void testJobDefinitionResourceIsTheSingleJsonResource() {
+        // resourceList is multi-select and also carries auxiliary files, so the job definition
+        // is identified as the single .json resource, not resourceList.get(0) (issue #18389)
+
+        // only an auxiliary keytab and no json: no job definition, invalid
+        DataxParameters onlyAuxiliary = new DataxParameters();
+        onlyAuxiliary.setCustomConfig(1);
+        onlyAuxiliary.setResourceList(resources("/datax/hdfs.keytab"));
+        Assertions.assertNull(onlyAuxiliary.getJobDefinitionResource());
+        Assertions.assertFalse(onlyAuxiliary.checkParameters(),
+                "a task carrying only auxiliary resources has no job definition");
+
+        // a keytab listed before the job file: the .json is chosen, not the first entry
+        DataxParameters auxiliaryBeforeJob = new DataxParameters();
+        auxiliaryBeforeJob.setCustomConfig(1);
+        auxiliaryBeforeJob.setResourceList(resources("/datax/hdfs.keytab", "/datax/job.json"));
+        Assertions.assertEquals("/datax/job.json",
+                auxiliaryBeforeJob.getJobDefinitionResource().getResourceName());
+        Assertions.assertTrue(auxiliaryBeforeJob.checkParameters());
+
+        // two json resources are ambiguous: no single job definition, invalid
+        DataxParameters twoJson = new DataxParameters();
+        twoJson.setCustomConfig(1);
+        twoJson.setResourceList(resources("/datax/a.json", "/datax/b.json"));
+        Assertions.assertNull(twoJson.getJobDefinitionResource());
+        Assertions.assertFalse(twoJson.checkParameters());
+
+        // exactly one json resource is the job definition
+        DataxParameters singleJson = new DataxParameters();
+        singleJson.setCustomConfig(1);
+        singleJson.setResourceList(resources("/datax/job.json"));
+        Assertions.assertEquals("/datax/job.json",
+                singleJson.getJobDefinitionResource().getResourceName());
+        Assertions.assertTrue(singleJson.checkParameters());
+    }
+
+    private List<ResourceInfo> resources(String... names) {
+        List<ResourceInfo> list = new ArrayList<>();
+        for (String name : names) {
+            ResourceInfo resource = new ResourceInfo();
+            resource.setResourceName(name);
+            list.add(resource);
+        }
+        return list;
+    }
+
+    @Test
     public void testLoadJvmEnv() {
 
         DataxParameters dataxParameters = new DataxParameters();
