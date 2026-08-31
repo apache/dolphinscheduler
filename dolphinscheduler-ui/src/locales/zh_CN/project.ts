@@ -628,6 +628,8 @@ export default {
     or: '或',
     datax_custom_template: '自定义模板',
     datax_json_template: 'JSON',
+    datax_custom_json_resource_tips:
+      '当自定义 JSON 为空时, 需要且仅需要附加一个携带 DataX 任务定义的 .json 资源文件。',
     datax_target_datasource_type: '目标源类型',
     datax_target_database: '目标源实例',
     datax_target_table: '目标表',

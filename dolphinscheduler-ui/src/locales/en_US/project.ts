@@ -647,6 +647,8 @@ export default {
     or: 'or',
     datax_custom_template: 'Custom Template',
     datax_json_template: 'JSON',
+    datax_custom_json_resource_tips:
+      'When the custom JSON is empty, attach exactly one .json resource file that carries the DataX job definition.',
     datax_target_datasource_type: 'Target Datasource Types',
     datax_target_database: 'Target Database',
     datax_target_table: 'Target Table',
