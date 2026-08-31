@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVari
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowInstanceServiceImpl;
@@ -155,6 +156,9 @@ public class WorkflowInstanceServiceTest {
 
     @Mock
     TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
+
+    @Mock
+    TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
 
     @Mock
     private TaskInstanceContextDao taskInstanceContextDao;
@@ -636,6 +640,37 @@ public class WorkflowInstanceServiceTest {
         }
         Mockito.verify(taskDatasourcePermissionChecker, Mockito.times(3))
                 .checkPermission(eq(loginUser), Mockito.anyList());
+        Mockito.verify(taskSubWorkflowPermissionChecker, Mockito.times(3))
+                .checkPermission(eq(loginUser), Mockito.anyList());
+    }
+
+    @Test
+    public void testUpdateWorkflowInstanceShouldRejectUnavailableSubWorkflow() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(projectCode);
+        workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
+
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskSubWorkflowPermissionChecker).checkPermission(eq(loginUser), Mockito.anyList());
+
+        try (
+                MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
+                        Mockito.mockStatic(TaskPluginManager.class)) {
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
+                    .thenReturn(true);
+
+            assertThrowsServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION,
+                    () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                            taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0));
+        }
+
+        Mockito.verify(processService, Mockito.never())
+                .saveTaskDefine(eq(loginUser), eq(projectCode), Mockito.anyList(), eq(Boolean.TRUE));
     }
 
     @Test

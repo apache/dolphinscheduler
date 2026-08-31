@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVari
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -167,6 +168,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
     @Autowired
     private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
+
+    @Autowired
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
 
     @Override
     public List<WorkflowInstanceSummaryVO> queryTopNLongestRunningWorkflowInstance(User loginUser, long projectCode,
@@ -428,6 +432,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         }
         mergeSensitiveLocalParams(taskDefinitionLogs);
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
+        taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs, syncDefine);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             log.error("Update task definition error, projectCode:{}, workflowInstanceId:{}", projectCode,

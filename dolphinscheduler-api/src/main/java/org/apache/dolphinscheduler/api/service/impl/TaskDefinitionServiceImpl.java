@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.PermissionCheck;
 import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowTaskRelationService;
@@ -102,6 +103,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     @Autowired
     private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
+
+    @Autowired
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
+
     /**
      * query task definition
      *
@@ -207,6 +212,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         TaskDefinitionLog taskDefinitionUpdate =
                 taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
         taskDatasourcePermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinitionUpdate));
+        taskSubWorkflowPermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinitionUpdate));
         taskDefinitionUpdate.setUserId(loginUser.getId());
         taskDefinitionUpdate.setUpdateTime(new Date());
         taskDefinitionUpdate.setId(taskDefinition.getId());
@@ -360,6 +366,8 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 break;
             case ONLINE:
                 taskDatasourcePermissionChecker.checkPermission(loginUser,
+                        Collections.singletonList(taskDefinitionLog));
+                taskSubWorkflowPermissionChecker.checkPermission(loginUser,
                         Collections.singletonList(taskDefinitionLog));
                 String resourceIds = taskDefinition.getResourceIds();
                 if (StringUtils.isNotBlank(resourceIds)) {

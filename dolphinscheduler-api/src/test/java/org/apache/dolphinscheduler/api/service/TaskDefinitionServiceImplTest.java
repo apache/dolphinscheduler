@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -118,6 +119,9 @@ public class TaskDefinitionServiceImplTest {
     private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
 
     @Mock
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
+
+    @Mock
     private WorkflowTaskRelationLogMapper workflowTaskRelationLogMapper;
 
     @Mock
@@ -200,6 +204,26 @@ public class TaskDefinitionServiceImplTest {
                 .thenReturn(new TaskDefinitionLog());
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
                 .when(taskDatasourcePermissionChecker).checkPermission(eq(user), anyList());
+
+        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION,
+                () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
+
+        Mockito.verify(taskDefinitionDao, Mockito.never()).updateById(any(TaskDefinition.class));
+    }
+
+    @Test
+    public void switchVersionShouldRejectUnavailableSubWorkflow() {
+        Project project = getProject();
+        when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(PROJECT_CODE);
+        when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
+                .thenReturn(new TaskDefinitionLog());
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskSubWorkflowPermissionChecker).checkPermission(eq(user), anyList());
 
         assertThrowsServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION,
                 () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
@@ -308,6 +332,31 @@ public class TaskDefinitionServiceImplTest {
         assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
                 () -> taskDefinitionService.releaseTaskDefinition(user, PROJECT_CODE, TASK_CODE,
                         ReleaseState.getEnum(2)));
+    }
+
+    @Test
+    public void releaseTaskDefinitionShouldRejectUnavailableSubWorkflow() {
+        Project project = getProject();
+        when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setProjectCode(PROJECT_CODE);
+        taskDefinition.setVersion(VERSION);
+        taskDefinition.setCode(TASK_CODE);
+        when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
+                .thenReturn(taskDefinitionLog);
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskSubWorkflowPermissionChecker).checkPermission(eq(user), anyList());
+
+        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION,
+                () -> taskDefinitionService.releaseTaskDefinition(
+                        user, PROJECT_CODE, TASK_CODE, ReleaseState.ONLINE));
+
+        Mockito.verify(taskDefinitionDao, Mockito.never()).updateById(any(TaskDefinition.class));
+        Mockito.verify(taskDefinitionLogMapper, Mockito.never()).updateById(any(TaskDefinitionLog.class));
     }
 
     @Test

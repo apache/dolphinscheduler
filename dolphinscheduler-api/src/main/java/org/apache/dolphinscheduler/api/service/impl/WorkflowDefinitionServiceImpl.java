@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.api.dto.workflow.WorkflowDefinitionVariablesD
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionLogService;
@@ -212,6 +213,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Autowired
     private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
 
+    @Autowired
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
+
     /**
      * create workflow definition
      *
@@ -276,6 +280,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                  WorkflowDefinition workflowDefinition,
                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
+        taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         int saveTaskResult = processService.saveTaskDefine(loginUser, workflowDefinition.getProjectCode(),
                 taskDefinitionLogs, Boolean.TRUE);
         if (saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
@@ -739,6 +744,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                  WorkflowDefinition workflowDefinitionDeepCopy,
                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
+        taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         int saveTaskResult = processService.saveTaskDefine(loginUser, workflowDefinition.getProjectCode(),
                 taskDefinitionLogs, Boolean.TRUE);
         if (saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
@@ -1656,6 +1662,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                             return Stream.of(taskDefinitionLog);
                         }).collect(Collectors.toList()));
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogList);
+        taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogList);
 
         int switchVersion = processService.switchVersion(workflowDefinition, workflowDefinitionLog);
         if (switchVersion <= 0) {
@@ -1924,6 +1931,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         List<TaskDefinitionLog> taskDefinitionLogs =
                 taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
+        taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         // todo : check Workflow is validate
     }
 
