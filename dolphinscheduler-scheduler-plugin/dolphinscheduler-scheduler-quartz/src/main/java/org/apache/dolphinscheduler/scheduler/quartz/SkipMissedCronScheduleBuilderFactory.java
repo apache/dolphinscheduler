@@ -15,27 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto;
+package org.apache.dolphinscheduler.scheduler.quartz;
 
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
 
-import java.util.Map;
+import org.quartz.CronScheduleBuilder;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+final class SkipMissedCronScheduleBuilderFactory implements CronScheduleBuilderFactory {
 
-@Data
-@NoArgsConstructor
-public class DynamicSubWorkflowDto {
-
-    private long workflowInstanceId;
-
-    private String name;
-
-    private long index;
-
-    private Map<String, String> parameters;
-
-    private WorkflowExecutionStatus state;
-
+    @Override
+    public CronScheduleBuilder createCronScheduleBuilder(Schedule schedule) {
+        return CronScheduleBuilder.cronSchedule(schedule.getCrontab())
+                .withMisfireHandlingInstructionDoNothing()
+                .inTimeZone(DateUtils.getTimezone(schedule.getTimezoneId()));
+    }
 }
