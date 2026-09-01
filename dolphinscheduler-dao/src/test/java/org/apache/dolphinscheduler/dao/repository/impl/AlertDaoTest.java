@@ -167,9 +167,11 @@ class AlertDaoTest extends BaseDaoTest {
      * Verifies that concurrent calls to {@code addTaskResultAlert} with the same
      * deduplication key result in exactly one inserted row.
      * <p>
-     * The database-level unique constraint uk_alert_dedup plus the dialect-specific
-     * idempotent INSERT (ON DUPLICATE KEY UPDATE / ON CONFLICT DO NOTHING) ensures
-     * atomicity: only one insert succeeds, the rest return zero without throwing.
+     * The INSERT ... SELECT ... WHERE NOT EXISTS check is not atomic with the
+     * INSERT itself, so under concurrent access a race condition may cause a
+     * DuplicateKeyException from the uk_alert_dedup unique constraint. The DAO
+     * layer catches this exception and returns 0, ensuring exactly one row is
+     * inserted and no exception propagates to the caller.
      * <p>
      * Each losing thread must return 0, not throw an exception. If any thread throws,
      * {@link Future#get()} will propagate the exception and fail the test.

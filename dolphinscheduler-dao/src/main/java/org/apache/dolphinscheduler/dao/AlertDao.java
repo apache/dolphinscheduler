@@ -55,6 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -125,14 +126,22 @@ public class AlertDao {
 
         String sign = generateSign(alert);
         alert.setSign(sign);
-        int count = alertMapper.insertTaskResultAlertIfAbsent(alert);
-        if (count > 0) {
-            log.info("add task result alert to db , alert: {}", alert);
-        } else {
-            log.info("skip duplicate task result alert, sign: {}, workflowInstanceId: {}", sign,
+        try {
+            int count = alertMapper.insertTaskResultAlertIfAbsent(alert);
+            if (count > 0) {
+                log.info("add task result alert to db , alert: {}", alert);
+            } else {
+                log.info("skip duplicate task result alert, sign: {}, workflowInstanceId: {}", sign,
+                        alert.getWorkflowInstanceId());
+            }
+            return count;
+        } catch (DuplicateKeyException e) {
+            // Concurrent race: NOT EXISTS passed but another thread inserted first.
+            // The uk_alert_dedup unique constraint caught it — treat as a skip.
+            log.info("skip duplicate task result alert (concurrent race), sign: {}, workflowInstanceId: {}", sign,
                     alert.getWorkflowInstanceId());
+            return 0;
         }
-        return count;
     }
 
     /**
