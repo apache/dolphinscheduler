@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_CLUSTER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_CLUSTER_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CLUSTER_BY_CODE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CLUSTER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_CLUSTER_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_CLUSTER_ERROR;
@@ -121,26 +120,6 @@ public class ClusterController extends BaseController {
     }
 
     /**
-     * query cluster details by code
-     *
-     * @param clusterCode cluster code
-     * @return cluster detail information
-     */
-    @Operation(summary = "queryClusterByCode", description = "QUERY_CLUSTER_BY_CODE_NOTES")
-    @Parameters({
-            @Parameter(name = "clusterCode", description = "CLUSTER_CODE", required = true, schema = @Schema(implementation = long.class, example = "100"))
-    })
-    @GetMapping(value = "/query-by-code")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_CLUSTER_BY_CODE_ERROR)
-    public Result<ClusterDto> queryClusterByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                 @RequestParam("clusterCode") Long clusterCode) {
-
-        ClusterDto clusterDto = clusterService.queryClusterByCode(clusterCode);
-        return Result.success(clusterDto);
-    }
-
-    /**
      * query cluster list paging
      *
      * @param searchVal search value
@@ -164,7 +143,8 @@ public class ClusterController extends BaseController {
 
         checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        PageInfo<ClusterDto> clusterDtoPageInfo = clusterService.queryClusterListPaging(pageNo, pageSize, searchVal);
+        PageInfo<ClusterDto> clusterDtoPageInfo = clusterService.queryClusterListPaging(loginUser, pageNo, pageSize,
+                searchVal);
         return Result.success(clusterDtoPageInfo);
     }
 
@@ -201,7 +181,7 @@ public class ClusterController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_CLUSTER_ERROR)
     public Result<List<ClusterDto>> queryAllClusterList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        List<ClusterDto> clusterDtos = clusterService.queryAllClusterList();
+        List<ClusterDto> clusterDtos = clusterService.queryAllClusterList(loginUser);
         return Result.success(clusterDtos);
     }
 
@@ -221,7 +201,7 @@ public class ClusterController extends BaseController {
     @ApiException(VERIFY_CLUSTER_ERROR)
     public Result<Boolean> verifyCluster(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                          @RequestParam(value = "clusterName") String clusterName) {
-        clusterService.verifyCluster(clusterName);
+        clusterService.verifyCluster(loginUser, clusterName);
         return Result.success(true);
     }
 }

@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
@@ -452,7 +453,7 @@ public class DependentExecute {
      * query the first workflowInstance by scheduleTime(or startTime if scheduleTime is null)
      */
     public boolean isFirstWorkflowInstance(DependentItem dependentItem) {
-        WorkflowInstance firstWorkflowInstance =
+        WorkflowInstanceSummaryDto firstWorkflowInstance =
                 workflowInstanceDao.queryFirstScheduleWorkflowInstance(dependentItem.getDefinitionCode());
         if (firstWorkflowInstance == null) {
             firstWorkflowInstance =

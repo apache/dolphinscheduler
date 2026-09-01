@@ -149,6 +149,10 @@ export default {
     start_time: 'Start Time',
     end_time: 'End Time',
     crontab: 'Crontab',
+    missed_fire_policy: 'Missed Fire Policy',
+    skip_missed: 'Skip missed executions',
+    fire_once_now: 'Fire once immediately',
+    fire_all_missed: 'Fire all missed executions',
     delete_confirm: 'Delete?',
     delete_confirm_with_name: 'Delete "{name}"?',
     delete_irreversible:
@@ -641,6 +645,8 @@ export default {
     or: 'or',
     datax_custom_template: 'Custom Template',
     datax_json_template: 'JSON',
+    datax_custom_json_resource_tips:
+      'When the custom JSON is empty, attach exactly one .json resource file that carries the DataX job definition.',
     datax_target_datasource_type: 'Target Datasource Types',
     datax_target_database: 'Target Database',
     datax_target_table: 'Target Table',

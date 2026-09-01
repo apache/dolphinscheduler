@@ -128,7 +128,8 @@ public class FileUtils {
         FileOutputStream fos = null;
         try {
             File distFile = new File(filePath);
-            if (!distFile.getParentFile().exists() && !distFile.getParentFile().mkdirs()) {
+            File parentFile = distFile.getParentFile();
+            if (parentFile != null && !parentFile.exists() && !parentFile.mkdirs()) {
                 log.error("mkdir parent failed");
                 return false;
             }
