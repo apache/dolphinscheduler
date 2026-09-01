@@ -107,6 +107,9 @@ $bgLight: #ffffff;
     &.icon-sub_workflow {
       background-image: url('/images/task-icons/sub_workflow.png');
     }
+    &.icon-datavines {
+      background-image: url('/images/task-icons/datavines.png');
+    }
     &.icon-procedure {
       background-image: url('/images/task-icons/procedure.png');
     }
@@ -216,6 +219,9 @@ $bgLight: #ffffff;
       }
       &.icon-sub_workflow {
         background-image: url('/images/task-icons/sub_workflow_hover.png');
+      }
+      &.icon-datavines {
+        background-image: url('/images/task-icons/datavines_hover.png');
       }
       &.icon-procedure {
         background-image: url('/images/task-icons/procedure_hover.png');

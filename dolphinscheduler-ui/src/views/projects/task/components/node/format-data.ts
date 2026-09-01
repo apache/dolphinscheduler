@@ -412,6 +412,13 @@ export function formatParams(data: INodeData): {
     taskParams.online = data.online
   }
 
+  if (data.taskType === 'DATAVINES') {
+    taskParams.address = data.address
+    taskParams.jobId = data.jobId
+    taskParams.token = data.token
+    taskParams.failureBlock = data.failureBlock
+  }
+
   if (data.taskType === 'OPENMLDB') {
     taskParams.zk = data.zk
     taskParams.zkPath = data.zkPath

@@ -910,6 +910,14 @@ export default {
     dinky_task_id: 'Dinky task id',
     dinky_task_id_tips: 'Please enter the task id of your dinky',
     dinky_online: 'Online task',
+    datavines_address: 'Datavines address',
+    datavines_address_tips:
+      'Please enter the url of your datavines, eg: http://localhost:5600',
+    datavines_job_id: 'Datavines job id',
+    datavines_job_id_tips: 'Please enter the job id of your datavines',
+    datavines_token: 'Datavines token',
+    datavines_token_tips: 'Please enter the token of your datavines',
+    datavines_failure_block: 'Block on failure',
     factory_name: 'Factory Name',
     resource_group_name: 'Resource Group Name',
     pipeline_name: 'Pipeline Name',
@@ -969,6 +977,7 @@ export default {
     cloud: 'Cloud',
     logic: 'Logic',
     di: 'Data Integration',
+    dq: 'Data Quality',
     ml: 'Machine Learning',
     other: 'Other'
   },

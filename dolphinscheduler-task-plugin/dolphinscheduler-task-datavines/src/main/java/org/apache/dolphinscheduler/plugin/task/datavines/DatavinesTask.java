@@ -1,0 +1,250 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.dolphinscheduler.plugin.task.datavines;
+
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SUCCESS;
+
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.datavines.utils.RequestUtils;
+
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.Collections;
+import java.util.List;
+
+import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import com.fasterxml.jackson.databind.node.NullNode;
+
+@Slf4j
+public class DatavinesTask extends AbstractRemoteTask {
+
+    private final TaskExecutionContext taskExecutionContext;
+
+    private DatavinesParameters datavinesParameters;
+    private String jobExecutionId;
+    private boolean executionStatus;
+
+    protected DatavinesTask(TaskExecutionContext taskExecutionContext) {
+        super(taskExecutionContext);
+        this.taskExecutionContext = taskExecutionContext;
+    }
+
+    @Override
+    public List<String> getApplicationIds() throws TaskException {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void init() {
+        final String taskParams = taskExecutionContext.getTaskParams();
+        this.datavinesParameters = JSONUtils.parseObject(taskParams, DatavinesParameters.class);
+        if (this.datavinesParameters == null || !this.datavinesParameters.checkParameters()) {
+            throw new DatavinesTaskException("datavines task params is not valid");
+        }
+        log.info("initialize datavines task, address: {}, jobId: {}, failureBlock: {}",
+                datavinesParameters.getAddress(),
+                datavinesParameters.getJobId(),
+                datavinesParameters.isFailureBlock());
+    }
+
+    @Override
+    public void submitApplication() throws TaskException {
+        executeJob();
+    }
+
+    @Override
+    public void trackApplicationStatus() throws TaskException {
+        trackApplicationStatusInner();
+    }
+
+    private void executeJob() {
+        try {
+            String address = this.datavinesParameters.getAddress();
+            String jobId = this.datavinesParameters.getJobId();
+            String token = this.datavinesParameters.getToken();
+            String apiResultDataKey = DatavinesTaskConstants.API_RESULT_DATA;
+            JsonNode result = RequestUtils.executeJob(address, jobId, token);
+            if (checkResult(result)) {
+                jobExecutionId = result.get(apiResultDataKey).asText();
+                executionStatus = true;
+                setAppIds(String.format(DatavinesTaskConstants.APPIDS_FORMAT, address, jobExecutionId));
+            }
+        } catch (Exception ex) {
+            log.error(DatavinesTaskConstants.SUBMIT_FAILED_MSG, ex);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException(DatavinesTaskConstants.SUBMIT_FAILED_MSG, ex);
+        }
+    }
+
+    public void trackApplicationStatusInner() throws TaskException {
+        try {
+            String address = this.datavinesParameters.getAddress();
+            restoreJobExecutionId();
+            if (!executionStatus || jobExecutionId == null) {
+                setAppIds(String.format(DatavinesTaskConstants.APPIDS_FORMAT, address,
+                        this.datavinesParameters.getJobId()));
+                setExitStatusCode(mapStatusToExitCode(false));
+                log.info("datavines task failed.");
+                return;
+            }
+            String apiResultDataKey = DatavinesTaskConstants.API_RESULT_DATA;
+            boolean finishFlag = false;
+            while (!finishFlag) {
+                JsonNode jobExecutionStatus =
+                        RequestUtils.getJobExecutionStatus(address, jobExecutionId,
+                                this.datavinesParameters.getToken());
+                if (!checkResult(jobExecutionStatus)) {
+                    break;
+                }
+                String jobExecutionStatusStr = jobExecutionStatus.get(apiResultDataKey).asText();
+                switch (jobExecutionStatusStr) {
+                    case DatavinesTaskConstants.STATUS_SUCCESS:
+                        setAppIds(String.format(DatavinesTaskConstants.APPIDS_FORMAT, address, this.jobExecutionId));
+                        JsonNode jobExecutionResult =
+                                RequestUtils.getJobExecutionResult(address, jobExecutionId,
+                                        this.datavinesParameters.getToken());
+                        if (!checkResult(jobExecutionResult)) {
+                            finishFlag = true;
+                            break;
+                        }
+
+                        String jobExecutionResultStr = jobExecutionResult.get(apiResultDataKey).asText();
+                        boolean checkResult = true;
+                        if (this.datavinesParameters.isFailureBlock()) {
+                            checkResult = DatavinesTaskConstants.STATUS_SUCCESS.equals(jobExecutionResultStr);
+                        }
+
+                        setExitStatusCode(mapStatusToExitCode(checkResult));
+                        log.info("datavines task finished, execution status is {} and check result is {}",
+                                jobExecutionStatusStr, jobExecutionResultStr);
+                        finishFlag = true;
+                        break;
+                    case DatavinesTaskConstants.STATUS_FAILURE:
+                    case DatavinesTaskConstants.STATUS_KILL:
+                    case DatavinesTaskConstants.STATUS_PAUSE:
+                    case DatavinesTaskConstants.STATUS_STOP:
+                    case DatavinesTaskConstants.STATUS_NEED_FAULT_TOLERANCE:
+                        errorHandle("task execution status: " + jobExecutionStatusStr);
+                        finishFlag = true;
+                        break;
+                    default:
+                        Thread.sleep(DatavinesTaskConstants.SLEEP_MILLIS);
+                }
+            }
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            log.error(DatavinesTaskConstants.TRACK_FAILED_MSG, ex);
+            setExitStatusCode(EXIT_CODE_FAILURE);
+            throw new TaskException(DatavinesTaskConstants.TRACK_FAILED_MSG, ex);
+        }
+    }
+
+    /**
+     * Restore the remote job execution id from the persisted app id after the worker recovers.
+     * The app id is stored as {@code address-jobExecutionId}, see {@link DatavinesTaskConstants#APPIDS_FORMAT}.
+     */
+    private void restoreJobExecutionId() {
+        if (jobExecutionId != null || StringUtils.isEmpty(taskRequest.getAppIds())) {
+            return;
+        }
+        String appId = taskRequest.getAppIds();
+        int separatorIndex = appId.lastIndexOf('-');
+        if (separatorIndex < 0 || separatorIndex == appId.length() - 1) {
+            log.warn("invalid datavines app id: {}", appId);
+            return;
+        }
+        jobExecutionId = appId.substring(separatorIndex + 1);
+        executionStatus = true;
+        log.info("restored datavines job execution id: {}", jobExecutionId);
+    }
+
+    /**
+     * map datavines task status to exitStatusCode
+     *
+     * @param status datavines job status
+     * @return exitStatusCode
+     */
+    private int mapStatusToExitCode(boolean status) {
+        if (status) {
+            return EXIT_CODE_SUCCESS;
+        } else {
+            return EXIT_CODE_FAILURE;
+        }
+    }
+
+    private boolean checkResult(JsonNode result) {
+        boolean isCorrect = true;
+        if (result == null
+                || result instanceof MissingNode
+                || result instanceof NullNode
+                || !result.hasNonNull(DatavinesTaskConstants.API_RESULT_CODE)
+                || !result.hasNonNull(DatavinesTaskConstants.API_RESULT_DATA)) {
+            errorHandle(DatavinesTaskConstants.API_ERROR_MSG);
+            isCorrect = false;
+        } else if (result.get(DatavinesTaskConstants.API_RESULT_CODE)
+                .asInt() != DatavinesTaskConstants.API_RESULT_CODE_SUCCESS) {
+            JsonNode errorMsg = result.get(DatavinesTaskConstants.API_RESULT_MSG);
+            errorHandle(errorMsg == null || errorMsg instanceof NullNode
+                    ? DatavinesTaskConstants.API_ERROR_MSG
+                    : errorMsg);
+            isCorrect = false;
+        }
+        return isCorrect;
+    }
+
+    private void errorHandle(Object msg) {
+        setExitStatusCode(EXIT_CODE_FAILURE);
+        log.error("datavines task execute failed with error: {}", msg);
+    }
+
+    @Override
+    public AbstractParameters getParameters() {
+        return datavinesParameters;
+    }
+
+    @Override
+    public void cancelApplication() throws TaskException {
+        String address = this.datavinesParameters.getAddress();
+        if (StringUtils.isEmpty(jobExecutionId)) {
+            log.warn("datavines task has no job execution id, skip killing, taskId: {}, address: {}",
+                    this.taskExecutionContext.getTaskInstanceId(), address);
+            return;
+        }
+        log.info("trying terminate datavines task, taskId: {}, address: {}, jobExecutionId: {}",
+                this.taskExecutionContext.getTaskInstanceId(), address, jobExecutionId);
+        try {
+            RequestUtils.killJobExecution(address, jobExecutionId, this.datavinesParameters.getToken());
+            log.warn("datavines task terminated, taskId: {}, address: {}, jobExecutionId: {}",
+                    this.taskExecutionContext.getTaskInstanceId(),
+                    address,
+                    jobExecutionId);
+        } catch (Exception ex) {
+            log.error("datavines task kill failed, taskId: {}, address: {}, jobExecutionId: {}",
+                    this.taskExecutionContext.getTaskInstanceId(), address, jobExecutionId, ex);
+            throw new TaskException(DatavinesTaskConstants.KILL_FAILED_MSG, ex);
+        }
+    }
+}
