@@ -166,8 +166,8 @@ public class SensitivePropertyUtils {
                 PropertySensitiveUtils.findInvalidSensitivePlaceholderProp(submittedProperties, existingProperties);
         if (invalidProp != null) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
-                    "sensitive parameter '" + invalidProp
-                            + "' cannot use ****** when creating or enabling sensitive; please re-enter the value");
+                    "parameter '" + invalidProp
+                            + "' cannot use ****** when creating, enabling, or disabling sensitive; please re-enter the value");
         }
     }
 

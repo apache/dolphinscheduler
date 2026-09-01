@@ -16,6 +16,7 @@
  */
 import { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { applySensitiveToggle } from '@/utils/sensitive-param'
 import type { IJsonItem } from '../types'
 
 export function useCustomParams({
@@ -98,13 +99,22 @@ export function useCustomParams({
             maxLength: 256
           }
         },
-        {
-          type: 'checkbox',
+        (i?: number) => ({
+          type: 'checkbox' as const,
           field: 'sensitive',
           name: t('project.node.sensitive'),
           span: 3,
-          value: false
-        }
+          value: false,
+          props: {
+            onUpdateChecked: (checked: boolean) => {
+              const rows = model[field]
+              if (i === undefined || !rows || !rows[i]) {
+                return
+              }
+              applySensitiveToggle(rows[i], checked)
+            }
+          }
+        })
       ]
     }
   ]

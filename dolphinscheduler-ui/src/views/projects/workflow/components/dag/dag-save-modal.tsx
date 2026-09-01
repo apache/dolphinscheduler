@@ -41,6 +41,7 @@ import { useRoute } from 'vue-router'
 import { verifyName } from '@/service/modules/workflow-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
+import { applySensitiveToggle } from '@/utils/sensitive-param'
 import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
 
 const props = {
@@ -302,7 +303,12 @@ export default defineComponent({
                       />
                     </NGridItem>
                     <NGridItem span={4}>
-                      <NCheckbox v-model:checked={param.value.sensitive}>
+                      <NCheckbox
+                        checked={param.value.sensitive}
+                        onUpdateChecked={(checked: boolean) =>
+                          applySensitiveToggle(param.value, checked)
+                        }
+                      >
                         {t('project.dag.sensitive')}
                       </NCheckbox>
                     </NGridItem>

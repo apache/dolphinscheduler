@@ -22,7 +22,9 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -88,8 +90,39 @@ public class PropertySensitiveUtils {
     }
 
     /**
+     * Overlay start/command params onto workflow global params.
+     * <p>
+     * {@code ******} is keep-original and never used as a real override, including map-format
+     * startParams that lose {@code sensitive=true}. Empty string is a real empty value.
+     */
+    public List<Property> mergeStartParamsWithGlobalParams(List<Property> startParams,
+                                                           List<Property> globalParams) {
+        Map<String, Property> finalParams = new LinkedHashMap<>();
+        for (Property globalParam : CollectionUtils.emptyIfNull(globalParams)) {
+            if (globalParam == null || globalParam.getProp() == null) {
+                continue;
+            }
+            finalParams.put(globalParam.getProp(), copy(globalParam));
+        }
+        for (Property startParam : CollectionUtils.emptyIfNull(startParams)) {
+            if (startParam == null || startParam.getProp() == null) {
+                continue;
+            }
+            if (isSensitiveValuePlaceholder(startParam.getValue())) {
+                continue;
+            }
+            finalParams.put(startParam.getProp(), copy(startParam));
+        }
+        return new ArrayList<>(finalParams.values());
+    }
+
+    /**
      * Replace keep-original placeholders with existing DB values.
      * Only {@code ******} is treated as keep-original; empty string is a real empty value.
+     * <p>
+     * Used by definition/instance update. Start/command overlay uses
+     * {@link #mergeStartParamsWithGlobalParams} so a missing {@code sensitive} flag
+     * (map-format startParams) cannot persist the mask.
      */
     public List<Property> mergeSensitiveValuePlaceholders(List<Property> submittedProperties,
                                                           List<Property> existingProperties) {
@@ -106,7 +139,9 @@ public class PropertySensitiveUtils {
 
     /**
      * Validate that {@code ******} is only used when an existing sensitive value can be kept.
-     * Covers: new sensitive prop with placeholder; {@code false → true} with placeholder.
+     * Covers: new sensitive prop with placeholder; {@code false → true} with placeholder;
+     * {@code true → false} with placeholder (would persist the mask as a real value).
+     * Toggle sequences are judged by the final submitted pair only.
      *
      * @return first invalid prop name, or null if all valid
      */
@@ -117,10 +152,17 @@ public class PropertySensitiveUtils {
         }
         Map<String, Property> existingPropertyMap = toPropMap(existingProperties);
         for (Property submitted : submittedProperties) {
-            if (!isSensitive(submitted) || !isSensitiveValuePlaceholder(submitted.getValue())) {
+            if (!isSensitiveValuePlaceholder(submitted.getValue())) {
                 continue;
             }
             Property existing = existingPropertyMap.get(submitted.getProp());
+            if (!isSensitive(submitted)) {
+                // Disabling sensitive while still submitting the mask would overwrite the secret.
+                if (existing != null && existing.isSensitive()) {
+                    return submitted.getProp();
+                }
+                continue;
+            }
             if (existing == null || !existing.isSensitive()) {
                 return submitted.getProp();
             }

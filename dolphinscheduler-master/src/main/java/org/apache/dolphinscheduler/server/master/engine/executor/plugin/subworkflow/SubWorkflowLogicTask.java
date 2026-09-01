@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.AbstractLogicTask;
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskParameterDeserializer;
 import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
@@ -274,6 +275,9 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
                 continue;
             }
             for (Property property : param) {
+                if (PropertySensitiveUtils.isSensitiveValuePlaceholder(property.getValue())) {
+                    continue;
+                }
                 result.put(property.getProp(), property);
             }
         }

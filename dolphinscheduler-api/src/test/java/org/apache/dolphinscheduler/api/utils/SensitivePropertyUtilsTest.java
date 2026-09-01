@@ -60,6 +60,30 @@ class SensitivePropertyUtilsTest {
     }
 
     @Test
+    void mergeGlobalParamsRejectsTrueToFalseWithPlaceholder() {
+        String existing = GlobalParameterUtils.serializeGlobalParameter(
+                Collections.singletonList(sensitive("pwd", "Secret123")));
+        String submitted = GlobalParameterUtils.serializeGlobalParameter(
+                Collections.singletonList(nonSensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)));
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> SensitivePropertyUtils.mergeGlobalParams(submitted, existing));
+    }
+
+    @Test
+    void mergeGlobalParamsKeepsOriginalAfterToggleBackToSensitive() {
+        String existing = GlobalParameterUtils.serializeGlobalParameter(
+                Collections.singletonList(sensitive("pwd", "Secret123")));
+        String submitted = GlobalParameterUtils.serializeGlobalParameter(
+                Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)));
+
+        String merged = SensitivePropertyUtils.mergeGlobalParams(submitted, existing);
+        List<Property> properties = GlobalParameterUtils.deserializeGlobalParameter(merged);
+        Assertions.assertEquals("Secret123", properties.get(0).getValue());
+        Assertions.assertTrue(properties.get(0).isSensitive());
+    }
+
+    @Test
     void emptyStringIsPersistedAsEmpty() {
         String existing = GlobalParameterUtils.serializeGlobalParameter(
                 Collections.singletonList(sensitive("pwd", "Secret123")));
@@ -69,6 +93,18 @@ class SensitivePropertyUtilsTest {
         String merged = SensitivePropertyUtils.mergeGlobalParams(submitted, existing);
         List<Property> properties = GlobalParameterUtils.deserializeGlobalParameter(merged);
         Assertions.assertEquals("", properties.get(0).getValue());
+    }
+
+    @Test
+    void mergeLocalParamsRejectsTrueToFalseWithPlaceholder() {
+        String existing =
+                "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"abc\",\"sensitive\":true}]}";
+        String submitted =
+                "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\""
+                        + TaskConstants.SENSITIVE_DATA_MASK + "\",\"sensitive\":false}]}";
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> SensitivePropertyUtils.mergeLocalParamsInTaskParams(submitted, existing));
     }
 
     @Test
