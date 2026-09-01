@@ -168,6 +168,7 @@ spec:
               mountPath: /opt/dolphinscheduler/conf/application.yaml
               subPath: application.yaml
             {{- end }}
+            {{- include "dolphinscheduler.database.ssl.volumeMount" . | nindent 12 }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-alert
           {{- if .Values.alert.persistentVolumeClaim.enabled }}
@@ -184,4 +185,5 @@ spec:
           configMap:
             name: {{ include "dolphinscheduler.fullname" . }}-alert
         {{- end }}
+        {{- include "dolphinscheduler.database.ssl.volume" . | nindent 8 }}
 {{- end }}

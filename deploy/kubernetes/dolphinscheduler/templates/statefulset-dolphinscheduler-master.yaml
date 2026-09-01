@@ -168,6 +168,7 @@ spec:
               mountPath: /opt/dolphinscheduler/conf/common.properties
               subPath: common.properties
             {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
+            {{- include "dolphinscheduler.database.ssl.volumeMount" . | nindent 12 }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-master
           {{- if .Values.master.persistentVolumeClaim.enabled }}
@@ -186,6 +187,7 @@ spec:
           configMap:
             name: {{ include "dolphinscheduler.fullname" . }}-configs
         {{- include "dolphinscheduler.etcd.ssl.volume" . | nindent 8 }}
+        {{- include "dolphinscheduler.database.ssl.volume" . | nindent 8 }}
   {{- if .Values.master.persistentVolumeClaim.enabled }}
   volumeClaimTemplates:
     - metadata:

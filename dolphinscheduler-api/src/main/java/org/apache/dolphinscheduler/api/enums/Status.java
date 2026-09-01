@@ -402,6 +402,7 @@ public enum Status {
     CREATE_TASK_DEFINITION_LOG_ERROR(50061, "create task definition log {0} error", "创建任务操作记录 {0} 错误"),
     DELETE_TASK_DEFINE_BY_CODE_MSG_ERROR(50062, "delete task definition {0} error", "删除任务定义 {0} 错误"),
     TASK_DEFINITION_NOT_EXISTS(50064, "task definition {0} do not exists", "任务定义 {0} 不存在"),
+    SEARCH_TASK_DEFINITIONS_ERROR(50063, "search task definitions error", "搜索任务定义错误"),
     WORKFLOW_TASK_RELATION_NOT_EXPECT(50067, "workflow task relation number not expect, expect {0} but get {1}",
             "工作流任务关系数量不符合预期，预期 {0} 但是实际 {1}"),
     WORKFLOW_TASK_RELATION_BATCH_DELETE_ERROR(50068, "batch delete workflow task relation {0} error",

@@ -53,4 +53,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "dolphinscheduler.fullname" . }}-common
+          volumeMounts:
+            {{- include "dolphinscheduler.database.ssl.volumeMount" . | nindent 12 }}
+      volumes:
+        {{- include "dolphinscheduler.database.ssl.volume" . | nindent 8 }}
 {{- end }}

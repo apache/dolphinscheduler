@@ -68,6 +68,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.TaskSearchResult;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -1895,5 +1896,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                         "SubWorkflowDefinition " + subWorkflowDefinition.getName() + " is not online");
             }
         }
+    }
+
+    @Override
+    public List<TaskSearchResult> searchTaskDefinitionsByName(User loginUser, long projectCode, String searchVal) {
+        Project project = projectDao.queryByCode(projectCode)
+                .orElseThrow(() -> new ServiceException(Status.PROJECT_NOT_FOUND, projectCode));
+        if (!projectService.hasReadPermission(loginUser, project)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(),
+                    project.getName());
+        }
+        return taskDefinitionDao.searchTaskDefinitionsByName(projectCode, searchVal);
     }
 }

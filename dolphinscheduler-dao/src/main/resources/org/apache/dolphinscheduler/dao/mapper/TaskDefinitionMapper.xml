@@ -153,4 +153,29 @@
         where task_type = #{taskType}
     </select>
 
+    <select id="searchTaskDefinitionsByName" resultType="org.apache.dolphinscheduler.dao.entity.TaskSearchResult">
+        select
+            td.code as task_code,
+            td.name as task_name,
+            td.version as task_version,
+            td.task_type,
+            td.create_time as task_create_time,
+            td.update_time as task_update_time,
+            wd.code as workflow_definition_code,
+            wd.version as workflow_definition_version,
+            wd.name as workflow_definition_name,
+            wd.release_state as workflow_release_state
+        from t_ds_task_definition td
+        inner join t_ds_workflow_task_relation ptr on ptr.project_code = td.project_code
+            and td.code = ptr.post_task_code
+            and td.version = ptr.post_task_version
+        inner join t_ds_workflow_definition wd on wd.code = ptr.workflow_definition_code
+            and wd.version = ptr.workflow_definition_version
+        where td.project_code = #{projectCode}
+        <if test="searchVal != null and searchVal != ''">
+            and td.name like concat('%', #{searchVal}, '%')
+        </if>
+        order by td.update_time desc, td.id asc
+    </select>
+
 </mapper>

@@ -186,6 +186,69 @@ Create a database environment variables.
   {{- else }}
   value: {{ .Values.externalDatabase.driverClassName | quote }}
   {{- end }}
+{{- include "dolphinscheduler.database.ssl.env_vars" . }}
+{{- end -}}
+
+{{/*
+Create a database SSL environment variables for external database TLS connections.
+*/}}
+{{- define "dolphinscheduler.database.ssl.env_vars" -}}
+{{- if and (not .Values.postgresql.enabled) (not .Values.mysql.enabled) .Values.externalDatabase.ssl.enabled }}
+- name: SPRING_DATASOURCE_HIKARI_DATA-SOURCE-PROPERTIES_SSLROOTCERT
+  value: "/opt/dolphinscheduler/db-ssl/ca-certificate"
+{{- if .Values.externalDatabase.ssl.clientCertificate }}
+- name: SPRING_DATASOURCE_HIKARI_DATA-SOURCE-PROPERTIES_SSLCERT
+  value: "/opt/dolphinscheduler/db-ssl/client-certificate"
+{{- end }}
+{{- if .Values.externalDatabase.ssl.clientKey }}
+- name: SPRING_DATASOURCE_HIKARI_DATA-SOURCE-PROPERTIES_SSLKEY
+  value: "/opt/dolphinscheduler/db-ssl/client-key"
+{{- end }}
+{{- if eq .Values.externalDatabase.type "postgresql" }}
+- name: SPRING_DATASOURCE_HIKARI_DATA-SOURCE-PROPERTIES_SSLMODE
+  value: "verify-ca"
+{{- end }}
+{{- if eq .Values.externalDatabase.type "mysql" }}
+- name: SPRING_DATASOURCE_HIKARI_DATA-SOURCE-PROPERTIES_USESSL
+  value: "true"
+- name: SPRING_DATASOURCE_HIKARI_DATA-SOURCE-PROPERTIES_REQUIRESSL
+  value: "true"
+- name: SPRING_DATASOURCE_HIKARI_DATA-SOURCE-PROPERTIES_VERIFYSERVERCERTIFICATE
+  value: "true"
+{{- end }}
+{{- end }}
+{{- end -}}
+
+{{/*
+Create a database SSL volume.
+*/}}
+{{- define "dolphinscheduler.database.ssl.volume" -}}
+{{- if and (not .Values.postgresql.enabled) (not .Values.mysql.enabled) .Values.externalDatabase.ssl.enabled }}
+- name: db-ssl
+  secret:
+    secretName: {{ include "dolphinscheduler.fullname" . }}-db-ssl
+{{- end }}
+{{- end -}}
+
+{{/*
+Create a database SSL volumeMount.
+*/}}
+{{- define "dolphinscheduler.database.ssl.volumeMount" -}}
+{{- if and (not .Values.postgresql.enabled) (not .Values.mysql.enabled) .Values.externalDatabase.ssl.enabled }}
+- mountPath: "/opt/dolphinscheduler/db-ssl/ca-certificate"
+  name: db-ssl
+  subPath: ca-certificate
+{{- if .Values.externalDatabase.ssl.clientCertificate }}
+- mountPath: "/opt/dolphinscheduler/db-ssl/client-certificate"
+  name: db-ssl
+  subPath: client-certificate
+{{- end }}
+{{- if .Values.externalDatabase.ssl.clientKey }}
+- mountPath: "/opt/dolphinscheduler/db-ssl/client-key"
+  name: db-ssl
+  subPath: client-key
+{{- end }}
+{{- end }}
 {{- end -}}
 
 {{/*

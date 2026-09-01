@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskSearchResult;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 
@@ -228,4 +229,15 @@ public interface WorkflowDefinitionService {
                              long workflowDefinitionCode,
                              int workflowDefinitionVersion,
                              List<TaskDefinitionLog> taskDefinitionLogList);
+
+    /**
+     * Search task definitions by name across a project, returning task info
+     * together with the parent workflow definition info.
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @param searchVal   search value for task name (partial match). If empty, returns all tasks.
+     * @return list of task search results with workflow info
+     */
+    List<TaskSearchResult> searchTaskDefinitionsByName(User loginUser, long projectCode, String searchVal);
 }

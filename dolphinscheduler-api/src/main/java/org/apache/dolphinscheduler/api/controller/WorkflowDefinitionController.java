@@ -31,6 +31,7 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_DEFINI
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_DEFINITION_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_WORKFLOW_DEFINITION_VERSIONS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.RELEASE_WORKFLOW_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.SEARCH_TASK_DEFINITIONS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_WORKFLOW_DEFINITION_VERSION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_WORKFLOW_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_WORKFLOW_DEFINITION_NAME_UNIQUE_ERROR;
@@ -49,6 +50,7 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskSearchResult;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;

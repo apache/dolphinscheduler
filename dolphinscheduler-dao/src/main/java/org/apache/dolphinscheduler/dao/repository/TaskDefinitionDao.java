@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskSearchResult;
 
 import java.util.Collection;
 import java.util.List;
@@ -66,4 +67,14 @@ public interface TaskDefinitionDao extends IDao<TaskDefinition> {
     List<TaskDefinition> queryByEnvironmentCodeAndWorkerGroup(long environmentCode, String workerGroup);
 
     List<String> queryAllTaskDefinitionWorkerGroups(long projectCode);
+
+    /**
+     * Search task definitions by name across a project, returning task info
+     * together with the parent workflow definition info.
+     *
+     * @param projectCode project code
+     * @param searchVal   search value for task name (partial match). If empty, returns all tasks.
+     * @return list of task search results with workflow info
+     */
+    List<TaskSearchResult> searchTaskDefinitionsByName(long projectCode, String searchVal);
 }

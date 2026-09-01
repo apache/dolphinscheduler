@@ -152,6 +152,15 @@ externalDatabase:
   params: "characterEncoding=utf8"
   # -- The driverClassName of external database
   driverClassName: "org.postgresql.Driver"
+  ssl:
+    # -- Enable TLS/SSL connection to external database. If true, you must provide the CA certificate and optionally client certificates.
+    enabled: false
+    # -- Path to the CA certificate file (e.g., "db-certs/ca.crt")
+    caCertificate: "db-certs/ca.crt"
+    # -- Path to the client certificate file (optional, e.g., "db-certs/client.crt")
+    clientCertificate: "db-certs/client.crt"
+    # -- Path to the client key file (optional, e.g., "db-certs/client.key")
+    clientKey: "db-certs/client.key"
 
 zookeeper:
   # -- If not exists external registry, the zookeeper registry will be used by default.

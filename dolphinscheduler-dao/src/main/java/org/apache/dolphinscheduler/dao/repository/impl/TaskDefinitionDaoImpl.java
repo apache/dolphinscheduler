@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.TaskSearchResult;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
@@ -146,5 +147,10 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
     @Override
     public List<String> queryAllTaskDefinitionWorkerGroups(long projectCode) {
         return mybatisMapper.queryAllTaskDefinitionWorkerGroups(projectCode);
+    }
+
+    @Override
+    public List<TaskSearchResult> searchTaskDefinitionsByName(long projectCode, String searchVal) {
+        return mybatisMapper.searchTaskDefinitionsByName(projectCode, searchVal);
     }
 }

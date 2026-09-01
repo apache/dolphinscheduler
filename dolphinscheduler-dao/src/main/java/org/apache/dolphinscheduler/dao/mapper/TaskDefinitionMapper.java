@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
+import org.apache.dolphinscheduler.dao.entity.TaskSearchResult;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import org.apache.ibatis.annotations.Param;
@@ -122,4 +123,15 @@ public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
     void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion);
 
     List<TaskDefinition> queryDefinitionsByTaskType(@Param("taskType") String taskType);
+
+    /**
+     * Search task definitions by name across a project, returning task info
+     * together with the parent workflow definition info.
+     *
+     * @param projectCode project code
+     * @param searchVal   search value for task name (partial match). If empty, returns all tasks.
+     * @return list of task search results with workflow info
+     */
+    List<TaskSearchResult> searchTaskDefinitionsByName(@Param("projectCode") long projectCode,
+                                                       @Param("searchVal") String searchVal);
 }
