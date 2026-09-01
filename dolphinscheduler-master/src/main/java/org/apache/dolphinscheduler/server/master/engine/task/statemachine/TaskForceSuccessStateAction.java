@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.statemachine;
 
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
+import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,5 +33,16 @@ public class TaskForceSuccessStateAction extends TaskSuccessStateAction {
     @Override
     public TaskExecutionStatus matchState() {
         return TaskExecutionStatus.FORCED_SUCCESS;
+    }
+
+    @Override
+    protected void persistentTaskInstanceSuccessEventToDB(final ITaskExecution taskExecution,
+                                                          final TaskSuccessLifecycleEvent taskSuccessEvent) {
+        final TaskInstance taskInstance = taskExecution.getTaskInstance();
+        taskInstance.setState(TaskExecutionStatus.FORCED_SUCCESS);
+        if (taskInstance.getEndTime() == null) {
+            taskInstance.setEndTime(taskSuccessEvent.getEndTime());
+        }
+        taskInstanceDao.updateById(taskInstance);
     }
 }
