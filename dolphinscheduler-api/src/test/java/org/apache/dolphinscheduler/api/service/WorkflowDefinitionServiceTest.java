@@ -116,6 +116,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -1134,6 +1135,59 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
         Assertions.assertNotNull(resultDefinition);
         Assertions.assertEquals(2, resultDefinition.getVersion());
+    }
+
+    @Test
+    public void testUpdateWorkflowDefinitionMergesSensitiveLocalParamsFromMatchingTaskVersion() {
+        Project project = getProject(projectCode);
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        workflowDefinition.setName("origin-name");
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowDefinitionDao.verifyByDefineName(projectCode, name)).thenReturn(null);
+        when(processService.saveWorkflowDefine(any(User.class), any(WorkflowDefinition.class), eq(Boolean.TRUE),
+                eq(Boolean.TRUE))).thenReturn(2);
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(Collections.emptyList());
+        when(processService.saveTaskRelation(eq(user), eq(projectCode), eq(processDefinitionCode), eq(2), anyList(),
+                anyList(), eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        TaskDefinitionLog version1Log = new TaskDefinitionLog();
+        version1Log.setCode(123456789L);
+        version1Log.setVersion(1);
+        version1Log.setTaskParams(
+                "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"old-secret\",\"sensitive\":true}],\"rawScript\":\"echo 1\"}");
+        when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
+                .thenReturn(Collections.singletonList(version1Log));
+
+        String submittedTaskDefinitionJson =
+                "[{\"code\":123456789,\"name\":\"test1\",\"version\":1,\"description\":\"\",\"delayTime\":0,\"taskType\":\"SHELL\","
+                        + "\"taskParams\":{\"resourceList\":[],\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
+                        + "\"value\":\"******\",\"sensitive\":true}],\"rawScript\":\"echo 1\",\"dependence\":{},\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{},"
+                        + "\"switchResult\":{}},\"flag\":\"YES\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":1,\"timeoutFlag\":\"CLOSE\","
+                        + "\"timeoutNotifyStrategy\":null,\"timeout\":0,\"environmentCode\":-1},{\"code\":123451234,\"name\":\"test2\",\"version\":1,\"description\":\"\",\"delayTime\":0,\"taskType\":\"SHELL\","
+                        + "\"taskParams\":{\"resourceList\":[],\"localParams\":[],\"rawScript\":\"echo 2\",\"dependence\":{},\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{},"
+                        + "\"switchResult\":{}},\"flag\":\"YES\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":1,\"timeoutFlag\":\"CLOSE\","
+                        + "\"timeoutNotifyStrategy\":\"WARN\",\"timeout\":0,\"environmentCode\":-1}]";
+
+        ArgumentCaptor<List> savedTaskLogs = ArgumentCaptor.forClass(List.class);
+        when(processService.saveTaskDefine(eq(user), eq(projectCode), savedTaskLogs.capture(), eq(Boolean.TRUE)))
+                .thenReturn(1);
+
+        workflowDefinitionService.updateWorkflowDefinition(
+                user, projectCode, name, processDefinitionCode, description, "[]", "[]", timeout,
+                taskRelationJson, submittedTaskDefinitionJson, WorkflowExecutionTypeEnum.PARALLEL);
+
+        TaskDefinitionLog merged = ((List<TaskDefinitionLog>) savedTaskLogs.getValue()).stream()
+                .filter(log -> log.getCode() == 123456789L)
+                .findFirst()
+                .orElseThrow(AssertionError::new);
+        Assertions.assertTrue(merged.getTaskParams().contains("old-secret"));
+        Assertions.assertFalse(merged.getTaskParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        verify(taskDefinitionDao, Mockito.never()).queryByCodes(any());
+        verify(taskDefinitionLogMapper).queryByTaskDefinitions(anyList());
     }
 
     @Test

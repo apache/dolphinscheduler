@@ -685,23 +685,43 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
             return;
         }
-        Set<Long> taskDefinitionCodes = taskDefinitionLogs.stream()
-                .map(TaskDefinitionLog::getCode)
-                .filter(taskCode -> taskCode > 0)
-                .collect(Collectors.toSet());
-        if (CollectionUtils.isEmpty(taskDefinitionCodes)) {
-            taskDefinitionLogs.forEach(taskDefinitionLog -> SensitivePropertyUtils.validateSensitivePlaceholders(
-                    SensitivePropertyUtils.getLocalParams(taskDefinitionLog.getTaskParams()),
-                    Collections.emptyList()));
-            return;
+        // Use List, not Set: TaskDefinition.equals() ignores code/version, so a Set would collapse keys.
+        List<TaskDefinition> versionKeys = new ArrayList<>();
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            if (taskDefinitionLog.getCode() <= 0 || taskDefinitionLog.getVersion() <= 0) {
+                SensitivePropertyUtils.validateSensitivePlaceholders(
+                        SensitivePropertyUtils.getLocalParams(taskDefinitionLog.getTaskParams()),
+                        Collections.emptyList());
+                continue;
+            }
+            versionKeys.add(new TaskDefinition(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion()));
         }
-        Map<Long, String> existingTaskParamsMap = taskDefinitionDao.queryByCodes(taskDefinitionCodes)
-                .stream()
-                .collect(Collectors.toMap(TaskDefinition::getCode, TaskDefinition::getTaskParams, (a, b) -> a));
-        taskDefinitionLogs.forEach(taskDefinitionLog -> taskDefinitionLog.setTaskParams(
-                SensitivePropertyUtils.mergeLocalParamsInTaskParams(
-                        taskDefinitionLog.getTaskParams(),
-                        existingTaskParamsMap.get(taskDefinitionLog.getCode()))));
+        Map<String, String> existingTaskParamsMap = Collections.emptyMap();
+        if (CollectionUtils.isNotEmpty(versionKeys)) {
+            List<TaskDefinitionLog> existingLogs = taskDefinitionLogMapper.queryByTaskDefinitions(versionKeys);
+            if (CollectionUtils.isNotEmpty(existingLogs)) {
+                existingTaskParamsMap = existingLogs.stream()
+                        .collect(Collectors.toMap(
+                                log -> taskDefinitionVersionKey(log.getCode(), log.getVersion()),
+                                TaskDefinitionLog::getTaskParams,
+                                (a, b) -> a));
+            }
+        }
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            if (taskDefinitionLog.getCode() <= 0 || taskDefinitionLog.getVersion() <= 0) {
+                continue;
+            }
+            taskDefinitionLog.setTaskParams(
+                    SensitivePropertyUtils.mergeLocalParamsInTaskParams(
+                            taskDefinitionLog.getTaskParams(),
+                            existingTaskParamsMap.get(
+                                    taskDefinitionVersionKey(taskDefinitionLog.getCode(),
+                                            taskDefinitionLog.getVersion()))));
+        }
+    }
+
+    private static String taskDefinitionVersionKey(long code, int version) {
+        return code + "_" + version;
     }
 
     /**
