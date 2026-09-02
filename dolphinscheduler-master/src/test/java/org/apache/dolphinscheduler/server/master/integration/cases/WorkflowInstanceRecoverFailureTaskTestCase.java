@@ -95,6 +95,50 @@ public class WorkflowInstanceRecoverFailureTaskTestCase extends AbstractMasterIn
     }
 
     @Test
+    @DisplayName("Test recover failure tasks preserves forced-success task state")
+    public void testRecoverFailureTasks_preservesForcedSuccessTaskState() {
+        final String yaml =
+                "/it/recover_failure_tasks/failure_workflow_with_forced_success_predecessor.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+
+        final Integer workflowInstanceId = context.getWorkflowInstances().get(0).getId();
+        workflowOperator.recoverFailureTasks(workflowInstanceId);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    final WorkflowInstance workflowInstance = repository.queryWorkflowInstance(workflowInstanceId);
+                    assertThat(workflowInstance.getState())
+                            .isEqualTo(WorkflowExecutionStatus.SUCCESS);
+                    assertThat(workflowInstance.getRunTimes())
+                            .isEqualTo(2);
+
+                    final List<TaskInstance> taskInstances = repository.queryTaskInstance(workflowInstanceId);
+                    assertThat(taskInstances)
+                            .hasSize(3);
+
+                    assertThat(taskInstances)
+                            .filteredOn(t -> "A".equals(t.getName()))
+                            .singleElement()
+                            .matches(t -> t.getState() == TaskExecutionStatus.FORCED_SUCCESS)
+                            .matches(t -> t.getFlag() == Flag.YES);
+
+                    assertThat(taskInstances)
+                            .filteredOn(t -> "B".equals(t.getName()))
+                            .anySatisfy(t -> {
+                                assertThat(t.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                                assertThat(t.getFlag()).isEqualTo(Flag.NO);
+                            })
+                            .anySatisfy(t -> {
+                                assertThat(t.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                                assertThat(t.getFlag()).isEqualTo(Flag.YES);
+                                assertThat(t.getLogPath()).isNotEmpty();
+                            });
+                });
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
     @DisplayName("Test recover a failure workflow from another master")
     public void testRecoverFailureWorkflow_from_another_master() {
         final String yaml = "/it/recover_failure_tasks/failure_workflow_from_another_master.yaml";
