@@ -457,7 +457,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         List<WorkflowDefinition> resourceList = workflowDefinitionDao.queryAllDefinitionList(projectCode);
         return resourceList.stream()
                 .map(processService::genDagData)
-                .map(SensitivePropertyUtils::maskDagData)
                 .collect(Collectors.toList());
     }
 
@@ -534,7 +533,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             Schedule schedule = scheduleMap.get(pd.getCode());
             pd.setScheduleReleaseState(schedule == null ? null : schedule.getReleaseState());
             pd.setSchedule(schedule);
-            SensitivePropertyUtils.maskWorkflowDefinition(pd);
         }
 
         PageInfo<WorkflowDefinition> pageInfo = new PageInfo<>(pageNo, pageSize);
@@ -563,7 +561,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
         }
-        return SensitivePropertyUtils.maskDagData(processService.genDagData(workflowDefinition));
+        return processService.genDagData(workflowDefinition);
     }
 
     @Override
@@ -597,7 +595,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.error("workflow definition does not exist, projectCode:{}.", projectCode);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, name);
         }
-        return SensitivePropertyUtils.maskDagData(processService.genDagData(workflowDefinition));
+        return processService.genDagData(workflowDefinition);
     }
 
     /**
@@ -1033,7 +1031,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", code);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, String.valueOf(code));
         }
-        DagData dagData = SensitivePropertyUtils.maskDagData(processService.genDagData(workflowDefinition));
+        DagData dagData = processService.genDagData(workflowDefinition);
         return dagData.getTaskDefinitionList();
     }
 
@@ -1072,8 +1070,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
         Map<Long, List<TaskDefinition>> taskNodeMap = new HashMap<>();
         for (WorkflowDefinition workflowDefinition : workflowDefinitionListInProject) {
-            DagData dagData =
-                    SensitivePropertyUtils.maskDagData(processService.genDagData(workflowDefinition));
+            DagData dagData = processService.genDagData(workflowDefinition);
             taskNodeMap.put(workflowDefinition.getCode(), dagData.getTaskDefinitionList());
         }
         return taskNodeMap;
@@ -1095,7 +1092,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         List<WorkflowDefinition> workflowDefinitions = workflowDefinitionDao.queryAllDefinitionList(projectCode);
         return workflowDefinitions.stream()
                 .map(processService::genDagData)
-                .map(SensitivePropertyUtils::maskDagData)
                 .collect(Collectors.toList());
     }
 
@@ -1751,11 +1747,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         IPage<WorkflowDefinitionLog> workflowDefinitionLogIPage =
                 workflowDefinitionLogMapper.queryWorkflowDefinitionVersionsPaging(page, code, projectCode);
         List<WorkflowDefinitionLog> workflowDefinitionLogs = workflowDefinitionLogIPage.getRecords();
-        if (CollectionUtils.isNotEmpty(workflowDefinitionLogs)) {
-            workflowDefinitionLogs = workflowDefinitionLogs.stream()
-                    .map(SensitivePropertyUtils::copyAndMaskWorkflowDefinition)
-                    .collect(Collectors.toList());
-        }
 
         pageInfo.setTotalList(workflowDefinitionLogs);
         pageInfo.setTotal((int) workflowDefinitionLogIPage.getTotal());
@@ -1876,8 +1867,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         }
 
         // global params
-        List<Property> globalParams =
-                SensitivePropertyUtils.maskSensitiveValues(workflowDefinition.getGlobalParamList());
+        List<Property> globalParams = workflowDefinition.getGlobalParamList();
 
         Map<String, Map<String, Object>> localUserDefParams = getLocalParams(workflowDefinition);
 
@@ -1907,9 +1897,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     Map<String, Object> localParamsMap = new HashMap<>();
                     String localParams = JSONUtils.getNodeString(taskDefinition.getTaskParams(), LOCAL_PARAMS);
                     if (!StringUtils.isEmpty(localParams)) {
-                        List<Property> localParamsList =
-                                SensitivePropertyUtils.maskSensitiveValues(
-                                        JSONUtils.toList(localParams, Property.class));
+                        List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
                         localParamsMap.put(TASK_TYPE, taskDefinition.getTaskType());
                         localParamsMap.put(LOCAL_PARAMS_LIST, localParamsList);
                         if (CollectionUtils.isNotEmpty(localParamsList)) {

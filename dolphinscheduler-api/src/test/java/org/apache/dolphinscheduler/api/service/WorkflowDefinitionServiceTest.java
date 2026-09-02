@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -450,6 +451,11 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Result result = workflowDefinitionService.queryWorkflowDefinitionVersions(user, projectCode, 1, 10,
                 processDefinitionCode);
         PageInfo<WorkflowDefinitionLog> pageInfo = (PageInfo<WorkflowDefinitionLog>) result.getData();
+        WorkflowDefinitionLog fromService = pageInfo.getTotalList().get(0);
+        Assertions.assertTrue(fromService.getGlobalParams().contains("Secret123"));
+        Assertions.assertSame(versionLog, fromService);
+
+        SensitivePropertyUtils.maskApiResponseData(result);
         WorkflowDefinitionLog masked = pageInfo.getTotalList().get(0);
         Assertions.assertTrue(masked.getGlobalParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
         Assertions.assertFalse(masked.getGlobalParams().contains("Secret123"));

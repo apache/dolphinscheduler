@@ -30,7 +30,6 @@ import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowTaskRelationService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -128,7 +127,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             log.error("Task definition does not exist, taskName:{}.", taskName);
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskName);
         }
-        return SensitivePropertyUtils.maskTaskDefinition(taskDefinition);
+        return taskDefinition;
     }
 
     public void updateDag(User loginUser, long workflowDefinitionCode,
@@ -181,7 +180,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         Project project = projectDao.queryByCode(taskDefinition.getProjectCode());
         projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
-        return SensitivePropertyUtils.maskTaskDefinition(taskDefinition);
+        return taskDefinition;
     }
 
     /**
@@ -255,11 +254,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         IPage<TaskDefinitionLog> taskDefinitionVersionsPaging =
                 taskDefinitionLogMapper.queryTaskDefinitionVersionsPaging(page, taskCode, projectCode);
         List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionVersionsPaging.getRecords();
-        if (CollectionUtils.isNotEmpty(taskDefinitionLogs)) {
-            taskDefinitionLogs = taskDefinitionLogs.stream()
-                    .map(SensitivePropertyUtils::copyAndMaskTaskDefinition)
-                    .collect(Collectors.toList());
-        }
 
         pageInfo.setTotalList(taskDefinitionLogs);
         pageInfo.setTotal((int) taskDefinitionVersionsPaging.getTotal());
@@ -313,8 +307,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             taskRelationList = taskRelationList.stream()
                     .filter(v -> v.getPreTaskCode() != 0).collect(Collectors.toList());
         }
-        TaskDefinitionVO taskDefinitionVo =
-                TaskDefinitionVO.fromTaskDefinition(SensitivePropertyUtils.maskTaskDefinition(taskDefinition));
+        TaskDefinitionVO taskDefinitionVo = TaskDefinitionVO.fromTaskDefinition(taskDefinition);
         taskDefinitionVo.setWorkflowTaskRelationList(taskRelationList);
         return taskDefinitionVo;
     }

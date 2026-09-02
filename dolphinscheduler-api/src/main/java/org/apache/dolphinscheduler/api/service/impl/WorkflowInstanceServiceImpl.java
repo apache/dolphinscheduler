@@ -79,7 +79,6 @@ import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
-import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
@@ -223,10 +222,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowInstanceId);
         }
         workflowInstance.setLocations(workflowDefinition.getLocations());
-        workflowInstance
-                .setGlobalParams(SensitivePropertyUtils.maskGlobalParams(workflowInstance.getGlobalParams()));
-        workflowInstance.setDagData(
-                SensitivePropertyUtils.maskDagData(processService.genDagData(workflowDefinition)));
+        workflowInstance.setDagData(processService.genDagData(workflowDefinition));
         return workflowInstance;
     }
 
@@ -660,7 +656,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 }
             }
         }
-        return PropertySensitiveUtils.maskSensitiveValues(finalGlobalParams);
+        return finalGlobalParams;
     }
 
     /**
@@ -687,8 +683,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             if (!StringUtils.isEmpty(localParams)) {
                 // Replace placeholders and deserialize
                 localParams = ParameterUtils.convertParameterPlaceholders(localParams, parameterMap);
-                List<Property> localParamsList = PropertySensitiveUtils.maskSensitiveValues(
-                        JSONUtils.toList(localParams, Property.class));
+                List<Property> localParamsList = JSONUtils.toList(localParams, Property.class);
 
                 Map<String, Object> localParamsMap = new HashMap<>();
                 localParamsMap.put(TASK_TYPE, taskDefinitionLog.getTaskType());

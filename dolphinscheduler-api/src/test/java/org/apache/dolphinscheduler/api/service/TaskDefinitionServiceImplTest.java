@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -453,6 +454,11 @@ public class TaskDefinitionServiceImplTest {
 
         Result result = taskDefinitionService.queryTaskDefinitionVersions(user, PROJECT_CODE, TASK_CODE, 1, 10);
         PageInfo<TaskDefinitionLog> pageInfo = (PageInfo<TaskDefinitionLog>) result.getData();
+        TaskDefinitionLog fromService = pageInfo.getTotalList().get(0);
+        Assertions.assertTrue(fromService.getTaskParams().contains("secret-token"));
+        Assertions.assertSame(versionLog, fromService);
+
+        SensitivePropertyUtils.maskApiResponseData(result);
         TaskDefinitionLog masked = pageInfo.getTotalList().get(0);
         Assertions.assertTrue(masked.getTaskParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
         Assertions.assertFalse(masked.getTaskParams().contains("secret-token"));
