@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
@@ -209,5 +210,46 @@ class AlertSenderTest {
         pluginParamsTransferMockedStatic.when(() -> PluginParamsTransfer.getPluginParamsMap(PLUGIN_INSTANCE_PARAMS))
                 .thenReturn(paramsMap);
         alertSender.syncTestSend(PLUGIN_DEFINE_ID, PLUGIN_INSTANCE_PARAMS);
+    }
+
+    /**
+     * Simulates a mixed-version rolling upgrade scenario: an old Alert Server that
+     * does not yet know about a new AlertType enum value (e.g. TASK_RESULT) will
+     * have MyBatis map the unknown value to null. {@link AlertSender#getAlertData}
+     * must refuse to send rather than silently relabeling the alert as a
+     * workflow-instance failure.
+     */
+    @Test
+    void testGetAlertDataWithNullAlertType() {
+        Alert alert = new Alert();
+        alert.setId(1);
+        alert.setTitle(TITLE);
+        alert.setContent(CONTENT);
+        alert.setAlertGroupId(ALERT_GROUP_ID);
+        alert.setWarningType(WarningType.FAILURE);
+        // Simulate old Alert Server where unknown alert_type is deserialized as null
+        alert.setAlertType(null);
+
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> alertSender.getAlertData(alert),
+                "getAlertData should refuse to build AlertData with null alertType");
+    }
+
+    /**
+     * Ensures the normal path still works correctly when alertType is present.
+     */
+    @Test
+    void testGetAlertDataWithValidAlertType() {
+        Alert alert = new Alert();
+        alert.setId(2);
+        alert.setTitle(TITLE);
+        alert.setContent(CONTENT);
+        alert.setAlertGroupId(ALERT_GROUP_ID);
+        alert.setWarningType(WarningType.FAILURE);
+        alert.setAlertType(AlertType.TASK_RESULT);
+
+        AlertData alertData = alertSender.getAlertData(alert);
+        Assertions.assertNotNull(alertData);
+        Assertions.assertEquals(AlertType.TASK_RESULT.getCode(), alertData.getAlertType());
     }
 }

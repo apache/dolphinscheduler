@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
@@ -287,13 +288,21 @@ public class SqlTask extends AbstractTask {
             }
         }
 
-        String result = resultJSONArray.isEmpty() ? JSONUtils.toJsonString(generateEmptyRow(resultSet))
-                : JSONUtils.toJsonString(resultJSONArray);
+        String result;
+        ArrayNode alertArray = resultJSONArray;
+        if (resultJSONArray.isEmpty()) {
+            ArrayNode emptyRow = generateEmptyRow(resultSet);
+            result = JSONUtils.toJsonString(emptyRow);
+            alertArray = emptyRow;
+        } else {
+            result = JSONUtils.toJsonString(resultJSONArray);
+        }
 
         if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
-            sendAttachment(sqlParameters.getGroupId(), StringUtils.isNotEmpty(sqlParameters.getTitle())
-                    ? sqlParameters.getTitle()
-                    : taskExecutionContext.getTaskName() + " query result sets", result);
+            log.info("SendAlert is enabled, preparing task result alert");
+            prepareTaskResultAlert(alertArray);
+        } else {
+            log.info("SendAlert is not enabled, skip task result alert");
         }
         log.debug("execute sql result : {}", result);
         return result;
@@ -320,18 +329,33 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * send alert as an attachment
+     * Prepare task result alert info.
+     * Truncate the alert content to displayRows to avoid oversized RPC payload.
      *
-     * @param title   title
-     * @param content content
+     * @param resultJSONArray the full query result JSON array
      */
-    private void sendAttachment(int groupId, String title, String content) {
-        setNeedAlert(Boolean.TRUE);
+    private void prepareTaskResultAlert(ArrayNode resultJSONArray) {
         TaskAlertInfo taskAlertInfo = new TaskAlertInfo();
-        taskAlertInfo.setAlertGroupId(groupId);
-        taskAlertInfo.setContent(content);
-        taskAlertInfo.setTitle(title);
-        setTaskAlertInfo(taskAlertInfo);
+        taskAlertInfo.setAlertGroupId(sqlParameters.getGroupId());
+        taskAlertInfo.setTitle(StringUtils.isNotEmpty(sqlParameters.getTitle())
+                ? sqlParameters.getTitle()
+                : taskExecutionContext.getTaskName() + " query result sets");
+        // Truncate content to displayRows to avoid oversized RPC payload
+        int alertRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
+                : TaskConstants.DEFAULT_DISPLAY_ROWS;
+        alertRows = Math.min(alertRows, resultJSONArray.size());
+        ArrayNode alertContent = JSONUtils.createArrayNode();
+        for (int i = 0; i < alertRows; i++) {
+            alertContent.add(resultJSONArray.get(i));
+        }
+        taskAlertInfo.setContent(JSONUtils.toJsonString(alertContent));
+        taskAlertInfo.setAlertType(AlertType.TASK_RESULT);
+
+        taskExecutionContext.setNeedAlert(true);
+        taskExecutionContext.setTaskAlertInfo(taskAlertInfo);
+        log.info("Prepare task result alert: title={}, alertGroupId={}, alertType={}, totalRows={}, alertRows={}",
+                taskAlertInfo.getTitle(), taskAlertInfo.getAlertGroupId(), taskAlertInfo.getAlertType(),
+                resultJSONArray.size(), alertRows);
     }
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {

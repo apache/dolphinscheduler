@@ -43,6 +43,12 @@ public interface AlertMapper extends BaseMapper<Alert> {
     void insertAlertWhenServerCrash(@Param("alert") Alert alert,
                                     @Param("crashAlarmSuppressionStartTime") Date crashAlarmSuppressionStartTime);
 
+    /**
+     * Insert a task-result alert only if no alert with the same sign, workflow instance id and alert type
+     * already exists. This makes the insert idempotent against at-least-once event delivery.
+     */
+    int insertTaskResultAlertIfAbsent(@Param("alert") Alert alert);
+
     void deleteByWorkflowInstanceId(@Param("workflowInstanceId") Integer processInstanceId);
 
     List<Alert> selectByWorkflowInstanceId(@Param("workflowInstanceId") Integer processInstanceId);

@@ -56,8 +56,22 @@ public abstract class AbstractTask {
      */
     protected volatile int exitStatusCode = -1;
 
+    /**
+     * @deprecated Use {@link TaskExecutionContext#isNeedAlert()} on the
+     *             {@code taskRequest} field instead.  Retained for binary
+     *             compatibility with third-party plugins compiled against
+     *             the previous AbstractTask API.
+     */
+    @Deprecated
     protected boolean needAlert = false;
 
+    /**
+     * @deprecated Use {@link TaskExecutionContext#getTaskAlertInfo()} on the
+     *             {@code taskRequest} field instead.  Retained for binary
+     *             compatibility with third-party plugins compiled against
+     *             the previous AbstractTask API.
+     */
+    @Deprecated
     protected TaskAlertInfo taskAlertInfo;
 
     /**
@@ -109,20 +123,46 @@ public abstract class AbstractTask {
         this.appIds = appIds;
     }
 
+    /**
+     * @deprecated Use {@link TaskExecutionContext#isNeedAlert()} on the
+     *             {@code taskRequest} field instead.  This method is retained as a
+     *             compatibility bridge so that third-party task plugins compiled
+     *             against the previous AbstractTask API continue to work.
+     */
+    @Deprecated
     public boolean getNeedAlert() {
-        return needAlert;
+        return taskRequest != null && taskRequest.isNeedAlert();
     }
 
+    /**
+     * @deprecated Use {@link TaskExecutionContext#setNeedAlert(boolean)} on the
+     *             {@code taskRequest} field instead.
+     */
+    @Deprecated
     public void setNeedAlert(boolean needAlert) {
-        this.needAlert = needAlert;
+        if (taskRequest != null) {
+            taskRequest.setNeedAlert(needAlert);
+        }
     }
 
+    /**
+     * @deprecated Use {@link TaskExecutionContext#getTaskAlertInfo()} on the
+     *             {@code taskRequest} field instead.
+     */
+    @Deprecated
     public TaskAlertInfo getTaskAlertInfo() {
-        return taskAlertInfo;
+        return taskRequest != null ? taskRequest.getTaskAlertInfo() : null;
     }
 
+    /**
+     * @deprecated Use {@link TaskExecutionContext#setTaskAlertInfo(TaskAlertInfo)}
+     *             on the {@code taskRequest} field instead.
+     */
+    @Deprecated
     public void setTaskAlertInfo(TaskAlertInfo taskAlertInfo) {
-        this.taskAlertInfo = taskAlertInfo;
+        if (taskRequest != null) {
+            taskRequest.setTaskAlertInfo(taskAlertInfo);
+        }
     }
 
     /**

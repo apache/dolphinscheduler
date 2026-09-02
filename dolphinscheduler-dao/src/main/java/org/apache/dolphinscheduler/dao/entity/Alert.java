@@ -84,6 +84,14 @@ public class Alert {
     @TableField("alert_type")
     private AlertType alertType;
 
+    /**
+     * Transient field used only for sign generation in idempotent task-result alert inserts.
+     * <p>Not persisted to the database — it is incorporated into the SHA-1 sign so that
+     * alerts from different tasks with identical content are not treated as duplicates.
+     */
+    @TableField(exist = false)
+    private Integer taskInstanceId;
+
     @TableField(exist = false)
     private Map<String, Object> info = new HashMap<>();
 

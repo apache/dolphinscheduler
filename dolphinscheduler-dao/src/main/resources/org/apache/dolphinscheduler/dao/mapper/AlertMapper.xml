@@ -51,6 +51,29 @@
         having count(*) = 0
     </insert>
 
+    <!--
+      Idempotent insert for task-result alerts.
+      Uses INSERT ... SELECT ... WHERE NOT EXISTS to skip duplicates
+      without dialect-specific upsert syntax (ON DUPLICATE KEY / MERGE / ON CONFLICT).
+      The uk_alert_dedup unique constraint remains as a concurrent-safety net;
+      a DuplicateKeyException is caught by the DAO layer and treated as a skip.
+    -->
+    <insert id="insertTaskResultAlertIfAbsent">
+        INSERT INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
+                               create_time, update_time, project_code, workflow_definition_code,
+                               workflow_instance_id, alert_type)
+        SELECT #{alert.sign}, #{alert.title}, #{alert.content}, #{alert.alertStatus.code},
+               #{alert.warningType.code}, #{alert.log}, #{alert.alertGroupId}, #{alert.createTime},
+               #{alert.updateTime}, #{alert.projectCode}, #{alert.workflowDefinitionCode},
+               #{alert.workflowInstanceId}, #{alert.alertType.code}
+        WHERE NOT EXISTS (
+            SELECT 1 FROM t_ds_alert
+            WHERE sign = #{alert.sign}
+              AND workflow_instance_id = #{alert.workflowInstanceId}
+              AND alert_type = #{alert.alertType.code}
+        )
+    </insert>
+
     <select id="listingAlertByStatus" resultType="org.apache.dolphinscheduler.dao.entity.Alert">
         select
         <include refid="baseSql"/>

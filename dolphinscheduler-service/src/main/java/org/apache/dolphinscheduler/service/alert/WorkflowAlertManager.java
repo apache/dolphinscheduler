@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.service.alert;
 
+import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -34,6 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -208,4 +210,36 @@ public class WorkflowAlertManager {
         alertDao.sendWorkflowTimeoutAlert(workflowInstance, projectUser);
     }
 
+    /**
+     * send task result alert
+     *
+     * @param workflowInstance workflow instance
+     * @param taskInstance     task instance
+     * @param taskAlertInfo    task alert info
+     */
+    public void sendTaskResultAlert(WorkflowInstance workflowInstance,
+                                    TaskInstance taskInstance,
+                                    TaskAlertInfo taskAlertInfo) {
+        if (taskAlertInfo == null || taskAlertInfo.getAlertGroupId() == null) {
+            return;
+        }
+
+        Alert alert = new Alert();
+        alert.setTitle(taskAlertInfo.getTitle());
+        alert.setContent(taskAlertInfo.getContent());
+        alert.setWarningType(WarningType.SUCCESS);
+        alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+        alert.setCreateTime(new Date());
+        alert.setAlertGroupId(taskAlertInfo.getAlertGroupId());
+        alert.setProjectCode(workflowInstance.getProjectCode());
+        alert.setWorkflowDefinitionCode(workflowInstance.getWorkflowDefinitionCode());
+        alert.setWorkflowInstanceId(workflowInstance.getId());
+        alert.setAlertType(taskAlertInfo.getAlertType() != null
+                ? taskAlertInfo.getAlertType()
+                : AlertType.TASK_RESULT);
+        alert.setTaskInstanceId(taskInstance.getId());
+        alertDao.addTaskResultAlert(alert);
+        log.info("Send task result alert for task: {} in workflow: {}",
+                taskInstance.getName(), workflowInstance.getName());
+    }
 }

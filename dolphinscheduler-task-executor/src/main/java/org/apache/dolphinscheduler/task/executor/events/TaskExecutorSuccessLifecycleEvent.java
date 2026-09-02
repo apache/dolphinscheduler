@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.task.executor.events;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
 
 import java.util.List;
@@ -48,6 +49,10 @@ public class TaskExecutorSuccessLifecycleEvent extends AbstractTaskExecutorLifec
 
     private Long latestReportTime;
 
+    private boolean needAlert;
+
+    private TaskAlertInfo taskAlertInfo;
+
     public static TaskExecutorSuccessLifecycleEvent of(final ITaskExecutor taskExecutor) {
         final TaskExecutionContext taskExecutionContext = taskExecutor.getTaskExecutionContext();
         return TaskExecutorSuccessLifecycleEvent.builder()
@@ -57,6 +62,8 @@ public class TaskExecutorSuccessLifecycleEvent extends AbstractTaskExecutorLifec
                 .varPool(taskExecutionContext.getVarPool())
                 .type(TaskExecutorLifecycleEventType.SUCCESS)
                 .endTime(taskExecutionContext.getEndTime())
+                .needAlert(taskExecutionContext.isNeedAlert())
+                .taskAlertInfo(taskExecutionContext.getTaskAlertInfo())
                 .build();
     }
 

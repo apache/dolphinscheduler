@@ -55,6 +55,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -109,6 +110,41 @@ public class AlertDao {
     }
 
     /**
+     * Insert a task-result alert idempotently. If an alert with the same sign,
+     * workflow instance id and alert type already exists, the insert is skipped.
+     * <p>This guards against duplicate inserts caused by at-least-once delivery
+     * of task success lifecycle events.
+     *
+     * @param alert alert, must have sign, workflowInstanceId and alertType set
+     * @return insert count (1 if inserted, 0 if skipped)
+     */
+    public int addTaskResultAlert(Alert alert) {
+        if (null == alert.getAlertGroupId() || NumberUtils.INTEGER_ZERO.equals(alert.getAlertGroupId())) {
+            log.warn("the value of alertGroupId is null or 0 ");
+            return 0;
+        }
+
+        String sign = generateSign(alert);
+        alert.setSign(sign);
+        try {
+            int count = alertMapper.insertTaskResultAlertIfAbsent(alert);
+            if (count > 0) {
+                log.info("add task result alert to db , alert: {}", alert);
+            } else {
+                log.info("skip duplicate task result alert, sign: {}, workflowInstanceId: {}", sign,
+                        alert.getWorkflowInstanceId());
+            }
+            return count;
+        } catch (DuplicateKeyException e) {
+            // Concurrent race: NOT EXISTS passed but another thread inserted first.
+            // The uk_alert_dedup unique constraint caught it — treat as a skip.
+            log.info("skip duplicate task result alert (concurrent race), sign: {}, workflowInstanceId: {}", sign,
+                    alert.getWorkflowInstanceId());
+            return 0;
+        }
+    }
+
+    /**
      * update alert sending(execution) status
      *
      * @param alertStatus alertStatus
@@ -132,6 +168,13 @@ public class AlertDao {
      * @return sign's str
      */
     private String generateSign(Alert alert) {
+        // Task-result alerts include the task instance ID in the sign so that two
+        // different tasks returning identical results are not treated as duplicates.
+        // For other alert types taskInstanceId is null and the sign falls back to
+        // content-only, preserving the original behaviour.
+        if (alert.getTaskInstanceId() != null) {
+            return DigestUtils.sha1Hex(alert.getTaskInstanceId() + "|" + alert.getContent()).toLowerCase();
+        }
         return Optional.of(alert)
                 .map(Alert::getContent)
                 .map(DigestUtils::sha1Hex)
