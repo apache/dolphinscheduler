@@ -36,6 +36,7 @@ import {
   NButton,
   NIcon,
   NInput,
+  NInputNumber,
   NSpace,
   NRadio,
   NRadioGroup,
@@ -103,6 +104,11 @@ export default defineComponent({
     )
 
     const projectPreferences = ref({} as any)
+    const intervalHours = ref(1)
+    const intervalMinutes = ref(0)
+    const intervalSeconds = ref(0)
+    const intervalRepeat = ref(-1)
+    const cronExpression = ref(timingState.timingForm.crontab)
 
     const initProjectPreferences = (projectCode: number) => {
       queryProjectPreferenceByProjectCode(projectCode).then((result: any) => {
@@ -185,6 +191,15 @@ export default defineComponent({
     }
 
     const handlePreview = () => {
+      if (
+        timingState.timingForm.triggerType === 'INTERVAL' &&
+        intervalHours.value === 0 &&
+        intervalMinutes.value === 0 &&
+        intervalSeconds.value === 0
+      ) {
+        window.$message.error(t('project.workflow.interval_must_be_positive'))
+        return
+      }
       getPreviewSchedule()
     }
 
@@ -273,6 +288,57 @@ export default defineComponent({
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
+    const updateIntervalExpression = () => {
+      timingState.timingForm.crontab = JSON.stringify({
+        hour: intervalHours.value,
+        minute: intervalMinutes.value,
+        second: intervalSeconds.value,
+        repeat: intervalRepeat.value
+      })
+    }
+
+    const restoreIntervalExpression = (expression: string): boolean => {
+      try {
+        const interval = JSON.parse(expression)
+        intervalHours.value = interval.hour || 0
+        intervalMinutes.value = interval.minute || 0
+        intervalSeconds.value = interval.second || 0
+        intervalRepeat.value = interval.repeat ?? -1
+        return true
+      } catch {
+        return false
+      }
+    }
+
+    watch(
+      () => timingState.timingForm.triggerType,
+      (triggerType, previousTriggerType) => {
+        if (previousTriggerType === 'CRON') {
+          cronExpression.value = timingState.timingForm.crontab
+        }
+
+        if (triggerType === 'CRON') {
+          timingState.timingForm.crontab = cronExpression.value
+          return
+        }
+
+        if (
+          previousTriggerType !== 'INTERVAL' &&
+          !restoreIntervalExpression(timingState.timingForm.crontab)
+        ) {
+          updateIntervalExpression()
+        }
+      }
+    )
+
+    watch(
+      [intervalHours, intervalMinutes, intervalSeconds, intervalRepeat],
+      () => {
+        if (timingState.timingForm.triggerType === 'INTERVAL') {
+          updateIntervalExpression()
+        }
+      }
+    )
     onMounted(() => {
       getWorkerGroups()
       getTenantList()
@@ -293,10 +359,17 @@ export default defineComponent({
           new Date(props.row.startTime),
           new Date(props.row.endTime)
         ]
+        const triggerType = props.row.triggerType || 'CRON'
+        timingState.timingForm.triggerType = triggerType
         timingState.timingForm.crontab = props.row.crontab
-        timingState.timingForm.timezoneId = props.row.timezoneId
         timingState.timingForm.missedFirePolicy =
           props.row.missedFirePolicy || 'FIRE_ALL_MISSED'
+        if (triggerType === 'CRON') {
+          cronExpression.value = props.row.crontab
+        } else if (!restoreIntervalExpression(props.row.crontab)) {
+          updateIntervalExpression()
+        }
+        timingState.timingForm.timezoneId = props.row.timezoneId
         timingState.timingForm.failureStrategy = props.row.failureStrategy
         timingState.timingForm.warningType = props.row.warningType
         timingState.timingForm.workflowInstancePriority =
@@ -320,6 +393,10 @@ export default defineComponent({
       renderLabel,
       updateWorkerGroup,
       handlePreview,
+      intervalHours,
+      intervalMinutes,
+      intervalSeconds,
+      intervalRepeat,
       ...toRefs(variables),
       ...toRefs(timingState),
       ...toRefs(props),
@@ -354,33 +431,77 @@ export default defineComponent({
               v-model:value={this.timingForm.startEndTime}
             />
           </NFormItem>
-          <NFormItem label={t('project.workflow.timing')} path='crontab'>
-            <NInputGroup>
-              <NPopover
-                trigger='click'
-                showArrow={false}
-                placement='bottom'
-                style={{ width: '500px' }}
-              >
-                {{
-                  trigger: () => (
-                    <NInput
-                      allowInput={this.trim}
-                      style={{ width: '80%' }}
-                      readonly={true}
-                      v-model:value={this.timingForm.crontab}
-                    ></NInput>
-                  ),
-                  default: () => (
-                    <Crontab v-model:value={this.timingForm.crontab} />
-                  )
-                }}
-              </NPopover>
-              <NButton type='primary' ghost onClick={this.handlePreview}>
-                {t('project.workflow.execute_time')}
-              </NButton>
-            </NInputGroup>
+          <NFormItem
+            label={t('project.workflow.trigger_type')}
+            path='triggerType'
+          >
+            <NSelect
+              options={[
+                { label: t('project.workflow.cron_trigger'), value: 'CRON' },
+                {
+                  label: t('project.workflow.interval_trigger'),
+                  value: 'INTERVAL'
+                }
+              ]}
+              v-model:value={this.timingForm.triggerType}
+            />
           </NFormItem>
+          {this.timingForm.triggerType === 'CRON' ? (
+            <NFormItem label={t('project.workflow.timing')} path='crontab'>
+              <NInputGroup>
+                <NPopover
+                  trigger='click'
+                  showArrow={false}
+                  placement='bottom'
+                  style={{ width: '500px' }}
+                >
+                  {{
+                    trigger: () => (
+                      <NInput
+                        allowInput={this.trim}
+                        style={{ width: '80%' }}
+                        readonly={true}
+                        v-model:value={this.timingForm.crontab}
+                      />
+                    ),
+                    default: () => (
+                      <Crontab v-model:value={this.timingForm.crontab} />
+                    )
+                  }}
+                </NPopover>
+                <NButton type='primary' ghost onClick={this.handlePreview}>
+                  {t('project.workflow.execute_time')}
+                </NButton>
+              </NInputGroup>
+            </NFormItem>
+          ) : (
+            <NFormItem label={t('project.workflow.interval')} path='crontab'>
+              <div style={{ width: '100%' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '12px' }}>
+                  <NFormItem label={t('project.workflow.hours')} showFeedback={false}>
+                    <NInputNumber min={0} v-model:value={this.intervalHours} style={{ width: '100%' }} />
+                  </NFormItem>
+                  <NFormItem label={t('project.workflow.minutes')} showFeedback={false}>
+                    <NInputNumber min={0} max={59} v-model:value={this.intervalMinutes} style={{ width: '100%' }} />
+                  </NFormItem>
+                  <NFormItem label={t('project.workflow.seconds')} showFeedback={false}>
+                    <NInputNumber min={0} max={59} v-model:value={this.intervalSeconds} style={{ width: '100%' }} />
+                  </NFormItem>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', alignItems: 'end', gap: '12px', marginTop: '4px' }}>
+                  <NFormItem label={t('project.workflow.repeat')} showFeedback={false}>
+                    <NInputNumber min={-1} v-model:value={this.intervalRepeat} style={{ width: '100%' }} />
+                  </NFormItem>
+                  <NButton type='primary' ghost onClick={this.handlePreview}>
+                    {t('project.workflow.execute_time')}
+                  </NButton>
+                </div>
+                <div style={{ color: '#999', fontSize: '12px', marginTop: '4px' }}>
+                  {t('project.workflow.unlimited_repeat_tip')}
+                </div>
+              </div>
+            </NFormItem>
+          )}
           <NFormItem
             label={t('project.workflow.timezone')}
             path='timezoneId'

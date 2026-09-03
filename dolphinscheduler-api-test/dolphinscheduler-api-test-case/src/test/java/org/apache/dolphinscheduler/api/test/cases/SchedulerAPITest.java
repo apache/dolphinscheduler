@@ -111,7 +111,7 @@ public class SchedulerAPITest {
         workflowDefinitionPage.releaseWorkflowDefinition(loginUser, projectCode, workflowDefinitionCode,
                 ReleaseState.ONLINE);
         final String schedule =
-                "{\"startTime\":\"2019-08-08 00:00:00\",\"endTime\":\"2100-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}";
+                "{\"startTime\":\"2019-08-08 00:00:00\",\"endTime\":\"2100-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"triggerType\":\"INTERVAL\",\"crontab\":\"{\\\"hour\\\":0,\\\"minute\\\":0,\\\"second\\\":10,\\\"repeat\\\":2}\"}";
         HttpResponse createScheduleResponse =
                 schedulerPage.createSchedule(loginUser, projectCode, workflowDefinitionCode, schedule);
         Assertions.assertTrue(createScheduleResponse.getBody().getSuccess());
@@ -124,6 +124,8 @@ public class SchedulerAPITest {
         HttpResponse queryScheduleListResponse = schedulerPage.queryScheduleList(loginUser, projectCode);
         Assertions.assertTrue(queryScheduleListResponse.getBody().getSuccess());
         Assertions.assertTrue(queryScheduleListResponse.getBody().getData().toString().contains("2019-08-08"));
+        Assertions.assertTrue(
+                queryScheduleListResponse.getBody().getData().toString().contains("triggerType=INTERVAL"));
         scheduleId = (int) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryScheduleListResponse.getBody()
                 .getData()).get(0)).get("id");
     }
@@ -156,7 +158,7 @@ public class SchedulerAPITest {
     @Order(5)
     public void testUpdateSchedule() {
         final String schedule =
-                "{\"startTime\":\"1996-08-08 00:00:00\",\"endTime\":\"2200-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"crontab\":\"0 0 3/6 * * ? *\"}";
+                "{\"startTime\":\"1996-08-08 00:00:00\",\"endTime\":\"2200-08-08 00:00:00\",\"timezoneId\":\"America/Phoenix\",\"triggerType\":\"INTERVAL\",\"crontab\":\"{\\\"hour\\\":0,\\\"minute\\\":0,\\\"second\\\":20,\\\"repeat\\\":1}\"}";
         HttpResponse updateScheduleResponse =
                 schedulerPage.updateSchedule(loginUser, projectCode, scheduleId, schedule);
         Assertions.assertTrue(updateScheduleResponse.getBody().getSuccess());
@@ -164,6 +166,8 @@ public class SchedulerAPITest {
         HttpResponse queryScheduleListResponse = schedulerPage.queryScheduleList(loginUser, projectCode);
         Assertions.assertTrue(queryScheduleListResponse.getBody().getSuccess());
         Assertions.assertTrue(queryScheduleListResponse.getBody().getData().toString().contains("1996-08-08"));
+        Assertions.assertTrue(
+                queryScheduleListResponse.getBody().getData().toString().contains("triggerType=INTERVAL"));
     }
 
     @Test

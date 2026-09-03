@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
+import org.apache.dolphinscheduler.common.enums.ScheduleTriggerType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
@@ -57,6 +58,8 @@ public class ScheduleVO {
 
     private ScheduleMissedFirePolicy missedFirePolicy;
 
+    private ScheduleTriggerType triggerType;
+
     private FailureStrategy failureStrategy;
 
     private WarningType warningType;
@@ -87,6 +90,7 @@ public class ScheduleVO {
         this.setId(schedule.getId());
         this.setCrontab(schedule.getCrontab());
         this.setMissedFirePolicy(schedule.getMissedFirePolicy());
+        this.setTriggerType(schedule.getTriggerType());
         this.setProjectName(schedule.getProjectName());
         this.setUserName(schedule.getUserName());
         this.setWorkerGroup(schedule.getWorkerGroup());

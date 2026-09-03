@@ -20,3 +20,4 @@ ALTER TABLE `t_ds_workflow_instance` ADD INDEX idx_project_start_time (project_c
 ALTER TABLE `t_ds_schedules`
     ADD COLUMN `missed_fire_policy` tinyint NOT NULL DEFAULT '2' COMMENT 'missed fire policy: 0 skip missed, 1 fire once now, 2 fire all missed' AFTER `crontab`;
 
+ALTER TABLE `t_ds_schedules` ADD COLUMN `trigger_type` tinyint NOT NULL DEFAULT '0' COMMENT 'schedule trigger type: 0 cron, 1 interval' AFTER `crontab`;

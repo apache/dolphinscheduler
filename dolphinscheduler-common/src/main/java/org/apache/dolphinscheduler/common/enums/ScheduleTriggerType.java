@@ -13,10 +13,27 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
-*/
+ */
 
-CREATE INDEX idx_project_submit_time ON t_ds_task_instance (project_code ASC, submit_time DESC);
-CREATE INDEX idx_project_start_time ON t_ds_workflow_instance (project_code ASC, start_time DESC);
-ALTER TABLE t_ds_schedules
-    ADD COLUMN missed_fire_policy smallint NOT NULL DEFAULT 2;
-ALTER TABLE t_ds_schedules ADD COLUMN trigger_type smallint NOT NULL DEFAULT 0;
+package org.apache.dolphinscheduler.common.enums;
+
+import lombok.Getter;
+
+import com.baomidou.mybatisplus.annotation.EnumValue;
+
+@Getter
+public enum ScheduleTriggerType {
+
+    CRON(0, "Cron expression"),
+    INTERVAL(1, "Fixed interval");
+
+    @EnumValue
+    private final int code;
+
+    private final String description;
+
+    ScheduleTriggerType(int code, String description) {
+        this.code = code;
+        this.description = description;
+    }
+}

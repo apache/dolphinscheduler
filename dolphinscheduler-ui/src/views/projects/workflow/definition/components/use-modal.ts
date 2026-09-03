@@ -176,7 +176,9 @@ export function useModal(
     )
 
     const data = {
+      triggerType: state.timingForm.triggerType,
       schedule: JSON.stringify({
+        triggerType: state.timingForm.triggerType,
         startTime: start,
         endTime: end,
         crontab: state.timingForm.crontab,
@@ -264,7 +266,9 @@ export function useModal(
           startTime: start,
           endTime: end,
           crontab: state.timingForm.crontab,
-          timezoneId: state.timingForm.timezoneId
+          timezoneId: state.timingForm.timezoneId,
+          missedFirePolicy: state.timingForm.missedFirePolicy,
+          triggerType: state.timingForm.triggerType
         })
         previewSchedule({ schedule }, projectCode).then((res: any) => {
           variables.schedulePreviewList = res
