@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstanceRelation;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceRelationMapper;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceStatusCountDto;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.model.DateInterval;
@@ -135,7 +136,7 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
      * @return process instance
      */
     @Override
-    public WorkflowInstance queryFirstScheduleWorkflowInstance(Long definitionCode) {
+    public WorkflowInstanceSummaryDto queryFirstScheduleWorkflowInstance(Long definitionCode) {
         return mybatisMapper.queryFirstScheduleWorkflowInstance(definitionCode);
     }
 
@@ -146,7 +147,7 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
      * @return process instance
      */
     @Override
-    public WorkflowInstance queryFirstStartWorkflowInstance(Long definitionCode) {
+    public WorkflowInstanceSummaryDto queryFirstStartWorkflowInstance(Long definitionCode) {
         return mybatisMapper.queryFirstStartWorkflowInstance(definitionCode);
     }
 
@@ -163,9 +164,9 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     }
 
     @Override
-    public List<WorkflowInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
-                                                                   int workflowDefinitionVersion,
-                                                                   int[] states) {
+    public List<WorkflowInstanceSummaryDto> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
+                                                                             int workflowDefinitionVersion,
+                                                                             int[] states) {
         return mybatisMapper.queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion,
                 states);
     }
@@ -177,7 +178,7 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     }
 
     @Override
-    public List<WorkflowInstance> queryNeedFailoverWorkflowInstances(String masterAddress) {
+    public List<WorkflowInstanceSummaryDto> queryNeedFailoverWorkflowInstances(String masterAddress) {
         return mybatisMapper.queryByHostAndStatus(masterAddress,
                 WorkflowExecutionStatus.NEED_FAILOVER_STATES);
     }
@@ -205,50 +206,51 @@ public class WorkflowInstanceDaoImpl extends BaseDao<WorkflowInstance, WorkflowI
     }
 
     @Override
-    public List<WorkflowInstance> queryByTenantCodeAndStatus(String tenantCode, int[] states) {
+    public List<WorkflowInstanceSummaryDto> queryByTenantCodeAndStatus(String tenantCode, int[] states) {
         return mybatisMapper.queryByTenantCodeAndStatus(tenantCode, states);
     }
 
     @Override
-    public List<WorkflowInstance> queryByWorkerGroupNameAndStatus(String workerGroupName, int[] states) {
+    public List<WorkflowInstanceSummaryDto> queryByWorkerGroupNameAndStatus(String workerGroupName, int[] states) {
         return mybatisMapper.queryByWorkerGroupNameAndStatus(workerGroupName, states);
     }
 
     @Override
-    public List<WorkflowInstance> queryTopNWorkflowInstance(int size,
-                                                            Date startTime,
-                                                            Date endTime,
-                                                            WorkflowExecutionStatus status,
-                                                            long projectCode) {
+    public List<WorkflowInstanceSummaryDto> queryTopNWorkflowInstance(int size,
+                                                                      Date startTime,
+                                                                      Date endTime,
+                                                                      WorkflowExecutionStatus status,
+                                                                      long projectCode) {
         return mybatisMapper.queryTopNWorkflowInstance(size, startTime, endTime, status, projectCode);
     }
 
     @Override
-    public IPage<WorkflowInstance> queryWorkflowInstanceListPaging(Page<WorkflowInstance> page,
-                                                                   Long projectCode,
-                                                                   Long workflowDefinitionCode,
-                                                                   String searchVal,
-                                                                   String executorName,
-                                                                   int[] statusArray,
-                                                                   String host,
-                                                                   Date startTime,
-                                                                   Date endTime) {
+    public IPage<WorkflowInstanceSummaryDto> queryWorkflowInstanceListPaging(Page<WorkflowInstanceSummaryDto> page,
+                                                                             Long projectCode,
+                                                                             Long workflowDefinitionCode,
+                                                                             String searchVal,
+                                                                             String executorName,
+                                                                             int[] statusArray,
+                                                                             String host,
+                                                                             Date startTime,
+                                                                             Date endTime) {
         return mybatisMapper.queryWorkflowInstanceListPaging(page, projectCode, workflowDefinitionCode, searchVal,
                 executorName, statusArray, host, startTime, endTime);
     }
 
     @Override
-    public List<WorkflowInstance> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode, int[] states) {
+    public List<WorkflowInstanceSummaryDto> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode,
+                                                                                   int[] states) {
         return mybatisMapper.queryByWorkflowDefinitionCodeAndStatus(workflowDefinitionCode, states);
     }
 
     @Override
-    public List<WorkflowInstance> queryByWorkflowDefinitionCode(Long workflowDefinitionCode, int size) {
+    public List<WorkflowInstanceSummaryDto> queryByWorkflowDefinitionCode(Long workflowDefinitionCode, int size) {
         return mybatisMapper.queryByWorkflowDefinitionCode(workflowDefinitionCode, size);
     }
 
     @Override
-    public List<WorkflowInstance> queryByTriggerCode(Long triggerCode) {
+    public List<WorkflowInstanceSummaryDto> queryByTriggerCode(Long triggerCode) {
         return mybatisMapper.queryByTriggerCode(triggerCode);
     }
 }

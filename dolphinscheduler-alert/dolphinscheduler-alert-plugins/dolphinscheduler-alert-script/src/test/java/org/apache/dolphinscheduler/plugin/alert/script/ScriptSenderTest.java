@@ -21,12 +21,18 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class ScriptSenderTest {
 
@@ -53,11 +59,40 @@ public class ScriptSenderTest {
     }
 
     @Test
-    public void testScriptSenderInjectionTest() {
-        scriptConfig.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, "' ; calc.exe ; '");
-        ScriptSender scriptSender = new ScriptSender(scriptConfig);
-        AlertResult alertResult = scriptSender.sendScriptAlert("test title Kris", "test content");
-        Assertions.assertFalse(alertResult.isSuccess());
+    public void testScriptArgumentsArePassedLiterally(@TempDir Path tempDir) throws IOException {
+        Path scriptPath = tempDir.resolve("capture-arguments.sh");
+        Path argumentsPath = tempDir.resolve("capture-arguments.sh.args");
+        Path unexpectedCommandMarker = tempDir.resolve("unexpected-command");
+        Files.write(scriptPath, Arrays.asList("#!/bin/sh", "printf '%s\\n' \"$@\" > \"$0.args\""),
+                StandardCharsets.UTF_8);
+        Assertions.assertTrue(scriptPath.toFile().setExecutable(true));
+
+        String title = "Bob's workflow failed";
+        String content = "content $(touch " + unexpectedCommandMarker + ")";
+        String userParams = "' ; touch " + unexpectedCommandMarker + " ; #";
+        Map<String, String> config = new HashMap<>(scriptConfig);
+        config.put(ScriptParamsConstants.NAME_SCRIPT_PATH, scriptPath.toString());
+        config.put(ScriptParamsConstants.NAME_SCRIPT_USER_PARAMS, userParams);
+
+        AlertResult alertResult = new ScriptSender(config).sendScriptAlert(title, content);
+
+        Assertions.assertTrue(alertResult.isSuccess());
+        Assertions.assertFalse(Files.exists(unexpectedCommandMarker));
+        Assertions.assertEquals(Arrays.asList("-t", title, "-c", content, "-p", userParams),
+                Files.readAllLines(argumentsPath, StandardCharsets.UTF_8));
+    }
+
+    @Test
+    public void testScriptPathWithSpecialCharacters(@TempDir Path tempDir) throws IOException {
+        Path scriptPath = tempDir.resolve("script path$(:).sh");
+        Files.write(scriptPath, Arrays.asList("#!/bin/sh", "exit 0"), StandardCharsets.UTF_8);
+        Assertions.assertTrue(scriptPath.toFile().setExecutable(true));
+
+        Map<String, String> config = new HashMap<>(scriptConfig);
+        config.put(ScriptParamsConstants.NAME_SCRIPT_PATH, scriptPath.toString());
+
+        AlertResult alertResult = new ScriptSender(config).sendScriptAlert("test title", "test content");
+        Assertions.assertTrue(alertResult.isSuccess());
     }
 
     @Test
