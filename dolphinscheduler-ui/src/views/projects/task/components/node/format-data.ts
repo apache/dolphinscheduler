@@ -114,6 +114,7 @@ export function formatParams(data: INodeData): {
     taskParams.condition = data.condition
     taskParams.connectTimeout = data.connectTimeout
     taskParams.socketTimeout = data.socketTimeout
+    taskParams.socketKeepAlive = data.socketKeepAlive
   }
 
   if (data.taskType === 'SQOOP') {

@@ -154,7 +154,8 @@ public class HttpTask extends AbstractTask {
 
         OkHttpResponse okHttpResponse = OkHttpUtils.get(httpParameters.getUrl(), okHttpRequestHeaders,
                 requestParams, httpParameters.getConnectTimeout(),
-                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout());
+                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout(),
+                httpParameters.isSocketKeepAlive());
         addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
         return okHttpResponse;
     }
@@ -168,7 +169,8 @@ public class HttpTask extends AbstractTask {
 
         OkHttpResponse okHttpResponse = OkHttpUtils.post(httpParameters.getUrl(), okHttpRequestHeaders, null,
                 requestBody, httpParameters.getConnectTimeout(),
-                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout());
+                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout(),
+                httpParameters.isSocketKeepAlive());
         addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
         return okHttpResponse;
     }
@@ -182,7 +184,8 @@ public class HttpTask extends AbstractTask {
 
         OkHttpResponse okHttpResponse = OkHttpUtils.put(httpParameters.getUrl(), okHttpRequestHeaders,
                 requestBody, httpParameters.getConnectTimeout(),
-                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout());
+                httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout(),
+                httpParameters.isSocketKeepAlive());
         addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
         return okHttpResponse;
     }
@@ -195,7 +198,7 @@ public class HttpTask extends AbstractTask {
 
         OkHttpResponse okHttpResponse = OkHttpUtils.delete(httpParameters.getUrl(), okHttpRequestHeaders,
                 httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout(),
-                httpParameters.getConnectTimeout());
+                httpParameters.getConnectTimeout(), httpParameters.isSocketKeepAlive());
         addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));
         return okHttpResponse;
     }
