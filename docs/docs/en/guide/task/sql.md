@@ -27,6 +27,15 @@ Refer to [datasource-setting](../installation/datasource-setting.md) `DataSource
 | Pre-SQL           | Pre-SQL executes before the SQL statement.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 | Post-SQL          | Post-SQL executes after the SQL statement.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
+## Parameter Rendering
+
+SQL task replaces custom-parameter placeholders in the SQL text before submitting it to the datasource through JDBC `Statement`.
+
+- Both `${name}` and `!{name}` insert the parameter value as text. DolphinScheduler does not add quotes, escape characters, interpret the parameter type, or otherwise adapt the value to a database dialect.
+- Write datasource-specific SQL syntax, including any required quotes, in the SQL statement or parameter value. Only use trusted parameter values because text replacement does not prevent SQL injection.
+- Rendering scans the source SQL once. Placeholder-like text introduced by a parameter value is not rendered again.
+- If a source placeholder is unclosed or refers to a missing custom parameter, the SQL task fails before submitting the statement to the datasource.
+
 ## Task Example
 
 ### Hive Table Create Example
