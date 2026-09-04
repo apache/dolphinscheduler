@@ -44,7 +44,7 @@ This document records the incompatible updates between each version. You need to
 
 * Remove import and export of workflow definition. ([#17940](https://github.com/apache/dolphinscheduler/issues/17940))
 
-## 3.5.0
+## 3.4.3
 
 * Add the `missed_fire_policy` column to `t_ds_schedules`. Existing schedules default to `FIRE_ALL_MISSED` to preserve the previous Quartz `IgnoreMisfires` behavior. ([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
 * Remove the obsolete Dynamic Task query API. ([#18556](https://github.com/apache/dolphinscheduler/issues/18556))
