@@ -59,7 +59,7 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
      * All properties that were present on {@link WorkflowInstance} but are
      * intentionally removed from {@link WorkflowInstanceSummaryVO} and thus from
      * the list/topN/trigger API response. This list must stay in sync with the
-     * incompatible-change documentation in incompatible.md (version 3.5.0).
+     * incompatible-change documentation in incompatible.md (version 3.4.3).
      */
     private static final List<String> REMOVED_RESPONSE_PROPERTIES = java.util.Arrays.asList(
             // Heavy DB-backed fields removed from the SQL projection
