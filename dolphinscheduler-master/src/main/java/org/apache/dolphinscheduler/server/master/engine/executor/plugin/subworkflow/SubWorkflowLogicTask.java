@@ -261,7 +261,7 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
         return SubWorkflowLogicTaskRuntimeContext.of(subWorkflowInstanceId);
     }
 
-    private List<Property> mergeParams(List<List<Property>> params) {
+    static List<Property> mergeParams(List<List<Property>> params) {
         if (CollectionUtils.isEmpty(params)) {
             return Collections.emptyList();
         }
