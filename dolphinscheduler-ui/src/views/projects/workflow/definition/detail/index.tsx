@@ -58,12 +58,18 @@ export default defineComponent({
     const isLoading = ref(true)
     const dagRef = ref()
 
-    const refresh = () => {
+    const refresh = async () => {
       isLoading.value = true
-      queryWorkflowDefinitionByCode(code, projectCode).then((res: any) => {
+      try {
+        const res = await queryWorkflowDefinitionByCode(code, projectCode)
+        if (!res?.workflowDefinition) {
+          definition.value = undefined
+          message.error(t('project.workflow.request_failed'))
+          return
+        }
+
         readonly.value = res.workflowDefinition.releaseState === 'ONLINE'
         definition.value = res
-        isLoading.value = false
         if (!res.workflowDefinition.locations) {
           setTimeout(() => {
             const graph = dagRef.value
@@ -71,7 +77,9 @@ export default defineComponent({
             submit()
           }, 1000)
         }
-      })
+      } finally {
+        isLoading.value = false
+      }
     }
 
     const save = ({
@@ -121,7 +129,7 @@ export default defineComponent({
           theme.darkTheme ? Styles['dark'] : Styles['light']
         ]}
       >
-        {!isLoading.value && (
+        {!isLoading.value && definition.value && (
           <Dag
             ref={dagRef}
             definition={definition.value}

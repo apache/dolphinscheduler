@@ -53,11 +53,20 @@ export default defineComponent({
 
     const definition = ref<WorkflowDefinition>()
     const instance = ref<WorkflowInstance>()
+    const isLoading = ref(true)
     const dagInstanceRef = ref()
 
-    const refresh = () => {
-      queryWorkflowInstanceById(id, projectCode).then((res: any) => {
+    const refresh = async () => {
+      isLoading.value = true
+      try {
+        const res = await queryWorkflowInstanceById(id, projectCode)
         instance.value = res
+        if (!res?.dagData?.workflowDefinition) {
+          definition.value = undefined
+          window.$message.error(t('project.workflow.request_failed'))
+          return
+        }
+
         if (!res.dagData.workflowDefinition.locations) {
           setTimeout(() => {
             const graph = dagInstanceRef.value
@@ -65,10 +74,10 @@ export default defineComponent({
             submit()
           }, 1000)
         }
-        if (res.dagData) {
-          definition.value = res.dagData
-        }
-      })
+        definition.value = res.dagData
+      } finally {
+        isLoading.value = false
+      }
     }
 
     const save = ({
@@ -115,14 +124,16 @@ export default defineComponent({
           theme.darkTheme ? Styles['dark'] : Styles['light']
         ]}
       >
-        <Dag
-          ref={dagInstanceRef}
-          instance={instance.value}
-          definition={definition.value}
-          onRefresh={refresh}
-          projectCode={projectCode}
-          onSave={save}
-        />
+        {!isLoading.value && definition.value && instance.value && (
+          <Dag
+            ref={dagInstanceRef}
+            instance={instance.value}
+            definition={definition.value}
+            onRefresh={refresh}
+            projectCode={projectCode}
+            onSave={save}
+          />
+        )}
       </div>
     )
   }
