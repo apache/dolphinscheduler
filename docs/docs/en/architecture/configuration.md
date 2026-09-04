@@ -260,6 +260,7 @@ Location: `api-server/conf/application.yaml`
 | casdoor.organization-name                             |                                      | organization name in Casdoor                                                                   |
 | casdoor.application-name                              |                                      | application name in Casdoor                                                                    |
 | casdoor.redirect-url                                  |                                      | doplhinscheduler login url                                                                     |
+| api.datasource-connection-enable                      | false                                | Whether to test datasource connectivity before creating or updating a datasource               |
 | api.traffic.control.global.switch                     | false                                | traffic control global switch                                                                  |
 | api.traffic.control.max-global-qps-rate               | 300                                  | global max request number per second                                                           |
 | api.traffic.control.tenant-switch                     | false                                | traffic control tenant switch                                                                  |

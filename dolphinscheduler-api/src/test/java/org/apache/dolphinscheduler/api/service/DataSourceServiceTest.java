@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServi
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -94,6 +95,9 @@ public class DataSourceServiceTest {
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
+
+    @Mock
+    private ApiConfig apiConfig;
 
     @Mock
     private IPage<DataSource> dataSourceList;
@@ -233,6 +237,129 @@ public class DataSourceServiceTest {
             when(dataSourceDao.updateById(Mockito.any(DataSource.class))).thenThrow(DuplicateKeyException.class);
             assertThrowsServiceException(Status.DATASOURCE_EXIST,
                     () -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
+        }
+    }
+
+    @Test
+    public void createDataSourceChecksConnectionWhenConfigured() {
+        User loginUser = getAdminUser();
+        PostgreSQLDataSourceParamDTO postgreSqlDatasourceParam = new PostgreSQLDataSourceParamDTO();
+        postgreSqlDatasourceParam.setDatabase("dolphinscheduler");
+        postgreSqlDatasourceParam.setNote("test dataSource");
+        postgreSqlDatasourceParam.setHost("172.16.133.200");
+        postgreSqlDatasourceParam.setPort(5432);
+        postgreSqlDatasourceParam.setUserName("postgres");
+        postgreSqlDatasourceParam.setPassword("postgres");
+        postgreSqlDatasourceParam.setName("dataSource01");
+
+        when(apiConfig.isDatasourceConnectionEnable()).thenReturn(true);
+        passResourcePermissionCheckService();
+        when(dataSourceDao.queryDataSourceByName(postgreSqlDatasourceParam.getName().trim())).thenReturn(null);
+
+        try (
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils =
+                        Mockito.mockStatic(DataSourceUtils.class, Mockito.CALLS_REAL_METHODS)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+            ConnectionParam connectionParam = Mockito.mock(ConnectionParam.class);
+            mockedStaticDataSourceUtils.when(() -> DataSourceUtils.getDatasourceProcessor(Mockito.any()))
+                    .thenReturn(dataSourceProcessor);
+            when(dataSourceProcessor.createConnectionParams(Mockito.any(BaseDataSourceParamDTO.class)))
+                    .thenReturn(connectionParam);
+            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
+
+            assertThrowsServiceException(Status.CONNECTION_TEST_FAILURE,
+                    () -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
+        }
+    }
+
+    @Test
+    public void updateDataSourceChecksConnectionWhenConfigured() {
+        User loginUser = getAdminUser();
+        int dataSourceId = 12;
+        PostgreSQLDataSourceParamDTO postgreSqlDatasourceParam = new PostgreSQLDataSourceParamDTO();
+        postgreSqlDatasourceParam.setId(dataSourceId);
+        postgreSqlDatasourceParam.setDatabase("dolphinscheduler");
+        postgreSqlDatasourceParam.setNote("test dataSource");
+        postgreSqlDatasourceParam.setHost("172.16.133.200");
+        postgreSqlDatasourceParam.setPort(5432);
+        postgreSqlDatasourceParam.setUserName("postgres");
+        postgreSqlDatasourceParam.setPassword("postgres");
+        postgreSqlDatasourceParam.setName("dataSource01-update");
+
+        DataSource dataSource = new DataSource();
+        dataSource.setId(dataSourceId);
+        dataSource.setName("dataSource01");
+        dataSource.setType(DbType.POSTGRESQL);
+
+        when(apiConfig.isDatasourceConnectionEnable()).thenReturn(true);
+        passResourcePermissionCheckService();
+        when(dataSourceDao.queryById(dataSourceId)).thenReturn(dataSource);
+        when(dataSourceDao.queryDataSourceByName(postgreSqlDatasourceParam.getName())).thenReturn(null);
+
+        try (
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils =
+                        Mockito.mockStatic(DataSourceUtils.class, Mockito.CALLS_REAL_METHODS)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+            ConnectionParam connectionParam = Mockito.mock(ConnectionParam.class);
+            mockedStaticDataSourceUtils.when(() -> DataSourceUtils.getDatasourceProcessor(Mockito.any()))
+                    .thenReturn(dataSourceProcessor);
+            when(connectionParam.getPassword()).thenReturn("postgres");
+            when(dataSourceProcessor.createConnectionParams(Mockito.any(BaseDataSourceParamDTO.class)))
+                    .thenReturn(connectionParam);
+            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
+
+            assertThrowsServiceException(Status.CONNECTION_TEST_FAILURE,
+                    () -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
+        }
+    }
+
+    @Test
+    public void dataSourceDoesNotCheckConnectionByDefault() {
+        User loginUser = getAdminUser();
+        int dataSourceId = 12;
+        PostgreSQLDataSourceParamDTO createDatasourceParam = new PostgreSQLDataSourceParamDTO();
+        createDatasourceParam.setDatabase("dolphinscheduler");
+        createDatasourceParam.setNote("test dataSource");
+        createDatasourceParam.setHost("172.16.133.200");
+        createDatasourceParam.setPort(5432);
+        createDatasourceParam.setUserName("postgres");
+        createDatasourceParam.setPassword("postgres");
+        createDatasourceParam.setName("dataSource01");
+
+        PostgreSQLDataSourceParamDTO updateDatasourceParam = new PostgreSQLDataSourceParamDTO();
+        updateDatasourceParam.setId(dataSourceId);
+        updateDatasourceParam.setDatabase("dolphinscheduler");
+        updateDatasourceParam.setNote("test dataSource");
+        updateDatasourceParam.setHost("172.16.133.200");
+        updateDatasourceParam.setPort(5432);
+        updateDatasourceParam.setUserName("postgres");
+        updateDatasourceParam.setPassword("postgres");
+        updateDatasourceParam.setName("dataSource01-update");
+
+        DataSource dataSource = new DataSource();
+        dataSource.setId(dataSourceId);
+        dataSource.setName("dataSource01");
+        dataSource.setType(DbType.POSTGRESQL);
+
+        when(apiConfig.isDatasourceConnectionEnable()).thenReturn(false);
+        passResourcePermissionCheckService();
+        when(dataSourceDao.queryById(dataSourceId)).thenReturn(dataSource);
+        when(dataSourceDao.queryDataSourceByName(Mockito.anyString())).thenReturn(null);
+
+        try (
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils =
+                        Mockito.mockStatic(DataSourceUtils.class, Mockito.CALLS_REAL_METHODS)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+            ConnectionParam connectionParam = Mockito.mock(ConnectionParam.class);
+            mockedStaticDataSourceUtils.when(() -> DataSourceUtils.getDatasourceProcessor(Mockito.any()))
+                    .thenReturn(dataSourceProcessor);
+            when(connectionParam.getPassword()).thenReturn("postgres");
+            when(dataSourceProcessor.createConnectionParams(Mockito.any(BaseDataSourceParamDTO.class)))
+                    .thenReturn(connectionParam);
+
+            assertDoesNotThrow(() -> dataSourceService.createDataSource(loginUser, createDatasourceParam));
+            assertDoesNotThrow(() -> dataSourceService.updateDataSource(loginUser, updateDatasourceParam));
+            Mockito.verify(dataSourceProcessor, Mockito.never()).checkDataSourceConnectivity(Mockito.any());
         }
     }
 

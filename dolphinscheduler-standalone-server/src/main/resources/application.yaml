@@ -260,6 +260,8 @@ alert:
 
 api:
   audit-enable: false
+  # Whether to test datasource connectivity before creating or updating a datasource.
+  datasource-connection-enable: false
   # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
   # global max request number per second
   # default tenant-level max request number

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_UPDATE;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -78,6 +79,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Autowired
     private DataSourceUserDao datasourceUserDao;
 
+    @Autowired
+    private ApiConfig apiConfig;
+
     private static final String TABLE = "TABLE";
     private static final String VIEW = "VIEW";
     private static final String[] TABLE_TYPES = new String[]{TABLE, VIEW};
@@ -99,6 +103,10 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(datasourceParam);
+
+        if (apiConfig.isDatasourceConnectionEnable()) {
+            checkConnection(datasourceParam.getType(), connectionParam);
+        }
 
         // build datasource
         DataSource dataSource = new DataSource();
@@ -152,6 +160,10 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             connectionParam.setPassword(oldParams.path(Constants.PASSWORD).asText());
         }
 
+        if (apiConfig.isDatasourceConnectionEnable()) {
+            checkConnection(dataSourceParam.getType(), connectionParam);
+        }
+
         Date now = new Date();
 
         dataSource.setName(dataSourceParam.getName().trim());
@@ -192,7 +204,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         baseDataSourceParamDTO.setId(dataSource.getId());
         baseDataSourceParamDTO.setName(dataSource.getName());
         baseDataSourceParamDTO.setNote(dataSource.getNote());
-        baseDataSourceParamDTO.setPassword(getHiddenPassword());
+        baseDataSourceParamDTO.setPassword("");
 
         return baseDataSourceParamDTO;
     }
