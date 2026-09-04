@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.TaskInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
+import org.apache.dolphinscheduler.dao.model.TaskInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -193,42 +194,42 @@ public class TaskInstanceDaoImpl extends BaseDao<TaskInstance, TaskInstanceMappe
     }
 
     @Override
-    public List<TaskInstance> queryByWorkflowInstanceIdsAndTaskCodes(List<Integer> workflowInstanceIds,
-                                                                     List<Long> taskCodes) {
+    public List<TaskInstanceSummaryDto> queryByWorkflowInstanceIdsAndTaskCodes(List<Integer> workflowInstanceIds,
+                                                                               List<Long> taskCodes) {
         return mybatisMapper.queryByWorkflowInstanceIdsAndTaskCodes(workflowInstanceIds, taskCodes);
     }
 
     @Override
-    public IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
-                                                           Long projectCode,
-                                                           Integer workflowInstanceId,
-                                                           String workflowInstanceName,
-                                                           String searchVal,
-                                                           String taskName,
-                                                           Long taskCode,
-                                                           String executorName,
-                                                           int[] statusArray,
-                                                           String host,
-                                                           TaskExecuteType taskExecuteType,
-                                                           Date startTime,
-                                                           Date endTime) {
+    public IPage<TaskInstanceSummaryDto> queryTaskInstanceListPaging(IPage<TaskInstanceSummaryDto> page,
+                                                                     Long projectCode,
+                                                                     Integer workflowInstanceId,
+                                                                     String workflowInstanceName,
+                                                                     String searchVal,
+                                                                     String taskName,
+                                                                     Long taskCode,
+                                                                     String executorName,
+                                                                     int[] statusArray,
+                                                                     String host,
+                                                                     TaskExecuteType taskExecuteType,
+                                                                     Date startTime,
+                                                                     Date endTime) {
         return mybatisMapper.queryTaskInstanceListPaging(page, projectCode, workflowInstanceId, workflowInstanceName,
                 searchVal, taskName, taskCode, executorName, statusArray, host, taskExecuteType, startTime, endTime);
     }
 
     @Override
-    public IPage<TaskInstance> queryStreamTaskInstanceListPaging(IPage<TaskInstance> page,
-                                                                 Long projectCode,
-                                                                 String workflowDefinitionName,
-                                                                 String searchVal,
-                                                                 String taskName,
-                                                                 Long taskCode,
-                                                                 String executorName,
-                                                                 int[] statusArray,
-                                                                 String host,
-                                                                 TaskExecuteType taskExecuteType,
-                                                                 Date startTime,
-                                                                 Date endTime) {
+    public IPage<TaskInstanceSummaryDto> queryStreamTaskInstanceListPaging(IPage<TaskInstanceSummaryDto> page,
+                                                                           Long projectCode,
+                                                                           String workflowDefinitionName,
+                                                                           String searchVal,
+                                                                           String taskName,
+                                                                           Long taskCode,
+                                                                           String executorName,
+                                                                           int[] statusArray,
+                                                                           String host,
+                                                                           TaskExecuteType taskExecuteType,
+                                                                           Date startTime,
+                                                                           Date endTime) {
         return mybatisMapper.queryStreamTaskInstanceListPaging(page, projectCode, workflowDefinitionName, searchVal,
                 taskName, taskCode, executorName, statusArray, host, taskExecuteType, startTime, endTime);
     }
