@@ -33,7 +33,10 @@ public class PropertyUtils {
     }
 
     /**
-     * startParams transform propertyList
+     * startParams transform propertyList.
+     * <p>
+     * Map format {@code {"pwd":"******"}} loses {@code sensitive}; callers must overlay via
+     * {@link PropertySensitiveUtils#mergeStartParamsWithGlobalParams} so the mask is not persisted.
      *
      * @param startParams startParams
      * @return startParamList

@@ -20,9 +20,12 @@ package org.apache.dolphinscheduler.api.service;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
@@ -35,6 +38,7 @@ import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -59,6 +63,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
@@ -70,6 +75,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
@@ -82,6 +88,7 @@ import org.apache.dolphinscheduler.service.process.ProcessService;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -90,6 +97,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -143,6 +151,9 @@ public class WorkflowInstanceServiceTest {
 
     @Mock
     TaskDefinitionDao taskDefinitionDao;
+
+    @Mock
+    TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Mock
     TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
@@ -675,6 +686,133 @@ public class WorkflowInstanceServiceTest {
                 () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
                         shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0));
         Mockito.verifyNoInteractions(workflowDefinitionDao);
+    }
+
+    @Test
+    public void testUpdateWorkflowInstanceMergesSensitiveLocalParamsFromMatchingTaskVersion() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(projectCode);
+        workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
+        workflowInstance.setTimeout(3000);
+        workflowInstance.setCommandType(CommandType.STOP);
+        workflowInstance.setWorkflowDefinitionCode(46L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
+        WorkflowDefinition workflowDefinition = getProcessDefinition();
+        workflowDefinition.setProjectCode(projectCode);
+
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
+        when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowInstanceDao.updateById(workflowInstance)).thenReturn(true);
+        when(processService.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.FALSE))
+                .thenReturn(1);
+        Mockito.doNothing().when(workflowDefinitionService).checkWorkflowNodeList(any(), any());
+        Mockito.doNothing().when(taskDatasourcePermissionChecker).checkPermission(any(), any());
+
+        TaskDefinitionLog version1Log = new TaskDefinitionLog();
+        version1Log.setCode(4254862762304L);
+        version1Log.setVersion(1);
+        version1Log.setTaskParams(
+                "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"old-secret\",\"sensitive\":true}],\"rawScript\":\"echo 1\"}");
+        when(taskDefinitionLogMapper.queryByTaskDefinitions(any())).thenReturn(Collections.singletonList(version1Log));
+
+        TaskDefinition currentTask = new TaskDefinition();
+        currentTask.setCode(4254862762304L);
+        currentTask.setTaskParams(
+                "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"new-secret\",\"sensitive\":true}]}");
+        when(taskDefinitionDao.queryByCodes(any())).thenReturn(Collections.singletonList(currentTask));
+
+        String submittedTaskDefinitionJson =
+                "[{\"code\":4254862762304,\"name\":\"test1\",\"version\":1,\"description\":\"\",\"delayTime\":0,\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],"
+                        + "\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"******\",\"sensitive\":true}],\"rawScript\":\"echo 1\",\"dependence\":{},\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{},\"switchResult\":{}},\"flag\":\"YES\","
+                        + "\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":1,\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":null,\"timeout\":0,"
+                        + "\"environmentCode\":-1},{\"code\":4254865123776,\"name\":\"test2\",\"version\":1,\"description\":\"\",\"delayTime\":0,\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],"
+                        + "\"localParams\":[],\"rawScript\":\"echo 2\",\"dependence\":{},\"conditionResult\":{\"successNode\":[],\"failedNode\":[]},\"waitStartTimeout\":{},\"switchResult\":{}},\"flag\":\"YES\","
+                        + "\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\",\"failRetryTimes\":0,\"failRetryInterval\":1,\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":\"WARN\",\"timeout\":0,"
+                        + "\"environmentCode\":-1}]";
+
+        ArgumentCaptor<List> savedTaskLogs = ArgumentCaptor.forClass(List.class);
+        when(processService.saveTaskDefine(any(), Mockito.anyLong(), savedTaskLogs.capture(), any())).thenReturn(1);
+
+        try (
+                MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
+                        Mockito.mockStatic(TaskPluginManager.class)) {
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(any(), any()))
+                    .thenReturn(true);
+            workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                    taskRelationJson, submittedTaskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0);
+        }
+
+        TaskDefinitionLog merged = ((List<TaskDefinitionLog>) savedTaskLogs.getValue()).stream()
+                .filter(log -> log.getCode() == 4254862762304L)
+                .findFirst()
+                .orElseThrow(AssertionError::new);
+        Assertions.assertTrue(merged.getTaskParams().contains("old-secret"));
+        Assertions.assertFalse(merged.getTaskParams().contains("new-secret"));
+        Assertions.assertFalse(merged.getTaskParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        verify(taskDefinitionDao, never()).queryByCodes(any());
+        verify(taskDefinitionLogMapper, never()).queryByDefinitionCodeAndVersion(Mockito.anyLong(), Mockito.anyInt());
+        verify(taskDefinitionLogMapper).queryByTaskDefinitions(any());
+    }
+
+    @Test
+    public void testUpdateWorkflowInstanceResponseMasksSensitiveGlobalParamsWithoutMutatingPersisted() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(projectCode);
+        workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
+        workflowInstance.setTimeout(3000);
+        workflowInstance.setCommandType(CommandType.STOP);
+        workflowInstance.setWorkflowDefinitionCode(46L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
+        workflowInstance.setGlobalParams(
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"old-secret\",\"sensitive\":true}]");
+        WorkflowDefinition workflowDefinition = getProcessDefinition();
+        workflowDefinition.setProjectCode(projectCode);
+
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
+        when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowInstanceDao.updateById(workflowInstance)).thenReturn(true);
+        when(processService.saveTaskDefine(any(), Mockito.anyLong(), any(), any())).thenReturn(1);
+        Mockito.doNothing().when(workflowDefinitionService).checkWorkflowNodeList(any(), any());
+        Mockito.doNothing().when(taskDatasourcePermissionChecker).checkPermission(any(), any());
+        when(processService.saveTaskRelation(any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt(), any(),
+                any(), any())).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        ArgumentCaptor<WorkflowDefinition> persisted = ArgumentCaptor.forClass(WorkflowDefinition.class);
+        when(processService.saveWorkflowDefine(any(), persisted.capture(), eq(Boolean.TRUE), eq(Boolean.FALSE)))
+                .thenReturn(1);
+
+        String submittedGlobalParams =
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"new-secret\",\"sensitive\":true}]";
+        WorkflowDefinition updated;
+        try (
+                MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
+                        Mockito.mockStatic(TaskPluginManager.class)) {
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(any(), any()))
+                    .thenReturn(true);
+            updated = workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                    taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, submittedGlobalParams, "", 0);
+        }
+
+        Assertions.assertTrue(updated.getGlobalParams().contains("new-secret"));
+        Assertions.assertFalse(updated.getGlobalParams().contains("old-secret"));
+        Assertions.assertTrue(persisted.getValue().getGlobalParams().contains("new-secret"));
+        Assertions.assertSame(updated, persisted.getValue());
+
+        Result<WorkflowDefinition> response = Result.success(updated);
+        SensitivePropertyUtils.maskApiResponseData(response);
+
+        Assertions.assertTrue(response.getData().getGlobalParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(response.getData().getGlobalParams().contains("new-secret"));
+        Assertions.assertTrue(updated.getGlobalParams().contains("new-secret"));
+        Assertions.assertNotSame(updated, response.getData());
     }
 
     @Test

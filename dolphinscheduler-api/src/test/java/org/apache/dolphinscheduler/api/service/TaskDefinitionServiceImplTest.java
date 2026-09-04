@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION;
+import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_VERSION_VIEW;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -34,6 +35,9 @@ import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecke
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -57,10 +61,12 @@ import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 import org.apache.dolphinscheduler.service.process.ProcessServiceImpl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -75,6 +81,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -424,6 +433,37 @@ public class TaskDefinitionServiceImplTest {
         // success
         doNothing().when(projectService).checkProjectAndAuthThrowException(user, getProject(), TASK_DEFINITION);
         Assertions.assertDoesNotThrow(() -> taskDefinitionService.getTaskDefinition(user, TASK_CODE));
+    }
+
+    @Test
+    public void queryTaskDefinitionVersionsShouldMaskSensitiveLocalParams() {
+        Project project = getProject();
+        when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
+        doNothing().when(projectService).checkProjectAndAuthThrowException(user, project, TASK_VERSION_VIEW);
+
+        TaskDefinitionLog versionLog = new TaskDefinitionLog();
+        versionLog.setCode(TASK_CODE);
+        versionLog.setVersion(VERSION);
+        versionLog.setTaskParams(
+                "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"secret-token\",\"sensitive\":true}]}");
+        IPage<TaskDefinitionLog> paging = new Page<>(1, 10);
+        paging.setRecords(Collections.singletonList(versionLog));
+        paging.setTotal(1);
+        when(taskDefinitionLogMapper.queryTaskDefinitionVersionsPaging(any(Page.class), eq(TASK_CODE),
+                eq(PROJECT_CODE))).thenReturn(paging);
+
+        Result result = taskDefinitionService.queryTaskDefinitionVersions(user, PROJECT_CODE, TASK_CODE, 1, 10);
+        PageInfo<TaskDefinitionLog> pageInfo = (PageInfo<TaskDefinitionLog>) result.getData();
+        TaskDefinitionLog fromService = pageInfo.getTotalList().get(0);
+        Assertions.assertTrue(fromService.getTaskParams().contains("secret-token"));
+        Assertions.assertSame(versionLog, fromService);
+
+        SensitivePropertyUtils.maskApiResponseData(result);
+        TaskDefinitionLog masked = pageInfo.getTotalList().get(0);
+        Assertions.assertTrue(masked.getTaskParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(masked.getTaskParams().contains("secret-token"));
+        Assertions.assertTrue(versionLog.getTaskParams().contains("secret-token"));
+        Assertions.assertNotSame(versionLog, masked);
     }
 
     /**

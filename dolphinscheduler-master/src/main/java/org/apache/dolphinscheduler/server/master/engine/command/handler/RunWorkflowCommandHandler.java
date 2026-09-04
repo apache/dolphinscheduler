@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowGraph;
 import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowExecutionGraph;
@@ -36,11 +37,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecu
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
 
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -116,7 +113,8 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
 
     /**
      * Merge the command params with the workflow params.
-     * <p> If there are duplicate keys, the command params will override the workflow params.
+     * <p> Duplicate keys: command params override workflow params, except {@code ******}
+     * which is keep-original and never persisted as a real value.
      */
     private String mergeCommandParamsWithWorkflowParams(final Command command,
                                                         final WorkflowDefinition workflowDefinition) {
@@ -126,14 +124,8 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
                         .orElse(null);
         final List<Property> globalParamsList =
                 GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams());
-        Map<String, Property> finalParams = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(globalParamsList)) {
-            globalParamsList.forEach(globalParam -> finalParams.put(globalParam.getProp(), globalParam));
-        }
-        if (CollectionUtils.isNotEmpty(commandParams)) {
-            commandParams.forEach(commandParam -> finalParams.put(commandParam.getProp(), commandParam));
-        }
-        return JSONUtils.toJsonString(finalParams.values());
+        return JSONUtils.toJsonString(
+                PropertySensitiveUtils.mergeStartParamsWithGlobalParams(commandParams, globalParamsList));
     }
 
     @Override

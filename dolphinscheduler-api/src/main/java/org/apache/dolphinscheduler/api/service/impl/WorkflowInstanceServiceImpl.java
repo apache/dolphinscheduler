@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
@@ -411,6 +412,8 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             timezoneId = commandParam.getTimeZone();
         }
 
+        globalParams =
+                SensitivePropertyUtils.mergeGlobalParams(globalParams, workflowInstance.getGlobalParams());
         setWorkflowInstance(workflowInstance, scheduleTime, globalParams, timeout, timezoneId);
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         if (taskDefinitionLogs.isEmpty()) {
@@ -423,6 +426,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
             }
         }
+        mergeSensitiveLocalParams(taskDefinitionLogs);
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs, syncDefine);
@@ -479,6 +483,49 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 "Update workflow instance complete, projectCode:{}, workflowDefinitionCode:{}, workflowDefinitionVersion:{}, workflowInstanceId:{}",
                 projectCode, workflowDefinition.getCode(), insertVersion, workflowInstanceId);
         return workflowDefinition;
+    }
+
+    private void mergeSensitiveLocalParams(List<TaskDefinitionLog> taskDefinitionLogs) {
+        if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
+            return;
+        }
+        // Use List, not Set: TaskDefinition.equals() ignores code/version, so a Set would collapse keys.
+        List<TaskDefinition> versionKeys = new ArrayList<>();
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            if (taskDefinitionLog.getCode() <= 0 || taskDefinitionLog.getVersion() <= 0) {
+                SensitivePropertyUtils.validateSensitivePlaceholders(
+                        SensitivePropertyUtils.getLocalParams(taskDefinitionLog.getTaskParams()),
+                        Collections.emptyList());
+                continue;
+            }
+            versionKeys.add(new TaskDefinition(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion()));
+        }
+        Map<String, String> existingTaskParamsMap = Collections.emptyMap();
+        if (CollectionUtils.isNotEmpty(versionKeys)) {
+            List<TaskDefinitionLog> existingLogs = taskDefinitionLogMapper.queryByTaskDefinitions(versionKeys);
+            if (CollectionUtils.isNotEmpty(existingLogs)) {
+                existingTaskParamsMap = existingLogs.stream()
+                        .collect(Collectors.toMap(
+                                log -> taskDefinitionVersionKey(log.getCode(), log.getVersion()),
+                                TaskDefinitionLog::getTaskParams,
+                                (a, b) -> a));
+            }
+        }
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            if (taskDefinitionLog.getCode() <= 0 || taskDefinitionLog.getVersion() <= 0) {
+                continue;
+            }
+            taskDefinitionLog.setTaskParams(
+                    SensitivePropertyUtils.mergeLocalParamsInTaskParams(
+                            taskDefinitionLog.getTaskParams(),
+                            existingTaskParamsMap.get(
+                                    taskDefinitionVersionKey(taskDefinitionLog.getCode(),
+                                            taskDefinitionLog.getVersion()))));
+        }
+    }
+
+    private static String taskDefinitionVersionKey(long code, int version) {
+        return code + "_" + version;
     }
 
     /**
