@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
@@ -755,6 +756,63 @@ public class WorkflowInstanceServiceTest {
         verify(taskDefinitionDao, never()).queryByCodes(any());
         verify(taskDefinitionLogMapper, never()).queryByDefinitionCodeAndVersion(Mockito.anyLong(), Mockito.anyInt());
         verify(taskDefinitionLogMapper).queryByTaskDefinitions(any());
+    }
+
+    @Test
+    public void testUpdateWorkflowInstanceResponseMasksSensitiveGlobalParamsWithoutMutatingPersisted() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(projectCode);
+        workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
+        workflowInstance.setTimeout(3000);
+        workflowInstance.setCommandType(CommandType.STOP);
+        workflowInstance.setWorkflowDefinitionCode(46L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
+        workflowInstance.setGlobalParams(
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"old-secret\",\"sensitive\":true}]");
+        WorkflowDefinition workflowDefinition = getProcessDefinition();
+        workflowDefinition.setProjectCode(projectCode);
+
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
+        when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowInstanceDao.updateById(workflowInstance)).thenReturn(true);
+        when(processService.saveTaskDefine(any(), Mockito.anyLong(), any(), any())).thenReturn(1);
+        Mockito.doNothing().when(workflowDefinitionService).checkWorkflowNodeList(any(), any());
+        Mockito.doNothing().when(taskDatasourcePermissionChecker).checkPermission(any(), any());
+        when(processService.saveTaskRelation(any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt(), any(),
+                any(), any())).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        ArgumentCaptor<WorkflowDefinition> persisted = ArgumentCaptor.forClass(WorkflowDefinition.class);
+        when(processService.saveWorkflowDefine(any(), persisted.capture(), eq(Boolean.TRUE), eq(Boolean.FALSE)))
+                .thenReturn(1);
+
+        String submittedGlobalParams =
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"new-secret\",\"sensitive\":true}]";
+        WorkflowDefinition updated;
+        try (
+                MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
+                        Mockito.mockStatic(TaskPluginManager.class)) {
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(any(), any()))
+                    .thenReturn(true);
+            updated = workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                    taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, submittedGlobalParams, "", 0);
+        }
+
+        Assertions.assertTrue(updated.getGlobalParams().contains("new-secret"));
+        Assertions.assertFalse(updated.getGlobalParams().contains("old-secret"));
+        Assertions.assertTrue(persisted.getValue().getGlobalParams().contains("new-secret"));
+        Assertions.assertSame(updated, persisted.getValue());
+
+        Result<WorkflowDefinition> response = Result.success(updated);
+        SensitivePropertyUtils.maskApiResponseData(response);
+
+        Assertions.assertTrue(response.getData().getGlobalParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(response.getData().getGlobalParams().contains("new-secret"));
+        Assertions.assertTrue(updated.getGlobalParams().contains("new-secret"));
+        Assertions.assertNotSame(updated, response.getData());
     }
 
     @Test

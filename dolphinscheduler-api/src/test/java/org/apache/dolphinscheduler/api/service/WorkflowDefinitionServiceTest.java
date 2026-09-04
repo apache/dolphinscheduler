@@ -974,6 +974,40 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testCreateWorkflowDefinitionResponseMasksSensitiveGlobalParamsWithoutMutatingPersisted() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
+        when(workflowDefinitionDao.verifyByDefineName(projectCode, name)).thenReturn(null);
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        when(processService.saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE))).thenReturn(1);
+        when(processService.saveTaskRelation(eq(user), eq(projectCode), anyLong(), eq(1), anyList(), anyList(),
+                eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        ArgumentCaptor<WorkflowDefinition> persisted = ArgumentCaptor.forClass(WorkflowDefinition.class);
+        when(processService.saveWorkflowDefine(any(User.class), persisted.capture(), eq(Boolean.TRUE),
+                eq(Boolean.TRUE))).thenReturn(1);
+
+        String sensitiveGlobalParams =
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"Secret123\",\"sensitive\":true}]";
+        WorkflowDefinition created = workflowDefinitionService.createWorkflowDefinition(
+                user, projectCode, name, description, sensitiveGlobalParams, "[]", timeout,
+                taskRelationJson, taskDefinitionJson, null, WorkflowExecutionTypeEnum.PARALLEL);
+
+        Assertions.assertTrue(created.getGlobalParams().contains("Secret123"));
+        Assertions.assertTrue(persisted.getValue().getGlobalParams().contains("Secret123"));
+        Assertions.assertSame(created, persisted.getValue());
+
+        Result<WorkflowDefinition> response = Result.success(created);
+        SensitivePropertyUtils.maskApiResponseData(response);
+
+        Assertions.assertTrue(response.getData().getGlobalParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(response.getData().getGlobalParams().contains("Secret123"));
+        Assertions.assertTrue(created.getGlobalParams().contains("Secret123"));
+        Assertions.assertNotSame(created, response.getData());
+    }
+
+    @Test
     public void testCreateWorkflowDefinitionShouldRejectUnauthorizedDatasource() {
         Project project = getProject(projectCode);
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
@@ -1188,6 +1222,48 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertFalse(merged.getTaskParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
         verify(taskDefinitionDao, Mockito.never()).queryByCodes(any());
         verify(taskDefinitionLogMapper).queryByTaskDefinitions(anyList());
+    }
+
+    @Test
+    public void testUpdateWorkflowDefinitionResponseMasksNewSensitiveGlobalParamsWithoutMutatingPersisted() {
+        Project project = getProject(projectCode);
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        workflowDefinition.setName("origin-name");
+        workflowDefinition.setGlobalParams(
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"old-secret\",\"sensitive\":true}]");
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowDefinitionDao.verifyByDefineName(projectCode, name)).thenReturn(null);
+        when(processService.saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE))).thenReturn(1);
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(Collections.emptyList());
+        when(processService.saveTaskRelation(eq(user), eq(projectCode), eq(processDefinitionCode), eq(2), anyList(),
+                anyList(), eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        ArgumentCaptor<WorkflowDefinition> persisted = ArgumentCaptor.forClass(WorkflowDefinition.class);
+        when(processService.saveWorkflowDefine(any(User.class), persisted.capture(), eq(Boolean.TRUE),
+                eq(Boolean.TRUE))).thenReturn(2);
+
+        String submittedGlobalParams =
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"new-secret\",\"sensitive\":true}]";
+        WorkflowDefinition updated = workflowDefinitionService.updateWorkflowDefinition(
+                user, projectCode, name, processDefinitionCode, description, submittedGlobalParams, "[]", timeout,
+                taskRelationJson, taskDefinitionJson, WorkflowExecutionTypeEnum.PARALLEL);
+
+        Assertions.assertTrue(updated.getGlobalParams().contains("new-secret"));
+        Assertions.assertFalse(updated.getGlobalParams().contains("old-secret"));
+        Assertions.assertTrue(persisted.getValue().getGlobalParams().contains("new-secret"));
+        Assertions.assertSame(updated, persisted.getValue());
+
+        Result<WorkflowDefinition> response = Result.success(updated);
+        SensitivePropertyUtils.maskApiResponseData(response);
+
+        Assertions.assertTrue(response.getData().getGlobalParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(response.getData().getGlobalParams().contains("new-secret"));
+        Assertions.assertTrue(updated.getGlobalParams().contains("new-secret"));
+        Assertions.assertNotSame(updated, response.getData());
     }
 
     @Test
