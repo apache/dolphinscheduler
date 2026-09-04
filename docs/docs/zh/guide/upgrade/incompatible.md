@@ -44,7 +44,7 @@
 
 * 移除导入导出工作流([#17940](https://github.com/apache/dolphinscheduler/issues/17940))
 
-## 3.5.0
+## 3.4.3
 
 * 为 `t_ds_schedules` 表新增 `missed_fire_policy` 字段。现有定时默认使用 `FIRE_ALL_MISSED`，以保持原有 Quartz `IgnoreMisfires` 行为。([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
 * 移除已废弃的 Dynamic Task 查询接口。([#18556](https://github.com/apache/dolphinscheduler/issues/18556))
