@@ -237,7 +237,7 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
         final List<Property> paramList = mergeParams(asList(
                 new ArrayList<>(deserializeVarPool(workflowInstance.getGlobalParams())),
                 commandParam.getCommandParams(),
-                new ArrayList<>(deserializeVarPool(workflowInstance.getVarPool()))));
+                taskExecutionContext.getVarPool()));
 
         final WorkflowManualTriggerRequest workflowManualTriggerRequest = WorkflowManualTriggerRequest.builder()
                 .userId(taskExecutionContext.getExecutorId())
@@ -261,7 +261,7 @@ public class SubWorkflowLogicTask extends AbstractLogicTask<SubWorkflowParameter
         return SubWorkflowLogicTaskRuntimeContext.of(subWorkflowInstanceId);
     }
 
-    private List<Property> mergeParams(List<List<Property>> params) {
+    static List<Property> mergeParams(List<List<Property>> params) {
         if (CollectionUtils.isEmpty(params)) {
             return Collections.emptyList();
         }
