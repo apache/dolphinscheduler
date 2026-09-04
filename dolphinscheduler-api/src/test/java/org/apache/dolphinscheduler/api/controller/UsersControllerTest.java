@@ -68,6 +68,30 @@ public class UsersControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testCreateUserNotAllowedWhenOAuth2Enabled() throws Exception {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("userName", "user_test_with_oauth2");
+        paramsMap.add("userPassword", "123456qwe?");
+        paramsMap.add("tenantId", "109");
+        paramsMap.add("queue", "1");
+        paramsMap.add("email", "12343534@qq.com");
+        paramsMap.add("phone", "15800000000");
+        paramsMap.add("state", "1");
+
+        MvcResult mvcResult = mockMvc.perform(post("/users/create")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE.getCode(),
+                result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
     public void testUpdateUser() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("id", "32");
@@ -87,6 +111,56 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.UPDATE_USER_ERROR.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    public void testUpdateUserAllowsNonCredentialChangesWhenOAuth2Enabled() throws Exception {
+        MultiValueMap<String, String> paramsMap = buildUpdateUserParams(user.getUserName(), "");
+        paramsMap.set("email", "updated-user-with-oauth2@example.com");
+        paramsMap.set("phone", "15800000001");
+
+        MvcResult mvcResult = mockMvc.perform(post("/users/update")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        logger.info(mvcResult.getResponse().getContentAsString());
+    }
+
+    @Test
+    public void testUpdateUserNameNotAllowedWhenOAuth2Enabled() throws Exception {
+        MultiValueMap<String, String> paramsMap = buildUpdateUserParams("user_test_with_oauth2", "");
+
+        MvcResult mvcResult = mockMvc.perform(post("/users/update")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE.getCode(),
+                result.getCode().intValue());
+    }
+
+    @Test
+    public void testUpdateUserPasswordNotAllowedWhenOAuth2Enabled() throws Exception {
+        MultiValueMap<String, String> paramsMap = buildUpdateUserParams(user.getUserName(), "123456qwe?");
+
+        MvcResult mvcResult = mockMvc.perform(post("/users/update")
+                .header(SESSION_ID, sessionId)
+                .params(paramsMap))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        Assertions.assertEquals(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE.getCode(),
+                result.getCode().intValue());
     }
 
     @Test
@@ -258,7 +332,8 @@ public class UsersControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE.getCode(),
+                result.getCode().intValue());
     }
 
     @Test
@@ -294,5 +369,19 @@ public class UsersControllerTest extends AbstractControllerTest {
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    private MultiValueMap<String, String> buildUpdateUserParams(String userName, String userPassword) {
+        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
+        paramsMap.add("id", String.valueOf(user.getId()));
+        paramsMap.add("userName", userName);
+        paramsMap.add("userPassword", userPassword);
+        paramsMap.add("tenantId", "-1");
+        paramsMap.add("queue", "");
+        paramsMap.add("email", "user-with-oauth2@example.com");
+        paramsMap.add("phone", "15800000000");
+        paramsMap.add("state", "1");
+        paramsMap.add("timeZone", "Asia/Shanghai");
+        return paramsMap;
     }
 }

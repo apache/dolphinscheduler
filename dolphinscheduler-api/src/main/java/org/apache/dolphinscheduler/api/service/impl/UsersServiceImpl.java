@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.security.AuthenticationType;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -62,6 +63,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -99,6 +101,20 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Autowired
     private SessionService sessionService;
 
+    @Value("${security.authentication.type:PASSWORD}")
+    private String securityAuthenticationType = AuthenticationType.PASSWORD.name();
+
+    @Value("${security.authentication.oauth2.enable:false}")
+    private boolean oauth2Enabled;
+
+    private boolean isPasswordManagementDisabled() {
+        if (oauth2Enabled) {
+            return true;
+        }
+        return StringUtils.isNotBlank(securityAuthenticationType)
+                && !AuthenticationType.PASSWORD.name().equals(securityAuthenticationType);
+    }
+
     /**
      * create user, only system admin have permission
      *
@@ -124,6 +140,10 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
                            int state) throws Exception {
         if (!isAdmin(loginUser)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
+        if (isPasswordManagementDisabled()) {
+            throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
         }
 
         // check all user params
@@ -354,7 +374,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             }
         }
 
-        if (StringUtils.isNotEmpty(userName)) {
+        if (StringUtils.isNotEmpty(userName) && !StringUtils.equals(userName, user.getUserName())) {
+
+            if (isPasswordManagementDisabled()) {
+                throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
+            }
 
             if (!CheckUtils.checkUserName(userName)) {
                 throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, userName);
@@ -369,6 +393,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         }
 
         if (StringUtils.isNotEmpty(userPassword)) {
+
+            if (isPasswordManagementDisabled()) {
+                throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
+            }
+
             if (!CheckUtils.checkPasswordLength(userPassword)) {
                 throw new ServiceException(Status.USER_PASSWORD_LENGTH_ERROR);
             }
@@ -872,6 +901,11 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     @Override
     @Transactional
     public User registerUser(String userName, String userPassword, String repeatPassword, String email) {
+
+        if (isPasswordManagementDisabled()) {
+            throw new ServiceException(Status.OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE);
+        }
+
         // check user params
         String msg = this.checkUserParams(userName, userPassword, email, "");
         if (!StringUtils.isEmpty(msg)) {

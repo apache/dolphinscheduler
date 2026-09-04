@@ -23,5 +23,7 @@ export default {
   confirm_password_tips: 'Please enter your confirm password',
   two_password_entries_are_inconsistent:
     'Two password entries are inconsistent',
-  submit: 'Submit'
+  submit: 'Submit',
+  not_supported_in_non_password_mode:
+    'Password modification is not supported in the current authentication mode, please modify it in the authentication system'
 }

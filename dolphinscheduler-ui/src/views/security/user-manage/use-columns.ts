@@ -208,6 +208,8 @@ export function useColumns(onCallback: Function) {
                           type: 'error',
                           size: 'small',
                           class: 'edit',
+                          disabled:
+                            userStore.getSecurityConfigType !== 'PASSWORD',
                           onClick: () =>
                             void onCallback({ rowData }, 'resetPassword')
                         },

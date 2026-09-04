@@ -296,8 +296,8 @@ public class LoginController extends BaseController {
             }
             Session session = sessionService.createSessionIfAbsent(user);
             response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
-            response.sendRedirect(String.format("%s?sessionId=%s&authType=%s", oAuth2ClientProperties.getCallbackUrl(),
-                    session.getId(), "oauth2"));
+            response.sendRedirect(String.format("%s?sessionId=%s&authType=%s&securityConfigType=%s",
+                    oAuth2ClientProperties.getCallbackUrl(), session.getId(), "oauth2", "OAUTH2"));
         } catch (Exception ex) {
             log.error(ex.getMessage(), ex);
             response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
@@ -361,8 +361,8 @@ public class LoginController extends BaseController {
             Session session = sessionService.createSessionIfAbsent(user);
 
             response.setStatus(HttpStatus.SC_MOVED_TEMPORARILY);
-            response.sendRedirect(String.format("%s/login?sessionId=%s&authType=%s",
-                    apiConfig.getUiUrl(), session.getId(), "oidc"));
+            response.sendRedirect(String.format("%s/login?sessionId=%s&authType=%s&securityConfigType=%s",
+                    apiConfig.getUiUrl(), session.getId(), "oidc", "OIDC"));
         } catch (Exception ex) {
             log.error("A critical error occurred during the OIDC callback process.", ex);
             try {
