@@ -18,11 +18,11 @@
 package org.apache.dolphinscheduler.extract.base.client;
 
 import org.apache.dolphinscheduler.extract.base.StandardRpcResponse;
+import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.future.ResponseFuture;
 import org.apache.dolphinscheduler.extract.base.protocal.HeartBeatTransporter;
 import org.apache.dolphinscheduler.extract.base.protocal.Transporter;
 import org.apache.dolphinscheduler.extract.base.serialize.JsonSerializer;
-import org.apache.dolphinscheduler.extract.base.utils.ChannelUtils;
 
 import lombok.extern.slf4j.Slf4j;
 import io.netty.channel.ChannelFutureListener;
@@ -44,7 +44,11 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         log.info("Channel inactive: {}", ctx.channel());
-        nettyRemotingClient.onChannelInactive(ChannelUtils.toAddress(ctx.channel()));
+        // The channel is gone: no response can ever arrive, fail every in-flight request sent on
+        // it now instead of letting each caller wait for its individual RPC timeout.
+        ResponseFuture.failAllForChannel(ctx.channel(),
+                new RemoteException("Channel closed before response arrived: " + ctx.channel()));
+        nettyRemotingClient.onChannelInactive(ctx.channel());
         ctx.channel().close();
     }
 
@@ -60,14 +64,21 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             return;
         }
         StandardRpcResponse deserialize = JsonSerializer.deserialize(transporter.getBody(), StandardRpcResponse.class);
-        future.setIRpcResponse(deserialize);
+        // Only putResponse writes the field — it must go through the done-guard so a future that
+        // was already failed by a channel error cannot be silently resurrected by a late response.
+        // If deserialization throws, the request is still in FUTURE_TABLE, so the exception
+        // flowing into exceptionCaught below fails it with the real error instead of a timeout.
         future.putResponse(deserialize);
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("NettyClientHandler catch an exception on channel: {}", ctx.channel(), cause);
-        nettyRemotingClient.onChannelInactive(ChannelUtils.toAddress(ctx.channel()));
+        // Fail ALL in-flight requests on this channel with the REAL cause (e.g.
+        // TooLongFrameException from the maxFrameSize guard) — callers must not wait until RPC
+        // timeout, and the caller-side error inspection relies on the original exception.
+        ResponseFuture.failAllForChannel(ctx.channel(), cause);
+        nettyRemotingClient.onChannelInactive(ctx.channel());
         ctx.channel().close();
     }
 

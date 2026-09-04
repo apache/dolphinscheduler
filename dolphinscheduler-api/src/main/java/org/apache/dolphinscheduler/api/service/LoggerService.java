@@ -19,7 +19,11 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import java.io.IOException;
+import java.io.OutputStream;
 
 public interface LoggerService {
 
@@ -33,15 +37,6 @@ public interface LoggerService {
      * @return log string data
      */
     Result<ResponseTaskLog> queryLog(User loginUser, int taskInstId, int skipLineNum, int limit);
-
-    /**
-     * get log size
-     *
-     * @param loginUser   login user
-     * @param taskInstId task instance id
-     * @return log byte array
-     */
-    byte[] getLogBytes(User loginUser, int taskInstId);
 
     /**
      * query log
@@ -63,5 +58,27 @@ public interface LoggerService {
      * @param taskInstId  task instance id
      * @return log byte array
      */
+    byte[] getLogBytes(User loginUser, int taskInstId);
+
+    /**
+     * get log bytes
+     *
+     * @param loginUser   login user
+     * @param projectCode project code
+     * @param taskInstId  task instance id
+     * @return log byte array
+     */
     byte[] getLogBytes(User loginUser, long projectCode, int taskInstId);
+
+    /**
+     * Verify the user has permission to download the task log and return the task instance.
+     * Must be called BEFORE the HTTP response is committed (i.e., before StreamingResponseBody).
+     */
+    TaskInstance checkDownloadLogAuth(User loginUser, int taskInstId);
+
+    /**
+     * Stream the task instance log to the given output stream in bounded chunks. The caller must
+     * have already verified access via {@link #checkDownloadLogAuth}.
+     */
+    void streamLogBytes(TaskInstance taskInstance, OutputStream outputStream) throws IOException;
 }
