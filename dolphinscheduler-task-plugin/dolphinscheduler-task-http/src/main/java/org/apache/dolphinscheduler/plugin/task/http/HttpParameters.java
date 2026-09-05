@@ -56,6 +56,17 @@ public class HttpParameters extends AbstractParameters {
      */
     private int connectTimeout;
 
+    /**
+     * Whether to enable TCP keepalive (SO_KEEPALIVE) on the request socket.
+     * <p>
+     * Useful when the backend is reachable through a stateful firewall / NAT /
+     * security group that evicts idle TCP sessions: keepalive probes refresh the
+     * conntrack entry while the worker is waiting on a long-lived response. Note the
+     * probe interval itself is governed by the worker host OS sysctls
+     * ({@code net.ipv4.tcp_keepalive_time} etc), not by this JVM setting.
+     */
+    private boolean socketKeepAlive;
+
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(url) && httpRequestMethod != null
