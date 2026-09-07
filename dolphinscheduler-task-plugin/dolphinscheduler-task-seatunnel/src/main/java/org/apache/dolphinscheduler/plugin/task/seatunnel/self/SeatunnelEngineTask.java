@@ -46,7 +46,7 @@ public class SeatunnelEngineTask extends SeatunnelTask {
     public List<String> buildOptions() throws Exception {
         List<String> args = super.buildOptions();
         if (!Objects.isNull(seatunnelParameters.getDeployMode())) {
-            args.add(Constants.DEPLOY_MODE_OPTIONS);
+            args.add(Constants.MASTER_OPTIONS);
             args.add(seatunnelParameters.getDeployMode().getCommand());
         }
         if (StringUtils.isNotBlank(seatunnelParameters.getOthers())) {

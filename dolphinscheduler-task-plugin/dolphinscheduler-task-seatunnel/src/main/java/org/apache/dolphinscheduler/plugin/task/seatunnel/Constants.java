@@ -24,7 +24,6 @@ public class Constants {
     }
 
     public static final String CONFIG_OPTIONS = "--config";
-    public static final String DEPLOY_MODE_OPTIONS = "--deploy-mode";
     public static final String MASTER_OPTIONS = "--master";
     public static final String STARTUP_SCRIPT_SPARK = "spark";
     public static final String STARTUP_SCRIPT_FLINK = "flink";
