@@ -24,6 +24,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.DEFAULT_
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.TASK_TYPE_SET_K8S;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.shell.AbstractShell.ExitCodeException;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -242,6 +243,11 @@ public final class ProcessUtils {
             OSUtils.exeCmd(checkCmd);
             // If the command executes successfully, the process exists
             return true;
+        } catch (ExitCodeException e) {
+            // `kill -0` may exit with code 0 but still raise an ExitCodeException because the tenant
+            // login shell wrote to stderr (e.g. "HISTSIZE: readonly variable" warnings from /etc/profile.d).
+            // Exit code 0 means the signal check succeeded, so the process is actually alive.
+            return e.getExitCode() == 0;
         } catch (Exception e) {
             // If the command fails, the process does not exist
             return false;

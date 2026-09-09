@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import org.apache.dolphinscheduler.common.shell.AbstractShell.ExitCodeException;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -49,6 +50,7 @@ public class ProcessUtilsTest {
             mockedOSUtils.close();
         }
     }
+
     @Test
     public void testGetPidList() throws Exception {
         // first
@@ -197,6 +199,44 @@ public class ProcessUtilsTest {
         // Verify SIGTERM,SIGKILL was never called
         mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 12345 1234"), Mockito.never());
         mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 12345 1234"), Mockito.never());
+    }
+
+    @Test
+    void testKillProcessShouldKillPermittedChildrenWhenSudoParentCheckIsDenied() throws Exception {
+        TaskExecutionContext taskRequest = Mockito.mock(TaskExecutionContext.class);
+        Mockito.when(taskRequest.getProcessId()).thenReturn(12345);
+        Mockito.when(taskRequest.getTenantCode()).thenReturn("testTenant");
+
+        String pstreeCmd;
+        String pstreeOutput;
+        if (SystemUtils.IS_OS_MAC) {
+            pstreeCmd = "pstree -sp 12345";
+            pstreeOutput = "-+= 12345 sudo -+- 1234 86.sh --- 5678 python3";
+        } else {
+            pstreeCmd = "pstree -p 12345";
+            pstreeOutput = "sudo(12345)---86.sh(1234)---python3(5678)";
+        }
+        mockedOSUtils.when(() -> OSUtils.exeCmd(pstreeCmd)).thenReturn(pstreeOutput);
+
+        mockedOSUtils.when(() -> OSUtils.getSudoCmd(Mockito.eq("testTenant"), Mockito.anyString()))
+                .thenAnswer(invocation -> invocation.getArgument(1));
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -0 12345"))
+                .thenThrow(new ExitCodeException(1, "Operation not permitted"));
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -0 1234"))
+                .thenThrow(new ExitCodeException(0, "HISTSIZE: readonly variable"))
+                .thenThrow(new ExitCodeException(1, "No such process"));
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -0 5678"))
+                .thenThrow(new ExitCodeException(0, "HISTSIZE: readonly variable"))
+                .thenThrow(new ExitCodeException(1, "No such process"));
+        mockedOSUtils.when(() -> OSUtils.exeCmd("kill -2 1234 5678")).thenReturn("");
+
+        boolean result = ProcessUtils.kill(taskRequest);
+
+        Assertions.assertTrue(result);
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 1234 5678"), Mockito.times(1));
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -2 12345 1234 5678"), Mockito.never());
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -15 1234 5678"), Mockito.never());
+        mockedOSUtils.verify(() -> OSUtils.exeCmd("kill -9 1234 5678"), Mockito.never());
     }
 
     @Test
