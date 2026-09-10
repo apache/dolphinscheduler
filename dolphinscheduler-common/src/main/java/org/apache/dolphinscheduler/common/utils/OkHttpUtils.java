@@ -44,9 +44,7 @@ public class OkHttpUtils {
     private static OkHttpClient CLIENT = new OkHttpClient();
 
     /**
-     * Socket factory that builds sockets with TCP keepalive (SO_KEEPALIVE) enabled. OkHttp creates the
-     * raw socket via {@link SocketFactory#createSocket()} and connects it itself; enabling keepalive on the
-     * returned socket is preserved once the connection is established.
+     * Socket factory that enables TCP keepalive (SO_KEEPALIVE) on the sockets OkHttp creates.
      */
     private static final SocketFactory KEEP_ALIVE_SOCKET_FACTORY = new SocketFactory() {
 
