@@ -82,6 +82,16 @@ public class OkHttpUtils {
     };
 
     /**
+     * Base client for requests with TCP keepalive enabled. OkHttp ignores the socket factory when
+     * deciding whether a pooled connection can be reused, so it must not share the connection pool
+     * with {@link #CLIENT}, otherwise a connection created without keepalive could be reused by a
+     * keepalive request and vice versa.
+     */
+    private static final OkHttpClient KEEP_ALIVE_CLIENT = new OkHttpClient().newBuilder()
+            .socketFactory(KEEP_ALIVE_SOCKET_FACTORY)
+            .build();
+
+    /**
      * http get request
      * @param connectTimeout connect timeout in milliseconds
      * @param writeTimeout write timeout in milliseconds
@@ -312,11 +322,11 @@ public class OkHttpUtils {
                                               int writeTimeout,
                                               int readTimeout,
                                               boolean keepAlive) {
-        return CLIENT.newBuilder()
+        OkHttpClient baseClient = keepAlive ? KEEP_ALIVE_CLIENT : CLIENT;
+        return baseClient.newBuilder()
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                 .writeTimeout(writeTimeout, TimeUnit.MILLISECONDS)
                 .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
-                .socketFactory(keepAlive ? KEEP_ALIVE_SOCKET_FACTORY : SocketFactory.getDefault())
                 .build();
     }
 }
