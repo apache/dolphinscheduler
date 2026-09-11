@@ -1016,6 +1016,14 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/spark.html',
                             },
                             {
+                                title: 'Presto',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/presto.html',
+                            },
+                            {
+                                title: 'SQL SERVER',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/sqlserver.html',
+                            },
+                            {
                                 title: 'Amazon Athena',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/athena.html',
                             },
@@ -1026,6 +1034,14 @@ export default {
                             {
                                 title: 'Redshift',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/redshift.html',
+                            },
+                            {
+                                title: 'ClickHouse',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/clickhouse.html',
+                            },
+                            {
+                                title: 'IBM DB2',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/db2.html',
                             },
                             {
                                 title: 'Oracle',
