@@ -19,8 +19,11 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 
+import java.io.OutputStream;
 import java.lang.reflect.Field;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,11 +31,11 @@ import java.util.List;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.internal.connection.RealConnection;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import com.sun.net.httpserver.HttpServer;
 
 class OkHttpUtilsTest {
 
@@ -40,14 +43,9 @@ class OkHttpUtilsTest {
 
     @Test
     void testSocketKeepAliveIsAppliedPerSetting() throws Exception {
-        MockWebServer server = new MockWebServer();
+        HttpServer server = startServer();
         try {
-            server.enqueue(new MockResponse().setBody("ok"));
-            // the second response is consumed by the keepalive request only when it opens its own
-            // connection, which is exactly what this test asserts
-            server.enqueue(new MockResponse().setBody("ok"));
-            server.start();
-            String url = server.url("/").toString();
+            String url = "http://127.0.0.1:" + server.getAddress().getPort() + "/keep-alive";
 
             OkHttpUtils.get(url, new OkHttpRequestHeaders(), null, TIMEOUT, TIMEOUT, TIMEOUT, false);
             OkHttpUtils.get(url, new OkHttpRequestHeaders(), null, TIMEOUT, TIMEOUT, TIMEOUT, true);
@@ -65,8 +63,21 @@ class OkHttpUtilsTest {
                 Assertions.assertTrue(socket.getKeepAlive(), "the keepalive connection should enable TCP keepalive");
             }
         } finally {
-            server.shutdown();
+            server.stop(0);
         }
+    }
+
+    private static HttpServer startServer() throws Exception {
+        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
+        server.createContext("/keep-alive", exchange -> {
+            byte[] body = "ok".getBytes(StandardCharsets.UTF_8);
+            exchange.sendResponseHeaders(200, body.length);
+            try (OutputStream outputStream = exchange.getResponseBody()) {
+                outputStream.write(body);
+            }
+        });
+        server.start();
+        return server;
     }
 
     private static OkHttpClient baseClient(String fieldName) throws Exception {
