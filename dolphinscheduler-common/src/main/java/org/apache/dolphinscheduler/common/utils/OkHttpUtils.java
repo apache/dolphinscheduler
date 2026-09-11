@@ -39,6 +39,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class OkHttpUtils {
 
     private static OkHttpClient CLIENT = new OkHttpClient();
@@ -312,16 +314,11 @@ public class OkHttpUtils {
         return response.body().string();
     }
 
-    private static OkHttpClient getHttpClient(int connectTimeout,
-                                              int writeTimeout,
-                                              int readTimeout) {
-        return getHttpClient(connectTimeout, writeTimeout, readTimeout, false);
-    }
-
-    private static OkHttpClient getHttpClient(int connectTimeout,
-                                              int writeTimeout,
-                                              int readTimeout,
-                                              boolean keepAlive) {
+    @VisibleForTesting
+    static OkHttpClient getHttpClient(int connectTimeout,
+                                      int writeTimeout,
+                                      int readTimeout,
+                                      boolean keepAlive) {
         OkHttpClient baseClient = keepAlive ? KEEP_ALIVE_CLIENT : CLIENT;
         return baseClient.newBuilder()
                 .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)

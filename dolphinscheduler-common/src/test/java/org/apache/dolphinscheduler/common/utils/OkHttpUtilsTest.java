@@ -19,18 +19,16 @@ package org.apache.dolphinscheduler.common.utils;
 
 import org.apache.dolphinscheduler.common.model.OkHttpRequestHeaders;
 
+import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.reflect.Field;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
-import okhttp3.internal.connection.RealConnection;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,34 +40,85 @@ class OkHttpUtilsTest {
     private static final int TIMEOUT = 10_000;
 
     @Test
-    void testSocketKeepAliveIsAppliedPerSetting() throws Exception {
-        HttpServer server = startServer();
+    void testKeepAliveAndPlainClientsAreSeparated() throws Exception {
+        OkHttpClient plainClient = OkHttpUtils.getHttpClient(TIMEOUT, TIMEOUT, TIMEOUT, false);
+        OkHttpClient keepAliveClient = OkHttpUtils.getHttpClient(TIMEOUT, TIMEOUT, TIMEOUT, true);
+
+        Assertions.assertNotSame(plainClient.connectionPool(), keepAliveClient.connectionPool(),
+                "the two settings must not share a connection pool");
+        try (Socket plainSocket = plainClient.socketFactory().createSocket()) {
+            Assertions.assertFalse(plainSocket.getKeepAlive(), "the plain client must not enable TCP keepalive");
+        }
+        try (Socket keepAliveSocket = keepAliveClient.socketFactory().createSocket()) {
+            Assertions.assertTrue(keepAliveSocket.getKeepAlive(), "the keepalive client must enable TCP keepalive");
+        }
+    }
+
+    @Test
+    void testKeepAliveRequestDoesNotReusePlainConnection() throws Exception {
+        resetConnectionPools();
+        List<Integer> remotePorts = new CopyOnWriteArrayList<>();
+        HttpServer server = startServer(remotePorts);
         try {
-            String url = "http://127.0.0.1:" + server.getAddress().getPort() + "/keep-alive";
-
+            String url = urlOf(server);
             OkHttpUtils.get(url, new OkHttpRequestHeaders(), null, TIMEOUT, TIMEOUT, TIMEOUT, false);
+            assertPooledConnectionCount(false, 1);
+            assertPooledConnectionCount(true, 0);
+
             OkHttpUtils.get(url, new OkHttpRequestHeaders(), null, TIMEOUT, TIMEOUT, TIMEOUT, true);
-
-            List<Socket> plainSockets = pooledSockets(baseClient("CLIENT"));
-            List<Socket> keepAliveSockets = pooledSockets(baseClient("KEEP_ALIVE_CLIENT"));
-
-            Assertions.assertFalse(plainSockets.isEmpty(), "the socket of the plain request should be pooled");
-            Assertions.assertFalse(keepAliveSockets.isEmpty(),
-                    "the keepalive request must not reuse the pooled socket of the plain request");
-            for (Socket socket : plainSockets) {
-                Assertions.assertFalse(socket.getKeepAlive(), "the plain connection should not enable TCP keepalive");
-            }
-            for (Socket socket : keepAliveSockets) {
-                Assertions.assertTrue(socket.getKeepAlive(), "the keepalive connection should enable TCP keepalive");
-            }
+            assertPooledConnectionCount(false, 1);
+            assertPooledConnectionCount(true, 1);
+            assertRequestsUseDistinctConnections(remotePorts);
         } finally {
             server.stop(0);
         }
     }
 
-    private static HttpServer startServer() throws Exception {
+    @Test
+    void testPlainRequestDoesNotReuseKeepAliveConnection() throws Exception {
+        resetConnectionPools();
+        List<Integer> remotePorts = new CopyOnWriteArrayList<>();
+        HttpServer server = startServer(remotePorts);
+        try {
+            String url = urlOf(server);
+            OkHttpUtils.get(url, new OkHttpRequestHeaders(), null, TIMEOUT, TIMEOUT, TIMEOUT, true);
+            assertPooledConnectionCount(true, 1);
+            assertPooledConnectionCount(false, 0);
+
+            OkHttpUtils.get(url, new OkHttpRequestHeaders(), null, TIMEOUT, TIMEOUT, TIMEOUT, false);
+            assertPooledConnectionCount(true, 1);
+            assertPooledConnectionCount(false, 1);
+            assertRequestsUseDistinctConnections(remotePorts);
+        } finally {
+            server.stop(0);
+        }
+    }
+
+    private static void assertRequestsUseDistinctConnections(List<Integer> remotePorts) {
+        Assertions.assertEquals(2, remotePorts.size(), "both requests should reach the server");
+        Assertions.assertEquals(2, new HashSet<>(remotePorts).size(),
+                "the two requests reused one TCP connection, remote ports: " + remotePorts);
+    }
+
+    private static void assertPooledConnectionCount(boolean keepAlive, int expected) {
+        int actual = clientOf(keepAlive).connectionPool().connectionCount();
+        Assertions.assertEquals(expected, actual,
+                "unexpected pooled connection count of the keepAlive=" + keepAlive + " client");
+    }
+
+    private static void resetConnectionPools() {
+        clientOf(false).connectionPool().evictAll();
+        clientOf(true).connectionPool().evictAll();
+    }
+
+    private static OkHttpClient clientOf(boolean keepAlive) {
+        return OkHttpUtils.getHttpClient(TIMEOUT, TIMEOUT, TIMEOUT, keepAlive);
+    }
+
+    private static HttpServer startServer(List<Integer> remotePorts) throws IOException {
         HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         server.createContext("/keep-alive", exchange -> {
+            remotePorts.add(exchange.getRemoteAddress().getPort());
             byte[] body = "ok".getBytes(StandardCharsets.UTF_8);
             exchange.sendResponseHeaders(200, body.length);
             try (OutputStream outputStream = exchange.getResponseBody()) {
@@ -80,21 +129,7 @@ class OkHttpUtilsTest {
         return server;
     }
 
-    private static OkHttpClient baseClient(String fieldName) throws Exception {
-        Field field = OkHttpUtils.class.getDeclaredField(fieldName);
-        field.setAccessible(true);
-        return (OkHttpClient) field.get(null);
-    }
-
-    private static List<Socket> pooledSockets(OkHttpClient client) throws Exception {
-        ConnectionPool pool = client.connectionPool();
-        Field connectionsField = pool.getDelegate$okhttp().getClass().getDeclaredField("connections");
-        connectionsField.setAccessible(true);
-        Collection<?> connections = (Collection<?>) connectionsField.get(pool.getDelegate$okhttp());
-        List<Socket> sockets = new ArrayList<>(connections.size());
-        for (Object connection : connections) {
-            sockets.add(((RealConnection) connection).socket());
-        }
-        return sockets;
+    private static String urlOf(HttpServer server) {
+        return "http://127.0.0.1:" + server.getAddress().getPort() + "/keep-alive";
     }
 }
