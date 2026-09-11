@@ -221,6 +221,18 @@ export default {
                                 title: 'Remote Shell',
                                 link: '/en-us/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
+                            {
+                                title: 'Aliyun Serverless Spark',
+                                link: '/en-us/docs/dev/user_doc/guide/task/aliyun-serverless-spark.html',
+                            },
+                            {
+                                title: 'Azure DataFactory',
+                                link: '/en-us/docs/dev/user_doc/guide/task/datafactory.html',
+                            },
+                            {
+                                title: 'gRPC',
+                                link: '/en-us/docs/dev/user_doc/guide/task/grpc.html',
+                            },
                         ],
                     },
                     {
@@ -948,6 +960,18 @@ export default {
                             {
                                 title: 'Remote Shell',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/remoteshell.html',
+                            },
+                            {
+                                title: 'Aliyun Serverless Spark',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/aliyun-serverless-spark.html',
+                            },
+                            {
+                                title: 'Azure DataFactory',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/datafactory.html',
+                            },
+                            {
+                                title: 'gRPC',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/grpc.html',
                             },
                         ],
                     },
