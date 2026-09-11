@@ -42,7 +42,7 @@ export function useOpenmldb({
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
-    workerGroup: 'default',
+    workerGroup: null,
     delayTime: 0,
     timeout: 30,
     zk: '',

@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.api.validator.workflow;
 import org.apache.dolphinscheduler.api.validator.IValidator;
 import org.apache.dolphinscheduler.api.validator.StartParamListValidator;
 import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidationContext;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidator;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 
@@ -35,10 +37,14 @@ public class TriggerWorkflowDTOValidator implements IValidator<TriggerWorkflowDT
 
     private final StartParamListValidator startParamListValidator;
 
+    private final WorkerGroupValidator workerGroupValidator;
+
     public TriggerWorkflowDTOValidator(TenantExistValidator tenantExistValidator,
-                                       StartParamListValidator startParamListValidator) {
+                                       StartParamListValidator startParamListValidator,
+                                       WorkerGroupValidator workerGroupValidator) {
         this.tenantExistValidator = tenantExistValidator;
         this.startParamListValidator = startParamListValidator;
+        this.workerGroupValidator = workerGroupValidator;
     }
 
     @Override
@@ -56,5 +62,11 @@ public class TriggerWorkflowDTOValidator implements IValidator<TriggerWorkflowDT
         tenantExistValidator.validate(triggerWorkflowDTO.getTenantCode());
 
         startParamListValidator.validate(triggerWorkflowDTO.getStartParamList());
+
+        WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
+                .workerGroup(triggerWorkflowDTO.getWorkerGroup())
+                .projectCode(triggerWorkflowDTO.getWorkflowDefinition().getProjectCode())
+                .build();
+        workerGroupValidator.validate(workerGroupContext);
     }
 }

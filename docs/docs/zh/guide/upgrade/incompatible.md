@@ -56,3 +56,10 @@
   * **移除的派生属性**：`cmdTypeIfComplement`、`complementData`（补数执行相关，如需获取请使用详情接口）
   * 如需获取这些字段，请使用详情接口 `GET /projects/{projectCode}/workflow-instances/{id}`，该接口仍返回完整的 `WorkflowInstance` 对象 ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
 
+## 3.5.0
+
+* Worker 组（workerGroup）现在必须预先分配给项目后才能使用([#18293](https://github.com/apache/dolphinscheduler/pull/18293))：
+  * 前端不再为工作流定义、运行表单和项目偏好提供默认的 `default` worker 组，未指定时提交为 `null`。
+  * 在创建或更新工作流定义、创建或更新定时、更新项目偏好、复制或移动工作流定义到其他项目、以及上线工作流时，后端会校验任务和定时使用的 worker 组是否已分配给相关项目；未分配的 worker 组将导致请求失败（错误码 `WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT`，1402005）。
+  * 为避免破坏存量数据，已显式分配给项目的 worker 组、以及被项目内任务或定时**实际使用**的 worker 组，仍视为已分配；仅需关注使用新 worker 组的场景。
+

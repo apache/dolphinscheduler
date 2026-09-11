@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
+import java.time.Duration;
 import java.util.List;
 
 import lombok.Getter;
@@ -69,6 +70,12 @@ public abstract class TaskNodeForm {
             @FindBy(className = "n-base-selection"),
     })
     private WebElement selectEnv;
+
+    @FindBys({
+            @FindBy(className = "worker-group-select"),
+            @FindBy(className = "n-base-selection"),
+    })
+    private WebElement selectWorkerGroup;
 
     @FindBys({
             @FindBy(className = "btn-custom-parameters"),
@@ -137,6 +144,26 @@ public abstract class TaskNodeForm {
                 .filter(it -> it.getText().contains(envName))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No such envName: " + envName))
+                .click();
+
+        return this;
+    }
+
+    public TaskNodeForm setWorkerGroup(String workerGroupName) {
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectWorkerGroup);
+
+        final By optionsLocator = By.xpath(
+                "//div[contains(@class, 'n-select-menu')]//div[contains(@class, 'n-base-select-option')]");
+
+        WebDriverWaitFactory.createWebDriverWait(parent().driver(), Duration.ofSeconds(5))
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        parent().driver()
+                .findElements(optionsLocator)
+                .stream()
+                .filter(it -> workerGroupName.equals(it.getText().trim()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such worker group: " + workerGroupName))
                 .click();
 
         return this;

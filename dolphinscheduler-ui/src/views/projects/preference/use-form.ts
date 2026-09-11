@@ -59,7 +59,7 @@ export function useForm() {
   const data = reactive({
     model: {
       taskPriority: 'MEDIUM',
-      workerGroup: 'default',
+      workerGroup: null,
       environmentCode: null,
       failRetryTimes: 0,
       failRetryInterval: 1,

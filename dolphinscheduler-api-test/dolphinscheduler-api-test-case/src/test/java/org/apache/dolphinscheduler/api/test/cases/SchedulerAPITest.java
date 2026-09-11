@@ -98,6 +98,11 @@ public class SchedulerAPITest {
 
         projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
                 .getBody().getData()).get(0)).get("code");
+
+        String[] workerGroups = {"default"};
+        HttpResponse assignWorkerGroupsResponse = projectPage.assignWorkerGroups(loginUser, projectCode, workerGroups);
+        Assertions.assertTrue(assignWorkerGroupsResponse.getBody().getSuccess());
+
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
         workflowDefinitionPage.createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);

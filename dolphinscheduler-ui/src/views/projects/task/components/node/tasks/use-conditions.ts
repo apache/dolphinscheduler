@@ -40,7 +40,7 @@ export function useConditions({
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
-    workerGroup: 'default',
+    workerGroup: null,
     timeout: 30,
     relation: 'AND',
     dependTaskList: [],
