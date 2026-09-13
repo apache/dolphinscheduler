@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
+import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
@@ -35,15 +36,18 @@ import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -82,6 +86,12 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
     @Autowired
     private TaskDefinitionDao taskDefinitionDao;
 
+    @Autowired
+    private WorkerGroupDao workerGroupDao;
+
+    @Autowired
+    private WorkerGroupService workerGroupService;
+
     /**
      * create environment
      *
@@ -111,6 +121,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             throw new ServiceException(Status.ENVIRONMENT_NAME_EXISTS, name);
         }
 
+        List<String> workerGroupList = parseWorkerGroupList(workerGroups);
+        Map<String, WorkerGroup> workerGroupMap = queryWorkerGroupMap(workerGroupList);
+
         Environment env = new Environment();
         env.setName(name);
         env.setConfig(config);
@@ -121,25 +134,20 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
         env.setCode(CodeGenerateUtils.genCode());
 
         if (environmentMapper.insert(env) > 0) {
-            if (!StringUtils.isEmpty(workerGroups)) {
-                List<String> workerGroupList = JSONUtils.parseObject(workerGroups, new TypeReference<List<String>>() {
+            if (CollectionUtils.isNotEmpty(workerGroupList)) {
+                workerGroupList.forEach(workerGroup -> {
+                    EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
+                    relation.setEnvironmentCode(env.getCode());
+                    relation.setWorkerGroupId(workerGroupMap.get(workerGroup).getId());
+                    relation.setWorkerGroup(workerGroup);
+                    relation.setOperator(loginUser.getId());
+                    relation.setCreateTime(new Date());
+                    relation.setUpdateTime(new Date());
+                    relationMapper.insert(relation);
+                    log.info(
+                            "Environment-WorkerGroup relation create complete, environmentCode:{}, workerGroupId:{}.",
+                            env.getCode(), relation.getWorkerGroupId());
                 });
-                if (CollectionUtils.isNotEmpty(workerGroupList)) {
-                    workerGroupList.stream().forEach(workerGroup -> {
-                        if (!StringUtils.isEmpty(workerGroup)) {
-                            EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
-                            relation.setEnvironmentCode(env.getCode());
-                            relation.setWorkerGroup(workerGroup);
-                            relation.setOperator(loginUser.getId());
-                            relation.setCreateTime(new Date());
-                            relation.setUpdateTime(new Date());
-                            relationMapper.insert(relation);
-                            log.info(
-                                    "Environment-WorkerGroup relation create complete, environmentName:{}, workerGroup:{}.",
-                                    env.getName(), relation.getWorkerGroup());
-                        }
-                    });
-                }
             }
             return env.getCode();
         }
@@ -329,13 +337,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             throw new ServiceException(Status.ENVIRONMENT_NAME_EXISTS, name);
         }
 
-        Set<String> workerGroupSet;
-        if (!StringUtils.isEmpty(workerGroups)) {
-            workerGroupSet = JSONUtils.parseObject(workerGroups, new TypeReference<Set<String>>() {
-            });
-        } else {
-            workerGroupSet = new TreeSet<>();
-        }
+        Set<String> workerGroupSet = new TreeSet<>(parseWorkerGroupList(workerGroups));
 
         Set<String> existWorkerGroupSet = relationMapper
                 .queryByEnvironmentCode(code)
@@ -345,6 +347,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
 
         Set<String> deleteWorkerGroupSet = SetUtils.difference(existWorkerGroupSet, workerGroupSet).toSet();
         Set<String> addWorkerGroupSet = SetUtils.difference(workerGroupSet, existWorkerGroupSet).toSet();
+        Map<String, WorkerGroup> workerGroupMap = queryWorkerGroupMap(addWorkerGroupSet);
 
         // verify whether the relation of this environment and worker groups can be adjusted
         checkUsedEnvironmentWorkerGroupRelation(deleteWorkerGroupSet, name, code);
@@ -374,6 +377,7 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             if (StringUtils.isNotEmpty(key)) {
                 EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
                 relation.setEnvironmentCode(code);
+                relation.setWorkerGroupId(workerGroupMap.get(key).getId());
                 relation.setWorkerGroup(key);
                 relation.setUpdateTime(new Date());
                 relation.setCreateTime(new Date());
@@ -416,6 +420,49 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
                         environmentName, collect);
             }
         }
+    }
+
+    private List<String> parseWorkerGroupList(String workerGroups) {
+        if (StringUtils.isEmpty(workerGroups)) {
+            return Collections.emptyList();
+        }
+        List<String> workerGroupList = JSONUtils.parseObject(workerGroups, new TypeReference<List<String>>() {
+        });
+        if (CollectionUtils.isEmpty(workerGroupList)) {
+            return Collections.emptyList();
+        }
+        return workerGroupList.stream()
+                .filter(StringUtils::isNotEmpty)
+                .collect(Collectors.toList());
+    }
+
+    private Map<String, WorkerGroup> queryWorkerGroupMap(Collection<String> workerGroupNames) {
+        if (CollectionUtils.isEmpty(workerGroupNames)) {
+            return Collections.emptyMap();
+        }
+        Set<String> nonEmptyWorkerGroupNames = workerGroupNames.stream()
+                .filter(StringUtils::isNotEmpty)
+                .collect(Collectors.toCollection(TreeSet::new));
+        if (CollectionUtils.isEmpty(nonEmptyWorkerGroupNames)) {
+            return Collections.emptyMap();
+        }
+
+        List<WorkerGroup> workerGroups = workerGroupDao.queryWorkerGroupByNames(nonEmptyWorkerGroupNames);
+        Map<String, WorkerGroup> workerGroupMap = CollectionUtils.emptyIfNull(workerGroups).stream()
+                .collect(Collectors.toMap(WorkerGroup::getName, workerGroup -> workerGroup));
+        if (!workerGroupMap.keySet().containsAll(nonEmptyWorkerGroupNames)) {
+            // Configuration-defined groups are identified by name and have no database id.
+            workerGroupService.getConfigWorkerGroupPageDetail().stream()
+                    .filter(workerGroup -> nonEmptyWorkerGroupNames.contains(workerGroup.getName()))
+                    .forEach(workerGroup -> workerGroupMap.putIfAbsent(workerGroup.getName(), workerGroup));
+        }
+        Set<String> notExistWorkerGroups =
+                SetUtils.difference(nonEmptyWorkerGroupNames, workerGroupMap.keySet()).toSet();
+        if (CollectionUtils.isNotEmpty(notExistWorkerGroups)) {
+            throw new ServiceException(Status.WORKER_GROUP_NOT_EXIST,
+                    String.join(",", new TreeSet<>(notExistWorkerGroups)));
+        }
+        return workerGroupMap;
     }
 
     protected void checkParams(String name, String config, String workerGroups) {

@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface WorkerGroupDao extends IDao<WorkerGroup> {
@@ -30,4 +31,6 @@ public interface WorkerGroupDao extends IDao<WorkerGroup> {
     List<WorkerGroup> queryAllWorkerGroup();
 
     List<WorkerGroup> queryWorkerGroupByName(String name);
+
+    List<WorkerGroup> queryWorkerGroupByNames(Collection<String> names);
 }
