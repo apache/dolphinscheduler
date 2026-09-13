@@ -21,5 +21,5 @@ FROM t_ds_worker_group wg
 WHERE ewgr.worker_group_id IS NULL
   AND ewgr.worker_group = wg.name;
 
-ALTER TABLE t_ds_environment_worker_group_relation
-ALTER COLUMN worker_group_id SET NOT NULL;
+-- Configuration-defined groups and unmatched legacy names have no database id.
+-- Keep these relations name-based with a NULL worker_group_id.

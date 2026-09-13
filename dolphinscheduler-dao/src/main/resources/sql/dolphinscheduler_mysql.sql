@@ -1152,7 +1152,7 @@ DROP TABLE IF EXISTS `t_ds_environment_worker_group_relation`;
 CREATE TABLE `t_ds_environment_worker_group_relation` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT 'id',
   `environment_code` bigint(20) NOT NULL COMMENT 'environment code',
-  `worker_group_id` int(11) NOT NULL COMMENT 'worker group id',
+  `worker_group_id` int(11) DEFAULT NULL COMMENT 'worker group id, NULL for configuration-defined or unmatched legacy groups',
   `worker_group` varchar(255) NOT NULL COMMENT 'worker group name',
   `operator` int(11) DEFAULT NULL COMMENT 'operator user id',
   `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,

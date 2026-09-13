@@ -20,5 +20,5 @@ INNER JOIN `t_ds_worker_group` wg ON ewgr.`worker_group` = wg.`name`
 SET ewgr.`worker_group_id` = wg.`id`
 WHERE ewgr.`worker_group_id` IS NULL;
 
-ALTER TABLE `t_ds_environment_worker_group_relation`
-MODIFY COLUMN `worker_group_id` int(11) NOT NULL COMMENT 'worker group id';
+-- Configuration-defined groups and unmatched legacy names have no database id.
+-- Keep these relations name-based with a NULL worker_group_id.

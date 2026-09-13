@@ -30,16 +30,19 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
+import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.utils.ServiceTestUtil;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
@@ -68,6 +71,10 @@ import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -93,6 +100,9 @@ public class EnvironmentServiceTest {
 
     @Mock
     private WorkerGroupDao workerGroupDao;
+
+    @Mock
+    private WorkerGroupService workerGroupService;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -212,6 +222,115 @@ public class EnvironmentServiceTest {
         Assertions.assertTrue(relationCaptor.getAllValues().stream()
                 .anyMatch(relation -> "server2".equals(relation.getWorkerGroup())
                         && Integer.valueOf(2).equals(relation.getWorkerGroupId())));
+    }
+
+    @Test
+    public void testCreateEnvironmentWithConfigAndDatabaseWorkerGroups() {
+        allowEnvironmentOperation(ENVIRONMENT_CREATE);
+        WorkerGroupPageDetail configGroup = new WorkerGroupPageDetail();
+        configGroup.setName("configured");
+        WorkerGroupPageDetail overlappingGroup = new WorkerGroupPageDetail();
+        overlappingGroup.setName("default");
+        when(workerGroupService.getConfigWorkerGroupPageDetail())
+                .thenReturn(Lists.newArrayList(configGroup, configGroup, overlappingGroup));
+        when(workerGroupDao.queryWorkerGroupByNames(any()))
+                .thenReturn(Collections.singletonList(getWorkerGroup(1, "default")));
+        when(environmentMapper.insert(any(Environment.class))).thenReturn(1);
+
+        Long code = environmentService.createEnvironment(getAdminUser(), "testName", "test", "test",
+                "[\"default\",\"configured\"]");
+
+        ArgumentCaptor<EnvironmentWorkerGroupRelation> captor =
+                ArgumentCaptor.forClass(EnvironmentWorkerGroupRelation.class);
+        Mockito.verify(relationMapper, Mockito.times(2)).insert(captor.capture());
+        EnvironmentWorkerGroupRelation databaseRelation = captor.getAllValues().get(0);
+        assertEquals("default", databaseRelation.getWorkerGroup());
+        assertEquals(1, databaseRelation.getWorkerGroupId());
+        EnvironmentWorkerGroupRelation configRelation = captor.getAllValues().get(1);
+        assertEquals("configured", configRelation.getWorkerGroup());
+        Assertions.assertNull(configRelation.getWorkerGroupId());
+        assertEquals(code, configRelation.getEnvironmentCode());
+    }
+
+    @Test
+    public void testUpdateEnvironmentAddsConfigWorkerGroup() {
+        allowEnvironmentOperation(ENVIRONMENT_UPDATE);
+        WorkerGroupPageDetail configGroup = new WorkerGroupPageDetail();
+        configGroup.setName("configured");
+        when(workerGroupService.getConfigWorkerGroupPageDetail())
+                .thenReturn(Collections.singletonList(configGroup));
+        when(environmentMapper.update(any(Environment.class), any(Wrapper.class))).thenReturn(1);
+
+        environmentService.updateEnvironmentByCode(getAdminUser(), 1L, "testName", "test", "test",
+                "[\"configured\"]");
+
+        ArgumentCaptor<EnvironmentWorkerGroupRelation> captor =
+                ArgumentCaptor.forClass(EnvironmentWorkerGroupRelation.class);
+        Mockito.verify(relationMapper).insert(captor.capture());
+        assertEquals("configured", captor.getValue().getWorkerGroup());
+        Assertions.assertNull(captor.getValue().getWorkerGroupId());
+        assertEquals(1L, captor.getValue().getEnvironmentCode());
+    }
+
+    @Test
+    public void testUpdateEnvironmentPreservesOfflineWorkerGroup() {
+        allowEnvironmentOperation(ENVIRONMENT_UPDATE);
+        when(relationMapper.queryByEnvironmentCode(1L))
+                .thenReturn(Collections.singletonList(getEnvironmentWorkerGroup()));
+        when(environmentMapper.update(any(Environment.class), any(Wrapper.class))).thenReturn(1);
+
+        Environment updated = environmentService.updateEnvironmentByCode(getAdminUser(), 1L,
+                "testName", "updated config", "updated description", "[\"new_worker_group\"]");
+
+        assertEquals("updated config", updated.getConfig());
+        assertEquals("updated description", updated.getDescription());
+        Mockito.verify(relationMapper, Mockito.never()).insert(any(EnvironmentWorkerGroupRelation.class));
+        Mockito.verify(relationMapper, Mockito.never()).delete(any(Wrapper.class));
+        Mockito.verifyNoInteractions(workerGroupDao, workerGroupService);
+    }
+
+    @Test
+    public void testCreateEnvironmentLogDoesNotIncludeUserControlledNewlines() {
+        allowEnvironmentOperation(ENVIRONMENT_CREATE);
+        String name = "environment\r\nforged-environment-entry";
+        String groupName = "worker\r\nforged-worker-entry";
+        when(workerGroupDao.queryWorkerGroupByNames(Collections.singleton(groupName)))
+                .thenReturn(Collections.singletonList(getWorkerGroup(1, groupName)));
+        when(environmentMapper.insert(any(Environment.class))).thenReturn(1);
+        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) environmentServiceLogger;
+        Level previousLevel = logger.getLevel();
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        logger.setLevel(Level.INFO);
+        try {
+            environmentService.createEnvironment(getAdminUser(), name, "test", "test",
+                    JSONUtils.toJsonString(Collections.singletonList(groupName)));
+
+            Assertions.assertFalse(appender.list.isEmpty());
+            for (ILoggingEvent event : appender.list) {
+                Assertions.assertFalse(event.getFormattedMessage().contains("\r"));
+                Assertions.assertFalse(event.getFormattedMessage().contains("\n"));
+            }
+            ArgumentCaptor<Environment> envCaptor = ArgumentCaptor.forClass(Environment.class);
+            Mockito.verify(environmentMapper).insert(envCaptor.capture());
+            assertEquals(name, envCaptor.getValue().getName());
+            ArgumentCaptor<EnvironmentWorkerGroupRelation> relationCaptor =
+                    ArgumentCaptor.forClass(EnvironmentWorkerGroupRelation.class);
+            Mockito.verify(relationMapper).insert(relationCaptor.capture());
+            assertEquals(groupName, relationCaptor.getValue().getWorkerGroup());
+        } finally {
+            logger.detachAppender(appender);
+            logger.setLevel(previousLevel);
+            appender.stop();
+        }
+    }
+
+    private void allowEnvironmentOperation(String operation) {
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ENVIRONMENT,
+                getAdminUser().getId(), operation, baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ENVIRONMENT, null,
+                0, baseServiceLogger)).thenReturn(true);
     }
 
     @Test
