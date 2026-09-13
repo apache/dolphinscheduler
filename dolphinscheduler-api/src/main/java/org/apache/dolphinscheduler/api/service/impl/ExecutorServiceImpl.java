@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.C
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_START_NODES;
 import static org.apache.dolphinscheduler.common.constants.CommandKeyConstants.CMD_PARAM_SUB_WORKFLOW_DEFINITION_CODE;
 
-import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowBackFillRequest;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowExecuteResponse;
@@ -125,11 +124,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     @Transactional
     public Integer triggerWorkflowDefinition(final WorkflowTriggerRequest triggerRequest) {
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(
-                triggerRequest.getLoginUser(),
-                triggerRequest.getProjectCode(),
-                ApiFuncIdentificationConstant.RERUN);
+        projectService.checkHasProjectWritePermissionThrowException(
+                triggerRequest.getLoginUser(), triggerRequest.getProjectCode());
         final TriggerWorkflowDTO triggerWorkflowDTO = triggerWorkflowRequestTransformer.transform(triggerRequest);
         // verify the workflow definition belongs to the URL's project
         if (triggerWorkflowDTO.getWorkflowDefinition() == null
@@ -145,11 +141,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     @Transactional
     public List<Integer> backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest) {
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(
-                workflowBackFillRequest.getLoginUser(),
-                workflowBackFillRequest.getProjectCode(),
-                ApiFuncIdentificationConstant.RERUN);
+        projectService.checkHasProjectWritePermissionThrowException(
+                workflowBackFillRequest.getLoginUser(), workflowBackFillRequest.getProjectCode());
         final BackfillWorkflowDTO backfillWorkflowDTO =
                 backfillWorkflowRequestTransformer.transform(workflowBackFillRequest);
         // verify the workflow definition belongs to the URL's project
@@ -233,11 +226,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 .queryOptionalById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
 
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(
-                loginUser,
-                workflowInstance.getProjectCode(),
-                ApiFuncIdentificationConstant.map.get(executeType));
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, workflowInstance.getProjectCode());
 
         switch (executeType) {
             case REPEAT_RUNNING:
@@ -295,9 +284,7 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         WorkflowExecuteResponse response = new WorkflowExecuteResponse();
 
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
-                ApiFuncIdentificationConstant.map.get(ExecuteType.EXECUTE_TASK));
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
 
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
@@ -382,10 +369,12 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     public void forceStartTaskInstance(User loginUser, int queueId) {
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
         // check workflow instance exist
-        workflowInstanceDao.queryOptionalById(taskGroupQueue.getWorkflowInstanceId())
-                .orElseThrow(
-                        () -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
-                                taskGroupQueue.getWorkflowInstanceId()));
+        WorkflowInstance workflowInstance =
+                workflowInstanceDao.queryOptionalById(taskGroupQueue.getWorkflowInstanceId())
+                        .orElseThrow(
+                                () -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
+                                        taskGroupQueue.getWorkflowInstanceId()));
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, workflowInstance.getProjectCode());
 
         if (taskGroupQueue.getInQueue() == Flag.NO.getCode()) {
             throw new ServiceException(Status.TASK_GROUP_QUEUE_ALREADY_START);

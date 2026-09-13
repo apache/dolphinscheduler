@@ -239,6 +239,36 @@ public class DAGTest {
         }
     }
 
+    /**
+     * test cycle detection with converging paths
+     */
+    @Test
+    public void testCycleWithConvergingPaths() {
+        clear();
+
+        // 1->2, 1->3, 1->4
+        // 2->5, 3->5, 4->5
+        // 5->6
+        // 6->7
+
+        for (int i = 1; i <= 7; ++i) {
+            graph.addNode(i, "v(" + i + ")");
+        }
+
+        Assertions.assertTrue(graph.addEdge(1, 2));
+        Assertions.assertTrue(graph.addEdge(1, 3));
+        Assertions.assertTrue(graph.addEdge(1, 4));
+        Assertions.assertTrue(graph.addEdge(2, 5));
+        Assertions.assertTrue(graph.addEdge(3, 5));
+        Assertions.assertTrue(graph.addEdge(4, 5));
+        Assertions.assertTrue(graph.addEdge(5, 6));
+        Assertions.assertTrue(graph.addEdge(6, 7));
+
+        // 7->1 would create a cycle, so it must be rejected
+        Assertions.assertFalse(graph.addEdge(7, 1));
+        Assertions.assertFalse(graph.hasCycle());
+    }
+
     @Test
     public void testTopologicalSort() {
         makeGraph();

@@ -189,7 +189,7 @@ public class DataSourceMapperTest extends BaseDaoTest {
         for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
             if (expectedDataSource != null) {
-                Assertions.assertEquals(expectedDataSource, actualDataSource);
+                assertDataSourceSimpleInfo(expectedDataSource, actualDataSource);
             }
         }
 
@@ -210,9 +210,19 @@ public class DataSourceMapperTest extends BaseDaoTest {
         for (DataSource actualDataSource : actualDataSources) {
             DataSource expectedDataSource = expectedDataSourceMap.get(actualDataSource.getId());
             if (expectedDataSource != null) {
-                Assertions.assertEquals(expectedDataSource, actualDataSource);
+                assertDataSourceSimpleInfo(expectedDataSource, actualDataSource);
             }
         }
+    }
+
+    private void assertDataSourceSimpleInfo(DataSource expectedDataSource, DataSource actualDataSource) {
+        Assertions.assertEquals(expectedDataSource.getId(), actualDataSource.getId());
+        Assertions.assertEquals(expectedDataSource.getName(), actualDataSource.getName());
+        Assertions.assertNull(actualDataSource.getConnectionParams());
+        Assertions.assertNull(actualDataSource.getNote());
+        Assertions.assertNull(actualDataSource.getType());
+        Assertions.assertNull(actualDataSource.getCreateTime());
+        Assertions.assertNull(actualDataSource.getUpdateTime());
     }
 
     /**

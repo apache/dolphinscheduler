@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
+import org.apache.dolphinscheduler.api.vo.DataSourceSimpleInfoVO;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -126,18 +127,18 @@ public interface DataSourceService {
      *
      * @param loginUser login user
      * @param userId    user id
-     * @return a list of {@link DataSource} objects that are available to be authorized to the target user
+     * @return a list of data sources that are available to be authorized to the target user
      */
-    List<DataSource> unAuthDatasource(User loginUser, Integer userId);
+    List<DataSourceSimpleInfoVO> unAuthDatasource(User loginUser, Integer userId);
 
     /**
      * query the list of data sources authorized for a specific user
      *
      * @param loginUser login user
      * @param userId    user id
-     * @return a list of {@link DataSource} objects that are authorized to the target user
+     * @return a list of data sources that are authorized to the target user
      */
-    List<DataSource> authedDatasource(User loginUser, Integer userId);
+    List<DataSourceSimpleInfoVO> authedDatasource(User loginUser, Integer userId);
 
     /**
      * query the list of tables from a specific database within a data source

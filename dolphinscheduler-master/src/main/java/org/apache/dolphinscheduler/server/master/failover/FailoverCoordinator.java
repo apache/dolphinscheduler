@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.failover;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -152,7 +152,7 @@ public class FailoverCoordinator implements IFailoverCoordinator {
                         masterFailoverNodePath);
                 return;
             }
-            final List<WorkflowInstance> needFailoverWorkflows =
+            final List<WorkflowInstanceSummaryDto> needFailoverWorkflows =
                     getFailoverWorkflowsForMaster(masterAddress, new Date(workflowFailoverDeadline));
             needFailoverWorkflows.forEach(workflowFailover::failoverWorkflow);
             registryClient.persist(masterFailoverNodePath, String.valueOf(workflowFailoverDeadline));
@@ -164,10 +164,10 @@ public class FailoverCoordinator implements IFailoverCoordinator {
         }
     }
 
-    private List<WorkflowInstance> getFailoverWorkflowsForMaster(final String masterAddress,
-                                                                 final Date masterCrashTime) {
+    private List<WorkflowInstanceSummaryDto> getFailoverWorkflowsForMaster(final String masterAddress,
+                                                                           final Date masterCrashTime) {
         // todo: use page query
-        final List<WorkflowInstance> workflowInstances =
+        final List<WorkflowInstanceSummaryDto> workflowInstances =
                 workflowInstanceDao.queryNeedFailoverWorkflowInstances(masterAddress);
         return workflowInstances.stream()
                 .filter(workflowInstance -> {

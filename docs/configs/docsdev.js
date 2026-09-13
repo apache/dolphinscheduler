@@ -221,6 +221,18 @@ export default {
                                 title: 'Remote Shell',
                                 link: '/en-us/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
+                            {
+                                title: 'Aliyun Serverless Spark',
+                                link: '/en-us/docs/dev/user_doc/guide/task/aliyun-serverless-spark.html',
+                            },
+                            {
+                                title: 'Azure DataFactory',
+                                link: '/en-us/docs/dev/user_doc/guide/task/datafactory.html',
+                            },
+                            {
+                                title: 'gRPC',
+                                link: '/en-us/docs/dev/user_doc/guide/task/grpc.html',
+                            },
                         ],
                     },
                     {
@@ -949,6 +961,18 @@ export default {
                                 title: 'Remote Shell',
                                 link: '/zh-cn/docs/dev/user_doc/guide/task/remoteshell.html',
                             },
+                            {
+                                title: 'Aliyun Serverless Spark',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/aliyun-serverless-spark.html',
+                            },
+                            {
+                                title: 'Azure DataFactory',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/datafactory.html',
+                            },
+                            {
+                                title: 'gRPC',
+                                link: '/zh-cn/docs/dev/user_doc/guide/task/grpc.html',
+                            },
                         ],
                     },
                     {
@@ -1016,6 +1040,14 @@ export default {
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/spark.html',
                             },
                             {
+                                title: 'Presto',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/presto.html',
+                            },
+                            {
+                                title: 'SQL SERVER',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/sqlserver.html',
+                            },
+                            {
                                 title: 'Amazon Athena',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/athena.html',
                             },
@@ -1026,6 +1058,14 @@ export default {
                             {
                                 title: 'Redshift',
                                 link: '/zh-cn/docs/dev/user_doc/guide/datasource/redshift.html',
+                            },
+                            {
+                                title: 'ClickHouse',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/clickhouse.html',
+                            },
+                            {
+                                title: 'IBM DB2',
+                                link: '/zh-cn/docs/dev/user_doc/guide/datasource/db2.html',
                             },
                             {
                                 title: 'Oracle',

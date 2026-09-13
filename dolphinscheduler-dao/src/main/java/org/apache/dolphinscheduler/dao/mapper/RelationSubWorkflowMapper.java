@@ -29,9 +29,6 @@ public interface RelationSubWorkflowMapper extends BaseMapper<RelationSubWorkflo
 
     int batchInsert(@Param("relationSubWorkflows") List<RelationSubWorkflow> relationSubWorkflows);
 
-    List<RelationSubWorkflow> queryAllSubWorkflowInstance(@Param("parentWorkflowInstanceId") Long parentWorkflowInstanceId,
-                                                          @Param("parentTaskCode") Long parentTaskCode);
-
     RelationSubWorkflow queryParentWorkflowInstance(@Param("subWorkflowInstanceId") Long subWorkflowInstanceId);
 
 }

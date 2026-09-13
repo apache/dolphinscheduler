@@ -54,6 +54,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -72,6 +73,9 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
 
     @Autowired
     private WorkflowInstanceDao workflowInstanceDao;
+
+    @Autowired
+    private TransactionTemplate transactionTemplate;
 
     private boolean flag = false;
 
@@ -233,16 +237,17 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         for (final TaskGroupQueue taskGroupQueue : taskGroupQueues) {
             try {
                 LogUtils.setTaskInstanceIdMDC(taskGroupQueue.getTaskId());
-                // notify the waiting task instance
-                // We notify first, it notify failed, the taskGroupQueue will be in queue, and then we will retry it
-                // next time.
-                notifyWaitingTaskInstance(taskGroupQueue);
+                if (!notifyForceStartTaskGroupQueue(taskGroupQueue)) {
+                    log.debug("Skip stale ForceStart TaskGroupQueue: {}", taskGroupQueue.getId());
+                    continue;
+                }
                 log.info("Notify the ForceStart waiting TaskInstance: {} for taskGroupQueue: {} success",
                         taskGroupQueue.getTaskName(),
                         taskGroupQueue.getId());
-
-                deleteTaskGroupQueueSlot(taskGroupQueue);
                 log.info("Release the force start TaskGroupQueue {}", taskGroupQueue);
+            } catch (RetryableTaskGroupNotificationException retryableException) {
+                log.info("Notify the ForceStart TaskGroupQueue: {} is temporarily unavailable, will retry",
+                        taskGroupQueue.getId(), retryableException);
             } catch (UnsupportedOperationException unsupportedOperationException) {
                 deleteTaskGroupQueueSlot(taskGroupQueue);
                 log.info(
@@ -254,6 +259,24 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 LogUtils.removeTaskInstanceIdMDC();
             }
         }
+    }
+
+    /**
+     * Delete the queue before notifying so only one coordinator can notify it. A notification failure rolls back the
+     * transaction and restores the queue for retry.
+     */
+    private boolean notifyForceStartTaskGroupQueue(TaskGroupQueue taskGroupQueue) {
+        final Boolean notified = transactionTemplate.execute(transactionStatus -> {
+            if (!taskGroupQueueDao.deleteById(taskGroupQueue.getId())) {
+                return false;
+            }
+            notifyWaitingTaskInstance(taskGroupQueue);
+            return true;
+        });
+        if (notified == null) {
+            throw new IllegalStateException("Notify ForceStart TaskGroupQueue transaction returned null");
+        }
+        return notified;
     }
 
     private void dealWithWaitingTaskGroupQueue() {
@@ -286,23 +309,15 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
             for (TaskGroupQueue taskGroupQueue : taskGroupQueues) {
                 try {
                     LogUtils.setTaskInstanceIdMDC(taskGroupQueue.getTaskId());
-                    // Reduce the taskGroupSize
-                    boolean acquireResult = taskGroupDao.acquireTaskGroupSlot(taskGroup.getId());
-                    if (!acquireResult) {
-                        log.error("Failed to acquire task group slot for task group {}", taskGroup);
+                    if (!acquireTaskGroupSlotAndNotify(taskGroupQueue)) {
+                        log.debug("Skip stale or unavailable TaskGroupQueue: {} for TaskGroup: {}",
+                                taskGroupQueue.getId(), taskGroup.getId());
                         continue;
                     }
-                    // Notify the waiting task instance
-                    // We notify first, it notify failed, the taskGroupQueue will be in queue, and then we will retry it
-                    // next time.
-                    notifyWaitingTaskInstance(taskGroupQueue);
-
-                    // Set the taskGroupQueue status to ACQUIRE_SUCCESS and remove from WAITING queue
-                    taskGroupQueue.setInQueue(Flag.YES.getCode());
-                    taskGroupQueue.setStatus(TaskGroupQueueStatus.ACQUIRE_SUCCESS);
-                    taskGroupQueue.setUpdateTime(new Date());
-                    taskGroupQueueDao.updateById(taskGroupQueue);
                     log.info("Success acquire TaskGroupSlot for TaskGroupQueue: {}", taskGroupQueue);
+                } catch (RetryableTaskGroupNotificationException retryableException) {
+                    log.info("Notify Waiting TaskGroupQueue: {} is temporarily unavailable, will retry",
+                            taskGroupQueue.getId(), retryableException);
                 } catch (UnsupportedOperationException unsupportedOperationException) {
                     deleteTaskGroupQueueSlot(taskGroupQueue);
                     log.info(
@@ -315,6 +330,24 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 }
             }
         }
+    }
+
+    private boolean acquireTaskGroupSlotAndNotify(TaskGroupQueue taskGroupQueue) {
+        final Boolean acquired = transactionTemplate.execute(transactionStatus -> {
+            if (!taskGroupDao.acquireTaskGroupSlot(taskGroupQueue.getGroupId())) {
+                return false;
+            }
+            if (!taskGroupQueueDao.acquireTaskGroupQueue(taskGroupQueue.getId(), new Date())) {
+                transactionStatus.setRollbackOnly();
+                return false;
+            }
+            notifyWaitingTaskInstance(taskGroupQueue);
+            return true;
+        });
+        if (acquired == null) {
+            throw new IllegalStateException("Acquire TaskGroupSlot transaction returned null");
+        }
+        return acquired;
     }
 
     @Override
@@ -393,6 +426,26 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         }
     }
 
+    @Override
+    public boolean releaseWaitingTaskGroupSlot(TaskInstance taskInstance) {
+        if (taskInstance == null) {
+            throw new IllegalArgumentException("The TaskInstance is null");
+        }
+        if (taskInstance.getId() == null) {
+            throw new IllegalArgumentException("The TaskInstance id is null");
+        }
+        if (!TaskGroupUtils.isUsingTaskGroup(taskInstance)) {
+            return false;
+        }
+        final boolean removed = taskGroupQueueDao.deleteByTaskInstanceIdAndStatus(
+                taskInstance.getId(), TaskGroupQueueStatus.WAIT_QUEUE);
+        if (removed) {
+            log.info("Removed TaskInstance: {} from waiting TaskGroupQueue, taskGroupId: {}",
+                    taskInstance.getId(), taskInstance.getTaskGroupId());
+        }
+        return removed;
+    }
+
     private void notifyWaitingTaskInstance(TaskGroupQueue taskGroupQueue) {
         // Find the related waiting task instance
         // send RPC to notify the waiting task instance
@@ -414,12 +467,18 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                             + " is not exist, no need to notify");
         }
         if (workflowInstance.getState() != WorkflowExecutionStatus.RUNNING_EXECUTION) {
+            if (workflowInstance.getState() == WorkflowExecutionStatus.READY_PAUSE
+                    || workflowInstance.getState() == WorkflowExecutionStatus.READY_STOP) {
+                throw new RetryableTaskGroupNotificationException(
+                        "The WorkflowInstance: " + workflowInstance.getId() + " state is "
+                                + workflowInstance.getState());
+            }
             throw new UnsupportedOperationException(
                     "The WorkflowInstance: " + workflowInstance.getId() + " state is " + workflowInstance.getState()
                             + ", no need to notify");
         }
         if (workflowInstance.getHost() == null || Constants.NULL.equals(workflowInstance.getHost())) {
-            throw new UnsupportedOperationException(
+            throw new RetryableTaskGroupNotificationException(
                     "WorkflowInstance host is null, maybe it is in failover: " + workflowInstance);
         }
 
@@ -435,16 +494,26 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                         .withHost(workflowInstance.getHost())
                         .notifyTaskGroupSlotAcquireSuccess(taskGroupSlotAcquireSuccessNotifyRequest);
         if (!taskGroupSlotAcquireSuccessNotifyResponse.isSuccess()) {
-            throw new UnsupportedOperationException(
+            throw new RetryableTaskGroupNotificationException(
                     "Notify TaskInstance: " + taskInstance.getId() + " failed: "
                             + taskGroupSlotAcquireSuccessNotifyResponse);
         }
         log.info("Wake up TaskInstance: {} success", taskInstance.getName());
     }
 
+    private static final class RetryableTaskGroupNotificationException extends RuntimeException {
+
+        private RetryableTaskGroupNotificationException(String message) {
+            super(message);
+        }
+    }
+
     private void deleteTaskGroupQueueSlot(TaskGroupQueue taskGroupQueue) {
-        taskGroupQueueDao.deleteById(taskGroupQueue);
-        log.info("Success release TaskGroupQueue: {}", taskGroupQueue);
+        if (taskGroupQueueDao.deleteById(taskGroupQueue)) {
+            log.info("Success release TaskGroupQueue: {}", taskGroupQueue);
+            return;
+        }
+        log.debug("TaskGroupQueue has already been released: {}", taskGroupQueue.getId());
     }
 
     @Override

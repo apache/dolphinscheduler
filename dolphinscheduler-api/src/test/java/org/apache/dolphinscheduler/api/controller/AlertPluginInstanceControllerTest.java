@@ -21,6 +21,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -101,7 +102,8 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
         paramsMap.add("pluginDefineId", String.valueOf(pluginDefineId));
         paramsMap.add("pluginInstanceParams", pluginInstanceParams);
 
-        doNothing().when(alertPluginInstanceService).testSend(eq(pluginDefineId), eq(pluginInstanceParams));
+        doNothing().when(alertPluginInstanceService).testSend(any(User.class), eq(pluginDefineId),
+                eq(pluginInstanceParams));
 
         // When
         final MvcResult mvcResult = mockMvc.perform(post("/alert-plugin-instances/test-send")
@@ -116,6 +118,7 @@ public class AlertPluginInstanceControllerTest extends AbstractControllerTest {
                 JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         assertThat(actualResponseContent.getMsg()).isEqualTo(expectResponseContent.getMsg());
         assertThat(actualResponseContent.getCode()).isEqualTo(expectResponseContent.getCode());
+        verify(alertPluginInstanceService).testSend(any(User.class), eq(pluginDefineId), eq(pluginInstanceParams));
     }
 
     @Test
