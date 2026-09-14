@@ -74,7 +74,7 @@ public class HttpParametersTest {
     @Test
     public void testSocketKeepAliveDefaultFalse() {
         // historical task-params without the field must retain previous behaviour (disabled)
-        String paramData = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://www.baidu.com/\","
+        String paramData = "{\"localParams\":[],\"httpParams\":[],\"url\":\"https://example.com/\","
                 + "\"httpMethod\":\"GET\",\"httpCheckCondition\":\"STATUS_CODE_DEFAULT\",\"condition\":\"\",\"connectTimeout\":\"10000\"}";
         HttpParameters httpParameters = JSONUtils.parseObject(paramData, HttpParameters.class);
 
