@@ -527,6 +527,7 @@ export default {
     http_condition_tips: '请填写校验内容',
     timeout_settings: '超时设置',
     connect_timeout: '连接超时',
+    keep_alive: '启用 TCP 保活',
     ms: '毫秒',
     status_code_default: '默认响应码200',
     status_code_custom: '自定义响应码',

@@ -217,6 +217,13 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
         }
       }
     },
+    {
+      type: 'switch',
+      field: 'socketKeepAlive',
+      span: 12,
+      name: t('project.node.keep_alive'),
+      value: model.socketKeepAlive
+    },
     ...useCustomParams({
       model,
       field: 'localParams',
