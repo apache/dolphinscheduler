@@ -45,7 +45,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
@@ -61,10 +61,6 @@ import com.google.common.collect.Lists;
 @Slf4j
 public class JdbcRegistryServer implements IJdbcRegistryServer {
 
-    private static final AtomicReferenceFieldUpdater<JdbcRegistryServer, JdbcRegistryServerState> SERVER_STATE_UPDATER =
-            AtomicReferenceFieldUpdater.newUpdater(
-                    JdbcRegistryServer.class, JdbcRegistryServerState.class, "jdbcRegistryServerState");
-
     private final JdbcRegistryProperties jdbcRegistryProperties;
 
     private final JdbcRegistryLockRepository jdbcRegistryLockRepository;
@@ -75,7 +71,8 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
 
     private final JdbcRegistryLockManager jdbcRegistryLockManager;
 
-    private volatile JdbcRegistryServerState jdbcRegistryServerState;
+    private final AtomicReference<JdbcRegistryServerState> serverState =
+            new AtomicReference<>(JdbcRegistryServerState.INIT);
 
     private final List<IJdbcRegistryClient> jdbcRegistryClients = new CopyOnWriteArrayList<>();
 
@@ -105,13 +102,12 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 transactionTemplate, schedulerThreadExecutor);
         this.jdbcRegistryLockManager = new JdbcRegistryLockManager(
                 jdbcRegistryProperties, jdbcRegistryLockRepository);
-        this.jdbcRegistryServerState = JdbcRegistryServerState.INIT;
         lastSuccessHeartbeat = System.currentTimeMillis();
     }
 
     @Override
     public synchronized void start() {
-        if (jdbcRegistryServerState != JdbcRegistryServerState.INIT) {
+        if (serverState.get() != JdbcRegistryServerState.INIT) {
             // The server is already started or stopped, will not start again.
             return;
         }
@@ -124,7 +120,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 jdbcRegistryProperties.getSessionTimeout().toMillis(),
                 TimeUnit.MILLISECONDS);
         jdbcRegistryDataManager.start();
-        jdbcRegistryServerState = JdbcRegistryServerState.STARTED;
+        serverState.set(JdbcRegistryServerState.STARTED);
         doTriggerOnConnectedListener();
         schedulerThreadExecutor.scheduleWithFixedDelay(
                 this::refreshClientsHeartbeat,
@@ -173,7 +169,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
 
     @Override
     public JdbcRegistryServerState getServerState() {
-        return jdbcRegistryServerState;
+        return serverState.get();
     }
 
     @Override
@@ -262,8 +258,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     @Override
     public void close() {
         synchronized (this) {
-            if (SERVER_STATE_UPDATER.getAndSet(this,
-                    JdbcRegistryServerState.STOPPED) == JdbcRegistryServerState.STOPPED) {
+            if (serverState.getAndSet(JdbcRegistryServerState.STOPPED) == JdbcRegistryServerState.STOPPED) {
                 log.warn("The JdbcRegistryServer is already STOPPED.");
                 return;
             }
@@ -357,8 +352,8 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 clone.setLastHeartbeatTime(now);
                 if (!jdbcRegistryClientRepository.updateById(clone)) {
                     log.error("The client heartbeat has expired: {}", jdbcRegistryClientHeartbeatDTO.getId());
-                    transitionToDisconnected();
-                    return;
+                    throw new IllegalStateException(
+                            "The client heartbeat record no longer exists: " + jdbcRegistryClientHeartbeatDTO.getId());
                 }
                 jdbcRegistryClientHeartbeatDTO.setLastHeartbeatTime(clone.getLastHeartbeatTime());
             }
@@ -385,29 +380,29 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     }
 
     private void transitionToStarted() {
-        if (SERVER_STATE_UPDATER.compareAndSet(
-                this, JdbcRegistryServerState.SUSPENDED, JdbcRegistryServerState.STARTED)) {
+        if (serverState.compareAndSet(JdbcRegistryServerState.SUSPENDED, JdbcRegistryServerState.STARTED)) {
             doTriggerReconnectedListener();
         }
     }
 
     private void transitionToSuspended() {
-        SERVER_STATE_UPDATER.compareAndSet(
-                this, JdbcRegistryServerState.STARTED, JdbcRegistryServerState.SUSPENDED);
+        if (!serverState.compareAndSet(JdbcRegistryServerState.STARTED, JdbcRegistryServerState.SUSPENDED)) {
+            log.debug("Failed to transition JdbcRegistryServer to SUSPENDED; current state is {}", serverState.get());
+        }
     }
 
     private void transitionToDisconnected() {
         while (true) {
-            JdbcRegistryServerState currentState = jdbcRegistryServerState;
+            JdbcRegistryServerState currentState = serverState.get();
             if (currentState != JdbcRegistryServerState.STARTED
                     && currentState != JdbcRegistryServerState.SUSPENDED) {
                 return;
             }
-            if (SERVER_STATE_UPDATER.compareAndSet(
-                    this, currentState, JdbcRegistryServerState.DISCONNECTED)) {
+            if (serverState.compareAndSet(currentState, JdbcRegistryServerState.DISCONNECTED)) {
                 doTriggerOnDisConnectedListener();
                 return;
             }
+            log.debug("Failed to transition JdbcRegistryServer from {} to DISCONNECTED; retrying", currentState);
         }
     }
 
