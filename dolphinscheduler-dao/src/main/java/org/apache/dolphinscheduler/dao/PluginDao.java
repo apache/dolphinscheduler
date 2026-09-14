@@ -39,15 +39,6 @@ public class PluginDao {
     private PluginDefineMapper pluginDefineMapper;
 
     /**
-     * check plugin define table exist
-     *
-     * @return boolean
-     */
-    public boolean checkPluginDefineTableExist() {
-        return pluginDefineMapper.checkTableExist() > 0;
-    }
-
-    /**
      * add or update plugin define
      *
      * @param pluginDefine new pluginDefine

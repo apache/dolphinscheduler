@@ -34,8 +34,8 @@ import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
@@ -229,9 +229,9 @@ public class WorkerGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         WorkerGroup workerGroup = getWorkerGroup(1);
         when(workerGroupDao.queryById(1)).thenReturn(workerGroup);
-        WorkflowInstance workflowInstance = new WorkflowInstance();
+        WorkflowInstanceSummaryDto workflowInstance = new WorkflowInstanceSummaryDto();
         workflowInstance.setId(1);
-        List<WorkflowInstance> workflowInstances = new ArrayList<WorkflowInstance>();
+        List<WorkflowInstanceSummaryDto> workflowInstances = new ArrayList<WorkflowInstanceSummaryDto>();
         workflowInstances.add(workflowInstance);
         when(workflowInstanceDao.queryByWorkerGroupNameAndStatus(workerGroup.getName(),
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES))

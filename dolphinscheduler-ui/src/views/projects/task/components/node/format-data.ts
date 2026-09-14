@@ -205,6 +205,8 @@ export function formatParams(data: INodeData): {
     taskParams.type = data.type
     taskParams.datasource = data.datasource
     taskParams.sql = data.sql
+    taskParams.sqlSource = data.sqlSource
+    taskParams.sqlResource = data.sqlResource
     taskParams.sqlType = data.sqlType
     taskParams.preStatements = data.preStatements
     taskParams.postStatements = data.postStatements

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.UserSimpleInfoVO;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
@@ -147,7 +148,7 @@ public interface UsersService {
     /**
      * query enabled user list
      */
-    List<User> queryUserList(User loginUser);
+    List<UserSimpleInfoVO> queryUserList(User loginUser);
 
     /**
      * verify user name exists

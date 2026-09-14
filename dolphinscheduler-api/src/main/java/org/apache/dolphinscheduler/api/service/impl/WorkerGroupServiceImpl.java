@@ -40,8 +40,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
@@ -321,12 +321,12 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
             log.error("Worker group does not exist, workerGroupId:{}.", id);
             throw new ServiceException(Status.DELETE_WORKER_GROUP_NOT_EXIST);
         }
-        List<WorkflowInstance> workflowInstances = workflowInstanceDao.queryByWorkerGroupNameAndStatus(
+        List<WorkflowInstanceSummaryDto> workflowInstances = workflowInstanceDao.queryByWorkerGroupNameAndStatus(
                 workerGroup.getName(),
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES);
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
             List<Integer> workflowInstanceIds =
-                    workflowInstances.stream().map(WorkflowInstance::getId).collect(Collectors.toList());
+                    workflowInstances.stream().map(WorkflowInstanceSummaryDto::getId).collect(Collectors.toList());
             log.warn(
                     "Delete worker group failed because there are {} workflowInstances are using it, workflowInstanceIds:{}.",
                     workflowInstances.size(), workflowInstanceIds);

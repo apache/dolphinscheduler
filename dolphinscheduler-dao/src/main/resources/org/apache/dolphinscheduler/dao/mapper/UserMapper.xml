@@ -130,8 +130,7 @@
         where u.id = rel.user_id and rel.project_id = #{projectId}
     </select>
     <select id="queryEnabledUsers" resultType="org.apache.dolphinscheduler.dao.entity.User">
-        select
-        <include refid="baseSql"/>
+        select id, user_name
         from t_ds_user
         where state = 1
     </select>

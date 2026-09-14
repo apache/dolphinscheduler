@@ -35,7 +35,7 @@ import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -225,7 +225,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
             throw new ServiceException(Status.TENANT_NOT_EXIST);
         }
 
-        List<WorkflowInstance> workflowInstances = getWorkflowInstancesByTenant(tenant);
+        List<WorkflowInstanceSummaryDto> workflowInstances = getWorkflowInstancesByTenant(tenant);
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_FAIL, workflowInstances.size());
         }
@@ -247,7 +247,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         workflowInstanceDao.updateWorkflowInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
     }
 
-    private List<WorkflowInstance> getWorkflowInstancesByTenant(Tenant tenant) {
+    private List<WorkflowInstanceSummaryDto> getWorkflowInstancesByTenant(Tenant tenant) {
         return workflowInstanceDao.queryByTenantCodeAndStatus(
                 tenant.getTenantCode(),
                 WorkflowExecutionStatus.NOT_TERMINAL_STATES);

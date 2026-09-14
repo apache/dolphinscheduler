@@ -27,6 +27,20 @@
         workflow_instance_priority, worker_group,environment_code, timeout, tenant_code, var_pool,
         dry_run, next_workflow_instance_id, restart_time, state_history
     </sql>
+    <!--
+      Lightweight column projection for list/scan queries (internal + API).
+      Intentionally omits: commandParam, globalParams, historyCmd, varPool, stateHistory.
+      These 5 columns are large and only needed for detail views or internal processing.
+    -->
+    <sql id="listSql">
+        id
+        , name, workflow_definition_version, workflow_definition_code, project_code, state, recovery, start_time, end_time, run_times,host,
+        command_type, task_depend_type, max_try_times, failure_strategy, warning_type,
+        warning_group_id, schedule_time, command_start_time, flag,
+        update_time, is_sub_workflow, executor_id,
+        workflow_instance_priority, worker_group,environment_code, timeout, tenant_code,
+        dry_run, next_workflow_instance_id, restart_time
+    </sql>
 
     <select id="queryDetailById" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
         select
@@ -34,9 +48,9 @@
         from t_ds_workflow_instance
         where id = #{id}
     </select>
-    <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByHostAndStatus" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance
         where 1=1
         <if test="host != null and host != ''">
@@ -61,9 +75,9 @@
         </if>
     </select>
 
-    <select id="queryTopNWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryTopNWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance
         where state = #{status}
         <if test="projectCode != 0">
@@ -75,9 +89,9 @@
         limit #{size}
     </select>
 
-    <select id="queryByTenantCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByTenantCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance
         where 1=1
         <if test="tenantCode != ''">
@@ -91,10 +105,9 @@
         </if>
         order by id asc
     </select>
-
-    <select id="queryByWorkerGroupNameAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByWorkerGroupNameAndStatus" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance
         where 1=1
         <if test="workerGroupName != ''">
@@ -109,9 +122,9 @@
         order by id asc
     </select>
 
-    <select id="queryWorkflowInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryWorkflowInstanceListPaging" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance
         where is_sub_workflow=0
         and project_code = #{projectCode}
@@ -193,9 +206,9 @@
         group by state
     </select>
 
-    <select id="queryByWorkflowDefinitionCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByWorkflowDefinitionCode" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance
         where workflow_definition_code=#{workflowDefinitionCode}
         order by start_time desc limit #{size}
@@ -254,28 +267,26 @@
         </if>
         order by start_time desc limit 1
     </select>
-
-    <select id="queryFirstScheduleWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryFirstScheduleWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance
         where workflow_definition_code = #{workflowDefinitionCode} and schedule_time is not null
         order by schedule_time
         limit 1
     </select>
-
-    <select id="queryFirstStartWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryFirstStartWorkflowInstance" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance
         where workflow_definition_code = #{workflowDefinitionCode} and start_time is not null
         order by start_time
         limit 1
     </select>
 
-    <select id="queryByWorkflowDefinitionCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByWorkflowDefinitionCodeAndStatus" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance
         where workflow_definition_code=#{workflowDefinitionCode}
         <if test="states != null and states.length != 0">
@@ -286,10 +297,9 @@
         </if>
         order by id asc
     </select>
-
-    <select id="queryByWorkflowCodeVersionStatus" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByWorkflowCodeVersionStatus" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance
         where workflow_definition_code=#{workflowDefinitionCode}
         and workflow_definition_version = #{workflowDefinitionVersion}
@@ -301,9 +311,9 @@
         </if>
     </select>
 
-    <select id="queryWorkflowInstanceListV2Paging" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryWorkflowInstanceListV2Paging" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         SELECT
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         FROM t_ds_workflow_instance
         where is_sub_workflow=0
         <if test="projectCode != 0">
@@ -355,9 +365,9 @@
     </select>
 
 <!-- There are some columns with the same names in both tables, we use a sub-query here to avoid ambiguity-->
-    <select id="queryByTriggerCode" resultType="org.apache.dolphinscheduler.dao.entity.WorkflowInstance">
+    <select id="queryByTriggerCode" resultType="org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto">
         select
-        <include refid="baseSql"/>
+        <include refid="listSql"/>
         from t_ds_workflow_instance a
         join
             (select trigger_type, job_id, trigger_code from t_ds_trigger_relation) b

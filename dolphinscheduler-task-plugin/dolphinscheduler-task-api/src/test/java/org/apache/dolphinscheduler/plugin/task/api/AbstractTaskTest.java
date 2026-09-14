@@ -17,6 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +40,46 @@ public class AbstractTaskTest {
         }
         Assertions.assertNotNull(str);
         Assertions.assertEquals(jobId, str.substring(6));
+    }
+
+    @Test
+    public void testGetExitStatus() {
+        AbstractTask task = new TestTask();
+
+        task.setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
+        Assertions.assertEquals(TaskExecutionStatus.SUCCESS, task.getExitStatus());
+
+        task.setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
+        Assertions.assertEquals(TaskExecutionStatus.KILL, task.getExitStatus());
+
+        task.setExitStatusCode(TaskConstants.EXIT_CODE_HARD_KILL);
+        Assertions.assertEquals(TaskExecutionStatus.KILL, task.getExitStatus());
+
+        task.setExitStatusCode(TaskConstants.EXIT_CODE_SIGINT_KILL);
+        Assertions.assertEquals(TaskExecutionStatus.KILL, task.getExitStatus());
+
+        task.setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+        Assertions.assertEquals(TaskExecutionStatus.FAILURE, task.getExitStatus());
+    }
+
+    private static final class TestTask extends AbstractTask {
+
+        private TestTask() {
+            super(new TaskExecutionContext());
+        }
+
+        @Override
+        public void handle(TaskCallBack taskCallBack) {
+        }
+
+        @Override
+        public void cancel() {
+        }
+
+        @Override
+        public AbstractParameters getParameters() {
+            return new SubWorkflowParameters();
+        }
     }
 
 }

@@ -14,7 +14,7 @@ It is dedicated to handling complex task dependencies in data pipelines and prov
 Key features for DolphinScheduler are as follows:
 
 - Easy to deploy, providing four deployment modes including Standalone, Cluster, Docker, and Kubernetes.
-- Easy to use, workflows can be created and managed via Web UI, [Python SDK](https://dolphinscheduler.apache.org/python/main/index.html) or Open API
+- Easy to use, workflows can be created and managed via Web UI, [Python SDK](https://dolphinscheduler.apache.org/python/) or Open API
 - Highly reliable and high availability, with a decentralized, multi-master and multi-worker architecture and native support for horizontal scaling.
 - High performance, its performance is several times faster than other orchestration platforms, and it is capable of handling tens of millions of tasks per day
 - Cloud Native, DolphinScheduler supports orchestrating workflows across multiple clouds and data centers, and allows custom task types
