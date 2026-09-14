@@ -489,4 +489,69 @@ class SqlTaskTest {
         return resourceParametersHelper;
     }
 
+    @Test
+    void testReplaceOriginalValue_withSpecialCharacters() throws Exception {
+        Map<String, Property> paramsMap = new HashMap<>();
+
+        Property p1 = new Property();
+        p1.setProp("price");
+        p1.setValue("$100");
+        paramsMap.put("price", p1);
+
+        Property p2 = new Property();
+        p2.setProp("path");
+        p2.setValue("C:\\Users\\test");
+        paramsMap.put("path", p2);
+
+        Property p3 = new Property();
+        p3.setProp("empty");
+        p3.setValue("");
+        paramsMap.put("empty", p3);
+
+        Method method = SqlTask.class.getDeclaredMethod("replaceOriginalValue", String.class, String.class, Map.class);
+        method.setAccessible(true);
+
+        // The regex pattern matches optional quotes around !{...}, so they are replaced too
+        String sql1 = "select * from items where price = '!{price}'";
+        String result1 = (String) method.invoke(sqlTask, sql1, "['\"]*\\!\\{(.*?)\\}['\"]*", paramsMap);
+        Assertions.assertEquals("select * from items where price = $100", result1);
+
+        String sql2 = "load data local inpath \"!{path}\" into table t";
+        String result2 = (String) method.invoke(sqlTask, sql2, "['\"]*\\!\\{(.*?)\\}['\"]*", paramsMap);
+        Assertions.assertEquals("load data local inpath C:\\Users\\test into table t", result2);
+
+        String sql3 = "select !{empty} as val";
+        String result3 = (String) method.invoke(sqlTask, sql3, "['\"]*\\!\\{(.*?)\\}['\"]*", paramsMap);
+        Assertions.assertEquals("select  as val", result3);
+    }
+
+    @Test
+    void testReplaceOriginalValue_paramNotFound_keepsOriginalText() throws Exception {
+        Map<String, Property> paramsMap = new HashMap<>();
+
+        Method method = SqlTask.class.getDeclaredMethod("replaceOriginalValue", String.class, String.class, Map.class);
+        method.setAccessible(true);
+
+        String sql = "select * from t where name = '!{unknownParam}'";
+        String result = (String) method.invoke(sqlTask, sql, "['\"]*\\!\\{(.*?)\\}['\"]*", paramsMap);
+        Assertions.assertEquals(sql, result);
+    }
+
+    @Test
+    void testReplaceOriginalValue_paramValueNull_keepsOriginalText() throws Exception {
+        Map<String, Property> paramsMap = new HashMap<>();
+
+        Property p = new Property();
+        p.setProp("name");
+        p.setValue(null);
+        paramsMap.put("name", p);
+
+        Method method = SqlTask.class.getDeclaredMethod("replaceOriginalValue", String.class, String.class, Map.class);
+        method.setAccessible(true);
+
+        String sql = "select * from t where name = '!{name}'";
+        String result = (String) method.invoke(sqlTask, sql, "['\"]*\\!\\{(.*?)\\}['\"]*", paramsMap);
+        Assertions.assertEquals(sql, result);
+    }
+
 }

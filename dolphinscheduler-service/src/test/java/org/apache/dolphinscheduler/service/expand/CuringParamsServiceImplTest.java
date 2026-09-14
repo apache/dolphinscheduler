@@ -538,4 +538,83 @@ public class CuringParamsServiceImplTest {
         // Ensure no unintended side effects
         Assertions.assertEquals(4, paramsMap.size());
     }
+
+    @Test
+    public void testParamParsingPreparation_varPoolInjectionWhenParamNameNotInLocalParams() {
+        // Test scenario: upstream task outputs p1=111, downstream task has p2=${p1} but no local p1
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setTaskCode(1000001L);
+        taskInstance.setTaskDefinitionVersion(1);
+        taskInstance.setExecutePath("home/path/execute");
+
+        // VarPool from upstream: p1=111 (OUT direction)
+        taskInstance.setVarPool("[{\"prop\":\"p1\",\"direct\":\"OUT\",\"type\":\"VARCHAR\",\"value\":\"111\"}]");
+
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setName("TaskName-1");
+        taskDefinition.setCode(1000001L);
+        taskDefinition.setVersion(1);
+
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(2);
+        final BackfillWorkflowCommandParam backfillWorkflowCommandParam = BackfillWorkflowCommandParam.builder()
+                .timeZone("Asia/Shanghai")
+                .build();
+        workflowInstance.setCommandParam(JSONUtils.toJsonString(backfillWorkflowCommandParam));
+        workflowInstance.setHistoryCmd(CommandType.COMPLEMENT_DATA.toString());
+        workflowInstance.setGlobalParams("[]");
+        workflowInstance.setScheduleTime(DateUtils.stringToDate("2024-01-01 00:00:00"));
+
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setName("ProcessName-1");
+        workflowDefinition.setProjectName("ProjectName");
+        workflowDefinition.setProjectCode(3000001L);
+        workflowDefinition.setCode(200001L);
+
+        Project project = new Project();
+        project.setName("ProjectName");
+        project.setCode(3000001L);
+
+        workflowInstance.setWorkflowDefinitionCode(workflowDefinition.getCode());
+        workflowInstance.setProjectCode(workflowDefinition.getProjectCode());
+        taskInstance.setTaskCode(taskDefinition.getCode());
+        taskInstance.setTaskDefinitionVersion(taskDefinition.getVersion());
+        taskInstance.setProjectCode(workflowDefinition.getProjectCode());
+        taskInstance.setWorkflowInstanceId(workflowInstance.getId());
+
+        // Local params: p2=${p1} (references p1 which only exists in varPool, not in local params)
+        org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters sqlParameters =
+                new org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters();
+        sqlParameters.setType("MYSQL");
+        sqlParameters.setSql("select 1");
+
+        Property p2 = new Property();
+        p2.setProp("p2");
+        p2.setDirect(Direct.IN);
+        p2.setType(DataType.VARCHAR);
+        p2.setValue("${p1}");
+        sqlParameters.setLocalParams(Collections.singletonList(p2));
+
+        taskInstance.setTaskParams(JSONUtils.toJsonString(sqlParameters));
+
+        Mockito.when(projectParameterMapper.queryByProjectCode(Mockito.anyLong())).thenReturn(Collections.emptyList());
+
+        Map<String, Property> propertyMap =
+                curingParamsServiceImpl.paramParsingPreparation(taskInstance, sqlParameters, workflowInstance,
+                        project.getName(), workflowDefinition.getName());
+
+        Assertions.assertNotNull(propertyMap);
+
+        // Assert: p1 should be injected from varPool and announced as IN direction
+        Assertions.assertTrue(propertyMap.containsKey("p1"), "p1 should be injected from varPool");
+        Assertions.assertEquals("111", propertyMap.get("p1").getValue());
+        Assertions.assertEquals(Direct.IN, propertyMap.get("p1").getDirect(),
+                "injected varPool param should be announced as IN direction");
+
+        // Assert: p2 should exist and its value should be resolved from ${p1} to 111
+        Assertions.assertTrue(propertyMap.containsKey("p2"));
+        Assertions.assertEquals("111", propertyMap.get("p2").getValue(),
+                "p2's value ${p1} should be resolved to 111 using injected varPool param");
+    }
 }
