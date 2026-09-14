@@ -81,7 +81,7 @@ class TaskInstanceDaoImplTest extends BaseDaoTest {
         List<TaskInstance> result = taskInstanceDao.queryLastTaskInstanceListIntervalInWorkflowInstance(
                 WORKFLOW_INSTANCE_ID, taskCodes);
 
-        // Only the last attempt should be returned, otherwise callers which key the result by taskCode,
+        // Only the valid attempt should be returned, otherwise callers which key the result by taskCode,
         // e.g. DependentExecute, fail with "IllegalStateException: Duplicate key".
         assertEquals(1, result.size());
         assertEquals(TaskExecutionStatus.SUCCESS, result.get(0).getState());

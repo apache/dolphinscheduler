@@ -253,13 +253,12 @@
         </include>
         from t_ds_task_instance instance
         join (
-        select max(id) as max_id
+        select task_code, max(end_time) as max_end_time, workflow_instance_id
         from t_ds_task_instance
         where 1=1
         and workflow_instance_id = #{workflowInstanceId}
         and state != 8
         and flag = 1
-        and end_time is not null
         <if test="taskCodes != null and taskCodes.size() != 0">
             and task_code in
             <foreach collection="taskCodes" index="index" item="i" open="(" separator="," close=")">
@@ -268,7 +267,10 @@
         </if>
         group by task_code
         ) t_max
-        on instance.id = t_max.max_id
+        on instance.workflow_instance_id = t_max.workflow_instance_id
+        and instance.task_code = t_max.task_code
+        and instance.end_time = t_max.max_end_time
+        and instance.flag = 1
     </select>
     <select id="findLastTaskInstance" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
