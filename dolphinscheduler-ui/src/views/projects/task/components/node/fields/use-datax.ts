@@ -197,17 +197,46 @@ export function useDataX(model: { [field: string]: any }): IJsonItem[] {
       span: jsonEditorSpan,
       validate: {
         trigger: ['input', 'trigger'],
-        required: true,
+        required: false,
         validator() {
-          if (
-            model.json === '' ||
+          // When the inline json is absent the job definition must come from exactly one
+          // attached .json resource. resourceList is multi-select and also carries auxiliary
+          // files such as keytabs and xml, so the same rule as the backend
+          // DataxParameters.getJobDefinitionResource applies here (issue #18389).
+          const resourceList = (model.resourceList as string[]) || []
+          const hasSingleJsonResource =
+            resourceList.filter(
+              (fullName) =>
+                typeof fullName === 'string' &&
+                fullName.toLowerCase().endsWith('.json')
+            ).length === 1
+          // Treat a whitespace-only value as absent too, matching the backend
+          // DataxParameters.isInlineJsonAbsent which uses StringUtils.isBlank. Otherwise a
+          // blank inline json would reach utils.isJson below and be rejected even when exactly
+          // one valid .json resource is attached, a configuration the worker would have accepted.
+          const inlineJsonAbsent =
             model.json === undefined ||
-            model.json === null
-          ) {
-            return new Error(t('project.node.sql_empty_tips'))
+            model.json === null ||
+            (model.json as string).trim() === ''
+          if (inlineJsonAbsent) {
+            return hasSingleJsonResource
+              ? undefined
+              : new Error(t('project.node.datax_custom_json_resource_tips'))
           }
           if (!utils.isJson(model.json)) {
             return new Error(t('project.node.json_format_tips'))
+          }
+          // A semantically empty object ({}, { }, formatted) is the historical UI
+          // placeholder and does not count as an inline definition. Same rule as
+          // DataxParameters.isInlineJsonAbsent on the backend.
+          const parsed = JSON.parse(model.json)
+          const isEmptyObject =
+            parsed !== null &&
+            typeof parsed === 'object' &&
+            !Array.isArray(parsed) &&
+            Object.keys(parsed).length === 0
+          if (isEmptyObject && !hasSingleJsonResource) {
+            return new Error(t('project.node.datax_custom_json_resource_tips'))
           }
         }
       }
