@@ -30,15 +30,23 @@ import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.DagData;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -82,6 +90,7 @@ public class WorkflowDefinitionControllerTest {
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setName(name);
+        workflowDefinition.setGlobalParams(sensitiveGlobalParams());
 
         Mockito.when(processDefinitionService.createWorkflowDefinition(user, projectCode, name, description,
                 globalParams, locations, timeout, relationJson, taskDefinitionJson, "",
@@ -92,6 +101,8 @@ public class WorkflowDefinitionControllerTest {
                 name, description, globalParams, locations, timeout, relationJson, taskDefinitionJson, "",
                 WorkflowExecutionTypeEnum.PARALLEL);
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        assertMaskedAndOriginalUnchanged(workflowDefinition.getGlobalParams(),
+                response.getData().getGlobalParams());
     }
 
     public void putMsg(Result result, Status status, Object... statusParams) {
@@ -129,6 +140,7 @@ public class WorkflowDefinitionControllerTest {
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(code);
+        workflowDefinition.setGlobalParams(sensitiveGlobalParams());
 
         Mockito.when(processDefinitionService.updateWorkflowDefinition(user, projectCode, name, code, description,
                 globalParams, locations, timeout, relationJson, taskDefinitionJson,
@@ -138,6 +150,8 @@ public class WorkflowDefinitionControllerTest {
                 name, code, description, globalParams, locations, timeout, relationJson, taskDefinitionJson,
                 WorkflowExecutionTypeEnum.PARALLEL, ReleaseState.OFFLINE);
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        assertMaskedAndOriginalUnchanged(workflowDefinition.getGlobalParams(),
+                response.getData().getGlobalParams());
     }
 
     @Test
@@ -159,13 +173,21 @@ public class WorkflowDefinitionControllerTest {
 
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(code);
-        DagData dagData = new DagData(workflowDefinition, Collections.emptyList(), Collections.emptyList());
+        workflowDefinition.setGlobalParams(sensitiveGlobalParams());
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTaskParams(sensitiveTaskParams());
+        DagData dagData = new DagData(workflowDefinition, Collections.emptyList(),
+                Collections.singletonList(taskDefinition));
 
         Mockito.when(processDefinitionService.queryWorkflowDefinitionByCode(user, projectCode, code))
                 .thenReturn(dagData);
         Result<DagData> response = workflowDefinitionController.queryWorkflowDefinitionByCode(user, projectCode, code);
 
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
+        assertMaskedAndOriginalUnchanged(workflowDefinition.getGlobalParams(),
+                response.getData().getWorkflowDefinition().getGlobalParams());
+        assertMaskedAndOriginalUnchanged(taskDefinition.getTaskParams(),
+                response.getData().getTaskDefinitionList().get(0).getTaskParams());
     }
 
     @Test
@@ -281,7 +303,10 @@ public class WorkflowDefinitionControllerTest {
         String searchVal = "";
         int userId = 1;
 
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setGlobalParams(sensitiveGlobalParams());
         PageInfo<WorkflowDefinition> pageInfo = new PageInfo<>(1, 10);
+        pageInfo.setTotalList(Collections.singletonList(workflowDefinition));
 
         Mockito.when(
                 processDefinitionService.queryWorkflowDefinitionListPaging(user, projectCode, searchVal, "", userId,
@@ -291,6 +316,8 @@ public class WorkflowDefinitionControllerTest {
                 .queryWorkflowDefinitionListPaging(user, projectCode, searchVal, "", userId, pageNo, pageSize);
 
         Assertions.assertTrue(response != null && response.isSuccess());
+        assertMaskedAndOriginalUnchanged(workflowDefinition.getGlobalParams(),
+                response.getData().getTotalList().get(0).getGlobalParams());
     }
 
     @Test
@@ -299,7 +326,11 @@ public class WorkflowDefinitionControllerTest {
         long projectCode = 1L;
         Result resultMap = new Result();
         putMsg(resultMap, Status.SUCCESS);
-        resultMap.setData(new PageInfo<WorkflowDefinitionLog>(1, 10));
+        WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog();
+        workflowDefinitionLog.setGlobalParams(sensitiveGlobalParams());
+        PageInfo<WorkflowDefinitionLog> pageInfo = new PageInfo<>(1, 10);
+        pageInfo.setTotalList(Collections.singletonList(workflowDefinitionLog));
+        resultMap.setData(pageInfo);
         Mockito.when(processDefinitionService.queryWorkflowDefinitionVersions(
                 user, projectCode, 1, 10, 1))
                 .thenReturn(resultMap);
@@ -307,6 +338,10 @@ public class WorkflowDefinitionControllerTest {
                 user, projectCode, 1, 10, 1);
 
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
+        @SuppressWarnings("unchecked")
+        PageInfo<WorkflowDefinitionLog> maskedPage = (PageInfo<WorkflowDefinitionLog>) result.getData();
+        assertMaskedAndOriginalUnchanged(workflowDefinitionLog.getGlobalParams(),
+                maskedPage.getTotalList().get(0).getGlobalParams());
     }
 
     @Test
@@ -332,12 +367,55 @@ public class WorkflowDefinitionControllerTest {
     public void testViewVariables() {
         long projectCode = 1L;
 
+        Map<String, Object> localParam = new LinkedHashMap<>();
+        localParam.put(TaskConstants.LOCAL_PARAMS_LIST, Collections.singletonList(sensitive("token", "abc")));
+        WorkflowDefinitionVariablesDTO variables = new WorkflowDefinitionVariablesDTO(
+                Collections.singletonList(sensitive("pwd", "Secret123")),
+                Collections.singletonMap("shell-1", localParam));
         Mockito.when(processDefinitionService.viewVariables(user, projectCode, 1L))
-                .thenReturn(new WorkflowDefinitionVariablesDTO());
+                .thenReturn(variables);
 
         Result result = workflowDefinitionController.viewVariables(user, projectCode, 1L);
 
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        WorkflowDefinitionVariablesDTO masked = (WorkflowDefinitionVariablesDTO) result.getData();
+        Assertions.assertEquals(TaskConstants.SENSITIVE_DATA_MASK, masked.getGlobalParams().get(0).getValue());
+        Assertions.assertEquals("Secret123", variables.getGlobalParams().get(0).getValue());
+        @SuppressWarnings("unchecked")
+        List<Property> maskedLocalParams =
+                (List<Property>) masked.getLocalParams().get("shell-1").get(TaskConstants.LOCAL_PARAMS_LIST);
+        Assertions.assertEquals(TaskConstants.SENSITIVE_DATA_MASK, maskedLocalParams.get(0).getValue());
+        @SuppressWarnings("unchecked")
+        List<Property> originalLocalParams =
+                (List<Property>) variables.getLocalParams().get("shell-1").get(TaskConstants.LOCAL_PARAMS_LIST);
+        Assertions.assertEquals("abc", originalLocalParams.get(0).getValue());
+    }
+
+    private static String sensitiveGlobalParams() {
+        return GlobalParameterUtils.serializeGlobalParameter(Collections.singletonList(sensitive("pwd", "Secret123")));
+    }
+
+    private static String sensitiveTaskParams() {
+        return "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
+                + "\"value\":\"abc\",\"sensitive\":true}]}";
+    }
+
+    private static Property sensitive(String prop, String value) {
+        return Property.builder()
+                .prop(prop)
+                .direct(Direct.IN)
+                .type(DataType.VARCHAR)
+                .value(value)
+                .sensitive(true)
+                .build();
+    }
+
+    private static void assertMaskedAndOriginalUnchanged(String original, String masked) {
+        Assertions.assertTrue(original.contains("Secret123") || original.contains("\"abc\""));
+        Assertions.assertFalse(original.contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertTrue(masked.contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(masked.contains("Secret123"));
+        Assertions.assertFalse(masked.contains("\"abc\""));
     }
 
 }
