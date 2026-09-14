@@ -543,6 +543,7 @@ export default {
     http_condition_tips: 'Please Enter Http Condition',
     timeout_settings: 'Timeout Settings',
     connect_timeout: 'Connect Timeout',
+    keep_alive: 'TCP Keepalive',
     ms: 'ms',
     status_code_default: 'Default response code 200',
     status_code_custom: 'Custom response code',
