@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
@@ -51,10 +52,14 @@ import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -128,7 +133,7 @@ public class WorkflowDefinitionController extends BaseController {
         WorkflowDefinition workflowDefinition = workflowDefinitionService.createWorkflowDefinition(loginUser,
                 projectCode, name, description, globalParams,
                 locations, timeout, taskRelationJson, taskDefinitionJson, otherParamsJson, executionType);
-        return Result.success(workflowDefinition);
+        return Result.success(SensitivePropertyUtils.mask(workflowDefinition));
     }
 
     /**
@@ -254,7 +259,7 @@ public class WorkflowDefinitionController extends BaseController {
         if (releaseState == ReleaseState.ONLINE) {
             workflowDefinitionService.onlineWorkflowDefinition(loginUser, projectCode, code);
         }
-        return Result.success(workflowDefinition);
+        return Result.success(SensitivePropertyUtils.mask(workflowDefinition));
     }
 
     /**
@@ -283,8 +288,17 @@ public class WorkflowDefinitionController extends BaseController {
                                                   @PathVariable(value = "code") long code) {
 
         checkPageParams(pageNo, pageSize);
-        return workflowDefinitionService.queryWorkflowDefinitionVersions(loginUser, projectCode, pageNo, pageSize,
-                code);
+        Result result = workflowDefinitionService.queryWorkflowDefinitionVersions(loginUser, projectCode, pageNo,
+                pageSize, code);
+        @SuppressWarnings("unchecked")
+        PageInfo<WorkflowDefinitionLog> pageInfo = (PageInfo<WorkflowDefinitionLog>) result.getData();
+        if (pageInfo != null && pageInfo.getTotalList() != null) {
+            pageInfo.setTotalList(pageInfo.getTotalList().stream()
+                    .map(SensitivePropertyUtils::mask)
+                    .collect(Collectors.toList()));
+        }
+        result.setData(pageInfo);
+        return result;
     }
 
     /**
@@ -386,7 +400,7 @@ public class WorkflowDefinitionController extends BaseController {
                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                          @PathVariable(value = "code", required = true) long code) {
         DagData dagData = workflowDefinitionService.queryWorkflowDefinitionByCode(loginUser, projectCode, code);
-        return Result.success(dagData);
+        return Result.success(SensitivePropertyUtils.mask(dagData));
     }
 
     /**
@@ -408,7 +422,7 @@ public class WorkflowDefinitionController extends BaseController {
                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                          @RequestParam("name") String name) {
         DagData dagData = workflowDefinitionService.queryWorkflowDefinitionByName(loginUser, projectCode, name);
-        return Result.success(dagData);
+        return Result.success(SensitivePropertyUtils.mask(dagData));
     }
 
     /**
@@ -424,7 +438,13 @@ public class WorkflowDefinitionController extends BaseController {
     @ApiException(QUERY_WORKFLOW_DEFINITION_LIST)
     public Result<List<DagData>> queryWorkflowDefinitionList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        return Result.success(workflowDefinitionService.queryWorkflowDefinitionList(loginUser, projectCode));
+        List<DagData> dagDataList = workflowDefinitionService.queryWorkflowDefinitionList(loginUser, projectCode);
+        if (dagDataList == null) {
+            return Result.success(null);
+        }
+        return Result.success(dagDataList.stream()
+                .map(SensitivePropertyUtils::mask)
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -480,6 +500,11 @@ public class WorkflowDefinitionController extends BaseController {
 
         PageInfo<WorkflowDefinition> pageInfo = workflowDefinitionService.queryWorkflowDefinitionListPaging(
                 loginUser, projectCode, searchVal, otherParamsJson, userId, pageNo, pageSize);
+        if (pageInfo != null && pageInfo.getTotalList() != null) {
+            pageInfo.setTotalList(pageInfo.getTotalList().stream()
+                    .map(SensitivePropertyUtils::mask)
+                    .collect(Collectors.toList()));
+        }
         return Result.success(pageInfo);
 
     }
@@ -526,8 +551,14 @@ public class WorkflowDefinitionController extends BaseController {
     public Result<List<TaskDefinition>> getNodeListByDefinitionCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                     @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                     @PathVariable("code") long code) {
-        return Result.success(
-                workflowDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, code));
+        List<TaskDefinition> taskDefinitions =
+                workflowDefinitionService.getTaskNodeListByDefinitionCode(loginUser, projectCode, code);
+        if (taskDefinitions == null) {
+            return Result.success(null);
+        }
+        return Result.success(taskDefinitions.stream()
+                .map(SensitivePropertyUtils::mask)
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -548,8 +579,18 @@ public class WorkflowDefinitionController extends BaseController {
     public Result<Map<Long, List<TaskDefinition>>> getNodeListMapByDefinitionCodes(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                                    @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                                    @RequestParam("codes") String codes) {
-        return Result.success(
-                workflowDefinitionService.getNodeListMapByDefinitionCodes(loginUser, projectCode, codes));
+        Map<Long, List<TaskDefinition>> taskMap =
+                workflowDefinitionService.getNodeListMapByDefinitionCodes(loginUser, projectCode, codes);
+        if (taskMap == null) {
+            return Result.success(null);
+        }
+        Map<Long, List<TaskDefinition>> masked = new LinkedHashMap<>();
+        for (Map.Entry<Long, List<TaskDefinition>> entry : taskMap.entrySet()) {
+            List<TaskDefinition> tasks = entry.getValue();
+            masked.put(entry.getKey(), tasks == null ? null
+                    : tasks.stream().map(SensitivePropertyUtils::mask).collect(Collectors.toList()));
+        }
+        return Result.success(masked);
     }
 
     /**
@@ -645,8 +686,14 @@ public class WorkflowDefinitionController extends BaseController {
     @ApiException(QUERY_WORKFLOW_DEFINITION_LIST)
     public Result<List<DagData>> queryAllWorkflowDefinitionByProjectCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode) {
-        return Result.success(
-                workflowDefinitionService.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode));
+        List<DagData> dagDataList =
+                workflowDefinitionService.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+        if (dagDataList == null) {
+            return Result.success(null);
+        }
+        return Result.success(dagDataList.stream()
+                .map(SensitivePropertyUtils::mask)
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -666,7 +713,14 @@ public class WorkflowDefinitionController extends BaseController {
     public Result<WorkflowDefinitionVariablesDTO> viewVariables(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                                 @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                                 @PathVariable("code") Long code) {
-        return Result.success(workflowDefinitionService.viewVariables(loginUser, projectCode, code));
+        WorkflowDefinitionVariablesDTO variables =
+                workflowDefinitionService.viewVariables(loginUser, projectCode, code);
+        if (variables == null) {
+            return Result.success(null);
+        }
+        return Result.success(new WorkflowDefinitionVariablesDTO(
+                PropertySensitiveUtils.maskSensitiveValues(variables.getGlobalParams()),
+                SensitivePropertyUtils.mask(variables.getLocalParams())));
     }
 
 }

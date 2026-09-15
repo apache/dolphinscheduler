@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -43,6 +45,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -146,7 +149,15 @@ public class WorkflowInstanceController extends BaseController {
                                                                                  @PathVariable("id") Integer id) {
         WorkflowInstanceTaskListDTO taskList =
                 workflowInstanceService.queryTaskListByWorkflowInstanceId(loginUser, projectCode, id);
-        return Result.success(taskList);
+        if (taskList == null) {
+            return Result.success(null);
+        }
+        return Result.success(new WorkflowInstanceTaskListDTO(
+                taskList.getWorkflowInstanceState(),
+                taskList.getTaskList() == null ? null
+                        : taskList.getTaskList().stream()
+                                .map(SensitivePropertyUtils::mask)
+                                .collect(Collectors.toList())));
     }
 
     /**
@@ -189,7 +200,7 @@ public class WorkflowInstanceController extends BaseController {
                                                              @RequestParam(value = "timeout", required = false, defaultValue = "0") int timeout) {
         WorkflowDefinition workflowDefinition = workflowInstanceService.updateWorkflowInstance(loginUser, projectCode,
                 id, taskRelationJson, taskDefinitionJson, scheduleTime, syncDefine, globalParams, locations, timeout);
-        return Result.success(workflowDefinition);
+        return Result.success(SensitivePropertyUtils.mask(workflowDefinition));
     }
 
     /**
@@ -212,7 +223,7 @@ public class WorkflowInstanceController extends BaseController {
                                                               @PathVariable("id") Integer id) {
         WorkflowInstance workflowInstance =
                 workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, id);
-        return Result.success(workflowInstance);
+        return Result.success(SensitivePropertyUtils.mask(workflowInstance));
     }
 
     /**
@@ -333,7 +344,12 @@ public class WorkflowInstanceController extends BaseController {
                                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
                                                               @PathVariable("id") Integer id) {
         WorkflowInstanceVariablesDTO variables = workflowInstanceService.viewVariables(loginUser, projectCode, id);
-        return Result.success(variables);
+        if (variables == null) {
+            return Result.success(null);
+        }
+        return Result.success(new WorkflowInstanceVariablesDTO(
+                PropertySensitiveUtils.maskSensitiveValues(variables.getGlobalParams()),
+                SensitivePropertyUtils.mask(variables.getLocalParams())));
     }
 
     /**
@@ -420,4 +436,5 @@ public class WorkflowInstanceController extends BaseController {
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, triggerCode);
         return Result.success(workflowInstances);
     }
+
 }

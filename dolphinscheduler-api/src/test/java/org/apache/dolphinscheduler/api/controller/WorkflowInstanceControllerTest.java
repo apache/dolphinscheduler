@@ -24,6 +24,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -33,13 +34,23 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.DagData;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentDetails;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -164,8 +175,36 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testQueryTaskListByWorkflowInstanceIdMasksSensitiveTaskParams() throws Exception {
+        TaskInstanceDependentDetails taskInstance = new TaskInstanceDependentDetails();
+        taskInstance.setTaskParams(sensitiveTaskParams());
+        WorkflowInstanceTaskListDTO dto = new WorkflowInstanceTaskListDTO("SUCCESS",
+                Collections.singletonList(taskInstance));
+        Mockito.when(workflowInstanceService.queryTaskListByWorkflowInstanceId(Mockito.any(), Mockito.anyLong(),
+                Mockito.any()))
+                .thenReturn(dto);
+
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/workflow-instances/{id}/tasks", "1113", "123")
+                        .header(SESSION_ID, sessionId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        Result result = JSONUtils.parseObject(responseBody, Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        com.fasterxml.jackson.databind.node.ObjectNode root = JSONUtils.parseObject(responseBody);
+        String taskParams = root.path("data").path("taskList").path(0).path("taskParams").toString();
+        Assertions.assertTrue(taskParams.contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(taskParams.contains("abc"));
+        Assertions.assertTrue(taskInstance.getTaskParams().contains("abc"));
+    }
+
+    @Test
     public void testUpdateWorkflowInstance() throws Exception {
         WorkflowDefinition mockResult = new WorkflowDefinition();
+        mockResult.setGlobalParams(sensitiveGlobalParams());
         Mockito.when(workflowInstanceService
                 .updateWorkflowInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
@@ -197,13 +236,25 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        com.fasterxml.jackson.databind.node.ObjectNode updateRoot =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
+        String maskedGlobalParams = updateRoot.path("data").path("globalParams").asText();
+        Assertions.assertTrue(maskedGlobalParams.contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(maskedGlobalParams.contains("Secret123"));
+        Assertions.assertTrue(mockResult.getGlobalParams().contains("Secret123"));
     }
 
     @Test
     public void testQueryWorkflowInstanceById() throws Exception {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setGlobalParams(sensitiveGlobalParams());
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTaskParams(sensitiveTaskParams());
+        workflowInstance.setDagData(new DagData(new WorkflowDefinition(), Collections.emptyList(),
+                Collections.singletonList(taskDefinition)));
         Mockito.when(
                 workflowInstanceService.queryWorkflowInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
-                .thenReturn(new WorkflowInstance());
+                .thenReturn(workflowInstance);
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/workflow-instances/{id}", "1113", "123")
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
@@ -213,6 +264,14 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        com.fasterxml.jackson.databind.node.ObjectNode instanceRoot =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
+        String maskedPayload = instanceRoot.path("data").toString();
+        Assertions.assertTrue(maskedPayload.contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(maskedPayload.contains("Secret123"));
+        Assertions.assertFalse(maskedPayload.contains("\"abc\""));
+        Assertions.assertTrue(workflowInstance.getGlobalParams().contains("Secret123"));
+        Assertions.assertTrue(taskDefinition.getTaskParams().contains("abc"));
     }
 
     @Test
@@ -255,8 +314,11 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testViewVariables() throws Exception {
+        Map<String, Object> localParam = new LinkedHashMap<>();
+        localParam.put(TaskConstants.LOCAL_PARAMS_LIST, Collections.singletonList(sensitive("token", "abc")));
         WorkflowInstanceVariablesDTO mockResult =
-                new WorkflowInstanceVariablesDTO(Collections.emptyList(), Collections.emptyMap());
+                new WorkflowInstanceVariablesDTO(Collections.singletonList(sensitive("pwd", "Secret123")),
+                        Collections.singletonMap("shell-1", localParam));
         Mockito.when(workflowInstanceService.viewVariables(Mockito.any(), Mockito.eq(1113L), Mockito.eq(123)))
                 .thenReturn(mockResult);
         MvcResult mvcResult = mockMvc
@@ -268,6 +330,14 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        com.fasterxml.jackson.databind.node.ObjectNode variablesRoot =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
+        Assertions.assertEquals(TaskConstants.SENSITIVE_DATA_MASK,
+                variablesRoot.path("data").path("globalParams").path(0).path("value").asText());
+        Assertions.assertEquals("Secret123", mockResult.getGlobalParams().get(0).getValue());
+        Assertions.assertEquals(TaskConstants.SENSITIVE_DATA_MASK,
+                variablesRoot.path("data").path("localParams").path("shell-1")
+                        .path(TaskConstants.LOCAL_PARAMS_LIST).path(0).path("value").asText());
     }
 
     @Test
@@ -371,5 +441,24 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Assertions.assertEquals(WorkflowExecutionStatus.SUCCESS, result.getState());
         Assertions.assertEquals("admin", result.getExecutorName());
         Assertions.assertEquals("1h 2m", result.getDuration());
+    }
+
+    private static String sensitiveGlobalParams() {
+        return GlobalParameterUtils.serializeGlobalParameter(Collections.singletonList(sensitive("pwd", "Secret123")));
+    }
+
+    private static String sensitiveTaskParams() {
+        return "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
+                + "\"value\":\"abc\",\"sensitive\":true}]}";
+    }
+
+    private static Property sensitive(String prop, String value) {
+        return Property.builder()
+                .prop(prop)
+                .direct(Direct.IN)
+                .type(DataType.VARCHAR)
+                .value(value)
+                .sensitive(true)
+                .build();
     }
 }

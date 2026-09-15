@@ -28,13 +28,17 @@ import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -88,7 +92,17 @@ public class TaskDefinitionController extends BaseController {
                                               @RequestParam(value = "pageNo") int pageNo,
                                               @RequestParam(value = "pageSize") int pageSize) {
         checkPageParams(pageNo, pageSize);
-        return taskDefinitionService.queryTaskDefinitionVersions(loginUser, projectCode, code, pageNo, pageSize);
+        Result result = taskDefinitionService.queryTaskDefinitionVersions(loginUser, projectCode, code, pageNo,
+                pageSize);
+        @SuppressWarnings("unchecked")
+        PageInfo<TaskDefinitionLog> pageInfo = (PageInfo<TaskDefinitionLog>) result.getData();
+        if (pageInfo != null && pageInfo.getTotalList() != null) {
+            pageInfo.setTotalList(pageInfo.getTotalList().stream()
+                    .map(SensitivePropertyUtils::mask)
+                    .collect(Collectors.toList()));
+        }
+        result.setData(pageInfo);
+        return result;
     }
 
     /**
@@ -163,7 +177,7 @@ public class TaskDefinitionController extends BaseController {
                                                               @PathVariable(value = "code") long code) {
         TaskDefinitionVO taskDefinitionVO =
                 taskDefinitionService.queryTaskDefinitionDetail(loginUser, projectCode, code);
-        return Result.success(taskDefinitionVO);
+        return Result.success(SensitivePropertyUtils.mask(taskDefinitionVO));
     }
 
     /**
