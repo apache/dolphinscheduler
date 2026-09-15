@@ -258,6 +258,7 @@
         where 1=1
         and workflow_instance_id = #{workflowInstanceId}
         and state != 8
+        and flag = 1
         <if test="taskCodes != null and taskCodes.size() != 0">
             and task_code in
             <foreach collection="taskCodes" index="index" item="i" open="(" separator="," close=")">
@@ -269,6 +270,7 @@
         on instance.workflow_instance_id = t_max.workflow_instance_id
         and instance.task_code = t_max.task_code
         and instance.end_time = t_max.max_end_time
+        and instance.flag = 1
     </select>
     <select id="findLastTaskInstance" resultType="org.apache.dolphinscheduler.dao.entity.TaskInstance">
         select
