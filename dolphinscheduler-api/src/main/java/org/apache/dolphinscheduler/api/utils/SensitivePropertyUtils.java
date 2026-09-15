@@ -130,44 +130,67 @@ public class SensitivePropertyUtils {
      * Copy then mask for HTTP responses. Do not mask Service return values in place.
      * Nested {@link DagData} is remasked from the original (BeanUtils is shallow).
      */
-    @SuppressWarnings("unchecked")
-    public <T> T mask(T source) {
+    public Map<String, Map<String, Object>> mask(Map<String, Map<String, Object>> source) {
         if (source == null) {
             return null;
         }
-        if (source instanceof Map) {
-            return (T) maskLocalParamsMap((Map<String, Map<String, Object>>) source);
+        return maskLocalParamsMap(source);
+    }
+
+    public DagData mask(DagData source) {
+        if (source == null) {
+            return null;
+        }
+        DagData copy = copyBean(source);
+        copy.setWorkflowDefinition(mask(source.getWorkflowDefinition()));
+        if (source.getTaskDefinitionList() != null) {
+            copy.setTaskDefinitionList(source.getTaskDefinitionList().stream()
+                    .map(SensitivePropertyUtils::mask)
+                    .collect(Collectors.toList()));
+        }
+        return copy;
+    }
+
+    public WorkflowInstance mask(WorkflowInstance source) {
+        if (source == null) {
+            return null;
+        }
+        WorkflowInstance copy = copyBean(source);
+        copy.setGlobalParams(maskGlobalParams(copy.getGlobalParams()));
+        copy.setVarPool(maskVarPool(copy.getVarPool()));
+        copy.setDagData(mask(source.getDagData()));
+        return copy;
+    }
+
+    public <T extends WorkflowDefinition> T mask(T source) {
+        if (source == null) {
+            return null;
         }
         T copy = copyBean(source);
-        if (copy instanceof WorkflowInstance) {
-            WorkflowInstance workflowInstance = (WorkflowInstance) copy;
-            workflowInstance.setGlobalParams(maskGlobalParams(workflowInstance.getGlobalParams()));
-            workflowInstance.setVarPool(maskVarPool(workflowInstance.getVarPool()));
-            workflowInstance.setDagData(mask(((WorkflowInstance) source).getDagData()));
-        } else if (copy instanceof DagData) {
-            DagData dagData = (DagData) copy;
-            DagData original = (DagData) source;
-            dagData.setWorkflowDefinition(mask(original.getWorkflowDefinition()));
-            if (original.getTaskDefinitionList() != null) {
-                dagData.setTaskDefinitionList(original.getTaskDefinitionList().stream()
-                        .map(SensitivePropertyUtils::mask)
-                        .collect(Collectors.toList()));
-            }
-        } else if (copy instanceof WorkflowDefinition) {
-            WorkflowDefinition workflowDefinition = (WorkflowDefinition) copy;
-            workflowDefinition.setGlobalParams(maskGlobalParams(workflowDefinition.getGlobalParams()));
-            workflowDefinition.setGlobalParamMap(null);
-        } else if (copy instanceof TaskDefinition) {
-            TaskDefinition taskDefinition = (TaskDefinition) copy;
-            taskDefinition.setTaskParams(rewriteLocalParams(taskDefinition.getTaskParams(),
-                    PropertySensitiveUtils::maskSensitiveValues));
-            taskDefinition.setTaskParamMap(null);
-        } else if (copy instanceof TaskInstance) {
-            TaskInstance taskInstance = (TaskInstance) copy;
-            taskInstance.setTaskParams(rewriteLocalParams(taskInstance.getTaskParams(),
-                    PropertySensitiveUtils::maskSensitiveValues));
-            taskInstance.setVarPool(maskVarPool(taskInstance.getVarPool()));
+        copy.setGlobalParams(maskGlobalParams(copy.getGlobalParams()));
+        copy.setGlobalParamMap(null);
+        return copy;
+    }
+
+    public <T extends TaskDefinition> T mask(T source) {
+        if (source == null) {
+            return null;
         }
+        T copy = copyBean(source);
+        copy.setTaskParams(rewriteLocalParams(copy.getTaskParams(),
+                PropertySensitiveUtils::maskSensitiveValues));
+        copy.setTaskParamMap(null);
+        return copy;
+    }
+
+    public <T extends TaskInstance> T mask(T source) {
+        if (source == null) {
+            return null;
+        }
+        T copy = copyBean(source);
+        copy.setTaskParams(rewriteLocalParams(copy.getTaskParams(),
+                PropertySensitiveUtils::maskSensitiveValues));
+        copy.setVarPool(maskVarPool(copy.getVarPool()));
         return copy;
     }
 
