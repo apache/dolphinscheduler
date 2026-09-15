@@ -8,6 +8,47 @@ This chart bootstraps all the components needed to run Apache DolphinScheduler o
 
 Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/installation/kubernetes.md)
 
+## HDFS HA configuration
+
+For deployments configured to use HDFS, mount an existing ConfigMap containing `core-site.xml` and `hdfs-site.xml` into both the API and Worker containers to supply HA settings. The ConfigMap must be in the same namespace as DolphinScheduler.
+
+For example, with a ConfigMap named `hadoop-ha-config`, add the following values:
+
+```yaml
+api:
+  extraVolumes:
+    - name: hadoop-ha-config
+      configMap:
+        name: hadoop-ha-config
+  extraVolumeMounts:
+    - name: hadoop-ha-config
+      mountPath: /opt/dolphinscheduler/conf/core-site.xml
+      subPath: core-site.xml
+      readOnly: true
+    - name: hadoop-ha-config
+      mountPath: /opt/dolphinscheduler/conf/hdfs-site.xml
+      subPath: hdfs-site.xml
+      readOnly: true
+worker:
+  extraVolumes:
+    - name: hadoop-ha-config
+      configMap:
+        name: hadoop-ha-config
+  extraVolumeMounts:
+    - name: hadoop-ha-config
+      mountPath: /opt/dolphinscheduler/conf/core-site.xml
+      subPath: core-site.xml
+      readOnly: true
+    - name: hadoop-ha-config
+      mountPath: /opt/dolphinscheduler/conf/hdfs-site.xml
+      subPath: hdfs-site.xml
+      readOnly: true
+```
+
+Configure `fs.defaultFS` with the logical nameservice URI (for example, `hdfs://mycluster`) and include the corresponding HA settings in the XML files. Keep DolphinScheduler's filesystem configuration consistent with that URI.
+
+The paths above use `/opt/dolphinscheduler/conf`, as used by the chart's default API and Worker images. Check the configuration classpath of your image version or custom image and adjust the mount paths if it uses a different directory. Individual file mounts preserve the other packaged configuration files. Restart API and Worker pods after changing the ConfigMap: Kubernetes does not update ConfigMap files mounted using `subPath`.
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -58,6 +99,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | api.enableCustomizedConfig | bool | `false` | enable configure custom config |
 | api.enabled | bool | `true` | Enable or disable the API-Server component |
 | api.env.JAVA_OPTS | string | `"-Xms512m -Xmx512m -Xmn256m"` | The jvm options for api server |
+| api.extraVolumeMounts | list | `[]` | Additional volume mounts for the API container |
+| api.extraVolumes | list | `[]` | Additional volumes for the API container |
 | api.livenessProbe | object | `{"enabled":true,"failureThreshold":"3","initialDelaySeconds":"30","periodSeconds":"30","successThreshold":"1","timeoutSeconds":"5"}` | Periodic probe of container liveness. Container will be restarted if the probe fails. More info: [container-probes](https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#container-probes) |
 | api.livenessProbe.enabled | bool | `true` | Turn on and off liveness probe |
 | api.livenessProbe.failureThreshold | string | `"3"` | Minimum consecutive failures for the probe |
@@ -335,6 +378,8 @@ Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/inst
 | worker.env.WORKER_TENANT_CONFIG_AUTO_CREATE_TENANT_ENABLED | bool | `true` | tenant corresponds to the user of the system, which is used by the worker to submit the job. If system does not have this user, it will be automatically created after the parameter worker.tenant.auto.create is true. |
 | worker.env.WORKER_TENANT_CONFIG_DEFAULT_TENANT_ENABLED | bool | `false` | If set true, will use worker bootstrap user as the tenant to execute task when the tenant is `default`; |
 | worker.envFromSecret | string | `""` | Direct Secret Mounting Mount secrets directly as environment variables Single secret |
+| worker.extraVolumeMounts | list | `[]` | Additional volume mounts for the Worker container |
+| worker.extraVolumes | list | `[]` | Additional volumes for the Worker container |
 | worker.initContainers | object | `{}` | Init Container for Advanced Processing Use when you need to transform, validate, or prepare configuration files |
 | worker.keda.advanced | object | `{}` | Specify HPA related options |
 | worker.keda.cooldownPeriod | int | `30` | How many seconds KEDA will wait before scaling to zero. Note that HPA has a separate cooldown period for scale-downs |
