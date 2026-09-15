@@ -27,12 +27,14 @@ import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.model.TaskInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -106,22 +108,22 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      * @return task list page
      */
     @Override
-    public Result queryTaskListPaging(User loginUser,
-                                      long projectCode,
-                                      Integer workflowInstanceId,
-                                      String workflowInstanceName,
-                                      String workflowDefinitionName,
-                                      String taskName,
-                                      Long taskCode,
-                                      String executorName,
-                                      String startDate,
-                                      String endDate,
-                                      String searchVal,
-                                      TaskExecutionStatus stateType,
-                                      String host,
-                                      TaskExecuteType taskExecuteType,
-                                      Integer pageNo,
-                                      Integer pageSize) {
+    public Result<PageInfo<TaskInstanceSummaryVO>> queryTaskListPaging(User loginUser,
+                                                                       long projectCode,
+                                                                       Integer workflowInstanceId,
+                                                                       String workflowInstanceName,
+                                                                       String workflowDefinitionName,
+                                                                       String taskName,
+                                                                       Long taskCode,
+                                                                       String executorName,
+                                                                       String startDate,
+                                                                       String endDate,
+                                                                       String searchVal,
+                                                                       TaskExecutionStatus stateType,
+                                                                       String host,
+                                                                       TaskExecuteType taskExecuteType,
+                                                                       Integer pageNo,
+                                                                       Integer pageSize) {
         Result result = new Result();
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, TASK_INSTANCE);
@@ -131,9 +133,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         }
         Date start = checkAndParseDateParameters(startDate);
         Date end = checkAndParseDateParameters(endDate);
-        Page<TaskInstance> page = new Page<>(pageNo, pageSize);
-        PageInfo<TaskInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
-        IPage<TaskInstance> taskInstanceIPage;
+        Page<TaskInstanceSummaryDto> page = new Page<>(pageNo, pageSize);
+        PageInfo<TaskInstanceSummaryVO> pageInfo = new PageInfo<>(pageNo, pageSize);
+        IPage<TaskInstanceSummaryDto> taskInstanceIPage;
         if (taskExecuteType == TaskExecuteType.STREAM) {
             // stream task without workflow instance
             taskInstanceIPage = taskInstanceDao.queryStreamTaskInstanceListPaging(
@@ -165,12 +167,13 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                     start,
                     end);
         }
-        List<TaskInstance> taskInstanceList = taskInstanceIPage.getRecords();
+        List<TaskInstanceSummaryDto> taskInstanceList = taskInstanceIPage.getRecords();
         List<Integer> executorIds =
-                taskInstanceList.stream().map(TaskInstance::getExecutorId).distinct().collect(Collectors.toList());
+                taskInstanceList.stream().map(TaskInstanceSummaryDto::getExecutorId).distinct()
+                        .collect(Collectors.toList());
         List<User> users = usersService.queryUser(executorIds);
         Map<Integer, User> userMap = users.stream().collect(Collectors.toMap(User::getId, v -> v));
-        for (TaskInstance taskInstance : taskInstanceList) {
+        for (TaskInstanceSummaryDto taskInstance : taskInstanceList) {
             taskInstance.setDuration(DateUtils.format2Duration(taskInstance.getStartTime(), taskInstance.getEndTime()));
             User user = userMap.get(taskInstance.getExecutorId());
             if (user != null) {
@@ -178,7 +181,9 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
             }
         }
         pageInfo.setTotal((int) taskInstanceIPage.getTotal());
-        pageInfo.setTotalList(taskInstanceList);
+        pageInfo.setTotalList(taskInstanceList.stream()
+                .map(TaskInstanceSummaryVO::fromSummaryDto)
+                .collect(Collectors.toList()));
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
