@@ -25,6 +25,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.alert.api.AlertChannel;
+import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
 import org.apache.dolphinscheduler.alert.plugin.AlertPluginManager;
@@ -209,5 +210,34 @@ class AlertSenderTest {
         pluginParamsTransferMockedStatic.when(() -> PluginParamsTransfer.getPluginParamsMap(PLUGIN_INSTANCE_PARAMS))
                 .thenReturn(paramsMap);
         alertSender.syncTestSend(PLUGIN_DEFINE_ID, PLUGIN_INSTANCE_PARAMS);
+    }
+
+    @Test
+    void testGetAlertDataWithNullAlertType() {
+        Alert alert = new Alert();
+        alert.setId(1);
+        alert.setTitle(TITLE);
+        alert.setContent(CONTENT);
+        alert.setAlertGroupId(ALERT_GROUP_ID);
+        alert.setWarningType(WarningType.FAILURE);
+        alert.setAlertType(null);
+
+        Assertions.assertThrows(IllegalArgumentException.class,
+                () -> alertSender.getAlertData(alert));
+    }
+
+    @Test
+    void testGetAlertDataWithValidAlertType() {
+        Alert alert = new Alert();
+        alert.setId(2);
+        alert.setTitle(TITLE);
+        alert.setContent(CONTENT);
+        alert.setAlertGroupId(ALERT_GROUP_ID);
+        alert.setWarningType(WarningType.FAILURE);
+        alert.setAlertType(AlertType.TASK_RESULT);
+
+        AlertData alertData = alertSender.getAlertData(alert);
+        Assertions.assertNotNull(alertData);
+        Assertions.assertEquals(AlertType.TASK_RESULT.getCode(), alertData.getAlertType());
     }
 }

@@ -13,23 +13,16 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
-
-import org.apache.dolphinscheduler.common.enums.AlertType;
-
-import lombok.Data;
-
-@Data
-public class TaskAlertInfo {
-
-    private String title;
-
-    private String content;
-
-    private Integer alertGroupId;
-
-    private AlertType alertType;
-
-}
+-- Enforce idempotent task-result alerts at the database level.
+-- Allows INSERT IGNORE (MySQL) / ON CONFLICT DO NOTHING (PostgreSQL) to atomically
+-- prevent duplicates without check-then-insert race conditions.
+-- Clean up any existing duplicate rows before adding the unique constraint.
+DELETE FROM t_ds_alert a
+USING t_ds_alert b
+WHERE a.id < b.id
+  AND a.sign = b.sign
+  AND a.workflow_instance_id = b.workflow_instance_id
+  AND a.alert_type = b.alert_type;
+CREATE UNIQUE INDEX IF NOT EXISTS uk_alert_dedup ON t_ds_alert (sign, workflow_instance_id, alert_type);
