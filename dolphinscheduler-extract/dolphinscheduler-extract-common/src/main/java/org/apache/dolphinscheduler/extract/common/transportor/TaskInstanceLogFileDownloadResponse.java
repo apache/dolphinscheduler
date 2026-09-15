@@ -32,4 +32,9 @@ public class TaskInstanceLogFileDownloadResponse {
 
     private String message;
 
+    /**
+     * Whether this is the last chunk (or the only chunk for whole-file responses).
+     */
+    private boolean eof = true;
+
 }

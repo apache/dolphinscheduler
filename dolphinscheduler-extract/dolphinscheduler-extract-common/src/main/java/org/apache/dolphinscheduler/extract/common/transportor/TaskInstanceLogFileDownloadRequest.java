@@ -30,4 +30,21 @@ public class TaskInstanceLogFileDownloadRequest {
 
     private String taskInstanceLogAbsolutePath;
 
+    /**
+     * Chunk read offset in bytes. Only read by the chunk RPC — the legacy whole-file method
+     * ignores it. Non-positive values are clamped to 0 by the worker.
+     */
+    private long offset = 0;
+
+    /**
+     * Chunk read length in bytes. Only read by the chunk RPC — the legacy whole-file method
+     * ignores it. Non-positive values are clamped to the worker's maximum chunk size.
+     */
+    private int length = 0;
+
+    public TaskInstanceLogFileDownloadRequest(long taskInstanceId, String taskInstanceLogAbsolutePath) {
+        this.taskInstanceId = taskInstanceId;
+        this.taskInstanceLogAbsolutePath = taskInstanceLogAbsolutePath;
+    }
+
 }
