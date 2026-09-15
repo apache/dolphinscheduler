@@ -22,5 +22,7 @@ export default {
   password_tips: '请输入密码',
   confirm_password_tips: '请输入确认密码',
   two_password_entries_are_inconsistent: '两次密码输入不一致',
-  submit: '提交'
+  submit: '提交',
+  not_supported_in_non_password_mode:
+    '当前认证模式下不支持修改密码，请在认证系统中修改'
 }
