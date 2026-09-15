@@ -301,6 +301,7 @@ interface ITaskParams {
   condition?: string
   connectTimeout?: number
   socketTimeout?: number
+  socketKeepAlive?: boolean
   type?: string
   datasource?: string
   sql?: string

@@ -234,6 +234,37 @@ public class HttpTaskTest {
         Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
     }
 
+    @Test
+    public void testHandleWithSocketKeepAliveEnabled() throws Exception {
+        HttpTask getHttpTask = generateHttpTask(HttpRequestMethod.GET, HttpStatus.SC_OK, true);
+        HttpTask postHttpTask = generateHttpTask(HttpRequestMethod.POST, HttpStatus.SC_OK, true);
+        HttpTask deleteHttpTask = generateHttpTask(HttpRequestMethod.DELETE, HttpStatus.SC_OK, true);
+
+        getHttpTask.handle(null);
+        postHttpTask.handle(null);
+        deleteHttpTask.handle(null);
+
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, getHttpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, postHttpTask.getExitStatusCode());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, deleteHttpTask.getExitStatusCode());
+    }
+
+    private HttpTask generateHttpTask(HttpRequestMethod httpRequestMethod, int actualResponseCode,
+                                      boolean socketKeepAlive) throws JsonProcessingException, IOException {
+        String url = withMockWebServer(DEFAULT_MOCK_PATH, actualResponseCode, "");
+        HttpParameters httpParameters = new HttpParameters();
+        httpParameters.setUrl(url);
+        httpParameters.setHttpRequestMethod(httpRequestMethod);
+        httpParameters.setHttpRequestBody("");
+        httpParameters.setHttpCheckCondition(HttpCheckCondition.STATUS_CODE_DEFAULT);
+        httpParameters.setCondition("");
+        httpParameters.setConnectTimeout(10000);
+        httpParameters.setSocketKeepAlive(socketKeepAlive);
+        ObjectMapper mapper = new ObjectMapper();
+        String paramData = mapper.writeValueAsString(httpParameters);
+        return generateHttpTaskFromParamData(paramData, null);
+    }
+
     private String withMockWebServer(String path, int actualResponseCode,
                                      String actualResponseBody) throws IOException {
         MockWebServer server = new MockWebServer();
