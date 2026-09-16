@@ -15,8 +15,8 @@
  * limitations under the License.
  */
 
-import { computed, defineComponent, PropType, ref } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
+import { computed, defineComponent, nextTick, PropType, ref, watch } from 'vue'
+import { useResizeObserver, useWindowSize } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 import { NButton, NIcon, NTooltip, useThemeVars } from 'naive-ui'
 import { FileTextOutlined, InfoCircleOutlined } from '@vicons/antd'
@@ -24,6 +24,7 @@ import { tasksState } from '@/common/common'
 import type { ITaskState } from '@/common/types'
 import { useTimezoneStore } from '@/store/timezone/timezone'
 import { formatDuration } from '../model'
+import { availableGanttHeight } from '../layout'
 import type { GanttModel } from '../model'
 import type { GanttRow } from '../type'
 import styles from '../index.module.scss'
@@ -37,10 +38,38 @@ export default defineComponent({
     const timezone = useTimezoneStore()
     const theme = useThemeVars()
     const axis = ref<HTMLElement>()
+    const viewport = ref<HTMLElement>()
     const width = ref(600)
+    const viewportHeight = ref<number>()
+    const { height: windowHeight } = useWindowSize()
+    const updateViewportHeight = () => {
+      const element = viewport.value
+      if (!element) return
+      const container = element.closest('.n-scrollbar-container')
+      const containerBottom =
+        container?.getBoundingClientRect().bottom ?? window.innerHeight
+      viewportHeight.value = availableGanttHeight(
+        element.getBoundingClientRect().top,
+        containerBottom
+      )
+    }
     useResizeObserver(axis, (entries) => {
       width.value = entries[0].contentRect.width
     })
+    useResizeObserver(viewport, updateViewportHeight)
+    watch(
+      windowHeight,
+      () => {
+        void nextTick(updateViewportHeight)
+      },
+      { immediate: true }
+    )
+    watch(
+      () => props.model.rows.length,
+      () => {
+        void nextTick(updateViewportHeight)
+      }
+    )
     const ticks = computed(() => {
       const count = Math.max(1, Math.floor(width.value / 110))
       return Array.from({ length: count + 1 }, (_, index) => index / count)
@@ -120,7 +149,14 @@ export default defineComponent({
           </span>
         </div>
         <div
+          ref={viewport}
           class={styles.viewport}
+          style={{
+            maxHeight:
+              viewportHeight.value === undefined
+                ? undefined
+                : `${viewportHeight.value}px`
+          }}
           tabindex={0}
           aria-label={t('project.workflow.gantt_timeline')}
         >

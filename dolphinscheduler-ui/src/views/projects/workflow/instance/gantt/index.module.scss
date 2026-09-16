@@ -198,8 +198,8 @@
 .viewport {
   overflow-x: hidden;
   overflow-y: auto;
-  max-height: max(220px, calc(100vh - 300px));
   position: relative;
+  overscroll-behavior: contain;
 }
 .grid {
   display: grid;

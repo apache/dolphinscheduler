@@ -22,6 +22,7 @@ import {
   viewGanttTree
 } from '@/service/modules/workflow-instances'
 import { buildGanttModel, isWorkflowActive } from './model'
+import { isValidGanttIdentity } from './identity'
 import type { IGanttRes, TaskInstance, WorkflowInstance } from './type'
 
 export function useGantt(identity: () => [number, number]) {
@@ -41,7 +42,9 @@ export function useGantt(identity: () => [number, number]) {
   const refresh = async () => {
     if (loading.value || disposed) return
     const requestGeneration = generation
-    const [id, projectCode] = identity()
+    const requestIdentity = identity()
+    if (!isValidGanttIdentity(requestIdentity)) return
+    const [id, projectCode] = requestIdentity
     loading.value = true
     try {
       const [instance, taskResponse, ganttResponse] = await Promise.all([
