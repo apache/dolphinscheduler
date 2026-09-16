@@ -306,6 +306,7 @@ public final class Constants {
     public static final String TYPE_LOGIC = "Logic";
     public static final String TYPE_OTHER = "Other";
     public static final String TYPE_MACHINE_LEARNING = "MachineLearning";
+    public static final String TYPE_DATA_QUALITY = "DataQuality";
 
     /**
      * spi constants

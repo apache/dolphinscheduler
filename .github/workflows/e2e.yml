@@ -137,6 +137,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.HiveDataSourceE2ETest
           - name: DolphinDBDataSourceE2ETest
             class: org.apache.dolphinscheduler.e2e.cases.DolphinDBDataSourceE2ETest
+          - name: DatavinesTaskE2ETest
+            class: org.apache.dolphinscheduler.e2e.cases.tasks.DatavinesTaskE2ETest
     env:
       RECORDING_PATH: /tmp/recording-${{ matrix.case.name }}
     steps:

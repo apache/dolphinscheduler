@@ -1,0 +1,163 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.apache.dolphinscheduler.plugin.task.datavines.utils;
+
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.datavines.DatavinesTaskConstants;
+
+import org.apache.http.HttpStatus;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.util.EntityUtils;
+
+import java.net.URI;
+
+import lombok.extern.slf4j.Slf4j;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+@Slf4j
+public class RequestUtils {
+
+    private static final RequestConfig REQUEST_CONFIG = RequestConfig.custom()
+            .setConnectTimeout(Constants.HTTP_CONNECT_TIMEOUT)
+            .setSocketTimeout(Constants.SOCKET_TIMEOUT)
+            .setConnectionRequestTimeout(Constants.HTTP_CONNECTION_REQUEST_TIMEOUT)
+            .build();
+
+    private static final CloseableHttpClient HTTP_CLIENT = HttpClientBuilder.create()
+            .setDefaultRequestConfig(REQUEST_CONFIG)
+            .build();
+
+    private RequestUtils() {
+        throw new IllegalStateException("Utility class");
+    }
+
+    public static JsonNode executeJob(String address, String jobId, String token) {
+        return parse(doPost(address + DatavinesTaskConstants.EXECUTE_JOB + jobId, token));
+    }
+
+    public static JsonNode getJobExecutionStatus(String address, String jobExecutionId, String token) {
+        return parse(doGet(address + DatavinesTaskConstants.GET_JOB_EXECUTION_STATUS + jobExecutionId, token));
+    }
+
+    public static JsonNode getJobExecutionResult(String address, String jobExecutionId, String token) {
+        return parse(doGet(address + DatavinesTaskConstants.GET_JOB_EXECUTION_RESULT + jobExecutionId, token));
+    }
+
+    public static void killJobExecution(String address, String jobExecutionId, String token) {
+        String url = address + DatavinesTaskConstants.JOB_EXECUTION_KILL + jobExecutionId;
+        HttpPost httpPost = new HttpPost(url);
+        try {
+            httpPost.setHeader("Authorization", "Bearer " + token);
+            log.info("access url: {}", url);
+            try (CloseableHttpResponse response = HTTP_CLIENT.execute(httpPost)) {
+                String body = response.getEntity() == null ? "" : EntityUtils.toString(response.getEntity());
+                int statusCode = response.getStatusLine().getStatusCode();
+                log.info("kill datavines task, url: {}, status: {}, response: {}", url, statusCode, body);
+                validateKillResponse(statusCode, body);
+            }
+        } catch (IllegalStateException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("kill datavines task error: ", e);
+            throw new IllegalStateException("kill datavines task failed", e);
+        } finally {
+            httpPost.releaseConnection();
+        }
+    }
+
+    public static void validateKillResponse(int statusCode, String body) {
+        if (statusCode != HttpStatus.SC_OK) {
+            throw new IllegalStateException(
+                    "kill datavines task failed, http status: " + statusCode + ", response: " + body);
+        }
+        JsonNode result = parse(body);
+        if (result == null
+                || !result.hasNonNull(DatavinesTaskConstants.API_RESULT_CODE)
+                || result.get(DatavinesTaskConstants.API_RESULT_CODE)
+                        .asInt() != DatavinesTaskConstants.API_RESULT_CODE_SUCCESS) {
+            throw new IllegalStateException("kill datavines task failed, invalid response: " + body);
+        }
+    }
+
+    public static JsonNode parse(String res) {
+        try {
+            return JSONUtils.parseObject(res, JsonNode.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static String doGet(String url, String token) {
+        String result = "";
+        HttpGet httpGet = null;
+        try {
+            URIBuilder uriBuilder = new URIBuilder(url);
+            URI uri = uriBuilder.build();
+            httpGet = new HttpGet(uri);
+            httpGet.setHeader("Authorization", "Bearer " + token);
+            log.info("access url: {}", uri);
+            try (CloseableHttpResponse response = HTTP_CLIENT.execute(httpGet)) {
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    result = EntityUtils.toString(response.getEntity());
+                    log.info("datavines task succeed with results: {}", result);
+                } else {
+                    log.error("datavines task terminated,response: {}", response);
+                }
+            }
+        } catch (IllegalArgumentException ie) {
+            log.error("datavines task terminated: {}", ie.getMessage());
+        } catch (Exception e) {
+            log.error("datavines task terminated: ", e);
+        } finally {
+            if (null != httpGet) {
+                httpGet.releaseConnection();
+            }
+        }
+        return result;
+    }
+
+    public static String doPost(String url, String token) {
+        String result = "";
+        HttpPost httpPost = new HttpPost(url);
+        try {
+            httpPost.setHeader("Authorization", "Bearer " + token);
+            log.info("access url: {}", url);
+            try (CloseableHttpResponse response = HTTP_CLIENT.execute(httpPost)) {
+                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    result = EntityUtils.toString(response.getEntity());
+                    log.info("datavines task succeed with results: {}", result);
+                } else {
+                    log.error("datavines task terminated, response: {}", response);
+                }
+            }
+        } catch (IllegalArgumentException ie) {
+            log.error("datavines task terminated: {}", ie.getMessage());
+        } catch (Exception he) {
+            log.error("datavines task terminated: ", he);
+        }
+        return result;
+    }
+}

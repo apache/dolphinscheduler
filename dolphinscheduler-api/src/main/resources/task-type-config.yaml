@@ -47,6 +47,8 @@ task:
     - 'SEATUNNEL'
     - 'DATAX'
     - 'SQOOP'
+  dataQuality:
+    - 'DATAVINES'
   machineLearning:
     - 'JUPYTER'
     - 'MLFLOW'
