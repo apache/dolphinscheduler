@@ -15,59 +15,210 @@
  * limitations under the License.
  */
 
-import { defineComponent, onMounted, toRefs, watch } from 'vue'
+import { defineComponent } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
+import {
+  NAlert,
+  NButton,
+  NEmpty,
+  NSpin,
+  NSwitch,
+  NTag,
+  useThemeVars
+} from 'naive-ui'
 import Card from '@/components/card'
+import LogModal from '@/components/log-modal'
 import GanttChart from './components/gantt-chart'
 import { useGantt } from './use-gantt'
+import { useGanttLogs } from './use-logs'
+import { isWorkflowActive } from './model'
+import styles from './index.module.scss'
 
-const workflowRelation = defineComponent({
-  name: 'workflow-relation',
+export default defineComponent({
+  name: 'WorkflowInstanceGantt',
   setup() {
-    const { t, locale } = useI18n()
+    const { t } = useI18n()
     const route = useRoute()
-
-    const { variables, getGantt } = useGantt()
-
-    const id = Number(route.params.id)
-    const code = Number(route.params.projectCode)
-
-    const handleResetDate = () => {
-      variables.seriesData = []
-      variables.taskList = []
-      getGantt(id, code)
-    }
-
-    onMounted(() => {
-      getGantt(id, code)
-    })
-
-    watch(
-      () => [locale.value],
-      () => {
-        handleResetDate()
-      }
-    )
-
-    return { t, ...toRefs(variables) }
-  },
-  render() {
-    const { t } = this
-    return (
+    const theme = useThemeVars()
+    const { workflow, model, loading, error, autoRefresh, updatedAt, refresh } =
+      useGantt(() => [
+        Number(route.params.id),
+        Number(route.params.projectCode)
+      ])
+    const logs = useGanttLogs(t)
+    const statistics = [
+      'total',
+      'submitted',
+      'pending',
+      'waiting',
+      'running',
+      'success',
+      'failed',
+      'stopped'
+    ] as const
+    const statColor = (key: string) =>
+      ({
+        total: theme.value.textColor1,
+        submitted: '#7c6bc4',
+        pending: theme.value.textColor3,
+        waiting: theme.value.warningColor,
+        running: theme.value.infoColor,
+        success: theme.value.successColor,
+        failed: theme.value.errorColor,
+        stopped: '#b7815b'
+      }[key])
+    return () => (
       <Card title={t('project.workflow.gantt')}>
-        {{
-          default: () =>
-            this.seriesData.length > 0 && (
-              <GanttChart
-                seriesData={this.seriesData}
-                taskList={this.taskList}
-              />
-            )
-        }}
+        <div
+          class={styles.page}
+          style={{
+            '--gantt-border': theme.value.borderColor,
+            '--gantt-surface': theme.value.cardColor,
+            '--gantt-muted': theme.value.textColor3,
+            '--gantt-text': theme.value.textColor1,
+            '--gantt-primary': theme.value.primaryColor,
+            '--gantt-hover': theme.value.tableHeaderColor
+          }}
+        >
+          <div class={styles.heading}>
+            <div>
+              <h3>
+                {workflow.value?.name || t('project.workflow.gantt_timeline')}
+              </h3>
+              <div class={styles.metadata}>
+                <span>
+                  {t('project.workflow.gantt_instance')} #{route.params.id}
+                </span>
+                {updatedAt.value && (
+                  <span class={styles.updatedAt}>
+                    {t('project.workflow.gantt_updated')}{' '}
+                    {new Date(updatedAt.value).toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
+            </div>
+            <div class={styles.controls}>
+              {workflow.value && (
+                <NTag
+                  size='small'
+                  bordered={false}
+                  type={
+                    workflow.value.state === 'SUCCESS'
+                      ? 'success'
+                      : workflow.value.state === 'FAILURE'
+                      ? 'error'
+                      : 'info'
+                  }
+                >
+                  {t(
+                    `project.workflow.gantt_${
+                      isWorkflowActive(workflow.value.state)
+                        ? 'live'
+                        : 'finished'
+                    }`
+                  )}
+                </NTag>
+              )}
+              <label class={styles.autoRefresh}>
+                <NSwitch
+                  size='small'
+                  value={autoRefresh.value}
+                  onUpdateValue={(value) => {
+                    autoRefresh.value = value
+                  }}
+                />
+                <span>{t('project.workflow.gantt_auto_refresh')}</span>
+              </label>
+              <NButton
+                size='small'
+                loading={loading.value}
+                onClick={() => refresh()}
+              >
+                {t('project.task.refresh')}
+              </NButton>
+            </div>
+          </div>
+          {error.value && (
+            <NAlert type='error' class={styles.alert}>
+              {t(
+                workflow.value
+                  ? 'project.workflow.gantt_stale'
+                  : 'project.workflow.gantt_load_error'
+              )}
+            </NAlert>
+          )}
+          <NSpin show={loading.value && !workflow.value}>
+            {workflow.value && (
+              <>
+                <div class={styles.stats}>
+                  <div class={styles.statOverview}>
+                    {statistics.slice(0, 2).map((key) => (
+                      <div
+                        key={key}
+                        class={styles.statPrimary}
+                        style={{ '--stat-color': statColor(key) }}
+                      >
+                        <span>{t(`project.workflow.gantt_${key}`)}</span>
+                        <strong>{model.value.stats[key]}</strong>
+                      </div>
+                    ))}
+                  </div>
+                  <div class={styles.statStates}>
+                    {statistics.slice(2).map((key) => (
+                      <div
+                        key={key}
+                        class={[
+                          styles.stat,
+                          model.value.stats[key] === 0 && styles.statEmpty
+                        ]}
+                        style={{ '--stat-color': statColor(key) }}
+                      >
+                        <span>
+                          <i />
+                          {t(`project.workflow.gantt_${key}`)}
+                        </span>
+                        <strong>{model.value.stats[key]}</strong>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {model.value.rows.length ? (
+                  <GanttChart model={model.value} onViewLog={logs.open} />
+                ) : (
+                  <NEmpty
+                    class={styles.empty}
+                    description={t('project.workflow.gantt_empty')}
+                  />
+                )}
+              </>
+            )}
+            {!workflow.value && (
+              <div class={styles.empty}>
+                {error.value ? (
+                  <NButton onClick={() => refresh()}>
+                    {t('project.task.refresh')}
+                  </NButton>
+                ) : (
+                  t('project.workflow.gantt_loading')
+                )}
+              </div>
+            )}
+          </NSpin>
+          {logs.visible.value && (
+            <LogModal
+              showModalRef={logs.visible.value}
+              logRef={logs.text.value}
+              logLoadingRef={logs.loading.value}
+              row={logs.selected.value}
+              showDownloadLog={true}
+              onConfirmModal={logs.close}
+              onRefreshLogs={logs.refresh}
+              onDownloadLogs={logs.download}
+            />
+          )}
+        </div>
       </Card>
     )
   }
 })
-
-export default workflowRelation
