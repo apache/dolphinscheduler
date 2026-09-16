@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.extract.master.command.AbstractCommandParam;
+import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
@@ -158,6 +160,7 @@ public class SensitivePropertyUtils {
         WorkflowInstance copy = copyBean(source);
         copy.setGlobalParams(maskGlobalParams(copy.getGlobalParams()));
         copy.setVarPool(maskVarPool(copy.getVarPool()));
+        copy.setCommandParam(maskCommandParam(copy.getCommandParam()));
         copy.setDagData(mask(source.getDagData()));
         return copy;
     }
@@ -211,6 +214,28 @@ public class SensitivePropertyUtils {
             return varPool;
         }
         return VarPoolUtils.serializeVarPool(PropertySensitiveUtils.maskSensitiveValues(properties));
+    }
+
+    /**
+     * Mask {@link ICommandParam#getCommandParams()} in the response copy.
+     * Start restores {@code ******} to plaintext before Master persists {@code commandParam};
+     * query must hide those values again.
+     */
+    private String maskCommandParam(String commandParam) {
+        if (StringUtils.isEmpty(commandParam)) {
+            return commandParam;
+        }
+        ICommandParam parsed = JSONUtils.parseObject(commandParam, ICommandParam.class);
+        if (!(parsed instanceof AbstractCommandParam)) {
+            return commandParam;
+        }
+        AbstractCommandParam abstractCommandParam = (AbstractCommandParam) parsed;
+        if (CollectionUtils.isEmpty(abstractCommandParam.getCommandParams())) {
+            return commandParam;
+        }
+        abstractCommandParam.setCommandParams(
+                PropertySensitiveUtils.maskSensitiveValues(abstractCommandParam.getCommandParams()));
+        return JSONUtils.toJsonString(abstractCommandParam);
     }
 
     private Map<String, Map<String, Object>> maskLocalParamsMap(Map<String, Map<String, Object>> localParams) {
