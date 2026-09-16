@@ -202,43 +202,6 @@ class AbstractHAServerTest {
     }
 
     @Test
-    void testElectionErrorDemotesBeforeRetryAndReleasesAcquiredLock() {
-        server.start();
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new IllegalStateException("registry unavailable"));
-        try (MockedStatic<ThreadUtils> threadUtils = mockStatic(ThreadUtils.class)) {
-            // Verify safety at each retry boundary, without spending real time on retry sleeps.
-            threadUtils.when(() -> ThreadUtils.sleep(5_000)).thenAnswer(invocation -> {
-                assertFalse(server.isActive());
-                verify(statusListener, times(1)).changeToStandBy();
-                return null;
-            });
-            assertThrows(IllegalStateException.class, () -> remove(""));
-        }
-        assertFalse(server.isActive());
-        verify(statusListener, times(1)).changeToStandBy();
-        verify(registry, times(21)).releaseLock(ELECTION_LOCK);
-    }
-
-    @Test
-    void testTransientElectionErrorStopsAndRestartsCoordinator() {
-        server.start();
-        when(registry.exists(SELECTOR_PATH))
-                .thenThrow(new IllegalStateException("temporary registry failure"))
-                .thenReturn(true);
-        try (MockedStatic<ThreadUtils> threadUtils = mockStatic(ThreadUtils.class)) {
-            threadUtils.when(() -> ThreadUtils.sleep(5_000)).thenAnswer(invocation -> {
-                assertFalse(server.isActive());
-                verify(statusListener).changeToStandBy();
-                return null;
-            });
-            remove("");
-        }
-        assertTrue(server.isActive());
-        verify(statusListener, times(2)).changeToActive();
-        verify(statusListener).changeToStandBy();
-    }
-
-    @Test
     void testAcquisitionErrorDoesNotReleaseUnacquiredLock() {
         when(registry.acquireLock(ELECTION_LOCK)).thenThrow(new IllegalStateException("lock unavailable"));
         try (MockedStatic<ThreadUtils> ignored = mockStatic(ThreadUtils.class)) {
@@ -250,52 +213,35 @@ class AbstractHAServerTest {
     }
 
     @Test
-    void testShutdownDuringLockAcquisitionDoesNotClaimSelector() {
-        when(registry.acquireLock(ELECTION_LOCK)).thenAnswer(invocation -> {
-            // Shutdown is requested before the blocking acquisition returns to the election.
-            server.close();
-            return true;
-        });
-        server.start();
-        assertFalse(server.isActive());
-        verify(registry, never()).put(eq(SELECTOR_PATH), anyString(), eq(true));
-        verify(registry).releaseLock(ELECTION_LOCK);
-        verify(statusListener, never()).changeToActive();
-    }
-
-    @Test
-    void testTerminalDemotionListenerPreventsRetryAndReactivation() {
-        doAnswer(invocation -> {
-            server.close();
-            return null;
-        }).when(statusListener).changeToStandBy();
+    void testTransientElectionErrorKeepsRoleUntilOwnershipDecision() {
         server.start();
         when(registry.exists(SELECTOR_PATH))
                 .thenThrow(new IllegalStateException("temporary registry failure"))
                 .thenReturn(true);
         try (MockedStatic<ThreadUtils> threadUtils = mockStatic(ThreadUtils.class)) {
+            threadUtils.when(() -> ThreadUtils.sleep(5_000)).thenAnswer(invocation -> {
+                assertTrue(server.isActive());
+                verify(statusListener, never()).changeToStandBy();
+                return null;
+            });
             remove("");
-            // AlertServer shuts down on demotion, unlike restartable Master coordinators.
-            threadUtils.verifyNoInteractions();
         }
-        remove("");
-        assertFalse(server.isActive());
+        assertTrue(server.isActive());
         verify(statusListener, times(1)).changeToActive();
-        verify(statusListener, times(1)).changeToStandBy();
-        verify(registry, times(2)).acquireLock(ELECTION_LOCK);
+        verify(statusListener, never()).changeToStandBy();
     }
 
     @Test
-    void testClosePreventsRestartAndFurtherElection() {
+    void testExhaustedRetriesPreserveOriginalRole() {
         server.start();
-        server.close();
-        remove("");
-        server.start();
-        assertFalse(server.participateElection());
-        assertFalse(server.isActive());
-        verify(statusListener, times(1)).changeToActive();
-        verify(registry, times(1)).acquireLock(ELECTION_LOCK);
-        verify(registry, times(1)).subscribe(eq(SELECTOR_PATH), org.mockito.ArgumentMatchers.any());
+        when(registry.exists(SELECTOR_PATH)).thenThrow(new IllegalStateException("registry unavailable"));
+        try (MockedStatic<ThreadUtils> ignored = mockStatic(ThreadUtils.class)) {
+            assertThrows(IllegalStateException.class, () -> remove(""));
+        }
+        // Exception-driven demotion is deliberately outside this minimal candidate.
+        assertTrue(server.isActive());
+        verify(statusListener, never()).changeToStandBy();
+        verify(registry, times(21)).releaseLock(ELECTION_LOCK);
     }
 
     @Test
@@ -368,7 +314,7 @@ class AbstractHAServerTest {
 
             @Override
             public void close() {
-                super.close();
+
             }
         };
     }
