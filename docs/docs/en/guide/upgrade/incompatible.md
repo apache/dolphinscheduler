@@ -56,3 +56,7 @@ This document records the incompatible updates between each version. You need to
   * **Removed derived properties**: `cmdTypeIfComplement`, `complementData` (related to complement-data executions; use the detail API to obtain them)
   * To obtain any of these fields, use the detail API `GET /projects/{projectCode}/workflow-instances/{id}` instead, which continues to return the full `WorkflowInstance` object. ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
 
+## Next version
+
+* Master and Alert HA selector values now include a unique instance identifier after the server address. Treat these values as opaque ownership tokens, not network addresses. Registry paths and database schemas are unchanged. Upgrade all HA participants to obtain the ownership fix; unpatched participants retain their previous election behavior during a rolling upgrade or rollback. This change does not add fencing against delayed or missing registry notifications. Custom `AbstractHAServer` subclasses that override `close()` must call `super.close()` to stop further election callbacks after shutdown.
+
