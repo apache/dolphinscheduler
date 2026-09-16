@@ -18,9 +18,13 @@
 package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentDetails;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
+import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -187,6 +191,32 @@ class SensitivePropertyUtilsTest {
         Assertions.assertTrue(masked.getGlobalParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
         Assertions.assertEquals(TaskConstants.SENSITIVE_DATA_MASK, masked.getGlobalParamMap().get("pwd"));
         Assertions.assertEquals("Secret123", original.getGlobalParamMap().get("pwd"));
+    }
+
+    @Test
+    void maskWorkflowInstanceMasksCommandParam() {
+        String plaintextCommandParam = JSONUtils.toJsonString(RunWorkflowCommandParam.builder()
+                .commandParams(Collections.singletonList(sensitive("pwd", "Secret123")))
+                .timeZone("UTC")
+                .build());
+        WorkflowInstance original = new WorkflowInstance();
+        original.setCommandParam(plaintextCommandParam);
+        original.setGlobalParams("[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
+                + "\"value\":\"Secret123\",\"sensitive\":true}]");
+
+        WorkflowInstance masked = SensitivePropertyUtils.mask(original);
+
+        Assertions.assertEquals(plaintextCommandParam, original.getCommandParam());
+        Assertions.assertTrue(original.getCommandParam().contains("Secret123"));
+        Assertions.assertFalse(masked.getCommandParam().contains("Secret123"));
+        ICommandParam maskedCommandParam =
+                JSONUtils.parseObject(masked.getCommandParam(), ICommandParam.class);
+        Assertions.assertNotNull(maskedCommandParam);
+        Assertions.assertEquals(TaskConstants.SENSITIVE_DATA_MASK,
+                maskedCommandParam.getCommandParams().get(0).getValue());
+        Assertions.assertTrue(maskedCommandParam.getCommandParams().get(0).isSensitive());
+        Assertions.assertTrue(masked.getGlobalParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertNotSame(original, masked);
     }
 
     private static Property sensitive(String prop, String value) {
