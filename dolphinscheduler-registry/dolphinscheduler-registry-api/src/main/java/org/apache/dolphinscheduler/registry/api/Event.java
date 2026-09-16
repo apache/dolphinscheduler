@@ -33,6 +33,7 @@ public class Event {
     // The full path where the event was generated
     private final String eventPath;
     // The value corresponding to the path
+    // ADD/UPDATE carry the current value; REMOVE carries the last value before deletion.
     private final String eventData;
     // The event type {ADD, REMOVE, UPDATE}
     private Type type;
