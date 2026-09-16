@@ -35,7 +35,11 @@ import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,6 +50,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.google.common.collect.Lists;
 
@@ -171,4 +176,90 @@ class TaskGroupCoordinatorTest {
         verify(taskGroupQueueDao, Mockito.times(1)).deleteById(taskGroupQueue);
 
     }
+    @Test
+    void restartShouldWaitForPreviousFetchToReturn() throws Exception {
+        verifyRestartDuringFetch(false);
+    }
+
+    @Test
+    void closeShouldCancelPendingRestart() throws Exception {
+        verifyRestartDuringFetch(true);
+    }
+
+    private void verifyRestartDuringFetch(boolean cancelRestart) throws Exception {
+        taskGroupCoordinator = Mockito.spy(taskGroupCoordinator);
+        Mockito.doNothing().when(taskGroupCoordinator).pauseBeforeStart();
+        CountDownLatch fetching = new CountDownLatch(1);
+        CountDownLatch releaseFetch = new CountDownLatch(1);
+        CountDownLatch restarted = new CountDownLatch(1);
+        AtomicReference<Throwable> workerFailure = new AtomicReference<>();
+        AtomicReference<Thread> firstThread = new AtomicReference<>();
+        Mockito.when(taskGroupDao.queryAllTaskGroups()).thenAnswer(invocation -> {
+            if (firstThread.compareAndSet(null, Thread.currentThread())) {
+                fetching.countDown();
+                // JDBC calls can finish after interrupt. Keep the previous run inside its DAO call.
+                boolean released = false;
+                while (!released) {
+                    try {
+                        released = releaseFetch.await(5, TimeUnit.SECONDS);
+                        if (!released) {
+                            workerFailure.set(new AssertionError("Test did not release the blocked DAO"));
+                            return Collections.emptyList();
+                        }
+                    } catch (InterruptedException ignored) {
+                        // Model a driver that does not cancel its request on interrupt.
+                    }
+                }
+                TaskGroup staleGroup = new TaskGroup();
+                staleGroup.setId(1);
+                staleGroup.setUseSize(1);
+                return Collections.singletonList(staleGroup);
+            } else {
+                if (firstThread.get() == Thread.currentThread()) {
+                    workerFailure.set(new AssertionError("Old polling loop resumed"));
+                }
+                restarted.countDown();
+            }
+            return Collections.emptyList();
+        });
+        try {
+            taskGroupCoordinator.start();
+            Assertions.assertTrue(fetching.await(5, TimeUnit.SECONDS));
+            taskGroupCoordinator.close();
+            taskGroupCoordinator.start();
+            Assertions.assertSame(firstThread.get(), ReflectionTestUtils.getField(taskGroupCoordinator,
+                    "internalThread"), "Keep the old run until its DAO call returns");
+            if (cancelRestart) {
+                taskGroupCoordinator.close();
+            }
+            releaseFetch.countDown();
+            firstThread.get().join(5000);
+            Assertions.assertFalse(firstThread.get().isAlive());
+            if (cancelRestart) {
+                Assertions.assertEquals(1L, restarted.getCount());
+                Assertions.assertNull(ReflectionTestUtils.getField(taskGroupCoordinator, "internalThread"));
+            } else {
+                Assertions.assertTrue(restarted.await(5, TimeUnit.SECONDS));
+            }
+            Assertions.assertNull(workerFailure.get());
+            // The old fetch returned a nonempty batch, but cancellation must discard it.
+            Mockito.verify(taskGroupQueueDao, Mockito.never()).countUsingTaskGroupQueueByGroupId(Mockito.anyInt());
+        } finally {
+            Thread latestThread;
+            synchronized (taskGroupCoordinator) {
+                latestThread = (Thread) ReflectionTestUtils.getField(taskGroupCoordinator, "internalThread");
+                taskGroupCoordinator.close();
+            }
+            releaseFetch.countDown();
+            if (latestThread != null) {
+                latestThread.join(5000);
+                Assertions.assertFalse(latestThread.isAlive());
+            }
+            if (firstThread.get() != null) {
+                firstThread.get().join(5000);
+                Assertions.assertFalse(firstThread.get().isAlive());
+            }
+        }
+    }
+
 }
