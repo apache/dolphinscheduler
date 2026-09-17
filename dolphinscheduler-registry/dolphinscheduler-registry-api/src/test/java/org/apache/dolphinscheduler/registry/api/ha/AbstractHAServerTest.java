@@ -20,8 +20,10 @@ package org.apache.dolphinscheduler.registry.api.ha;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
@@ -38,17 +40,19 @@ import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
-import java.lang.management.LockInfo;
-import java.lang.management.ManagementFactory;
-import java.lang.management.ThreadInfo;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -58,6 +62,13 @@ class AbstractHAServerTest {
     private static final String SELECTOR_PATH = "/coordinator";
     private static final String ELECTION_LOCK = SELECTOR_PATH + "-lock";
     private static final String ADDRESS = "master-0:5678";
+
+    private final List<AbstractHAServer> servers = new ArrayList<>();
+    private final List<ExecutorService> electionExecutors = new ArrayList<>();
+    private final AtomicReference<Runnable> retryAction = new AtomicReference<>(() -> {
+    });
+    private ExecutorService electionExecutor;
+    private final AtomicReference<Throwable> workerFailure = new AtomicReference<>();
 
     private Registry registry;
     private AtomicReference<String> owner;
@@ -72,6 +83,7 @@ class AbstractHAServerTest {
         subscriber = new AtomicReference<>();
         statusListener = mock(AbstractServerStatusChangeListener.class, CALLS_REAL_METHODS);
         server = newServer();
+        electionExecutor = electionExecutors.get(0);
         server.addServerStatusChangeListener(statusListener);
         when(registry.acquireLock(ELECTION_LOCK)).thenReturn(true);
         when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> owner.get() != null);
@@ -84,6 +96,15 @@ class AbstractHAServerTest {
             subscriber.set(invocation.getArgument(1));
             return null;
         }).when(registry).subscribe(eq(SELECTOR_PATH), org.mockito.ArgumentMatchers.any());
+    }
+
+    @AfterEach
+    void tearDown() throws Exception {
+        servers.forEach(AbstractHAServer::close);
+        for (ExecutorService executor : electionExecutors) {
+            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
+        }
+        assertNoWorkerFailure();
     }
 
     @Test
@@ -177,6 +198,7 @@ class AbstractHAServerTest {
         owner.set(null);
         subscriber.get().notify(new Event(SELECTOR_PATH, SELECTOR_PATH, "", Event.Type.ADD));
         subscriber.get().notify(new Event(SELECTOR_PATH, SELECTOR_PATH, "", Event.Type.UPDATE));
+        drain();
         assertFalse(server.isActive());
         verify(registry, times(1)).acquireLock(ELECTION_LOCK);
         verify(statusListener, never()).changeToActive();
@@ -204,9 +226,8 @@ class AbstractHAServerTest {
     @Test
     void testAcquisitionErrorDoesNotReleaseUnacquiredLock() {
         when(registry.acquireLock(ELECTION_LOCK)).thenThrow(new IllegalStateException("lock unavailable"));
-        try (MockedStatic<ThreadUtils> ignored = mockStatic(ThreadUtils.class)) {
-            assertThrows(IllegalStateException.class, server::start);
-        }
+        assertThrows(IllegalStateException.class, server::start);
+        assertTrue(electionExecutor.isShutdown());
         assertFalse(server.isActive());
         verify(registry, never()).releaseLock(ELECTION_LOCK);
         verify(statusListener, never()).changeToActive();
@@ -218,14 +239,11 @@ class AbstractHAServerTest {
         when(registry.exists(SELECTOR_PATH))
                 .thenThrow(new IllegalStateException("temporary registry failure"))
                 .thenReturn(true);
-        try (MockedStatic<ThreadUtils> threadUtils = mockStatic(ThreadUtils.class)) {
-            threadUtils.when(() -> ThreadUtils.sleep(5_000)).thenAnswer(invocation -> {
-                assertTrue(server.isActive());
-                verify(statusListener, never()).changeToStandBy();
-                return null;
-            });
-            remove("");
-        }
+        retryAction.set(() -> {
+            assertTrue(server.isActive());
+            verify(statusListener, never()).changeToStandBy();
+        });
+        remove("");
         assertTrue(server.isActive());
         verify(statusListener, times(1)).changeToActive();
         verify(statusListener, never()).changeToStandBy();
@@ -235,9 +253,8 @@ class AbstractHAServerTest {
     void testExhaustedRetriesPreserveOriginalRole() {
         server.start();
         when(registry.exists(SELECTOR_PATH)).thenThrow(new IllegalStateException("registry unavailable"));
-        try (MockedStatic<ThreadUtils> ignored = mockStatic(ThreadUtils.class)) {
-            assertThrows(IllegalStateException.class, () -> remove(""));
-        }
+        // Asynchronous callback failures are logged by the worker, not thrown on the Registry thread.
+        remove("");
         // Exception-driven demotion is deliberately outside this minimal candidate.
         assertTrue(server.isActive());
         verify(statusListener, never()).changeToStandBy();
@@ -248,61 +265,264 @@ class AbstractHAServerTest {
     void testRemoveCannotBeOverwrittenByEarlierStartupElection() throws Exception {
         CountDownLatch startupElectionFinished = new CountDownLatch(1);
         CountDownLatch allowStartupToReturn = new CountDownLatch(1);
-        CountDownLatch callbackStarted = new CountDownLatch(1);
         AtomicBoolean firstRelease = new AtomicBoolean(true);
-        AtomicReference<Thread> callbackThread = new AtomicReference<>();
         when(registry.releaseLock(ELECTION_LOCK)).thenAnswer(invocation -> {
             if (firstRelease.getAndSet(false)) {
-                // Pause after the successful election but before startup publishes ACTIVE.
+                // Pause after election, before publication; the notification must queue behind it.
                 startupElectionFinished.countDown();
                 assertTrue(allowStartupToReturn.await(5, TimeUnit.SECONDS));
             }
             return true;
         });
-        ExecutorService executor = Executors.newFixedThreadPool(2);
+        ExecutorService caller = Executors.newSingleThreadExecutor();
         try {
-            Future<?> startup = executor.submit(server::start);
+            Future<?> startup = caller.submit(server::start);
             assertTrue(startupElectionFinished.await(5, TimeUnit.SECONDS));
-            String previousOwner = owner.get();
             owner.set("master-1:5678#peer-instance");
-            Future<?> callback = executor.submit(() -> {
-                callbackThread.set(Thread.currentThread());
-                callbackStarted.countDown();
-                remove(previousOwner);
-            });
-            assertTrue(callbackStarted.await(5, TimeUnit.SECONDS));
-            // Wait for actual monitor contention (fixed code), or completion (old code).
-            // This forces the relevant ordering rather than relying on a sleep or scheduler luck.
-            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
-            while (!callback.isDone() && !isBlockedOnServer(callbackThread.get())
-                    && System.nanoTime() < deadline) {
-                Thread.yield();
-            }
-            assertTrue(callback.isDone() || isBlockedOnServer(callbackThread.get()));
+            notifyRemove("");
             allowStartupToReturn.countDown();
             startup.get(5, TimeUnit.SECONDS);
-            callback.get(5, TimeUnit.SECONDS);
+            drain();
             assertFalse(server.isActive());
             verify(statusListener).changeToActive();
             verify(statusListener).changeToStandBy();
         } finally {
             allowStartupToReturn.countDown();
-            executor.shutdownNow();
-            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
+            caller.shutdownNow();
+            assertTrue(caller.awaitTermination(5, TimeUnit.SECONDS));
         }
     }
 
-    private boolean isBlockedOnServer(Thread thread) {
-        ThreadInfo threadInfo = ManagementFactory.getThreadMXBean().getThreadInfo(thread.getId());
-        if (threadInfo == null || threadInfo.getThreadState() != Thread.State.BLOCKED) {
-            return false;
+    @Test
+    void testCallbacksReturnWhileRoleListenerIsBlockedAndRecheckCurrentOwner() throws Exception {
+        server.start();
+        String ownIdentity = owner.get();
+        CountDownLatch stopping = new CountDownLatch(1);
+        CountDownLatch allowStop = new CountDownLatch(1);
+        AtomicReference<Thread> listenerThread = new AtomicReference<>();
+        server.addServerStatusChangeListener(new AbstractServerStatusChangeListener() {
+
+            @Override
+            public void changeToActive() {
+            }
+
+            @Override
+            public void changeToStandBy() {
+                listenerThread.set(Thread.currentThread());
+                stopping.countDown();
+                await(allowStop);
+            }
+        });
+        try {
+            owner.set("master-1:5678#peer-instance");
+            notifyRemove("");
+            assertTrue(stopping.await(5, TimeUnit.SECONDS));
+            assertNotEquals(Thread.currentThread(), listenerThread.get());
+            // Queue while this instance appears to own the key, then change the owner again.
+            // The queued request must re-read the Registry, not publish a captured ACTIVE decision.
+            owner.set(ownIdentity);
+            notifyRemove("");
+            owner.set("master-2:5678#peer-instance");
+            allowStop.countDown();
+            drain();
+            assertFalse(server.isActive());
+            verify(statusListener, times(1)).changeToActive();
+        } finally {
+            allowStop.countDown();
         }
-        LockInfo lockInfo = threadInfo.getLockInfo();
-        return lockInfo != null && lockInfo.getIdentityHashCode() == System.identityHashCode(server);
+    }
+
+    @Test
+    void testElectionAndPublicationRunOnSameWorker() {
+        AtomicReference<Thread> electionThread = new AtomicReference<>();
+        AtomicReference<Thread> publicationThread = new AtomicReference<>();
+        when(registry.acquireLock(ELECTION_LOCK)).thenAnswer(invocation -> {
+            electionThread.set(Thread.currentThread());
+            return true;
+        });
+        server.addServerStatusChangeListener((origin, target) -> publicationThread.set(Thread.currentThread()));
+        server.start();
+        assertNotEquals(Thread.currentThread(), electionThread.get());
+        assertEquals(electionThread.get(), publicationThread.get());
+        owner.set("master-1:5678#peer-instance");
+        remove("");
+        assertEquals(electionThread.get(), publicationThread.get());
+    }
+
+    @Test
+    void testCloseDiscardsPendingRequestAndLateElectionResult() throws Exception {
+        CountDownLatch acquired = new CountDownLatch(1);
+        CountDownLatch allowElection = new CountDownLatch(1);
+        when(registry.acquireLock(ELECTION_LOCK)).thenAnswer(invocation -> {
+            acquired.countDown();
+            assertTrue(allowElection.await(5, TimeUnit.SECONDS));
+            return true;
+        });
+        ExecutorService caller = Executors.newSingleThreadExecutor();
+        try {
+            Future<?> startup = caller.submit(server::start);
+            assertTrue(acquired.await(5, TimeUnit.SECONDS));
+            notifyRemove("");
+            server.close();
+            // A notification after shutdown is ignored, including the submit/shutdown race.
+            notifyRemove("");
+            allowElection.countDown();
+            startup.get(5, TimeUnit.SECONDS);
+            assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
+            assertFalse(server.isActive());
+            verify(statusListener, never()).changeToActive();
+            verify(registry, times(1)).acquireLock(ELECTION_LOCK);
+        } finally {
+            allowElection.countDown();
+            caller.shutdownNow();
+            assertTrue(caller.awaitTermination(5, TimeUnit.SECONDS));
+        }
+    }
+
+    @Test
+    void testCloseFromListenerDoesNotDeadlockOrActivateQueuedWork() throws Exception {
+        server.start();
+        CountDownLatch closed = new CountDownLatch(1);
+        server.addServerStatusChangeListener(new AbstractServerStatusChangeListener() {
+
+            @Override
+            public void changeToActive() {
+            }
+
+            @Override
+            public void changeToStandBy() {
+                // Alert closes its HA server from the demotion listener on the election worker.
+                server.close();
+                owner.set(null);
+                notifyRemove("");
+                closed.countDown();
+            }
+        });
+        AbstractServerStatusChangeListener subsequentListener = mock(AbstractServerStatusChangeListener.class);
+        server.addServerStatusChangeListener(subsequentListener);
+        owner.set("master-1:5678#peer-instance");
+        notifyRemove("");
+        assertTrue(closed.await(5, TimeUnit.SECONDS));
+        assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
+        assertFalse(server.isActive());
+        verify(statusListener, times(1)).changeToActive();
+        org.mockito.Mockito.verifyNoInteractions(subsequentListener);
+    }
+
+    @Test
+    void testCloseDoesNotStrandQueuedStartupFuture() throws Exception {
+        CountDownLatch workerBlocked = new CountDownLatch(1);
+        CountDownLatch releaseWorker = new CountDownLatch(1);
+        electionExecutor.execute(() -> {
+            workerBlocked.countDown();
+            await(releaseWorker);
+        });
+        ExecutorService caller = Executors.newSingleThreadExecutor();
+        try {
+            assertTrue(workerBlocked.await(5, TimeUnit.SECONDS));
+            Future<?> startup = caller.submit(server::start);
+            // Observe the submitted Future in the queue, not just subscribe() before submission.
+            ThreadPoolExecutor executor = (ThreadPoolExecutor) electionExecutor;
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            while (executor.getQueue().isEmpty() && System.nanoTime() < deadline) {
+                Thread.yield();
+            }
+            assertEquals(1, executor.getQueue().size());
+            server.close();
+            releaseWorker.countDown();
+            startup.get(5, TimeUnit.SECONDS);
+            assertFalse(server.isActive());
+            verify(registry, never()).acquireLock(ELECTION_LOCK);
+        } finally {
+            releaseWorker.countDown();
+            caller.shutdownNow();
+            assertTrue(caller.awaitTermination(5, TimeUnit.SECONDS));
+        }
+    }
+
+    @Test
+    void testCloseBeforeStartupSubmissionRejectsWithoutWaiting() {
+        doAnswer(invocation -> {
+            // Close after subscription but before the startup Future can be submitted.
+            server.close();
+            return null;
+        }).when(registry).subscribe(eq(SELECTOR_PATH), org.mockito.ArgumentMatchers.any());
+        assertThrows(java.util.concurrent.RejectedExecutionException.class, server::start);
+        verify(registry, never()).acquireLock(ELECTION_LOCK);
+    }
+
+    @Test
+    void testExternalCloseWaitsForEnteredListener() throws Exception {
+        server.start();
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch releaseListener = new CountDownLatch(1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        server.addServerStatusChangeListener((origin, target) -> {
+            entered.countDown();
+            await(releaseListener);
+        });
+        Thread closer = new Thread(() -> {
+            try {
+                server.close();
+            } catch (Throwable ex) {
+                failure.set(ex);
+            }
+        });
+        closer.setDaemon(true);
+        try {
+            owner.set("master-1:5678#peer-instance");
+            notifyRemove("");
+            assertTrue(entered.await(5, TimeUnit.SECONDS));
+            closer.start();
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            while (closer.isAlive() && closer.getState() != Thread.State.BLOCKED
+                    && System.nanoTime() < deadline) {
+                Thread.yield();
+            }
+            // The listener holds the publication monitor; external close must wait for it.
+            assertEquals(Thread.State.BLOCKED, closer.getState());
+            releaseListener.countDown();
+            closer.join(5000);
+            assertFalse(closer.isAlive());
+            assertNull(failure.get());
+        } finally {
+            releaseListener.countDown();
+            closer.join(5000);
+        }
     }
 
     private void remove(String previousOwner) {
+        notifyRemove(previousOwner);
+        drain();
+    }
+
+    private void notifyRemove(String previousOwner) {
         subscriber.get().notify(new Event(SELECTOR_PATH, SELECTOR_PATH, previousOwner, Event.Type.REMOVE));
+    }
+
+    private void drain() {
+        try {
+            electionExecutor.submit(() -> {
+            }).get(5, TimeUnit.SECONDS);
+            assertNoWorkerFailure();
+        } catch (Exception e) {
+            throw new AssertionError("Election worker did not finish", e);
+        }
+    }
+
+    private void assertNoWorkerFailure() {
+        if (workerFailure.get() != null) {
+            throw new AssertionError("Election worker failed", workerFailure.get());
+        }
+    }
+
+    private void await(CountDownLatch latch) {
+        try {
+            assertTrue(latch.await(5, TimeUnit.SECONDS));
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new AssertionError(e);
+        }
     }
 
     private AbstractHAServer newServer() {
@@ -310,12 +530,28 @@ class AbstractHAServerTest {
     }
 
     private AbstractHAServer newServer(String address) {
-        return new AbstractHAServer(registry, SELECTOR_PATH, address) {
-
-            @Override
-            public void close() {
-
-            }
+        ExecutorService executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
+                new LinkedBlockingQueue<>(), runnable -> {
+                    Thread thread = new Thread(() -> {
+                        // Static mocks are thread-local, so install the retry delay stub on the election worker.
+                        try (
+                                MockedStatic<ThreadUtils> threadUtils =
+                                        mockStatic(ThreadUtils.class, CALLS_REAL_METHODS)) {
+                            threadUtils.when(() -> ThreadUtils.sleep(anyLong())).thenAnswer(invocation -> {
+                                retryAction.get().run();
+                                return null;
+                            });
+                            runnable.run();
+                        }
+                    }, "test-ha-election");
+                    thread.setUncaughtExceptionHandler(
+                            (failedThread, failure) -> workerFailure.compareAndSet(null, failure));
+                    return thread;
+                });
+        electionExecutors.add(executor);
+        AbstractHAServer result = new AbstractHAServer(registry, SELECTOR_PATH, address, executor) {
         };
+        servers.add(result);
+        return result;
     }
 }
