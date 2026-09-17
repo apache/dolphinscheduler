@@ -62,7 +62,7 @@
 - 单数据断言，应使用`assertTrue`，`assertFalse`，`assertNull`和`assertNotNull`。
 - 多数据断言，应使用`assertThat`。
 - 精确断言，尽量不使用`not`，`containsString`断言。
-- 测试用例的真实值应名为为actualXXX，期望值应命名为expectedXXX。
+- 测试用例的真实值应命名为actualXXX，期望值应命名为expectedXXX。
 - 测试类和`@Test`标注的方法无需javadoc。
 - 公共规范
   - 每行长度不超过`200`个字符，保证每一行语义完整以便于理解。
