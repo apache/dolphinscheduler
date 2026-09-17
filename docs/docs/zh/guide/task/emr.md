@@ -95,6 +95,43 @@ stepsDefineJson 参数样例
 }
 ```
 
+## AWS 认证配置
+
+Amazon EMR（EMR on EC2）任务通过 DolphinScheduler Worker 的 `aws.yaml` 配置文件读取 AWS 认证信息，配置路径为 `conf/aws.yaml` 中的 `aws.emr` 段。
+
+若凭证缺失或无效，任务提交会失败，常见错误类似：
+
+```text
+AmazonElasticMapReduceException: The security token included in the request is invalid
+(Error Code: UnrecognizedClientException)
+```
+
+### 使用 IAM Role（推荐）
+
+如果 DolphinScheduler Worker 节点运行在 EC2 实例上，并已绑定可调用 EMR API 的 IAM Role，配置如下：
+
+```yaml
+aws:
+  emr:
+    credentials.provider.type: InstanceProfileCredentialsProvider
+    region: us-east-1
+```
+
+### 使用 Access Key
+
+如果需要使用 AK/SK 方式认证：
+
+```yaml
+aws:
+  emr:
+    credentials.provider.type: AWSStaticCredentialsProvider
+    access.key.id: your-access-key-id
+    access.key.secret: your-secret-access-key
+    region: us-east-1
+```
+
+> **注意**：`aws.emr` 段的配置同时被 EMR on EC2 和 EMR Serverless 任务类型共享。也可参考 [Amazon EMR Serverless](emr-serverless.md)。
+
 ## 注意事项：
 
 - EMR 任务类型的故障转移尚未实现。目前，DolphinScheduler 仅支持对 yarn task type 进行故障转移。其他任务类型，如 EMR 任务、k8s 任务尚未准备好。
