@@ -30,14 +30,14 @@ class LogUtilsTest {
 
     @Test
     void testRollViewLogLinesWithMultibyteCharacters() {
-        String line = StringUtils.repeat("中", 22000);
+        String line = StringUtils.repeat("\u20AC", 22000);
 
         assertEquals(line + "\r\n", LogUtils.rollViewLogLines(Collections.singletonList(line)));
     }
 
     @Test
     void testRollViewLogLinesTruncatesLongLines() {
-        for (String character : Arrays.asList("a", "中")) {
+        for (String character : Arrays.asList("a", "\u20AC")) {
             String line = StringUtils.repeat(character, 65536);
             String expected = StringUtils.repeat(character, 65535)
                     + " [this line's size 65536 characters exceeds 65535 characters, so only "
@@ -49,7 +49,7 @@ class LogUtilsTest {
 
     @Test
     void testRollViewLogLinesStopsAtCharacterLimit() {
-        String line = StringUtils.repeat("中", 32768);
+        String line = StringUtils.repeat("\u20AC", 32768);
 
         assertEquals(line + "\r\n" + line + "\r\n",
                 LogUtils.rollViewLogLines(Arrays.asList(line, line, "omitted")));
