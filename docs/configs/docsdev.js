@@ -263,10 +263,6 @@ export default {
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/priority.html',
                             },
                             {
-                                title: 'File Parameter',
-                                link: '/en-us/docs/dev/user_doc/guide/parameter/file-parameter.html',
-                            },
-                            {
                                 title: 'StartUp Parameter',
                                 link: '/en-us/docs/dev/user_doc/guide/parameter/startup-parameter.html',
                             },
@@ -1001,10 +997,6 @@ export default {
                             {
                                 title: '参数优先级',
                                 link: '/zh-cn/docs/dev/user_doc/guide/parameter/priority.html',
-                            },
-                            {
-                                title: '文件参数传递',
-                                link: '/zh-cn/docs/dev/user_doc/guide/parameter/file-parameter.html',
                             },
                             {
                                 title: '启动参数',
