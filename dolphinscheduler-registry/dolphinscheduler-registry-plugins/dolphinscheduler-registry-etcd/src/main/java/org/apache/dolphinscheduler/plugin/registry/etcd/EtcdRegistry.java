@@ -433,18 +433,14 @@ public class EtcdRegistry implements Registry {
                 break;
         }
         final KeyValue keyValue = watchEvent.getKeyValue();
-        final KeyValue dataKeyValue;
-        if (eventType == Event.Type.REMOVE) {
-            dataKeyValue = watchEvent.getPrevKV();
-        } else {
-            dataKeyValue = keyValue;
-        }
         return Event.builder()
                 .type(eventType)
                 .watchedPath(watchedPath)
                 .eventPath(Optional.ofNullable(keyValue).map(kv -> kv.getKey().toString(StandardCharsets.UTF_8))
                         .orElse(null))
-                .eventData(Optional.ofNullable(dataKeyValue).map(kv -> kv.getValue().toString(StandardCharsets.UTF_8))
+                .eventData(Optional
+                        .ofNullable(eventType == Event.Type.REMOVE ? watchEvent.getPrevKV() : watchEvent.getKeyValue())
+                        .map(kv -> kv.getValue().toString(StandardCharsets.UTF_8))
                         .orElse(null))
                 .build();
     }
