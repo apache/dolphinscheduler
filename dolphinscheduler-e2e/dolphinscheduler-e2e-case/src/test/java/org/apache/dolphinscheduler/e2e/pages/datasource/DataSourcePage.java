@@ -66,13 +66,13 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         buttonCreateDataSource().click();
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOf(dataSourceModal));
-        WebElement dataSourceTypeButton = By.className(dataSourceType.toUpperCase() + "-box").findElement(driver);
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(dataSourceTypeButton));
+        By dataSourceTypeBox = By.className(dataSourceType.toUpperCase() + "-box");
+        WebElement dataSourceTypeButton = WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(dataSourceTypeBox));
         dataSourceTypeButton.click();
 
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.textToBePresentInElement(
-                driver.findElement(By.className("dialog-create-data-source")), dataSourceType.toUpperCase()));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.textToBePresentInElementLocated(
+                By.className("dialog-create-data-source"), dataSourceType.toUpperCase()));
 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
