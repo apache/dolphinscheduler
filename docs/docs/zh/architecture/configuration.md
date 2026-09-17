@@ -373,7 +373,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 ## dolphinscheduler_env.sh [环境变量配置]
 
-通过类似shell方式提交任务的的时候，会加载该配置文件中的环境变量到主机中。涉及到的 `JAVA_HOME`
+通过类似shell方式提交任务的时候，会加载该配置文件中的环境变量到主机中。涉及到的 `JAVA_HOME`
 任务类型的环境配置，其中任务类型主要有: Shell任务、Python任务、Spark任务、Flink任务、Datax任务等等。
 
 ```bash
