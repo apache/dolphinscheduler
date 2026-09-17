@@ -22,11 +22,11 @@ api:
         name: hadoop-ha-config
   extraVolumeMounts:
     - name: hadoop-ha-config
-      mountPath: /opt/dolphinscheduler/conf/core-site.xml
+      mountPath: /opt/dolphinscheduler/api-server/conf/core-site.xml
       subPath: core-site.xml
       readOnly: true
     - name: hadoop-ha-config
-      mountPath: /opt/dolphinscheduler/conf/hdfs-site.xml
+      mountPath: /opt/dolphinscheduler/api-server/conf/hdfs-site.xml
       subPath: hdfs-site.xml
       readOnly: true
 worker:
@@ -36,17 +36,17 @@ worker:
         name: hadoop-ha-config
   extraVolumeMounts:
     - name: hadoop-ha-config
-      mountPath: /opt/dolphinscheduler/conf/core-site.xml
+      mountPath: /opt/dolphinscheduler/worker-server/conf/core-site.xml
       subPath: core-site.xml
       readOnly: true
     - name: hadoop-ha-config
-      mountPath: /opt/dolphinscheduler/conf/hdfs-site.xml
+      mountPath: /opt/dolphinscheduler/worker-server/conf/hdfs-site.xml
       subPath: hdfs-site.xml
       readOnly: true
 ```
 
 Configure `fs.defaultFS` with the logical nameservice URI (for example, `hdfs://mycluster`) and include the corresponding HA settings in the XML files. Keep DolphinScheduler's filesystem configuration consistent with that URI.
 
-The paths above use `/opt/dolphinscheduler/conf`, as used by the chart's default API and Worker images. Check the configuration classpath of your image version or custom image and adjust the mount paths if it uses a different directory. Individual file mounts preserve the other packaged configuration files. Restart API and Worker pods after changing the ConfigMap: Kubernetes does not update ConfigMap files mounted using `subPath`.
+The paths above match the API and Worker server classpaths. Check the configuration classpath of a custom image and adjust the mount paths if needed. Individual file mounts preserve the other packaged configuration files. Restart API and Worker pods after changing the ConfigMap: Kubernetes does not update ConfigMap files mounted using `subPath`.
 
 {{ template "chart.valuesSection" . }}
