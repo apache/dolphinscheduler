@@ -13,23 +13,4 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-
-package org.apache.dolphinscheduler.plugin.task.api.model;
-
-import org.apache.dolphinscheduler.common.enums.AlertType;
-
-import lombok.Data;
-
-@Data
-public class TaskAlertInfo {
-
-    private String title;
-
-    private String content;
-
-    private Integer alertGroupId;
-
-    private AlertType alertType;
-
-}
+*/
