@@ -68,7 +68,10 @@ export function useResources(
     resources: ResourceOption[]
   ): boolean => {
     const isDirectory = (res: ResourceOption): boolean => {
-      return res.dirctory && new RegExp(`^${res.fullName}`).test(fullName)
+      return (
+        res.dirctory &&
+        (fullName === res.fullName || fullName.startsWith(`${res.fullName}/`))
+      )
     }
 
     const processDirectory = (res: ResourceOption): boolean => {
