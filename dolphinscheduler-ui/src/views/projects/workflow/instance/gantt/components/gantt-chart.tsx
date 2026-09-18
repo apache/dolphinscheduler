@@ -15,208 +15,324 @@
  * limitations under the License.
  */
 
-import _ from 'lodash'
-import { defineComponent, ref, PropType } from 'vue'
-import * as echarts from 'echarts'
-import type { Ref } from 'vue'
+import { computed, defineComponent, nextTick, PropType, ref, watch } from 'vue'
+import { useResizeObserver, useWindowSize } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
-import initChart from '@/components/chart'
+import { NButton, NIcon, NTooltip, useThemeVars } from 'naive-ui'
+import {
+  FileTextOutlined,
+  InfoCircleOutlined,
+  SettingOutlined
+} from '@vicons/antd'
 import { tasksState } from '@/common/common'
-import type { ISeriesData, ITaskState } from '../type'
+import type { ITaskState } from '@/common/types'
+import { useTimezoneStore } from '@/store/timezone/timezone'
+import { formatDuration } from '../model'
+import { availableGanttHeight } from '../layout'
+import type { GanttModel } from '../model'
+import type { GanttRow } from '../type'
+import styles from '../index.module.scss'
 
-const props = {
-  height: {
-    type: [String, Number] as PropType<string | number>,
-    default: window.innerHeight - 174
-  },
-  width: {
-    type: [String, Number] as PropType<string | number>,
-    default: '100%'
-  },
-  seriesData: {
-    type: Array as PropType<Array<any>>,
-    default: () => []
-  },
-  taskList: {
-    type: Array as PropType<Array<string>>,
-    default: []
-  }
-}
-
-const GanttChart = defineComponent({
+export default defineComponent({
   name: 'GanttChart',
-  props,
-  setup(props) {
-    const graphChartRef: Ref<HTMLDivElement | null> = ref(null)
-    const { t } = useI18n()
-
-    const state = tasksState(t)
-
-    const data: ISeriesData = {}
-    Object.keys(state).forEach((key) => (data[key] = []))
-    const series = Object.keys(state).map((key) => ({
-      id: key,
-      type: 'custom',
-      name: state[key as ITaskState].desc,
-      renderItem: renderItem,
-      itemStyle: {
-        opacity: 0.8,
-        color: state[key as ITaskState].color,
-        color0: state[key as ITaskState].color
-      },
-      encode: {
-        x: [1, 2],
-        y: 0
-      },
-      data: data[key]
-    }))
-
-    // format series data
-    let minTime = Number.MAX_VALUE
-    let maxTime = 0
-    props.seriesData.forEach(function (task, index) {
-      const start = Math.floor(task.startDate[0] / 1000) * 1000
-      const end = Math.floor(task.endDate[0] / 1000) * 1000
-      minTime = minTime < start ? minTime : start
-      maxTime = maxTime > end ? maxTime : end
-      data[task.status].push({
-        name: task.taskName,
-        value: [index, start, end, end - start],
-        itemStyle: {
-          color: state[task.status as ITaskState].color
-        }
-      })
-    })
-
-    // customer render
-    function renderItem(params: any, api: any) {
-      const taskIndex = api.value(0)
-      const start = api.coord([api.value(1), taskIndex])
-      const end = api.coord([api.value(2), taskIndex])
-      const height = api.size([0, 1])[1] * 0.6
-      const rectShape = echarts.graphic.clipRectByRect(
-        {
-          x: start[0],
-          y: start[1] - height / 2,
-          width: _.max([end[0] - start[0], 1]) || 1,
-          height: height
-        },
-        {
-          x: params.coordSys.x,
-          y: params.coordSys.y,
-          width: params.coordSys.width,
-          height: params.coordSys.height
-        }
-      )
-      return (
-        rectShape && {
-          type: 'rect',
-          transition: ['shape'],
-          shape: rectShape,
-          style: api.style()
-        }
-      )
-    }
-
-    const option = {
-      title: {
-        text: t('project.workflow.task_state'),
-        textStyle: {
-          fontWeight: 'normal',
-          fontSize: 14
-        },
-        left: 50
-      },
-      tooltip: {
-        formatter: function (params: any) {
-          const taskName = params.data.name
-          const data = props.seriesData.filter(
-            (item) => item.taskName === taskName
-          )
-          let str = `taskName : ${taskName}</br>`
-          str += `status : ${state[data[0].status as ITaskState].desc} (${
-            data[0].status
-          })</br>`
-          str += `startTime : ${data[0].isoStart}</br>`
-          str += `endTime : ${data[0].isoEnd}</br>`
-          str += `duration : ${data[0].duration}</br>`
-          return str
-        }
-      },
-      legend: {
-        left: 150,
-        padding: [5, 5, 5, 5]
-      },
-      dataZoom: [
-        {
-          type: 'slider',
-          xAxisIndex: 0,
-          filterMode: 'weakFilter',
-          height: 20,
-          bottom: 0,
-          start: 0,
-          end: 100,
-          handleSize: '80%',
-          showDetail: false,
-          top: '85%'
-        },
-        {
-          type: 'inside',
-          filterMode: 'weakFilter'
-        }
-      ],
-      grid: {
-        height: '70%',
-        top: 80
-      },
-      xAxis: {
-        type: 'time',
-        min: minTime,
-        max: maxTime - minTime > 5000 ? maxTime + 1000 : minTime + 5000,
-        position: 'top',
-        axisTick: { show: true },
-        splitLine: { show: false },
-        axisLabel: {
-          formatter: '{HH}:{mm}:{ss}',
-          showMinLabel: true,
-          showMaxLabel: true,
-          hideOverlap: true
-        }
-      },
-      yAxis: {
-        axisTick: { show: false },
-        splitLine: { show: false },
-        axisLine: { show: false },
-        data: props.taskList.map((item: string) => {
-          return {
-            value: item,
-            textStyle: {
-              width: 130,
-              overflow: 'truncate'
-            }
-          }
-        })
-      },
-      series: series
-    }
-
-    initChart(graphChartRef, option)
-
-    return { graphChartRef }
+  props: { model: { type: Object as PropType<GanttModel>, required: true } },
+  emits: {
+    viewLog: (ignoredRow: GanttRow) => true,
+    viewConfig: (ignoredRow: GanttRow) => true
   },
-  render() {
-    const { height, width } = this
-
-    return (
-      <div
-        ref='graphChartRef'
-        style={{
-          height: typeof height === 'number' ? height + 'px' : height,
-          width: typeof width === 'number' ? width + 'px' : width
-        }}
-      />
+  setup(props, { emit }) {
+    const { t } = useI18n()
+    const timezone = useTimezoneStore()
+    const theme = useThemeVars()
+    const axis = ref<HTMLElement>()
+    const viewport = ref<HTMLElement>()
+    const width = ref(600)
+    const viewportHeight = ref<number>()
+    const { height: windowHeight } = useWindowSize()
+    const updateViewportHeight = () => {
+      const element = viewport.value
+      if (!element) return
+      const container = element.closest('.n-scrollbar-container')
+      const containerBottom =
+        container?.getBoundingClientRect().bottom ?? window.innerHeight
+      viewportHeight.value = availableGanttHeight(
+        element.getBoundingClientRect().top,
+        containerBottom
+      )
+    }
+    useResizeObserver(axis, (entries) => {
+      width.value = entries[0].contentRect.width
+    })
+    useResizeObserver(viewport, updateViewportHeight)
+    watch(
+      windowHeight,
+      () => {
+        void nextTick(updateViewportHeight)
+      },
+      { immediate: true }
+    )
+    watch(
+      () => props.model.rows.length,
+      () => {
+        void nextTick(updateViewportHeight)
+      }
+    )
+    const ticks = computed(() => {
+      const count = Math.max(1, Math.floor(width.value / 110))
+      return Array.from({ length: count + 1 }, (_, index) => index / count)
+    })
+    const taskStates = computed(() => tasksState(t))
+    const state = (row: GanttRow) =>
+      taskStates.value[row.state as ITaskState]?.desc ||
+      (row.state === 'NOT_SUBMITTED'
+        ? t('project.workflow.gantt_pending')
+        : row.state)
+    const color = (row: GanttRow) => {
+      if (['SUCCESS', 'FORCED_SUCCESS'].includes(row.state))
+        return theme.value.successColor
+      if (row.state === 'FAILURE') return theme.value.errorColor
+      if (row.state === 'RUNNING_EXECUTION') return theme.value.infoColor
+      if (['KILL', 'STOP', 'PAUSE'].includes(row.state))
+        return theme.value.warningColor
+      return theme.value.textColor3
+    }
+    const date = (time: number | null) =>
+      time === null
+        ? '—'
+        : new Date(time).toLocaleString(undefined, {
+            timeZone: timezone.getTimezone,
+            hour12: false
+          })
+    const details = (row: GanttRow) => (
+      <div class={styles.tooltip}>
+        <strong>{row.name}</strong>
+        <div>{state(row)}</div>
+        <div>
+          {t('project.workflow.gantt_start')}: {date(row.start)}
+        </div>
+        <div>
+          {t('project.workflow.gantt_end')}:{' '}
+          {row.state === 'RUNNING_EXECUTION'
+            ? t('project.workflow.executing')
+            : date(row.end)}
+        </div>
+        <div>
+          {t('project.workflow.gantt_duration')}: {formatDuration(row.duration)}
+        </div>
+        <div>
+          {t('project.workflow.gantt_share')}: {row.percent.toFixed(2)}%
+        </div>
+      </div>
+    )
+    return () => (
+      <section class={styles.chart}>
+        <div class={styles.toolbar}>
+          <div class={styles.timelineTitle}>
+            <strong>{t('project.workflow.gantt_timeline')}</strong>
+            <NTooltip trigger='hover'>
+              {{
+                trigger: () => (
+                  <NButton
+                    text
+                    size='tiny'
+                    aria-label={t('project.workflow.gantt_help')}
+                  >
+                    <NIcon size={14}>
+                      <InfoCircleOutlined />
+                    </NIcon>
+                  </NButton>
+                ),
+                default: () => (
+                  <div class={styles.help}>
+                    <div>{t('project.workflow.gantt_axis_note')}</div>
+                    <div>{t('project.workflow.gantt_share_note')}</div>
+                  </div>
+                )
+              }}
+            </NTooltip>
+          </div>
+          <span class={styles.elapsed}>
+            {t('project.workflow.gantt_elapsed')}{' '}
+            <strong>{formatDuration(props.model.duration)}</strong>
+          </span>
+        </div>
+        <div
+          ref={viewport}
+          class={styles.viewport}
+          style={{
+            maxHeight:
+              viewportHeight.value === undefined
+                ? undefined
+                : `${viewportHeight.value}px`
+          }}
+          tabindex={0}
+          aria-label={t('project.workflow.gantt_timeline')}
+        >
+          <div
+            class={styles.grid}
+            role='table'
+            aria-label={t('project.workflow.gantt_timeline')}
+          >
+            <div class={[styles.nameCell, styles.corner]} role='columnheader'>
+              <span>{t('project.workflow.gantt_task')}</span>
+              <span>{t('project.workflow.gantt_duration_share')}</span>
+            </div>
+            <div ref={axis} class={styles.axis} role='columnheader'>
+              {ticks.value.map((fraction, index) => (
+                <span
+                  key={index}
+                  class={styles.tick}
+                  style={{
+                    left: `${fraction * 100}%`,
+                    transform:
+                      index === 0
+                        ? 'none'
+                        : index === ticks.value.length - 1
+                        ? 'translateX(-100%)'
+                        : 'translateX(-50%)'
+                  }}
+                >
+                  <span>
+                    {formatDuration(fraction * props.model.axisDuration)}
+                  </span>
+                  <small>{Math.round(fraction * 100)}%</small>
+                </span>
+              ))}
+            </div>
+            {props.model.rows.map((row, index) => (
+              <div key={row.code} role='row' class={styles.row}>
+                <div class={styles.nameCell} role='cell'>
+                  <span class={styles.index}>
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div class={styles.taskInfo}>
+                    <div class={styles.taskTitle}>
+                      <span class={styles.taskName} title={row.name}>
+                        {row.name}
+                      </span>
+                    </div>
+                    <span class={styles.taskState}>
+                      <i style={{ background: color(row) }} />
+                      <span class={styles.stateText}>
+                        {state(row)}
+                        {row.taskType && ` · ${row.taskType}`}
+                      </span>
+                      <span class={styles.taskActions}>
+                        <NTooltip>
+                          {{
+                            trigger: () => (
+                              <NButton
+                                text
+                                size='tiny'
+                                class={styles.actionButton}
+                                disabled={!row.logAvailable}
+                                aria-label={`${row.name} · ${t(
+                                  'project.task.view_log'
+                                )}`}
+                                onClick={() => emit('viewLog', row)}
+                              >
+                                <NIcon size={14}>
+                                  <FileTextOutlined />
+                                </NIcon>
+                              </NButton>
+                            ),
+                            default: () =>
+                              row.logAvailable
+                                ? t('project.task.view_log')
+                                : t('project.workflow.gantt_no_log')
+                          }}
+                        </NTooltip>
+                        <NTooltip>
+                          {{
+                            trigger: () => (
+                              <NButton
+                                text
+                                size='tiny'
+                                class={styles.actionButton}
+                                disabled={!row.definition}
+                                aria-label={`${row.name} · ${t(
+                                  'project.workflow.gantt_view_config'
+                                )}`}
+                                onClick={() => emit('viewConfig', row)}
+                              >
+                                <NIcon size={14}>
+                                  <SettingOutlined />
+                                </NIcon>
+                              </NButton>
+                            ),
+                            default: () =>
+                              row.definition
+                                ? t('project.workflow.gantt_view_config')
+                                : t('project.workflow.gantt_no_config')
+                          }}
+                        </NTooltip>
+                      </span>
+                    </span>
+                  </div>
+                  <div class={styles.metrics}>
+                    <span>{formatDuration(row.duration)}</span>
+                    <small>
+                      {row.duration === null
+                        ? '—'
+                        : `${row.percent.toFixed(2)}%`}
+                    </small>
+                  </div>
+                </div>
+                <div
+                  class={styles.lane}
+                  role='cell'
+                  style={{
+                    backgroundSize: `${100 / (ticks.value.length - 1)}% 100%`
+                  }}
+                >
+                  {row.start !== null && row.duration !== null ? (
+                    <NTooltip>
+                      {{
+                        trigger: () => (
+                          <span
+                            class={[
+                              styles.bar,
+                              row.state === 'RUNNING_EXECUTION' &&
+                                styles.running
+                            ]}
+                            style={{
+                              left: `min(calc(100% - var(--gantt-min-bar-width)), ${
+                                ((row.start! - props.model.start) /
+                                  props.model.axisDuration) *
+                                100
+                              }%)`,
+                              width: `${
+                                (row.duration! / props.model.axisDuration) * 100
+                              }%`,
+                              backgroundColor: color(row)
+                            }}
+                            aria-label={`${row.name} · ${state(
+                              row
+                            )} · ${formatDuration(
+                              row.duration
+                            )} · ${row.percent.toFixed(2)}%`}
+                          >
+                            {(row.duration! / props.model.axisDuration) *
+                              width.value >
+                              95 && <span>{formatDuration(row.duration)}</span>}
+                          </span>
+                        ),
+                        default: () => details(row)
+                      }}
+                    </NTooltip>
+                  ) : (
+                    <span class={styles.noBar}>
+                      {row.start === null
+                        ? state(row)
+                        : t('project.workflow.gantt_time_unavailable')}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
     )
   }
 })
-
-export default GanttChart
