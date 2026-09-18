@@ -15,15 +15,6 @@
  * limitations under the License.
 */
 
--- Enforce idempotent task-result alerts at the database level.
--- Allows INSERT IGNORE (MySQL) / ON CONFLICT DO NOTHING (PostgreSQL) to atomically
--- prevent duplicates without check-then-insert race conditions.
--- Clean up any existing duplicate rows before adding the unique constraint.
-DELETE t1 FROM t_ds_alert t1
-INNER JOIN t_ds_alert t2
-WHERE t1.id < t2.id
-  AND t1.sign = t2.sign
-  AND t1.workflow_instance_id = t2.workflow_instance_id
-  AND t1.alert_type = t2.alert_type;
+-- If the table already has duplicate rows, index creation will fail; resolve them manually first.
 ALTER TABLE `t_ds_alert` ADD UNIQUE INDEX `uk_alert_dedup` (`sign`, `workflow_instance_id`, `alert_type`);
 
