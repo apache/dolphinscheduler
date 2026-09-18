@@ -56,6 +56,12 @@ public class HttpParameters extends AbstractParameters {
      */
     private int connectTimeout;
 
+    /**
+     * Whether to enable TCP keepalive (SO_KEEPALIVE) on the request socket.
+     * The probe interval is controlled by the worker host OS, not by this flag.
+     */
+    private boolean socketKeepAlive;
+
     @Override
     public boolean checkParameters() {
         return StringUtils.isNotEmpty(url) && httpRequestMethod != null
