@@ -25,9 +25,13 @@ import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 
 @Slf4j
@@ -39,7 +43,9 @@ public abstract class AbstractHAServer implements HAServer {
 
     private final String serverIdentify;
 
-    private ServerStatus serverStatus;
+    private volatile ServerStatus serverStatus;
+
+    private final ExecutorService electionExecutor;
 
     private final List<ServerStatusChangeListener> serverStatusChangeListeners;
 
@@ -48,40 +54,98 @@ public abstract class AbstractHAServer implements HAServer {
     private static final int DEFAULT_MAX_RETRY_TIMES = 20;
 
     public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
+        this(registry, selectorPath, serverIdentify,
+                ThreadUtils.newDaemonFixedThreadExecutor("HA-Election-%d", 1));
+    }
+
+    @VisibleForTesting
+    AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify,
+                     final ExecutorService electionExecutor) {
+        this.electionExecutor = electionExecutor;
         this.registry = registry;
         this.selectorPath = checkNotNull(selectorPath);
-        this.serverIdentify = checkNotNull(serverIdentify);
+        // Include the creation time to distinguish restarts at the same address.
+        this.serverIdentify = checkNotNull(serverIdentify) + "#" + System.currentTimeMillis();
         this.serverStatus = ServerStatus.STAND_BY;
         this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());
     }
 
     @Override
     public void start() {
-        registry.subscribe(selectorPath, new SubscribeListener() {
+        try {
+            registry.subscribe(selectorPath, new SubscribeListener() {
 
-            @Override
-            public void notify(Event event) {
-                if (Event.Type.REMOVE.equals(event.getType())) {
-                    if (serverIdentify.equals(event.getEventData())) {
-                        statusChange(ServerStatus.STAND_BY);
-                    } else {
-                        if (participateElection()) {
-                            statusChange(ServerStatus.ACTIVE);
-                        }
+                @Override
+                public void notify(Event event) {
+                    if (Event.Type.REMOVE.equals(event.getType())) {
+                        enqueueElection();
                     }
                 }
-            }
 
-            @Override
-            public SubscribeScope getSubscribeScope() {
-                return SubscribeScope.PATH_ONLY;
+                @Override
+                public SubscribeScope getSubscribeScope() {
+                    return SubscribeScope.PATH_ONLY;
+                }
+            });
+            // Preserve startup completion and failure semantics; callbacks only enqueue work.
+            electionExecutor.submit(this::reconcileElection).get();
+        } catch (InterruptedException e) {
+            close();
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while starting HA server", e);
+        } catch (ExecutionException e) {
+            close();
+            if (e.getCause() instanceof RuntimeException) {
+                throw (RuntimeException) e.getCause();
             }
-        });
+            throw new IllegalStateException("Failed to start HA server", e.getCause());
+        } catch (RuntimeException e) {
+            close();
+            throw e;
+        }
+    }
 
-        if (participateElection()) {
+    private void enqueueElection() {
+        if (electionExecutor.isShutdown()) {
+            return;
+        }
+        try {
+            electionExecutor.execute(() -> {
+                try {
+                    reconcileElection();
+                } catch (Exception e) {
+                    log.error("Failed to reconcile HA ownership for {}", serverIdentify, e);
+                }
+            });
+        } catch (RejectedExecutionException e) {
+            // The Registry can deliver callbacks concurrently with close().
+            if (!electionExecutor.isShutdown()) {
+                throw e;
+            }
+        }
+    }
+
+    private void reconcileElection() {
+        // REMOVE is a request to recheck ownership, not a role decision to replay later.
+        boolean elected = participateElection();
+        if (electionExecutor.isShutdown()) {
+            return;
+        }
+        if (elected) {
             statusChange(ServerStatus.ACTIVE);
         } else {
+            statusChange(ServerStatus.STAND_BY);
             log.info("Server {} is standby", serverIdentify);
+        }
+    }
+
+    @Override
+    public void close() {
+        // Let queued startup futures finish as no-ops. shutdownNow would strand their callers.
+        electionExecutor.shutdown();
+        synchronized (this) {
+            // Wait for any publication already in progress, without joining the event worker:
+            // an Alert listener can close this server from that worker itself.
         }
     }
 
@@ -96,22 +160,35 @@ public abstract class AbstractHAServer implements HAServer {
         // If meet exception during participate election, will retry.
         // This can avoid the situation that the server is not elected as leader due to network jitter.
         for (int i = 0; i < DEFAULT_MAX_RETRY_TIMES; i++) {
+            if (electionExecutor.isShutdown()) {
+                return false;
+            }
             try {
+                if (!registry.acquireLock(electionLock)) {
+                    return false;
+                }
                 try {
-                    if (registry.acquireLock(electionLock)) {
-                        if (!registry.exists(selectorPath)) {
-                            registry.put(selectorPath, serverIdentify, true);
-                            return true;
-                        }
+                    if (electionExecutor.isShutdown()) {
+                        return false;
+                    }
+                    boolean selectorExists = registry.exists(selectorPath);
+                    if (electionExecutor.isShutdown()) {
+                        return false;
+                    }
+                    if (selectorExists) {
                         return serverIdentify.equals(registry.get(selectorPath));
                     }
-                    return false;
+                    registry.put(selectorPath, serverIdentify, true);
+                    return true;
                 } finally {
                     registry.releaseLock(electionLock);
                 }
             } catch (Exception e) {
                 log.error("Participate election error, meet an exception, will retry after {}ms",
                         DEFAULT_RETRY_INTERVAL, e);
+                if (electionExecutor.isShutdown()) {
+                    return false;
+                }
                 ThreadUtils.sleep(DEFAULT_RETRY_INTERVAL);
             }
         }
@@ -129,15 +206,22 @@ public abstract class AbstractHAServer implements HAServer {
         return serverStatus;
     }
 
-    private void statusChange(ServerStatus targetStatus) {
+    // Use the same monitor as external close() so it waits for ongoing status updates and listener calls.
+    private synchronized void statusChange(ServerStatus targetStatus) {
+        if (electionExecutor.isShutdown()) {
+            return;
+        }
         final ServerStatus originStatus = serverStatus;
         serverStatus = targetStatus;
-        synchronized (this) {
-            try {
-                serverStatusChangeListeners.forEach(listener -> listener.change(originStatus, serverStatus));
-            } catch (Exception ex) {
-                log.error("Trigger ServerStatusChangeListener from {} -> {} error", originStatus, targetStatus, ex);
-            }
+        try {
+            serverStatusChangeListeners.forEach(listener -> {
+                // A listener may close this server; do not invoke subsequent listeners after that.
+                if (!electionExecutor.isShutdown()) {
+                    listener.change(originStatus, targetStatus);
+                }
+            });
+        } catch (Exception ex) {
+            log.error("Trigger ServerStatusChangeListener from {} -> {} error", originStatus, targetStatus, ex);
         }
     }
 }
