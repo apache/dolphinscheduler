@@ -62,6 +62,8 @@ import com.aliyun.oss.model.PutObjectRequest;
 @Slf4j
 public class OssStorageOperator extends AbstractStorageOperator implements Closeable, StorageOperator {
 
+    private static final int MAX_KEYS = 1000;
+
     private String region;
 
     private String bucketName;
@@ -224,29 +226,43 @@ public class OssStorageOperator extends AbstractStorageOperator implements Close
     public List<StorageEntity> listStorageEntity(String resourceAbsolutePath) {
         final String ossResourceAbsolutePath = transformAbsolutePathToOssKey(resourceAbsolutePath);
 
-        ListObjectsV2Request listObjectsV2Request = new ListObjectsV2Request()
-                .withBucketName(bucketName)
-                .withDelimiter("/")
-                .withPrefix(ossResourceAbsolutePath);
-
-        ListObjectsV2Result listObjectsV2Result = ossClient.listObjectsV2(listObjectsV2Request);
-
-        // Collect common prefixes (directories)
-        Set<String> commonPrefixSet = new HashSet<>(listObjectsV2Result.getCommonPrefixes());
-
         List<StorageEntity> storageEntities = new ArrayList<>();
-        storageEntities.addAll(listObjectsV2Result.getCommonPrefixes()
-                .stream()
-                .map(this::transformCommonPrefixToStorageEntity)
-                .collect(Collectors.toList()));
-        storageEntities.addAll(
-                listObjectsV2Result.getObjectSummaries().stream()
-                        // Filter out the current directory itself
-                        .filter(ossObjectSummary -> !ossObjectSummary.getKey().equals(ossResourceAbsolutePath))
-                        // Filter out directory marker objects that are already in commonPrefixes
-                        .filter(ossObjectSummary -> !commonPrefixSet.contains(ossObjectSummary.getKey()))
-                        .map(this::transformOSSObjectToStorageEntity)
-                        .collect(Collectors.toList()));
+        Set<String> commonPrefixSet = new HashSet<>();
+        String continuationToken = null;
+        boolean truncated;
+        do {
+            ListObjectsV2Request listObjectsV2Request = new ListObjectsV2Request()
+                    .withBucketName(bucketName)
+                    .withDelimiter("/")
+                    .withPrefix(ossResourceAbsolutePath)
+                    .withMaxKeys(MAX_KEYS);
+            if (continuationToken != null) {
+                listObjectsV2Request.setContinuationToken(continuationToken);
+            }
+
+            ListObjectsV2Result listObjectsV2Result = ossClient.listObjectsV2(listObjectsV2Request);
+
+            for (String commonPrefix : listObjectsV2Result.getCommonPrefixes()) {
+                if (commonPrefixSet.add(commonPrefix)) {
+                    storageEntities.add(transformCommonPrefixToStorageEntity(commonPrefix));
+                }
+            }
+
+            for (OSSObjectSummary ossObjectSummary : listObjectsV2Result.getObjectSummaries()) {
+                // Filter out the current directory itself
+                if (ossObjectSummary.getKey().equals(ossResourceAbsolutePath)) {
+                    continue;
+                }
+                // Filter out directory marker objects that are already in commonPrefixes
+                if (commonPrefixSet.contains(ossObjectSummary.getKey())) {
+                    continue;
+                }
+                storageEntities.add(transformOSSObjectToStorageEntity(ossObjectSummary));
+            }
+
+            truncated = listObjectsV2Result.isTruncated();
+            continuationToken = listObjectsV2Result.getNextContinuationToken();
+        } while (truncated && continuationToken != null);
 
         return storageEntities;
 

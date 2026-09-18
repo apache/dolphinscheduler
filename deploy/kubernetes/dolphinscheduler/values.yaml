@@ -598,6 +598,10 @@ master:
       annotations: {}
 
 worker:
+  # -- Additional volumes for the Worker container
+  extraVolumes: []
+  # -- Additional volume mounts for the Worker container
+  extraVolumeMounts: []
   # -- Enable or disable the Worker component
   enabled: true
   # -- PodManagementPolicy controls how pods are created during initial scale up, when replacing pods on nodes, or when scaling down.
@@ -916,6 +920,10 @@ alert:
 
 
 api:
+  # -- Additional volumes for the API container
+  extraVolumes: []
+  # -- Additional volume mounts for the API container
+  extraVolumeMounts: []
   # -- Enable or disable the API-Server component
   enabled: true
   # -- Number of desired pods. This is a pointer to distinguish between explicit zero and not specified. Defaults to 1.
