@@ -67,10 +67,12 @@ export default {
     gantt_end: 'End',
     gantt_share: 'Share of workflow elapsed',
     gantt_axis_note:
-      'Time is relative to workflow start. Select task names to copy; use the log icon to view logs.',
+      'Time is relative to workflow start. Select task names to copy; use the icons to view logs or configuration.',
     gantt_share_note:
       'Share = task duration / workflow elapsed. Parallel tasks may sum to more than 100%.',
     gantt_no_log: 'No log available yet',
+    gantt_view_config: 'View configuration',
+    gantt_no_config: 'Configuration unavailable',
     gantt_time_unavailable: 'Execution time unavailable',
     gantt_log_limit:
       'Showing the first 20,000 lines. Download for the complete log.',
@@ -581,7 +583,6 @@ export default {
     http_condition_tips: 'Please Enter Http Condition',
     timeout_settings: 'Timeout Settings',
     connect_timeout: 'Connect Timeout',
-    keep_alive: 'TCP Keepalive',
     ms: 'ms',
     status_code_default: 'Default response code 200',
     status_code_custom: 'Custom response code',

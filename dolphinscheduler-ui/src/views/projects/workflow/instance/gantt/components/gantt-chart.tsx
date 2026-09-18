@@ -19,7 +19,11 @@ import { computed, defineComponent, nextTick, PropType, ref, watch } from 'vue'
 import { useResizeObserver, useWindowSize } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
 import { NButton, NIcon, NTooltip, useThemeVars } from 'naive-ui'
-import { FileTextOutlined, InfoCircleOutlined } from '@vicons/antd'
+import {
+  FileTextOutlined,
+  InfoCircleOutlined,
+  SettingOutlined
+} from '@vicons/antd'
 import { tasksState } from '@/common/common'
 import type { ITaskState } from '@/common/types'
 import { useTimezoneStore } from '@/store/timezone/timezone'
@@ -32,7 +36,10 @@ import styles from '../index.module.scss'
 export default defineComponent({
   name: 'GanttChart',
   props: { model: { type: Object as PropType<GanttModel>, required: true } },
-  emits: { viewLog: (ignoredRow: GanttRow) => true },
+  emits: {
+    viewLog: (ignoredRow: GanttRow) => true,
+    viewConfig: (ignoredRow: GanttRow) => true
+  },
   setup(props, { emit }) {
     const { t } = useI18n()
     const timezone = useTimezoneStore()
@@ -203,35 +210,63 @@ export default defineComponent({
                       <span class={styles.taskName} title={row.name}>
                         {row.name}
                       </span>
-                      <NTooltip>
-                        {{
-                          trigger: () => (
-                            <NButton
-                              text
-                              size='tiny'
-                              class={styles.logButton}
-                              disabled={!row.logAvailable}
-                              aria-label={`${row.name} · ${t(
-                                'project.task.view_log'
-                              )}`}
-                              onClick={() => emit('viewLog', row)}
-                            >
-                              <NIcon size={14}>
-                                <FileTextOutlined />
-                              </NIcon>
-                            </NButton>
-                          ),
-                          default: () =>
-                            row.logAvailable
-                              ? t('project.task.view_log')
-                              : t('project.workflow.gantt_no_log')
-                        }}
-                      </NTooltip>
                     </div>
                     <span class={styles.taskState}>
                       <i style={{ background: color(row) }} />
-                      {state(row)}
-                      {row.taskType && ` · ${row.taskType}`}
+                      <span class={styles.stateText}>
+                        {state(row)}
+                        {row.taskType && ` · ${row.taskType}`}
+                      </span>
+                      <span class={styles.taskActions}>
+                        <NTooltip>
+                          {{
+                            trigger: () => (
+                              <NButton
+                                text
+                                size='tiny'
+                                class={styles.actionButton}
+                                disabled={!row.logAvailable}
+                                aria-label={`${row.name} · ${t(
+                                  'project.task.view_log'
+                                )}`}
+                                onClick={() => emit('viewLog', row)}
+                              >
+                                <NIcon size={14}>
+                                  <FileTextOutlined />
+                                </NIcon>
+                              </NButton>
+                            ),
+                            default: () =>
+                              row.logAvailable
+                                ? t('project.task.view_log')
+                                : t('project.workflow.gantt_no_log')
+                          }}
+                        </NTooltip>
+                        <NTooltip>
+                          {{
+                            trigger: () => (
+                              <NButton
+                                text
+                                size='tiny'
+                                class={styles.actionButton}
+                                disabled={!row.definition}
+                                aria-label={`${row.name} · ${t(
+                                  'project.workflow.gantt_view_config'
+                                )}`}
+                                onClick={() => emit('viewConfig', row)}
+                              >
+                                <NIcon size={14}>
+                                  <SettingOutlined />
+                                </NIcon>
+                              </NButton>
+                            ),
+                            default: () =>
+                              row.definition
+                                ? t('project.workflow.gantt_view_config')
+                                : t('project.workflow.gantt_no_config')
+                          }}
+                        </NTooltip>
+                      </span>
                     </span>
                   </div>
                   <div class={styles.metrics}>

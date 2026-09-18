@@ -21,6 +21,7 @@ export interface TaskDefinition {
   code: number
   name: string
   taskType?: string
+  [key: string]: unknown
 }
 
 export interface TaskInstance {
@@ -66,4 +67,5 @@ export interface GanttRow {
   duration: number | null
   percent: number
   logAvailable: boolean
+  definition?: TaskDefinition
 }

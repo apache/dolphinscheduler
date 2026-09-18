@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import {
@@ -29,10 +29,12 @@ import {
 } from 'naive-ui'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
+import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import GanttChart from './components/gantt-chart'
 import { useGantt } from './use-gantt'
 import { useGanttLogs } from './use-logs'
 import { isWorkflowActive } from './model'
+import type { GanttRow } from './type'
 import styles from './index.module.scss'
 
 export default defineComponent({
@@ -47,6 +49,18 @@ export default defineComponent({
         Number(route.params.projectCode)
       ])
     const logs = useGanttLogs(t)
+    const configVisible = ref(false)
+    const configTask = ref<GanttRow['definition']>()
+    const workflowDefinition = computed(() => workflow.value?.dagData as any)
+    const openConfig = (row: GanttRow) => {
+      if (!row.definition) return
+      configTask.value = row.definition
+      configVisible.value = true
+    }
+    const closeConfig = () => {
+      configVisible.value = false
+      configTask.value = undefined
+    }
     const statistics = [
       'total',
       'submitted',
@@ -184,7 +198,11 @@ export default defineComponent({
                   </div>
                 </div>
                 {model.value.rows.length ? (
-                  <GanttChart model={model.value} onViewLog={logs.open} />
+                  <GanttChart
+                    model={model.value}
+                    onViewLog={logs.open}
+                    onViewConfig={openConfig}
+                  />
                 ) : (
                   <NEmpty
                     class={styles.empty}
@@ -217,6 +235,22 @@ export default defineComponent({
               onDownloadLogs={logs.download}
             />
           )}
+          <TaskModal
+            readonly
+            confirmShow={false}
+            show={configVisible.value}
+            from={1}
+            projectCode={Number(route.params.projectCode)}
+            data={
+              (configTask.value || {
+                code: 0,
+                name: '',
+                taskType: 'SHELL'
+              }) as any
+            }
+            definition={workflowDefinition}
+            onCancel={closeConfig}
+          />
         </div>
       </Card>
     )

@@ -67,10 +67,12 @@ export default {
     gantt_end: '结束',
     gantt_share: '占工作流耗时',
     gantt_axis_note:
-      '从工作流开始计时；任务名称可复制，点击旁边的日志图标查看日志。',
+      '从工作流开始计时；任务名称可复制，点击状态信息右侧图标查看日志或任务配置。',
     gantt_share_note:
       '占比 = 任务耗时 / 工作流耗时，并行任务占比之和可能超过 100%。',
     gantt_no_log: '暂无日志',
+    gantt_view_config: '查看配置',
+    gantt_no_config: '暂无任务配置',
     gantt_time_unavailable: '暂无完整执行时间',
     gantt_log_limit: '已展示前 20000 行，请下载查看完整日志。',
     gantt_log_error: '日志加载失败，请点击刷新重试。',
@@ -560,7 +562,6 @@ export default {
     http_condition_tips: '请填写校验内容',
     timeout_settings: '超时设置',
     connect_timeout: '连接超时',
-    keep_alive: '启用 TCP 保活',
     ms: '毫秒',
     status_code_default: '默认响应码200',
     status_code_custom: '自定义响应码',

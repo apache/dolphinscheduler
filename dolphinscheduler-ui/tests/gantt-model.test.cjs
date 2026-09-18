@@ -101,6 +101,29 @@ test('counts definition nodes including unsubmitted tasks and deduplicates retry
   assert.equal(result.rows[2].start, null)
 })
 
+test('keeps the workflow instance version task definition for read-only viewing', () => {
+  const instanceVersion = {
+    code: 1,
+    name: 'extract',
+    taskType: 'SQL',
+    version: 7,
+    taskParams: { sql: 'select 1' }
+  }
+  const result = build(
+    {
+      ...workflow,
+      dagData: { taskDefinitionList: [instanceVersion] }
+    },
+    [],
+    undefined,
+    12000
+  )
+
+  assert.equal(result.rows[0].definition, instanceVersion)
+  assert.equal(result.rows[0].definition.version, 7)
+  assert.equal(result.rows[0].definition.taskParams.sql, 'select 1')
+})
+
 test('uses millisecond gantt timestamps and workflow elapsed duration for percentages', () => {
   const result = build(
     workflow,

@@ -88,11 +88,10 @@ export function buildGanttModel(
     )
       latest.set(task.taskCode, task)
   }
+  const configuredDefinitions = workflow.dagData?.taskDefinitionList || []
+  const configuredCodes = new Set(configuredDefinitions.map(({ code }) => code))
   const definitions = new Map(
-    (workflow.dagData?.taskDefinitionList || []).map((task) => [
-      task.code,
-      task
-    ])
+    configuredDefinitions.map((task) => [task.code, task])
   )
   latest.forEach((task) => {
     if (!definitions.has(task.taskCode))
@@ -152,7 +151,10 @@ export function buildGanttModel(
         end,
         duration: start !== null && end !== null ? end - start : null,
         percent: 0,
-        logAvailable: Boolean(task?.id && (task.logPath || task.startTime))
+        logAvailable: Boolean(task?.id && (task.logPath || task.startTime)),
+        definition: configuredCodes.has(definition.code)
+          ? definition
+          : undefined
       }
     })
   const starts = rows.flatMap((row) => (row.start === null ? [] : [row.start]))

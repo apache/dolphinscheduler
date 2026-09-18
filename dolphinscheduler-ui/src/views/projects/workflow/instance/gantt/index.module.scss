@@ -261,7 +261,26 @@
 }
 .index {
   color: var(--gantt-muted);
-  font: 10px ui-monospace, SFMono-Regular, Menlo, monospace;
+  font: 9px/14px ui-monospace, SFMono-Regular, Menlo, monospace;
+  height: 14px;
+  width: 24px;
+  padding: 0 4px;
+  border-radius: 7px;
+  text-align: center;
+  box-sizing: border-box;
+  background: color-mix(in srgb, var(--gantt-muted) 10%, transparent);
+  flex-shrink: 0;
+}
+.taskActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.actionButton {
+  width: 18px;
+  height: 18px;
+  color: var(--gantt-primary);
 }
 .taskInfo {
   min-width: 0;
@@ -286,23 +305,26 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.logButton {
-  flex-shrink: 0;
-  color: var(--gantt-primary);
-}
 .taskState {
   font-size: 10px;
   color: var(--gantt-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
   white-space: nowrap;
-  text-overflow: ellipsis;
+  min-width: 0;
+}
+.stateText {
   overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 .taskState i {
-  display: inline-block;
-  width: 5px;
-  height: 5px;
+  display: block;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  margin-right: 4px;
+  flex-shrink: 0;
 }
 .metrics {
   text-align: right;
@@ -381,8 +403,5 @@
   .nameCell {
     padding: 0 6px;
     gap: 4px;
-  }
-  .index {
-    display: none;
   }
 }
