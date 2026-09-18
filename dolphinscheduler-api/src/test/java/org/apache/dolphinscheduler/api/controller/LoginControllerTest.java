@@ -280,6 +280,7 @@ public class LoginControllerTest extends AbstractControllerTest {
             Assertions.assertEquals(302, ((MockHttpServletResponse) response).getStatus());
             String redirect = ((MockHttpServletResponse) response).getRedirectedUrl();
             Assertions.assertTrue(redirect.startsWith("http://ui/callback?sessionId=sid-1"));
+            Assertions.assertTrue(redirect.contains("securityConfigType=OAUTH2"));
         }
     }
 
