@@ -17,6 +17,18 @@
 
 import { axios } from '@/service/service'
 import { ProjectCodeReq, TaskDefinitionJsonReq } from './types'
+import type { TaskWorkflowSearchPage, TaskWorkflowSearchParams } from './types'
+
+export function searchTaskWorkflows(
+  params: TaskWorkflowSearchParams,
+  projectCode: number
+) {
+  return axios.request<unknown, TaskWorkflowSearchPage>({
+    url: `/projects/${projectCode}/task-definition/search`,
+    method: 'get',
+    params
+  })
+}
 
 export function save(
   data: TaskDefinitionJsonReq,

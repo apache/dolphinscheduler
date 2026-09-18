@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.controller;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_TASK_DEFINITION_VERSION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_TASK_DEFINITION_ERROR;
+import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_DEFINITION_LIST_PAGING_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_DEFINITION_VERSIONS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.RELEASE_TASK_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_TASK_DEFINITION_VERSION_ERROR;
@@ -28,11 +29,13 @@ import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.model.TaskWorkflowSearchResult;
 
 import java.util.List;
 
@@ -61,6 +64,26 @@ public class TaskDefinitionController extends BaseController {
 
     @Autowired
     private TaskDefinitionService taskDefinitionService;
+
+    @Operation(summary = "searchTaskWorkflows", description = "Search tasks by name in the current project and locate their workflows")
+    @Parameters({
+            @Parameter(name = "searchVal", description = "Task name substring", schema = @Schema(implementation = String.class)),
+            @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
+            @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10"))
+    })
+    @GetMapping("/search")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiException(QUERY_TASK_DEFINITION_LIST_PAGING_ERROR)
+    public Result<PageInfo<TaskWorkflowSearchResult>> searchTaskWorkflows(
+                                                                          @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                          @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                          @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                                          @RequestParam("pageNo") int pageNo,
+                                                                          @RequestParam("pageSize") int pageSize) {
+        checkPageParams(pageNo, pageSize);
+        return Result.success(taskDefinitionService.searchTaskWorkflows(loginUser, projectCode, searchVal,
+                pageNo, pageSize));
+    }
 
     /**
      * query task definition version paging list info

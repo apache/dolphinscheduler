@@ -17,15 +17,30 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.model.TaskWorkflowSearchResult;
 
 import java.util.List;
 
 public interface TaskDefinitionService {
+
+    /**
+     * Search tasks referenced by current workflow definitions within an authorized project.
+     *
+     * @param loginUser login user
+     * @param projectCode project code
+     * @param searchVal literal task name substring, or empty to list all tasks
+     * @param pageNo page number
+     * @param pageSize page size
+     * @return a page of distinct task/workflow pairs
+     */
+    PageInfo<TaskWorkflowSearchResult> searchTaskWorkflows(User loginUser, long projectCode, String searchVal,
+                                                           int pageNo, int pageSize);
 
     /**
      * query task definition

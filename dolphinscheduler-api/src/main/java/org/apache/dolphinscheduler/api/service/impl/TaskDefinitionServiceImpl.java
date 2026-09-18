@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.model.TaskWorkflowSearchResult;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
@@ -105,6 +106,15 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
 
     @Autowired
     private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
+
+    @Override
+    public PageInfo<TaskWorkflowSearchResult> searchTaskWorkflows(User loginUser, long projectCode, String searchVal,
+                                                                  int pageNo, int pageSize) {
+        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, TASK_DEFINITION);
+        String escapedSearchVal = StringUtils.trimToEmpty(searchVal)
+                .replace("!", "!!").replace("%", "!%").replace("_", "!_");
+        return PageInfo.of(taskDefinitionDao.searchTaskWorkflows(pageNo, pageSize, projectCode, escapedSearchVal));
+    }
 
     /**
      * query task definition

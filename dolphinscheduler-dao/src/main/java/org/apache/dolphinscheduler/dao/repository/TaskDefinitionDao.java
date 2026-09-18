@@ -18,15 +18,20 @@
 package org.apache.dolphinscheduler.dao.repository;
 
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.model.TaskWorkflowSearchResult;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+
 /**
  * Task Instance DAO
  */
 public interface TaskDefinitionDao extends IDao<TaskDefinition> {
+
+    IPage<TaskWorkflowSearchResult> searchTaskWorkflows(int pageNo, int pageSize, long projectCode, String searchVal);
 
     /**
      * Get list of task definition by process definition code

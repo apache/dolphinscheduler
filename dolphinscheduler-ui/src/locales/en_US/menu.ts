@@ -32,6 +32,7 @@ export default {
   workflow_timing: 'Workflow Timing',
   task: 'Task',
   task_instance: 'Task Instance',
+  task_search: 'Task Search',
   file_manage: 'File Manage',
   resource_manage: 'Resource Manage',
   function_manage: 'Function Manage',

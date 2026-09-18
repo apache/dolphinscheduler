@@ -191,6 +191,17 @@ export default {
       }
     },
     {
+      path: '/projects/:projectCode/task/search',
+      name: 'task-search',
+      component: components['projects-task-search'],
+      meta: {
+        title: '任务搜索',
+        activeMenu: 'projects',
+        showSide: true,
+        auth: []
+      }
+    },
+    {
       path: '/projects/:projectCode/workflow-definition/tree/:definitionCode',
       name: 'workflow-definition-tree',
       component: components['projects-workflow-definition-tree'],

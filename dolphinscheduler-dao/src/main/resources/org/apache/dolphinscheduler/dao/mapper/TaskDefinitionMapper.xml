@@ -18,6 +18,24 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper">
+    <select id="searchTaskWorkflows" resultType="org.apache.dolphinscheduler.dao.model.TaskWorkflowSearchResult">
+        SELECT DISTINCT td.code AS task_code, td.name AS task_name, td.task_type,
+                        wd.code AS workflow_definition_code, wd.name AS workflow_definition_name
+        FROM t_ds_workflow_definition wd
+        JOIN t_ds_workflow_task_relation wtr
+          ON wtr.project_code = wd.project_code
+         AND wtr.workflow_definition_code = wd.code
+         AND wtr.workflow_definition_version = wd.version
+        JOIN t_ds_task_definition_log td
+          ON td.code = wtr.post_task_code
+         AND td.version = wtr.post_task_version
+         AND td.project_code = wd.project_code
+        WHERE wd.project_code = #{projectCode}
+        <if test="searchVal != null and searchVal != ''">
+            AND td.name LIKE concat('%', #{searchVal}, '%') ESCAPE '!'
+        </if>
+        ORDER BY task_code, workflow_definition_code
+    </select>
     <sql id="baseSql">
         id, code, name, version, description, project_code, user_id, task_type, task_params, flag, task_priority,
         worker_group, environment_code, fail_retry_times, fail_retry_interval, timeout_flag, timeout_notify_strategy, timeout, delay_time,

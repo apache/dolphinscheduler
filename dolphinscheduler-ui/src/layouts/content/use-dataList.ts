@@ -157,6 +157,11 @@ export function useDataList() {
                 label: t('menu.task_instance'),
                 key: `/projects/${projectCode}/task/instances`,
                 payload: { projectName: projectName }
+              },
+              {
+                label: t('menu.task_search'),
+                key: `/projects/${projectCode}/task/search`,
+                payload: { projectName: projectName }
               }
             ]
           }

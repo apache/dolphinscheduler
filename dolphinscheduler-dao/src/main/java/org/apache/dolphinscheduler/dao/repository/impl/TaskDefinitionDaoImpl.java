@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
+import org.apache.dolphinscheduler.dao.model.TaskWorkflowSearchResult;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 
@@ -44,6 +45,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 
 @Repository
@@ -61,6 +64,12 @@ public class TaskDefinitionDaoImpl extends BaseDao<TaskDefinition, TaskDefinitio
 
     public TaskDefinitionDaoImpl(@NonNull TaskDefinitionMapper taskDefinitionMapper) {
         super(taskDefinitionMapper);
+    }
+
+    @Override
+    public IPage<TaskWorkflowSearchResult> searchTaskWorkflows(int pageNo, int pageSize, long projectCode,
+                                                               String searchVal) {
+        return mybatisMapper.searchTaskWorkflows(new Page<>(pageNo, pageSize), projectCode, searchVal);
     }
 
     @Override

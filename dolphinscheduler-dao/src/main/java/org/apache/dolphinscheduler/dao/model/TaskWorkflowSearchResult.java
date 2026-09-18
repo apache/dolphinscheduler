@@ -15,31 +15,23 @@
  * limitations under the License.
  */
 
-interface ProjectCodeReq {
-  projectCode: number
-}
+package org.apache.dolphinscheduler.dao.model;
 
-interface TaskDefinitionJsonReq {
-  taskDefinitionJson: string
-}
+import lombok.Data;
 
-export interface TaskWorkflowSearchResult {
-  taskCode: number
-  taskName: string
-  taskType: string
-  workflowDefinitionCode: number
-  workflowDefinitionName: string
-}
+/**
+ * A task referenced by the current version of a workflow definition.
+ */
+@Data
+public class TaskWorkflowSearchResult {
 
-export interface TaskWorkflowSearchParams {
-  searchVal?: string
-  pageNo: number
-  pageSize: number
-}
+    private long taskCode;
 
-export interface TaskWorkflowSearchPage {
-  totalList: TaskWorkflowSearchResult[]
-  total: number
-}
+    private String taskName;
 
-export { ProjectCodeReq, TaskDefinitionJsonReq }
+    private String taskType;
+
+    private long workflowDefinitionCode;
+
+    private String workflowDefinitionName;
+}

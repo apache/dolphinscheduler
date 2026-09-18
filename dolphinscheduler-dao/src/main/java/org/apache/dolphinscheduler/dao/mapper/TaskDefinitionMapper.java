@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.mapper;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
+import org.apache.dolphinscheduler.dao.model.TaskWorkflowSearchResult;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
 import org.apache.ibatis.annotations.Param;
@@ -31,6 +32,18 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 
 public interface TaskDefinitionMapper extends BaseMapper<TaskDefinition> {
+
+    /**
+     * Search task/workflow pairs, deduplicating multiple upstream relations before pagination.
+     *
+     * @param page pagination
+     * @param projectCode project code
+     * @param searchVal task name substring with LIKE metacharacters escaped using '!'
+     * @return matching task/workflow pairs
+     */
+    IPage<TaskWorkflowSearchResult> searchTaskWorkflows(IPage<TaskWorkflowSearchResult> page,
+                                                        @Param("projectCode") long projectCode,
+                                                        @Param("searchVal") String searchVal);
 
     /**
      * query task definition by name
