@@ -74,8 +74,9 @@ export default defineComponent({
       const count = Math.max(1, Math.floor(width.value / 110))
       return Array.from({ length: count + 1 }, (_, index) => index / count)
     })
+    const taskStates = computed(() => tasksState(t))
     const state = (row: GanttRow) =>
-      tasksState(t)[row.state as ITaskState]?.desc ||
+      taskStates.value[row.state as ITaskState]?.desc ||
       (row.state === 'NOT_SUBMITTED'
         ? t('project.workflow.gantt_pending')
         : row.state)

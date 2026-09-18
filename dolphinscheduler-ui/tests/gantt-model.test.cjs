@@ -125,6 +125,53 @@ test('uses millisecond gantt timestamps and workflow elapsed duration for percen
   assert.equal(result.duration, 10000)
 })
 
+test('indexes gantt tasks once when building large workflows', () => {
+  const taskCount = 100
+  const definitions = Array.from({ length: taskCount }, (_, index) => ({
+    code: index + 1,
+    name: `task-${index + 1}`
+  }))
+  const instances = definitions.map(({ code, name }) => ({
+    id: code,
+    taskCode: code,
+    name,
+    state: 'SUCCESS',
+    startTime: code * 1000,
+    endTime: code * 1000 + 500
+  }))
+  let taskReads = 0
+  const ganttTasks = new Proxy(
+    definitions.map(({ code, name }) => ({
+      taskName: name,
+      startDate: [code * 1000],
+      endDate: [code * 1000 + 500],
+      ...(code === 1 ? { isoStart: '1970-01-01T00:00:01Z' } : {})
+    })),
+    {
+      get(target, property, receiver) {
+        if (typeof property === 'string' && /^\d+$/.test(property)) taskReads++
+        return Reflect.get(target, property, receiver)
+      }
+    }
+  )
+
+  build(
+    {
+      state: 'SUCCESS',
+      startTime: 1000,
+      endTime: taskCount * 1000 + 500,
+      dagData: { taskDefinitionList: definitions }
+    },
+    instances,
+    { taskNames: definitions.map(({ code }) => code), tasks: ganttTasks }
+  )
+
+  assert.ok(
+    taskReads <= taskCount * 3,
+    `expected a linear scan, read ${taskReads} entries for ${taskCount} tasks`
+  )
+})
+
 test('extends running bars and workflow bounds with current time but never stretches completed bars', () => {
   const running = { ...workflow, state: 'RUNNING_EXECUTION', endTime: null }
   const tasks = [

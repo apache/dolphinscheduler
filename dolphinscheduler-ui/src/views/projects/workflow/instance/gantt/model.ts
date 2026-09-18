@@ -57,9 +57,15 @@ export function buildGanttModel(
   now = Date.now()
 ) {
   // Calibrate formatted server dates against the epoch timestamps returned by view-gantt.
-  const reference = gantt?.tasks.find(
-    (task) => task.isoStart && Number.isFinite(task.startDate?.[0])
-  )
+  let reference: IGanttRes['tasks'][number] | undefined
+  const ganttTasksByName = new Map<string, IGanttRes['tasks']>()
+  for (const task of gantt?.tasks || []) {
+    if (!reference && task.isoStart && Number.isFinite(task.startDate?.[0]))
+      reference = task
+    const matches = ganttTasksByName.get(task.taskName)
+    if (matches) matches.push(task)
+    else ganttTasksByName.set(task.taskName, [task])
+  }
   const formatted = timestamp(reference?.isoStart)
   const offset =
     reference && formatted !== null
@@ -114,11 +120,9 @@ export function buildGanttModel(
       let end = date(task?.endTime)
       const precise =
         task && nameCounts.get(task.name) === 1
-          ? gantt?.tasks.find(
-              (item) =>
-                item.taskName === task.name &&
-                (!item.status || item.status === task.state)
-            )
+          ? ganttTasksByName
+              .get(task.name)
+              ?.find((item) => !item.status || item.status === task.state)
           : undefined
       // The gantt endpoint has no instance ID. Only use precision for an unambiguous matching attempt.
       if (
