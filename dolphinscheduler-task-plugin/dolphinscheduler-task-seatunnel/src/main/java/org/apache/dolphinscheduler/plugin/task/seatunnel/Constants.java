@@ -32,4 +32,11 @@ public class Constants {
     public static final String JSON_SUFFIX = "json";
     public static final String CONF_SUFFIX = "conf";
 
+    /**
+     * SeaTunnel Engine client logs job id as: "Start submit job, job id: 123, ..."
+     * or "Submit job finished, job id: 123, job name: ..."
+     */
+    public static final String SEATUNNEL_JOB_ID_REGEX = "(?i)job id:\\s*(\\d+)";
+    public static final String CANCEL_JOB_OPTIONS = "-can";
+
 }
