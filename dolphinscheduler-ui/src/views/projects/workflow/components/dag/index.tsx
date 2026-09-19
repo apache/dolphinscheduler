@@ -127,7 +127,7 @@ export default defineComponent({
       if (props.definition) {
         return (
           route.name === 'workflow-definition-detail' &&
-          props.definition!.workflowDefinition.releaseState === 'ONLINE'
+          props.definition.workflowDefinition?.releaseState === 'ONLINE'
         )
       } else {
         return false
@@ -149,7 +149,7 @@ export default defineComponent({
           props.instance.state === 'STOP'
         )
       } else if (props.definition) {
-        return props.definition!.workflowDefinition.releaseState === 'OFFLINE'
+        return props.definition.workflowDefinition?.releaseState === 'OFFLINE'
       } else {
         return false
       }
