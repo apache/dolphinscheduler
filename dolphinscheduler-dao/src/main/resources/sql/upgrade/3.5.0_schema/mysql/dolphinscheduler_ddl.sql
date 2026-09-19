@@ -13,40 +13,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-package org.apache.dolphinscheduler.dao.entity;
-
-import java.util.Date;
-
-import lombok.Data;
-
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-
-@Data
-@TableName("t_ds_environment_worker_group_relation")
-public class EnvironmentWorkerGroupRelation {
-
-    @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
-
-    private Long environmentCode;
-
-    /**
-     * worker group id
-     */
-    private Integer workerGroupId;
-
-    private String workerGroup;
-
-    /**
-     * operator user id
-     */
-    private Integer operator;
-
-    private Date createTime;
-
-    private Date updateTime;
-}
+ALTER TABLE `t_ds_environment_worker_group_relation`
+ADD COLUMN `worker_group_id` int(11) DEFAULT NULL COMMENT 'worker group id';
