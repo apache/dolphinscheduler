@@ -44,6 +44,7 @@ export function useWorkerGroup(projectCode: number): IJsonItem {
   return {
     type: 'select',
     field: 'workerGroup',
+    class: 'worker-group-select',
     span: 12,
     name: t('project.node.worker_group'),
     props: {

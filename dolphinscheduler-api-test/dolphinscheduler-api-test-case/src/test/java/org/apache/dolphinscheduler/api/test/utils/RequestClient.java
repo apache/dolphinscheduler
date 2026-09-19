@@ -21,20 +21,12 @@ import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponseBody;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-
-import java.io.File;
-import java.nio.file.Files;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -95,20 +87,62 @@ public class RequestClient {
     }
 
     public static String getParams(Map<String, Object> params) {
-        StringBuilder sb = new StringBuilder(Constants.QUESTION_MARK);
-        if (!params.isEmpty()) {
-            for (Map.Entry<String, Object> item : params.entrySet()) {
-                Object value = item.getValue();
-                if (Objects.nonNull(value)) {
-                    sb.append(Constants.AND_MARK);
-                    sb.append(item.getKey());
-                    sb.append(Constants.EQUAL_MARK);
-                    sb.append(value);
-                }
-            }
-            return sb.toString();
-        } else {
+        return getParams(params, true);
+    }
+
+    public static String getParams(Map<String, Object> params, boolean includeQuestionMark) {
+        if (params == null || params.isEmpty()) {
             return "";
+        }
+
+        if (!(params instanceof SortedMap)) {
+            params = new TreeMap<>(params);
+        }
+
+        StringBuilder sb = new StringBuilder(params.size() * 16);
+        boolean isFirst = true;
+
+        for (Map.Entry<String, Object> entry : params.entrySet()) {
+            Object value = entry.getValue();
+            if (value == null) {
+                continue;
+            }
+
+            String key = entry.getKey();
+
+            if (value.getClass().isArray()) {
+                int length = java.lang.reflect.Array.getLength(value);
+                for (int i = 0; i < length; i++) {
+                    Object item = java.lang.reflect.Array.get(value, i);
+                    if (item != null) {
+                        appendParam(sb, isFirst, key, item.toString(), includeQuestionMark);
+                        isFirst = false;
+                    }
+                }
+            } else {
+                appendParam(sb, isFirst, key, value.toString(), includeQuestionMark);
+                isFirst = false;
+            }
+        }
+
+        return sb.toString();
+    }
+
+    private static void appendParam(StringBuilder sb, boolean isFirst, String key, String value,
+                                    boolean includeQuestionMark) {
+        if (isFirst) {
+            if (includeQuestionMark) {
+                sb.append(Constants.QUESTION_MARK);
+            }
+        } else {
+            sb.append(Constants.AND_MARK);
+        }
+        try {
+            sb.append(URLEncoder.encode(key, StandardCharsets.UTF_8.name()))
+                    .append(Constants.EQUAL_MARK)
+                    .append(URLEncoder.encode(value, StandardCharsets.UTF_8.name()));
+        } catch (Exception e) {
+            sb.append(key).append(Constants.EQUAL_MARK).append(value);
         }
     }
 
@@ -121,7 +155,8 @@ public class RequestClient {
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
         headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
         Headers headersBuilder = Headers.of(headers);
-        RequestBody requestBody = FormBody.create(getParams(params), MediaType.parse(Constants.REQUEST_CONTENT_TYPE));
+        RequestBody requestBody =
+                FormBody.create(getParams(params, false), MediaType.parse(Constants.REQUEST_CONTENT_TYPE));
         log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
                 .headers(headersBuilder)
@@ -159,7 +194,8 @@ public class RequestClient {
         String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
         headers.put("Content-Type", Constants.REQUEST_CONTENT_TYPE);
         Headers headersBuilder = Headers.of(headers);
-        RequestBody requestBody = FormBody.create(getParams(params), MediaType.parse(Constants.REQUEST_CONTENT_TYPE));
+        RequestBody requestBody =
+                FormBody.create(getParams(params, false), MediaType.parse(Constants.REQUEST_CONTENT_TYPE));
         log.info("PUT request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
         Request request = new Request.Builder()
                 .headers(headersBuilder)
@@ -186,33 +222,6 @@ public class RequestClient {
         log.info("PUT response: {}", httpResponse);
 
         return httpResponse;
-    }
-
-    public CloseableHttpResponse postWithFile(String url, Map<String, String> headers, Map<String, Object> params,
-                                              File file) {
-        try {
-            Headers headersBuilder = Headers.of(headers);
-            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
-            builder.addTextBody("json", getParams(params), ContentType.MULTIPART_FORM_DATA);
-            builder.addBinaryBody(
-                    "file",
-                    Files.newInputStream(file.toPath()),
-                    ContentType.APPLICATION_OCTET_STREAM,
-                    file.getName());
-            HttpEntity multipart = builder.build();
-            String requestUrl = String.format("%s%s", Constants.DOLPHINSCHEDULER_API_URL, url);
-            log.info("POST request to {}, Headers: {}, Params: {}", requestUrl, headersBuilder, params);
-            HttpPost httpPost = new HttpPost(requestUrl);
-            for (Map.Entry<String, String> header : headers.entrySet()) {
-                httpPost.setHeader(new BasicHeader(header.getKey(), header.getValue()));
-            }
-            httpPost.setEntity(multipart);
-            CloseableHttpClient client = HttpClients.createDefault();
-            return client.execute(httpPost);
-        } catch (Exception e) {
-            log.error("error", e);
-        }
-        return null;
     }
 
     @SneakyThrows

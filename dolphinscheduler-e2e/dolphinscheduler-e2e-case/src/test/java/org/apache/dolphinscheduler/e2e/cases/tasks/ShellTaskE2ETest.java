@@ -34,6 +34,7 @@ import org.apache.dolphinscheduler.e2e.pages.resource.ResourcePage;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
@@ -63,7 +64,16 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                     .update(adminUser);
         }
 
-        tenantPage
+        WorkerGroupPage workerGroupPage = tenantPage
+                .goToNav(SecurityPage.class)
+                .goToTab(WorkerGroupPage.class);
+
+        if (workerGroupPage.workerGroupList().stream()
+                .noneMatch(it -> it.getText().contains("default"))) {
+            workerGroupPage.create("default");
+        }
+
+        workerGroupPage
                 .goToNav(ProjectPage.class)
                 .createProjectUntilSuccess(projectName);
     }
@@ -84,6 +94,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
                 .script("echo hello world\n")
                 .name(taskName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -119,6 +130,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
                 .script("[ \"${name}\" = \"tom\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
                 .name(taskName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -155,6 +167,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .script("[ \"${name}\" = \"tom\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
                 .name(taskName)
                 .addParam("name", "tom")
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -190,6 +203,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .script("[ \"${name}\" = \"jerry\" ] && echo \"success\" || { echo \"failed\"; exit 1; }")
                 .name(taskName)
                 .addParam("name", "tom")
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -232,6 +246,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .script("cat " + testFileName + ".sh")
                 .name(taskName)
                 .selectResource(testFileName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
@@ -266,6 +281,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
                 .script("echo 'I am failed'\n exit1\n")
                 .name(taskName)
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()
