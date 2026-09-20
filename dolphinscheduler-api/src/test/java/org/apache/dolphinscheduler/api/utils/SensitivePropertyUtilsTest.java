@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.Command;
+import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentDetails;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -92,6 +94,20 @@ class SensitivePropertyUtilsTest {
                 Collections.singletonList(sensitive("pwd", "Secret123")));
 
         Assertions.assertEquals("new-secret", restored.get(0).getValue());
+        Assertions.assertTrue(restored.get(0).isSensitive());
+    }
+
+    @Test
+    void restoreStartParamsInheritsGlobalAttributesForSameName() {
+        // Map/start transform builds Property without sensitive; same-name must inherit from global.
+        List<Property> restored = SensitivePropertyUtils.restoreStartParams(
+                Collections.singletonList(nonSensitive("pwd", "new-secret")),
+                Collections.singletonList(sensitive("pwd", "Secret123")));
+
+        Assertions.assertEquals("new-secret", restored.get(0).getValue());
+        Assertions.assertTrue(restored.get(0).isSensitive());
+        Assertions.assertEquals(Direct.IN, restored.get(0).getDirect());
+        Assertions.assertEquals(DataType.VARCHAR, restored.get(0).getType());
     }
 
     @Test
@@ -112,6 +128,18 @@ class SensitivePropertyUtilsTest {
                 Collections.emptyList());
 
         Assertions.assertTrue(restored.isEmpty());
+    }
+
+    @Test
+    void restoreStartParamsNonMatchingNameIsNonSensitive() {
+        List<Property> restored = SensitivePropertyUtils.restoreStartParams(
+                Collections.singletonList(sensitive("extra", "plain")),
+                Collections.singletonList(sensitive("pwd", "Secret123")));
+
+        Assertions.assertEquals(1, restored.size());
+        Assertions.assertEquals("extra", restored.get(0).getProp());
+        Assertions.assertEquals("plain", restored.get(0).getValue());
+        Assertions.assertFalse(restored.get(0).isSensitive());
     }
 
     @Test
@@ -216,6 +244,39 @@ class SensitivePropertyUtilsTest {
                 maskedCommandParam.getCommandParams().get(0).getValue());
         Assertions.assertTrue(maskedCommandParam.getCommandParams().get(0).isSensitive());
         Assertions.assertTrue(masked.getGlobalParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertNotSame(original, masked);
+    }
+
+    @Test
+    void maskCommandMasksSensitiveCommandParam() {
+        String plaintextCommandParam = JSONUtils.toJsonString(RunWorkflowCommandParam.builder()
+                .commandParams(Collections.singletonList(sensitive("pwd", "Secret123")))
+                .timeZone("UTC")
+                .build());
+        Command original = Command.builder().commandParam(plaintextCommandParam).build();
+
+        Command masked = SensitivePropertyUtils.mask(original);
+
+        Assertions.assertEquals(plaintextCommandParam, original.getCommandParam());
+        Assertions.assertFalse(masked.getCommandParam().contains("Secret123"));
+        Assertions.assertTrue(masked.getCommandParam().contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertNotSame(original, masked);
+    }
+
+    @Test
+    void maskErrorCommandMasksSensitiveCommandParam() {
+        String plaintextCommandParam = JSONUtils.toJsonString(RunWorkflowCommandParam.builder()
+                .commandParams(Collections.singletonList(sensitive("pwd", "Secret123")))
+                .timeZone("UTC")
+                .build());
+        ErrorCommand original = new ErrorCommand();
+        original.setCommandParam(plaintextCommandParam);
+
+        ErrorCommand masked = SensitivePropertyUtils.mask(original);
+
+        Assertions.assertEquals(plaintextCommandParam, original.getCommandParam());
+        Assertions.assertFalse(masked.getCommandParam().contains("Secret123"));
+        Assertions.assertTrue(masked.getCommandParam().contains(TaskConstants.SENSITIVE_DATA_MASK));
         Assertions.assertNotSame(original, masked);
     }
 

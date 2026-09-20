@@ -25,7 +25,9 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.AbstractTaskInstanceContext;
+import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
+import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -97,7 +99,14 @@ public class SensitivePropertyUtils {
         return PropertySensitiveUtils.mergeSensitiveValuePlaceholders(submittedProperties, existingProperties);
     }
 
-    /** Start: {@code ******} is replaced with the matching definition global plaintext. */
+    /**
+     * Build start/command params before persist.
+     * <ul>
+     * <li>Same name as a workflow global: inherit all global attributes, only override {@code value}
+     * ({@code ******} keeps the global plaintext).</li>
+     * <li>Not matching any global: treat as a non-sensitive start param; bare {@code ******} is dropped.</li>
+     * </ul>
+     */
     public List<Property> restoreStartParams(List<Property> startParams, List<Property> globalParams) {
         if (CollectionUtils.isEmpty(startParams)) {
             return startParams;
@@ -111,13 +120,19 @@ public class SensitivePropertyUtils {
             if (startParam == null) {
                 continue;
             }
-            if (!PropertySensitiveUtils.isSensitiveValuePlaceholder(startParam.getValue())) {
-                restored.add(startParam);
-                continue;
-            }
             Property global = globals.get(startParam.getProp());
             if (global != null) {
-                restored.add(PropertySensitiveUtils.copy(global));
+                Property inherited = PropertySensitiveUtils.copy(global);
+                if (!PropertySensitiveUtils.isSensitiveValuePlaceholder(startParam.getValue())) {
+                    inherited.setValue(startParam.getValue());
+                }
+                restored.add(inherited);
+            } else if (PropertySensitiveUtils.isSensitiveValuePlaceholder(startParam.getValue())) {
+                continue;
+            } else {
+                Property nonGlobal = PropertySensitiveUtils.copy(startParam);
+                nonGlobal.setSensitive(false);
+                restored.add(nonGlobal);
             }
         }
         return restored;
@@ -169,6 +184,26 @@ public class SensitivePropertyUtils {
         copy.setVarPool(maskVarPool(copy.getVarPool()));
         copy.setCommandParam(maskCommandParam(copy.getCommandParam()));
         copy.setDagData(mask(source.getDagData()));
+        return copy;
+    }
+
+    public Command mask(Command source) {
+        if (source == null) {
+            return null;
+        }
+        Command copy = new Command();
+        BeanUtils.copyProperties(source, copy);
+        copy.setCommandParam(maskCommandParam(copy.getCommandParam()));
+        return copy;
+    }
+
+    public ErrorCommand mask(ErrorCommand source) {
+        if (source == null) {
+            return null;
+        }
+        ErrorCommand copy = new ErrorCommand();
+        BeanUtils.copyProperties(source, copy);
+        copy.setCommandParam(maskCommandParam(copy.getCommandParam()));
         return copy;
     }
 
