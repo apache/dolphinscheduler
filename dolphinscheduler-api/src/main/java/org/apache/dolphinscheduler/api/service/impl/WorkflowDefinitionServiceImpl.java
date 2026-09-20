@@ -1728,9 +1728,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * @return the pagination workflow definition versions info of the certain workflow definition
      */
     @Override
-    public Result queryWorkflowDefinitionVersions(User loginUser, long projectCode, int pageNo, int pageSize,
-                                                  long code) {
-        Result result = new Result();
+    public Result<PageInfo<WorkflowDefinitionLog>> queryWorkflowDefinitionVersions(User loginUser, long projectCode,
+                                                                                   int pageNo, int pageSize,
+                                                                                   long code) {
+        Result<PageInfo<WorkflowDefinitionLog>> result = new Result<>();
         Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, VERSION_LIST);

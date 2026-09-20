@@ -79,18 +79,18 @@ public class TaskDefinitionControllerTest {
         taskDefinitionLog.setTaskParams(sensitiveTaskParams());
         PageInfo<TaskDefinitionLog> pageInfo = new PageInfo<>(1, 10);
         pageInfo.setTotalList(Collections.singletonList(taskDefinitionLog));
-        Result result = new Result();
+        Result<PageInfo<TaskDefinitionLog>> result = new Result<>();
         result.setCode(Status.SUCCESS.getCode());
         result.setMsg(Status.SUCCESS.getMsg());
         result.setData(pageInfo);
         Mockito.when(taskDefinitionService.queryTaskDefinitionVersions(user, 1L, 2L, 1, 10))
                 .thenReturn(result);
 
-        Result response = taskDefinitionController.queryTaskDefinitionVersions(user, 1L, 2L, 1, 10);
+        Result<PageInfo<TaskDefinitionLog>> response =
+                taskDefinitionController.queryTaskDefinitionVersions(user, 1L, 2L, 1, 10);
 
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
-        @SuppressWarnings("unchecked")
-        PageInfo<TaskDefinitionLog> maskedPage = (PageInfo<TaskDefinitionLog>) response.getData();
+        PageInfo<TaskDefinitionLog> maskedPage = response.getData();
         Assertions.assertTrue(
                 maskedPage.getTotalList().get(0).getTaskParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
         Assertions.assertFalse(maskedPage.getTotalList().get(0).getTaskParams().contains("abc"));

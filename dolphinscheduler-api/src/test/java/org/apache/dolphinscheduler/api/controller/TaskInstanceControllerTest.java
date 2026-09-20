@@ -61,7 +61,7 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryTaskListPaging() {
 
-        Result result = new Result();
+        Result<PageInfo<TaskInstance>> result = new Result<>();
         Integer pageNo = 1;
         Integer pageSize = 20;
         TaskInstance taskInstance = new TaskInstance();
@@ -77,12 +77,11 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
                 any(),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
                         .thenReturn(result);
-        Result taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "", "", "",
+        Result<PageInfo<TaskInstance>> taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "", "", "",
                 "", 1L, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00",
                 TaskExecuteType.BATCH, pageNo, pageSize);
         Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
-        @SuppressWarnings("unchecked")
-        PageInfo<TaskInstance> maskedPage = (PageInfo<TaskInstance>) taskResult.getData();
+        PageInfo<TaskInstance> maskedPage = taskResult.getData();
         Assertions.assertTrue(
                 maskedPage.getTotalList().get(0).getTaskParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
         Assertions.assertFalse(maskedPage.getTotalList().get(0).getTaskParams().contains("abc"));

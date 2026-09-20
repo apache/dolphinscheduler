@@ -281,23 +281,21 @@ public class WorkflowDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_WORKFLOW_DEFINITION_VERSIONS_ERROR)
-    public Result queryWorkflowDefinitionVersions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                  @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                  @RequestParam(value = "pageNo") int pageNo,
-                                                  @RequestParam(value = "pageSize") int pageSize,
-                                                  @PathVariable(value = "code") long code) {
+    public Result<PageInfo<WorkflowDefinitionLog>> queryWorkflowDefinitionVersions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                                   @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                                   @RequestParam(value = "pageNo") int pageNo,
+                                                                                   @RequestParam(value = "pageSize") int pageSize,
+                                                                                   @PathVariable(value = "code") long code) {
 
         checkPageParams(pageNo, pageSize);
-        Result result = workflowDefinitionService.queryWorkflowDefinitionVersions(loginUser, projectCode, pageNo,
-                pageSize, code);
-        @SuppressWarnings("unchecked")
-        PageInfo<WorkflowDefinitionLog> pageInfo = (PageInfo<WorkflowDefinitionLog>) result.getData();
+        Result<PageInfo<WorkflowDefinitionLog>> result = workflowDefinitionService.queryWorkflowDefinitionVersions(
+                loginUser, projectCode, pageNo, pageSize, code);
+        PageInfo<WorkflowDefinitionLog> pageInfo = result.getData();
         if (pageInfo != null && pageInfo.getTotalList() != null) {
             pageInfo.setTotalList(pageInfo.getTotalList().stream()
                     .map(SensitivePropertyUtils::mask)
                     .collect(Collectors.toList()));
         }
-        result.setData(pageInfo);
         return result;
     }
 

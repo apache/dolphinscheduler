@@ -324,7 +324,7 @@ public class WorkflowDefinitionControllerTest {
     public void testQueryWorkflowDefinitionVersions() {
 
         long projectCode = 1L;
-        Result resultMap = new Result();
+        Result<PageInfo<WorkflowDefinitionLog>> resultMap = new Result<>();
         putMsg(resultMap, Status.SUCCESS);
         WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog();
         workflowDefinitionLog.setGlobalParams(sensitiveGlobalParams());
@@ -334,12 +334,11 @@ public class WorkflowDefinitionControllerTest {
         Mockito.when(processDefinitionService.queryWorkflowDefinitionVersions(
                 user, projectCode, 1, 10, 1))
                 .thenReturn(resultMap);
-        Result result = workflowDefinitionController.queryWorkflowDefinitionVersions(
+        Result<PageInfo<WorkflowDefinitionLog>> result = workflowDefinitionController.queryWorkflowDefinitionVersions(
                 user, projectCode, 1, 10, 1);
 
         Assertions.assertEquals(Status.SUCCESS.getCode(), (int) result.getCode());
-        @SuppressWarnings("unchecked")
-        PageInfo<WorkflowDefinitionLog> maskedPage = (PageInfo<WorkflowDefinitionLog>) result.getData();
+        PageInfo<WorkflowDefinitionLog> maskedPage = result.getData();
         assertMaskedAndOriginalUnchanged(workflowDefinitionLog.getGlobalParams(),
                 maskedPage.getTotalList().get(0).getGlobalParams());
     }

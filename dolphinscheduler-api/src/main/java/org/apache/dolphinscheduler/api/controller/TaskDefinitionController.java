@@ -86,22 +86,20 @@ public class TaskDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_DEFINITION_VERSIONS_ERROR)
-    public Result queryTaskDefinitionVersions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @PathVariable(value = "code") long code,
-                                              @RequestParam(value = "pageNo") int pageNo,
-                                              @RequestParam(value = "pageSize") int pageSize) {
+    public Result<PageInfo<TaskDefinitionLog>> queryTaskDefinitionVersions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                           @PathVariable(value = "code") long code,
+                                                                           @RequestParam(value = "pageNo") int pageNo,
+                                                                           @RequestParam(value = "pageSize") int pageSize) {
         checkPageParams(pageNo, pageSize);
-        Result result = taskDefinitionService.queryTaskDefinitionVersions(loginUser, projectCode, code, pageNo,
-                pageSize);
-        @SuppressWarnings("unchecked")
-        PageInfo<TaskDefinitionLog> pageInfo = (PageInfo<TaskDefinitionLog>) result.getData();
+        Result<PageInfo<TaskDefinitionLog>> result = taskDefinitionService.queryTaskDefinitionVersions(loginUser,
+                projectCode, code, pageNo, pageSize);
+        PageInfo<TaskDefinitionLog> pageInfo = result.getData();
         if (pageInfo != null && pageInfo.getTotalList() != null) {
             pageInfo.setTotalList(pageInfo.getTotalList().stream()
                     .map(SensitivePropertyUtils::mask)
                     .collect(Collectors.toList()));
         }
-        result.setData(pageInfo);
         return result;
     }
 
