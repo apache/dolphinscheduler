@@ -317,7 +317,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 setTaskInstanceDependentResult(taskInstanceList);
         return new WorkflowInstanceTaskListDTO(workflowInstance.getState().toString(),
-                taskInstanceDependentDetailsList);
+                new ArrayList<>(taskInstanceDependentDetailsList));
     }
 
     private List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {

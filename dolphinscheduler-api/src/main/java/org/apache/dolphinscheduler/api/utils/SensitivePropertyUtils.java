@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.AbstractTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
@@ -211,20 +210,12 @@ public class SensitivePropertyUtils {
         if (source == null) {
             return null;
         }
+        WorkflowDefinition copy;
         if (source instanceof WorkflowDefinitionLog) {
-            return mask((WorkflowDefinitionLog) source);
+            copy = new WorkflowDefinitionLog();
+        } else {
+            copy = new WorkflowDefinition();
         }
-        WorkflowDefinition copy = new WorkflowDefinition();
-        BeanUtils.copyProperties(source, copy);
-        applyWorkflowDefinitionMask(copy);
-        return copy;
-    }
-
-    public WorkflowDefinitionLog mask(WorkflowDefinitionLog source) {
-        if (source == null) {
-            return null;
-        }
-        WorkflowDefinitionLog copy = new WorkflowDefinitionLog();
         BeanUtils.copyProperties(source, copy);
         applyWorkflowDefinitionMask(copy);
         return copy;
@@ -234,33 +225,14 @@ public class SensitivePropertyUtils {
         if (source == null) {
             return null;
         }
+        TaskDefinition copy;
         if (source instanceof TaskDefinitionVO) {
-            return mask((TaskDefinitionVO) source);
+            copy = new TaskDefinitionVO();
+        } else if (source instanceof TaskDefinitionLog) {
+            copy = new TaskDefinitionLog();
+        } else {
+            copy = new TaskDefinition();
         }
-        if (source instanceof TaskDefinitionLog) {
-            return mask((TaskDefinitionLog) source);
-        }
-        TaskDefinition copy = new TaskDefinition();
-        BeanUtils.copyProperties(source, copy);
-        applyTaskDefinitionMask(copy);
-        return copy;
-    }
-
-    public TaskDefinitionLog mask(TaskDefinitionLog source) {
-        if (source == null) {
-            return null;
-        }
-        TaskDefinitionLog copy = new TaskDefinitionLog();
-        BeanUtils.copyProperties(source, copy);
-        applyTaskDefinitionMask(copy);
-        return copy;
-    }
-
-    public TaskDefinitionVO mask(TaskDefinitionVO source) {
-        if (source == null) {
-            return null;
-        }
-        TaskDefinitionVO copy = new TaskDefinitionVO();
         BeanUtils.copyProperties(source, copy);
         applyTaskDefinitionMask(copy);
         return copy;
@@ -270,21 +242,12 @@ public class SensitivePropertyUtils {
         if (source == null) {
             return null;
         }
+        TaskInstance copy;
         if (source instanceof TaskInstanceDependentDetails) {
-            return mask((TaskInstanceDependentDetails<?>) source);
+            copy = new TaskInstanceDependentDetails<>();
+        } else {
+            copy = new TaskInstance();
         }
-        TaskInstance copy = new TaskInstance();
-        BeanUtils.copyProperties(source, copy);
-        applyTaskInstanceMask(copy);
-        return copy;
-    }
-
-    public <T extends AbstractTaskInstanceContext> TaskInstanceDependentDetails<T> mask(
-                                                                                        TaskInstanceDependentDetails<T> source) {
-        if (source == null) {
-            return null;
-        }
-        TaskInstanceDependentDetails<T> copy = new TaskInstanceDependentDetails<>();
         BeanUtils.copyProperties(source, copy);
         applyTaskInstanceMask(copy);
         return copy;

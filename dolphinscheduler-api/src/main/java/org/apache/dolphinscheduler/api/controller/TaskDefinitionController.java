@@ -97,7 +97,7 @@ public class TaskDefinitionController extends BaseController {
         PageInfo<TaskDefinitionLog> pageInfo = result.getData();
         if (pageInfo != null && pageInfo.getTotalList() != null) {
             pageInfo.setTotalList(pageInfo.getTotalList().stream()
-                    .map(SensitivePropertyUtils::mask)
+                    .map(log -> (TaskDefinitionLog) SensitivePropertyUtils.mask(log))
                     .collect(Collectors.toList()));
         }
         return result;
@@ -175,7 +175,7 @@ public class TaskDefinitionController extends BaseController {
                                                               @PathVariable(value = "code") long code) {
         TaskDefinitionVO taskDefinitionVO =
                 taskDefinitionService.queryTaskDefinitionDetail(loginUser, projectCode, code);
-        return Result.success(SensitivePropertyUtils.mask(taskDefinitionVO));
+        return Result.success((TaskDefinitionVO) SensitivePropertyUtils.mask(taskDefinitionVO));
     }
 
     /**

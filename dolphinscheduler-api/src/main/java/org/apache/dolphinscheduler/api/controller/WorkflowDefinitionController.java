@@ -293,7 +293,7 @@ public class WorkflowDefinitionController extends BaseController {
         PageInfo<WorkflowDefinitionLog> pageInfo = result.getData();
         if (pageInfo != null && pageInfo.getTotalList() != null) {
             pageInfo.setTotalList(pageInfo.getTotalList().stream()
-                    .map(SensitivePropertyUtils::mask)
+                    .map(log -> (WorkflowDefinitionLog) SensitivePropertyUtils.mask(log))
                     .collect(Collectors.toList()));
         }
         return result;
