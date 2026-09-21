@@ -19,10 +19,12 @@ package org.apache.dolphinscheduler.api.validator.workflow;
 
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowTriggerRequest;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.api.validator.ITransformer;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +41,11 @@ public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowT
 
     @Override
     public TriggerWorkflowDTO transform(WorkflowTriggerRequest workflowTriggerRequest) {
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao
+                .queryByCode(workflowTriggerRequest.getWorkflowDefinitionCode())
+                .orElseThrow(() -> new ServiceException(
+                        "Cannot find the workflow: " + workflowTriggerRequest.getWorkflowDefinitionCode()));
+
         TriggerWorkflowDTO triggerWorkflowDTO = TriggerWorkflowDTO.builder()
                 .loginUser(workflowTriggerRequest.getLoginUser())
                 .startNodes(WorkflowUtils.parseStartNodeList(workflowTriggerRequest.getStartNodes()))
@@ -51,16 +58,11 @@ public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowT
                 .workerGroup(workflowTriggerRequest.getWorkerGroup())
                 .tenantCode(workflowTriggerRequest.getTenantCode())
                 .environmentCode(workflowTriggerRequest.getEnvironmentCode())
-                .startParamList(
-                        PropertyUtils.startParamsTransformPropertyList(workflowTriggerRequest.getStartParamList()))
+                .startParamList(SensitivePropertyUtils.restoreStartParams(
+                        PropertyUtils.startParamsTransformPropertyList(workflowTriggerRequest.getStartParamList()),
+                        GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams())))
                 .dryRun(workflowTriggerRequest.getDryRun())
                 .build();
-
-        WorkflowDefinition workflowDefinition = workflowDefinitionDao
-                .queryByCode(workflowTriggerRequest.getWorkflowDefinitionCode())
-                .orElseThrow(() -> new ServiceException(
-                        "Cannot find the workflow: " + workflowTriggerRequest.getWorkflowDefinitionCode()));
-
         triggerWorkflowDTO.setWorkflowDefinition(workflowDefinition);
         return triggerWorkflowDTO;
     }
