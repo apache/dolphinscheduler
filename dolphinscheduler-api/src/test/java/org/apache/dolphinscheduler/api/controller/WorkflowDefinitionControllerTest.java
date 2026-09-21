@@ -285,10 +285,11 @@ public class WorkflowDefinitionControllerTest {
 
         Mockito.when(
                 processDefinitionService.queryWorkflowDefinitionListPaging(user, projectCode, searchVal, "", userId,
-                        pageNo, pageSize))
+                        pageNo, pageSize, null, null))
                 .thenReturn(pageInfo);
         Result<PageInfo<WorkflowDefinition>> response = workflowDefinitionController
-                .queryWorkflowDefinitionListPaging(user, projectCode, searchVal, "", userId, pageNo, pageSize);
+                .queryWorkflowDefinitionListPaging(user, projectCode, searchVal, "", userId, pageNo, pageSize,
+                        null, null);
 
         Assertions.assertTrue(response != null && response.isSuccess());
     }

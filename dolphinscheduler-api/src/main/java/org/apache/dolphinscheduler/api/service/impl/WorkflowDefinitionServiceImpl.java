@@ -499,14 +499,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                                           String otherParamsJson,
                                                                           Integer userId,
                                                                           Integer pageNo,
-                                                                          Integer pageSize) {
+                                                                          Integer pageSize,
+                                                                          String sortField,
+                                                                          String sortOrder) {
 
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_DEFINITION);
 
         PageListingResult<WorkflowDefinition> workflowDefinitionPageListingResult =
                 workflowDefinitionDao.listingWorkflowDefinition(
-                        pageNo, pageSize, searchVal, userId, projectCode);
+                        pageNo, pageSize, searchVal, userId, projectCode, sortField, sortOrder);
         List<WorkflowDefinition> workflowDefinitions = workflowDefinitionPageListingResult.getRecords();
 
         List<Long> workflowDefinitionCodes =
