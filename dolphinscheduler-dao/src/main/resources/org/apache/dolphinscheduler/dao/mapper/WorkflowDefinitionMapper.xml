@@ -79,7 +79,19 @@
                 name like concat('%', #{searchVal}, '%') OR description like concat('%', #{searchVal}, '%')
                 )
         </if>
-        order by update_time desc, id asc
+        order by
+        <choose>
+            <when test='sortField != null and "name".equals(sortField)'>name</when>
+            <when test='sortField != null and "createTime".equals(sortField)'>create_time</when>
+            <when test='sortField != null and "updateTime".equals(sortField)'>update_time</when>
+            <otherwise>update_time</otherwise>
+        </choose>
+        <choose>
+            <when test='sortOrder != null and "asc".equals(sortOrder)'>asc</when>
+            <when test='sortOrder != null and "desc".equals(sortOrder)'>desc</when>
+            <otherwise>desc</otherwise>
+        </choose>
+        , id asc
     </select>
     <select id="filterWorkflowDefinition"
             parameterType="org.apache.dolphinscheduler.dao.entity.WorkflowDefinition"
