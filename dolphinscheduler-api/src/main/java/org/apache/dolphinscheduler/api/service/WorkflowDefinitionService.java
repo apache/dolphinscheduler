@@ -73,7 +73,9 @@ public interface WorkflowDefinitionService {
                                                                    String otherParamsJson,
                                                                    Integer userId,
                                                                    Integer pageNo,
-                                                                   Integer pageSize);
+                                                                   Integer pageSize,
+                                                                   String sortField,
+                                                                   String sortOrder);
 
     /**
      * query detail of workflow definition

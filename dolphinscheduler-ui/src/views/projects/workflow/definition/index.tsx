@@ -70,6 +70,12 @@ export default defineComponent({
       })
     }
 
+    const handleSorterChange = (sorter: any) => {
+      variables.sorter = sorter
+      variables.page = 1
+      requestData()
+    }
+
     const handleUpdateList = () => {
       requestData()
     }
@@ -126,6 +132,7 @@ export default defineComponent({
 
     return {
       requestData,
+      handleSorterChange,
       handleSearch,
       onClearSearch,
       handleUpdateList,
@@ -190,6 +197,9 @@ export default defineComponent({
               columns={this.columns}
               data={this.tableData}
               striped
+              remote
+              sort={this.sorter}
+              onUpdateSorter={this.handleSorterChange}
               v-model:checked-row-keys={this.checkedRowKeys}
               row-class-name='items'
               scrollX={this.tableWidth}

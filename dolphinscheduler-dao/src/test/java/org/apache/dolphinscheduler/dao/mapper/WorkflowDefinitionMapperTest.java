@@ -236,15 +236,70 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
     }
 
     /**
-     * test page
+     * Insert three definitions whose name, createTime and updateTime each yield a
+     * different, verifiable ordering, then assert the returned row order for every
+     * supported sortField/sortOrder combination, the default (no-sort) path, and the
+     * invalid-field fallback path. Exercises the ORDER BY whitelist in
+     * {@code queryDefineListPaging} against a real H2 mapper.
      */
     @Test
     public void testQueryDefineListPaging() {
-        insertOne("def 1");
-        Page<WorkflowDefinition> page = new Page(1, 3);
-        IPage<WorkflowDefinition> processDefinitionIPage =
-                workflowDefinitionMapper.queryDefineListPaging(page, "def", 101, 1010L);
-        Assertions.assertNotEquals(0, processDefinitionIPage.getTotal());
+        // Fixed absolute instants so the create/update orderings are distinct and
+        // independent of the test machine's timezone. wf-gamma is updated last on
+        // purpose so update_time order differs from create_time order.
+        // wf-gamma: create base+0, update base+300s (update newest)
+        // wf-alpha: create base+60s, update base+60s
+        // wf-beta: create base+120s, update base+120s
+        long base = 1_700_000_000_000L;
+        insertWithTimes("wf-gamma", base, base + 300_000L);
+        insertWithTimes("wf-alpha", base + 60_000L, base + 60_000L);
+        insertWithTimes("wf-beta", base + 120_000L, base + 120_000L);
+
+        // default (no sort) -> update_time desc, id asc
+        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+                definitionNames(queryPaging(null, null)));
+        // name asc / desc
+        Assertions.assertEquals(List.of("wf-alpha", "wf-beta", "wf-gamma"),
+                definitionNames(queryPaging("name", "asc")));
+        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+                definitionNames(queryPaging("name", "desc")));
+        // createTime asc / desc
+        Assertions.assertEquals(List.of("wf-gamma", "wf-alpha", "wf-beta"),
+                definitionNames(queryPaging("createTime", "asc")));
+        Assertions.assertEquals(List.of("wf-beta", "wf-alpha", "wf-gamma"),
+                definitionNames(queryPaging("createTime", "desc")));
+        // updateTime asc / desc
+        Assertions.assertEquals(List.of("wf-alpha", "wf-beta", "wf-gamma"),
+                definitionNames(queryPaging("updateTime", "asc")));
+        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+                definitionNames(queryPaging("updateTime", "desc")));
+        // invalid sortField/sortOrder -> fallback to default (update_time desc, id asc)
+        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+                definitionNames(queryPaging("foo", "bar")));
+        // sortField without sortOrder -> default direction desc
+        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+                definitionNames(queryPaging("name", null)));
+    }
+
+    private IPage<WorkflowDefinition> queryPaging(String sortField, String sortOrder) {
+        return workflowDefinitionMapper.queryDefineListPaging(
+                new Page<>(1, 10), "", 101, 1010L, sortField, sortOrder);
+    }
+
+    private List<String> definitionNames(IPage<WorkflowDefinition> page) {
+        return page.getRecords().stream().map(WorkflowDefinition::getName).toList();
+    }
+
+    private WorkflowDefinition insertWithTimes(String name, long createTimeMillis, long updateTimeMillis) {
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setCode(atomicLong.getAndIncrement());
+        workflowDefinition.setName(name);
+        workflowDefinition.setProjectCode(1010L);
+        workflowDefinition.setUserId(101);
+        workflowDefinition.setCreateTime(new Date(createTimeMillis));
+        workflowDefinition.setUpdateTime(new Date(updateTimeMillis));
+        workflowDefinitionMapper.insert(workflowDefinition);
+        return workflowDefinition;
     }
 
     /**

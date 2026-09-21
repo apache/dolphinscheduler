@@ -453,6 +453,8 @@ public class WorkflowDefinitionController extends BaseController {
      * @param pageNo          page number
      * @param pageSize        page size
      * @param userId          user id
+     * @param sortField       sort field
+     * @param sortOrder       sort order
      * @return workflow definition page
      */
     @Operation(summary = "queryListPaging", description = "QUERY_WORKFLOW_DEFINITION_LIST_PAGING_NOTES")
@@ -461,7 +463,9 @@ public class WorkflowDefinitionController extends BaseController {
             @Parameter(name = "userId", description = "USER_ID", required = false, schema = @Schema(implementation = int.class, example = "100")),
             @Parameter(name = "pageNo", description = "PAGE_NO", required = true, schema = @Schema(implementation = int.class, example = "1")),
             @Parameter(name = "pageSize", description = "PAGE_SIZE", required = true, schema = @Schema(implementation = int.class, example = "10")),
-            @Parameter(name = "otherParamsJson", description = "OTHER_PARAMS_JSON", required = false, schema = @Schema(implementation = String.class))
+            @Parameter(name = "otherParamsJson", description = "OTHER_PARAMS_JSON", required = false, schema = @Schema(implementation = String.class)),
+            @Parameter(name = "sortField", description = "SORT_FIELD", required = false, schema = @Schema(implementation = String.class, example = "updateTime")),
+            @Parameter(name = "sortOrder", description = "SORT_ORDER", required = false, schema = @Schema(implementation = String.class, example = "desc"))
     })
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
@@ -473,13 +477,15 @@ public class WorkflowDefinitionController extends BaseController {
                                                                                   @RequestParam(value = "otherParamsJson", required = false) String otherParamsJson,
                                                                                   @RequestParam(value = "userId", required = false, defaultValue = "0") Integer userId,
                                                                                   @RequestParam("pageNo") Integer pageNo,
-                                                                                  @RequestParam("pageSize") Integer pageSize) {
+                                                                                  @RequestParam("pageSize") Integer pageSize,
+                                                                                  @RequestParam(value = "sortField", required = false) String sortField,
+                                                                                  @RequestParam(value = "sortOrder", required = false) String sortOrder) {
 
         checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
 
         PageInfo<WorkflowDefinition> pageInfo = workflowDefinitionService.queryWorkflowDefinitionListPaging(
-                loginUser, projectCode, searchVal, otherParamsJson, userId, pageNo, pageSize);
+                loginUser, projectCode, searchVal, otherParamsJson, userId, pageNo, pageSize, sortField, sortOrder);
         return Result.success(pageInfo);
 
     }
