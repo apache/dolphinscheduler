@@ -34,18 +34,5 @@ runs:
     - name: Check License Header
       uses: apache/skywalking-eyes/header@main
 
-    # Retry Wrapper download on Maven Central HTTP 429. `if cmd` is used so
-    # `set -e` does not abort the loop on a failed attempt.
-    - name: Spotless Check
-      shell: bash
-      run: |
-        for i in 1 2 3 4 5; do
-          if ./mvnw spotless:check; then
-            break
-          fi
-          if [ "$i" -eq 5 ]; then
-            echo "::error::mvnw spotless:check failed after ${i} attempts"
-            exit 1
-          fi
-          sleep $(( i * 15 + RANDOM % 20 ))
-        done
+    - shell: bash
+      run: ./mvnw spotless:check

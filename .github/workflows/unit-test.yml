@@ -51,10 +51,6 @@ jobs:
       - uses: actions/checkout@v6
         with:
           submodules: true
-      # Cache the Maven Wrapper distribution (~/.m2/wrapper) so the unit-test
-      # matrix can restore it instead of downloading apache-maven-*-bin.zip
-      # from Maven Central in parallel (HTTP 429). Key is independent of
-      # pom.xml so dependency changes do not invalidate the dist cache.
       - name: Cache Maven Wrapper
         uses: actions/cache@v5
         with:
