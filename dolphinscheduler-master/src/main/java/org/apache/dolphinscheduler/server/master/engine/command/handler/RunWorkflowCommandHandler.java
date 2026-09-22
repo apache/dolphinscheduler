@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.server.master.engine.graph.WorkflowGraphTopol
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionBuilder;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
+import org.apache.dolphinscheduler.server.master.utils.SensitivePropertyCryptoUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -125,7 +126,8 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
                         .map(ICommandParam::getCommandParams)
                         .orElse(null);
         final List<Property> globalParamsList =
-                GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams());
+                SensitivePropertyCryptoUtils.decodeSensitiveValues(
+                        GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams()));
         Map<String, Property> finalParams = new HashMap<>();
         if (CollectionUtils.isNotEmpty(globalParamsList)) {
             globalParamsList.forEach(globalParam -> finalParams.put(globalParam.getProp(), globalParam));

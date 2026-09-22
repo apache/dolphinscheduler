@@ -449,7 +449,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                     ? null
                     : existingTaskParamsMap.get(submitted.getCode() + "_" + submitted.getVersion());
             submitted.setTaskParams(SensitivePropertyUtils.mergeLocalParams(
-                    submitted.getTaskParams(), existingTaskParams));
+                    submitted.getTaskParams(), existingTaskParams, false));
         }
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
