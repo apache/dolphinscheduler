@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.service.impl.SessionServiceImpl;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -24,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.SessionDao;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -37,6 +39,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -48,10 +51,14 @@ public class SessionServiceTest {
     @Mock
     private SessionDao sessionDao;
 
+    @Spy
+    private ApiConfig apiConfig = new ApiConfig();
+
     private String sessionId = "aaaaaaaaaaaaaaaaaa";
 
     @BeforeEach
     public void setUp() {
+        apiConfig.setSessionTimeout(Duration.ofHours(2));
     }
 
     @AfterEach
@@ -98,6 +105,19 @@ public class SessionServiceTest {
 
         sessionService.expireSession(userId);
 
+    }
+
+    @Test
+    public void testIsSessionExpireUsesConfiguredTimeout() {
+        apiConfig.setSessionTimeout(Duration.ofHours(1));
+
+        Session stillAlive = getSession();
+        stillAlive.setLastLoginTime(new Date(System.currentTimeMillis() - Duration.ofMinutes(30).toMillis()));
+        Assertions.assertFalse(sessionService.isSessionExpire(stillAlive));
+
+        Session expired = getSession();
+        expired.setLastLoginTime(new Date(System.currentTimeMillis() - Duration.ofMinutes(90).toMillis()));
+        Assertions.assertTrue(sessionService.isSessionExpire(expired));
     }
 
     private Session getSession() {

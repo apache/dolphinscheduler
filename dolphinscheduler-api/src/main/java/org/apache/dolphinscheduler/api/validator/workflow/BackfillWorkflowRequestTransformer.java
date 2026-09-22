@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.validator.workflow;
 
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowBackFillRequest;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.api.validator.ITransformer;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
@@ -26,6 +27,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertyUtils;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -54,6 +56,10 @@ public class BackfillWorkflowRequestTransformer implements ITransformer<Workflow
     @Override
     public BackfillWorkflowDTO transform(WorkflowBackFillRequest workflowBackFillRequest) {
 
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao
+                .queryByCode(workflowBackFillRequest.getWorkflowDefinitionCode())
+                .orElseThrow(() -> new ServiceException(
+                        "Cannot find the workflow: " + workflowBackFillRequest.getWorkflowDefinitionCode()));
         final BackfillWorkflowDTO.BackfillParamsDTO backfillParams =
                 transformBackfillParamsDTO(workflowBackFillRequest);
         final BackfillWorkflowDTO backfillWorkflowDTO = BackfillWorkflowDTO.builder()
@@ -69,18 +75,13 @@ public class BackfillWorkflowRequestTransformer implements ITransformer<Workflow
                 .workerGroup(workflowBackFillRequest.getWorkerGroup())
                 .tenantCode(workflowBackFillRequest.getTenantCode())
                 .environmentCode(workflowBackFillRequest.getEnvironmentCode())
-                .startParamList(
-                        PropertyUtils.startParamsTransformPropertyList(workflowBackFillRequest.getStartParamList()))
+                .startParamList(SensitivePropertyUtils.restoreStartParams(
+                        PropertyUtils.startParamsTransformPropertyList(workflowBackFillRequest.getStartParamList()),
+                        GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams())))
                 .dryRun(workflowBackFillRequest.getDryRun())
                 .triggerCode(CodeGenerateUtils.genCode())
                 .backfillParams(backfillParams)
                 .build();
-
-        WorkflowDefinition workflowDefinition = workflowDefinitionDao
-                .queryByCode(workflowBackFillRequest.getWorkflowDefinitionCode())
-                .orElseThrow(() -> new ServiceException(
-                        "Cannot find the workflow: " + workflowBackFillRequest.getWorkflowDefinitionCode()));
-
         backfillWorkflowDTO.setWorkflowDefinition(workflowDefinition);
         return backfillWorkflowDTO;
     }
