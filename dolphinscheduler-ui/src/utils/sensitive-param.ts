@@ -15,22 +15,15 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.dto.workflowInstance;
+export const SENSITIVE_VALUE_MASK = '******'
 
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-
-import java.util.List;
-
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class WorkflowInstanceTaskListDTO {
-
-    private String workflowInstanceState;
-
-    private List<TaskInstance> taskList;
+/** Unchecking does not clear value; empty + re-check restores ****** (keep-original). */
+export function applySensitiveToggle(
+  param: { value?: string; sensitive?: boolean },
+  checked: boolean
+) {
+  param.sensitive = checked
+  if (checked && (param.value === '' || param.value == null)) {
+    param.value = SENSITIVE_VALUE_MASK
+  }
 }
