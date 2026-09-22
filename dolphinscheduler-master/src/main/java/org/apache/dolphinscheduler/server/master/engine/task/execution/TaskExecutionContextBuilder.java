@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.server.master.utils.SensitivePropertyCryptoUtils;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -81,7 +82,8 @@ public class TaskExecutionContextBuilder {
                         (int) Math.min(TimeUnit.MINUTES.toSeconds(taskDefinition.getTimeout()), Integer.MAX_VALUE));
             }
         }
-        taskExecutionContext.setTaskParams(taskDefinition.getTaskParams());
+        taskExecutionContext.setTaskParams(
+                SensitivePropertyCryptoUtils.decodeLocalParamsInTaskParams(taskDefinition.getTaskParams()));
         return this;
     }
 
