@@ -16,6 +16,7 @@
  */
 import { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { applySensitiveToggle } from '@/utils/sensitive-param'
 import type { IJsonItem } from '../types'
 
 export function useCustomParams({
@@ -44,7 +45,7 @@ export function useCustomParams({
         {
           type: 'input',
           field: 'prop',
-          span: 6,
+          span: 5,
           class: 'input-param-key',
           props: {
             placeholder: t('project.node.prop_tips'),
@@ -81,7 +82,7 @@ export function useCustomParams({
         {
           type: 'select',
           field: 'type',
-          span: 6,
+          span: 5,
           options: TYPE_LIST,
           value: 'VARCHAR',
           props: {
@@ -91,13 +92,29 @@ export function useCustomParams({
         {
           type: 'input',
           field: 'value',
-          span: 6,
+          span: 5,
           class: 'input-param-value',
           props: {
             placeholder: t('project.node.value_tips'),
             maxLength: 256
           }
-        }
+        },
+        (i?: number) => ({
+          type: 'checkbox' as const,
+          field: 'sensitive',
+          name: t('project.node.sensitive'),
+          span: 3,
+          value: false,
+          props: {
+            onUpdateChecked: (checked: boolean) => {
+              const rows = model[field]
+              if (i === undefined || !rows || !rows[i]) {
+                return
+              }
+              applySensitiveToggle(rows[i], checked)
+            }
+          }
+        })
       ]
     }
   ]

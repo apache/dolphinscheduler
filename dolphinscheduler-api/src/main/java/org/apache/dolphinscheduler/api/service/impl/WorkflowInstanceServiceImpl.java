@@ -41,6 +41,7 @@ import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
@@ -317,7 +318,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 setTaskInstanceDependentResult(taskInstanceList);
         return new WorkflowInstanceTaskListDTO(workflowInstance.getState().toString(),
-                taskInstanceDependentDetailsList);
+                new ArrayList<>(taskInstanceDependentDetailsList));
     }
 
     private List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
@@ -412,6 +413,12 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             timezoneId = commandParam.getTimeZone();
         }
 
+        List<Property> submittedGlobalParams = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
+        if (CollectionUtils.isNotEmpty(submittedGlobalParams)) {
+            globalParams = GlobalParameterUtils.serializeGlobalParameter(
+                    SensitivePropertyUtils.merge(submittedGlobalParams,
+                            GlobalParameterUtils.deserializeGlobalParameter(workflowInstance.getGlobalParams())));
+        }
         setWorkflowInstance(workflowInstance, scheduleTime, globalParams, timeout, timezoneId);
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         if (taskDefinitionLogs.isEmpty()) {
@@ -423,6 +430,27 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 log.error("Task parameters are invalid,  taskDefinitionName:{}.", taskDefinitionLog.getName());
                 throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
             }
+        }
+        List<TaskDefinition> versionKeys = new ArrayList<>();
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            if (taskDefinitionLog.getCode() > 0 && taskDefinitionLog.getVersion() > 0) {
+                versionKeys.add(new TaskDefinition(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion()));
+            }
+        }
+        List<TaskDefinitionLog> existingTaskLogs = CollectionUtils.isEmpty(versionKeys)
+                ? Collections.emptyList()
+                : taskDefinitionLogMapper.queryByTaskDefinitions(versionKeys);
+        Map<String, String> existingTaskParamsMap = existingTaskLogs.stream()
+                .collect(Collectors.toMap(
+                        log -> log.getCode() + "_" + log.getVersion(),
+                        TaskDefinitionLog::getTaskParams,
+                        (left, right) -> left));
+        for (TaskDefinitionLog submitted : taskDefinitionLogs) {
+            String existingTaskParams = submitted.getCode() <= 0 || submitted.getVersion() <= 0
+                    ? null
+                    : existingTaskParamsMap.get(submitted.getCode() + "_" + submitted.getVersion());
+            submitted.setTaskParams(SensitivePropertyUtils.mergeLocalParams(
+                    submitted.getTaskParams(), existingTaskParams));
         }
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);

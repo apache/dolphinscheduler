@@ -28,8 +28,13 @@ export function renderCheckbox(
   if (!options) {
     return h(NCheckbox, {
       ...props,
-      value: fields[field],
-      onUpdateChecked: (checked: boolean) => void (fields[field] = checked)
+      checked: !!fields[field],
+      onUpdateChecked: (checked: boolean) => {
+        fields[field] = checked
+        if (props && typeof props.onUpdateChecked === 'function') {
+          props.onUpdateChecked(checked)
+        }
+      }
     })
   }
   return h(
