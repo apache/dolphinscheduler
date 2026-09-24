@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -41,8 +44,11 @@ import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.Statement;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -420,12 +426,12 @@ class SqlTaskTest {
         Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
         method.setAccessible(true);
 
-        String inputSql = "select * from student where dt=${dt}";
+        String inputSql = "select * from student where dt='${dt}'";
         SqlBinds binds = (SqlBinds) method.invoke(task, inputSql);
 
-        Assertions.assertEquals("select * from student where dt=?", binds.getSql());
+        Assertions.assertEquals("select * from student where dt='1970'", binds.getSql());
         Assertions.assertNotNull(binds.getParamsMap());
-        Assertions.assertEquals("1970", binds.getParamsMap().get(1).getValue());
+        Assertions.assertTrue(binds.getParamsMap().isEmpty());
     }
 
     @Test
@@ -477,6 +483,243 @@ class SqlTaskTest {
                 InvocationTargetException.class,
                 () -> ensureSqlContent.invoke(task));
         Assertions.assertInstanceOf(TaskException.class, thrown.getCause());
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_replacesParametersAsText() throws Exception {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("dd", new Property("dd", Direct.IN, DataType.VARCHAR, "20250411"));
+        prepareParamsMap.put("name", new Property("name", Direct.IN, DataType.VARCHAR, "E'O\\Reilly'"));
+        prepareParamsMap.put("ids", new Property("ids", Direct.IN, DataType.LIST, "1,'x',3"));
+        prepareParamsMap.put("enabled", new Property("enabled", Direct.IN, DataType.BOOLEAN, "TRUE"));
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\"}");
+        ctx.setScheduleTime(System.currentTimeMillis());
+        ctx.setTaskInstanceId(1);
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+        ctx.setPrepareParamsMap(prepareParamsMap);
+
+        SqlTask task = new SqlTask(ctx);
+
+        Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
+        method.setAccessible(true);
+
+        String inputSql = "create table test_${dd} as select * from user where name=${name} "
+                + "and id in (${ids}) and enabled=${enabled}";
+        SqlBinds binds = (SqlBinds) method.invoke(task, inputSql);
+
+        Assertions.assertEquals(
+                "create table test_20250411 as select * from user where name=E'O\\Reilly' "
+                        + "and id in (1,'x',3) and enabled=TRUE",
+                binds.getSql());
+        Assertions.assertTrue(binds.getParamsMap().isEmpty());
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_preservesSqlAuthoredQuotesAroundParameters() throws Exception {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("dt", new Property("dt", Direct.IN, DataType.DATE, "2026-07-06"));
+        prepareParamsMap.put("name", new Property("name", Direct.IN, DataType.VARCHAR, "O'Reilly"));
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\"}");
+        ctx.setScheduleTime(System.currentTimeMillis());
+        ctx.setTaskInstanceId(1);
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+        ctx.setPrepareParamsMap(prepareParamsMap);
+
+        SqlTask task = new SqlTask(ctx);
+
+        Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
+        method.setAccessible(true);
+
+        SqlBinds binds = (SqlBinds) method.invoke(task,
+                "select * from student where dt='${dt}' and name='${name}'");
+
+        Assertions.assertEquals("select * from student where dt='2026-07-06' and name='O'Reilly'",
+                binds.getSql());
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_replacesRawPlaceholderWithDollarAndBackslashCharacters() throws Exception {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("partition", new Property("partition", Direct.IN, DataType.VARCHAR,
+                "dt='$[yyyyMMdd]' and path='s3://bucket/a\\b'"));
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\"}");
+        ctx.setScheduleTime(System.currentTimeMillis());
+        ctx.setTaskInstanceId(1);
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+        ctx.setPrepareParamsMap(prepareParamsMap);
+
+        SqlTask task = new SqlTask(ctx);
+
+        Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
+        method.setAccessible(true);
+
+        SqlBinds binds = (SqlBinds) method.invoke(task,
+                "alter table t add if not exists partition (!{partition})");
+
+        Assertions.assertEquals(
+                "alter table t add if not exists partition (dt='$[yyyyMMdd]' and path='s3://bucket/a\\b')",
+                binds.getSql());
+    }
+
+    @Test
+    void testExecuteQueryUsesStatementWithRenderedSql() throws Exception {
+        Connection connection = mock(Connection.class);
+        Statement statement = mock(Statement.class);
+        ResultSet resultSet = mock(ResultSet.class);
+        ResultSetMetaData metaData = mock(ResultSetMetaData.class);
+
+        when(connection.createStatement()).thenReturn(statement);
+        when(statement.executeQuery("select 1 as id")).thenReturn(resultSet);
+        when(resultSet.getMetaData()).thenReturn(metaData);
+        when(metaData.getColumnCount()).thenReturn(1);
+        when(metaData.getColumnLabel(1)).thenReturn("id");
+        when(resultSet.next()).thenReturn(false);
+
+        Method method = SqlTask.class.getDeclaredMethod("executeQuery", Connection.class, SqlBinds.class, String.class);
+        method.setAccessible(true);
+
+        String result = (String) method.invoke(sqlTask, connection,
+                new SqlBinds("select 1 as id", new HashMap<>()), "main");
+
+        Assertions.assertEquals("[{\"id\":\"\"}]", result);
+        verify(connection).createStatement();
+        verify(connection, never()).prepareStatement(anyString());
+        verify(statement).executeQuery("select 1 as id");
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_doesNotRescanRawReplacementForSqlParameters() throws Exception {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("fragment", new Property("fragment", Direct.IN, DataType.VARCHAR,
+                "dt='${hiveconf:dt}'"));
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\"}");
+        ctx.setScheduleTime(System.currentTimeMillis());
+        ctx.setTaskInstanceId(1);
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+        ctx.setPrepareParamsMap(prepareParamsMap);
+
+        SqlTask task = new SqlTask(ctx);
+
+        Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
+        method.setAccessible(true);
+
+        SqlBinds binds = (SqlBinds) method.invoke(task,
+                "alter table t add if not exists partition (!{fragment})");
+
+        Assertions.assertEquals(
+                "alter table t add if not exists partition (dt='${hiveconf:dt}')",
+                binds.getSql());
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_doesNotRescanTextParameterValueForRawPlaceholder() throws Exception {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("name", new Property("name", Direct.IN, DataType.VARCHAR, "!{fragment}"));
+        prepareParamsMap.put("fragment", new Property("fragment", Direct.IN, DataType.VARCHAR, "unsafe_sql"));
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\"}");
+        ctx.setScheduleTime(System.currentTimeMillis());
+        ctx.setTaskInstanceId(1);
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+        ctx.setPrepareParamsMap(prepareParamsMap);
+
+        SqlTask task = new SqlTask(ctx);
+
+        Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
+        method.setAccessible(true);
+
+        SqlBinds binds = (SqlBinds) method.invoke(task,
+                "select * from student where name=${name}");
+
+        Assertions.assertEquals("select * from student where name=!{fragment}", binds.getSql());
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_replacesPlaceholderInsideJsonStringLiteral() throws Exception {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("name", new Property("name", Direct.IN, DataType.VARCHAR, "O'Reilly"));
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\"}");
+        ctx.setScheduleTime(System.currentTimeMillis());
+        ctx.setTaskInstanceId(1);
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+        ctx.setPrepareParamsMap(prepareParamsMap);
+
+        SqlTask task = new SqlTask(ctx);
+
+        Method method = SqlTask.class.getDeclaredMethod("getSqlAndSqlParamsMap", String.class);
+        method.setAccessible(true);
+
+        SqlBinds binds = (SqlBinds) method.invoke(task,
+                "select '{\"name\":\"${name}\"}' as payload");
+
+        Assertions.assertEquals("select '{\"name\":\"O'Reilly\"}' as payload", binds.getSql());
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_allowsDatasourceSpecificIdentifierFragment() {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("suffix", new Property("suffix", Direct.IN, DataType.VARCHAR, "2025-04-11"));
+
+        Assertions.assertEquals(
+                "create table test_2025-04-11",
+                SqlTaskParameterRenderer.render("create table test_${suffix}", prepareParamsMap, 1));
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_doesNotInterpretParameterType() {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("id", new Property("id", Direct.IN, DataType.INTEGER, "1 OR 1=1"));
+
+        Assertions.assertEquals(
+                "select * from student where id=1 OR 1=1",
+                SqlTaskParameterRenderer.render("select * from student where id=${id}", prepareParamsMap, 1));
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_rejectsMissingParametersWhenMapIsEmpty() {
+        Assertions.assertAll(
+                () -> Assertions.assertThrows(TaskException.class,
+                        () -> SqlTaskParameterRenderer.render(
+                                "select * from student where id=${missing}", Collections.emptyMap(), 1)),
+                () -> Assertions.assertThrows(TaskException.class,
+                        () -> SqlTaskParameterRenderer.render(
+                                "select * from student where id=!{missing}", Collections.emptyMap(), 1)));
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_rejectsMissingParameterWhenMapIsNotEmpty() {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("other", new Property("other", Direct.IN, DataType.VARCHAR, "value"));
+
+        Assertions.assertThrows(
+                TaskException.class,
+                () -> SqlTaskParameterRenderer.render(
+                        "select * from student where id=${missing}", prepareParamsMap, 1));
+    }
+
+    @Test
+    void testSqlTaskLocalRenderer_rejectsUnclosedSourcePlaceholder() {
+        Map<String, Property> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("id", new Property("id", Direct.IN, DataType.INTEGER, "1"));
+
+        Assertions.assertAll(
+                () -> Assertions.assertThrows(TaskException.class,
+                        () -> SqlTaskParameterRenderer.render(
+                                "select * from student where id=${id", prepareParamsMap, 1)),
+                () -> Assertions.assertThrows(TaskException.class,
+                        () -> SqlTaskParameterRenderer.render(
+                                "select * from student where id=!{id", prepareParamsMap, 1)));
     }
 
     private ResourceParametersHelper getResourceParametersHelperWithDatasourceType(DbType dbType) {
