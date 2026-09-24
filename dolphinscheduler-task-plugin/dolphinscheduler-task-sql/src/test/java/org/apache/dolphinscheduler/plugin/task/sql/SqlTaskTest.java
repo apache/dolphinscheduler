@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.sql;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SqlParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
@@ -487,6 +489,205 @@ class SqlTaskTest {
         ResourceParametersHelper resourceParametersHelper = new ResourceParametersHelper();
         resourceParametersHelper.put(ResourceType.DATASOURCE, 1, parameters);
         return resourceParametersHelper;
+    }
+
+    private TaskExecutionContext createSqlTaskWithAlert(ArrayNode resultArray, int displayRows, String title,
+                                                        int groupId) {
+        SqlParameters sqlParameters = new SqlParameters();
+        sqlParameters.setType("HIVE");
+        sqlParameters.setDatasource(1);
+        sqlParameters.setSql("select 1");
+        sqlParameters.setSendEmail(true);
+        sqlParameters.setDisplayRows(displayRows);
+        sqlParameters.setGroupId(groupId);
+        if (title != null) {
+            sqlParameters.setTitle(title);
+        }
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams(JSONUtils.toJsonString(sqlParameters));
+        ctx.setTaskName("test_sql_task");
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+
+        SqlTask task = new SqlTask(ctx);
+        try {
+            Method method = SqlTask.class.getDeclaredMethod("prepareTaskResultAlert", ArrayNode.class);
+            method.setAccessible(true);
+            method.invoke(task, resultArray);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return ctx;
+    }
+
+    @Test
+    void testPrepareTaskResultAlertSetsNeedAlertAndTaskAlertInfo() {
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        resultArray.add(JSONUtils.parseObject("{\"id\":\"1\",\"name\":\"alice\"}"));
+        resultArray.add(JSONUtils.parseObject("{\"id\":\"2\",\"name\":\"bob\"}"));
+
+        TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "My Alert Title", 5);
+
+        Assertions.assertTrue(ctx.isNeedAlert());
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        Assertions.assertNotNull(alertInfo);
+        Assertions.assertEquals(5, alertInfo.getAlertGroupId());
+        Assertions.assertEquals("My Alert Title", alertInfo.getTitle());
+        Assertions.assertEquals(AlertType.TASK_RESULT, alertInfo.getAlertType());
+        Assertions.assertNotNull(alertInfo.getContent());
+
+        ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
+        Assertions.assertEquals(2, contentArray.size());
+    }
+
+    @Test
+    void testPrepareTaskResultAlertTruncatesToDisplayRows() {
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        for (int i = 0; i < 50; i++) {
+            resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
+        }
+
+        // displayRows = 3, result has 50 rows -> content should be truncated to 3
+        TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 3, null, 1);
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        Assertions.assertNotNull(alertInfo);
+
+        ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
+        Assertions.assertEquals(3, contentArray.size());
+        Assertions.assertEquals("0", contentArray.get(0).get("id").asText());
+        Assertions.assertEquals("1", contentArray.get(1).get("id").asText());
+        Assertions.assertEquals("2", contentArray.get(2).get("id").asText());
+    }
+
+    @Test
+    void testPrepareTaskResultAlertUsesDefaultDisplayRowsWhenUnset() {
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        for (int i = 0; i < 20; i++) {
+            resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
+        }
+
+        // displayRows = 0 means unset -> should default to DEFAULT_DISPLAY_ROWS (10)
+        TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 0, "default rows test", 2);
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        Assertions.assertNotNull(alertInfo);
+
+        ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
+        Assertions.assertEquals(TaskConstants.DEFAULT_DISPLAY_ROWS, contentArray.size());
+    }
+
+    @Test
+    void testPrepareTaskResultAlertUsesCustomTitle() {
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        resultArray.add(JSONUtils.parseObject("{\"id\":\"1\"}"));
+
+        TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "Custom Title", 1);
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        Assertions.assertNotNull(alertInfo);
+        Assertions.assertEquals("Custom Title", alertInfo.getTitle());
+    }
+
+    @Test
+    void testPrepareTaskResultAlertUsesDefaultTitleWhenEmpty() {
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        resultArray.add(JSONUtils.parseObject("{\"id\":\"1\"}"));
+
+        TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, null, 1);
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        Assertions.assertNotNull(alertInfo);
+        Assertions.assertEquals("test_sql_task query result sets", alertInfo.getTitle());
+    }
+
+    @Test
+    void testResultProcessSendEmailDisabledDoesNotSetNeedAlert() throws Exception {
+        // Build a SqlTask with sendEmail = false
+        String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\",\"sendEmail\":false}";
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams(taskParams);
+        ctx.setTaskName("no_alert_task");
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+
+        SqlTask task = new SqlTask(ctx);
+
+        ResultSet mockResultSet = mock(ResultSet.class);
+        ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+        when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+        when(mockMetaData.getColumnCount()).thenReturn(1);
+        when(mockMetaData.getColumnLabel(1)).thenReturn("id");
+        when(mockResultSet.next()).thenReturn(true, false);
+        when(mockResultSet.getObject(1)).thenReturn("1");
+
+        Method resultProcessMethod = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+        resultProcessMethod.setAccessible(true);
+        resultProcessMethod.invoke(task, mockResultSet);
+
+        Assertions.assertFalse(ctx.isNeedAlert());
+        Assertions.assertNull(ctx.getTaskAlertInfo());
+    }
+
+    @Test
+    void testResultProcessEmptyResultSetPreparesAlertWithEmptyRow() throws Exception {
+        String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\""
+                + ",\"sendEmail\":true,\"displayRows\":10,\"groupId\":3,\"title\":\"empty result\"}";
+
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams(taskParams);
+        ctx.setTaskName("empty_result_task");
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+
+        SqlTask task = new SqlTask(ctx);
+
+        ResultSet mockResultSet = mock(ResultSet.class);
+        ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+        when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+        when(mockMetaData.getColumnCount()).thenReturn(2);
+        when(mockMetaData.getColumnLabel(1)).thenReturn("id");
+        when(mockMetaData.getColumnLabel(2)).thenReturn("name");
+        when(mockResultSet.next()).thenReturn(false); // empty result set
+
+        Method resultProcessMethod = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+        resultProcessMethod.setAccessible(true);
+        resultProcessMethod.invoke(task, mockResultSet);
+
+        Assertions.assertTrue(ctx.isNeedAlert());
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        Assertions.assertNotNull(alertInfo);
+        Assertions.assertEquals(3, alertInfo.getAlertGroupId());
+        Assertions.assertEquals("empty result", alertInfo.getTitle());
+        Assertions.assertEquals(AlertType.TASK_RESULT, alertInfo.getAlertType());
+
+        ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
+        Assertions.assertEquals(1, contentArray.size());
+        Assertions.assertEquals("", contentArray.get(0).get("id").asText());
+        Assertions.assertEquals("", contentArray.get(0).get("name").asText());
+    }
+
+    @Test
+    void testTaskExecutionContextCarriesAlertInfoForEventPropagation() {
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setNeedAlert(true);
+
+        TaskAlertInfo alertInfo = new TaskAlertInfo();
+        alertInfo.setTitle("test title");
+        alertInfo.setContent("[{\"id\":\"1\"}]");
+        alertInfo.setAlertGroupId(7);
+        alertInfo.setAlertType(AlertType.TASK_RESULT);
+        ctx.setTaskAlertInfo(alertInfo);
+
+        Assertions.assertTrue(ctx.isNeedAlert());
+        Assertions.assertNotNull(ctx.getTaskAlertInfo());
+        Assertions.assertEquals("test title", ctx.getTaskAlertInfo().getTitle());
+        Assertions.assertEquals(7, ctx.getTaskAlertInfo().getAlertGroupId());
+        Assertions.assertEquals(AlertType.TASK_RESULT, ctx.getTaskAlertInfo().getAlertType());
+
+        TaskExecutionContext ctx2 = new TaskExecutionContext();
+        Assertions.assertFalse(ctx2.isNeedAlert());
+        Assertions.assertNull(ctx2.getTaskAlertInfo());
     }
 
 }

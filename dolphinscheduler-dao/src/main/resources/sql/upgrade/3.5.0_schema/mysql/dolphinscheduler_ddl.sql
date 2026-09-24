@@ -13,23 +13,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-package org.apache.dolphinscheduler.plugin.task.api.model;
+-- If the table already has duplicate rows, index creation will fail; resolve them manually first.
+ALTER TABLE `t_ds_alert` ADD UNIQUE INDEX `uk_alert_dedup` (`sign`, `workflow_instance_id`, `alert_type`);
 
-import org.apache.dolphinscheduler.common.enums.AlertType;
-
-import lombok.Data;
-
-@Data
-public class TaskAlertInfo {
-
-    private String title;
-
-    private String content;
-
-    private Integer alertGroupId;
-
-    private AlertType alertType;
-
-}

@@ -24,18 +24,26 @@ import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.TaskLifec
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskSuccessLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.statemachine.ITaskStateAction;
 import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
+import org.apache.dolphinscheduler.service.alert.WorkflowAlertManager;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
 
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class TaskSuccessLifecycleEventHandler extends AbstractTaskLifecycleEventHandler<TaskSuccessLifecycleEvent> {
 
     private final TaskExecutorClient taskExecutorClient;
 
-    public TaskSuccessLifecycleEventHandler(final TaskExecutorClient taskExecutorClient) {
+    private final WorkflowAlertManager workflowAlertManager;
+
+    public TaskSuccessLifecycleEventHandler(final TaskExecutorClient taskExecutorClient,
+                                            final WorkflowAlertManager workflowAlertManager) {
         this.taskExecutorClient = taskExecutorClient;
+        this.workflowAlertManager = workflowAlertManager;
     }
 
     @Override
@@ -44,6 +52,14 @@ public class TaskSuccessLifecycleEventHandler extends AbstractTaskLifecycleEvent
                        final ITaskExecution taskExecution,
                        final TaskSuccessLifecycleEvent taskSuccessEvent) {
         taskStateAction.onSucceedEvent(workflowExecution, taskExecution, taskSuccessEvent);
+
+        if (taskSuccessEvent.isNeedAlert()) {
+            workflowAlertManager.sendTaskResultAlert(
+                    taskExecution.getWorkflowInstance(),
+                    taskExecution.getTaskInstance(),
+                    taskSuccessEvent.getTaskAlertInfo());
+        }
+
         taskExecutorClient.ackTaskExecutorLifecycleEvent(
                 taskExecution,
                 new ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck(

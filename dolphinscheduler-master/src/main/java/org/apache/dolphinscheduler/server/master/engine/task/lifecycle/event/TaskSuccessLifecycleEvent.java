@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event;
 
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.AbstractTaskLifecycleEvent;
@@ -41,6 +42,10 @@ public class TaskSuccessLifecycleEvent extends AbstractTaskLifecycleEvent {
 
     private final List<Property> varPool;
 
+    private final boolean needAlert;
+
+    private final TaskAlertInfo taskAlertInfo;
+
     @Override
     public ILifecycleEventType getEventType() {
         return TaskLifecycleEventType.SUCCEEDED;
@@ -52,6 +57,7 @@ public class TaskSuccessLifecycleEvent extends AbstractTaskLifecycleEvent {
                 "task=" + taskExecution.getName() +
                 ", endTime=" + endTime +
                 ", varPool='" + varPool + '\'' +
+                ", needAlert=" + needAlert +
                 '}';
     }
 }
