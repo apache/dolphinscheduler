@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.ExecuteStatusCount;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
+import org.apache.dolphinscheduler.dao.model.TaskInstanceSummaryDto;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import org.apache.ibatis.annotations.Param;
@@ -42,8 +43,8 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
     TaskInstance queryByInstanceIdAndCode(@Param("workflowInstanceId") int workflowInstanceId,
                                           @Param("taskCode") Long taskCode);
 
-    List<TaskInstance> queryByWorkflowInstanceIdsAndTaskCodes(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds,
-                                                              @Param("taskCodes") List<Long> taskCodes);
+    List<TaskInstanceSummaryDto> queryByWorkflowInstanceIdsAndTaskCodes(@Param("workflowInstanceIds") List<Integer> workflowInstanceIds,
+                                                                        @Param("taskCodes") List<Long> taskCodes);
 
     /**
      * Statistics task instance group by given project codes list by start time
@@ -94,32 +95,32 @@ public interface TaskInstanceMapper extends BaseMapper<TaskInstance> {
                                                                                          @Param("projectIds") Set<Integer> projectIds,
                                                                                          @Param("states") List<TaskExecutionStatus> states);
 
-    IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
-                                                    @Param("projectCode") Long projectCode,
-                                                    @Param("workflowInstanceId") Integer workflowInstanceId,
-                                                    @Param("workflowInstanceName") String workflowInstanceName,
-                                                    @Param("searchVal") String searchVal,
-                                                    @Param("taskName") String taskName,
-                                                    @Param("taskCode") Long taskCode,
-                                                    @Param("executorName") String executorName,
-                                                    @Param("states") int[] statusArray,
-                                                    @Param("host") String host,
-                                                    @Param("taskExecuteType") TaskExecuteType taskExecuteType,
-                                                    @Param("startTime") Date startTime,
-                                                    @Param("endTime") Date endTime);
+    IPage<TaskInstanceSummaryDto> queryTaskInstanceListPaging(IPage<TaskInstanceSummaryDto> page,
+                                                              @Param("projectCode") Long projectCode,
+                                                              @Param("workflowInstanceId") Integer workflowInstanceId,
+                                                              @Param("workflowInstanceName") String workflowInstanceName,
+                                                              @Param("searchVal") String searchVal,
+                                                              @Param("taskName") String taskName,
+                                                              @Param("taskCode") Long taskCode,
+                                                              @Param("executorName") String executorName,
+                                                              @Param("states") int[] statusArray,
+                                                              @Param("host") String host,
+                                                              @Param("taskExecuteType") TaskExecuteType taskExecuteType,
+                                                              @Param("startTime") Date startTime,
+                                                              @Param("endTime") Date endTime);
 
-    IPage<TaskInstance> queryStreamTaskInstanceListPaging(IPage<TaskInstance> page,
-                                                          @Param("projectCode") Long projectCode,
-                                                          @Param("workflowDefinitionName") String workflowDefinitionName,
-                                                          @Param("searchVal") String searchVal,
-                                                          @Param("taskName") String taskName,
-                                                          @Param("taskCode") Long taskCode,
-                                                          @Param("executorName") String executorName,
-                                                          @Param("states") int[] statusArray,
-                                                          @Param("host") String host,
-                                                          @Param("taskExecuteType") TaskExecuteType taskExecuteType,
-                                                          @Param("startTime") Date startTime,
-                                                          @Param("endTime") Date endTime);
+    IPage<TaskInstanceSummaryDto> queryStreamTaskInstanceListPaging(IPage<TaskInstanceSummaryDto> page,
+                                                                    @Param("projectCode") Long projectCode,
+                                                                    @Param("workflowDefinitionName") String workflowDefinitionName,
+                                                                    @Param("searchVal") String searchVal,
+                                                                    @Param("taskName") String taskName,
+                                                                    @Param("taskCode") Long taskCode,
+                                                                    @Param("executorName") String executorName,
+                                                                    @Param("states") int[] statusArray,
+                                                                    @Param("host") String host,
+                                                                    @Param("taskExecuteType") TaskExecuteType taskExecuteType,
+                                                                    @Param("startTime") Date startTime,
+                                                                    @Param("endTime") Date endTime);
 
     void deleteByWorkflowInstanceId(@Param("workflowInstanceId") int workflowInstanceId);
 

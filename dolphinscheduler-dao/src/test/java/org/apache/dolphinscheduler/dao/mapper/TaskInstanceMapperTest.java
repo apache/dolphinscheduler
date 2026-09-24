@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
+import org.apache.dolphinscheduler.dao.model.TaskInstanceSummaryDto;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Collections;
@@ -207,11 +208,20 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
         task.setHost("111.111.11.11");
         taskInstanceMapper.updateById(task);
 
-        List<TaskInstance> taskInstances = taskInstanceMapper.queryByWorkflowInstanceIdsAndTaskCodes(
+        List<TaskInstanceSummaryDto> taskInstances = taskInstanceMapper.queryByWorkflowInstanceIdsAndTaskCodes(
                 Collections.singletonList(task.getWorkflowInstanceId()),
                 Collections.singletonList(task.getTaskCode()));
         taskInstanceMapper.deleteById(task.getId());
         Assertions.assertEquals(1, taskInstances.size());
+        // The summary DTO type itself guarantees that heavy fields (taskParams,
+        // varPool, logPath) are not present — no getter exists for them on
+        // TaskInstanceSummaryDto.
+        // Verify that essential fields ARE populated
+        TaskInstanceSummaryDto summaryDto = taskInstances.get(0);
+        Assertions.assertNotNull(summaryDto.getId(), "id should be populated");
+        Assertions.assertNotNull(summaryDto.getName(), "name should be populated");
+        Assertions.assertNotNull(summaryDto.getState(), "state should be populated");
+        Assertions.assertNotNull(summaryDto.getHost(), "host should be populated");
     }
 
     /**
@@ -294,11 +304,14 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
 
         // insert taskInstance
         TaskInstance task = insertTaskInstance(workflowInstance.getId());
+        task.setTaskParams("{\"type\":\"SHELL\"}");
+        task.setVarPool("[]");
+        taskInstanceMapper.updateById(task);
 
-        Page<TaskInstance> page = new Page(1, 3);
-        IPage<TaskInstance> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
+        Page<TaskInstanceSummaryDto> page = new Page(1, 3);
+        IPage<TaskInstanceSummaryDto> taskInstanceIPage = taskInstanceMapper.queryTaskInstanceListPaging(
                 page,
-                definition.getProjectCode(),
+                task.getProjectCode(),
                 task.getWorkflowInstanceId(),
                 "",
                 "",
@@ -309,10 +322,20 @@ public class TaskInstanceMapperTest extends BaseDaoTest {
                 "",
                 TaskExecuteType.BATCH,
                 null, null);
+
+        // The summary DTO type itself guarantees that heavy fields (taskParams,
+        // varPool, logPath) are not present — no getter exists for them on
+        // TaskInstanceSummaryDto.
+        // Verify that essential fields ARE populated
+        for (TaskInstanceSummaryDto dto : taskInstanceIPage.getRecords()) {
+            Assertions.assertNotNull(dto.getId(), "id should be populated");
+            Assertions.assertNotNull(dto.getName(), "name should be populated");
+        }
+
         workflowInstanceMapper.deleteById(workflowInstance.getId());
         taskInstanceMapper.deleteById(task.getId());
         workflowDefinitionMapper.deleteById(definition.getId());
-        Assertions.assertEquals(0, taskInstanceIPage.getTotal());
+        Assertions.assertEquals(1, taskInstanceIPage.getTotal());
 
     }
 }
