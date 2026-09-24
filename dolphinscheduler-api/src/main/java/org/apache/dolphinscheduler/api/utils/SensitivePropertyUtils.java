@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.command.AbstractCommandParam;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
@@ -62,9 +63,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * HTTP-layer helpers for {@link Property#isSensitive()}.
- * Values stay plaintext in DB. Query masks them as {@code ******}.
- * Create rejects {@code ******}; Update {@link #merge}s it back to the old value.
- * Start: {@code ******} is replaced with the definition global plaintext.
+ * Definition write path: merge keep-original then encode with {@link PasswordUtils} when enabled.
+ * Query masks values as {@code ******}. Start / execution use decrypt copies.
  */
 @UtilityClass
 public class SensitivePropertyUtils {
@@ -80,9 +80,27 @@ public class SensitivePropertyUtils {
     }
 
     /**
-     * Update: restore DB plaintext for keep-original {@code ******}.
+     * Create definition params: reject {@code ******}, then encode sensitive plaintext.
+     */
+    public List<Property> encodeForCreate(List<Property> properties) {
+        requireNoPlaceholder(properties);
+        return encodeNewSensitivePlaintext(properties, Collections.emptyList());
+    }
+
+    /**
+     * Update definition params: restore DB value for keep-original {@code ******}, then encode.
      * Empty / null is a real empty value. {@code false→true} + {@code ******} is allowed;
      * {@code true→false} + {@code ******} is rejected.
+     * Runtime instance updates should call {@link #merge} only (no encode).
+     */
+    public List<Property> mergeAndEncode(List<Property> submittedProperties, List<Property> existingProperties) {
+        List<Property> merged = merge(submittedProperties, existingProperties);
+        return encodeNewSensitivePlaintext(merged, existingProperties);
+    }
+
+    /**
+     * Update: restore DB value for keep-original {@code ******} without encoding.
+     * Used for runtime instance global_params (plaintext materialization).
      */
     public List<Property> merge(List<Property> submittedProperties, List<Property> existingProperties) {
         if (CollectionUtils.isEmpty(submittedProperties)) {
@@ -100,6 +118,7 @@ public class SensitivePropertyUtils {
 
     /**
      * Build start/command params before persist.
+     * Decrypts definition globals first, then:
      * <ul>
      * <li>Same name as a workflow global: inherit all global attributes, only override {@code value}
      * ({@code ******} keeps the global plaintext).</li>
@@ -110,7 +129,8 @@ public class SensitivePropertyUtils {
         if (CollectionUtils.isEmpty(startParams)) {
             return startParams;
         }
-        Map<String, Property> globals = CollectionUtils.emptyIfNull(globalParams).stream()
+        List<Property> decryptedGlobals = decodeSensitiveValues(globalParams);
+        Map<String, Property> globals = CollectionUtils.emptyIfNull(decryptedGlobals).stream()
                 .filter(Objects::nonNull)
                 .filter(property -> property.getProp() != null)
                 .collect(Collectors.toMap(Property::getProp, Function.identity(), (left, right) -> right));
@@ -137,14 +157,77 @@ public class SensitivePropertyUtils {
         return restored;
     }
 
+    public List<Property> decodeSensitiveValues(List<Property> properties) {
+        return PropertySensitiveUtils.transformSensitiveValues(properties, PasswordUtils::decodePassword);
+    }
+
     public String mergeLocalParams(String submittedTaskParams, String existingTaskParams) {
+        return mergeLocalParams(submittedTaskParams, existingTaskParams, true);
+    }
+
+    /**
+     * @param encodeForDefinition when true, encode after merge (workflow/task definition persist);
+     *                            when false, merge only (runtime instance edit).
+     */
+    public String mergeLocalParams(String submittedTaskParams, String existingTaskParams,
+                                   boolean encodeForDefinition) {
         return rewriteLocalParams(submittedTaskParams, submitted -> {
             if (StringUtils.isEmpty(existingTaskParams)) {
-                requireNoPlaceholder(submitted);
-                return submitted;
+                return encodeForDefinition ? encodeForCreate(submitted) : requireNoPlaceholderAndReturn(submitted);
             }
-            return merge(submitted, getLocalParams(existingTaskParams));
+            List<Property> existing = getLocalParams(existingTaskParams);
+            return encodeForDefinition ? mergeAndEncode(submitted, existing) : merge(submitted, existing);
         });
+    }
+
+    private List<Property> requireNoPlaceholderAndReturn(List<Property> submitted) {
+        requireNoPlaceholder(submitted);
+        return submitted;
+    }
+
+    /**
+     * Encode sensitive values that are new plaintext for definition persist.
+     * Keep-original from an already-sensitive existing value is written as-is (no re-encode).
+     * {@code false→true} keep-original merges non-sensitive plaintext and then encodes.
+     */
+    private List<Property> encodeNewSensitivePlaintext(List<Property> mergedProperties,
+                                                       List<Property> existingProperties) {
+        if (CollectionUtils.isEmpty(mergedProperties)) {
+            return mergedProperties;
+        }
+        Map<String, Property> existingMap = CollectionUtils.emptyIfNull(existingProperties).stream()
+                .filter(Objects::nonNull)
+                .filter(property -> property.getProp() != null)
+                .collect(Collectors.toMap(Property::getProp, Function.identity(), (left, right) -> right));
+        List<Property> encoded = new ArrayList<>(mergedProperties.size());
+        for (Property property : mergedProperties) {
+            Property copy = PropertySensitiveUtils.copy(property);
+            if (!PropertySensitiveUtils.isSensitive(copy)) {
+                Property existing = existingMap.get(copy.getProp());
+                // true→false: if a non-UI client re-sent ciphertext, decode back to plaintext.
+                if (existing != null && existing.isSensitive()
+                        && StringUtils.isNotEmpty(copy.getValue())
+                        && Objects.equals(copy.getValue(), existing.getValue())) {
+                    copy.setValue(PasswordUtils.decodePassword(copy.getValue()));
+                }
+                encoded.add(copy);
+                continue;
+            }
+            if (StringUtils.isEmpty(copy.getValue())) {
+                encoded.add(copy);
+                continue;
+            }
+            Property existing = existingMap.get(copy.getProp());
+            if (existing != null && existing.isSensitive()
+                    && Objects.equals(copy.getValue(), existing.getValue())) {
+                // true→true keep-original (or identical resubmit): already persisted form.
+                encoded.add(copy);
+                continue;
+            }
+            copy.setValue(PasswordUtils.encodePassword(copy.getValue()));
+            encoded.add(copy);
+        }
+        return encoded;
     }
 
     /**

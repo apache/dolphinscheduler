@@ -264,7 +264,13 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
-        SensitivePropertyUtils.requireNoPlaceholder(GlobalParameterUtils.deserializeGlobalParameter(globalParams));
+        List<Property> submittedGlobalParams = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
+        if (CollectionUtils.isNotEmpty(submittedGlobalParams)) {
+            globalParams = GlobalParameterUtils.serializeGlobalParameter(
+                    SensitivePropertyUtils.encodeForCreate(submittedGlobalParams));
+        } else {
+            SensitivePropertyUtils.requireNoPlaceholder(submittedGlobalParams);
+        }
         for (TaskDefinitionLog taskDefinitionLog : CollectionUtils.emptyIfNull(taskDefinitionLogs)) {
             taskDefinitionLog.setTaskParams(
                     SensitivePropertyUtils.mergeLocalParams(taskDefinitionLog.getTaskParams(), null));
@@ -667,7 +673,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 GlobalParameterUtils.deserializeGlobalParameter(globalParams);
         if (CollectionUtils.isNotEmpty(submittedGlobalParams)) {
             globalParams = GlobalParameterUtils.serializeGlobalParameter(
-                    SensitivePropertyUtils.merge(submittedGlobalParams,
+                    SensitivePropertyUtils.mergeAndEncode(submittedGlobalParams,
                             GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams())));
         }
         List<TaskDefinition> versionKeys = new ArrayList<>();
