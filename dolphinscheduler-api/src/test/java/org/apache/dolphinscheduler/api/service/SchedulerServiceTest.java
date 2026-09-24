@@ -73,9 +73,6 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     private ProjectService projectService;
 
     @Mock
-    private ExecutorService executorService;
-
-    @Mock
     private TenantExistValidator tenantExistValidator;
 
     @Mock
@@ -322,6 +319,59 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         // success
         Mockito.when(scheduleDao.deleteById(scheduleId)).thenReturn(true);
         Assertions.assertDoesNotThrow(() -> schedulerService.deleteSchedulesById(user, scheduleId));
+    }
+
+    @Test
+    public void testInsertScheduleWorkflowNotExists() {
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.empty());
+
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.insertSchedule(
+                        user, projectCode, processDefinitionCode, scheduleExpression(null), WarningType.NONE, 0,
+                        FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode));
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
+    }
+
+    @Test
+    public void testInsertScheduleWorkflowFromAnotherProject() {
+        Project project = this.getProject();
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
+        workflowDefinition.setProjectCode(999L);
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.insertSchedule(
+                        user, projectCode, processDefinitionCode, scheduleExpression(null), WarningType.NONE, 0,
+                        FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode));
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(),
+                ((ServiceException) exception).getCode());
+    }
+
+    @Test
+    public void testInsertScheduleOfflineWorkflow() {
+        Project project = this.getProject();
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
+        workflowDefinition.setReleaseState(ReleaseState.OFFLINE);
+        Schedule insertedSchedule = new Schedule();
+        insertedSchedule.setId(scheduleId);
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(null);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+        Mockito.when(scheduleDao.queryById(Mockito.any())).thenReturn(insertedSchedule);
+
+        Schedule result = schedulerService.insertSchedule(
+                user, projectCode, processDefinitionCode, scheduleExpression(null), WarningType.NONE, 0,
+                FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenantCode", environmentCode);
+
+        ArgumentCaptor<Schedule> scheduleCaptor = ArgumentCaptor.forClass(Schedule.class);
+        Mockito.verify(scheduleDao).insert(scheduleCaptor.capture());
+        Assertions.assertSame(insertedSchedule, result);
     }
 
     @Test

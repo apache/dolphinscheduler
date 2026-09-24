@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -79,9 +78,6 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     private ProjectService projectService;
 
     @Autowired
-    private ExecutorService executorService;
-
-    @Autowired
     private ScheduleDao scheduleDao;
 
     @Autowired
@@ -129,10 +125,12 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
-        // check workflow define release state
-        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
-        executorService.checkWorkflowDefinitionValid(projectCode, workflowDefinition, workflowDefinitionCode,
-                workflowDefinition.getVersion());
+        // check workflow definition exists
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
+                .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode));
+        if (projectCode != workflowDefinition.getProjectCode()) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode);
+        }
 
         Schedule scheduleExists =
                 scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
