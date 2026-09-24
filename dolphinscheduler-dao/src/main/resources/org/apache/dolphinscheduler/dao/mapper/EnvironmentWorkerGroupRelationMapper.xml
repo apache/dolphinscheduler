@@ -19,7 +19,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper">
     <sql id="baseSql">
-        id, environment_code, worker_group, operator, create_time, update_time
+        id, environment_code, worker_group_id, worker_group, operator, create_time, update_time
     </sql>
     <select id="queryByEnvironmentCode" resultType="org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation">
         select
