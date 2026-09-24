@@ -51,6 +51,8 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidationContext;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -216,6 +218,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Autowired
     private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
 
+    @Autowired
+    private WorkerGroupValidator workerGroupValidator;
+
     /**
      * create workflow definition
      *
@@ -263,6 +268,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         globalParamsValidator.validate(globalParams);
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
+
+        // Validate worker groups in task definitions
+        validateTaskWorkerGroups(projectCode, taskDefinitionLogs);
+
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
         SensitivePropertyUtils.requireNoPlaceholder(GlobalParameterUtils.deserializeGlobalParameter(globalParams));
         for (TaskDefinitionLog taskDefinitionLog : CollectionUtils.emptyIfNull(taskDefinitionLogs)) {
@@ -393,6 +402,32 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.error("Generate task definition list failed, meet an unknown exception", e);
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR);
         }
+    }
+
+    /**
+     * Validate worker groups in task definitions
+     */
+    private void validateTaskWorkerGroups(long projectCode, List<TaskDefinitionLog> taskDefinitionLogs) {
+        if (CollectionUtils.isEmpty(taskDefinitionLogs)) {
+            return;
+        }
+
+        List<String> workerGroups = taskDefinitionLogs.stream()
+                .map(TaskDefinitionLog::getWorkerGroup)
+                .collect(Collectors.toList());
+
+        workerGroupValidator.validate(workerGroups, projectCode);
+    }
+
+    /**
+     * Validate the worker group of a schedule against the project
+     */
+    private void validateScheduleWorkerGroup(long projectCode, String workerGroup) {
+        WorkerGroupValidationContext workerGroupContext = WorkerGroupValidationContext.builder()
+                .workerGroup(workerGroup)
+                .projectCode(projectCode)
+                .build();
+        workerGroupValidator.validate(workerGroupContext);
     }
 
     private List<WorkflowTaskRelationLog> generateTaskRelationList(String taskRelationJson,
@@ -640,6 +675,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         globalParamsValidator.validate(globalParams);
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
+
+        // Validate worker groups in task definitions
+        validateTaskWorkerGroups(projectCode, taskDefinitionLogs);
+
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
 
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(code).orElse(null);
@@ -1394,6 +1433,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 log.info("Copy workflow definition...");
                 List<TaskDefinitionLog> taskDefinitionLogs =
                         taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
+                // Validate the worker groups of the copied tasks against the target project
+                validateTaskWorkerGroups(targetProjectCode, taskDefinitionLogs);
                 Map<Long, Long> taskCodeMap = new HashMap<>();
                 taskDefinitionLogs.forEach(
                         taskDefinitionLog -> taskCodeMap.put(taskDefinitionLog.getCode(), CodeGenerateUtils.genCode()));
@@ -1412,14 +1453,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     }
                 }
 
-                for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
-                    if (workflowTaskRelationLog.getPreTaskCode() > 0) {
-                        workflowTaskRelationLog
-                                .setPreTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPreTaskCode()));
-                    }
-                    if (workflowTaskRelationLog.getPostTaskCode() > 0) {
-                        workflowTaskRelationLog
-                                .setPostTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPostTaskCode()));
+                if (!taskDefinitionLogs.isEmpty()) {
+                    for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
+                        if (workflowTaskRelationLog.getPreTaskCode() > 0) {
+                            workflowTaskRelationLog
+                                    .setPreTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPreTaskCode()));
+                        }
+                        if (workflowTaskRelationLog.getPostTaskCode() > 0) {
+                            workflowTaskRelationLog
+                                    .setPostTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPostTaskCode()));
+                        }
                     }
                 }
                 final long oldWorkflowDefinitionCode = workflowDefinition.getCode();
@@ -1444,6 +1487,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 // copy timing configuration
                 Schedule scheduleObj = scheduleDao.queryByWorkflowDefinitionCode(oldWorkflowDefinitionCode);
                 if (scheduleObj != null) {
+                    validateScheduleWorkerGroup(targetProjectCode, scheduleObj.getWorkerGroup());
                     scheduleObj.setId(null);
                     scheduleObj.setUserId(loginUser.getId());
                     scheduleObj.setWorkflowDefinitionCode(workflowDefinition.getCode());
@@ -1465,6 +1509,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 }
             } else {
                 log.info("Move workflow definition...");
+                List<TaskDefinitionLog> taskDefinitionLogs =
+                        taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
+                // Validate the worker groups of the moved tasks against the target project
+                validateTaskWorkerGroups(targetProjectCode, taskDefinitionLogs);
                 try {
                     updateDagDefine(loginUser, taskRelationList, workflowDefinition, null,
                             Lists.newArrayList());
@@ -1692,7 +1740,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      *
      * @param srcProjectCode    srcProjectCode
      * @param targetProjectCode targetProjectCode
-     * @param result            result
      * @param failedWorkflowList failedWorkflowList
      * @param isCopy            isCopy
      */
@@ -1807,7 +1854,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return;
         }
 
-        checkWorkflowDefinitionIsValidated(loginUser, workflowDefinition.getCode());
+        checkWorkflowDefinitionIsValidated(loginUser, projectCode, workflowDefinition.getCode());
         checkAllSubWorkflowDefinitionIsOnline(workflowDefinition.getCode());
 
         workflowDefinition.setReleaseState(ReleaseState.ONLINE);
@@ -1903,7 +1950,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         return localUserDefParams;
     }
 
-    private void checkWorkflowDefinitionIsValidated(User loginUser, Long workflowDefinitionCode) {
+    private void checkWorkflowDefinitionIsValidated(User loginUser, Long projectCode, Long workflowDefinitionCode) {
         // todo: build dag check if the dag is validated
         List<WorkflowTaskRelation> workflowTaskRelations =
                 workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
@@ -1914,6 +1961,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
+        // Validate the worker groups of the workflow tasks are assigned to the project
+        validateTaskWorkerGroups(projectCode, taskDefinitionLogs);
         // todo : check Workflow is validate
     }
 

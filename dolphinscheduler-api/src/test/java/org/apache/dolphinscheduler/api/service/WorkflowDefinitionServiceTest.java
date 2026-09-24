@@ -41,12 +41,13 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidationContext;
+import org.apache.dolphinscheduler.api.validator.WorkerGroupValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -205,6 +206,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Mock
     private GlobalParamsValidator globalParamsValidator;
+
+    @Mock
+    private WorkerGroupValidator workerGroupValidator;
 
     @Mock
     private UserDao userDao;
@@ -580,6 +584,109 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testBatchCopyWorkflowDefinitionShouldRejectWorkerGroupNotAssignedToTargetProject() {
+        Project sourceProject = getProject(projectCode);
+        Project targetProject = getProject(projectCodeOther);
+        when(projectDao.queryByCode(projectCode)).thenReturn(sourceProject);
+        when(projectDao.queryByCode(projectCodeOther)).thenReturn(targetProject);
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, sourceProject, WORKFLOW_BATCH_COPY);
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, targetProject);
+
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(getWorkflowDefinition()));
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(getProcessTaskRelation());
+        when(taskDefinitionLogDao.queryTaskDefineLogList(anyList()))
+                .thenReturn(Collections.singletonList(new TaskDefinitionLog()));
+        doThrow(new ServiceException(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT))
+                .when(workerGroupValidator).validate(anyList(), anyLong());
+
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchCopyWorkflowDefinition(
+                        user, projectCode, String.valueOf(processDefinitionCode), projectCodeOther));
+
+        Assertions.assertEquals(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT.getCode(), ex.getCode());
+        verify(workerGroupValidator).validate(anyList(), eq(projectCodeOther));
+        verify(scheduleDao, Mockito.never()).insert(any(Schedule.class));
+    }
+
+    @Test
+    public void testBatchCopyWorkflowDefinitionShouldRejectScheduleWorkerGroupNotAssignedToTargetProject() {
+        Project sourceProject = getProject(projectCode);
+        Project targetProject = getProject(projectCodeOther);
+        when(projectDao.queryByCode(projectCode)).thenReturn(sourceProject);
+        when(projectDao.queryByCode(projectCodeOther)).thenReturn(targetProject);
+        doNothing().when(projectService)
+                .checkProjectAndAuthThrowException(user, sourceProject, WORKFLOW_BATCH_COPY);
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, targetProject);
+
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(getWorkflowDefinition()));
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(getProcessTaskRelation());
+        when(taskDefinitionLogDao.queryTaskDefineLogList(anyList())).thenReturn(Collections.emptyList());
+        when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(getSchedule());
+        doThrow(new ServiceException(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT))
+                .when(workerGroupValidator).validate(any(WorkerGroupValidationContext.class));
+
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchCopyWorkflowDefinition(
+                        user, projectCode, String.valueOf(processDefinitionCode), projectCodeOther));
+
+        Assertions.assertEquals(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT.getCode(), ex.getCode());
+        verify(workerGroupValidator).validate(any(WorkerGroupValidationContext.class));
+        verify(scheduleDao, Mockito.never()).insert(any(Schedule.class));
+    }
+
+    @Test
+    public void testBatchMoveWorkflowDefinitionShouldRejectWorkerGroupNotAssignedToTargetProject() {
+        Project sourceProject = getProject(projectCode);
+        Project targetProject = getProject(projectCodeOther);
+        when(projectDao.queryByCode(projectCode)).thenReturn(sourceProject);
+        when(projectDao.queryByCode(projectCodeOther)).thenReturn(targetProject);
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, sourceProject);
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, targetProject);
+
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(getWorkflowDefinition()));
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(getProcessTaskRelation());
+        when(taskDefinitionLogDao.queryTaskDefineLogList(anyList()))
+                .thenReturn(Collections.singletonList(new TaskDefinitionLog()));
+        doThrow(new ServiceException(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT))
+                .when(workerGroupValidator).validate(anyList(), anyLong());
+
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchMoveWorkflowDefinition(
+                        user, projectCode, String.valueOf(processDefinitionCode), projectCodeOther));
+
+        Assertions.assertEquals(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT.getCode(), ex.getCode());
+        verify(workerGroupValidator).validate(anyList(), eq(projectCodeOther));
+    }
+
+    @Test
+    public void testOnlineWorkflowDefinitionShouldRejectWorkerGroupNotAssignedToProject() {
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        WorkflowTaskRelation workflowTaskRelation =
+                getWorkflowTaskRelation(1, 1, projectCode, processDefinitionCode, 0, 0, 123456789L, 1);
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(Collections.singletonList(workflowTaskRelation));
+        when(taskDefinitionLogDao.queryTaskDefineLogList(anyList()))
+                .thenReturn(Collections.singletonList(new TaskDefinitionLog()));
+        doThrow(new ServiceException(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT))
+                .when(workerGroupValidator).validate(anyList(), anyLong());
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.onlineWorkflowDefinition(user, projectCode, processDefinitionCode));
+
+        Assertions.assertEquals(Status.WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT.getCode(), exception.getCode());
+        verify(workerGroupValidator).validate(anyList(), eq(projectCode));
+        Mockito.verify(workflowDefinitionDao, Mockito.never()).updateById(any(WorkflowDefinition.class));
+    }
+
+    @Test
     public void testReadOnlyUserCannotSwitchOrReleaseWorkflowDefinition() {
         Project project = getProject(projectCode);
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
@@ -927,6 +1034,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 eq(Boolean.TRUE))).thenReturn(1);
         when(processService.saveTaskRelation(eq(user), eq(projectCode), anyLong(), eq(1), anyList(), anyList(),
                 eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+        doNothing().when(workerGroupValidator).validate(anyList(), anyLong());
 
         WorkflowDefinition workflowDefinition = workflowDefinitionService.createWorkflowDefinition(
                 user, projectCode, name, description, "[]", "[]", timeout,
@@ -1134,6 +1242,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 .thenReturn(Collections.emptyList());
         when(processService.saveTaskRelation(eq(user), eq(projectCode), eq(processDefinitionCode), eq(2), anyList(),
                 anyList(), eq(Boolean.TRUE))).thenReturn(Constants.EXIT_CODE_SUCCESS);
+        doNothing().when(workerGroupValidator).validate(anyList(), anyLong());
 
         WorkflowDefinition resultDefinition = workflowDefinitionService.updateWorkflowDefinition(
                 user, projectCode, name, processDefinitionCode, description, "[]", "[]", timeout,
@@ -1372,7 +1481,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         schedule.setUserId(1);
         schedule.setReleaseState(ReleaseState.OFFLINE);
         schedule.setWorkflowInstancePriority(Priority.MEDIUM);
-        schedule.setWarningType(WarningType.NONE);
+        schedule.setWarningType(null);
         schedule.setWarningGroupId(1);
         schedule.setWorkerGroup(WorkerGroupUtils.getDefaultWorkerGroup());
         return schedule;

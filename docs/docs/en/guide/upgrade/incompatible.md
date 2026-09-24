@@ -56,3 +56,10 @@ This document records the incompatible updates between each version. You need to
   * **Removed derived properties**: `cmdTypeIfComplement`, `complementData` (related to complement-data executions; use the detail API to obtain them)
   * To obtain any of these fields, use the detail API `GET /projects/{projectCode}/workflow-instances/{id}` instead, which continues to return the full `WorkflowInstance` object. ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
 
+## 3.5.0
+
+* Worker groups must now be assigned to a project before they can be used([#18293](https://github.com/apache/dolphinscheduler/pull/18293)):
+  * The frontend no longer provides a default `default` worker group for workflow definitions, run forms, or project preferences; the submitted value is `null` when none is selected.
+  * When creating or updating a workflow definition, creating or updating a schedule, updating project preferences, copying or moving a workflow definition into a project, or going a workflow definition online, the backend validates that the worker groups used by the tasks and the schedule are assigned to the relevant project. Unassigned worker groups cause the request to fail (error code `WORKER_GROUP_NOT_ASSIGNED_TO_PROJECT`, 1402005).
+  * To avoid breaking existing data, worker groups explicitly assigned to a project, as well as worker groups **actually used** by tasks or schedules within the project, are still considered assigned; only scenarios that use new worker groups require attention.
+
