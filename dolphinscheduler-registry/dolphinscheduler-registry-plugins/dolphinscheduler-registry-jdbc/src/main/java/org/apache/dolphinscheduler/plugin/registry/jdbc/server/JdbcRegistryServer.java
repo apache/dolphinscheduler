@@ -32,19 +32,22 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryD
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryLockRepository;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.time.StopWatch;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 import lombok.SneakyThrows;
@@ -70,18 +73,43 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
 
     private final JdbcRegistryLockManager jdbcRegistryLockManager;
 
-    private JdbcRegistryServerState jdbcRegistryServerState;
-
-    private final List<IJdbcRegistryClient> jdbcRegistryClients = new CopyOnWriteArrayList<>();
+    private final AtomicReference<JdbcRegistryServerState> serverState =
+            new AtomicReference<>(JdbcRegistryServerState.INIT);
 
     private final List<ConnectionStateListener> connectionStateListeners = new CopyOnWriteArrayList<>();
 
-    private final Map<JdbcRegistryClientIdentify, JdbcRegistryClientHeartbeatDTO> jdbcRegistryClientDTOMap =
-            new ConcurrentHashMap<>();
+    private final ReentrantLock lifecycleLock = new ReentrantLock();
+
+    private final Map<JdbcRegistryClientIdentify, ClientRegistration> clientRegistrations = new LinkedHashMap<>();
+
+    private final CompletableFuture<Void> closeCompletion = new CompletableFuture<>();
 
     private final ScheduledExecutorService schedulerThreadExecutor;
 
-    private Long lastSuccessHeartbeat;
+    private volatile long lastSuccessHeartbeat;
+
+    private static final class ClientRegistration {
+
+        private final IJdbcRegistryClient client;
+        private final JdbcRegistryClientHeartbeatDTO heartbeat;
+        private final ReentrantLock lock = new ReentrantLock();
+        private volatile boolean active = true;
+
+        private ClientRegistration(IJdbcRegistryClient client, JdbcRegistryClientHeartbeatDTO heartbeat) {
+            this.client = client;
+            this.heartbeat = heartbeat;
+        }
+    }
+
+    private static final class HeartbeatUpdateException extends RuntimeException {
+
+        private final ClientRegistration registration;
+
+        private HeartbeatUpdateException(ClientRegistration registration) {
+            super("The client heartbeat record no longer exists: " + registration.heartbeat.getId());
+            this.registration = registration;
+        }
+    }
 
     public JdbcRegistryServer(JdbcRegistryDataRepository jdbcRegistryDataRepository,
                               JdbcRegistryLockRepository jdbcRegistryLockRepository,
@@ -100,32 +128,56 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 transactionTemplate, schedulerThreadExecutor);
         this.jdbcRegistryLockManager = new JdbcRegistryLockManager(
                 jdbcRegistryProperties, jdbcRegistryLockRepository);
-        this.jdbcRegistryServerState = JdbcRegistryServerState.INIT;
         lastSuccessHeartbeat = System.currentTimeMillis();
     }
 
     @Override
     public void start() {
-        if (jdbcRegistryServerState != JdbcRegistryServerState.INIT) {
-            // The server is already started or stopped, will not start again.
-            return;
+        lifecycleLock.lock();
+        try {
+            if (serverState.get() != JdbcRegistryServerState.INIT) {
+                // The server is already started or stopped, will not start again.
+                return;
+            }
+            // Start the Purge thread
+            // The Purge thread will clear the invalidated data
+            purgeInvalidJdbcRegistryMetadata();
+            schedulerThreadExecutor.scheduleWithFixedDelay(
+                    this::purgeInvalidJdbcRegistryMetadata,
+                    jdbcRegistryProperties.getSessionTimeout().toMillis(),
+                    jdbcRegistryProperties.getSessionTimeout().toMillis(),
+                    TimeUnit.MILLISECONDS);
+            jdbcRegistryDataManager.start();
+            if (!serverState.compareAndSet(JdbcRegistryServerState.INIT, JdbcRegistryServerState.STARTED)) {
+                log.warn("The JdbcRegistryServer state changed before startup completed: {}", serverState.get());
+                return;
+            }
+        } finally {
+            lifecycleLock.unlock();
         }
-        // Start the Purge thread
-        // The Purge thread will clear the invalidated data
-        purgeInvalidJdbcRegistryMetadata();
-        schedulerThreadExecutor.scheduleWithFixedDelay(
-                this::purgeInvalidJdbcRegistryMetadata,
-                jdbcRegistryProperties.getSessionTimeout().toMillis(),
-                jdbcRegistryProperties.getSessionTimeout().toMillis(),
-                TimeUnit.MILLISECONDS);
-        jdbcRegistryDataManager.start();
-        jdbcRegistryServerState = JdbcRegistryServerState.STARTED;
+
+        lifecycleLock.lock();
+        try {
+            if (serverState.get() != JdbcRegistryServerState.STARTED) {
+                return;
+            }
+        } finally {
+            lifecycleLock.unlock();
+        }
         doTriggerOnConnectedListener();
-        schedulerThreadExecutor.scheduleWithFixedDelay(
-                this::refreshClientsHeartbeat,
-                0,
-                jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
-                TimeUnit.MILLISECONDS);
+
+        lifecycleLock.lock();
+        try {
+            if (serverState.get() == JdbcRegistryServerState.STARTED && !schedulerThreadExecutor.isShutdown()) {
+                schedulerThreadExecutor.scheduleWithFixedDelay(
+                        this::refreshClientsHeartbeat,
+                        0,
+                        jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis(),
+                        TimeUnit.MILLISECONDS);
+            }
+        } finally {
+            lifecycleLock.unlock();
+        }
     }
 
     @SneakyThrows
@@ -146,12 +198,23 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 .lastHeartbeatTime(System.currentTimeMillis())
                 .build();
 
-        if (jdbcRegistryClientDTOMap.containsKey(jdbcRegistryClientIdentify)) {
-            throw new IllegalArgumentException("The client is already registered: " + jdbcRegistryClientIdentify);
+        lifecycleLock.lock();
+        try {
+            JdbcRegistryServerState currentState = serverState.get();
+            if (currentState == JdbcRegistryServerState.STOPPED
+                    || currentState == JdbcRegistryServerState.DISCONNECTED) {
+                throw new IllegalStateException("Cannot register a client when the JdbcRegistryServer is "
+                        + currentState);
+            }
+            if (clientRegistrations.containsKey(jdbcRegistryClientIdentify)) {
+                throw new IllegalArgumentException("The client is already registered: " + jdbcRegistryClientIdentify);
+            }
+            jdbcRegistryClientRepository.insert(registryClientDTO);
+            clientRegistrations.put(
+                    jdbcRegistryClientIdentify, new ClientRegistration(jdbcRegistryClient, registryClientDTO));
+        } finally {
+            lifecycleLock.unlock();
         }
-        jdbcRegistryClientRepository.insert(registryClientDTO);
-        jdbcRegistryClients.add(jdbcRegistryClient);
-        jdbcRegistryClientDTOMap.put(jdbcRegistryClientIdentify, registryClientDTO);
     }
 
     @Override
@@ -160,15 +223,28 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         final JdbcRegistryClientIdentify clientIdentify = jdbcRegistryClient.getJdbcRegistryClientIdentify();
         checkNotNull(clientIdentify);
 
-        jdbcRegistryClients.removeIf(client -> clientIdentify.equals(client.getJdbcRegistryClientIdentify()));
-        jdbcRegistryClientDTOMap.remove(jdbcRegistryClient.getJdbcRegistryClientIdentify());
-
-        doPurgeJdbcRegistryClientInDB(Lists.newArrayList(clientIdentify.getClientId()));
+        lifecycleLock.lock();
+        try {
+            ClientRegistration registration = clientRegistrations.get(clientIdentify);
+            if (registration == null || registration.client != jdbcRegistryClient) {
+                return;
+            }
+            registration.active = false;
+            clientRegistrations.remove(clientIdentify, registration);
+            registration.lock.lock();
+            try {
+                purgeClientRegistration(registration);
+            } finally {
+                registration.lock.unlock();
+            }
+        } finally {
+            lifecycleLock.unlock();
+        }
     }
 
     @Override
     public JdbcRegistryServerState getServerState() {
-        return jdbcRegistryServerState;
+        return serverState.get();
     }
 
     @Override
@@ -256,117 +332,235 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
 
     @Override
     public void close() {
-        jdbcRegistryServerState = JdbcRegistryServerState.STOPPED;
-        schedulerThreadExecutor.shutdown();
-        List<Long> clientIds = jdbcRegistryClients.stream()
-                .map(IJdbcRegistryClient::getJdbcRegistryClientIdentify)
-                .map(JdbcRegistryClientIdentify::getClientId)
-                .collect(Collectors.toList());
-        doPurgeJdbcRegistryClientInDB(clientIds);
-        jdbcRegistryClients.clear();
-        jdbcRegistryClientDTOMap.clear();
+        List<ClientRegistration> registrationsToClose;
+        boolean waitForClose = false;
+        lifecycleLock.lock();
+        try {
+            JdbcRegistryServerState currentState = serverState.get();
+            if (currentState == JdbcRegistryServerState.STOPPED) {
+                waitForClose = true;
+                registrationsToClose = null;
+            } else if (!serverState.compareAndSet(currentState, JdbcRegistryServerState.STOPPED)) {
+                log.warn("Failed to stop JdbcRegistryServer from state {}, current state is {}",
+                        currentState,
+                        serverState.get());
+                return;
+            } else {
+                registrationsToClose = new ArrayList<>(clientRegistrations.values());
+                clientRegistrations.clear();
+                registrationsToClose.forEach(registration -> registration.active = false);
+            }
+        } finally {
+            lifecycleLock.unlock();
+        }
+
+        if (waitForClose) {
+            closeCompletion.join();
+            return;
+        }
+
+        try {
+            schedulerThreadExecutor.shutdownNow();
+            for (ClientRegistration registration : registrationsToClose) {
+                registration.lock.lock();
+                try {
+                    purgeClientRegistration(registration);
+                } finally {
+                    registration.lock.unlock();
+                }
+            }
+            try {
+                if (!schedulerThreadExecutor.awaitTermination(
+                        Math.max(1, jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis()),
+                        TimeUnit.MILLISECONDS)) {
+                    log.warn("The JdbcRegistryServer scheduler did not terminate within the close timeout.");
+                }
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                throw new IllegalStateException("Interrupted while closing the JdbcRegistryServer", ex);
+            }
+            closeCompletion.complete(null);
+        } catch (RuntimeException ex) {
+            closeCompletion.completeExceptionally(ex);
+            throw ex;
+        }
     }
 
     private void purgeInvalidJdbcRegistryMetadata() {
         final StopWatch stopWatch = StopWatch.createStarted();
-        if (jdbcRegistryServerState == JdbcRegistryServerState.STOPPED) {
+        JdbcRegistryServerState currentState = getServerState();
+        if (currentState == JdbcRegistryServerState.STOPPED
+                || currentState == JdbcRegistryServerState.DISCONNECTED) {
             return;
         }
         // remove the client which is already dead from the registry, and remove it's related data and lock.
         final List<JdbcRegistryClientHeartbeatDTO> jdbcRegistryClients = jdbcRegistryClientRepository.queryAll();
-        final Set<Long> deadJdbcRegistryClientIds = jdbcRegistryClients
-                .stream()
+        jdbcRegistryClients.stream()
                 .filter(JdbcRegistryClientHeartbeatDTO::isDead)
-                .map(JdbcRegistryClientHeartbeatDTO::getId)
-                .collect(Collectors.toSet());
-        doPurgeJdbcRegistryClientInDB(deadJdbcRegistryClientIds);
+                .filter(jdbcRegistryClient -> jdbcRegistryClientRepository.deleteByIdAndLastHeartbeatTime(
+                        jdbcRegistryClient.getId(), jdbcRegistryClient.getLastHeartbeatTime()))
+                .forEach(jdbcRegistryClient -> log.info(
+                        "Success delete dead jdbcRegistryClient: {}", jdbcRegistryClient.getId()));
 
-        // remove the data and lock which client is not exist.
-        final Set<Long> existJdbcRegistryClientIds = jdbcRegistryClients
-                .stream()
-                .map(JdbcRegistryClientHeartbeatDTO::getId)
-                .filter(id -> !deadJdbcRegistryClientIds.contains(id))
-                .collect(Collectors.toSet());
-        jdbcRegistryDataManager.getAllJdbcRegistryData()
-                .stream()
-                .filter(jdbcRegistryDataDTO -> !existJdbcRegistryClientIds.contains(jdbcRegistryDataDTO.getClientId()))
-                .filter(jdbcRegistryDataDTO -> DataType.EPHEMERAL.name().equals(jdbcRegistryDataDTO.getDataType()))
-                .forEach(jdbcRegistryData -> {
-                    log.info("Remove the JdbcRegistryData: {} which client is not exist in the registry",
-                            jdbcRegistryData);
-                    jdbcRegistryDataManager.deleteJdbcRegistryDataByKey(jdbcRegistryData.getDataKey());
-                });
-        jdbcRegistryLockRepository.queryAll()
-                .stream()
-                .filter(jdbcRegistryLockDTO -> !existJdbcRegistryClientIds.contains(jdbcRegistryLockDTO.getClientId()))
-                .forEach(jdbcRegistryLockDTO -> {
-                    log.info("Remove the JdbcRegistryLock: {} which client is not exist in the registry",
-                            jdbcRegistryLockDTO);
-                    jdbcRegistryLockRepository.deleteById(jdbcRegistryLockDTO.getId());
-                });
+        // Remove data and locks only while the database still confirms that the owner has no heartbeat.
+        purgeInactiveMetadata(null);
         stopWatch.stop();
         log.debug("Success purge invalid jdbcRegistryMetadata, cost: {} ms", stopWatch.getTime());
     }
 
-    private void doPurgeJdbcRegistryClientInDB(final Collection<Long> jdbcRegistryClientIds) {
-        if (CollectionUtils.isEmpty(jdbcRegistryClientIds)) {
-            return;
-        }
-        log.info("Begin to delete dead jdbcRegistryClient: {}", jdbcRegistryClientIds);
-        jdbcRegistryClientRepository.deleteByIds(jdbcRegistryClientIds);
-        log.info("Success delete dead jdbcRegistryClient: {}", jdbcRegistryClientIds);
+    private void purgeClientRegistration(ClientRegistration registration) {
+        Long clientId = registration.heartbeat.getId();
+        log.info("Begin to delete dead jdbcRegistryClient: {}", clientId);
+        jdbcRegistryClientRepository.deleteByIdAndLastHeartbeatTime(
+                clientId, registration.heartbeat.getLastHeartbeatTime());
+        purgeInactiveMetadata(Lists.newArrayList(clientId));
+        log.info("Success delete dead jdbcRegistryClient: {}", clientId);
+    }
+
+    private void purgeInactiveMetadata(Collection<Long> candidateClientIds) {
+        Set<Long> candidates = candidateClientIds == null
+                ? null
+                : candidateClientIds.stream().collect(Collectors.toSet());
+        jdbcRegistryDataManager.getAllJdbcRegistryData()
+                .stream()
+                .filter(jdbcRegistryDataDTO -> DataType.EPHEMERAL.name().equals(jdbcRegistryDataDTO.getDataType()))
+                .filter(jdbcRegistryDataDTO -> candidates == null
+                        || candidates.contains(jdbcRegistryDataDTO.getClientId()))
+                .forEach(jdbcRegistryData -> {
+                    log.info("Remove the JdbcRegistryData: {} which client is not exist in the registry",
+                            jdbcRegistryData);
+                    jdbcRegistryDataManager.deleteEphemeralDataIfClientInactive(jdbcRegistryData);
+                });
+        jdbcRegistryLockRepository.queryAll()
+                .stream()
+                .filter(jdbcRegistryLockDTO -> candidates == null
+                        || candidates.contains(jdbcRegistryLockDTO.getClientId()))
+                .forEach(jdbcRegistryLock -> {
+                    log.info("Remove the JdbcRegistryLock: {} which client is not exist in the registry",
+                            jdbcRegistryLock);
+                    jdbcRegistryLockManager.deleteIfInactive(jdbcRegistryLock);
+                });
     }
 
     private void refreshClientsHeartbeat() {
-        if (CollectionUtils.isEmpty(jdbcRegistryClients)) {
-            return;
-        }
-        if (jdbcRegistryServerState == JdbcRegistryServerState.STOPPED) {
-            log.warn("The JdbcRegistryServer is STOPPED, will not refresh clients: {} heartbeat.",
-                    CollectionUtils.collect(jdbcRegistryClients, IJdbcRegistryClient::getJdbcRegistryClientIdentify));
-            return;
-        }
-        // Refresh the client's term
+        List<ClientRegistration> registrations;
+        lifecycleLock.lock();
         try {
-            long now = System.currentTimeMillis();
-            for (IJdbcRegistryClient jdbcRegistryClient : jdbcRegistryClients) {
-                JdbcRegistryClientHeartbeatDTO jdbcRegistryClientHeartbeatDTO =
-                        jdbcRegistryClientDTOMap.get(jdbcRegistryClient.getJdbcRegistryClientIdentify());
-                if (jdbcRegistryClientHeartbeatDTO == null) {
-                    // This may occur when the data in db has been deleted, but the client is still alive.
-                    log.error(
-                            "The client {} is not found in the registry, will not refresh it's term. (This may happen when the client is removed from the db)",
-                            jdbcRegistryClient.getJdbcRegistryClientIdentify().getClientId());
-                    continue;
-                }
-                JdbcRegistryClientHeartbeatDTO clone = jdbcRegistryClientHeartbeatDTO.clone();
-                clone.setLastHeartbeatTime(now);
-                jdbcRegistryClientRepository.updateById(jdbcRegistryClientHeartbeatDTO);
-                jdbcRegistryClientHeartbeatDTO.setLastHeartbeatTime(clone.getLastHeartbeatTime());
+            JdbcRegistryServerState currentState = serverState.get();
+            if (currentState == JdbcRegistryServerState.STOPPED
+                    || currentState == JdbcRegistryServerState.DISCONNECTED) {
+                return;
             }
-            if (jdbcRegistryServerState == JdbcRegistryServerState.SUSPENDED) {
-                jdbcRegistryServerState = JdbcRegistryServerState.STARTED;
+            registrations = new ArrayList<>(clientRegistrations.values());
+        } finally {
+            lifecycleLock.unlock();
+        }
+        if (registrations.isEmpty()) {
+            return;
+        }
+
+        ClientRegistration failedRegistration = null;
+        try {
+            long heartbeatTime = System.currentTimeMillis();
+            for (ClientRegistration registration : registrations) {
+                failedRegistration = registration;
+                registration.lock.lock();
+                try {
+                    if (!registration.active || !isHeartbeatRefreshAllowed()) {
+                        continue;
+                    }
+                    JdbcRegistryClientHeartbeatDTO clone = registration.heartbeat.clone();
+                    clone.setLastHeartbeatTime(heartbeatTime);
+                    if (!jdbcRegistryClientRepository.updateById(clone)) {
+                        log.error("The client heartbeat has expired: {}", registration.heartbeat.getId());
+                        throw new HeartbeatUpdateException(registration);
+                    }
+                    if (registration.active) {
+                        registration.heartbeat.setLastHeartbeatTime(clone.getLastHeartbeatTime());
+                    }
+                } finally {
+                    registration.lock.unlock();
+                }
+            }
+
+            boolean reconnect = false;
+            lifecycleLock.lock();
+            try {
+                JdbcRegistryServerState currentState = serverState.get();
+                if (currentState == JdbcRegistryServerState.STOPPED
+                        || currentState == JdbcRegistryServerState.DISCONNECTED) {
+                    return;
+                }
+                if (currentState == JdbcRegistryServerState.SUSPENDED) {
+                    if (!serverState.compareAndSet(
+                            JdbcRegistryServerState.SUSPENDED, JdbcRegistryServerState.STARTED)) {
+                        log.debug("Failed to reconnect JdbcRegistryServer; current state is {}", serverState.get());
+                        return;
+                    }
+                    reconnect = true;
+                } else if (currentState != JdbcRegistryServerState.STARTED) {
+                    return;
+                }
+                lastSuccessHeartbeat = System.currentTimeMillis();
+            } finally {
+                lifecycleLock.unlock();
+            }
+            if (reconnect) {
                 doTriggerReconnectedListener();
             }
-            lastSuccessHeartbeat = now;
             log.debug("Success refresh clients: {} heartbeat.",
-                    CollectionUtils.collect(jdbcRegistryClients, IJdbcRegistryClient::getJdbcRegistryClientIdentify));
+                    registrations.stream()
+                            .map(registration -> registration.client.getJdbcRegistryClientIdentify())
+                            .collect(Collectors.toList()));
+        } catch (HeartbeatUpdateException ex) {
+            log.error("Failed to refresh the client's term", ex);
+            handleHeartbeatFailure(ex.registration);
         } catch (Exception ex) {
             log.error("Failed to refresh the client's term", ex);
-            switch (jdbcRegistryServerState) {
-                case STARTED:
-                    jdbcRegistryServerState = JdbcRegistryServerState.SUSPENDED;
-                    break;
-                case SUSPENDED:
-                    if (System.currentTimeMillis() - lastSuccessHeartbeat > jdbcRegistryProperties.getSessionTimeout()
-                            .toMillis()) {
-                        jdbcRegistryServerState = JdbcRegistryServerState.DISCONNECTED;
-                        doTriggerOnDisConnectedListener();
-                    }
-                    break;
-                default:
-                    break;
+            handleHeartbeatFailure(failedRegistration);
+        }
+    }
+
+    private boolean isHeartbeatRefreshAllowed() {
+        JdbcRegistryServerState currentState = serverState.get();
+        return currentState != JdbcRegistryServerState.STOPPED
+                && currentState != JdbcRegistryServerState.DISCONNECTED;
+    }
+
+    private void handleHeartbeatFailure(ClientRegistration failedRegistration) {
+        if (failedRegistration != null && !failedRegistration.active) {
+            return;
+        }
+        boolean disconnected = false;
+        long sessionTimeoutMillis = jdbcRegistryProperties.getSessionTimeout().toMillis();
+        lifecycleLock.lock();
+        try {
+            JdbcRegistryServerState currentState = serverState.get();
+            if (currentState == JdbcRegistryServerState.STOPPED
+                    || currentState == JdbcRegistryServerState.DISCONNECTED) {
+                return;
             }
+            boolean sessionTimedOut = System.currentTimeMillis() - lastSuccessHeartbeat > sessionTimeoutMillis;
+            if (sessionTimedOut) {
+                if ((currentState == JdbcRegistryServerState.STARTED
+                        || currentState == JdbcRegistryServerState.SUSPENDED)
+                        && serverState.compareAndSet(currentState, JdbcRegistryServerState.DISCONNECTED)) {
+                    disconnected = true;
+                } else {
+                    log.debug("Failed to disconnect JdbcRegistryServer from state {}, current state is {}",
+                            currentState,
+                            serverState.get());
+                }
+            } else if (currentState == JdbcRegistryServerState.STARTED
+                    && !serverState.compareAndSet(
+                            JdbcRegistryServerState.STARTED, JdbcRegistryServerState.SUSPENDED)) {
+                log.debug("Failed to suspend JdbcRegistryServer; current state is {}", serverState.get());
+            }
+        } finally {
+            lifecycleLock.unlock();
+        }
+        if (disconnected) {
+            doTriggerOnDisConnectedListener();
         }
     }
 

@@ -47,8 +47,16 @@ public class JdbcRegistryDataRepository {
                 .map(JdbcRegistryDataDTO::fromJdbcRegistryData);
     }
 
-    public void deleteByKey(String key) {
-        jdbcRegistryDataMapper.deleteByKey(key);
+    public boolean deleteByKey(String key) {
+        return jdbcRegistryDataMapper.deleteByKey(key) == 1;
+    }
+
+    public boolean deleteByKeyAndId(String key, Long id) {
+        return jdbcRegistryDataMapper.deleteByKeyAndId(key, id) == 1;
+    }
+
+    public boolean deleteEphemeralByKeyAndInactiveClient(String dataKey, Long clientId) {
+        return jdbcRegistryDataMapper.deleteEphemeralByKeyAndInactiveClient(dataKey, clientId) == 1;
     }
 
     public void insert(JdbcRegistryDataDTO jdbcRegistryData) {
@@ -57,7 +65,7 @@ public class JdbcRegistryDataRepository {
         jdbcRegistryData.setId(jdbcRegistryDataDO.getId());
     }
 
-    public void updateById(JdbcRegistryDataDTO jdbcRegistryDataDTO) {
-        jdbcRegistryDataMapper.updateById(JdbcRegistryDataDTO.toJdbcRegistryData(jdbcRegistryDataDTO));
+    public boolean updateById(JdbcRegistryDataDTO jdbcRegistryDataDTO) {
+        return jdbcRegistryDataMapper.updateById(JdbcRegistryDataDTO.toJdbcRegistryData(jdbcRegistryDataDTO)) == 1;
     }
 }
