@@ -36,4 +36,12 @@ public interface JdbcRegistryLockMapper extends BaseMapper<JdbcRegistryLock> {
             "</foreach>",
             "</script>"})
     void deleteByClientIds(@Param("clientIds") List<Long> clientIds);
+
+    @Delete("delete from t_ds_jdbc_registry_lock "
+            + "where id = #{lockId} "
+            + "and client_id = #{clientId} "
+            + "and not exists ("
+            + "select 1 from t_ds_jdbc_registry_client_heartbeat h "
+            + "where h.id = t_ds_jdbc_registry_lock.client_id)")
+    int deleteByIdAndInactiveClient(@Param("lockId") Long lockId, @Param("clientId") Long clientId);
 }

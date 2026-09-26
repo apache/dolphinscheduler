@@ -52,6 +52,10 @@ public class JdbcRegistryClientRepository {
         jdbcRegistryClientHeartbeatMapper.deleteBatchIds(clientIds);
     }
 
+    public boolean deleteByIdAndLastHeartbeatTime(Long clientId, Long lastHeartbeatTime) {
+        return jdbcRegistryClientHeartbeatMapper.deleteByIdAndLastHeartbeatTime(clientId, lastHeartbeatTime) == 1;
+    }
+
     public boolean updateById(JdbcRegistryClientHeartbeatDTO jdbcRegistryClientHeartbeatDTO) {
         JdbcRegistryClientHeartbeat jdbcRegistryClientHeartbeat =
                 JdbcRegistryClientHeartbeatDTO.toJdbcRegistryClientHeartbeat(jdbcRegistryClientHeartbeatDTO);

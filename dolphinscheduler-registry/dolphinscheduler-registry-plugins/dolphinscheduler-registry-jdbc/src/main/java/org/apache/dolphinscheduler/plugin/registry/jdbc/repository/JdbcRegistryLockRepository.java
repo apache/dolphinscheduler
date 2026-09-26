@@ -52,4 +52,8 @@ public class JdbcRegistryLockRepository {
     public void deleteById(Long id) {
         jdbcRegistryLockMapper.deleteById(id);
     }
+
+    public boolean deleteByIdAndInactiveClient(Long lockId, Long clientId) {
+        return jdbcRegistryLockMapper.deleteByIdAndInactiveClient(lockId, clientId) == 1;
+    }
 }

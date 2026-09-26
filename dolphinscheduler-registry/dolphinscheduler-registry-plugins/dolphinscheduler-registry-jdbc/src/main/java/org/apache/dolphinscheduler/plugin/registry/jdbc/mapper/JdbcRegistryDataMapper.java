@@ -36,7 +36,10 @@ public interface JdbcRegistryDataMapper extends BaseMapper<JdbcRegistryData> {
     JdbcRegistryData selectByKey(@Param("key") String key);
 
     @Delete("delete from t_ds_jdbc_registry_data where data_key = #{key}")
-    void deleteByKey(@Param("key") String key);
+    int deleteByKey(@Param("key") String key);
+
+    @Delete("delete from t_ds_jdbc_registry_data where data_key = #{key} and id = #{id}")
+    int deleteByKeyAndId(@Param("key") String key, @Param("id") Long id);
 
     @Delete({"<script>",
             "delete from t_ds_jdbc_registry_data",
@@ -47,5 +50,15 @@ public interface JdbcRegistryDataMapper extends BaseMapper<JdbcRegistryData> {
             "and data_type = #{dataType}",
             "</script>"})
     void deleteByClientIds(@Param("clientIds") List<Long> clientIds, @Param("dataType") String dataType);
+
+    @Delete("delete from t_ds_jdbc_registry_data "
+            + "where data_key = #{dataKey} "
+            + "and client_id = #{clientId} "
+            + "and data_type = 'EPHEMERAL' "
+            + "and not exists ("
+            + "select 1 from t_ds_jdbc_registry_client_heartbeat h "
+            + "where h.id = t_ds_jdbc_registry_data.client_id)")
+    int deleteEphemeralByKeyAndInactiveClient(@Param("dataKey") String dataKey,
+                                              @Param("clientId") Long clientId);
 
 }

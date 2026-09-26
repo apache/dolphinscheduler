@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.plugin.registry.jdbc.mapper;
 
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DO.JdbcRegistryClientHeartbeat;
 
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -29,5 +31,10 @@ public interface JdbcRegistryClientHeartbeatMapper extends BaseMapper<JdbcRegist
 
     @Select("select * from t_ds_jdbc_registry_client_heartbeat")
     List<JdbcRegistryClientHeartbeat> selectAll();
+
+    @Delete("delete from t_ds_jdbc_registry_client_heartbeat "
+            + "where id = #{id} and last_heartbeat_time = #{lastHeartbeatTime}")
+    int deleteByIdAndLastHeartbeatTime(@Param("id") Long id,
+                                       @Param("lastHeartbeatTime") Long lastHeartbeatTime);
 
 }
