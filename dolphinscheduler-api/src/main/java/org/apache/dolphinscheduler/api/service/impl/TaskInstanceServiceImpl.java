@@ -106,23 +106,23 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
      * @return task list page
      */
     @Override
-    public Result queryTaskListPaging(User loginUser,
-                                      long projectCode,
-                                      Integer workflowInstanceId,
-                                      String workflowInstanceName,
-                                      String workflowDefinitionName,
-                                      String taskName,
-                                      Long taskCode,
-                                      String executorName,
-                                      String startDate,
-                                      String endDate,
-                                      String searchVal,
-                                      TaskExecutionStatus stateType,
-                                      String host,
-                                      TaskExecuteType taskExecuteType,
-                                      Integer pageNo,
-                                      Integer pageSize) {
-        Result result = new Result();
+    public Result<PageInfo<TaskInstance>> queryTaskListPaging(User loginUser,
+                                                              long projectCode,
+                                                              Integer workflowInstanceId,
+                                                              String workflowInstanceName,
+                                                              String workflowDefinitionName,
+                                                              String taskName,
+                                                              Long taskCode,
+                                                              String executorName,
+                                                              String startDate,
+                                                              String endDate,
+                                                              String searchVal,
+                                                              TaskExecutionStatus stateType,
+                                                              String host,
+                                                              TaskExecuteType taskExecuteType,
+                                                              Integer pageNo,
+                                                              Integer pageSize) {
+        Result<PageInfo<TaskInstance>> result = new Result<>();
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, TASK_INSTANCE);
         int[] statusArray = null;

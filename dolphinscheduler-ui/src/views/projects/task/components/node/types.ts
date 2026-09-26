@@ -64,6 +64,7 @@ interface ILocalParam {
   direct?: string
   type?: string
   value?: string
+  sensitive?: boolean
 }
 
 interface ILabel {
@@ -301,6 +302,7 @@ interface ITaskParams {
   condition?: string
   connectTimeout?: number
   socketTimeout?: number
+  socketKeepAlive?: boolean
   type?: string
   datasource?: string
   sql?: string

@@ -41,6 +41,7 @@ import { useRoute } from 'vue-router'
 import { verifyName } from '@/service/modules/workflow-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
+import { applySensitiveToggle } from '@/utils/sensitive-param'
 import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
 
 const props = {
@@ -156,7 +157,8 @@ export default defineComponent({
             key: param.prop,
             value: param.value,
             direct: param.direct,
-            type: param.type
+            type: param.type,
+            sensitive: param.sensitive || false
           })
         )
       }
@@ -243,7 +245,8 @@ export default defineComponent({
                   key: '',
                   direct: 'IN',
                   type: 'VARCHAR',
-                  value: ''
+                  value: '',
+                  sensitive: false
                 }
               }}
               class='input-global-params'
@@ -255,10 +258,11 @@ export default defineComponent({
                     direct: string
                     type: string
                     value: string
+                    sensitive?: boolean
                   }
                 }) => (
                   <NGrid xGap={12} cols={24}>
-                    <NGridItem span={6}>
+                    <NGridItem span={5}>
                       <NInput
                         v-model:value={param.value.key}
                         placeholder={t('project.dag.key')}
@@ -274,7 +278,7 @@ export default defineComponent({
                         defaultValue={'IN'}
                       />
                     </NGridItem>
-                    <NGridItem span={7}>
+                    <NGridItem span={5}>
                       <NSelect
                         options={[
                           { value: 'VARCHAR', label: 'VARCHAR' },
@@ -292,11 +296,21 @@ export default defineComponent({
                         defaultValue={'VARCHAR'}
                       />
                     </NGridItem>
-                    <NGridItem span={6}>
+                    <NGridItem span={5}>
                       <NInput
                         v-model:value={param.value.value}
                         placeholder={t('project.dag.value')}
                       />
+                    </NGridItem>
+                    <NGridItem span={4}>
+                      <NCheckbox
+                        checked={param.value.sensitive}
+                        onUpdateChecked={(checked: boolean) =>
+                          applySensitiveToggle(param.value, checked)
+                        }
+                      >
+                        {t('project.dag.sensitive')}
+                      </NCheckbox>
                     </NGridItem>
                   </NGrid>
                 )
