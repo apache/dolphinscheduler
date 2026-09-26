@@ -185,13 +185,13 @@ class JdbcRegistryServerTest {
         Map<JdbcRegistryClientIdentify, JdbcRegistryClientHeartbeatDTO> heartbeatMap =
                 (Map<JdbcRegistryClientIdentify, JdbcRegistryClientHeartbeatDTO>) ReflectionTestUtils
                         .getField(jdbcRegistryServer, "jdbcRegistryClientDTOMap");
-        long originalHeartbeat = heartbeatMap.get(CLIENT_IDENTIFY).getLastHeartbeatTime();
+        heartbeatMap.get(CLIENT_IDENTIFY).setLastHeartbeatTime(0L);
 
         ReflectionTestUtils.invokeMethod(jdbcRegistryServer, "refreshClientsHeartbeat");
 
         Truth.assertThat(updateInvocations.get()).isEqualTo(2);
         Truth.assertThat(jdbcRegistryServer.getServerState()).isEqualTo(JdbcRegistryServerState.SUSPENDED);
-        Truth.assertThat(heartbeatMap.get(CLIENT_IDENTIFY).getLastHeartbeatTime()).isGreaterThan(originalHeartbeat);
+        Truth.assertThat(heartbeatMap.get(CLIENT_IDENTIFY).getLastHeartbeatTime()).isGreaterThan(0L);
         Mockito.verify(connectionStateListener, Mockito.never()).onReconnected();
         Mockito.verify(connectionStateListener, Mockito.never()).onDisConnected();
     }
