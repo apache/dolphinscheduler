@@ -83,7 +83,7 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
 
     private final ScheduledExecutorService schedulerThreadExecutor;
 
-    private Long lastSuccessHeartbeat;
+    private volatile long lastSuccessHeartbeat;
 
     public JdbcRegistryServer(JdbcRegistryDataRepository jdbcRegistryDataRepository,
                               JdbcRegistryLockRepository jdbcRegistryLockRepository,
@@ -120,7 +120,10 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 jdbcRegistryProperties.getSessionTimeout().toMillis(),
                 TimeUnit.MILLISECONDS);
         jdbcRegistryDataManager.start();
-        serverState.set(JdbcRegistryServerState.STARTED);
+        if (!serverState.compareAndSet(JdbcRegistryServerState.INIT, JdbcRegistryServerState.STARTED)) {
+            log.warn("The JdbcRegistryServer state changed before startup completed: {}", serverState.get());
+            return;
+        }
         doTriggerOnConnectedListener();
         schedulerThreadExecutor.scheduleWithFixedDelay(
                 this::refreshClientsHeartbeat,
@@ -258,8 +261,15 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
     @Override
     public void close() {
         synchronized (this) {
-            if (serverState.getAndSet(JdbcRegistryServerState.STOPPED) == JdbcRegistryServerState.STOPPED) {
+            JdbcRegistryServerState currentState = serverState.get();
+            if (currentState == JdbcRegistryServerState.STOPPED) {
                 log.warn("The JdbcRegistryServer is already STOPPED.");
+                return;
+            }
+            if (!serverState.compareAndSet(currentState, JdbcRegistryServerState.STOPPED)) {
+                log.warn("Failed to stop JdbcRegistryServer from state {}, current state is {}",
+                        currentState,
+                        serverState.get());
                 return;
             }
         }
@@ -275,7 +285,9 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
 
     private void purgeInvalidJdbcRegistryMetadata() {
         final StopWatch stopWatch = StopWatch.createStarted();
-        if (getServerState() == JdbcRegistryServerState.STOPPED) {
+        JdbcRegistryServerState currentState = getServerState();
+        if (currentState == JdbcRegistryServerState.STOPPED
+                || currentState == JdbcRegistryServerState.DISCONNECTED) {
             return;
         }
         // remove the client which is already dead from the registry, and remove it's related data and lock.
@@ -357,52 +369,54 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
                 }
                 jdbcRegistryClientHeartbeatDTO.setLastHeartbeatTime(clone.getLastHeartbeatTime());
             }
-            transitionToStarted();
-            lastSuccessHeartbeat = now;
+            synchronized (this) {
+                currentState = serverState.get();
+                if (currentState == JdbcRegistryServerState.STOPPED
+                        || currentState == JdbcRegistryServerState.DISCONNECTED) {
+                    return;
+                }
+                if (currentState == JdbcRegistryServerState.SUSPENDED) {
+                    if (!serverState.compareAndSet(
+                            JdbcRegistryServerState.SUSPENDED, JdbcRegistryServerState.STARTED)) {
+                        log.debug("Failed to reconnect JdbcRegistryServer; current state is {}", serverState.get());
+                        return;
+                    }
+                    lastSuccessHeartbeat = now;
+                    doTriggerReconnectedListener();
+                } else if (currentState == JdbcRegistryServerState.STARTED) {
+                    lastSuccessHeartbeat = now;
+                } else {
+                    return;
+                }
+            }
             log.debug("Success refresh clients: {} heartbeat.",
                     CollectionUtils.collect(jdbcRegistryClients, IJdbcRegistryClient::getJdbcRegistryClientIdentify));
         } catch (Exception ex) {
             log.error("Failed to refresh the client's term", ex);
-            switch (getServerState()) {
-                case STARTED:
-                    transitionToSuspended();
-                    break;
-                case SUSPENDED:
-                    if (System.currentTimeMillis() - lastSuccessHeartbeat > jdbcRegistryProperties.getSessionTimeout()
-                            .toMillis()) {
-                        transitionToDisconnected();
+            long sessionTimeoutMillis = jdbcRegistryProperties.getSessionTimeout().toMillis();
+            synchronized (this) {
+                currentState = serverState.get();
+                if (currentState == JdbcRegistryServerState.STOPPED
+                        || currentState == JdbcRegistryServerState.DISCONNECTED) {
+                    return;
+                }
+                boolean sessionTimedOut = System.currentTimeMillis() - lastSuccessHeartbeat > sessionTimeoutMillis;
+                if (sessionTimedOut) {
+                    if ((currentState == JdbcRegistryServerState.STARTED
+                            || currentState == JdbcRegistryServerState.SUSPENDED)
+                            && serverState.compareAndSet(currentState, JdbcRegistryServerState.DISCONNECTED)) {
+                        doTriggerOnDisConnectedListener();
+                    } else {
+                        log.debug("Failed to disconnect JdbcRegistryServer from state {}, current state is {}",
+                                currentState,
+                                serverState.get());
                     }
-                    break;
-                default:
-                    break;
+                } else if (currentState == JdbcRegistryServerState.STARTED
+                        && !serverState.compareAndSet(
+                                JdbcRegistryServerState.STARTED, JdbcRegistryServerState.SUSPENDED)) {
+                    log.debug("Failed to suspend JdbcRegistryServer; current state is {}", serverState.get());
+                }
             }
-        }
-    }
-
-    private void transitionToStarted() {
-        if (serverState.compareAndSet(JdbcRegistryServerState.SUSPENDED, JdbcRegistryServerState.STARTED)) {
-            doTriggerReconnectedListener();
-        }
-    }
-
-    private void transitionToSuspended() {
-        if (!serverState.compareAndSet(JdbcRegistryServerState.STARTED, JdbcRegistryServerState.SUSPENDED)) {
-            log.debug("Failed to transition JdbcRegistryServer to SUSPENDED; current state is {}", serverState.get());
-        }
-    }
-
-    private void transitionToDisconnected() {
-        while (true) {
-            JdbcRegistryServerState currentState = serverState.get();
-            if (currentState != JdbcRegistryServerState.STARTED
-                    && currentState != JdbcRegistryServerState.SUSPENDED) {
-                return;
-            }
-            if (serverState.compareAndSet(currentState, JdbcRegistryServerState.DISCONNECTED)) {
-                doTriggerOnDisConnectedListener();
-                return;
-            }
-            log.debug("Failed to transition JdbcRegistryServer from {} to DISCONNECTED; retrying", currentState);
         }
     }
 

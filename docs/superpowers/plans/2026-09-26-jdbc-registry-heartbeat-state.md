@@ -63,7 +63,6 @@
 - 保持 `IJdbcRegistryServer` 和 `JdbcRegistryServerState` 不变。
 - 删除只包装单个 CAS 的 `transitionToStarted()` 和 `transitionToSuspended()`。
 - 保持 `refreshClientsHeartbeat()`、`close()` 和监听器接口签名不变。
-
 - [ ] **步骤 1：将 close 改为 CAS 终态转换**
 
 在现有 `synchronized (this)` 生命周期临界区内循环读取状态并执行 `compareAndSet(current, STOPPED)`；读取到 `STOPPED` 时直接返回。只有 CAS 成功的调用继续关闭调度器、清理数据库和清空本地集合。

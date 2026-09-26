@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryD
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryLockRepository;
 
 import java.time.Duration;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -144,19 +145,55 @@ class JdbcRegistryServerTest {
     }
 
     @Test
-    void refreshClientsHeartbeat_shouldDisconnectAfterSessionTimeoutWhenStartedHeartbeatRecordWasPurged() {
+    void refreshClientsHeartbeat_shouldDisconnectImmediatelyWhenStartedHeartbeatRecordWasPurgedAfterTimeout() {
         setServerState(JdbcRegistryServerState.STARTED);
+        ReflectionTestUtils.setField(jdbcRegistryServer, "lastSuccessHeartbeat", 0L);
+        Mockito.when(jdbcRegistryClientRepository.updateById(Mockito.any())).thenReturn(false);
+
+        ReflectionTestUtils.invokeMethod(jdbcRegistryServer, "refreshClientsHeartbeat");
+
+        Truth.assertThat(jdbcRegistryServer.getServerState()).isEqualTo(JdbcRegistryServerState.DISCONNECTED);
+        Mockito.verify(jdbcRegistryClientRepository).updateById(Mockito.any());
+        Mockito.verify(connectionStateListener).onDisConnected();
+    }
+
+    @Test
+    void refreshClientsHeartbeat_shouldSuspendWhenStartedHeartbeatRecordWasPurgedBeforeTimeout() {
+        setServerState(JdbcRegistryServerState.STARTED);
+        ReflectionTestUtils.setField(jdbcRegistryServer, "lastSuccessHeartbeat", System.currentTimeMillis());
         Mockito.when(jdbcRegistryClientRepository.updateById(Mockito.any())).thenReturn(false);
 
         ReflectionTestUtils.invokeMethod(jdbcRegistryServer, "refreshClientsHeartbeat");
 
         Truth.assertThat(jdbcRegistryServer.getServerState()).isEqualTo(JdbcRegistryServerState.SUSPENDED);
-        ReflectionTestUtils.setField(jdbcRegistryServer, "lastSuccessHeartbeat", 0L);
+        Mockito.verify(connectionStateListener, Mockito.never()).onDisConnected();
+    }
+
+    @Test
+    void refreshClientsHeartbeat_shouldKeepPartialHeartbeatUpdateWhenLaterClientFails() {
+        IJdbcRegistryClient secondClient = Mockito.mock(IJdbcRegistryClient.class);
+        JdbcRegistryClientIdentify secondClientIdentify = new JdbcRegistryClientIdentify(2L, "second-client");
+        Mockito.when(secondClient.getJdbcRegistryClientIdentify()).thenReturn(secondClientIdentify);
+        jdbcRegistryServer.registerClient(secondClient);
+        setServerState(JdbcRegistryServerState.STARTED);
+        ReflectionTestUtils.setField(jdbcRegistryServer, "lastSuccessHeartbeat", System.currentTimeMillis());
+        AtomicInteger updateInvocations = new AtomicInteger();
+        Mockito.when(jdbcRegistryClientRepository.updateById(Mockito.any()))
+                .thenAnswer(invocation -> updateInvocations.incrementAndGet() == 1);
+
+        @SuppressWarnings("unchecked")
+        Map<JdbcRegistryClientIdentify, JdbcRegistryClientHeartbeatDTO> heartbeatMap =
+                (Map<JdbcRegistryClientIdentify, JdbcRegistryClientHeartbeatDTO>) ReflectionTestUtils
+                        .getField(jdbcRegistryServer, "jdbcRegistryClientDTOMap");
+        long originalHeartbeat = heartbeatMap.get(CLIENT_IDENTIFY).getLastHeartbeatTime();
+
         ReflectionTestUtils.invokeMethod(jdbcRegistryServer, "refreshClientsHeartbeat");
 
-        Truth.assertThat(jdbcRegistryServer.getServerState()).isEqualTo(JdbcRegistryServerState.DISCONNECTED);
-        Mockito.verify(jdbcRegistryClientRepository, Mockito.times(2)).updateById(Mockito.any());
-        Mockito.verify(connectionStateListener).onDisConnected();
+        Truth.assertThat(updateInvocations.get()).isEqualTo(2);
+        Truth.assertThat(jdbcRegistryServer.getServerState()).isEqualTo(JdbcRegistryServerState.SUSPENDED);
+        Truth.assertThat(heartbeatMap.get(CLIENT_IDENTIFY).getLastHeartbeatTime()).isGreaterThan(originalHeartbeat);
+        Mockito.verify(connectionStateListener, Mockito.never()).onReconnected();
+        Mockito.verify(connectionStateListener, Mockito.never()).onDisConnected();
     }
 
     @Test
@@ -191,6 +228,7 @@ class JdbcRegistryServerTest {
     @Test
     void refreshClientsHeartbeat_shouldNotReconnectWhenCloseWinsSuccessfulHeartbeatRace() throws Exception {
         setServerState(JdbcRegistryServerState.SUSPENDED);
+        ReflectionTestUtils.setField(jdbcRegistryServer, "lastSuccessHeartbeat", 42L);
         CountDownLatch heartbeatUpdateStarted = new CountDownLatch(1);
         CountDownLatch allowHeartbeatUpdateToFinish = new CountDownLatch(1);
         Mockito.when(jdbcRegistryClientRepository.updateById(Mockito.any())).thenAnswer(invocation -> {
@@ -214,6 +252,8 @@ class JdbcRegistryServerTest {
         }
 
         Truth.assertThat(jdbcRegistryServer.getServerState()).isEqualTo(JdbcRegistryServerState.STOPPED);
+        Truth.assertThat((long) ReflectionTestUtils.getField(jdbcRegistryServer, "lastSuccessHeartbeat"))
+                .isEqualTo(42L);
         Mockito.verify(connectionStateListener, Mockito.never()).onReconnected();
         Mockito.verify(connectionStateListener, Mockito.never()).onDisConnected();
     }
