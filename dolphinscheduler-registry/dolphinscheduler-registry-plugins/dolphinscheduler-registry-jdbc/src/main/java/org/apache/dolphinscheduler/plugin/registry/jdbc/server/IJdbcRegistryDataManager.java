@@ -57,11 +57,4 @@ public interface IJdbcRegistryDataManager {
      * Delete the {@link JdbcRegistryDataDTO} by key.
      */
     void deleteJdbcRegistryDataByKey(String key);
-
-    /**
-     * Delete an ephemeral row only when its client heartbeat no longer exists.
-     *
-     * @return {@code true} when the row was actually deleted
-     */
-    boolean deleteEphemeralDataIfClientInactive(JdbcRegistryDataDTO data);
 }

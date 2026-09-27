@@ -45,8 +45,6 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
     // lockKey -> LockEntry
     private final Map<String, LockEntry> jdbcRegistryLockHolderMap = new ConcurrentHashMap<>();
 
-    private final Object lockHolderMonitor = new Object();
-
     public JdbcRegistryLockManager(JdbcRegistryProperties jdbcRegistryProperties,
                                    JdbcRegistryLockRepository jdbcRegistryLockRepository) {
         this.jdbcRegistryProperties = jdbcRegistryProperties;
@@ -57,7 +55,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
     public void acquireJdbcRegistryLock(Long clientId, String lockKey) {
         String lockOwner = LockUtils.getLockOwner();
         while (true) {
-            if (tryReenterLock(clientId, lockKey, lockOwner)) {
+            if (tryReenterLock(lockKey, lockOwner)) {
                 return;
             }
             JdbcRegistryLockDTO jdbcRegistryLock = JdbcRegistryLockDTO.builder()
@@ -67,39 +65,31 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
                     .createTime(new Date())
                     .build();
             try {
-                synchronized (lockHolderMonitor) {
-                    jdbcRegistryLockRepository.insert(jdbcRegistryLock);
+                jdbcRegistryLockRepository.insert(jdbcRegistryLock);
+                if (jdbcRegistryLock != null) {
                     jdbcRegistryLockHolderMap.put(lockKey, LockEntry.builder()
                             .lockKey(lockKey)
                             .lockOwner(lockOwner)
                             .jdbcRegistryLock(jdbcRegistryLock)
                             .build());
+                    return;
                 }
                 log.debug("{} acquire the lock {} success", lockOwner, lockKey);
-                return;
             } catch (DuplicateKeyException duplicateKeyException) {
                 // The lock is already exist, wait it release.
-                log.debug("{} failed to acquire the lock {}, it is held by another owner", lockOwner, lockKey);
+                continue;
             }
             log.debug("{} acquire the lock {} failed try again", lockOwner, lockKey);
             // acquire failed, wait and try again
-            if (!sleepBeforeRetry(jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis())) {
-                throw new IllegalStateException("Interrupted while acquiring the lock: " + lockKey);
-            }
+            ThreadUtils.sleep(jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis());
         }
     }
 
-    private boolean tryReenterLock(Long clientId, String lockKey, String lockAcquirer) {
-        synchronized (lockHolderMonitor) {
-            LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
-            if (lockEntry != null && lockAcquirer.equals(lockEntry.getLockOwner())) {
-                if (!clientId.equals(lockEntry.getJdbcRegistryLock().getClientId())) {
-                    throw new UnsupportedOperationException(
-                            "The client " + clientId + " is not the lock owner of the lock: " + lockKey);
-                }
-                lockEntry.lockCount.incrementAndGet();
-                return true;
-            }
+    private boolean tryReenterLock(String lockKey, String lockAcquirer) {
+        LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
+        if (lockEntry != null && lockAcquirer.equals(lockEntry.getLockOwner())) {
+            lockEntry.lockCount.incrementAndGet();
+            return true;
         }
         return false;
     }
@@ -109,7 +99,7 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
         String lockOwner = LockUtils.getLockOwner();
         long start = System.currentTimeMillis();
         while (System.currentTimeMillis() - start <= timeout) {
-            if (tryReenterLock(clientId, lockKey, lockOwner)) {
+            if (tryReenterLock(lockKey, lockOwner)) {
                 return true;
             }
             JdbcRegistryLockDTO jdbcRegistryLock = JdbcRegistryLockDTO.builder()
@@ -119,83 +109,47 @@ public class JdbcRegistryLockManager implements IJdbcRegistryLockManager {
                     .createTime(new Date())
                     .build();
             try {
-                synchronized (lockHolderMonitor) {
-                    jdbcRegistryLockRepository.insert(jdbcRegistryLock);
+                jdbcRegistryLockRepository.insert(jdbcRegistryLock);
+                if (jdbcRegistryLock != null) {
                     jdbcRegistryLockHolderMap.put(lockKey, LockEntry.builder()
                             .lockKey(lockKey)
                             .lockOwner(lockOwner)
                             .jdbcRegistryLock(jdbcRegistryLock)
                             .build());
+                    return true;
                 }
                 log.debug("{} acquire the lock {} success", lockOwner, lockKey);
-                return true;
             } catch (DuplicateKeyException duplicateKeyException) {
                 // The lock is already exist, wait it release.
-                log.debug("{} failed to acquire the lock {}, it is held by another owner", lockOwner, lockKey);
+                continue;
             }
             log.debug("{} acquire the lock {} failed try again", lockOwner, lockKey);
             // acquire failed, wait and try again
-            long remaining = timeout - (System.currentTimeMillis() - start);
-            if (remaining <= 0 || !sleepBeforeRetry(Math.min(
-                    remaining, jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis()))) {
-                return false;
-            }
+            ThreadUtils.sleep(jdbcRegistryProperties.getHeartbeatRefreshInterval().toMillis());
         }
         return false;
-    }
-
-    private boolean sleepBeforeRetry(long millis) {
-        if (millis <= 0 || Thread.currentThread().isInterrupted()) {
-            return false;
-        }
-        ThreadUtils.sleep(millis);
-        return !Thread.currentThread().isInterrupted();
     }
 
     @Override
     public void releaseJdbcRegistryLock(Long clientId, String lockKey) {
         String lockOwner = LockUtils.getLockOwner();
-        LockEntry lockEntry;
-        synchronized (lockHolderMonitor) {
-            lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
-            if (lockEntry == null || !lockOwner.equals(lockEntry.getLockOwner())) {
-                return;
-            }
-            if (!clientId.equals(lockEntry.getJdbcRegistryLock().getClientId())) {
-                throw new UnsupportedOperationException(
-                        "The client " + clientId + " is not the lock owner of the lock: " + lockKey);
-            }
-            int newLockCount = lockEntry.lockCount.decrementAndGet();
-            if (newLockCount > 0) {
-                return;
-            }
-            if (newLockCount < 0) {
-                lockEntry.lockCount.incrementAndGet();
-                throw new IllegalMonitorStateException("Jdbc lock count has gone negative for lock: " + lockKey);
-            }
-            // Remove before deleting from the database so a replacement entry cannot be removed by this release.
-            jdbcRegistryLockHolderMap.remove(lockKey, lockEntry);
+        LockEntry lockEntry = jdbcRegistryLockHolderMap.get(lockKey);
+        if (lockEntry == null || !lockOwner.equals(lockEntry.getLockOwner())) {
+            return;
+        }
+        if (!clientId.equals(lockEntry.getJdbcRegistryLock().getClientId())) {
+            throw new UnsupportedOperationException(
+                    "The client " + clientId + " is not the lock owner of the lock: " + lockKey);
+        }
+        int newLockCount = lockEntry.lockCount.decrementAndGet();
+        if (newLockCount > 0) {
+            return;
+        }
+        if (newLockCount < 0) {
+            throw new IllegalMonitorStateException("Jdbc lock count has gone negative for lock: " + lockKey);
         }
         jdbcRegistryLockRepository.deleteById(lockEntry.getJdbcRegistryLock().getId());
-    }
-
-    /**
-     * Delete an inactive lock while serializing it with local acquire/release operations.
-     */
-    boolean deleteIfInactive(JdbcRegistryLockDTO jdbcRegistryLock) {
-        synchronized (lockHolderMonitor) {
-            boolean deleted = jdbcRegistryLockRepository.deleteByIdAndInactiveClient(
-                    jdbcRegistryLock.getId(), jdbcRegistryLock.getClientId());
-            if (!deleted) {
-                return false;
-            }
-            LockEntry lockEntry = jdbcRegistryLockHolderMap.get(jdbcRegistryLock.getLockKey());
-            if (lockEntry != null
-                    && jdbcRegistryLock.getId().equals(lockEntry.getJdbcRegistryLock().getId())) {
-                jdbcRegistryLockHolderMap.remove(jdbcRegistryLock.getLockKey(), lockEntry);
-            }
-            return true;
-        }
+        jdbcRegistryLockHolderMap.remove(lockKey);
     }
 
     @Data
