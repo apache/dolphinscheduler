@@ -140,6 +140,7 @@ export interface GlobalParam {
   direct: string
   type: string
   value: string
+  sensitive?: boolean
 }
 
 export interface SaveForm {

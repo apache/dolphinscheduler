@@ -8,4 +8,45 @@ This chart bootstraps all the components needed to run Apache DolphinScheduler o
 
 Please refer to the [Quick Start in Kubernetes](../../../docs/docs/en/guide/installation/kubernetes.md)
 
+## HDFS HA configuration
+
+For deployments configured to use HDFS, mount an existing ConfigMap containing `core-site.xml` and `hdfs-site.xml` into both the API and Worker containers to supply HA settings. The ConfigMap must be in the same namespace as DolphinScheduler.
+
+For example, with a ConfigMap named `hadoop-ha-config`, add the following values:
+
+```yaml
+api:
+  extraVolumes:
+    - name: hadoop-ha-config
+      configMap:
+        name: hadoop-ha-config
+  extraVolumeMounts:
+    - name: hadoop-ha-config
+      mountPath: /opt/dolphinscheduler/api-server/conf/core-site.xml
+      subPath: core-site.xml
+      readOnly: true
+    - name: hadoop-ha-config
+      mountPath: /opt/dolphinscheduler/api-server/conf/hdfs-site.xml
+      subPath: hdfs-site.xml
+      readOnly: true
+worker:
+  extraVolumes:
+    - name: hadoop-ha-config
+      configMap:
+        name: hadoop-ha-config
+  extraVolumeMounts:
+    - name: hadoop-ha-config
+      mountPath: /opt/dolphinscheduler/worker-server/conf/core-site.xml
+      subPath: core-site.xml
+      readOnly: true
+    - name: hadoop-ha-config
+      mountPath: /opt/dolphinscheduler/worker-server/conf/hdfs-site.xml
+      subPath: hdfs-site.xml
+      readOnly: true
+```
+
+Configure `fs.defaultFS` with the logical nameservice URI (for example, `hdfs://mycluster`) and include the corresponding HA settings in the XML files. Keep DolphinScheduler's filesystem configuration consistent with that URI.
+
+The paths above match the API and Worker server classpaths. Check the configuration classpath of a custom image and adjust the mount paths if needed. Individual file mounts preserve the other packaged configuration files. Restart API and Worker pods after changing the ConfigMap: Kubernetes does not update ConfigMap files mounted using `subPath`.
+
 {{ template "chart.valuesSection" . }}

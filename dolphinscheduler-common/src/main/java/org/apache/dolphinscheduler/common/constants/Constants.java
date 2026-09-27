@@ -248,8 +248,6 @@ public final class Constants {
      */
     public static final String LOCALE_LANGUAGE = "language";
 
-    public static final int SESSION_TIME_OUT = 7200;
-
     public static final int AUTHORIZE_WRITABLE_PERM = 7;
 
     public static final String START_TIME = "start time";

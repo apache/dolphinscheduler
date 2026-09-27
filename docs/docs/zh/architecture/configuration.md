@@ -260,6 +260,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | casdoor.organization-name                             |                                      | Casdoor中的组织名称                                   |
 | casdoor.application-name                              |                                      | Casdoor中的应用名称                                   |
 | casdoor.redirect-url                                  |                                      | dolphinscheduler登录URL                           |
+| api.session-timeout                                   | 2h                                   | 登录会话有效期，从登录时刻开始计算，支持 Duration 格式（如 30m、12h、1d）  |
 | api.traffic.control.global.switch                     | false                                | 流量控制全局开关                                        |
 | api.traffic.control.max-global-qps-rate               | 300                                  | 全局最大请求数/秒                                       |
 | api.traffic.control.tenant-switch                     | false                                | 流量控制租户开关                                        |
@@ -373,7 +374,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 ## dolphinscheduler_env.sh [环境变量配置]
 
-通过类似shell方式提交任务的的时候，会加载该配置文件中的环境变量到主机中。涉及到的 `JAVA_HOME`
+通过类似shell方式提交任务的时候，会加载该配置文件中的环境变量到主机中。涉及到的 `JAVA_HOME`
 任务类型的环境配置，其中任务类型主要有: Shell任务、Python任务、Spark任务、Flink任务、Datax任务等等。
 
 ```bash

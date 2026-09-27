@@ -17,8 +17,8 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.service.SessionService;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.Session;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.SessionDao;
@@ -45,6 +45,9 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
 
     @Autowired
     private SessionDao sessionDao;
+
+    @Autowired
+    private ApiConfig apiConfig;
 
     @Override
     public Session getSession(String sessionId) {
@@ -94,7 +97,8 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
 
     @Override
     public boolean isSessionExpire(Session session) {
-        return System.currentTimeMillis() - session.getLastLoginTime().getTime() >= Constants.SESSION_TIME_OUT * 1000;
+        return System.currentTimeMillis() - session.getLastLoginTime().getTime() >= apiConfig.getSessionTimeout()
+                .toMillis();
     }
 
 }
