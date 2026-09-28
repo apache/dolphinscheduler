@@ -23,12 +23,14 @@ import org.apache.dolphinscheduler.plugin.registry.jdbc.JdbcRegistryProperties;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.client.IJdbcRegistryClient;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.client.JdbcRegistryClientIdentify;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryClientHeartbeatDTO;
+import org.apache.dolphinscheduler.plugin.registry.jdbc.model.DTO.JdbcRegistryLockDTO;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryClientRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataChangeEventRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryDataRepository;
 import org.apache.dolphinscheduler.plugin.registry.jdbc.repository.JdbcRegistryLockRepository;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -443,6 +445,31 @@ class JdbcRegistryServerTest {
         ReflectionTestUtils.invokeMethod(jdbcRegistryServer, "refreshClientsHeartbeat");
 
         Mockito.verify(jdbcRegistryClientRepository, Mockito.never()).updateById(Mockito.any());
+    }
+
+    @Test
+    void purgeInvalidJdbcRegistryMetadata_shouldKeepMetadataWhenHeartbeatWasUpdatedAfterSnapshot() {
+        JdbcRegistryClientHeartbeatDTO staleHeartbeat = JdbcRegistryClientHeartbeatDTO.builder()
+                .id(CLIENT_IDENTIFY.getClientId())
+                .clientName(CLIENT_IDENTIFY.getClientName())
+                .lastHeartbeatTime(System.currentTimeMillis() - Duration.ofSeconds(2).toMillis())
+                .clientConfig(new JdbcRegistryClientHeartbeatDTO.ClientConfig(Duration.ofSeconds(1).toMillis()))
+                .build();
+        JdbcRegistryLockDTO clientLock = JdbcRegistryLockDTO.builder()
+                .id(1L)
+                .clientId(CLIENT_IDENTIFY.getClientId())
+                .build();
+        Mockito.when(jdbcRegistryClientRepository.queryAll()).thenReturn(Collections.singletonList(staleHeartbeat));
+        Mockito.when(jdbcRegistryClientRepository.deleteByIdAndLastHeartbeatTime(
+                staleHeartbeat.getId(), staleHeartbeat.getLastHeartbeatTime())).thenReturn(false);
+        Mockito.when(jdbcRegistryDataRepository.selectAll()).thenReturn(Collections.emptyList());
+        Mockito.when(jdbcRegistryLockRepository.queryAll()).thenReturn(Collections.singletonList(clientLock));
+
+        ReflectionTestUtils.invokeMethod(jdbcRegistryServer, "purgeInvalidJdbcRegistryMetadata");
+
+        Mockito.verify(jdbcRegistryClientRepository).deleteByIdAndLastHeartbeatTime(
+                staleHeartbeat.getId(), staleHeartbeat.getLastHeartbeatTime());
+        Mockito.verify(jdbcRegistryLockRepository, Mockito.never()).deleteById(clientLock.getId());
     }
 
     @SuppressWarnings("unchecked")

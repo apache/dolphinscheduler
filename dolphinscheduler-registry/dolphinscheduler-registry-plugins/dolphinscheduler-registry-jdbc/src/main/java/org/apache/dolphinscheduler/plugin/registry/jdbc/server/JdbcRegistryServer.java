@@ -295,18 +295,19 @@ public class JdbcRegistryServer implements IJdbcRegistryServer {
         }
         // remove the client which is already dead from the registry, and remove it's related data and lock.
         final List<JdbcRegistryClientHeartbeatDTO> jdbcRegistryClients = jdbcRegistryClientRepository.queryAll();
-        final Set<Long> deadJdbcRegistryClientIds = jdbcRegistryClients
+        final Set<Long> deletedJdbcRegistryClientIds = jdbcRegistryClients
                 .stream()
                 .filter(JdbcRegistryClientHeartbeatDTO::isDead)
+                .filter(jdbcRegistryClient -> jdbcRegistryClientRepository.deleteByIdAndLastHeartbeatTime(
+                        jdbcRegistryClient.getId(), jdbcRegistryClient.getLastHeartbeatTime()))
                 .map(JdbcRegistryClientHeartbeatDTO::getId)
                 .collect(Collectors.toSet());
-        doPurgeJdbcRegistryClientInDB(deadJdbcRegistryClientIds);
 
         // remove the data and lock which client is not exist.
         final Set<Long> existJdbcRegistryClientIds = jdbcRegistryClients
                 .stream()
                 .map(JdbcRegistryClientHeartbeatDTO::getId)
-                .filter(id -> !deadJdbcRegistryClientIds.contains(id))
+                .filter(id -> !deletedJdbcRegistryClientIds.contains(id))
                 .collect(Collectors.toSet());
         jdbcRegistryDataManager.getAllJdbcRegistryData()
                 .stream()
