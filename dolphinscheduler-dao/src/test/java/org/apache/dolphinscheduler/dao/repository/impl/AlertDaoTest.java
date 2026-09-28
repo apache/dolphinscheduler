@@ -19,10 +19,15 @@ package org.apache.dolphinscheduler.dao.repository.impl;
 
 import org.apache.dolphinscheduler.common.enums.AlertStatus;
 import org.apache.dolphinscheduler.common.enums.AlertType;
+import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Alert;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -214,5 +219,92 @@ class AlertDaoTest extends BaseDaoTest {
                 .filter(a -> a.getAlertType() == AlertType.TASK_RESULT)
                 .count();
         Assertions.assertEquals(1L, dbCount);
+    }
+
+    /**
+     * Duplicate calls to addAlert with the same dedup key must be skipped instead of
+     * throwing, so existing workflow alert paths stay safe once the uk_alert_dedup
+     * unique constraint applies to all inserts.
+     */
+    @Test
+    void testAddAlertIdempotent() {
+        String content = "[{\"workflowInstanceId\":888881,\"event\":\"FAILURE\"}]";
+        int workflowInstanceId = 888881;
+
+        Alert alert = new Alert();
+        alert.setTitle("Workflow Failure");
+        alert.setContent(content);
+        alert.setWarningType(WarningType.FAILURE);
+        alert.setAlertGroupId(1);
+        alert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+        alert.setWorkflowInstanceId(workflowInstanceId);
+        alert.setAlertType(AlertType.WORKFLOW_INSTANCE_FAILURE);
+        alert.setCreateTime(new java.util.Date());
+
+        int firstCount = alertDao.addAlert(alert);
+        Assertions.assertEquals(1, firstCount);
+
+        // Second insert with the same dedup key must be skipped, not throw
+        Alert duplicateAlert = new Alert();
+        duplicateAlert.setTitle("Workflow Failure");
+        duplicateAlert.setContent(content);
+        duplicateAlert.setWarningType(WarningType.FAILURE);
+        duplicateAlert.setAlertGroupId(1);
+        duplicateAlert.setAlertStatus(AlertStatus.WAIT_EXECUTION);
+        duplicateAlert.setWorkflowInstanceId(workflowInstanceId);
+        duplicateAlert.setAlertType(AlertType.WORKFLOW_INSTANCE_FAILURE);
+        duplicateAlert.setCreateTime(new java.util.Date());
+
+        int secondCount = alertDao.addAlert(duplicateAlert);
+        Assertions.assertEquals(0, secondCount);
+
+        long count = alertDao.listAlerts(workflowInstanceId)
+                .stream()
+                .filter(a -> a.getAlertType() == AlertType.WORKFLOW_INSTANCE_FAILURE)
+                .count();
+        Assertions.assertEquals(1L, count);
+    }
+
+    /**
+     * Repeated timeout alerts for the same task share the same dedup key; the unique
+     * constraint must skip the duplicate instead of throwing in the timeout alert path.
+     */
+    @Test
+    void testSendTaskTimeoutAlertIdempotent() {
+        int workflowInstanceId = 888882;
+
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setId(workflowInstanceId);
+        workflowInstance.setWarningGroupId(1);
+        workflowInstance.setProjectCode(1L);
+        workflowInstance.setWorkflowDefinitionCode(1L);
+        workflowInstance.setName("timeout-workflow");
+        workflowInstance.setCommandType(CommandType.START_PROCESS);
+        workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+        workflowInstance.setRunTimes(1);
+        workflowInstance.setStartTime(new java.util.Date());
+        workflowInstance.setHost("127.0.0.1:5678");
+
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(1);
+        taskInstance.setName("timeout-task");
+        taskInstance.setTaskType("SQL");
+        taskInstance.setStartTime(new java.util.Date());
+        taskInstance.setHost("127.0.0.1:1234");
+
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setProjectCode(1L);
+        projectUser.setProjectName("timeout-project");
+        projectUser.setUserName("admin");
+
+        // First insert should succeed, the duplicate must be skipped without throwing
+        alertDao.sendTaskTimeoutAlert(workflowInstance, taskInstance, projectUser);
+        alertDao.sendTaskTimeoutAlert(workflowInstance, taskInstance, projectUser);
+
+        long count = alertDao.listAlerts(workflowInstanceId)
+                .stream()
+                .filter(a -> a.getAlertType() == AlertType.TASK_TIMEOUT)
+                .count();
+        Assertions.assertEquals(1L, count);
     }
 }

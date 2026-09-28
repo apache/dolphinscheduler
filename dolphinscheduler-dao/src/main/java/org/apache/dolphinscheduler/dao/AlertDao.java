@@ -104,9 +104,15 @@ public class AlertDao {
 
         String sign = generateSign(alert);
         alert.setSign(sign);
-        int count = alertMapper.insert(alert);
-        log.info("add alert to db , alert: {}", alert);
-        return count;
+        try {
+            int count = alertMapper.insert(alert);
+            log.info("add alert to db , alert: {}", alert);
+            return count;
+        } catch (DuplicateKeyException e) {
+            // The uk_alert_dedup unique constraint caught a duplicate — treat as a skip.
+            log.info("skip duplicate alert, sign: {}, workflowInstanceId: {}", sign, alert.getWorkflowInstanceId());
+            return 0;
+        }
     }
 
     /**
@@ -281,7 +287,13 @@ public class AlertDao {
         alert.setUpdateTime(new Date());
         String sign = generateSign(alert);
         alert.setSign(sign);
-        alertMapper.insert(alert);
+        try {
+            alertMapper.insert(alert);
+        } catch (DuplicateKeyException e) {
+            // The uk_alert_dedup unique constraint caught a duplicate — treat as a skip.
+            log.info("skip duplicate timeout alert, sign: {}, workflowInstanceId: {}", sign,
+                    alert.getWorkflowInstanceId());
+        }
     }
 
     /**
