@@ -30,7 +30,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class FlinkArgsUtils {
 
     private FlinkArgsUtils() {
@@ -68,7 +72,7 @@ public class FlinkArgsUtils {
      */
     public static List<String> buildCancelCommandLine(TaskExecutionContext taskExecutionContext) {
         List<String> args = new ArrayList<>();
-        args.add(FlinkConstants.FLINK_COMMAND);
+        args.add(buildFlinkCommand(taskExecutionContext));
         args.add(FlinkConstants.FLINK_CANCEL);
         args.add(taskExecutionContext.getAppIds());
         return args;
@@ -80,10 +84,66 @@ public class FlinkArgsUtils {
      */
     public static List<String> buildSavePointCommandLine(TaskExecutionContext taskExecutionContext) {
         List<String> args = new ArrayList<>();
-        args.add(FlinkConstants.FLINK_COMMAND);
+        args.add(buildFlinkCommand(taskExecutionContext));
         args.add(FlinkConstants.FLINK_SAVEPOINT);
         args.add(taskExecutionContext.getAppIds());
         return args;
+    }
+
+    /**
+     * Build the flink command, with the ${FLINK_HOME} placeholder resolved.
+     *
+     * <p>The task script is executed by a shell, which expands ${FLINK_HOME} for us, but the cancel
+     * and savepoint commands are executed by {@link ProcessBuilder} directly, and it doesn't expand
+     * shell variables. So the placeholder has to be resolved before the command is executed.
+     *
+     * @param taskExecutionContext task execution context
+     * @return the flink command, with ${FLINK_HOME} resolved when it can be resolved
+     */
+    public static String buildFlinkCommand(TaskExecutionContext taskExecutionContext) {
+        String flinkHome = null;
+        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
+        if (paramsMap != null) {
+            flinkHome = ParameterUtils.convert(paramsMap).get(FlinkConstants.FLINK_HOME);
+        }
+        if (StringUtils.isEmpty(flinkHome)) {
+            flinkHome = System.getenv(FlinkConstants.FLINK_HOME);
+        }
+        if (StringUtils.isEmpty(flinkHome)) {
+            return FlinkConstants.FLINK_COMMAND;
+        }
+        return FlinkConstants.FLINK_COMMAND.replace("${" + FlinkConstants.FLINK_HOME + "}", flinkHome);
+    }
+
+    /**
+     * Execute a flink command and wait for it to finish.
+     *
+     * @param args the command arguments
+     * @return true if the command finished successfully
+     */
+    public static boolean executeCommand(List<String> args) {
+        try {
+            Process process = new ProcessBuilder(args).start();
+            if (!process.waitFor(FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                log.warn("Execute flink command timeout after {}s, args: {}",
+                        FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS, args);
+                process.destroyForcibly();
+                return false;
+            }
+            int exitCode = process.exitValue();
+            if (exitCode != 0) {
+                log.error("Execute flink command failed, exitCode: {}, args: {}", exitCode, args);
+                return false;
+            }
+            return true;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Execute flink command interrupted, args: {}", args, e);
+            return false;
+        } catch (Exception e) {
+            log.error("Execute flink command error, args: {}", args, e);
+            return false;
+        }
     }
 
     /**

@@ -19,14 +19,12 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
-import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -62,27 +60,6 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     @Override
     public AbstractParameters getParameters() {
         return flinkParameters;
-    }
-
-    @Override
-    public void cancelApplication() throws TaskException {
-        List<String> appIds = getApplicationIds();
-        if (CollectionUtils.isEmpty(appIds)) {
-            log.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
-            return;
-        }
-        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
-        List<String> args = FlinkArgsUtils.buildCancelCommandLine(taskExecutionContext);
-
-        log.info("cancel application args:{}", args);
-
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(args);
-        try {
-            processBuilder.start();
-        } catch (IOException e) {
-            throw new TaskException("cancel application error", e);
-        }
     }
 
     @Override

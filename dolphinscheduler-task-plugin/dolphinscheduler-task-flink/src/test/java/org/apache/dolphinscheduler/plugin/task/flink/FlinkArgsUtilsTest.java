@@ -18,9 +18,11 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -142,5 +144,31 @@ public class FlinkArgsUtilsTest {
         Assertions.assertTrue(initOptions.contains("set jobmanager.memory.process.size=1024m"));
         Assertions.assertTrue(initOptions.contains("set taskmanager.memory.process.size=1024m"));
         Assertions.assertTrue(initOptions.contains("set parallelism.default=4"));
+    }
+
+    @Test
+    public void testBuildCancelCommandLineResolveFlinkHome() {
+        TaskExecutionContext taskExecutionContext = buildTestTaskExecutionContext();
+        taskExecutionContext.setAppIds("1234567890abcdef1234567890abcdef");
+        taskExecutionContext.setPrepareParamsMap(Collections.singletonMap("FLINK_HOME",
+                new Property("FLINK_HOME", null, null, "/opt/flink")));
+
+        List<String> commandLine = FlinkArgsUtils.buildCancelCommandLine(taskExecutionContext);
+
+        Assertions.assertEquals("/opt/flink/bin/flink cancel 1234567890abcdef1234567890abcdef",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testBuildSavePointCommandLineResolveFlinkHome() {
+        TaskExecutionContext taskExecutionContext = buildTestTaskExecutionContext();
+        taskExecutionContext.setAppIds("1234567890abcdef1234567890abcdef");
+        taskExecutionContext.setPrepareParamsMap(Collections.singletonMap("FLINK_HOME",
+                new Property("FLINK_HOME", null, null, "/opt/flink")));
+
+        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
+
+        Assertions.assertEquals("/opt/flink/bin/flink savepoint 1234567890abcdef1234567890abcdef",
+                joinStringListWithSpace(commandLine));
     }
 }

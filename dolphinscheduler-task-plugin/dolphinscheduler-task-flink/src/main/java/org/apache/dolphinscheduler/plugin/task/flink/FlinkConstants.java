@@ -24,17 +24,27 @@ public class FlinkConstants {
     }
 
     /**
+     * flink home
+     */
+    public static final String FLINK_HOME = "FLINK_HOME";
+
+    /**
      * flink command
      * usage: flink run [OPTIONS] <jar-file> <arguments>
      */
-    public static final String FLINK_COMMAND = "${FLINK_HOME}/bin/flink";
+    public static final String FLINK_COMMAND = "${" + FLINK_HOME + "}/bin/flink";
     public static final String FLINK_RUN = "run";
 
     /**
      * flink sql command
      * usage: sql-client.sh -i <initialization file>, -f <script file>
      */
-    public static final String FLINK_SQL_COMMAND = "${FLINK_HOME}/bin/sql-client.sh";
+    public static final String FLINK_SQL_COMMAND = "${" + FLINK_HOME + "}/bin/sql-client.sh";
+
+    /**
+     * The timeout of waiting for a flink command, e.g. `flink cancel`, to finish
+     */
+    public static final int FLINK_COMMAND_TIMEOUT_SECONDS = 30;
 
     /**
      * flink run options
