@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
@@ -76,6 +77,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
     @Autowired
     private ProjectService projectService;
+
+    @Autowired
+    private ExecutorService executorService;
 
     @Autowired
     private ScheduleDao scheduleDao;
@@ -473,6 +477,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 workflowDefinitionDao.queryByCode(schedule.getWorkflowDefinitionCode()).orElse(null);
         if (!ReleaseState.ONLINE.equals(workflowDefinition.getReleaseState())) {
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_RELEASE, workflowDefinition.getName());
+        }
+        if (!executorService.checkSubWorkflowDefinitionValid(workflowDefinition)) {
+            throw new ServiceException(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE);
         }
 
         schedule.setReleaseState(ReleaseState.ONLINE);
