@@ -372,6 +372,26 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         ArgumentCaptor<Schedule> scheduleCaptor = ArgumentCaptor.forClass(Schedule.class);
         Mockito.verify(scheduleDao).insert(scheduleCaptor.capture());
         Assertions.assertSame(insertedSchedule, result);
+        Assertions.assertEquals(ReleaseState.OFFLINE, scheduleCaptor.getValue().getReleaseState());
+        Mockito.verifyNoInteractions(schedulerApi);
+    }
+
+    @Test
+    public void testOnlineSchedulerRejectsOfflineWorkflow() {
+        Schedule schedule = this.getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        WorkflowDefinition workflowDefinition = this.getProcessDefinition();
+        workflowDefinition.setReleaseState(ReleaseState.OFFLINE);
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(workflowDefinition));
+
+        ServiceException ex = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.onlineScheduler(user, projectCode, scheduleId));
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_RELEASE.getCode(), ex.getCode());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any());
+        Mockito.verifyNoInteractions(schedulerApi);
     }
 
     @Test
