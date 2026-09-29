@@ -276,6 +276,10 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
         // invalid sortField/sortOrder -> fallback to default (update_time desc, id asc)
         Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
                 definitionNames(queryPaging("foo", "bar")));
+        // invalid sortField with a valid sortOrder=asc must still yield the
+        // complete default (update_time desc, id asc), not update_time asc
+        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+                definitionNames(queryPaging("foo", "asc")));
         // sortField without sortOrder -> default direction desc
         Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
                 definitionNames(queryPaging("name", null)));

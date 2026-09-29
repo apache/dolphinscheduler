@@ -81,15 +81,25 @@
         </if>
         order by
         <choose>
-            <when test='sortField != null and "name".equals(sortField)'>name</when>
-            <when test='sortField != null and "createTime".equals(sortField)'>create_time</when>
-            <when test='sortField != null and "updateTime".equals(sortField)'>update_time</when>
-            <otherwise>update_time</otherwise>
-        </choose>
-        <choose>
-            <when test='sortOrder != null and "asc".equals(sortOrder)'>asc</when>
-            <when test='sortOrder != null and "desc".equals(sortOrder)'>desc</when>
-            <otherwise>desc</otherwise>
+            <when test='sortField != null and "name".equals(sortField)'>
+                <choose>
+                    <when test='sortOrder != null and "asc".equals(sortOrder)'>name asc</when>
+                    <otherwise>name desc</otherwise>
+                </choose>
+            </when>
+            <when test='sortField != null and "createTime".equals(sortField)'>
+                <choose>
+                    <when test='sortOrder != null and "asc".equals(sortOrder)'>create_time asc</when>
+                    <otherwise>create_time desc</otherwise>
+                </choose>
+            </when>
+            <when test='sortField != null and "updateTime".equals(sortField)'>
+                <choose>
+                    <when test='sortOrder != null and "asc".equals(sortOrder)'>update_time asc</when>
+                    <otherwise>update_time desc</otherwise>
+                </choose>
+            </when>
+            <otherwise>update_time desc</otherwise>
         </choose>
         , id asc
     </select>
