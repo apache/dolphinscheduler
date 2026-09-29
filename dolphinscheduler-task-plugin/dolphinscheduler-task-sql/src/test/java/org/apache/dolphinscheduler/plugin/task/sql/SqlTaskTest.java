@@ -542,40 +542,39 @@ class SqlTaskTest {
     }
 
     @Test
-    void testPrepareTaskResultAlertTruncatesToDisplayRows() {
+    void testPrepareTaskResultAlertKeepsFullContentRegardlessOfDisplayRows() {
         ArrayNode resultArray = JSONUtils.createArrayNode();
         for (int i = 0; i < 50; i++) {
             resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
         }
 
-        // displayRows = 3, result has 50 rows -> content should be truncated to 3
+        // displayRows is only a log-display setting, the alert content must keep all rows
         TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 3, null, 1);
 
         TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
         Assertions.assertNotNull(alertInfo);
 
         ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
-        Assertions.assertEquals(3, contentArray.size());
+        Assertions.assertEquals(50, contentArray.size());
         Assertions.assertEquals("0", contentArray.get(0).get("id").asText());
-        Assertions.assertEquals("1", contentArray.get(1).get("id").asText());
-        Assertions.assertEquals("2", contentArray.get(2).get("id").asText());
+        Assertions.assertEquals("49", contentArray.get(49).get("id").asText());
     }
 
     @Test
-    void testPrepareTaskResultAlertUsesDefaultDisplayRowsWhenUnset() {
+    void testPrepareTaskResultAlertKeepsFullContentWhenDisplayRowsUnset() {
         ArrayNode resultArray = JSONUtils.createArrayNode();
         for (int i = 0; i < 20; i++) {
             resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
         }
 
-        // displayRows = 0 means unset -> should default to DEFAULT_DISPLAY_ROWS (10)
+        // displayRows = 0 means unset, the alert content still keeps all rows
         TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 0, "default rows test", 2);
 
         TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
         Assertions.assertNotNull(alertInfo);
 
         ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
-        Assertions.assertEquals(TaskConstants.DEFAULT_DISPLAY_ROWS, contentArray.size());
+        Assertions.assertEquals(20, contentArray.size());
     }
 
     @Test

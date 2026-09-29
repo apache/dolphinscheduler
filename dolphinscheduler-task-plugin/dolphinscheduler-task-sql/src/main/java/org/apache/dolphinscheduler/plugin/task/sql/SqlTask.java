@@ -326,7 +326,7 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * Prepare task result alert info, truncating content to displayRows.
+     * Prepare task result alert info with the complete query result as content.
      */
     private void prepareTaskResultAlert(ArrayNode resultJSONArray) {
         TaskAlertInfo taskAlertInfo = new TaskAlertInfo();
@@ -334,21 +334,14 @@ public class SqlTask extends AbstractTask {
         taskAlertInfo.setTitle(StringUtils.isNotEmpty(sqlParameters.getTitle())
                 ? sqlParameters.getTitle()
                 : taskExecutionContext.getTaskName() + " query result sets");
-        int alertRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
-                : TaskConstants.DEFAULT_DISPLAY_ROWS;
-        alertRows = Math.min(alertRows, resultJSONArray.size());
-        ArrayNode alertContent = JSONUtils.createArrayNode();
-        for (int i = 0; i < alertRows; i++) {
-            alertContent.add(resultJSONArray.get(i));
-        }
-        taskAlertInfo.setContent(JSONUtils.toJsonString(alertContent));
+        taskAlertInfo.setContent(JSONUtils.toJsonString(resultJSONArray));
         taskAlertInfo.setAlertType(AlertType.TASK_RESULT);
 
         taskExecutionContext.setNeedAlert(true);
         taskExecutionContext.setTaskAlertInfo(taskAlertInfo);
-        log.debug("Prepare task result alert: title={}, alertGroupId={}, alertType={}, totalRows={}, alertRows={}",
+        log.debug("Prepare task result alert: title={}, alertGroupId={}, alertType={}, totalRows={}",
                 taskAlertInfo.getTitle(), taskAlertInfo.getAlertGroupId(), taskAlertInfo.getAlertType(),
-                resultJSONArray.size(), alertRows);
+                resultJSONArray.size());
     }
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {

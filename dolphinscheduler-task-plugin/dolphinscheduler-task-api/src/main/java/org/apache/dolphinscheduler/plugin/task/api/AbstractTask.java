@@ -126,12 +126,14 @@ public abstract class AbstractTask {
     /**
      * @deprecated Use {@link TaskExecutionContext#isNeedAlert()} on the
      *             {@code taskRequest} field instead.  This method is retained as a
-     *             compatibility bridge so that third-party task plugins compiled
-     *             against the previous AbstractTask API continue to work.
+     *             compatibility bridge so that third-party plugins compiled against
+     *             the previous AbstractTask API continue to work.  The value is merged
+     *             with the legacy field so that direct field writes from such plugins
+     *             are still honored.
      */
     @Deprecated
     public boolean getNeedAlert() {
-        return taskRequest != null && taskRequest.isNeedAlert();
+        return needAlert || (taskRequest != null && taskRequest.isNeedAlert());
     }
 
     /**
@@ -140,6 +142,7 @@ public abstract class AbstractTask {
      */
     @Deprecated
     public void setNeedAlert(boolean needAlert) {
+        this.needAlert = needAlert;
         if (taskRequest != null) {
             taskRequest.setNeedAlert(needAlert);
         }
@@ -151,6 +154,9 @@ public abstract class AbstractTask {
      */
     @Deprecated
     public TaskAlertInfo getTaskAlertInfo() {
+        if (taskAlertInfo != null) {
+            return taskAlertInfo;
+        }
         return taskRequest != null ? taskRequest.getTaskAlertInfo() : null;
     }
 
@@ -160,6 +166,7 @@ public abstract class AbstractTask {
      */
     @Deprecated
     public void setTaskAlertInfo(TaskAlertInfo taskAlertInfo) {
+        this.taskAlertInfo = taskAlertInfo;
         if (taskRequest != null) {
             taskRequest.setTaskAlertInfo(taskAlertInfo);
         }
