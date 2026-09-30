@@ -166,10 +166,8 @@ public class FlinkArgsUtilsTest {
 
     @Test
     public void testBuildSavePointCommandLine() {
-        TaskExecutionContext taskExecutionContext = buildTestTaskExecutionContext();
-        taskExecutionContext.setAppIds("1234567890abcdef1234567890abcdef");
-
-        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
+        // the Flink JobID is passed explicitly, the YARN/K8s application id is not used here
+        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef");
 
         Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef",
                 joinStringListWithSpace(commandLine));

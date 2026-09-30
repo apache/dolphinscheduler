@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -65,20 +64,22 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     public void savePoint() throws Exception {
-        List<String> appIds = getApplicationIds();
-        if (CollectionUtils.isEmpty(appIds)) {
+        // `flink savepoint` takes the Flink JobID, the YARN/K8s application id is a different
+        // identifier and must not be passed to it
+        List<String> jobIds = getFlinkJobIds();
+        if (CollectionUtils.isEmpty(jobIds)) {
             throw new TaskException(
-                    "Cannot find the application id of the flink task, taskInstanceId: "
+                    "Cannot find the flink JobID of the task, taskInstanceId: "
                             + taskExecutionContext.getTaskInstanceId());
         }
+        for (String jobId : jobIds) {
+            List<String> args = FlinkArgsUtils.buildSavePointCommandLine(jobId);
+            log.info("savepoint args:{}", args);
 
-        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
-        List<String> args = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
-        log.info("savepoint args:{}", args);
-
-        if (!executeFlinkCommand(args)) {
-            throw new TaskException(
-                    "Trigger savepoint failed, taskInstanceId: " + taskExecutionContext.getTaskInstanceId());
+            if (!executeFlinkCommand(args)) {
+                throw new TaskException("Trigger savepoint for flink job " + jobId + " failed, taskInstanceId: "
+                        + taskExecutionContext.getTaskInstanceId());
+            }
         }
     }
 }

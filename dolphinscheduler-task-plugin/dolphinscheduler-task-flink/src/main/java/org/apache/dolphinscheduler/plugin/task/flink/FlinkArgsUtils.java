@@ -97,13 +97,15 @@ public class FlinkArgsUtils {
 
     /**
      * build flink savepoint command line, the savepoint folder should be set in flink conf
-     * @return
+     *
+     * @param jobId the Flink JobID printed by `flink run`, it is not the YARN/K8s application id
+     * @return argument list
      */
-    public static List<String> buildSavePointCommandLine(TaskExecutionContext taskExecutionContext) {
+    public static List<String> buildSavePointCommandLine(String jobId) {
         List<String> args = new ArrayList<>();
         args.add(FlinkConstants.FLINK_COMMAND);
         args.add(FlinkConstants.FLINK_SAVEPOINT);
-        args.add(taskExecutionContext.getAppIds());
+        args.add(jobId);
         return args;
     }
 

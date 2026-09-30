@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +114,7 @@ public class FlinkStreamTaskTest {
 
     private TaskExecutionContext buildSavepointTaskExecutionContext(String logContent) throws Exception {
         Path logPath = tempDir.resolve("task.log");
-        Files.write(logPath, Collections.singletonList(logContent));
+        Files.write(logPath, logContent.getBytes(StandardCharsets.UTF_8));
 
         TaskExecutionContext context = new TaskExecutionContext();
         context.setTaskInstanceId(16789);
@@ -128,8 +127,10 @@ public class FlinkStreamTaskTest {
 
     @Test
     public void testSavePointCommand() throws Exception {
+        // the task log contains both identifiers, the JobID is the one `flink savepoint` takes
         TaskExecutionContext context = buildSavepointTaskExecutionContext(
-                "Submitted application application_1700000000000_0001");
+                "Job has been submitted with JobID 1234567890abcdef1234567890abcdef\n"
+                        + "Submitted application application_1700000000000_0001");
         FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
 
         List<List<String>> executedCommands = new ArrayList<>();
@@ -141,14 +142,16 @@ public class FlinkStreamTaskTest {
         task.savePoint();
 
         Assertions.assertEquals(1, executedCommands.size());
-        Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint application_1700000000000_0001",
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef",
                 String.join(" ", executedCommands.get(0)));
+        // the YARN application id is kept separate and is not passed to `flink savepoint`
+        Assertions.assertNull(context.getAppIds());
     }
 
     @Test
     public void testSavePointFailWhenCommandFailed() throws Exception {
         TaskExecutionContext context = buildSavepointTaskExecutionContext(
-                "Submitted application application_1700000000000_0001");
+                "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
         FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
 
         Mockito.doReturn(false).when(task).executeFlinkCommand(Mockito.anyList());
@@ -157,8 +160,10 @@ public class FlinkStreamTaskTest {
     }
 
     @Test
-    public void testSavePointFailWhenApplicationIdIsMissing() throws Exception {
-        TaskExecutionContext context = buildSavepointTaskExecutionContext("Flink job is running");
+    public void testSavePointFailWhenJobIdIsMissing() throws Exception {
+        // a YARN application id cannot be used as a Flink JobID
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Submitted application application_1700000000000_0001");
         FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
 
         Assertions.assertThrows(TaskException.class, task::savePoint);
