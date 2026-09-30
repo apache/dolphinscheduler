@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.model.TaskInstanceStatusCountDto;
+import org.apache.dolphinscheduler.dao.model.TaskInstanceSummaryDto;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
 import java.util.Collection;
@@ -112,33 +113,33 @@ public interface TaskInstanceDao extends IDao<TaskInstance> {
                                                                           Date endTime,
                                                                           Collection<Long> projectCodes);
 
-    List<TaskInstance> queryByWorkflowInstanceIdsAndTaskCodes(List<Integer> workflowInstanceIds,
-                                                              List<Long> taskCodes);
+    List<TaskInstanceSummaryDto> queryByWorkflowInstanceIdsAndTaskCodes(List<Integer> workflowInstanceIds,
+                                                                        List<Long> taskCodes);
 
-    IPage<TaskInstance> queryTaskInstanceListPaging(IPage<TaskInstance> page,
-                                                    Long projectCode,
-                                                    Integer workflowInstanceId,
-                                                    String workflowInstanceName,
-                                                    String searchVal,
-                                                    String taskName,
-                                                    Long taskCode,
-                                                    String executorName,
-                                                    int[] statusArray,
-                                                    String host,
-                                                    TaskExecuteType taskExecuteType,
-                                                    Date startTime,
-                                                    Date endTime);
+    IPage<TaskInstanceSummaryDto> queryTaskInstanceListPaging(IPage<TaskInstanceSummaryDto> page,
+                                                              Long projectCode,
+                                                              Integer workflowInstanceId,
+                                                              String workflowInstanceName,
+                                                              String searchVal,
+                                                              String taskName,
+                                                              Long taskCode,
+                                                              String executorName,
+                                                              int[] statusArray,
+                                                              String host,
+                                                              TaskExecuteType taskExecuteType,
+                                                              Date startTime,
+                                                              Date endTime);
 
-    IPage<TaskInstance> queryStreamTaskInstanceListPaging(IPage<TaskInstance> page,
-                                                          Long projectCode,
-                                                          String workflowDefinitionName,
-                                                          String searchVal,
-                                                          String taskName,
-                                                          Long taskCode,
-                                                          String executorName,
-                                                          int[] statusArray,
-                                                          String host,
-                                                          TaskExecuteType taskExecuteType,
-                                                          Date startTime,
-                                                          Date endTime);
+    IPage<TaskInstanceSummaryDto> queryStreamTaskInstanceListPaging(IPage<TaskInstanceSummaryDto> page,
+                                                                    Long projectCode,
+                                                                    String workflowDefinitionName,
+                                                                    String searchVal,
+                                                                    String taskName,
+                                                                    Long taskCode,
+                                                                    String executorName,
+                                                                    int[] statusArray,
+                                                                    String host,
+                                                                    TaskExecuteType taskExecuteType,
+                                                                    Date startTime,
+                                                                    Date endTime);
 }

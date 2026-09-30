@@ -19,8 +19,8 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 
@@ -44,22 +44,22 @@ public interface TaskInstanceService {
      * @param pageSize page size
      * @return task list page
      */
-    Result<PageInfo<TaskInstance>> queryTaskListPaging(User loginUser,
-                                                       long projectCode,
-                                                       Integer workflowInstanceId,
-                                                       String workflowInstanceName,
-                                                       String workflowDefinitionName,
-                                                       String taskName,
-                                                       Long taskCode,
-                                                       String executorName,
-                                                       String startDate,
-                                                       String endDate,
-                                                       String searchVal,
-                                                       TaskExecutionStatus stateType,
-                                                       String host,
-                                                       TaskExecuteType taskExecuteType,
-                                                       Integer pageNo,
-                                                       Integer pageSize);
+    Result<PageInfo<TaskInstanceSummaryVO>> queryTaskListPaging(User loginUser,
+                                                                long projectCode,
+                                                                Integer workflowInstanceId,
+                                                                String workflowInstanceName,
+                                                                String workflowDefinitionName,
+                                                                String taskName,
+                                                                Long taskCode,
+                                                                String executorName,
+                                                                String startDate,
+                                                                String endDate,
+                                                                String searchVal,
+                                                                TaskExecutionStatus stateType,
+                                                                String host,
+                                                                TaskExecuteType taskExecuteType,
+                                                                Integer pageNo,
+                                                                Integer pageSize);
 
     /**
      * change one task instance's state from failure to forced success
