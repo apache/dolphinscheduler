@@ -26,6 +26,7 @@ import AuthorizeModal from './components/authorize-modal'
 import PasswordModal from './components/password-modal'
 import Card from '@/components/card'
 import Search from '@/components/input-search'
+import { useUserStore } from '@/store/user/user'
 
 const UsersManage = defineComponent({
   name: 'user-manage',
@@ -34,6 +35,7 @@ const UsersManage = defineComponent({
     const { state, changePage, changePageSize, updateList, onOperationClick } =
       useTable()
     const { columnsRef } = useColumns(onOperationClick)
+    const userStore = useUserStore()
 
     const onAddUser = () => {
       state.detailModalShow = true
@@ -62,7 +64,8 @@ const UsersManage = defineComponent({
       onDetailModalCancel,
       onAuthorizeModalCancel,
       onPasswordModalCancel,
-      trim
+      trim,
+      userStore
     }
   },
   render() {
@@ -75,6 +78,7 @@ const UsersManage = defineComponent({
               type='primary'
               class='btn-create-user'
               size='small'
+              disabled={this.userStore.getSecurityConfigType !== 'PASSWORD'}
             >
               {this.t('security.user.create_user')}
             </NButton>

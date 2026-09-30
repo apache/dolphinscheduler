@@ -16,10 +16,11 @@
  */
 
 import { defineComponent, getCurrentInstance, toRefs } from 'vue'
-import { NForm, NFormItem, NButton, NInput } from 'naive-ui'
+import { NForm, NFormItem, NButton, NInput, NEmpty } from 'naive-ui'
 import { useForm } from './use-form'
 import { useUpdate } from './use-update'
 import Card from '@/components/card'
+import { useUserStore } from '@/store/user/user'
 
 const password = defineComponent({
   name: 'password',
@@ -27,11 +28,22 @@ const password = defineComponent({
     const { state, rules, t } = useForm()
     const { handleUpdate } = useUpdate(state)
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
+    const userStore = useUserStore()
 
-    return { ...toRefs(state), t, handleUpdate, rules, trim }
+    return { ...toRefs(state), t, handleUpdate, rules, trim, userStore }
   },
   render() {
     const { t } = this
+
+    if (this.userStore.getSecurityConfigType !== 'PASSWORD') {
+      return (
+        <Card title={t('password.edit_password')}>
+          <NEmpty
+            description={t('password.not_supported_in_non_password_mode')}
+          />
+        </Card>
+      )
+    }
 
     return (
       <Card title={t('password.edit_password')}>

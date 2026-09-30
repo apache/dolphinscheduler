@@ -97,7 +97,12 @@ export function useLogin(state: any) {
       if (authType === 'oauth2' || authType === 'oidc') {
         const sessionId = route.query.sessionId
         if (sessionId) {
-          cookies.set('sessionId', String(sessionId), { path: '/' })
+          const currentSessionId = String(sessionId)
+          await userStore.setSessionId(currentSessionId)
+          cookies.set('sessionId', currentSessionId, { path: '/' })
+          await userStore.setSecurityConfigType(
+            String(route.query.securityConfigType || authType).toUpperCase()
+          )
           const userInfoRes: UserInfoRes = await getUserInfo()
           await userStore.setUserInfo(userInfoRes)
           const timezone = userInfoRes.timeZone ? userInfoRes.timeZone : 'UTC'
