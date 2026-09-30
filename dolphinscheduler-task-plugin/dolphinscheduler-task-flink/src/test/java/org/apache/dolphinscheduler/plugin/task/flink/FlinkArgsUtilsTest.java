@@ -30,8 +30,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.condition.EnabledOnOs;
-import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 public class FlinkArgsUtilsTest {
@@ -174,7 +172,6 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
-    @EnabledOnOs(OS.LINUX)
     public void testExecuteCommandReuseTaskEnvironment() throws Exception {
         // FLINK_HOME is only defined in the task environment, not in the task parameters
         Path executePath = tempDir.resolve("execute");
