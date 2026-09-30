@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
@@ -66,14 +67,18 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void savePoint() throws Exception {
         List<String> appIds = getApplicationIds();
         if (CollectionUtils.isEmpty(appIds)) {
-            log.warn("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
-            return;
+            throw new TaskException(
+                    "Cannot find the application id of the flink task, taskInstanceId: "
+                            + taskExecutionContext.getTaskInstanceId());
         }
 
         taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
         List<String> args = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
         log.info("savepoint args:{}", args);
 
-        FlinkArgsUtils.executeCommand(taskExecutionContext, args);
+        if (!executeFlinkCommand(args)) {
+            throw new TaskException(
+                    "Trigger savepoint failed, taskInstanceId: " + taskExecutionContext.getTaskInstanceId());
+        }
     }
 }
