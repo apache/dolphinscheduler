@@ -43,6 +43,13 @@ public interface AlertMapper extends BaseMapper<Alert> {
     void insertAlertWhenServerCrash(@Param("alert") Alert alert,
                                     @Param("crashAlarmSuppressionStartTime") Date crashAlarmSuppressionStartTime);
 
+    /**
+     * Insert a task-result alert. Idempotency is enforced by the uk_alert_dedup unique constraint
+     * on (sign, workflow_instance_id, alert_type); the DAO layer catches DuplicateKeyException
+     * and treats it as a skip.
+     */
+    int insertTaskResultAlert(@Param("alert") Alert alert);
+
     void deleteByWorkflowInstanceId(@Param("workflowInstanceId") Integer processInstanceId);
 
     List<Alert> selectByWorkflowInstanceId(@Param("workflowInstanceId") Integer processInstanceId);

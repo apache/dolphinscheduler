@@ -51,6 +51,21 @@
         having count(*) = 0
     </insert>
 
+    <!--
+      Task-result alerts rely on the uk_alert_dedup unique constraint
+      on (sign, workflow_instance_id, alert_type) for idempotency.
+      The DAO layer catches DuplicateKeyException and treats it as a skip.
+    -->
+    <insert id="insertTaskResultAlert">
+        INSERT INTO t_ds_alert(sign, title, content, alert_status, warning_type, log, alertgroup_id,
+                               create_time, update_time, project_code, workflow_definition_code,
+                               workflow_instance_id, alert_type)
+        VALUES (#{alert.sign}, #{alert.title}, #{alert.content}, #{alert.alertStatus.code},
+                #{alert.warningType.code}, #{alert.log}, #{alert.alertGroupId}, #{alert.createTime},
+                #{alert.updateTime}, #{alert.projectCode}, #{alert.workflowDefinitionCode},
+                #{alert.workflowInstanceId}, #{alert.alertType.code})
+    </insert>
+
     <select id="listingAlertByStatus" resultType="org.apache.dolphinscheduler.dao.entity.Alert">
         select
         <include refid="baseSql"/>

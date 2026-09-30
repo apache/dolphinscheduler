@@ -100,6 +100,13 @@ public class AlertSender extends AbstractEventSender<Alert> {
 
     @Override
     public AlertData getAlertData(Alert event) {
+        if (event.getAlertType() == null) {
+            log.error("Alert {} has null alertType, refusing to send. This indicates the Alert Server version "
+                    + "is older than the Master that created the alert. Please upgrade the Alert Server first "
+                    + "(see upgrade guide: Alert Server -> Master -> Worker).", event.getId());
+            throw new IllegalArgumentException(
+                    "Cannot build AlertData with null alertType for alert " + event.getId());
+        }
         return AlertData.builder()
                 .id(event.getId())
                 .content(event.getContent())
