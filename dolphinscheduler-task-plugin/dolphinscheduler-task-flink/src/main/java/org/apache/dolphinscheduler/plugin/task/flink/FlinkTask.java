@@ -148,8 +148,10 @@ public class FlinkTask extends AbstractYarnTask {
      * and cancelling the application through the resource manager is the reliable way.
      *
      * @return true if the job was cancelled through the CLI, false if the caller should fall back
+     * @throws TaskException if a cancelable job was found but could not be cancelled, so that the
+     *         failure is reported instead of being hidden behind the fallback
      */
-    protected boolean cancelFlinkJob() {
+    protected boolean cancelFlinkJob() throws TaskException {
         try {
             if (CollectionUtils.isNotEmpty(getApplicationIds())) {
                 return false;
@@ -165,14 +167,15 @@ public class FlinkTask extends AbstractYarnTask {
             return false;
         }
         for (String jobId : jobIds) {
-            taskExecutionContext.setAppIds(jobId);
-            List<String> args = FlinkArgsUtils.buildCancelCommandLine(taskExecutionContext);
-            log.info("Cancel flink job, args: {}", args);
+            List<String> args = FlinkArgsUtils.buildCancelCommandLine(jobId);
+            log.info("Cancel flink job, jobId: {}, args: {}", jobId, args);
             if (!executeFlinkCommand(args)) {
-                return false;
+                throw new TaskException(String.format(
+                        "Cancel flink job %s failed, the job may still be running, taskInstanceId: %s", jobId,
+                        taskExecutionContext.getTaskInstanceId()));
             }
         }
-        log.info("Successfully cancelled flink job, jobIds: {}", jobIds);
+        log.info("Successfully cancelled flink jobs: {}", jobIds);
         return true;
     }
 
@@ -200,6 +203,6 @@ public class FlinkTask extends AbstractYarnTask {
      * Execute the given flink command, kept as a separate method so it can be verified in tests.
      */
     protected boolean executeFlinkCommand(List<String> args) {
-        return FlinkArgsUtils.executeCommand(args);
+        return FlinkArgsUtils.executeCommand(taskExecutionContext, args);
     }
 }

@@ -74,8 +74,6 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         List<String> args = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
         log.info("savepoint args:{}", args);
 
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(args);
-        processBuilder.start();
+        FlinkArgsUtils.executeCommand(taskExecutionContext, args);
     }
 }

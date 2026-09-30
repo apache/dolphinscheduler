@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.PARAMETER_DATETIME;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
@@ -120,8 +121,6 @@ public class FlinkTaskTest {
         context.setExecutePath(tempDir.toString());
         context.setLogPath(logPath.toString());
         context.setAppInfoPath(tempDir.resolve("appInfo.log").toString());
-        context.setPrepareParamsMap(Collections.singletonMap("FLINK_HOME",
-                new Property("FLINK_HOME", null, null, "/opt/flink")));
         return context;
     }
 
@@ -140,22 +139,23 @@ public class FlinkTaskTest {
         task.cancelApplication();
 
         Assertions.assertEquals(1, executedCommands.size());
-        Assertions.assertEquals("/opt/flink/bin/flink cancel 1234567890abcdef1234567890abcdef",
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef",
                 String.join(" ", executedCommands.get(0)));
+        // the Flink JobID must not leak into the application ids used by the YARN/K8s fallback
+        Assertions.assertNull(context.getAppIds());
     }
 
     @Test
-    public void testCancelApplicationFallbackWhenCliFailed() throws Exception {
+    public void testCancelApplicationFailWhenCliFailed() throws Exception {
         TaskExecutionContext context = buildTaskExecutionContext(
                 "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
         FlinkTask task = Mockito.spy(new FlinkTask(context));
 
         Mockito.doReturn(false).when(task).executeFlinkCommand(Mockito.anyList());
 
-        // the task has never been started, so falling back must neither throw nor kill anything
-        task.cancelApplication();
-
-        Mockito.verify(task).executeFlinkCommand(Mockito.anyList());
+        // the job was found but could not be cancelled, the failure must not be hidden by the fallback
+        Assertions.assertThrows(TaskException.class, task::cancelApplication);
+        Assertions.assertNull(context.getAppIds());
     }
 
     @Test
@@ -163,6 +163,7 @@ public class FlinkTaskTest {
         TaskExecutionContext context = buildTaskExecutionContext("Flink job is running");
         FlinkTask task = Mockito.spy(new FlinkTask(context));
 
+        // the task has never been started, so falling back must neither throw nor kill anything
         task.cancelApplication();
 
         Mockito.verify(task, Mockito.never()).executeFlinkCommand(Mockito.anyList());

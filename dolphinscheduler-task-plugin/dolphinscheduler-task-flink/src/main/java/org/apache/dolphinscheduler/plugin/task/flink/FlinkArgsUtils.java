@@ -17,15 +17,23 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +59,14 @@ public class FlinkArgsUtils {
     public static final FlinkDeployMode DEFAULT_DEPLOY_MODE = FlinkDeployMode.CLUSTER;
 
     /**
+     * The name suffix of the generated script which executes a flink command, it is suffixed with a
+     * unique value because a script can only be created once in the task working directory.
+     */
+    private static final String FLINK_COMMAND_SHELL_NAME_SUFFIX = "_flink_command_";
+
+    private static final long OUTPUT_READER_JOIN_TIMEOUT_SECONDS = 1L;
+
+    /**
      * build flink run command line
      *
      * @param param flink parameters
@@ -67,14 +83,15 @@ public class FlinkArgsUtils {
 
     /**
      * build flink cancel command line
-     * @param taskExecutionContext
-     * @return
+     *
+     * @param jobId the Flink JobID printed by `flink run`, it is not the YARN/K8s application id
+     * @return argument list
      */
-    public static List<String> buildCancelCommandLine(TaskExecutionContext taskExecutionContext) {
+    public static List<String> buildCancelCommandLine(String jobId) {
         List<String> args = new ArrayList<>();
-        args.add(buildFlinkCommand(taskExecutionContext));
+        args.add(FlinkConstants.FLINK_COMMAND);
         args.add(FlinkConstants.FLINK_CANCEL);
-        args.add(taskExecutionContext.getAppIds());
+        args.add(jobId);
         return args;
     }
 
@@ -84,58 +101,51 @@ public class FlinkArgsUtils {
      */
     public static List<String> buildSavePointCommandLine(TaskExecutionContext taskExecutionContext) {
         List<String> args = new ArrayList<>();
-        args.add(buildFlinkCommand(taskExecutionContext));
+        args.add(FlinkConstants.FLINK_COMMAND);
         args.add(FlinkConstants.FLINK_SAVEPOINT);
         args.add(taskExecutionContext.getAppIds());
         return args;
     }
 
     /**
-     * Build the flink command, with the ${FLINK_HOME} placeholder resolved.
+     * Execute a flink command in the same environment as the task itself.
      *
-     * <p>The task script is executed by a shell, which expands ${FLINK_HOME} for us, but the cancel
-     * and savepoint commands are executed by {@link ProcessBuilder} directly, and it doesn't expand
-     * shell variables. So the placeholder has to be resolved before the command is executed.
+     * <p>The task script is executed by a shell interceptor which sources shell.env_source_list and the
+     * task's custom environment, resolves the task parameters and runs as the task's tenant. The
+     * cancel / savepoint commands must reuse that environment, otherwise placeholders like
+     * ${FLINK_HOME} cannot be resolved when they are only defined in the selected task environment.
      *
      * @param taskExecutionContext task execution context
-     * @return the flink command, with ${FLINK_HOME} resolved when it can be resolved
-     */
-    public static String buildFlinkCommand(TaskExecutionContext taskExecutionContext) {
-        String flinkHome = null;
-        Map<String, Property> paramsMap = taskExecutionContext.getPrepareParamsMap();
-        if (paramsMap != null) {
-            flinkHome = ParameterUtils.convert(paramsMap).get(FlinkConstants.FLINK_HOME);
-        }
-        if (StringUtils.isEmpty(flinkHome)) {
-            flinkHome = System.getenv(FlinkConstants.FLINK_HOME);
-        }
-        if (StringUtils.isEmpty(flinkHome)) {
-            return FlinkConstants.FLINK_COMMAND;
-        }
-        return FlinkConstants.FLINK_COMMAND.replace("${" + FlinkConstants.FLINK_HOME + "}", flinkHome);
-    }
-
-    /**
-     * Execute a flink command and wait for it to finish.
-     *
      * @param args the command arguments
      * @return true if the command finished successfully
      */
-    public static boolean executeCommand(List<String> args) {
+    public static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args) {
+        return executeCommand(taskExecutionContext, args, OSUtils.isSudoEnable());
+    }
+
+    /**
+     * Same as {@link #executeCommand(TaskExecutionContext, List)}, with the sudo mode injected so that
+     * the command execution can be verified without requiring sudo permissions.
+     */
+    static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args, boolean sudoEnable) {
+        Process process = null;
         try {
-            Process process = new ProcessBuilder(args).start();
-            if (!process.waitFor(FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
-                log.warn("Execute flink command timeout after {}s, args: {}",
-                        FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS, args);
-                process.destroyForcibly();
-                return false;
+            IShellInterceptorBuilder shellInterceptorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .shellDirectory(taskExecutionContext.getExecutePath())
+                    .shellName(taskExecutionContext.getTaskAppId() + FLINK_COMMAND_SHELL_NAME_SUFFIX
+                            + System.nanoTime())
+                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
+                    .appendScript(String.join(" ", args))
+                    .sudoMode(sudoEnable)
+                    .runUser(taskExecutionContext.getTenantCode());
+            if (CollectionUtils.isNotEmpty(ShellUtils.ENV_SOURCE_LIST)) {
+                ShellUtils.ENV_SOURCE_LIST.forEach(shellInterceptorBuilder::appendSystemEnv);
             }
-            int exitCode = process.exitValue();
-            if (exitCode != 0) {
-                log.error("Execute flink command failed, exitCode: {}, args: {}", exitCode, args);
-                return false;
+            if (StringUtils.isNotBlank(taskExecutionContext.getEnvironmentConfig())) {
+                shellInterceptorBuilder.appendCustomEnvScript(taskExecutionContext.getEnvironmentConfig());
             }
-            return true;
+            process = shellInterceptorBuilder.build().execute();
+            return waitForCommand(process, args);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("Execute flink command interrupted, args: {}", args, e);
@@ -143,7 +153,48 @@ public class FlinkArgsUtils {
         } catch (Exception e) {
             log.error("Execute flink command error, args: {}", args, e);
             return false;
+        } finally {
+            if (process != null && process.isAlive()) {
+                process.destroyForcibly();
+            }
         }
+    }
+
+    /**
+     * Wait for the command to finish, consuming its output so that the command cannot block on a full
+     * pipe, and keep the output for diagnostics.
+     */
+    private static boolean waitForCommand(Process process, List<String> args) throws InterruptedException {
+        StringBuilder output = new StringBuilder();
+        Thread outputReader = new Thread(() -> {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append(System.lineSeparator());
+                }
+            } catch (IOException e) {
+                // the process has exited and its streams are closed
+            }
+        }, "flink-command-output-reader");
+        outputReader.setDaemon(true);
+        outputReader.start();
+
+        boolean finished = process.waitFor(FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        // both streams are merged into stdout by the shell interceptor, so joining the reader is enough
+        outputReader.join(TimeUnit.SECONDS.toMillis(OUTPUT_READER_JOIN_TIMEOUT_SECONDS));
+        if (!finished) {
+            process.destroyForcibly();
+            log.error("Execute flink command timeout after {}s, args: {}, output: {}",
+                    FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS, args, output);
+            return false;
+        }
+        int exitCode = process.exitValue();
+        if (exitCode != 0) {
+            log.error("Execute flink command failed, exitCode: {}, args: {}, output: {}", exitCode, args, output);
+            return false;
+        }
+        log.info("Execute flink command successfully, args: {}, output: {}", args, output);
+        return true;
     }
 
     /**
