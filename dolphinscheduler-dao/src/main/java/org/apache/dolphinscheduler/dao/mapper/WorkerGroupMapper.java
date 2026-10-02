@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -48,6 +49,14 @@ public interface WorkerGroupMapper extends BaseMapper<WorkerGroup> {
      * @return worker group list
      */
     List<WorkerGroup> queryWorkerGroupByName(@Param("name") String name);
+
+    /**
+     * query worker groups by names
+     *
+     * @param names worker group names
+     * @return worker group list
+     */
+    List<WorkerGroup> queryWorkerGroupByNames(@Param("names") Collection<String> names);
 
     int updateAddrListByWorkerGroupName(@Param("name") String name,
                                         @Param("addrList") String addrList,
