@@ -37,4 +37,24 @@ public class TaskInstanceLogFileDownloadResponse {
      */
     private boolean eof = true;
 
+    /**
+     * The file length the worker observed on this chunk's single stat; 0 when unknown (e.g. an
+     * old worker that does not report it). The API pins the download's target length to the FIRST
+     * chunk's value, so streaming a live log that keeps growing still yields a snapshot taken at
+     * request time instead of an unbounded tail.
+     */
+    private long observedLength;
+
+    /**
+     * Convenience constructor for callers that do not report {@link #observedLength} — it stays
+     * 0, i.e. unknown.
+     */
+    public TaskInstanceLogFileDownloadResponse(final byte[] logBytes, final LogResponseStatus code,
+                                               final String message, final boolean eof) {
+        this.logBytes = logBytes;
+        this.code = code;
+        this.message = message;
+        this.eof = eof;
+    }
+
 }

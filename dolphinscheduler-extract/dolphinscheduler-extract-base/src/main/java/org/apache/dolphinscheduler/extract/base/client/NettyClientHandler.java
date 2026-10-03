@@ -60,7 +60,13 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     private void processReceived(final Transporter transporter) {
         ResponseFuture future = ResponseFuture.getFuture(transporter.getHeader().getOpaque());
         if (future == null) {
-            log.warn("Cannot find the ResponseFuture if transporter: {}", transporter);
+            // Log the opaque and the body size only: Transporter's Lombok toString renders the
+            // body byte[] (a log chunk response is ~10 MB), and this branch is hit exactly when a
+            // timed-out request's late response arrives — rendering it would dump megabytes per
+            // late response into the log.
+            log.warn("Cannot find the ResponseFuture for the late response with opaque {} ({} bytes body), dropping it",
+                    transporter.getHeader().getOpaque(),
+                    transporter.getBody() == null ? 0 : transporter.getBody().length);
             return;
         }
         StandardRpcResponse deserialize = JsonSerializer.deserialize(transporter.getBody(), StandardRpcResponse.class);

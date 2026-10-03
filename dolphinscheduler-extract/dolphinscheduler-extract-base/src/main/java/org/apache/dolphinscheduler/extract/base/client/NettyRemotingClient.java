@@ -184,7 +184,11 @@ public class NettyRemotingClient implements AutoCloseable {
                 }
                 responseFuture.setCause(future.cause());
                 responseFuture.putResponse(null);
-                log.error("Send Sync request {} to host {} failed", transporter, serverHost, responseFuture.getCause());
+                // Log the small header (and the body size), never the transporter itself: its
+                // Lombok toString renders the body byte[] and request bodies can be large.
+                log.error("Send Sync request {} ({} bytes body) to host {} failed", transporter.getHeader(),
+                        transporter.getBody() == null ? 0 : transporter.getBody().length, serverHost,
+                        responseFuture.getCause());
             });
         }
         /*
@@ -214,10 +218,30 @@ public class NettyRemotingClient implements AutoCloseable {
             // alive even though the server never responds). A late response finds no future and
             // is dropped.
             responseFuture.cancel();
-            throw new RemoteTimeoutException(serverHost.toString(), timeoutMills, null);
-        } else {
-            throw new RemoteException(serverHost.toString(), null);
         }
+        // Deliberately re-read the state here: a write failure can be recorded between the cause
+        // check above and this classification (the failure drain races the timeout), so neither
+        // branch may hard-code a null cause.
+        throw buildEmptyResponseException(serverHost, responseFuture, timeoutMills);
+    }
+
+    /**
+     * Classify a request that completed without a response: {@code sendOK} means the request was
+     * written and the server simply never answered (a genuine timeout); otherwise the write
+     * itself failed and the recorded cause is the real error, which must never be dropped — a
+     * bare host string makes "worker down" indistinguishable from "slow response".
+     *
+     * <p>Package-private for tests: the timing race that makes the cause interesting (a write
+     * failure landing between the caller's cause check and this classification) cannot be driven
+     * deterministically through {@link #doSendSync}.
+     */
+    static RemoteException buildEmptyResponseException(final Host serverHost,
+                                                       final ResponseFuture responseFuture,
+                                                       final long timeoutMills) {
+        final Throwable cause = responseFuture.getCause();
+        return responseFuture.isSendOK()
+                ? new RemoteTimeoutException(serverHost.toString(), timeoutMills, cause)
+                : new RemoteException(serverHost.toString(), cause);
     }
 
     Channel getOrCreateChannel(Host host) {

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.executor.logging;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.extract.base.exception.MethodInvocationException;
+import org.apache.dolphinscheduler.extract.base.exception.MethodNotFoundException;
 import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
@@ -204,7 +206,7 @@ public class LogClientDelegateTest {
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
         when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
-                .thenThrow(new MethodInvocationException(
+                .thenThrow(new MethodNotFoundException(
                         "Cannot find the ServerMethodInvoker of getTaskInstanceLogFileChunk"));
         doThrow(new IOException("Remote log file not found after download (remote log archiving may not be enabled "
                 + "or the archive is missing): /tmp/x.log"))
@@ -275,6 +277,35 @@ public class LogClientDelegateTest {
     }
 
     /**
+     * A CURRENT worker that answered but failed the invocation (e.g. its invocation pool is
+     * full) produces the same MethodInvocationException type as an old worker would: the typed
+     * MethodNotFoundException is what separates them, so the upgrade guidance must NOT appear
+     * here — the error has to say the worker answered with an error instead.
+     */
+    @Test
+    public void testStreamWholeLogWorkerAnsweredWithErrorDoesNotSuggestUpgrade() throws Exception {
+        TaskInstance ti = newTaskInstance();
+
+        when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+                .thenThrow(new MethodInvocationException("NettyRemotingServer's thread pool is full"));
+        doThrow(new IOException("Remote log file not found after download (remote log archiving may not be enabled "
+                + "or the archive is missing): /tmp/x.log"))
+                        .when(remoteLogClient).streamWholeLog(eq(ti), any(OutputStream.class));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        IOException thrown = assertThrows(IOException.class, () -> logClientDelegate.streamWholeLog(ti, out));
+        assertFalse(thrown.getMessage().contains("upgrade required"),
+                "A saturated current worker must not be reported as needing an upgrade: " + thrown.getMessage());
+        assertTrue(thrown.getMessage().contains("the worker answered with an error"),
+                "The error must say the worker answered and failed, got: " + thrown.getMessage());
+        assertTrue(thrown.getMessage().contains("thread pool is full"),
+                "The server-side failure message must stay visible, got: " + thrown.getMessage());
+        assertTrue(thrown.getCause().getMessage().contains("Remote log file not found"));
+        assertEquals(0, out.toByteArray().length);
+    }
+
+    /**
      * A SUCCESS chunk with ZERO bytes is the worker's authoritative "task produced no output" —
      * a valid terminal state. Must return normally without touching remote storage.
      */
@@ -330,6 +361,62 @@ public class LogClientDelegateTest {
         byte[] b = new byte[len];
         System.arraycopy(full, off, b, 0, len);
         return new TaskInstanceLogFileDownloadResponse(b, LogResponseStatus.SUCCESS, null, eof);
+    }
+
+    private static TaskInstanceLogFileDownloadResponse chunkWithLength(byte[] data, boolean eof, long observedLength) {
+        final TaskInstanceLogFileDownloadResponse response =
+                new TaskInstanceLogFileDownloadResponse(data, LogResponseStatus.SUCCESS, null, eof);
+        response.setObservedLength(observedLength);
+        return response;
+    }
+
+    /**
+     * A live task keeps writing while its log is downloaded: the download must be a SNAPSHOT of
+     * the length observed on the FIRST chunk, not an unbounded tail that never reaches eof. The
+     * follow-up chunks are requested clamped to the snapshot boundary, so output written after
+     * the download started is never streamed.
+     */
+    @Test
+    public void testStreamWholeLogLiveLogStreamsTheRequestTimeSnapshot() throws Exception {
+        TaskInstance ti = newTaskInstance();
+        final int chunkSize = 8 * 1024 * 1024;
+
+        when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
+        // The first chunk pins the snapshot: 6 of 10 bytes delivered, the log already grew to 30.
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize)))
+                .thenReturn(chunkWithLength("ABCDEF".getBytes(StandardCharsets.UTF_8), false, 10));
+        // The second request is clamped to the 4 bytes left of the snapshot.
+        when(localLogClient.getLogChunk(eq(ti), eq(6L), eq(4)))
+                .thenReturn(chunkWithLength("GHIJ".getBytes(StandardCharsets.UTF_8), false, 30));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        logClientDelegate.streamWholeLog(ti, out);
+
+        assertEquals("ABCDEFGHIJ", new String(out.toByteArray(), StandardCharsets.UTF_8));
+        // Exactly the snapshot was fetched — no third request follows the growing tail.
+        verify(localLogClient, times(2)).getLogChunk(eq(ti), anyLong(), anyInt());
+    }
+
+    /**
+     * An old worker during a rolling upgrade does not report the observed length: the loop must
+     * fall back to eof-only termination and keep requesting full chunks.
+     */
+    @Test
+    public void testStreamWholeLogUnreportedObservedLengthKeepsEofOnlyTermination() throws Exception {
+        TaskInstance ti = newTaskInstance();
+        final int chunkSize = 8 * 1024 * 1024;
+
+        when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize)))
+                .thenReturn(chunkWithLength("ABCDEF".getBytes(StandardCharsets.UTF_8), false, 0));
+        when(localLogClient.getLogChunk(eq(ti), eq(6L), eq(chunkSize)))
+                .thenReturn(chunkWithLength("GHIJ".getBytes(StandardCharsets.UTF_8), true, 0));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        logClientDelegate.streamWholeLog(ti, out);
+
+        assertEquals("ABCDEFGHIJ", new String(out.toByteArray(), StandardCharsets.UTF_8));
+        verify(localLogClient, times(2)).getLogChunk(eq(ti), anyLong(), anyInt());
     }
 
     /**
@@ -417,36 +504,33 @@ public class LogClientDelegateTest {
     }
 
     /**
-     * Regression: when the first chunk fails and we fall back to remote storage, the
-     * remote file must be streamed to the OutputStream in chunks rather than loaded
-     * into a single byte[].
+     * The remote fallback must stream into the response's own OutputStream: the delegate must not
+     * buffer the archive (the OOM shape this PR removes) and must not wrap the stream. The
+     * byte-level "bounded writes, never one giant array" property is asserted where it actually
+     * lives: {@code RemoteLogClientTest#streamWholeLog_largeArchive_writesInBoundedChunks}.
      */
     @Test
-    public void testStreamWholeLogRemoteFallbackIsChunked() throws Exception {
+    public void testStreamWholeLogRemoteFallbackWritesStraightToTheResponseStream() throws Exception {
         TaskInstance ti = newTaskInstance();
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
         when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
                 .thenReturn(new TaskInstanceLogFileDownloadResponse(null, LogResponseStatus.ERROR, "down", true));
 
-        // Count how many times the mocked remote stream writes to the output stream.
-        // A byte[]-based implementation would write once; a chunked stream writes many times.
-        final int[] writeCallCount = {0};
+        final OutputStream[] streamHandedToRemote = new OutputStream[1];
         doAnswer(invocation -> {
             OutputStream out = invocation.getArgument(1);
-            // Simulate a 3-chunk stream of a large log.
-            for (int i = 0; i < 3; i++) {
-                out.write(new byte[]{0x01, 0x02});
-                writeCallCount[0]++;
-            }
+            streamHandedToRemote[0] = out;
+            out.write(new byte[]{0x01, 0x02, 0x03});
             return null;
         }).when(remoteLogClient).streamWholeLog(eq(ti), any(OutputStream.class));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         logClientDelegate.streamWholeLog(ti, out);
 
-        assertEquals(3, writeCallCount[0]);
-        assertEquals(6, out.toByteArray().length);
+        assertSame(out, streamHandedToRemote[0],
+                "the fallback must write into the response stream itself, not an intermediate buffer");
+        assertArrayEquals(new byte[]{0x01, 0x02, 0x03}, out.toByteArray());
     }
 
     private void mockRemoteStream(TaskInstance ti, byte[] data) throws IOException {

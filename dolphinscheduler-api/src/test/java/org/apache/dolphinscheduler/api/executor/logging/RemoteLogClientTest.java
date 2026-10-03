@@ -19,10 +19,13 @@ package org.apache.dolphinscheduler.api.executor.logging;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.io.ByteArrayInputStream;
@@ -32,15 +35,21 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 public class RemoteLogClientTest {
 
@@ -204,27 +213,147 @@ public class RemoteLogClientTest {
     }
 
     /**
-     * The startup sweep deletes snapshot files orphaned by a previous JVM life, keeps snapshots
-     * younger than the age gate (another live instance's in-flight transfer on a shared disk)
-     * and keeps ordinary log files.
+     * A remote download failure must FAIL the request — even when a complete archive is already
+     * cached at the log path. Snapshotting whatever file happens to sit there would report a
+     * failed (possibly truncated) download as a successful response.
      */
     @Test
-    public void deleteOrphanedSnapshots_removesOnlyAgedSnapshots(@TempDir Path tempDir) throws Exception {
+    public void streamWholeLog_remoteDownloadFailure_propagatesAndLeavesArchiveUntouched(@TempDir Path tempDir) throws Exception {
+        final Path logFile = tempDir.resolve("task.log");
+        final byte[] cached = "previously published complete log".getBytes(StandardCharsets.UTF_8);
+        Files.write(logFile, cached);
+
+        final RemoteLogClient client = new RemoteLogClient();
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (MockedStatic<RemoteLogUtils> remoteLogUtils = Mockito.mockStatic(RemoteLogUtils.class)) {
+            remoteLogUtils.when(() -> RemoteLogUtils.getRemoteLog(logFile.toString()))
+                    .thenThrow(new IOException("connection reset mid-transfer"));
+
+            final IOException thrown = assertThrows(IOException.class,
+                    () -> client.streamWholeLog(taskInstance(logFile.toString()), out));
+            assertEquals("connection reset mid-transfer", thrown.getMessage());
+        }
+
+        assertEquals(0, out.toByteArray().length, "A failed download must stream nothing");
+        assertArrayEquals(cached, Files.readAllBytes(logFile),
+                "A failed download must not touch the cached archive");
+        assertOnlyArchiveRemains(tempDir);
+    }
+
+    /**
+     * The archive is copied to the response in bounded buffers — never in a single write of the
+     * whole file. This is the memory property the chunked download exists for; a rewrite that
+     * materializes the file (or hands one giant array to {@code write}) fails here.
+     */
+    @Test
+    public void streamWholeLog_largeArchive_writesInBoundedChunks(@TempDir Path tempDir) throws Exception {
+        final Path logFile = tempDir.resolve("big.log");
+        final byte[] content = patternedBytes(512 * 1024, 251);
+        Files.write(logFile, content);
+
+        final List<Integer> writeSizes = new ArrayList<>();
+        final ByteArrayOutputStream received = new ByteArrayOutputStream();
+        final OutputStream boundedRecorder = new OutputStream() {
+
+            @Override
+            public void write(final int b) {
+                throw new AssertionError("the streaming copy must use bulk writes");
+            }
+
+            @Override
+            public void write(final byte[] b, final int off, final int len) {
+                writeSizes.add(len);
+                received.write(b, off, len);
+            }
+        };
+
+        new RemoteLogClient().streamWholeLog(taskInstance(logFile.toString()), boundedRecorder);
+
+        assertEquals(content.length, received.size(), "the full archive must arrive");
+        assertTrue(writeSizes.size() > 1, "the archive must be streamed in multiple writes");
+        assertTrue(Collections.max(writeSizes) < content.length,
+                "no single write may carry the whole file, but one carried " + Collections.max(writeSizes) + " bytes");
+    }
+
+    /**
+     * The startup sweep deletes per-download temp files (snapshots or handler staging files)
+     * orphaned by a previous JVM life, keeps files younger than the age gate (another live
+     * instance's in-flight transfer on a shared disk) and keeps ordinary log files.
+     */
+    @Test
+    public void deleteOrphanedTempFiles_removesOnlyAgedOrphans(@TempDir Path tempDir) throws Exception {
         final Path oldOrphan = tempDir.resolve("task.log.download-1111");
         Files.write(oldOrphan, new byte[]{1});
-        final Path freshSnapshot = tempDir.resolve("task.log.download-2222");
-        Files.write(freshSnapshot, new byte[]{2});
+        final Path freshTemp = tempDir.resolve("task.log.download-2222");
+        Files.write(freshTemp, new byte[]{2});
         final Path ordinaryLog = tempDir.resolve("task.log");
         Files.write(ordinaryLog, new byte[]{3});
         // Age the first file past the orphan threshold.
         oldOrphan.toFile().setLastModified(System.currentTimeMillis() - 2 * 60 * 60 * 1000L);
 
         final RemoteLogClient client = new RemoteLogClient();
-        client.deleteOrphanedSnapshots(tempDir);
+        client.deleteOrphanedTempFiles(tempDir);
 
         assertTrue(Files.notExists(oldOrphan), "Aged orphan must be swept");
-        assertTrue(Files.exists(freshSnapshot), "Snapshot within the age gate must be kept");
+        assertTrue(Files.exists(freshTemp), "Temp file within the age gate must be kept");
         assertTrue(Files.exists(ordinaryLog), "Ordinary log files must never be swept");
+    }
+
+    /**
+     * Requests for the same log coalesce on one lock: the second request waits for the in-flight
+     * download instead of re-downloading a possibly multi-GB archive.
+     */
+    @Test
+    public void logPathLockFor_samePath_coalescesOnTheSameLock() {
+        final String path = "/tmp/coalesce.log";
+        final ReentrantLock first = RemoteLogClient.lockFor(path);
+        try {
+            assertSame(first, RemoteLogClient.lockFor(path),
+                    "requests for the same log must coalesce on the same lock");
+        } finally {
+            RemoteLogClient.unlockFor(path);
+            RemoteLogClient.unlockFor(path);
+        }
+    }
+
+    /**
+     * Requests for different logs never wait behind each other — the previous fixed stripe array
+     * made unrelated logs sharing a hash stripe block for a whole remote download.
+     */
+    @Test
+    public void logPathLockFor_differentPaths_neverBlockEachOther() throws Exception {
+        final String held = "/tmp/held.log";
+        final String other = "/tmp/other.log";
+        final ReentrantLock heldLock = RemoteLogClient.lockFor(held);
+        heldLock.lock();
+        try {
+            final ReentrantLock otherLock = RemoteLogClient.lockFor(other);
+            try {
+                assertTrue(otherLock.tryLock(5, TimeUnit.SECONDS),
+                        "an unrelated log must never wait behind another log's download");
+            } finally {
+                otherLock.unlock();
+            }
+        } finally {
+            heldLock.unlock();
+            RemoteLogClient.unlockFor(held);
+            RemoteLogClient.unlockFor(other);
+        }
+    }
+
+    /** The lock entries must not leak: the entry is dropped with its last user. */
+    @Test
+    public void logPathLockFor_lastUserRelease_removesTheEntry() {
+        final String path = "/tmp/released.log";
+        final ReentrantLock first = RemoteLogClient.lockFor(path);
+        RemoteLogClient.unlockFor(path);
+
+        final ReentrantLock second = RemoteLogClient.lockFor(path);
+        try {
+            assertNotSame(first, second, "the entry must be removed once the last user releases it");
+        } finally {
+            RemoteLogClient.unlockFor(path);
+        }
     }
 
     private static TaskInstance taskInstance(final String logPath) {

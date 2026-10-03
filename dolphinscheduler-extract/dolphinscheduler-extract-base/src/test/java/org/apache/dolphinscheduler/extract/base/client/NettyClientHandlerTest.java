@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.extract.base.client;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -42,6 +43,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,7 +54,11 @@ import org.awaitility.Awaitility;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -204,6 +210,41 @@ class NettyClientHandlerTest {
         assertNull(future.waitResponse(), "Future must be failed, not completed with a response");
         assertNotNull(future.getCause(),
                 "The failing request must receive the real error promptly — not hang until timeout");
+    }
+
+    /**
+     * A late response whose future was already dropped (a timed-out request is removed from
+     * FUTURE_TABLE) must not render the response body into the log: {@code Transporter}'s Lombok
+     * toString prints the raw body byte[], which is ~10 MB for a log chunk — one late response per
+     * timeout would otherwise build megabytes of log text on the Netty event loop.
+     */
+    @Test
+    void channelRead_unknownOpaque_dropsLateResponseWithoutLoggingItsBody() {
+        final NettyRemotingClient mockClient = mock(NettyRemotingClient.class);
+        final NettyClientHandler handler = new NettyClientHandler(mockClient);
+        final EmbeddedChannel channel = new EmbeddedChannel(handler);
+
+        final byte[] bigBody = new byte[4 * 1024 * 1024];
+        Arrays.fill(bigBody, (byte) 'x');
+        // Fresh header → the opaque has no future, exactly like a late response after a timeout.
+        final Transporter lateResponse = Transporter.of(new TransporterHeader("test-method"), bigBody);
+
+        final Logger handlerLogger = (Logger) LoggerFactory.getLogger(NettyClientHandler.class);
+        final ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        handlerLogger.addAppender(appender);
+        try {
+            channel.writeInbound(lateResponse);
+        } finally {
+            handlerLogger.detachAppender(appender);
+            channel.finishAndReleaseAll();
+        }
+
+        assertEquals(1, appender.list.size(), "the dropped response must be logged exactly once");
+        final String message = appender.list.get(0).getFormattedMessage();
+        assertTrue(message.length() < 200,
+                "the log line must identify the response without rendering its body, but was " + message.length()
+                        + " chars");
     }
 
     /**

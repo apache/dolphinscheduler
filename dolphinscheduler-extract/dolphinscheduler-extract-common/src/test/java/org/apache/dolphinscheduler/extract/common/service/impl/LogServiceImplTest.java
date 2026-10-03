@@ -59,6 +59,31 @@ class LogServiceImplTest {
         }
     }
 
+    /**
+     * The chunk response reports the worker's single-stat file length: the API pins the
+     * download's snapshot target to the FIRST chunk's value, so it must be present (0 is only
+     * for workers that do not report it, e.g. during a rolling upgrade).
+     */
+    @Test
+    void getTaskInstanceLogFileChunk_reportsObservedFileLength() throws IOException {
+        Path file = Files.createTempFile("ds-chunk-observed", ".log");
+        try {
+            Files.write(file, new byte[20]);
+
+            TaskInstanceLogFileDownloadRequest req = new TaskInstanceLogFileDownloadRequest();
+            req.setTaskInstanceLogAbsolutePath(file.toString());
+            req.setOffset(0);
+            req.setLength(10);
+
+            TaskInstanceLogFileDownloadResponse resp = logService.getTaskInstanceLogFileChunk(req);
+
+            assertEquals(LogResponseStatus.SUCCESS, resp.getCode());
+            assertEquals(20, resp.getObservedLength(), "the snapshot target comes from this value");
+        } finally {
+            Files.deleteIfExists(file);
+        }
+    }
+
     @Test
     void getTaskInstanceLogFileChunk_lastChunkEof() throws IOException {
         Path file = Files.createTempFile("ds-chunk-eof", ".log");

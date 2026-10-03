@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.executor.logging;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +31,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
+import org.apache.dolphinscheduler.extract.base.RpcMethod;
+import org.apache.dolphinscheduler.extract.base.RpcService;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.extract.common.ILogService;
@@ -61,11 +64,15 @@ import org.mockito.quality.Strictness;
 /**
  * Rolling-upgrade regression test for chunked log streaming.
  *
- * <p>Simulates an OLD worker (deployed before this feature) behind a real Netty RPC server and a
- * real RPC client. The old worker would happily answer the legacy whole-file RPC (it counts and
- * would return the full payload), but it does not implement the chunked log download RPC — from
- * the client's perspective this is indistinguishable from the real deployed old worker, whose
- * server replies "Cannot find the ServerMethodInvoker" for the chunk method.
+ * <p>Two worker simulations run behind a real Netty RPC server with a real RPC client:
+ * <ul>
+ *   <li>a stub worker whose chunk call fails server-side while the legacy whole-file RPC still
+ *       works (it counts invocations and returns the full payload) — a current worker under
+ *       stress, and the strongest guard for "the whole-file payload is NEVER requested";</li>
+ *   <li>a server registered WITHOUT any log RPC, which is what a genuinely outdated worker
+ *       answers: "Cannot find the ServerMethodInvoker" — the typed not-found signal
+ *       ({@code MethodNotFoundException}) that alone justifies the upgrade guidance.</li>
+ * </ul>
  *
  * <p>The regression under test (issue #18459 review): a large log must NEVER be requested from the
  * old worker via the whole-file payload — that RPC reads the entire file into the worker's heap
@@ -75,6 +82,18 @@ import org.mockito.quality.Strictness;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class RollingUpgradeLogStreamingIntegrationTest {
+
+    /**
+     * A server-side interface with NO log RPC at all. Calling the chunk method against a server
+     * registered with it finds no invoker — exactly what a REAL old worker (whose ILogService
+     * predates the chunk method) answers: "Cannot find the ServerMethodInvoker of ...".
+     */
+    @RpcService
+    interface UnrelatedWorkerService {
+
+        @RpcMethod
+        String ping();
+    }
 
     /**
      * Larger than the 8 MB chunk size: exercises the "large log" path the reviewer is concerned
@@ -131,12 +150,11 @@ class RollingUpgradeLogStreamingIntegrationTest {
                 (proxy, method, args) -> {
                     switch (method.getName()) {
                         case "getTaskInstanceLogFileChunk":
-                            // Old worker does not implement the chunked log download RPC. A real
-                            // old worker fails with "Cannot find the ServerMethodInvoker"; throwing
-                            // here is wire-equivalent from the client's perspective (both come back
-                            // as a failed RPC → MethodInvocationException).
+                            // The stub worker's chunk call fails server-side (a current worker
+                            // whose log RPC threw). The genuinely-missing-method signal of a REAL
+                            // old worker is modelled by the unrelated-server test.
                             throw new UnsupportedOperationException(
-                                    "simulated old worker: chunked log RPC not implemented");
+                                    "simulated worker: chunked log RPC failed");
                         case "getTaskInstanceWholeLogFileBytes":
                             wholeFileRpcInvocations.incrementAndGet();
                             return new TaskInstanceLogFileDownloadResponse(
@@ -196,12 +214,14 @@ class RollingUpgradeLogStreamingIntegrationTest {
     }
 
     /**
-     * Rolling upgrade, old worker, remote log storage UNAVAILABLE (not enabled / archive missing,
-     * the default deployment): the download fails with the explicit "worker upgrade required"
-     * error — and still never asks the old worker for the whole-file payload.
+     * The worker HAS the chunk method but the call fails on the server side (the log RPC throws)
+     * and remote log storage is UNAVAILABLE: the download fails with an explicit error reporting
+     * the worker-side failure — and still never asks the worker for the whole-file payload. The
+     * upgrade guidance must NOT appear here: the worker answered, it is not outdated. Only a
+     * worker that does not have the method is (see the missing-method test below).
      */
     @Test
-    void oldWorkerLargeLogWithoutRemoteArchiveFailsWithExplicitUpgradeError() throws Exception {
+    void workerAnsweredChunkFailureWithoutRemoteArchiveFailsWithExplicitError() throws Exception {
         final TaskInstance taskInstance = newTaskInstance();
         when(registryClient.checkNodeExists(eq(taskInstance.getHost()), any(RegistryNodeType.class)))
                 .thenReturn(true);
@@ -213,10 +233,51 @@ class RollingUpgradeLogStreamingIntegrationTest {
         final IOException thrown = assertThrows(IOException.class,
                 () -> logClientDelegate.streamWholeLog(taskInstance, out));
 
-        assertTrue(thrown.getMessage().contains("upgrade required"),
-                "Error must contain the explicit upgrade guidance, got: " + thrown.getMessage());
+        assertTrue(thrown.getMessage().contains("the worker answered with an error"),
+                "A worker that answered and failed must be reported as such, got: " + thrown.getMessage());
+        assertFalse(thrown.getMessage().contains("upgrade required"),
+                "A current worker whose invocation failed must not be reported as needing an upgrade, got: "
+                        + thrown.getMessage());
         assertEquals(0, out.toByteArray().length);
         assertEquals(0, wholeFileRpcInvocations.get(),
-                "the old worker must NEVER be asked for the whole-file payload on the large-log path");
+                "the worker must NEVER be asked for the whole-file payload on the large-log path");
+    }
+
+    /**
+     * The genuine missing-method signal over the real wire: the worker's ILogService does not
+     * have the chunk method at all (a REAL old worker), the server answers "Cannot find the
+     * ServerMethodInvoker" with the typed not-found flag, and with remote storage unavailable
+     * the download fails with the explicit "worker upgrade required" guidance.
+     */
+    @Test
+    void missingChunkMethodWorkerWithoutRemoteArchiveFailsWithExplicitUpgradeError() throws Exception {
+        final int port;
+        try (ServerSocket s = new ServerSocket(0)) {
+            port = s.getLocalPort();
+        }
+        final SpringServerMethodInvokerDiscovery unrelatedServer = new SpringServerMethodInvokerDiscovery(
+                NettyServerConfig.builder().serverName("TestUnrelatedWorkerLogServer").listenPort(port).build());
+        unrelatedServer.registerServerMethodInvokerProvider((UnrelatedWorkerService) () -> "pong");
+        unrelatedServer.start();
+        try {
+            final TaskInstance taskInstance = newTaskInstance();
+            taskInstance.setHost("127.0.0.1:" + port);
+            when(registryClient.checkNodeExists(eq(taskInstance.getHost()), any(RegistryNodeType.class)))
+                    .thenReturn(true);
+            doThrow(new IOException("Remote log file not found after download (remote log archiving may not be "
+                    + "enabled or the archive is missing): " + taskInstance.getLogPath()))
+                            .when(remoteLogClient).streamWholeLog(eq(taskInstance), any(OutputStream.class));
+
+            final ByteArrayOutputStream out = new ByteArrayOutputStream();
+            final IOException thrown = assertThrows(IOException.class,
+                    () -> logClientDelegate.streamWholeLog(taskInstance, out));
+
+            assertTrue(thrown.getMessage().contains("upgrade required"),
+                    "A worker that does not have the chunk method must yield the upgrade guidance, got: "
+                            + thrown.getMessage());
+            assertEquals(0, out.toByteArray().length);
+        } finally {
+            unrelatedServer.close();
+        }
     }
 }

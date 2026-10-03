@@ -39,6 +39,12 @@ public interface ILogService {
     /**
      * Read a bounded chunk of the log file [offset, offset+length) for streaming download.
      * The worker clamps length to a maximum chunk size and returns eof metadata.
+     *
+     * <p>Each response also reports the file length observed by the worker's single stat
+     * ({@link TaskInstanceLogFileDownloadResponse#getObservedLength()}). The API uses the FIRST
+     * chunk's value as the download's target length, so streaming a live, growing log yields a
+     * snapshot taken at request time. A 0 means the worker does not report it (e.g. an old
+     * worker) and the caller must end the stream on {@code eof} instead.
      */
     @RpcMethod(timeout = 30_000)
     TaskInstanceLogFileDownloadResponse getTaskInstanceLogFileChunk(TaskInstanceLogFileDownloadRequest request);

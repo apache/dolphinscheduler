@@ -119,6 +119,7 @@ public class LogServiceImpl implements ILogService {
             // re-statting after the read would race against rotation between the two
             // observations and could misclassify the result.
             final long observedFileLength = logFile.length();
+            response.setObservedLength(observedFileLength);
             if (offset > observedFileLength) {
                 // offset is PAST the observed file size: the file shrank underneath the reader
                 // (log rotation renamed it, a fresh one started from 0). offset == fileLength

@@ -21,14 +21,19 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
+
 import java.io.EOFException;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 public class LogUtilsTest {
 
@@ -76,5 +81,25 @@ public class LogUtilsTest {
     public void readFileRange_missingFileThrows(@TempDir Path tempDir) {
         assertThrows(FileNotFoundException.class,
                 () -> LogUtils.readFileRange(tempDir.resolve("absent.log").toFile(), 0, 10, 100));
+    }
+
+    /**
+     * The view path must fail when the remote download fails — even with a local file sitting at
+     * the path — instead of falling through to reading a stale or partial file and reporting it
+     * as the current log.
+     */
+    @Test
+    public void readPartFileContentFromRemote_downloadFailure_doesNotReadLocalFile(@TempDir Path tempDir) throws Exception {
+        final Path file = tempDir.resolve("task.log");
+        Files.write(file, "stale local content\n".getBytes(StandardCharsets.UTF_8));
+
+        try (MockedStatic<RemoteLogUtils> remoteLogUtils = Mockito.mockStatic(RemoteLogUtils.class)) {
+            remoteLogUtils.when(() -> RemoteLogUtils.getRemoteLog(file.toString()))
+                    .thenThrow(new IOException("connection reset mid-transfer"));
+
+            final RuntimeException thrown = assertThrows(RuntimeException.class,
+                    () -> LogUtils.readPartFileContentFromRemote(file.toString(), 0, 10));
+            assertEquals("connection reset mid-transfer", thrown.getCause().getMessage());
+        }
     }
 }

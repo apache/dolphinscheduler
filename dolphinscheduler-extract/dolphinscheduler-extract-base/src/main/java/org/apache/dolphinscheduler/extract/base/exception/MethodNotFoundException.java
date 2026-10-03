@@ -15,24 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.base;
+package org.apache.dolphinscheduler.extract.base.exception;
 
-public interface IRpcResponse {
+/**
+ * The server answered that it does not have the requested method — the old-server signal during
+ * a rolling upgrade. A subclass of {@link MethodInvocationException} so existing callers keep
+ * working; only callers that must distinguish "outdated peer" from "the invocation failed" (e.g.
+ * the worker-upgrade guidance of the chunked log download) need to check for this type: every
+ * other server-side failure — the method threw, the server's invocation pool is full — is
+ * reported as a plain {@link MethodInvocationException}.
+ */
+public class MethodNotFoundException extends MethodInvocationException {
 
-    boolean isSuccess();
-
-    String getMessage();
-
-    byte[] getBody();
-
-    byte[] toBytes();
-
-    /**
-     * Whether the failure is specifically "the server does not have this method" (an old server
-     * during a rolling upgrade) rather than any other invocation failure.
-     */
-    default boolean isMethodNotFound() {
-        return false;
+    public MethodNotFoundException(String message) {
+        super(message);
     }
-
 }

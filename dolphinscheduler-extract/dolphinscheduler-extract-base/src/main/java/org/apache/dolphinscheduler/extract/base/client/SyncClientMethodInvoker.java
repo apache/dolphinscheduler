@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.StandardRpcRequest;
 import org.apache.dolphinscheduler.extract.base.SyncRequestDto;
 import org.apache.dolphinscheduler.extract.base.exception.MethodInvocationException;
+import org.apache.dolphinscheduler.extract.base.exception.MethodNotFoundException;
 import org.apache.dolphinscheduler.extract.base.protocal.Transporter;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterHeader;
 import org.apache.dolphinscheduler.extract.base.serialize.JsonSerializer;
@@ -50,6 +51,11 @@ class SyncClientMethodInvoker extends AbstractClientMethodInvoker {
                 .build();
         IRpcResponse iRpcResponse = nettyRemotingClient.sendSync(syncRequestDto);
         if (!iRpcResponse.isSuccess()) {
+            if (iRpcResponse.isMethodNotFound()) {
+                // The server answered that it does not have this method — an old server during a
+                // rolling upgrade, not a server that failed to execute the call.
+                throw new MethodNotFoundException(iRpcResponse.getMessage());
+            }
             throw MethodInvocationException.of(iRpcResponse.getMessage());
         }
         if (iRpcResponse.getBody() == null) {

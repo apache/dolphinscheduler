@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.executor.logging;
 
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.extract.base.exception.MethodInvocationException;
+import org.apache.dolphinscheduler.extract.base.exception.MethodNotFoundException;
 import org.apache.dolphinscheduler.extract.common.transportor.LogResponseStatus;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogFileDownloadResponse;
 import org.apache.dolphinscheduler.extract.common.transportor.TaskInstanceLogPageQueryResponse;
@@ -101,10 +102,13 @@ public class LogClientDelegate {
      * <ul>
      *   <li>If the worker node is gone, read straight from remote log storage (archive), streamed
      *       in bounded chunks.</li>
-     *   <li>Otherwise stream via the chunk RPC. If the FIRST chunk fails — e.g. an old worker
-     *       during a rolling upgrade does not implement {@code getTaskInstanceLogFileChunk} —
-     *       fall back to remote log storage; if that also fails, throw an explicit error asking
-     *       for a worker upgrade.</li>
+     *   <li>Otherwise stream via the chunk RPC, bounded to a SNAPSHOT of the log taken when the
+     *       download starts: the target length is pinned to the length the worker reports on the
+     *       first chunk, so a live task's growing log ends cleanly at that boundary instead of
+     *       tailing the file until the writer stops (or the request times out).</li>
+     *   <li>If the FIRST chunk fails — e.g. an old worker during a rolling upgrade does not
+     *       implement {@code getTaskInstanceLogFileChunk} — fall back to remote log storage; if
+     *       that also fails, throw an explicit error asking for a worker upgrade.</li>
      *   <li>The legacy whole-file worker RPC is deliberately NEVER used: it reads the entire file
      *       into the worker's heap before serialization, so a large log can OOM the worker. A
      *       receiver-side maxFrameSize cannot prevent that allocation, and an old worker (already
@@ -122,28 +126,52 @@ public class LogClientDelegate {
             return;
         }
         long offset = 0;
+        // The length of the snapshot this download delivers. Unknown until the first chunk
+        // reports it; 0 means the worker does not report it (e.g. an old worker during a rolling
+        // upgrade) and the stream then ends on eof only.
+        long snapshotLength = -1;
         while (true) {
+            if (snapshotLength > 0 && offset >= snapshotLength) {
+                // The last byte of the request-time snapshot has been delivered. A live task may
+                // have written more since the first chunk observed the length: the download is a
+                // snapshot taken when it started, not an unbounded tail of a growing log.
+                return;
+            }
+            // After the first chunk only what is left of the snapshot is requested — the worker
+            // clamps to the file, so a growing log is never read past the snapshot boundary.
+            final int chunkLength = snapshotLength > 0
+                    ? (int) Math.min(LOG_CHUNK_SIZE, snapshotLength - offset)
+                    : LOG_CHUNK_SIZE;
             final TaskInstanceLogFileDownloadResponse chunk;
             try {
-                chunk = localLogClient.getLogChunk(taskInstance, offset, LOG_CHUNK_SIZE);
+                chunk = localLogClient.getLogChunk(taskInstance, offset, chunkLength);
             } catch (Exception e) {
                 if (offset > 0) {
                     throw new IOException("Log streaming failed at offset " + offset, e);
                 }
                 log.warn("Chunked log RPC failed for task instance {}, falling back to remote log storage",
                         taskInstance.getId(), e);
-                // A MethodInvocationException means the worker ANSWERED but could not dispatch the
-                // method — that is the old-worker signal (rolling upgrade: the chunk method does
-                // not exist there), so the upgrade guidance is accurate. Any other transport
-                // failure (connect refused, timeout) just means the worker is unreachable; blaming
-                // the worker version would mislead operations.
-                final String errorMessage =
-                        ExceptionUtils.throwableOfType(e, MethodInvocationException.class) != null
-                                ? "Worker upgrade required for large log download: chunked log RPC is not available"
-                                        + " on worker " + taskInstance.getHost() + " and remote log storage also failed"
-                                : "Chunked log RPC to worker " + taskInstance.getHost()
-                                        + " failed (the worker may be down or unreachable)"
-                                        + " and remote log storage also failed";
+                // Distinguish the three failure shapes so operations get accurate guidance:
+                // - MethodNotFoundException: the worker ANSWERED that the chunk method does not
+                // exist — an old worker during a rolling upgrade, the upgrade guidance fits.
+                // - any other MethodInvocationException: the worker ANSWERED but the invocation
+                // failed there (its invocation pool is full, the method threw) — a current
+                // worker under stress must NOT be told to upgrade.
+                // - anything else (connect refused, timeout): the worker never answered.
+                final String errorMessage;
+                if (ExceptionUtils.throwableOfType(e, MethodNotFoundException.class) != null) {
+                    errorMessage = "Worker upgrade required for large log download: chunked log RPC is not available"
+                            + " on worker " + taskInstance.getHost() + " and remote log storage also failed";
+                } else if (ExceptionUtils.throwableOfType(e, MethodInvocationException.class) != null) {
+                    errorMessage = "Chunked log fetch failed on worker " + taskInstance.getHost()
+                            + " for task instance " + taskInstance.getId()
+                            + " (the worker answered with an error: " + ExceptionUtils.getRootCauseMessage(e) + ")"
+                            + " and remote log storage also failed";
+                } else {
+                    errorMessage = "Chunked log RPC to worker " + taskInstance.getHost()
+                            + " failed (the worker may be down or unreachable)"
+                            + " and remote log storage also failed";
+                }
                 fallbackToRemoteStorage(taskInstance, outputStream, errorMessage);
                 return;
             }
@@ -162,6 +190,10 @@ public class LogClientDelegate {
                         "Chunked log fetch failed on worker " + taskInstance.getHost() + " for task instance "
                                 + taskInstance.getId() + " (" + failure + ") and remote log storage also failed");
                 return;
+            }
+            if (snapshotLength < 0) {
+                // Pin the snapshot from the worker's first stat; 0 keeps the eof-only behavior.
+                snapshotLength = chunk.getObservedLength();
             }
             final byte[] data = chunk.getLogBytes();
             if (data != null && data.length > 0) {
