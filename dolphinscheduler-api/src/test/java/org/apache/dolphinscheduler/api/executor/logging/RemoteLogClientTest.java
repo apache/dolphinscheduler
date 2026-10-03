@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.io.ByteArrayInputStream;
@@ -41,6 +42,8 @@ import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 public class RemoteLogClientTest {
 
@@ -204,26 +207,54 @@ public class RemoteLogClientTest {
     }
 
     /**
-     * The startup sweep deletes snapshot files orphaned by a previous JVM life, keeps snapshots
-     * younger than the age gate (another live instance's in-flight transfer on a shared disk)
-     * and keeps ordinary log files.
+     * A remote download failure must FAIL the request — even when a complete archive is already
+     * cached at the log path. Snapshotting whatever file happens to sit there would report a
+     * failed (possibly truncated) download as a successful response.
      */
     @Test
-    public void deleteOrphanedSnapshots_removesOnlyAgedSnapshots(@TempDir Path tempDir) throws Exception {
+    public void streamWholeLog_remoteDownloadFailure_propagatesAndLeavesArchiveUntouched(@TempDir Path tempDir) throws Exception {
+        final Path logFile = tempDir.resolve("task.log");
+        final byte[] cached = "previously published complete log".getBytes(StandardCharsets.UTF_8);
+        Files.write(logFile, cached);
+
+        final RemoteLogClient client = new RemoteLogClient();
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (MockedStatic<RemoteLogUtils> remoteLogUtils = Mockito.mockStatic(RemoteLogUtils.class)) {
+            remoteLogUtils.when(() -> RemoteLogUtils.getRemoteLog(logFile.toString()))
+                    .thenThrow(new IOException("connection reset mid-transfer"));
+
+            final IOException thrown = assertThrows(IOException.class,
+                    () -> client.streamWholeLog(taskInstance(logFile.toString()), out));
+            assertEquals("connection reset mid-transfer", thrown.getMessage());
+        }
+
+        assertEquals(0, out.toByteArray().length, "A failed download must stream nothing");
+        assertArrayEquals(cached, Files.readAllBytes(logFile),
+                "A failed download must not touch the cached archive");
+        assertOnlyArchiveRemains(tempDir);
+    }
+
+    /**
+     * The startup sweep deletes per-download temp files (snapshots or handler staging files)
+     * orphaned by a previous JVM life, keeps files younger than the age gate (another live
+     * instance's in-flight transfer on a shared disk) and keeps ordinary log files.
+     */
+    @Test
+    public void deleteOrphanedTempFiles_removesOnlyAgedOrphans(@TempDir Path tempDir) throws Exception {
         final Path oldOrphan = tempDir.resolve("task.log.download-1111");
         Files.write(oldOrphan, new byte[]{1});
-        final Path freshSnapshot = tempDir.resolve("task.log.download-2222");
-        Files.write(freshSnapshot, new byte[]{2});
+        final Path freshTemp = tempDir.resolve("task.log.download-2222");
+        Files.write(freshTemp, new byte[]{2});
         final Path ordinaryLog = tempDir.resolve("task.log");
         Files.write(ordinaryLog, new byte[]{3});
         // Age the first file past the orphan threshold.
         oldOrphan.toFile().setLastModified(System.currentTimeMillis() - 2 * 60 * 60 * 1000L);
 
         final RemoteLogClient client = new RemoteLogClient();
-        client.deleteOrphanedSnapshots(tempDir);
+        client.deleteOrphanedTempFiles(tempDir);
 
         assertTrue(Files.notExists(oldOrphan), "Aged orphan must be swept");
-        assertTrue(Files.exists(freshSnapshot), "Snapshot within the age gate must be kept");
+        assertTrue(Files.exists(freshTemp), "Temp file within the age gate must be kept");
         assertTrue(Files.exists(ordinaryLog), "Ordinary log files must never be swept");
     }
 

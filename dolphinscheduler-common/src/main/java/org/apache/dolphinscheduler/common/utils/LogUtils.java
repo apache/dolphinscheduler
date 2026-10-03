@@ -76,7 +76,14 @@ public class LogUtils {
     public static List<String> readPartFileContentFromRemote(String filePath,
                                                              int skipLine,
                                                              int limit) {
-        RemoteLogUtils.getRemoteLog(filePath);
+        try {
+            RemoteLogUtils.getRemoteLog(filePath);
+        } catch (IOException e) {
+            // The view path reports failures as runtime exceptions (see
+            // readPartFileContentFromLocal); a failed download must never fall through to reading
+            // a stale or partial local file.
+            throw new RuntimeException(String.format("Get remote log file: %s error", filePath), e);
+        }
         return readPartFileContentFromLocal(filePath, skipLine, limit);
     }
 

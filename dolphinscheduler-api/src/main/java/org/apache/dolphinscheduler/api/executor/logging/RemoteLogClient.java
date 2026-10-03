@@ -46,26 +46,29 @@ import org.springframework.stereotype.Component;
 public class RemoteLogClient {
 
     /**
-     * Marker of the per-download snapshot files ({@code <archive>.download-<uuid>}), also used
-     * by the startup sweep to recognize orphans.
+     * Marker of the per-download temporary files ({@code <archive>.download-<uuid>}): the private
+     * streaming snapshots of this class and the staging files the remote log handlers download
+     * into (see {@link RemoteLogUtils#downloadToLocalFileAtomically}). Also used by the startup
+     * sweep to recognize orphans.
      */
-    private static final String SNAPSHOT_MARKER = ".download-";
+    private static final String DOWNLOAD_TEMP_MARKER = RemoteLogUtils.DOWNLOAD_TEMP_FILE_MARKER;
 
     /**
-     * Snapshots younger than this are never swept as orphans: on the (unsupported but possible)
-     * shared-disk setup the age gate protects another live instance's in-flight transfer.
+     * Per-download temp files younger than this are never swept as orphans: on the (unsupported
+     * but possible) shared-disk setup the age gate protects another live instance's in-flight
+     * transfer.
      */
-    private static final long ORPHAN_SNAPSHOT_MIN_AGE_MILLIS = 60 * 60 * 1000L;
+    private static final long ORPHAN_TEMP_FILE_MIN_AGE_MILLIS = 60 * 60 * 1000L;
 
     /**
      * Striped locks serializing download + snapshot per log path. The remote log handlers
-     * rewrite the local archive file in place ({@code new FileOutputStream(logPath)} truncates
-     * it), so concurrent download/view requests for the same log must not interleave their
-     * download windows; {@link #streamWholeLog} additionally snapshots the archive into a
-     * private temp file, so its lock-free streaming read stays stable across later cache
-     * rewrites. A fixed stripe array avoids unbounded lock-map growth; different logs sharing
-     * a stripe only lose a little parallelism, never correctness. Each API instance downloads
-     * to its own local disk, so per-JVM locking is sufficient.
+     * download the archive for this path and publish it atomically, so concurrent download/view
+     * requests for the same log must not interleave their download windows; {@link
+     * #streamWholeLog} additionally snapshots the archive into a private temp file, so its
+     * lock-free streaming read stays stable across later cache replacements. A fixed stripe
+     * array avoids unbounded lock-map growth; different logs sharing a stripe only lose a little
+     * parallelism, never correctness. Each API instance downloads to its own local disk, so
+     * per-JVM locking is sufficient.
      */
     private static final int LOCK_STRIPES = 64;
     private static final ReentrantLock[] LOG_PATH_LOCKS = new ReentrantLock[LOCK_STRIPES];
@@ -81,27 +84,28 @@ public class RemoteLogClient {
     }
 
     /**
-     * At startup this JVM can have no in-flight transfer, so any snapshot file left over from a
-     * previous life (graceful shutdown and kill -9 alike skip the transfer's {@code finally}) is
+     * At startup this JVM can have no in-flight transfer, so any per-download temp file left over
+     * from a previous life — this class's streaming snapshot or a remote handler's download
+     * staging file (graceful shutdown and kill -9 alike skip the transfer's {@code finally}) — is
      * an orphan and is swept. Best effort: any error just skips the sweep. Does nothing when
      * logging is not initialized (e.g. plain unit tests).
      */
     @PostConstruct
-    public void deleteOrphanedSnapshots() {
+    public void deleteOrphanedTempFiles() {
         final String baseDir = LogUtils.getLocalLogBaseDir();
         if (baseDir != null) {
-            deleteOrphanedSnapshots(Paths.get(baseDir));
+            deleteOrphanedTempFiles(Paths.get(baseDir));
         }
     }
 
-    void deleteOrphanedSnapshots(final Path baseDir) {
+    void deleteOrphanedTempFiles(final Path baseDir) {
         try (Stream<Path> walk = Files.walk(baseDir)) {
             walk.filter(Files::isRegularFile)
-                    .filter(file -> file.getFileName().toString().contains(SNAPSHOT_MARKER))
+                    .filter(file -> file.getFileName().toString().contains(DOWNLOAD_TEMP_MARKER))
                     .filter(RemoteLogClient::olderThanOrphanAge)
-                    .forEach(this::deleteSnapshotQuietly);
+                    .forEach(this::deleteTempFileQuietly);
         } catch (Exception e) {
-            log.warn("Failed to sweep orphaned log download snapshots under {}", baseDir, e);
+            log.warn("Failed to sweep orphaned log download temp files under {}", baseDir, e);
         }
     }
 
@@ -109,16 +113,20 @@ public class RemoteLogClient {
         // java.io.File#lastModified returns 0 when the time cannot be read — treat that as
         // "unknown age, keep it" rather than sweeping blindly.
         final long lastModified = file.toFile().lastModified();
-        return lastModified > 0 && lastModified < System.currentTimeMillis() - ORPHAN_SNAPSHOT_MIN_AGE_MILLIS;
+        return lastModified > 0 && lastModified < System.currentTimeMillis() - ORPHAN_TEMP_FILE_MIN_AGE_MILLIS;
     }
 
     /**
      * Stream the entire remote-archived log to {@code outputStream} without loading the whole
      * file into memory. Downloads the archive to a local file, snapshots it into a private temp
      * file ({@code <archive>.download-<uuid>}, deleted when the transfer ends; leftovers are
-     * swept by {@link #deleteOrphanedSnapshots()}) and streams that snapshot — see the
+     * swept by {@link #deleteOrphanedTempFiles()}) and streams that snapshot — see the
      * {@code LOG_PATH_LOCKS} note for why the snapshot is required. Costs a second write of the
      * archive (~2x peak disk for one download).
+     *
+     * <p>A failed remote download propagates — nothing is streamed and any previously published
+     * archive is left untouched (the handler publishes a download only after a complete
+     * transfer), so a truncated log can never be served as a successful download.
      *
      * @throws IOException if the log cannot be downloaded, the file is missing, no data is
      *                     available, or the snapshot ends prematurely (local disk trouble).
@@ -142,7 +150,7 @@ public class RemoteLogClient {
             // terminal state as an empty log served by a live worker — and must stream
             // normally (zero bytes; the caller appends the head). Only a MISSING file is an
             // error: a missing archive must not be reported as a successful empty download.
-            snapshot = archive.resolveSibling(archive.getFileName() + SNAPSHOT_MARKER + UUID.randomUUID());
+            snapshot = archive.resolveSibling(archive.getFileName() + DOWNLOAD_TEMP_MARKER + UUID.randomUUID());
             boolean opened = false;
             try {
                 Files.copy(archive, snapshot, StandardCopyOption.REPLACE_EXISTING);
@@ -155,7 +163,7 @@ public class RemoteLogClient {
                 // finally (not catch): a partial snapshot must never survive a failed creation,
                 // whatever the failure type — up to and including Error (e.g. OOM mid-copy).
                 if (!opened) {
-                    deleteSnapshotQuietly(snapshot);
+                    deleteTempFileQuietly(snapshot);
                 }
             }
         } finally {
@@ -171,18 +179,18 @@ public class RemoteLogClient {
                 // own exception nor skip the snapshot deletion below.
                 log.warn("Failed to close the log download snapshot stream for {}", logPath, e);
             }
-            deleteSnapshotQuietly(snapshot);
+            deleteTempFileQuietly(snapshot);
         }
         outputStream.flush();
     }
 
-    private void deleteSnapshotQuietly(final Path snapshot) {
+    private void deleteTempFileQuietly(final Path tempFile) {
         try {
-            Files.deleteIfExists(snapshot);
+            Files.deleteIfExists(tempFile);
         } catch (Throwable e) {
             // Throwable, not IOException: this runs in finally blocks and must never throw
             // through them (masking the original failure) or give up on deletion early.
-            log.warn("Failed to delete the log download snapshot {}", snapshot, e);
+            log.warn("Failed to delete the log download temp file {}", tempFile, e);
         }
     }
 

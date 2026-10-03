@@ -75,15 +75,12 @@ public class OssRemoteLogHandler implements RemoteLogHandler, Closeable {
     }
 
     @Override
-    public void getRemoteLog(String logPath) {
+    public void getRemoteLog(String logPath) throws IOException {
         String objectName = RemoteLogUtils.getObjectNameFromLogPath(logPath);
+        log.info("get remote log on OSS {} to {}", objectName, logPath);
 
-        try {
-            log.info("get remote log on OSS {} to {}", objectName, logPath);
-            ossClient.getObject(new GetObjectRequest(bucketName, objectName), new File(logPath));
-        } catch (Exception e) {
-            log.error("error while getting remote log on OSS {} to {}", objectName, logPath, e);
-        }
+        RemoteLogUtils.downloadToLocalFileAtomically(logPath,
+                staging -> ossClient.getObject(new GetObjectRequest(bucketName, objectName), staging.toFile()));
     }
 
     @Override
