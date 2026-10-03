@@ -18,10 +18,12 @@
 package org.apache.dolphinscheduler.server.master.engine.workflow.listener;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.extract.master.command.BackfillWorkflowCommandParam;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.transportor.workflow.WorkflowBackfillTriggerRequest;
@@ -47,10 +49,18 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
     @Autowired
     private WorkflowBackfillTrigger workflowBackfillTrigger;
 
+    @Autowired
+    private WorkflowInstanceDao workflowInstanceDao;
+
     @Override
     public void notifyWorkflowLifecycleEvent(final IWorkflowExecution workflowExecution,
                                              final AbstractWorkflowLifecycleLifecycleEvent lifecycleEvent) {
         final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
+        if (workflowInstance.getNextWorkflowInstanceId() > 0
+                || (lifecycleEvent.getEventType() == WorkflowLifecycleEventType.FAILED
+                        && workflowInstance.getFailureStrategy() != FailureStrategy.CONTINUE)) {
+            return;
+        }
         if (Flag.YES == workflowInstance.getIsSubWorkflow()) {
             // The sub workflow does not need to generate the backfill command
             // Since the parent workflow will trigger the task to generate the sub workflow instance.
@@ -99,12 +109,17 @@ public class WorkflowSuccessLifecycleListener implements IWorkflowLifecycleListe
                 workflowBackfillTrigger.triggerWorkflow(backfillTriggerRequest);
         if (!backfillTriggerResponse.isSuccess()) {
             log.warn("Backfill workflow failed: {}", backfillTriggerResponse.getMessage());
+        } else {
+            workflowInstance.setNextWorkflowInstanceId(backfillTriggerResponse.getWorkflowInstanceId());
+            workflowInstanceDao.updateById(workflowInstance);
         }
     }
 
     @Override
     public boolean match(AbstractWorkflowLifecycleLifecycleEvent event) {
-        return event.getEventType() == WorkflowLifecycleEventType.SUCCEED;
+        return event.getEventType() == WorkflowLifecycleEventType.SUCCEED
+                // CONTINUE backfills must not leave the remaining dates stranded after a failed date.
+                || event.getEventType() == WorkflowLifecycleEventType.FAILED;
     }
 
 }
