@@ -336,7 +336,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         try {
             doThrow(new ServiceException(Status.PROJECT_NOT_EXIST)).when(projectService)
                     .checkProjectAndAuthThrowException(user, projectCode, WORKFLOW_DEFINITION);
-            workflowDefinitionService.queryWorkflowDefinitionListPaging(user, projectCode, "", "", 1, 5, 0);
+            workflowDefinitionService.queryWorkflowDefinitionListPaging(user, projectCode, "", "", 1, 5, 0, null,
+                    null);
         } catch (ServiceException serviceException) {
             Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), serviceException.getCode());
         }
@@ -363,7 +364,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 eq(10),
                 eq(""),
                 eq(1),
-                eq(projectCode))).thenReturn(pageListingResult);
+                eq(projectCode),
+                any(),
+                any())).thenReturn(pageListingResult);
         String user1 = "user1";
         String user2 = "user2";
         when(userDao.queryUserWithWorkflowDefinitionCode(processDefinitionCodes))
@@ -391,7 +394,9 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 "",
                 1,
                 0,
-                10);
+                10,
+                null,
+                null);
         Assertions.assertNotNull(pageInfo);
         WorkflowDefinition pd1 = pageInfo.getTotalList().stream()
                 .filter(pd -> pd.getCode() == processDefinitionCode1).findFirst().orElse(null);
