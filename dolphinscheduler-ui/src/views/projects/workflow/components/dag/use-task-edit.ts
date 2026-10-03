@@ -48,6 +48,7 @@ export function useTaskEdit(options: Options) {
     getTargets,
     setNodeName,
     setNodeFillColor,
+    setNodeExecuteType,
     setNodeEdge
   } = useCellUpdate({
     graph
@@ -91,9 +92,16 @@ export function useTaskEdit(options: Options) {
     flag: string,
     coordinate: Coordinate
   ) {
-    addNode(code + '', type, name, flag, coordinate)
     const definition = workflowDefinition.value.taskDefinitionList.find(
       (t) => t.code === targetCode
+    )
+    addNode(
+      code + '',
+      type,
+      name,
+      flag,
+      coordinate,
+      definition?.taskExecuteType
     )
 
     const newDefinition = {
@@ -177,6 +185,10 @@ export function useTaskEdit(options: Options) {
           setNodeFillColor(task.code + '', fillColor)
 
           setNodeEdge(String(task.code), data.preTasks)
+          setNodeExecuteType(
+            String(task.code),
+            taskDef.taskExecuteType || 'BATCH'
+          )
           updatePreTasks(data.preTasks, task.code)
           return {
             ...taskDef,

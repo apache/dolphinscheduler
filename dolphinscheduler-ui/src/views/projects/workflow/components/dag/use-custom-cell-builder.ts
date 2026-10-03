@@ -18,7 +18,7 @@
 import type { Node, Edge } from '@antv/x6'
 import { X6_NODE_NAME, X6_EDGE_NAME } from './dag-config'
 import utils from '@/utils'
-import { TaskType } from '@/store/project/types'
+import { TaskType, TaskExecuteType } from '@/store/project/types'
 import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import { WorkflowDefinition, Coordinate } from './types'
 
@@ -75,7 +75,8 @@ export function useCustomCellBuilder() {
     type: TaskType,
     taskName: string,
     flag: string,
-    coordinate: Coordinate = { x: 100, y: 100 }
+    coordinate: Coordinate = { x: 100, y: 100 },
+    taskExecuteType?: TaskExecuteType
   ): Node.Metadata {
     const truncation = taskName ? utils.truncateText(taskName, 18) : id
     return {
@@ -87,7 +88,8 @@ export function useCustomCellBuilder() {
         taskType: type,
         taskName: taskName || id,
         flag: flag,
-        taskExecuteType: TASK_TYPES_MAP[type].taskExecuteType
+        taskExecuteType:
+          taskExecuteType || TASK_TYPES_MAP[type].taskExecuteType || 'BATCH'
       },
       attrs: {
         image: {
@@ -122,7 +124,7 @@ export function useCustomCellBuilder() {
       parseLocationStr(definition.workflowDefinition.locations) || []
     const tasks = definition.taskDefinitionList
     const connects = definition.workflowTaskRelationList
-    const taskTypeMap = {} as { [key in string]: TaskType }
+    const taskExecuteTypeMap = {} as { [key in string]: TaskExecuteType }
 
     tasks.forEach((task) => {
       const location = locations.find((l) => l.taskCode === task.code) || {}
@@ -134,20 +136,19 @@ export function useCustomCellBuilder() {
         {
           x: location.x,
           y: location.y
-        }
+        },
+        task.taskExecuteType
       )
       nodes.push(node)
-      taskTypeMap[String(task.code)] = task.taskType
+      taskExecuteTypeMap[String(task.code)] = node.data.taskExecuteType
     })
 
     connects
       .filter((r) => !!r.preTaskCode)
       .forEach((c) => {
         const isStream =
-          TASK_TYPES_MAP[taskTypeMap[c.preTaskCode]].taskExecuteType ===
-            'STREAM' ||
-          TASK_TYPES_MAP[taskTypeMap[c.postTaskCode]].taskExecuteType ===
-            'STREAM'
+          taskExecuteTypeMap[c.preTaskCode] === 'STREAM' ||
+          taskExecuteTypeMap[c.postTaskCode] === 'STREAM'
         const edge = buildEdge(
           c.preTaskCode + '',
           c.postTaskCode + '',

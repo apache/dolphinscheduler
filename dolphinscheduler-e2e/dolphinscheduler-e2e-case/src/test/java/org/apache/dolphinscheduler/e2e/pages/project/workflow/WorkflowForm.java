@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.PythonTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SeaTunnelTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
@@ -90,6 +91,8 @@ public final class WorkflowForm {
                 return (T) new JavaTaskForm(this);
             case PYTHON:
                 return (T) new PythonTaskForm(this);
+            case SEATUNNEL:
+                return (T) new SeaTunnelTaskForm(this);
         }
         throw new UnsupportedOperationException("Unknown task type");
     }
@@ -129,6 +132,7 @@ public final class WorkflowForm {
         SWITCH,
         HTTP,
         JAVA,
-        PYTHON
+        PYTHON,
+        SEATUNNEL
     }
 }
