@@ -26,9 +26,11 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.model.WorkflowDefinitionCountDto;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -256,32 +258,32 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
         insertWithTimes("wf-beta", base + 120_000L, base + 120_000L);
 
         // default (no sort) -> update_time desc, id asc
-        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+        Assertions.assertEquals(Arrays.asList("wf-gamma", "wf-beta", "wf-alpha"),
                 definitionNames(queryPaging(null, null)));
         // name asc / desc
-        Assertions.assertEquals(List.of("wf-alpha", "wf-beta", "wf-gamma"),
+        Assertions.assertEquals(Arrays.asList("wf-alpha", "wf-beta", "wf-gamma"),
                 definitionNames(queryPaging("name", "asc")));
-        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+        Assertions.assertEquals(Arrays.asList("wf-gamma", "wf-beta", "wf-alpha"),
                 definitionNames(queryPaging("name", "desc")));
         // createTime asc / desc
-        Assertions.assertEquals(List.of("wf-gamma", "wf-alpha", "wf-beta"),
+        Assertions.assertEquals(Arrays.asList("wf-gamma", "wf-alpha", "wf-beta"),
                 definitionNames(queryPaging("createTime", "asc")));
-        Assertions.assertEquals(List.of("wf-beta", "wf-alpha", "wf-gamma"),
+        Assertions.assertEquals(Arrays.asList("wf-beta", "wf-alpha", "wf-gamma"),
                 definitionNames(queryPaging("createTime", "desc")));
         // updateTime asc / desc
-        Assertions.assertEquals(List.of("wf-alpha", "wf-beta", "wf-gamma"),
+        Assertions.assertEquals(Arrays.asList("wf-alpha", "wf-beta", "wf-gamma"),
                 definitionNames(queryPaging("updateTime", "asc")));
-        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+        Assertions.assertEquals(Arrays.asList("wf-gamma", "wf-beta", "wf-alpha"),
                 definitionNames(queryPaging("updateTime", "desc")));
         // invalid sortField/sortOrder -> fallback to default (update_time desc, id asc)
-        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+        Assertions.assertEquals(Arrays.asList("wf-gamma", "wf-beta", "wf-alpha"),
                 definitionNames(queryPaging("foo", "bar")));
         // invalid sortField with a valid sortOrder=asc must still yield the
         // complete default (update_time desc, id asc), not update_time asc
-        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+        Assertions.assertEquals(Arrays.asList("wf-gamma", "wf-beta", "wf-alpha"),
                 definitionNames(queryPaging("foo", "asc")));
         // sortField without sortOrder -> default direction desc
-        Assertions.assertEquals(List.of("wf-gamma", "wf-beta", "wf-alpha"),
+        Assertions.assertEquals(Arrays.asList("wf-gamma", "wf-beta", "wf-alpha"),
                 definitionNames(queryPaging("name", null)));
     }
 
@@ -291,7 +293,7 @@ public class WorkflowDefinitionMapperTest extends BaseDaoTest {
     }
 
     private List<String> definitionNames(IPage<WorkflowDefinition> page) {
-        return page.getRecords().stream().map(WorkflowDefinition::getName).toList();
+        return page.getRecords().stream().map(WorkflowDefinition::getName).collect(Collectors.toList());
     }
 
     private WorkflowDefinition insertWithTimes(String name, long createTimeMillis, long updateTimeMillis) {
