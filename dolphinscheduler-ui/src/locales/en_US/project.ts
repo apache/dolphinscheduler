@@ -383,6 +383,7 @@ export default {
     name_tips: 'Please enter name (required)',
     task_type: 'Task Type',
     task_type_tips: 'Please select a task type (required)',
+    task_execute_type: 'Task execution type',
     workflow_name: 'Workflow Name',
     child_node: 'Child Node',
     child_node_tips: 'Please select a child node (required)',

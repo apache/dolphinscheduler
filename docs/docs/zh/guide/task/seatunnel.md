@@ -13,6 +13,8 @@
 ## 任务参数
 
 - 默认参数说明请参考[DolphinScheduler任务参数附录](appendix.md)`默认任务参数`一栏。
+- 任务执行类型：默认为“批量任务”。运行 SeaTunnel 流作业时，选择“实时任务”，工作流中的任务实例将显示在“任务实例 -> 实时任务”列表。该选项独立于 SeaTunnel 配置保存，同时适用于自定义脚本和资源文件；所选配置中仍需设置 SeaTunnel 的 `env.job.mode = "STREAMING"`。
+  实时任务通过工作流启动，必须使用前台等待作业结束的提交方式；使用 `--async` 等后台提交选项时，任务无法跟踪持续运行的作业。当前任务插件不支持 SeaTunnel 保存点操作。
 - 启动脚本：选择你想要运行任务的启动脚本（不同 SeaTunnel 发行包可能存在差异，以实际 `${SEATUNNEL_HOME}/bin/` 为准），包括 `seatunnel.sh`, `start-seatunnel-flink-13-connector-v2.sh`, `start-seatunnel-flink-15-connector-v2.sh`, `start-seatunnel-flink-connector-v2.sh`, `start-seatunnel-flink.sh`, `start-seatunnel-spark-2-connector-v2.sh`, `start-seatunnel-spark-3-connector-v2.sh`, `start-seatunnel-spark-connector-v2.sh`, `start-seatunnel-spark.sh`
 - FLINK
 - 运行模型：支持 `run` 和 `run-application` 两种模式

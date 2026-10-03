@@ -160,6 +160,7 @@ export function useTable() {
                         circle: true,
                         type: 'info',
                         size: 'small',
+                        disabled: row.taskType === 'SEATUNNEL',
                         onClick: () => onSavePoint(row.id)
                       },
                       {
