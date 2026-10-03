@@ -92,7 +92,7 @@ const getDefaultValue = (children: IJsonItem[]) => {
         }
         return
       } else {
-        parent[mergedChild.field] = mergedChild.value || null
+        parent[mergedChild.field] = mergedChild.value ?? null
         if (mergedChild.validate)
           ruleParent[mergedChild.field] = formatValidate(mergedChild.validate)
       }
