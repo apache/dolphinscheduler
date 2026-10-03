@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import static org.apache.dolphinscheduler.common.constants.DateConstants.PARAMETER_DATETIME;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
@@ -27,12 +28,16 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
 
 public class FlinkTaskTest {
 
@@ -103,5 +108,76 @@ public class FlinkTaskTest {
         String nodeContent = new String(Files.readAllBytes(Paths.get(nodeScriptPath)), StandardCharsets.UTF_8);
         Assertions.assertEquals("SELECT 1;", nodeContent.trim());
         Assertions.assertNotNull(script);
+    }
+
+    private TaskExecutionContext buildTaskExecutionContext(String logContent) throws Exception {
+        Path logPath = tempDir.resolve("task.log");
+        Files.write(logPath, Collections.singletonList(logContent));
+
+        TaskExecutionContext context = new TaskExecutionContext();
+        context.setTaskInstanceId(16789);
+        context.setTaskName("flink-test");
+        context.setTaskAppId("16789");
+        context.setExecutePath(tempDir.toString());
+        context.setLogPath(logPath.toString());
+        context.setAppInfoPath(tempDir.resolve("appInfo.log").toString());
+        return context;
+    }
+
+    @Test
+    public void testCancelApplicationCancelJobThroughFlinkCli() throws Exception {
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkCommand(Mockito.anyList());
+
+        task.cancelApplication();
+
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef",
+                String.join(" ", executedCommands.get(0)));
+        // the Flink JobID must not leak into the application ids used by the YARN/K8s fallback
+        Assertions.assertNull(context.getAppIds());
+    }
+
+    @Test
+    public void testCancelApplicationFailWhenCliFailed() throws Exception {
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        Mockito.doReturn(false).when(task).executeFlinkCommand(Mockito.anyList());
+
+        // the job was found but could not be cancelled, the failure must not be hidden by the fallback
+        Assertions.assertThrows(TaskException.class, task::cancelApplication);
+        Assertions.assertNull(context.getAppIds());
+    }
+
+    @Test
+    public void testCancelApplicationFallbackWhenNoJobIdFound() throws Exception {
+        TaskExecutionContext context = buildTaskExecutionContext("Flink job is running");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        // the task has never been started, so falling back must neither throw nor kill anything
+        task.cancelApplication();
+
+        Mockito.verify(task, Mockito.never()).executeFlinkCommand(Mockito.anyList());
+    }
+
+    @Test
+    public void testCancelApplicationSkipCliWhenSubmittedToYarn() throws Exception {
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Submitted application application_1700000000000_0001");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        task.cancelApplication();
+
+        // the YARN application is cancelled through the resource manager by the fallback
+        Mockito.verify(task, Mockito.never()).executeFlinkCommand(Mockito.anyList());
     }
 }

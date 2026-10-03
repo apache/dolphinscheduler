@@ -21,12 +21,21 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class FlinkArgsUtilsTest {
+
+    @TempDir
+    Path tempDir;
 
     private String joinStringListWithSpace(List<String> stringList) {
         return String.join(" ", stringList);
@@ -142,5 +151,55 @@ public class FlinkArgsUtilsTest {
         Assertions.assertTrue(initOptions.contains("set jobmanager.memory.process.size=1024m"));
         Assertions.assertTrue(initOptions.contains("set taskmanager.memory.process.size=1024m"));
         Assertions.assertTrue(initOptions.contains("set parallelism.default=4"));
+    }
+
+    @Test
+    public void testBuildCancelCommandLine() {
+        // ${FLINK_HOME} is resolved when the command is executed, in the same environment as the task
+        List<String> commandLine = FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef");
+
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testBuildSavePointCommandLine() {
+        // the Flink JobID is passed explicitly, the YARN/K8s application id is not used here
+        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef");
+
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testExecuteCommandReuseTaskEnvironment() throws Exception {
+        // FLINK_HOME is only defined in the task environment, not in the task parameters
+        Path executePath = tempDir.resolve("execute");
+        Files.createDirectories(executePath);
+        Path flinkHome = tempDir.resolve("flink");
+        Files.createDirectories(flinkHome.resolve("bin"));
+        Path markerFile = tempDir.resolve("invoked.txt");
+        Path flinkCommand = flinkHome.resolve("bin/flink");
+        // write more output than a pipe buffer holds, so the command would block if it is not consumed
+        Files.write(flinkCommand, Arrays.asList(
+                "#!/bin/bash",
+                "echo \"$@\" > " + markerFile,
+                "for i in $(seq 1 20000); do echo \"line $i\"; done"));
+        Assertions.assertTrue(flinkCommand.toFile().setExecutable(true));
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(16789);
+        taskExecutionContext.setTaskAppId("16789");
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTenantCode("");
+        taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
+        taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
+
+        boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef"), false);
+
+        Assertions.assertTrue(success);
+        Assertions.assertEquals("cancel 1234567890abcdef1234567890abcdef",
+                new String(Files.readAllBytes(markerFile), StandardCharsets.UTF_8).trim());
     }
 }

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -26,7 +25,6 @@ import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -65,40 +63,23 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     }
 
     @Override
-    public void cancelApplication() throws TaskException {
-        List<String> appIds = getApplicationIds();
-        if (CollectionUtils.isEmpty(appIds)) {
-            log.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
-            return;
-        }
-        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
-        List<String> args = FlinkArgsUtils.buildCancelCommandLine(taskExecutionContext);
-
-        log.info("cancel application args:{}", args);
-
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(args);
-        try {
-            processBuilder.start();
-        } catch (IOException e) {
-            throw new TaskException("cancel application error", e);
-        }
-    }
-
-    @Override
     public void savePoint() throws Exception {
-        List<String> appIds = getApplicationIds();
-        if (CollectionUtils.isEmpty(appIds)) {
-            log.warn("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
-            return;
+        // `flink savepoint` takes the Flink JobID, the YARN/K8s application id is a different
+        // identifier and must not be passed to it
+        List<String> jobIds = getFlinkJobIds();
+        if (CollectionUtils.isEmpty(jobIds)) {
+            throw new TaskException(
+                    "Cannot find the flink JobID of the task, taskInstanceId: "
+                            + taskExecutionContext.getTaskInstanceId());
         }
+        for (String jobId : jobIds) {
+            List<String> args = FlinkArgsUtils.buildSavePointCommandLine(jobId);
+            log.info("savepoint args:{}", args);
 
-        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
-        List<String> args = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
-        log.info("savepoint args:{}", args);
-
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(args);
-        processBuilder.start();
+            if (!executeFlinkCommand(args)) {
+                throw new TaskException("Trigger savepoint for flink job " + jobId + " failed, taskInstanceId: "
+                        + taskExecutionContext.getTaskInstanceId());
+            }
+        }
     }
 }
