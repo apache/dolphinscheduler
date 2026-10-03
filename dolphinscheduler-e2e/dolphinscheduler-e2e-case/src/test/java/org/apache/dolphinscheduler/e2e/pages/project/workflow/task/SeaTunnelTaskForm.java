@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -32,7 +33,12 @@ public class SeaTunnelTaskForm extends TaskNodeForm {
 
     public SeaTunnelTaskForm executionType(String executionType) {
         WebElement input = executionTypeInput(executionType);
-        input.findElement(By.xpath("..")).click();
+        WebElement label = input.findElement(By.xpath(".."));
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+                label);
+        label.click();
+        WebDriverWaitFactory.createWebDriverWait(parent().driver())
+                .until(ExpectedConditions.elementToBeSelected(input));
         return this;
     }
 
