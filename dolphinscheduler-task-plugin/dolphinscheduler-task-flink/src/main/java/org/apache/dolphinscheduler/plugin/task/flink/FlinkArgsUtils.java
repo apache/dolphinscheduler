@@ -134,7 +134,7 @@ public class FlinkArgsUtils {
         try {
             IShellInterceptorBuilder shellInterceptorBuilder = ShellInterceptorBuilderFactory.newBuilder()
                     .shellDirectory(taskExecutionContext.getExecutePath())
-                    .shellName(taskExecutionContext.getTaskAppId() + FLINK_COMMAND_SHELL_NAME_SUFFIX
+                    .shellName(taskExecutionContext.getTaskInstanceId() + FLINK_COMMAND_SHELL_NAME_SUFFIX
                             + System.nanoTime())
                     .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
                     .appendScript(String.join(" ", args))
