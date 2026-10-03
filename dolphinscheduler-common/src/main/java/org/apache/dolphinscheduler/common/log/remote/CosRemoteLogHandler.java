@@ -79,15 +79,12 @@ public class CosRemoteLogHandler implements RemoteLogHandler, Closeable {
     }
 
     @Override
-    public void getRemoteLog(String logPath) {
+    public void getRemoteLog(String logPath) throws IOException {
         String objectName = RemoteLogUtils.getObjectNameFromLogPath(logPath);
+        log.info("get remote log from tencent cos {} to {}", objectName, logPath);
 
-        try {
-            log.info("get remote log from tencent cos {} to {}", objectName, logPath);
-            cosClient.getObject(new GetObjectRequest(bucketName, objectName), new File(logPath));
-        } catch (Exception e) {
-            log.error("error while sending remote log from {} to tencent cos {}, reason:", objectName, logPath, e);
-        }
+        RemoteLogUtils.downloadToLocalFileAtomically(logPath,
+                staging -> cosClient.getObject(new GetObjectRequest(bucketName, objectName), staging.toFile()));
     }
 
     @Override

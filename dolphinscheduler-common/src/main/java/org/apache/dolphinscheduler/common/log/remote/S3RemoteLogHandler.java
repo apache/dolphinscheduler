@@ -81,24 +81,31 @@ public class S3RemoteLogHandler implements RemoteLogHandler, Closeable {
     }
 
     @Override
-    public void getRemoteLog(String logPath) {
+    public void getRemoteLog(String logPath) throws IOException {
         String objectName = RemoteLogUtils.getObjectNameFromLogPath(logPath);
+        log.info("get remote log on S3 {} to {}", objectName, logPath);
 
-        try {
-            log.info("get remote log on S3 {} to {}", objectName, logPath);
+        RemoteLogUtils.downloadToLocalFileAtomically(logPath, staging -> {
             S3Object o = s3Client.getObject(bucketName, objectName);
+            final long expectedLength = o.getObjectMetadata().getContentLength();
+            long writtenLength = 0;
             try (
                     S3ObjectInputStream s3is = o.getObjectContent();
-                    FileOutputStream fos = new FileOutputStream(logPath)) {
+                    FileOutputStream fos = new FileOutputStream(staging.toFile())) {
                 byte[] readBuf = new byte[1024];
                 int readLen = 0;
                 while ((readLen = s3is.read(readBuf)) > 0) {
                     fos.write(readBuf, 0, readLen);
+                    writtenLength += readLen;
                 }
             }
-        } catch (Exception e) {
-            log.error("error while getting remote log on S3 {} to {}", objectName, logPath, e);
-        }
+            if (expectedLength >= 0 && writtenLength != expectedLength) {
+                // The SDK normally fails the read on a broken transfer; this check guarantees that
+                // a short stream can never be published as a complete log either way.
+                throw new IOException("Truncated download of the remote log on S3 " + objectName + ": expected "
+                        + expectedLength + " bytes but received " + writtenLength);
+            }
+        });
     }
 
     protected String readBucketName() {

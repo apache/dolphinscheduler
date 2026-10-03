@@ -106,7 +106,8 @@ public class NettyRemotingClient implements AutoCloseable {
                                                 clientConfig.getHeartBeatIntervalMillis(),
                                                 0,
                                                 TimeUnit.MILLISECONDS))
-                                .addLast(new TransporterDecoder(), clientHandler, new TransporterEncoder());
+                                .addLast(new TransporterDecoder(clientConfig.getMaxFrameSize()),
+                                        clientHandler, new TransporterEncoder());
                     }
                 });
         isStarted.compareAndSet(false, true);
@@ -162,29 +163,60 @@ public class NettyRemotingClient implements AutoCloseable {
         if (channel == null) {
             throw new RemoteException(String.format("connect to : %s fail", serverHost));
         }
-        final ResponseFuture responseFuture = new ResponseFuture(transporter.getHeader().getOpaque(), timeoutMills);
-        channel.writeAndFlush(transporter).addListener(future -> {
-            if (future.isSuccess()) {
-                responseFuture.setSendOk(true);
-                return;
-            } else {
-                responseFuture.setSendOk(false);
-            }
-            responseFuture.setCause(future.cause());
-            responseFuture.putResponse(null);
-            log.error("Send Sync request {} to host {} failed", transporter, serverHost, responseFuture.getCause());
-        });
+        final ResponseFuture responseFuture =
+                new ResponseFuture(transporter.getHeader().getOpaque(), timeoutMills, channel);
+        if (!channel.isActive()) {
+            // The channel died between getOrCreateChannel's liveness check and this registration
+            // (e.g. the drain of a concurrent channel failure just ran): no response can ever
+            // arrive on it. Fail this request NOW — the caller wakes immediately with the cause
+            // instead of waiting out the full RPC timeout. Checking liveness AFTER registering in
+            // FUTURE_TABLE is what makes this airtight: if the channel dies after the check, the
+            // channelInactive drain finds the future in the table and fails it; if it died
+            // before, this check catches it.
+            responseFuture.fail(new RemoteException("Channel is not active: " + serverHost));
+        } else {
+            channel.writeAndFlush(transporter).addListener(future -> {
+                if (future.isSuccess()) {
+                    responseFuture.setSendOk(true);
+                    return;
+                } else {
+                    responseFuture.setSendOk(false);
+                }
+                responseFuture.setCause(future.cause());
+                responseFuture.putResponse(null);
+                log.error("Send Sync request {} to host {} failed", transporter, serverHost, responseFuture.getCause());
+            });
+        }
         /*
          * sync wait for result
          */
-        final IRpcResponse iRpcResponse = responseFuture.waitResponse();
+        final IRpcResponse iRpcResponse;
+        try {
+            iRpcResponse = responseFuture.waitResponse();
+        } catch (InterruptedException e) {
+            // Caller thread was interrupted while waiting (e.g. shutdownNow / task cancellation).
+            // Same leak concern as the timeout path below: give up on this request and drop it
+            // from FUTURE_TABLE — nothing else will clean it up while the channel stays healthy.
+            responseFuture.cancel();
+            throw e;
+        }
         if (iRpcResponse != null) {
             return iRpcResponse;
         }
-        if (responseFuture.isSendOK()) {
-            throw new RemoteTimeoutException(serverHost.toString(), timeoutMills, responseFuture.getCause());
-        } else {
+        // If cause was set (e.g. by exceptionCaught for TooLongFrameException),
+        // surface it immediately rather than reporting a misleading timeout.
+        if (responseFuture.getCause() != null) {
             throw new RemoteException(serverHost.toString(), responseFuture.getCause());
+        }
+        if (responseFuture.isSendOK()) {
+            // Timed out: the caller gives up. Complete the future and drop it from FUTURE_TABLE —
+            // nothing else will clean it up while the channel stays healthy (heartbeats keep it
+            // alive even though the server never responds). A late response finds no future and
+            // is dropped.
+            responseFuture.cancel();
+            throw new RemoteTimeoutException(serverHost.toString(), timeoutMills, null);
+        } else {
+            throw new RemoteException(serverHost.toString(), null);
         }
     }
 
@@ -253,7 +285,14 @@ public class NettyRemotingClient implements AutoCloseable {
         }
     }
 
-    public void onChannelInactive(final Host host) {
-        channels.remove(host);
+    /**
+     * Called when a channel died (inactive or pipeline exception). Removes the entry by CHANNEL
+     * IDENTITY, never by host: by the time this late notification runs, another thread may have
+     * already built a replacement channel for the same host — removing by host would evict that
+     * healthy replacement, orphaning it (never reused, never closed) and forcing later requests
+     * to create yet another connection.
+     */
+    public void onChannelInactive(final Channel channel) {
+        channels.values().removeIf(ch -> ch == channel);
     }
 }

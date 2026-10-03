@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
@@ -103,24 +104,31 @@ public class AbsRemoteLogHandler implements RemoteLogHandler, Closeable {
     }
 
     @Override
-    public void getRemoteLog(String logPath) {
+    public void getRemoteLog(String logPath) throws IOException {
         String objectName = RemoteLogUtils.getObjectNameFromLogPath(logPath);
+        log.info("get remote log on Azure Blob {} to {}", objectName, logPath);
 
-        try {
-            log.info("get remote log on Azure Blob {} to {}", objectName, logPath);
-
+        RemoteLogUtils.downloadToLocalFileAtomically(logPath, staging -> {
+            BlobClient blobClient = blobContainerClient.getBlobClient(objectName);
             try (
-                    BlobInputStream bis = blobContainerClient.getBlobClient(objectName).openInputStream();
-                    FileOutputStream fos = new FileOutputStream(logPath)) {
+                    BlobInputStream bis = blobClient.openInputStream();
+                    FileOutputStream fos = new FileOutputStream(staging.toFile())) {
+                final long expectedLength = bis.getProperties().getBlobSize();
+                long writtenLength = 0;
                 byte[] readBuf = new byte[1024];
                 int readLen = 0;
                 while ((readLen = bis.read(readBuf)) > 0) {
                     fos.write(readBuf, 0, readLen);
+                    writtenLength += readLen;
+                }
+                if (expectedLength >= 0 && writtenLength != expectedLength) {
+                    // The SDK normally fails the read on a broken transfer; this check guarantees
+                    // that a short stream can never be published as a complete log either way.
+                    throw new IOException("Truncated download of the remote log on Azure Blob " + objectName
+                            + ": expected " + expectedLength + " bytes but received " + writtenLength);
                 }
             }
-        } catch (Exception e) {
-            log.error("error while getting remote log on Azure Blob {} to {}", objectName, logPath, e);
-        }
+        });
     }
 
     protected String readAccountName() {

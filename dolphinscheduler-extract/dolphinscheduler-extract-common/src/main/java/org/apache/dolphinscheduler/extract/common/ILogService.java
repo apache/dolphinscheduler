@@ -36,4 +36,11 @@ public interface ILogService {
     @RpcMethod
     void removeTaskInstanceLog(String taskInstanceLogAbsolutePath);
 
+    /**
+     * Read a bounded chunk of the log file [offset, offset+length) for streaming download.
+     * The worker clamps length to a maximum chunk size and returns eof metadata.
+     */
+    @RpcMethod(timeout = 30_000)
+    TaskInstanceLogFileDownloadResponse getTaskInstanceLogFileChunk(TaskInstanceLogFileDownloadRequest request);
+
 }
