@@ -157,7 +157,7 @@ export function useTaskEdit(options: Options) {
       (t) => t.code === code
     )
     if (definition) {
-      currTask.value = definition
+      currTask.value = cloneDeep(definition)
     }
     updatePreTasks(getSources(String(code)), code)
     updatePostTasks(code)
