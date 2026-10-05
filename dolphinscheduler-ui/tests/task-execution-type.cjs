@@ -63,6 +63,20 @@ function load(file) {
   const module = { exports: {} }
   const code = ts.transpileModule(source(file), { compilerOptions }).outputText
   function localRequire(id) {
+    if (id === './dag-hooks') {
+      return {
+        useCellUpdate: () => ({
+          addNode() {},
+          removeNode() {},
+          getSources: () => [],
+          getTargets: () => [],
+          setNodeName() {},
+          setNodeFillColor() {},
+          setNodeExecuteType() {},
+          setNodeEdge() {}
+        })
+      }
+    }
     if (id === '../fields/index') return fields
     if (id === './tasks') {
       return {
@@ -146,6 +160,98 @@ function check(name, run) {
   } catch (error) {
     checks.push({ name, result: 'FAIL', error: error.message })
   }
+}
+
+// Mount the real editor hook so its lifecycle and reactive ownership are active.
+// Graph rendering is irrelevant to the task-definition Cancel/Save contract.
+function makeEditor() {
+  const definition = vue.ref({
+    workflowDefinition: {},
+    workflowTaskRelationList: [],
+    taskDefinitionList: [
+      {
+        id: 5,
+        code: 20,
+        version: 3,
+        name: 'saved',
+        taskType: 'SEATUNNEL',
+        taskExecuteType: 'STREAM',
+        taskParams: { localParams: [{ prop: 'key', value: 'original' }] }
+      }
+    ]
+  })
+  let editor
+  const app = vue
+    .createRenderer({
+      createComment: () => ({}),
+      insert() {},
+      remove() {},
+      parentNode() {},
+      nextSibling() {}
+    })
+    .createApp({
+      setup() {
+        editor = load(
+          'views/projects/workflow/components/dag/use-task-edit.ts'
+        ).useTaskEdit({ graph: vue.ref(), definition })
+        return () => null
+      }
+    })
+  app.mount({})
+  return { definition, editor, close: () => app.unmount() }
+}
+
+for (const nextType of ['SHELL', 'FLINK_STREAM', 'SEATUNNEL']) {
+  check(
+    `Cancel ${nextType} edit preserves saved task and nested parameters`,
+    () => {
+      const { definition, editor, close } = makeEditor()
+      try {
+        const original = definition.value.taskDefinitionList[0]
+        const snapshot = JSON.parse(JSON.stringify(original))
+        editor.editTask(20)
+        changeTaskType(editor.currTask.value, nextType)
+        editor.currTask.value.taskParams.localParams[0].value = 'draft'
+        editor.taskCancel()
+        assert.equal(editor.taskModalVisible.value, false)
+        assert.equal(definition.value.taskDefinitionList[0], original)
+        assert.deepEqual(JSON.parse(JSON.stringify(original)), snapshot)
+      } finally {
+        close()
+      }
+    }
+  )
+}
+
+for (const nextType of ['SEATUNNEL', 'FLINK_STREAM', 'SHELL']) {
+  check(
+    `Save ${nextType} edit commits mode and preserves task identity`,
+    () => {
+      const { definition, editor, close } = makeEditor()
+      try {
+        const original = definition.value.taskDefinitionList[0]
+        const parent = definition.value
+        editor.editTask(20)
+        changeTaskType(editor.currTask.value, nextType)
+        const model = makeForm(editor.currTask.value, 1)
+        model.taskExecuteType = nextType === 'FLINK_STREAM' ? 'STREAM' : 'BATCH'
+        model.name = 'edited'
+        editor.taskConfirm({ data: model })
+        const saved = definition.value.taskDefinitionList[0]
+        assert.equal(editor.workflowDefinition.value, parent)
+        assert.notEqual(saved, original)
+        assert.equal(saved.taskType, nextType)
+        assert.equal(saved.taskExecuteType, model.taskExecuteType)
+        assert.equal(saved.name, 'edited')
+        assert.equal(saved.id, 5)
+        assert.equal(saved.code, 20)
+        assert.equal(saved.version, 3)
+        assert.equal(editor.taskModalVisible.value, false)
+      } finally {
+        close()
+      }
+    }
+  )
 }
 
 for (const [oldType, oldMode, nextType, expected] of [
