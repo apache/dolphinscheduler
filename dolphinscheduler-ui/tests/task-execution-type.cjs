@@ -49,6 +49,7 @@ const compilerOptions = {
   esModuleInterop: true
 }
 const cache = new Map()
+const graphModes = new Map()
 const fields = new Proxy(
   { __esModule: true },
   { get: (target, key) => (key === '__esModule' ? true : () => []) }
@@ -72,7 +73,9 @@ function load(file) {
           getTargets: () => [],
           setNodeName() {},
           setNodeFillColor() {},
-          setNodeExecuteType() {},
+          setNodeExecuteType(code, mode) {
+            graphModes.set(code, mode)
+          },
           setNodeEdge() {}
         })
       }
@@ -164,7 +167,8 @@ function check(name, run) {
 
 // Mount the real editor hook so its lifecycle and reactive ownership are active.
 // Graph rendering is irrelevant to the task-definition Cancel/Save contract.
-function makeEditor() {
+function makeEditor(taskType = 'SEATUNNEL', taskExecuteType = 'STREAM') {
+  graphModes.clear()
   const definition = vue.ref({
     workflowDefinition: {},
     workflowTaskRelationList: [],
@@ -174,8 +178,8 @@ function makeEditor() {
         code: 20,
         version: 3,
         name: 'saved',
-        taskType: 'SEATUNNEL',
-        taskExecuteType: 'STREAM',
+        taskType,
+        taskExecuteType,
         taskParams: { localParams: [{ prop: 'key', value: 'original' }] }
       }
     ]
@@ -253,6 +257,49 @@ for (const nextType of ['SEATUNNEL', 'FLINK_STREAM', 'SHELL']) {
     }
   )
 }
+
+for (const [taskType, mode, expected] of [
+  ['FLINK_STREAM', null, 'STREAM'],
+  ['SHELL', null, 'BATCH'],
+  ['SEATUNNEL', null, 'BATCH'],
+  ['FLINK_STREAM', 'BATCH', 'BATCH'],
+  ['FLINK_STREAM', 'STREAM', 'STREAM'],
+  ['SEATUNNEL', 'BATCH', 'BATCH'],
+  ['SEATUNNEL', 'STREAM', 'STREAM']
+]) {
+  check(`Confirm ${taskType}/${mode} keeps graph mode ${expected}`, () => {
+    const { definition, editor, close } = makeEditor(taskType, mode)
+    try {
+      editor.editTask(20)
+      const model = reopen(editor.currTask.value)
+      assert.equal(model.taskExecuteType, mode)
+      editor.taskConfirm({ data: model })
+      assert.equal(graphModes.get('20'), expected)
+      assert.equal(definition.value.taskDefinitionList[0].taskExecuteType, mode)
+    } finally {
+      close()
+    }
+  })
+}
+
+check('Confirm graph fallback follows the edited type being saved', () => {
+  const { definition, editor, close } = makeEditor('SHELL', 'BATCH')
+  try {
+    editor.editTask(20)
+    changeTaskType(editor.currTask.value, 'FLINK_STREAM')
+    const model = makeForm(editor.currTask.value)
+    model.taskExecuteType = null
+    editor.taskConfirm({ data: model })
+    assert.equal(graphModes.get('20'), 'STREAM')
+    assert.equal(
+      definition.value.taskDefinitionList[0].taskType,
+      'FLINK_STREAM'
+    )
+    assert.equal(definition.value.taskDefinitionList[0].taskExecuteType, null)
+  } finally {
+    close()
+  }
+})
 
 for (const [oldType, oldMode, nextType, expected] of [
   ['SHELL', 'BATCH', 'FLINK_STREAM', 'STREAM'],
