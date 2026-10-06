@@ -224,6 +224,11 @@ const NodeDetailModal = defineComponent({
     }
 
     const onTaskTypeChange = (taskType: ITaskType) => {
+      if (props.data.taskType !== taskType) {
+        // Let the new task type initialize its execution mode.
+        // eslint-disable-next-line vue/no-mutating-props
+        delete props.data.taskExecuteType
+      }
       // eslint-disable-next-line vue/no-mutating-props
       props.data.taskType = taskType
       initHeaderLinks(props.workflowInstance, props.data.taskType)
