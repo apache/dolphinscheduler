@@ -89,6 +89,10 @@ jobs:
             echo "Code format check failed! Please run \`pnpm run lint\` to format the code."
             exit -1
           fi
+      - name: Task execution type regressions
+        run: |
+          node tests/task-execution-type.cjs
+          node tests/task-execution-graph.cjs
       - name: Compile and Build on ${{ matrix.os }}
         run: |
           pnpm run build:prod

@@ -28,6 +28,8 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskFor
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
@@ -68,13 +70,19 @@ public final class WorkflowForm {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public <T> T addTask(TaskType type) {
+        return addTask(type, null, null);
+    }
+
+    @SneakyThrows
+    @SuppressWarnings("unchecked")
+    public <T> T addTask(TaskType type, Integer x, Integer y) {
         final WebElement task = driver.findElement(By.className("task-item-" + type.name()));
         final WebElement canvas = driver.findElement(By.className("dag-container"));
 
         final JavascriptExecutor js = (JavascriptExecutor) driver;
         final String dragAndDrop = String.join("\n",
                 Resources.readLines(Resources.getResource("dragAndDrop.js"), StandardCharsets.UTF_8));
-        js.executeScript(dragAndDrop, task, canvas);
+        js.executeScript(dragAndDrop, task, canvas, x, y);
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions
                 .visibilityOfElementLocated(By.xpath("//*[contains(text(), 'Current node settings')]")));
 
@@ -111,6 +119,58 @@ public final class WorkflowForm {
         action.doubleClick(task).build().perform();
 
         return task;
+    }
+
+    public String taskCode(String taskName) {
+        return WebDriverWaitFactory.createWebDriverWait(driver).until(unused -> driver
+                .findElements(By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task']")).stream()
+                .filter(node -> node.findElement(By.xpath("./*[local-name()='text']")).getText()
+                        .equals(taskName))
+                .map(node -> node.getAttribute("data-cell-id"))
+                .findFirst().orElse(null));
+    }
+
+    public void openTask(String code) {
+        WebElement node = WebDriverWaitFactory.createWebDriverWait(driver).until(
+                ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task'][data-cell-id='"
+                                + code + "']")));
+        new Actions(driver).doubleClick(node).perform();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".input-node-name input")));
+    }
+
+    public String copyTask(String code) {
+        Set<String> existing = driver
+                .findElements(By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task']")).stream()
+                .map(node -> node.getAttribute("data-cell-id")).collect(Collectors.toSet());
+        new Actions(driver).contextClick(driver.findElement(
+                By.cssSelector(
+                        ".dag-container .x6-graph-scroller g[data-shape='dag-task'][data-cell-id='" + code + "']")))
+                .perform();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(By.xpath(
+                "//div[contains(@class, 'dag-context-menu')]//button[normalize-space(.)='Copy']"))).click();
+        return WebDriverWaitFactory.createWebDriverWait(driver).until(unused -> {
+            List<String> added = driver
+                    .findElements(By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task']")).stream()
+                    .map(node -> node.getAttribute("data-cell-id"))
+                    .filter(id -> !existing.contains(id)).collect(Collectors.toList());
+            return added.size() == 1 ? added.get(0) : null;
+        });
+    }
+
+    public void waitForEdgeStyle(int count, boolean stream) {
+        WebDriverWaitFactory.createWebDriverWait(driver).until(unused -> {
+            List<WebElement> edges =
+                    driver.findElements(By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-edge']"));
+            return edges.size() == count && edges.stream().allMatch(edge -> {
+                List<WebElement> lines = edge.findElements(By.cssSelector("path[stroke-dasharray]"));
+                return !lines.isEmpty() && lines.stream()
+                        .allMatch(line -> line.getAttribute("stroke-dasharray").replace(',', ' ').trim()
+                                .replaceAll("\\s+", " ")
+                                .equals(stream ? "5 5" : "none"));
+            });
+        });
     }
 
     public WorkflowSaveDialog submit() {
