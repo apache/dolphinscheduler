@@ -700,7 +700,9 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setVersion(taskDefinitionLog.getVersion());
                 taskNode.setName(taskDefinitionLog.getName());
                 taskNode.setDesc(taskDefinitionLog.getDescription());
-                taskNode.setType(taskDefinitionLog.getTaskType().toUpperCase());
+                taskNode.setType(taskDefinitionLog.getTaskType() != null
+                        ? taskDefinitionLog.getTaskType().toUpperCase()
+                        : "");
                 taskNode.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_NORMAL
                         : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
                 taskNode.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
@@ -715,6 +717,7 @@ public class ProcessServiceImpl implements ProcessService {
                                 taskDefinitionLog.getTimeout())));
                 taskNode.setDelayTime(taskDefinitionLog.getDelayTime());
                 taskNode.setPreTasks(JSONUtils.toJsonString(code.getValue().stream().map(taskDefinitionLogMap::get)
+                        .filter(Objects::nonNull)
                         .map(TaskDefinition::getCode).collect(Collectors.toList())));
                 taskNode.setTaskGroupId(taskDefinitionLog.getTaskGroupId());
                 taskNode.setTaskGroupPriority(taskDefinitionLog.getTaskGroupPriority());
