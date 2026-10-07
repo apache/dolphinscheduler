@@ -674,6 +674,46 @@ public class WorkflowInstanceServiceTest {
     }
 
     @Test
+    public void testUpdateWorkflowInstanceShouldRejectUnknownPreTaskCode() {
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(projectCode);
+        workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
+        WorkflowDefinition workflowDefinition = new WorkflowDefinition();
+        workflowDefinition.setProjectCode(projectCode);
+        workflowDefinition.setCode(46L);
+
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
+        when(processService.saveTaskDefine(eq(loginUser), eq(projectCode), Mockito.anyList(), eq(Boolean.TRUE)))
+                .thenReturn(1);
+        when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
+        // transformTask rejects the relation referencing a preTaskCode without task definition
+        doThrow(new ServiceException(Status.TASK_DEFINE_NOT_EXIST, "123451235"))
+                .when(workflowDefinitionService).checkWorkflowNodeList(Mockito.anyString(), Mockito.anyList());
+
+        try (
+                MockedStatic<TaskPluginManager> taskPluginManagerMockedStatic =
+                        Mockito.mockStatic(TaskPluginManager.class)) {
+            taskPluginManagerMockedStatic
+                    .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
+                    .thenReturn(true);
+
+            assertThrowsServiceException(Status.TASK_DEFINE_NOT_EXIST,
+                    () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                            taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0));
+        }
+
+        // no invalid relation and no new definition version may be persisted when the check fails
+        Mockito.verify(processService, Mockito.never())
+                .saveTaskRelation(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt(),
+                        Mockito.anyList(), Mockito.anyList(), Mockito.anyBoolean());
+        Mockito.verify(processService, Mockito.never())
+                .saveWorkflowDefine(Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+    }
+
+    @Test
     public void testUpdateWorkflowInstanceWithMismatchedProjectCode() {
         long projectCode = 1L;
         User loginUser = getAdminUser();
