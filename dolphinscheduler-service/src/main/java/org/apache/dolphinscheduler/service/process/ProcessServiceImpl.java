@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.TimeoutFlag;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -438,6 +439,11 @@ public class ProcessServiceImpl implements ProcessService {
             taskDefinitionLog.setUpdateTime(now);
             taskDefinitionLog.setOperateTime(now);
             taskDefinitionLog.setOperator(operator.getId());
+            if (taskDefinitionLog.getTaskExecuteType() == null) {
+                // taskExecuteType is missing when the task definition comes from
+                // workflow export/import, default it to BATCH instead of persisting null
+                taskDefinitionLog.setTaskExecuteType(TaskExecuteType.BATCH);
+            }
             if (taskDefinitionLog.getCode() == 0) {
                 taskDefinitionLog.setCode(CodeGenerateUtils.genCode());
             }

@@ -113,4 +113,25 @@ public class WorkflowInstanceUtilsTest {
                 + "Start Time:             2023-08-01\n"
                 + "End Time:               2023-08-01\n", WorkflowInstanceUtils.logTaskInstanceInDetail(taskInstance));
     }
+
+    @Test
+    public void testLogTaskInstanceInDetailWithNullTaskExecuteType() {
+        // taskExecuteType is null when the task definition was created via workflow
+        // export/import; the log helper must not throw NPE on the task finish path
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setName("test_process");
+        workflowInstance.setTenantCode("default");
+
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setName("test_task");
+        taskInstance.setWorkflowInstance(workflowInstance);
+        taskInstance.setState(TaskExecutionStatus.SUCCESS);
+        taskInstance.setTaskExecuteType(null);
+        taskInstance.setHost("127.0.0.1");
+        taskInstance.setTaskType("SHELL");
+        taskInstance.setTaskInstancePriority(Priority.MEDIUM);
+
+        String detail = WorkflowInstanceUtils.logTaskInstanceInDetail(taskInstance);
+        Assertions.assertTrue(detail.contains("Task Execute Type:      N/A"));
+    }
 }

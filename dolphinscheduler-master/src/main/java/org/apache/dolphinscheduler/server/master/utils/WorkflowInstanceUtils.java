@@ -91,7 +91,11 @@ public class WorkflowInstanceUtils {
                 .append(Strings.repeat("*", horizontalLineLength)).append("\n")
                 .append("Task Name:              ").append(taskInstance.getName()).append("\n")
                 .append("Workflow Instance Name: ").append(taskInstance.getWorkflowInstance().getName()).append("\n")
-                .append("Task Execute Type:      ").append(taskInstance.getTaskExecuteType().getDesc()).append("\n")
+                .append("Task Execute Type:      ")
+                .append(taskInstance.getTaskExecuteType() == null
+                        ? "N/A"
+                        : taskInstance.getTaskExecuteType().getDesc())
+                .append("\n")
                 .append("Execute State:          ").append(taskInstance.getState().getDesc()).append("\n")
                 .append("Host:                   ").append(taskInstance.getHost()).append("\n")
                 .append("Task Type:              ").append(taskInstance.getTaskType()).append("\n")
