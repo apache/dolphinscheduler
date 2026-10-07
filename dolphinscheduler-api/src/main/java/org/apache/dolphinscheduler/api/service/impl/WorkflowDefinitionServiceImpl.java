@@ -996,7 +996,15 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             List<WorkflowTaskRelation> taskRelationList =
                     JSONUtils.toList(workflowTaskRelationJson, WorkflowTaskRelation.class);
             // Check whether the task node is normal
-            List<TaskNode> taskNodes = processService.transformTask(taskRelationList, taskDefinitionLogsList);
+            List<TaskNode> taskNodes;
+            try {
+                taskNodes = processService.transformTask(taskRelationList, taskDefinitionLogsList);
+            } catch (org.apache.dolphinscheduler.service.exceptions.ServiceException e) {
+                // transformTask reports task codes referenced by relations but missing in task definitions
+                log.error("Task definitions do not exist, given workflowTaskRelationJson: {}",
+                        workflowTaskRelationJson, e);
+                throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, e.getMessage());
+            }
 
             if (CollectionUtils.isEmpty(taskNodes)) {
                 log.error("Task node data is empty.");

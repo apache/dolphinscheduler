@@ -84,6 +84,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParamete
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.process.ProcessServiceImpl;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -797,6 +798,43 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         ServiceException emptyDagEx = Assertions.assertThrows(ServiceException.class,
                 () -> workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs));
         Assertions.assertEquals(Status.WORKFLOW_DAG_IS_EMPTY.getCode(), emptyDagEx.getCode());
+    }
+
+    @Test
+    public void testTransformTaskShouldRejectMissingPreTaskDefinition() {
+        // relation references preTaskCode 123451235 which has no task definition; the shared
+        // transformation must fail explicitly instead of silently dropping the dependency
+        String taskRelationJsonWithUnknownPreTaskCode =
+                "[{\"name\":\"\",\"preTaskCode\":123451235,\"preTaskVersion\":1,\"postTaskCode\":123456789,"
+                        + "\"postTaskVersion\":1,\"conditionType\":\"NONE\",\"conditionParams\":\"{}\"}]";
+        List<WorkflowTaskRelation> taskRelations =
+                JSONUtils.toList(taskRelationJsonWithUnknownPreTaskCode, WorkflowTaskRelation.class);
+        List<TaskDefinitionLog> taskDefinitionLogs =
+                JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+
+        org.apache.dolphinscheduler.service.exceptions.ServiceException exception =
+                Assertions.assertThrows(org.apache.dolphinscheduler.service.exceptions.ServiceException.class,
+                        () -> new ProcessServiceImpl().transformTask(taskRelations, taskDefinitionLogs));
+        Assertions.assertTrue(exception.getMessage().contains("123451235"));
+    }
+
+    @Test
+    public void testCheckWorkflowNodeListShouldReportMissingTaskCode() {
+        // the workflow-instance update path goes through checkWorkflowNodeList -> transformTask,
+        // the missing task code must be reported as TASK_DEFINE_NOT_EXIST
+        when(processService.transformTask(anyList(), anyList())).thenThrow(
+                new org.apache.dolphinscheduler.service.exceptions.ServiceException(
+                        "The task definitions of pre taskCodes: [123451235] do not exist"));
+        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+
+        String taskRelationJsonWithUnknownPreTaskCode =
+                "[{\"name\":\"\",\"preTaskCode\":123451235,\"preTaskVersion\":1,\"postTaskCode\":123456789,"
+                        + "\"postTaskVersion\":1,\"conditionType\":\"NONE\",\"conditionParams\":\"{}\"}]";
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.checkWorkflowNodeList(taskRelationJsonWithUnknownPreTaskCode,
+                        taskDefinitionLogs));
+        Assertions.assertEquals(Status.TASK_DEFINE_NOT_EXIST.getCode(), exception.getCode());
+        Assertions.assertTrue(exception.getMessage().contains("123451235"));
     }
 
     @Test
