@@ -130,12 +130,19 @@ public final class WorkflowForm {
                 .findFirst().orElse(null));
     }
 
-    public void openTask(String code) {
+    private WebElement taskBodyInView(String code) {
         WebElement node = WebDriverWaitFactory.createWebDriverWait(driver).until(
                 ExpectedConditions.visibilityOfElementLocated(
                         By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task'][data-cell-id='"
-                                + code + "']")));
-        new Actions(driver).doubleClick(node).perform();
+                                + code + "'] > .dag-task-body")));
+        // Keep native pointer actions clear of the minimap overlay.
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block: 'center', inline: 'center'});", node);
+        return node;
+    }
+
+    public void openTask(String code) {
+        new Actions(driver).doubleClick(taskBodyInView(code)).perform();
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
                 By.cssSelector(".input-node-name input")));
     }
@@ -144,10 +151,7 @@ public final class WorkflowForm {
         Set<String> existing = driver
                 .findElements(By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task']")).stream()
                 .map(node -> node.getAttribute("data-cell-id")).collect(Collectors.toSet());
-        new Actions(driver).contextClick(driver.findElement(
-                By.cssSelector(
-                        ".dag-container .x6-graph-scroller g[data-shape='dag-task'][data-cell-id='" + code + "']")))
-                .perform();
+        new Actions(driver).contextClick(taskBodyInView(code)).perform();
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(By.xpath(
                 "//div[contains(@class, 'dag-context-menu')]//button[normalize-space(.)='Copy']"))).click();
         return WebDriverWaitFactory.createWebDriverWait(driver).until(unused -> {
