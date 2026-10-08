@@ -41,7 +41,11 @@ import {
 } from '@/common/column-width-config'
 import type { IDefinitionParam } from './types'
 import type { Router } from 'vue-router'
-import type { TableColumns, RowKey } from 'naive-ui/es/data-table/src/interface'
+import type {
+  TableColumns,
+  RowKey,
+  SortState
+} from 'naive-ui/es/data-table/src/interface'
 import { useDependencies } from '../../components/dependencies/use-dependencies'
 
 export function useTable() {
@@ -60,6 +64,7 @@ export function useTable() {
     page: ref(1),
     pageSize: ref(10),
     searchVal: ref(),
+    sorter: ref<SortState | null>(null),
     totalPage: ref(1),
     totalCount: ref(0),
     timingType: ref('create'),
@@ -96,6 +101,7 @@ export function useTable() {
       {
         title: t('project.workflow.workflow_name'),
         key: 'name',
+        sorter: 'default',
         className: 'workflow-name',
         ...COLUMN_WIDTH_CONFIG['name'],
         titleColSpan: 3,
@@ -238,11 +244,13 @@ export function useTable() {
       {
         title: t('project.workflow.create_time'),
         key: 'createTime',
+        sorter: 'default',
         ...COLUMN_WIDTH_CONFIG['time']
       },
       {
         title: t('project.workflow.update_time'),
         key: 'updateTime',
+        sorter: 'default',
         ...COLUMN_WIDTH_CONFIG['time']
       },
       {
@@ -507,8 +515,17 @@ export function useTable() {
     if (variables.loadingRef) return
     variables.loadingRef = true
     // Always release loading lock, even when request fails.
+    const sorter = variables.sorter
+    const sortField =
+      sorter && sorter.order ? String(sorter.columnKey) : undefined
+    const sortOrder =
+      sorter && sorter.order === 'ascend'
+        ? 'asc'
+        : sorter && sorter.order === 'descend'
+        ? 'desc'
+        : undefined
     const queryStatePromise = queryListPaging(
-      { ...params },
+      { ...params, sortField, sortOrder },
       variables.projectCode
     )
       .then((res: any) => {

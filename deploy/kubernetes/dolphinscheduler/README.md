@@ -425,10 +425,11 @@ The paths above match the API and Worker server classpaths. Check the configurat
 | worker.tolerations | list | `[]` | Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission, effectively unioning the set of nodes tolerated by the pod and the RuntimeClass. |
 | worker.updateStrategy.type | string | `"RollingUpdate"` |  |
 | zookeeper.enabled | bool | `true` | If not exists external registry, the zookeeper registry will be used by default. |
+| zookeeper.extraEnvVars | list | `[{"name":"ALLOW_EMPTY_PASSWORD","value":"yes"}]` | Extra environment variables for ZooKeeper. ZooKeeper images since 3.9.4 require ALLOW_EMPTY_PASSWORD instead of ALLOW_ANONYMOUS_LOGIN, which the bundled chart still sets |
 | zookeeper.fourlwCommandsWhitelist | string | `"srvr,ruok,wchs,cons"` | A list of comma separated Four Letter Words commands to use |
 | zookeeper.image.registry | string | `"docker.io"` |  |
-| zookeeper.image.repository | string | `"bitnamilegacy/zookeeper"` |  |
-| zookeeper.image.tag | string | `"3.9.3-debian-12-r21"` |  |
+| zookeeper.image.repository | string | `"soldevelo/zookeeper"` |  |
+| zookeeper.image.tag | string | `"3.9.6-debian-12-r1"` |  |
 | zookeeper.persistence.enabled | bool | `false` | Set `zookeeper.persistence.enabled` to true to mount a new volume for internal ZooKeeper |
 | zookeeper.persistence.size | string | `"20Gi"` | PersistentVolumeClaim size |
 | zookeeper.persistence.storageClass | string | `"-"` | ZooKeeper data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |

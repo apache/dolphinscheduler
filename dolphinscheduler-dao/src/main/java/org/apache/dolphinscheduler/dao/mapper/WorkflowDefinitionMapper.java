@@ -101,7 +101,9 @@ public interface WorkflowDefinitionMapper extends BaseMapper<WorkflowDefinition>
     IPage<WorkflowDefinition> queryDefineListPaging(IPage<WorkflowDefinition> page,
                                                     @Param("searchVal") String searchVal,
                                                     @Param("userId") int userId,
-                                                    @Param("projectCode") long projectCode);
+                                                    @Param("projectCode") long projectCode,
+                                                    @Param("sortField") String sortField,
+                                                    @Param("sortOrder") String sortOrder);
 
     /**
      * Filter workflow definitions
