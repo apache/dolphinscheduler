@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.lifecycle.handler;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.ILifecycleEventType;
 import org.apache.dolphinscheduler.server.master.engine.task.client.TaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
@@ -53,7 +54,12 @@ public class TaskSuccessLifecycleEventHandler extends AbstractTaskLifecycleEvent
                        final TaskSuccessLifecycleEvent taskSuccessEvent) {
         taskStateAction.onSucceedEvent(workflowExecution, taskExecution, taskSuccessEvent);
 
-        if (taskSuccessEvent.isNeedAlert()) {
+        // Only persist the task result alert when the success event has been accepted and the
+        // task has actually transitioned to SUCCESS. State actions that reject a late success
+        // event (e.g. a paused or killed task) only log a warning and keep the task in its
+        // current state, so the alert must be skipped as well.
+        if (taskExecution.getTaskInstance().getState() == TaskExecutionStatus.SUCCESS
+                && taskSuccessEvent.isNeedAlert()) {
             workflowAlertManager.sendTaskResultAlert(
                     taskExecution.getWorkflowInstance(),
                     taskExecution.getTaskInstance(),
