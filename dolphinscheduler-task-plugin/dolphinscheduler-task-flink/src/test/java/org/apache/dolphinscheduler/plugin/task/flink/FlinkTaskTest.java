@@ -202,10 +202,27 @@ public class FlinkTaskTest {
         FlinkTask task = Mockito.spy(new FlinkTask(context));
 
         Mockito.doReturn(false).when(task).executeFlinkCommand(Mockito.anyList());
+        Mockito.doNothing().when(task).cancelClientByProcess();
 
-        // the job was found but could not be cancelled, the failure must not be hidden by the fallback
+        // the job was found but could not be cancelled, the failure must not be hidden
         Assertions.assertThrows(TaskException.class, task::cancelApplication);
+        // the client process of the task must still be stopped, otherwise the task instance cannot
+        // reach a final state
+        Mockito.verify(task).cancelClientByProcess();
         Assertions.assertNull(context.getAppIds());
+    }
+
+    @Test
+    public void testCancelApplicationDoesNotKillClientWhenCliSucceeded() throws Exception {
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        Mockito.doReturn(true).when(task).executeFlinkCommand(Mockito.anyList());
+
+        task.cancelApplication();
+
+        Mockito.verify(task, Mockito.never()).cancelClientByProcess();
     }
 
     @Test

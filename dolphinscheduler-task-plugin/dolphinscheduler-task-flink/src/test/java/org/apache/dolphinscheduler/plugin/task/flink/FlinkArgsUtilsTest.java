@@ -207,22 +207,58 @@ public class FlinkArgsUtilsTest {
 
     @Test
     public void testExtractClusterConnectionOptions() {
-        // both the short and the long form of the connection options are kept, and so are -D configs
+        // the short and the long form of the connection options are kept, in the submission order
         List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
-                "--jobmanager remote-jm:8081 --target remote -Drest.port=8082");
+                "--jobmanager remote-jm:8081 -t yarn-per-job");
 
         Assertions.assertEquals(
-                Arrays.asList("--jobmanager", "remote-jm:8081", "--target", "remote", "-Drest.port=8082"),
+                Arrays.asList("--jobmanager", "remote-jm:8081", "-t", "yarn-per-job"),
+                options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsWithAttachedAndSeparatedValues() {
+        // --jobmanager=<address> and -D <key>=<value> are accepted by the flink CLI as well
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "--jobmanager=remote-jm:8081 -D rest.port=8082");
+
+        Assertions.assertEquals(
+                Arrays.asList("--jobmanager=remote-jm:8081", "-D", "rest.port=8082"),
+                options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsKeepsOnlyClusterConfigs() {
+        // only the -D options which identify the cluster are kept
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-Drest.address=remote-jm -Djobmanager.rpc.port=6123 -Dkubernetes.cluster-id=my-cluster "
+                        + "-Dexecution.target=yarn-per-job -Dyarn.application.id=application_1700000000000_0001");
+
+        Assertions.assertEquals(
+                Arrays.asList("-Drest.address=remote-jm", "-Djobmanager.rpc.port=6123",
+                        "-Dkubernetes.cluster-id=my-cluster", "-Dexecution.target=yarn-per-job",
+                        "-Dyarn.application.id=application_1700000000000_0001"),
                 options);
     }
 
     @Test
     public void testExtractClusterConnectionOptionsDropsSubmissionOnlyOptions() {
-        // the parallelism, slots, memory, application name and main class only matter at submission
+        // the parallelism, slots, memory, application name, main class, savepoint and configuration
+        // of the submission only matter at submission time
         List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
-                "-m remote-jm:8081 -p 4 -ys 2 -ynm demo-app -yjm 1024m -ytm 2048m -c org.example.Main");
+                "-m remote-jm:8081 -p 4 -ys 2 -ynm demo-app -yjm 1024m -ytm 2048m -c org.example.Main "
+                        + "-s hdfs:///flink/savepoint-1 -d -Dparallelism.default=4 "
+                        + "-Dtaskmanager.memory.process.size=1024m");
 
         Assertions.assertEquals(Arrays.asList("-m", "remote-jm:8081"), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsKeepsQuotedValues() {
+        // a quoted address keeps its whitespace and is not split
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions("-ynm \"my app\" -m \"remote jm:8081\"");
+
+        Assertions.assertEquals(Arrays.asList("-m", "\"remote jm:8081\""), options);
     }
 
     @Test

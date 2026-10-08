@@ -50,9 +50,10 @@ public class FlinkTask extends AbstractYarnTask {
     private TaskExecutionContext taskExecutionContext;
 
     /**
-     * rules for flink application ID
+     * The pattern of the Flink JobID printed by the submission, it is not the YARN/K8s application
+     * id.
      */
-    protected static final Pattern FLINK_APPLICATION_REGEX = Pattern.compile(TaskConstants.FLINK_APPLICATION_REGEX);
+    protected static final Pattern FLINK_JOB_ID_REGEX = Pattern.compile(TaskConstants.FLINK_JOB_ID_REGEX);
 
     public FlinkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -118,8 +119,8 @@ public class FlinkTask extends AbstractYarnTask {
      * @param line line
      * @return the Flink JobID, or null when the line does not contain one
      */
-    protected String findAppId(String line) {
-        Matcher matcher = FLINK_APPLICATION_REGEX.matcher(line);
+    protected String findFlinkJobId(String line) {
+        Matcher matcher = FLINK_JOB_ID_REGEX.matcher(line);
         if (matcher.find()) {
             return matcher.group(1);
         }
@@ -131,14 +132,43 @@ public class FlinkTask extends AbstractYarnTask {
      *
      * <p>The process started by the worker is only the flink client, not the job itself: when the
      * client exits, or when it is killed, the job keeps running for local/standalone/session
-     * deployments. So the job is cancelled through the flink CLI first, and the default behaviour
-     * (kill the process tree and cancel the YARN/K8s application) is only used as a fallback.
+     * deployments. So the job is cancelled through the flink CLI first. The process tree kill and
+     * the YARN/K8s application cancellation are used when no JobID was found or when the task was
+     * submitted to a resource manager, and they are always used to stop the client process when the
+     * CLI fails.
      */
     @Override
     public void cancelApplication() throws TaskException {
-        if (cancelFlinkJob()) {
-            return;
+        TaskException cancelFailure = null;
+        try {
+            if (cancelFlinkJob()) {
+                return;
+            }
+        } catch (TaskException e) {
+            cancelFailure = e;
         }
+        // The client process has to be stopped even when the remote job could not be cancelled,
+        // otherwise the worker keeps the task executor running and the task instance cannot reach a
+        // final state. The failure is still propagated afterwards.
+        try {
+            cancelClientByProcess();
+        } catch (TaskException e) {
+            if (cancelFailure == null) {
+                cancelFailure = e;
+            } else {
+                cancelFailure.addSuppressed(e);
+            }
+        }
+        if (cancelFailure != null) {
+            throw cancelFailure;
+        }
+    }
+
+    /**
+     * Stop the flink client process of the task, kept as a separate method so that the fallback can
+     * be verified in tests.
+     */
+    protected void cancelClientByProcess() throws TaskException {
         super.cancelApplication();
     }
 
@@ -150,7 +180,7 @@ public class FlinkTask extends AbstractYarnTask {
      *
      * @return true if the job was cancelled through the CLI, false if the caller should fall back
      * @throws TaskException if a cancelable job was found but could not be cancelled, so that the
-     *         failure is reported instead of being hidden behind the fallback
+     *         failure is not hidden by the fallback
      */
     protected boolean cancelFlinkJob() throws TaskException {
         try {
@@ -191,7 +221,7 @@ public class FlinkTask extends AbstractYarnTask {
             return Collections.emptyList();
         }
         try (Stream<String> lines = Files.lines(logFile.toPath())) {
-            return lines.map(this::findAppId)
+            return lines.map(this::findFlinkJobId)
                     .filter(Objects::nonNull)
                     .distinct()
                     .collect(Collectors.toList());

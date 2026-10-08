@@ -36,10 +36,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,13 +70,42 @@ public class FlinkArgsUtils {
     private static final String FLINK_COMMAND_SHELL_NAME_SUFFIX = "_flink_command_";
 
     /**
-     * The options which identify the cluster a job was submitted to. They have to be repeated on the
-     * cancel / savepoint command, otherwise the command targets the default cluster of the worker
-     * instead of the cluster which runs the job. Submission-only options are not included.
+     * The short and the long form of the options which select the cluster a job was submitted to.
+     * They are accepted by the cancel / savepoint command as well, so they are repeated there.
      */
     private static final List<String> CLUSTER_CONNECTION_OPTIONS = Arrays.asList(
             "-m", "--jobmanager",
             "-t", "--target");
+
+    /**
+     * The configuration keys which identify the cluster a job was submitted to. They may be given as
+     * {@code -D<key>=<value>}. The other {@code -D} options configure the submission only and are
+     * not repeated on the cancel / savepoint command.
+     */
+    private static final Set<String> CLUSTER_CONNECTION_CONFIG_KEYS = new HashSet<>(Arrays.asList(
+            "rest.address",
+            "rest.port",
+            "rest.bind-address",
+            "rest.bind-port",
+            "jobmanager.rpc.address",
+            "jobmanager.rpc.port",
+            "yarn.application.id",
+            "kubernetes.cluster-id",
+            "kubernetes.namespace",
+            "kubernetes.context",
+            "kubernetes.config.file",
+            "execution.target"));
+
+    /**
+     * The {@code -D} option of the flink CLI, which allows specifying a configuration value.
+     */
+    private static final String DYNAMIC_PROPERTY_OPTION = "-D";
+
+    /**
+     * The tokens of the extra options of the submission. A quoted value is kept as a single token,
+     * so that a value which contains whitespace is not split.
+     */
+    private static final Pattern OPTION_TOKEN_REGEX = Pattern.compile("\"[^\"]*\"|'[^']*'|\\S+");
 
     private static final long OUTPUT_READER_JOIN_TIMEOUT_SECONDS = 1L;
 
@@ -111,9 +144,13 @@ public class FlinkArgsUtils {
 
     /**
      * Extract the cluster connection options from the extra options of the submission, so that the
-     * cancel / savepoint command targets the same cluster as the submission. Submission-only
-     * arguments, such as the parallelism, the slots, the application name or the main class, are
-     * not copied.
+     * cancel / savepoint command targets the same cluster as the submission.
+     *
+     * <p>Only the options which identify the cluster are kept: {@code -m}/{@code --jobmanager},
+     * {@code -t}/{@code --target} and the {@code -D} options which configure the cluster address or
+     * the execution target. Submission-only arguments, such as the parallelism, the slots, the
+     * memory, the application name, the main class or the savepoint to restore from, are not copied.
+     * Reusing the task environment does not preserve the command line connection options.
      *
      * @param others the extra options of the submission, may be null
      * @return the cluster connection options, in the order they appear in the submission
@@ -123,20 +160,47 @@ public class FlinkArgsUtils {
         if (StringUtils.isBlank(others)) {
             return options;
         }
-        String[] tokens = others.trim().split("\\s+");
-        for (int i = 0; i < tokens.length; i++) {
-            String token = tokens[i];
-            if (CLUSTER_CONNECTION_OPTIONS.contains(token)) {
+        List<String> tokens = tokenizeOptions(others);
+        for (int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+            String option = token.contains("=") ? token.substring(0, token.indexOf('=')) : token;
+            if (CLUSTER_CONNECTION_OPTIONS.contains(option)) {
                 options.add(token);
-                if (i + 1 < tokens.length) {
-                    options.add(tokens[++i]);
+                // the value may be given as a separate argument, for example "-m <jobmanager>"
+                if (option.equals(token) && i + 1 < tokens.size()) {
+                    options.add(tokens.get(++i));
                 }
-            } else if (token.startsWith("-D") && token.length() > 2) {
-                // the cluster address and the execution target may also be given as a configuration
+            } else if (isClusterConnectionConfig(token)) {
                 options.add(token);
+            } else if (DYNAMIC_PROPERTY_OPTION.equals(token) && i + 1 < tokens.size()) {
+                // the configuration may also be given as a separate argument, "-D <key>=<value>"
+                String value = tokens.get(++i);
+                if (isClusterConnectionConfig(DYNAMIC_PROPERTY_OPTION + value)) {
+                    options.add(token);
+                    options.add(value);
+                }
             }
         }
         return options;
+    }
+
+    private static List<String> tokenizeOptions(String others) {
+        List<String> tokens = new ArrayList<>();
+        Matcher matcher = OPTION_TOKEN_REGEX.matcher(others);
+        while (matcher.find()) {
+            tokens.add(matcher.group());
+        }
+        return tokens;
+    }
+
+    private static boolean isClusterConnectionConfig(String token) {
+        if (!token.startsWith(DYNAMIC_PROPERTY_OPTION) || token.length() <= DYNAMIC_PROPERTY_OPTION.length()) {
+            return false;
+        }
+        String config = token.substring(DYNAMIC_PROPERTY_OPTION.length());
+        int separator = config.indexOf('=');
+        String key = separator < 0 ? config : config.substring(0, separator);
+        return CLUSTER_CONNECTION_CONFIG_KEYS.contains(key);
     }
 
     /**
