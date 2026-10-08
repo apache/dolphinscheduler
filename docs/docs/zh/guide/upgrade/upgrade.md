@@ -84,6 +84,20 @@ jar 包 并添加到 `./tools/libs` 目录下，设置以下环境变量
 
 按照"Alert Server → Master → Worker"的顺序升级可消除此风险。
 
+#### 如果升级失败
+
+如果未按上述顺序升级（例如在 Alert Server 之前先升级了 Master/Worker），且新的 `alert_type` 枚举值已写入 `t_ds_alert` 表，请按以下步骤恢复：
+
+1. 将 Alert Server 升级到包含新枚举值的版本并重启，卡在 `WAIT_EXECUTION` 状态的告警会被正常拉取并投递。
+2. 如果暂时无法升级 Alert Server，请先停止旧版 Alert Server，再备份并清理受影响告警，避免其持续阻塞告警投递：
+
+   ```sql
+   -- 1. 备份受影响告警
+   create table t_ds_alert_bak as select * from t_ds_alert where alert_type = 8;
+   -- 2. 从主表清理
+   delete from t_ds_alert where alert_type = 8;
+   ```
+
 #### 升级后的注意事项
 
 在历史版本中可能告警插件会有一些脏数据，升级后请参考一下 SQL 手动清理。

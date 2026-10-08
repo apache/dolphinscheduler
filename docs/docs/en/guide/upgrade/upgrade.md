@@ -83,6 +83,20 @@ Starting from 3.5.0, the Master may persist new `alert_type` enum values (e.g. `
 
 Upgrading in the order "Alert Server → Master → Worker" eliminates this risk.
 
+#### If the upgrade fails
+
+If the upgrade order was not followed (e.g. Master/Worker has already been upgraded before the Alert Server) and new `alert_type` values have been persisted to the `t_ds_alert` table, follow these steps to recover:
+
+1. Upgrade the Alert Server to a version that includes the new enum values and restart it. Alerts stuck in `WAIT_EXECUTION` will be picked up and delivered normally.
+2. If the Alert Server cannot be upgraded immediately, stop the old Alert Server first, then back up and clean up the affected alerts so they cannot keep blocking alert delivery:
+
+   ```sql
+   -- 1. back up the affected alerts
+   create table t_ds_alert_bak as select * from t_ds_alert where alert_type = 8;
+   -- 2. remove them from the active table
+   delete from t_ds_alert where alert_type = 8;
+   ```
+
 #### Precautions after the upgrade
 
 The alert plugin may have some dirty data. After the upgrade, clear it manually by referring to SQL.
