@@ -70,6 +70,12 @@ export default defineComponent({
       })
     }
 
+    const handleSorterChange = (sorter: any) => {
+      variables.sorter = sorter
+      variables.page = 1
+      requestData()
+    }
+
     const handleUpdateList = () => {
       requestData()
     }
@@ -129,6 +135,7 @@ export default defineComponent({
       handleSearch,
       onClearSearch,
       handleUpdateList,
+      handleSorterChange,
       createDefinition,
       createDefinitionDynamic,
       handleChangePageSize,
@@ -185,6 +192,8 @@ export default defineComponent({
         <Card title={t('project.workflow.workflow_definition')}>
           <NSpace vertical>
             <NDataTable
+              remote
+              onUpdateSorter={this.handleSorterChange}
               loading={loadingRef}
               rowKey={(row) => row.code}
               columns={this.columns}
