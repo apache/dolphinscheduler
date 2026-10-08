@@ -47,6 +47,13 @@ public class FlinkConstants {
     public static final int FLINK_COMMAND_TIMEOUT_SECONDS = 30;
 
     /**
+     * The timeout of waiting for `flink savepoint` to finish. Taking a savepoint of a large stateful
+     * job takes much longer than cancelling it, so it does not reuse
+     * {@link #FLINK_COMMAND_TIMEOUT_SECONDS}.
+     */
+    public static final int FLINK_SAVEPOINT_TIMEOUT_SECONDS = 600;
+
+    /**
      * flink run options
      */
     public static final String FLINK_RUN_APPLICATION = "run-application";

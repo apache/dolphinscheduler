@@ -247,7 +247,17 @@ public class FlinkArgsUtils {
      * @return true if the command finished successfully
      */
     public static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args) {
-        return executeCommand(taskExecutionContext, args, OSUtils.isSudoEnable());
+        return executeCommand(taskExecutionContext, args, OSUtils.isSudoEnable(),
+                FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS);
+    }
+
+    /**
+     * Same as {@link #executeCommand(TaskExecutionContext, List)}, with a custom timeout. The
+     * savepoint command uses a much longer timeout than the cancel command.
+     */
+    public static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args,
+                                         int timeoutSeconds) {
+        return executeCommand(taskExecutionContext, args, OSUtils.isSudoEnable(), timeoutSeconds);
     }
 
     /**
@@ -255,6 +265,15 @@ public class FlinkArgsUtils {
      * the command execution can be verified without requiring sudo permissions.
      */
     static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args, boolean sudoEnable) {
+        return executeCommand(taskExecutionContext, args, sudoEnable, FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS);
+    }
+
+    /**
+     * Same as {@link #executeCommand(TaskExecutionContext, List, int)}, with the sudo mode injected so
+     * that the command execution can be verified without requiring sudo permissions.
+     */
+    static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args, boolean sudoEnable,
+                                  int timeoutSeconds) {
         Process process = null;
         try {
             IShellInterceptorBuilder shellInterceptorBuilder = ShellInterceptorBuilderFactory.newBuilder()
@@ -272,7 +291,7 @@ public class FlinkArgsUtils {
                 shellInterceptorBuilder.appendCustomEnvScript(taskExecutionContext.getEnvironmentConfig());
             }
             process = shellInterceptorBuilder.build().execute();
-            return waitForCommand(process, args);
+            return waitForCommand(process, args, timeoutSeconds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("Execute flink command interrupted, args: {}", args, e);
@@ -291,7 +310,8 @@ public class FlinkArgsUtils {
      * Wait for the command to finish, consuming its output so that the command cannot block on a full
      * pipe, and keep the output for diagnostics.
      */
-    private static boolean waitForCommand(Process process, List<String> args) throws InterruptedException {
+    private static boolean waitForCommand(Process process, List<String> args,
+                                          int timeoutSeconds) throws InterruptedException {
         StringBuilder output = new StringBuilder();
         Thread outputReader = new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -306,13 +326,12 @@ public class FlinkArgsUtils {
         outputReader.setDaemon(true);
         outputReader.start();
 
-        boolean finished = process.waitFor(FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS, TimeUnit.SECONDS);
+        boolean finished = process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
         // both streams are merged into stdout by the shell interceptor, so joining the reader is enough
         outputReader.join(TimeUnit.SECONDS.toMillis(OUTPUT_READER_JOIN_TIMEOUT_SECONDS));
         if (!finished) {
             process.destroyForcibly();
-            log.error("Execute flink command timeout after {}s, args: {}, output: {}",
-                    FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS, args, output);
+            log.error("Execute flink command timeout after {}s, args: {}, output: {}", timeoutSeconds, args, output);
             return false;
         }
         int exitCode = process.exitValue();

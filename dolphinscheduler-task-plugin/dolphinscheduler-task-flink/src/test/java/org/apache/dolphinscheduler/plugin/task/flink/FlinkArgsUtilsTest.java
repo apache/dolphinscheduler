@@ -299,4 +299,34 @@ public class FlinkArgsUtilsTest {
         Assertions.assertEquals("cancel 1234567890abcdef1234567890abcdef",
                 new String(Files.readAllBytes(markerFile), StandardCharsets.UTF_8).trim());
     }
+
+    @Test
+    public void testExecuteCommandTimeoutKillsTheCommand() throws Exception {
+        // the command outlives its timeout, so it must be killed and reported as a failure
+        Path executePath = tempDir.resolve("timeout-execute");
+        Files.createDirectories(executePath);
+        Path flinkHome = tempDir.resolve("flink-timeout");
+        Files.createDirectories(flinkHome.resolve("bin"));
+        Path flinkCommand = flinkHome.resolve("bin/flink");
+        Files.write(flinkCommand, Arrays.asList("#!/bin/bash", "sleep 30"));
+        Assertions.assertTrue(flinkCommand.toFile().setExecutable(true));
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(16789);
+        taskExecutionContext.setTaskAppId("16789");
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTenantCode("");
+        taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
+        taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
+
+        long start = System.currentTimeMillis();
+        boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList()),
+                false, 1);
+        long elapsed = System.currentTimeMillis() - start;
+
+        Assertions.assertFalse(success);
+        // the command is killed when the timeout expires, it does not wait for the command to finish
+        Assertions.assertTrue(elapsed < 20_000, "the command must be killed on timeout, elapsed: " + elapsed + "ms");
+    }
 }

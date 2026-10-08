@@ -138,7 +138,7 @@ public class FlinkStreamTaskTest {
         Mockito.doAnswer(invocation -> {
             executedCommands.add(invocation.getArgument(0));
             return true;
-        }).when(task).executeFlinkCommand(Mockito.anyList());
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
 
         task.savePoint();
 
@@ -160,7 +160,7 @@ public class FlinkStreamTaskTest {
         Mockito.doAnswer(invocation -> {
             executedCommands.add(invocation.getArgument(0));
             return true;
-        }).when(task).executeFlinkCommand(Mockito.anyList());
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
 
         task.savePoint();
 
@@ -181,7 +181,7 @@ public class FlinkStreamTaskTest {
         Mockito.doAnswer(invocation -> {
             executedCommands.add(invocation.getArgument(0));
             return true;
-        }).when(task).executeFlinkCommand(Mockito.anyList());
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
 
         task.savePoint();
 
@@ -210,7 +210,7 @@ public class FlinkStreamTaskTest {
         Mockito.doAnswer(invocation -> {
             executedCommands.add(invocation.getArgument(0));
             return true;
-        }).when(task).executeFlinkCommand(Mockito.anyList());
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
 
         task.savePoint();
 
@@ -226,7 +226,7 @@ public class FlinkStreamTaskTest {
                 "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
         FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
 
-        Mockito.doReturn(false).when(task).executeFlinkCommand(Mockito.anyList());
+        Mockito.doReturn(false).when(task).executeFlinkSavepointCommand(Mockito.anyList());
 
         Assertions.assertThrows(TaskException.class, task::savePoint);
     }
@@ -239,6 +239,6 @@ public class FlinkStreamTaskTest {
         FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
 
         Assertions.assertThrows(TaskException.class, task::savePoint);
-        Mockito.verify(task, Mockito.never()).executeFlinkCommand(Mockito.anyList());
+        Mockito.verify(task, Mockito.never()).executeFlinkSavepointCommand(Mockito.anyList());
     }
 }

@@ -41,6 +41,9 @@ public class AbstractTaskTest {
         matcher = flinkJobIdRegex.matcher("Job ID: " + jobId);
         Assertions.assertTrue(matcher.find());
         Assertions.assertEquals(jobId, matcher.group(1));
+        // a line which only mentions a job id is not a Flink JobID
+        Assertions.assertFalse(flinkJobIdRegex.matcher("Job ID: 12345").find());
+        Assertions.assertFalse(flinkJobIdRegex.matcher("Job ID: " + jobId + "0").find());
     }
 
     @Test

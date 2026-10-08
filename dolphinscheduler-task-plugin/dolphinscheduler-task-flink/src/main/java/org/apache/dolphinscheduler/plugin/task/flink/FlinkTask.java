@@ -175,8 +175,10 @@ public class FlinkTask extends AbstractYarnTask {
     /**
      * Cancel the flink job through the flink CLI.
      *
-     * <p>Tasks submitted to YARN or K8s are not handled here: for them the application id is known
-     * and cancelling the application through the resource manager is the reliable way.
+     * <p>Tasks submitted to YARN are not handled here: their application id is known and cancelling
+     * the application through the resource manager is the reliable way. A Kubernetes cluster is
+     * identified by a cluster id rather than by an application id, so a job submitted to Kubernetes
+     * is cancelled through the CLI, with the cluster connection options of the submission.
      *
      * @return true if the job was cancelled through the CLI, false if the caller should fall back
      * @throws TaskException if a cancelable job was found but could not be cancelled, so that the
@@ -250,5 +252,15 @@ public class FlinkTask extends AbstractYarnTask {
      */
     protected boolean executeFlinkCommand(List<String> args) {
         return FlinkArgsUtils.executeCommand(taskExecutionContext, args);
+    }
+
+    /**
+     * Execute the savepoint command. It is kept as a separate method so it can be verified in tests,
+     * and it gets its own timeout because a savepoint of a large stateful job takes much longer than
+     * a cancel.
+     */
+    protected boolean executeFlinkSavepointCommand(List<String> args) {
+        return FlinkArgsUtils.executeCommand(taskExecutionContext, args,
+                FlinkConstants.FLINK_SAVEPOINT_TIMEOUT_SECONDS);
     }
 }
