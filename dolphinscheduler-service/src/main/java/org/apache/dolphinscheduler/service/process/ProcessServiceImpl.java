@@ -701,9 +701,11 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setVersion(taskDefinitionLog.getVersion());
                 taskNode.setName(taskDefinitionLog.getName());
                 taskNode.setDesc(taskDefinitionLog.getDescription());
-                taskNode.setType(taskDefinitionLog.getTaskType() != null
-                        ? taskDefinitionLog.getTaskType().toUpperCase()
-                        : "");
+                if (taskDefinitionLog.getTaskType() == null) {
+                    throw new ServiceException("The taskType of taskDefinition is null, taskCode: "
+                            + taskDefinitionLog.getCode() + ", taskName: " + taskDefinitionLog.getName());
+                }
+                taskNode.setType(taskDefinitionLog.getTaskType().toUpperCase());
                 taskNode.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_NORMAL
                         : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
                 taskNode.setMaxRetryTimes(taskDefinitionLog.getFailRetryTimes());
