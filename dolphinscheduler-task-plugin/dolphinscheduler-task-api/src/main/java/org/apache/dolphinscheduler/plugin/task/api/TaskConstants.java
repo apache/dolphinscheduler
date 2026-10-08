@@ -33,7 +33,12 @@ public class TaskConstants {
 
     public static final String YARN_APPLICATION_REGEX = "application_\\d+_\\d+";
 
-    public static final String FLINK_APPLICATION_REGEX = "JobID \\w+";
+    /**
+     * The Flink JobID printed by `flink run` ("JobID" followed by the id) or by the Flink SQL
+     * Client ("Job ID:" followed by the id). The first group is the JobID, which is not the
+     * YARN/K8s application id.
+     */
+    public static final String FLINK_APPLICATION_REGEX = "Job\\s*ID:?\\s+(\\w+)";
 
     public static final String DATASOURCE_PASSWORD_REGEX =
             "(?<=((?i)password((\" : \")|(\":\")|(\\\\\":\\\\\")|(=')))).*?(?=((\")|(\\\\\")|(')))";

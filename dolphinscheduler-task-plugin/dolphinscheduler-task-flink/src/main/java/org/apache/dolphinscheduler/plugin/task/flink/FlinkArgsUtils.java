@@ -98,14 +98,24 @@ public class FlinkArgsUtils {
     /**
      * build flink savepoint command line, the savepoint folder should be set in flink conf
      *
+     * <p>The Flink JobID identifies the job, the YARN application id only identifies the cluster
+     * which runs it, so they are passed as different arguments. The YARN application id is passed
+     * as the {@code -yid} targeting option, as documented by "Trigger a Savepoint with YARN":
+     * {@code flink savepoint :jobId [:targetDirectory] -yid :yarnAppId}.
+     *
      * @param jobId the Flink JobID printed by `flink run`, it is not the YARN/K8s application id
+     * @param yarnApplicationId the YARN application id used to target the cluster, may be null
      * @return argument list
      */
-    public static List<String> buildSavePointCommandLine(String jobId) {
+    public static List<String> buildSavePointCommandLine(String jobId, String yarnApplicationId) {
         List<String> args = new ArrayList<>();
         args.add(FlinkConstants.FLINK_COMMAND);
         args.add(FlinkConstants.FLINK_SAVEPOINT);
         args.add(jobId);
+        if (StringUtils.isNotBlank(yarnApplicationId)) {
+            args.add(FlinkConstants.FLINK_YARN_APPLICATION_ID);
+            args.add(yarnApplicationId);
+        }
         return args;
     }
 

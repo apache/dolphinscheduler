@@ -146,6 +146,26 @@ public class FlinkTaskTest {
     }
 
     @Test
+    public void testCancelApplicationCancelSqlClientJobThroughFlinkCli() throws Exception {
+        // the Flink SQL Client prints "Job ID: <id>", which is a different format from `flink run`
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job ID: 1234567890abcdef1234567890abcdef");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkCommand(Mockito.anyList());
+
+        task.cancelApplication();
+
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef",
+                String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
     public void testCancelApplicationFailWhenCliFailed() throws Exception {
         TaskExecutionContext context = buildTaskExecutionContext(
                 "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");

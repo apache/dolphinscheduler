@@ -64,22 +64,40 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
 
     @Override
     public void savePoint() throws Exception {
-        // `flink savepoint` takes the Flink JobID, the YARN/K8s application id is a different
-        // identifier and must not be passed to it
+        // `flink savepoint` takes the Flink JobID. The YARN/K8s application id is a different
+        // identifier: it is not the savepoint target, it only targets the cluster which runs the
+        // job, and is passed as the `-yid` option.
         List<String> jobIds = getFlinkJobIds();
         if (CollectionUtils.isEmpty(jobIds)) {
             throw new TaskException(
                     "Cannot find the flink JobID of the task, taskInstanceId: "
                             + taskExecutionContext.getTaskInstanceId());
         }
+        String yarnApplicationId = getYarnApplicationId();
         for (String jobId : jobIds) {
-            List<String> args = FlinkArgsUtils.buildSavePointCommandLine(jobId);
+            List<String> args = FlinkArgsUtils.buildSavePointCommandLine(jobId, yarnApplicationId);
             log.info("savepoint args:{}", args);
 
             if (!executeFlinkCommand(args)) {
                 throw new TaskException("Trigger savepoint for flink job " + jobId + " failed, taskInstanceId: "
                         + taskExecutionContext.getTaskInstanceId());
             }
+        }
+    }
+
+    /**
+     * The YARN application id is kept separate from the Flink JobID, it is only used to target the
+     * cluster which runs the job.
+     *
+     * @return the YARN application id, or null when the task was not submitted to YARN
+     */
+    private String getYarnApplicationId() {
+        try {
+            List<String> appIds = getApplicationIds();
+            return CollectionUtils.isEmpty(appIds) ? null : appIds.get(0);
+        } catch (Exception e) {
+            log.warn("Get application ids failed, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
+            return null;
         }
     }
 }

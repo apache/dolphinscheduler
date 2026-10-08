@@ -111,16 +111,17 @@ public class FlinkTask extends AbstractYarnTask {
     }
 
     /**
-     * find app id
+     * Find the Flink JobID in a log line. Both the {@code flink run} format (JobID) and the Flink
+     * SQL Client format (Job ID:) are supported. The returned id is the Flink JobID, it is not the
+     * YARN/K8s application id.
      *
      * @param line line
-     * @return appid
+     * @return the Flink JobID, or null when the line does not contain one
      */
     protected String findAppId(String line) {
         Matcher matcher = FLINK_APPLICATION_REGEX.matcher(line);
         if (matcher.find()) {
-            String str = matcher.group();
-            return str.substring(6);
+            return matcher.group(1);
         }
         return null;
     }

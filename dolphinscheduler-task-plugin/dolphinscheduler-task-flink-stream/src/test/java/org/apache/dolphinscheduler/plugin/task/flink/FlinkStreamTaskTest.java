@@ -127,7 +127,8 @@ public class FlinkStreamTaskTest {
 
     @Test
     public void testSavePointCommand() throws Exception {
-        // the task log contains both identifiers, the JobID is the one `flink savepoint` takes
+        // the task log contains both identifiers: the JobID is the savepoint target, the YARN
+        // application id is only used to target the cluster
         TaskExecutionContext context = buildSavepointTaskExecutionContext(
                 "Job has been submitted with JobID 1234567890abcdef1234567890abcdef\n"
                         + "Submitted application application_1700000000000_0001");
@@ -142,10 +143,51 @@ public class FlinkStreamTaskTest {
         task.savePoint();
 
         Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef -yid application_1700000000000_0001",
+                String.join(" ", executedCommands.get(0)));
+        // the YARN application id is never used as the savepoint target, it is passed as -yid only
+        Assertions.assertNull(context.getAppIds());
+    }
+
+    @Test
+    public void testSavePointCommandWithoutYarnApplicationId() throws Exception {
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkCommand(Mockito.anyList());
+
+        task.savePoint();
+
+        // no -yid is added when the task was not submitted to a resource manager
+        Assertions.assertEquals(1, executedCommands.size());
         Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef",
                 String.join(" ", executedCommands.get(0)));
-        // the YARN application id is kept separate and is not passed to `flink savepoint`
-        Assertions.assertNull(context.getAppIds());
+    }
+
+    @Test
+    public void testSavePointCommandParsesSqlClientJobId() throws Exception {
+        // the Flink SQL Client prints "Job ID: <id>"
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Job ID: 1234567890abcdef1234567890abcdef");
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkCommand(Mockito.anyList());
+
+        task.savePoint();
+
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef",
+                String.join(" ", executedCommands.get(0)));
     }
 
     @Test

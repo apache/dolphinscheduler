@@ -60,6 +60,7 @@ public class FlinkConstants {
     public static final String FLINK_APP_NAME = "-ynm";
     public static final String FLINK_YARN_QUEUE_FOR_MODE = "-yqu";
     public static final String FLINK_YARN_QUEUE_FOR_TARGETS = "-Dyarn.application.queue";
+    public static final String FLINK_YARN_APPLICATION_ID = "-yid";
     public static final String FLINK_TASK_MANAGE = "-yn";
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
     public static final String FLINK_TASK_MANAGE_MEM = "-ytm";

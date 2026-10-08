@@ -165,9 +165,21 @@ public class FlinkArgsUtilsTest {
     @Test
     public void testBuildSavePointCommandLine() {
         // the Flink JobID is passed explicitly, the YARN/K8s application id is not used here
-        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef");
+        List<String> commandLine =
+                FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef", null);
 
         Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testBuildSavePointCommandLineWithYarnApplicationId() {
+        // the YARN application id only targets the cluster, it is passed after the JobID as -yid
+        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef",
+                "application_1700000000000_0001");
+
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef -yid application_1700000000000_0001",
                 joinStringListWithSpace(commandLine));
     }
 
