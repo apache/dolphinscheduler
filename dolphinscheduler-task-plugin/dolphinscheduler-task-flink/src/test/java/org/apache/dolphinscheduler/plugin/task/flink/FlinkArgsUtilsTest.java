@@ -156,17 +156,29 @@ public class FlinkArgsUtilsTest {
     @Test
     public void testBuildCancelCommandLine() {
         // ${FLINK_HOME} is resolved when the command is executed, in the same environment as the task
-        List<String> commandLine = FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef");
+        List<String> commandLine =
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList());
 
         Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef",
                 joinStringListWithSpace(commandLine));
     }
 
     @Test
+    public void testBuildCancelCommandLineKeepsClusterConnectionOptions() {
+        // the job was submitted to a remote JobManager, the cancel command must target it as well
+        List<String> commandLine = FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef",
+                Arrays.asList("-m", "remote-jm:8081"));
+
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef -m remote-jm:8081",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
     public void testBuildSavePointCommandLine() {
         // the Flink JobID is passed explicitly, the YARN/K8s application id is not used here
-        List<String> commandLine =
-                FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef", null);
+        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef",
+                null, Collections.emptyList());
 
         Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef",
                 joinStringListWithSpace(commandLine));
@@ -176,11 +188,47 @@ public class FlinkArgsUtilsTest {
     public void testBuildSavePointCommandLineWithYarnApplicationId() {
         // the YARN application id only targets the cluster, it is passed after the JobID as -yid
         List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef",
-                "application_1700000000000_0001");
+                "application_1700000000000_0001", Collections.emptyList());
 
         Assertions.assertEquals(
                 "${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef -yid application_1700000000000_0001",
                 joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testBuildSavePointCommandLineKeepsClusterConnectionOptions() {
+        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef",
+                "application_1700000000000_0001", Arrays.asList("-m", "remote-jm:8081"));
+
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef -yid application_1700000000000_0001 -m remote-jm:8081",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptions() {
+        // both the short and the long form of the connection options are kept, and so are -D configs
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "--jobmanager remote-jm:8081 --target remote -Drest.port=8082");
+
+        Assertions.assertEquals(
+                Arrays.asList("--jobmanager", "remote-jm:8081", "--target", "remote", "-Drest.port=8082"),
+                options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsDropsSubmissionOnlyOptions() {
+        // the parallelism, slots, memory, application name and main class only matter at submission
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-m remote-jm:8081 -p 4 -ys 2 -ynm demo-app -yjm 1024m -ytm 2048m -c org.example.Main");
+
+        Assertions.assertEquals(Arrays.asList("-m", "remote-jm:8081"), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsWithoutOthers() {
+        Assertions.assertTrue(FlinkArgsUtils.extractClusterConnectionOptions(null).isEmpty());
+        Assertions.assertTrue(FlinkArgsUtils.extractClusterConnectionOptions("   ").isEmpty());
     }
 
     @Test
@@ -208,7 +256,8 @@ public class FlinkArgsUtilsTest {
         taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
 
         boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
-                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef"), false);
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList()),
+                false);
 
         Assertions.assertTrue(success);
         Assertions.assertEquals("cancel 1234567890abcdef1234567890abcdef",

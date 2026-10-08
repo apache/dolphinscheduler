@@ -167,8 +167,9 @@ public class FlinkTask extends AbstractYarnTask {
                     taskExecutionContext.getTaskInstanceId());
             return false;
         }
+        List<String> clusterConnectionOptions = getClusterConnectionOptions();
         for (String jobId : jobIds) {
-            List<String> args = FlinkArgsUtils.buildCancelCommandLine(jobId);
+            List<String> args = FlinkArgsUtils.buildCancelCommandLine(jobId, clusterConnectionOptions);
             log.info("Cancel flink job, jobId: {}, args: {}", jobId, args);
             if (!executeFlinkCommand(args)) {
                 throw new TaskException(String.format(
@@ -198,6 +199,20 @@ public class FlinkTask extends AbstractYarnTask {
             log.error("Read task log failed, logPath: {}", logPath, e);
             return Collections.emptyList();
         }
+    }
+
+    /**
+     * The cluster connection options of the submission, for example {@code -m <jobmanager>} or
+     * {@code -t <target>}. They have to be repeated on the cancel / savepoint command, otherwise
+     * that command targets the default cluster of the worker instead of the cluster the job was
+     * submitted to.
+     */
+    protected List<String> getClusterConnectionOptions() {
+        AbstractParameters parameters = getParameters();
+        if (!(parameters instanceof FlinkParameters)) {
+            return Collections.emptyList();
+        }
+        return FlinkArgsUtils.extractClusterConnectionOptions(((FlinkParameters) parameters).getOthers());
     }
 
     /**

@@ -166,6 +166,36 @@ public class FlinkTaskTest {
     }
 
     @Test
+    public void testCancelApplicationKeepsClusterConnectionOptions() throws Exception {
+        // the job was submitted to a remote JobManager, so the cancel command must target it as well
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SELECT 1;");
+        parameters.setOthers("-m remote-jm:8081");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkCommand(Mockito.anyList());
+
+        task.cancelApplication();
+
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef -m remote-jm:8081",
+                String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
     public void testCancelApplicationFailWhenCliFailed() throws Exception {
         TaskExecutionContext context = buildTaskExecutionContext(
                 "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");

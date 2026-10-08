@@ -35,6 +35,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -64,6 +65,15 @@ public class FlinkArgsUtils {
      */
     private static final String FLINK_COMMAND_SHELL_NAME_SUFFIX = "_flink_command_";
 
+    /**
+     * The options which identify the cluster a job was submitted to. They have to be repeated on the
+     * cancel / savepoint command, otherwise the command targets the default cluster of the worker
+     * instead of the cluster which runs the job. Submission-only options are not included.
+     */
+    private static final List<String> CLUSTER_CONNECTION_OPTIONS = Arrays.asList(
+            "-m", "--jobmanager",
+            "-t", "--target");
+
     private static final long OUTPUT_READER_JOIN_TIMEOUT_SECONDS = 1L;
 
     /**
@@ -85,14 +95,48 @@ public class FlinkArgsUtils {
      * build flink cancel command line
      *
      * @param jobId the Flink JobID printed by `flink run`, it is not the YARN/K8s application id
+     * @param clusterConnectionOptions the cluster connection options of the submission, may be empty
      * @return argument list
      */
-    public static List<String> buildCancelCommandLine(String jobId) {
+    public static List<String> buildCancelCommandLine(String jobId, List<String> clusterConnectionOptions) {
         List<String> args = new ArrayList<>();
         args.add(FlinkConstants.FLINK_COMMAND);
         args.add(FlinkConstants.FLINK_CANCEL);
         args.add(jobId);
+        if (CollectionUtils.isNotEmpty(clusterConnectionOptions)) {
+            args.addAll(clusterConnectionOptions);
+        }
         return args;
+    }
+
+    /**
+     * Extract the cluster connection options from the extra options of the submission, so that the
+     * cancel / savepoint command targets the same cluster as the submission. Submission-only
+     * arguments, such as the parallelism, the slots, the application name or the main class, are
+     * not copied.
+     *
+     * @param others the extra options of the submission, may be null
+     * @return the cluster connection options, in the order they appear in the submission
+     */
+    public static List<String> extractClusterConnectionOptions(String others) {
+        List<String> options = new ArrayList<>();
+        if (StringUtils.isBlank(others)) {
+            return options;
+        }
+        String[] tokens = others.trim().split("\\s+");
+        for (int i = 0; i < tokens.length; i++) {
+            String token = tokens[i];
+            if (CLUSTER_CONNECTION_OPTIONS.contains(token)) {
+                options.add(token);
+                if (i + 1 < tokens.length) {
+                    options.add(tokens[++i]);
+                }
+            } else if (token.startsWith("-D") && token.length() > 2) {
+                // the cluster address and the execution target may also be given as a configuration
+                options.add(token);
+            }
+        }
+        return options;
     }
 
     /**
@@ -101,13 +145,17 @@ public class FlinkArgsUtils {
      * <p>The Flink JobID identifies the job, the YARN application id only identifies the cluster
      * which runs it, so they are passed as different arguments. The YARN application id is passed
      * as the {@code -yid} targeting option, as documented by "Trigger a Savepoint with YARN":
-     * {@code flink savepoint :jobId [:targetDirectory] -yid :yarnAppId}.
+     * {@code flink savepoint :jobId [:targetDirectory] -yid :yarnAppId}. The cluster connection
+     * options of the submission are repeated as well, otherwise the savepoint is triggered against
+     * the default cluster of the worker instead of the cluster which runs the job.
      *
      * @param jobId the Flink JobID printed by `flink run`, it is not the YARN/K8s application id
      * @param yarnApplicationId the YARN application id used to target the cluster, may be null
+     * @param clusterConnectionOptions the cluster connection options of the submission, may be empty
      * @return argument list
      */
-    public static List<String> buildSavePointCommandLine(String jobId, String yarnApplicationId) {
+    public static List<String> buildSavePointCommandLine(String jobId, String yarnApplicationId,
+                                                         List<String> clusterConnectionOptions) {
         List<String> args = new ArrayList<>();
         args.add(FlinkConstants.FLINK_COMMAND);
         args.add(FlinkConstants.FLINK_SAVEPOINT);
@@ -115,6 +163,9 @@ public class FlinkArgsUtils {
         if (StringUtils.isNotBlank(yarnApplicationId)) {
             args.add(FlinkConstants.FLINK_YARN_APPLICATION_ID);
             args.add(yarnApplicationId);
+        }
+        if (CollectionUtils.isNotEmpty(clusterConnectionOptions)) {
+            args.addAll(clusterConnectionOptions);
         }
         return args;
     }

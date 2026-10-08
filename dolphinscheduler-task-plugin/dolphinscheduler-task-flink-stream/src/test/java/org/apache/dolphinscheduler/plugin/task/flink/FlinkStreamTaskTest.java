@@ -191,6 +191,36 @@ public class FlinkStreamTaskTest {
     }
 
     @Test
+    public void testSavePointCommandKeepsClusterConnectionOptions() throws Exception {
+        // the job was submitted to a remote JobManager, so the savepoint must target it as well
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
+
+        FlinkStreamParameters parameters = new FlinkStreamParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SELECT 1;");
+        parameters.setOthers("-m remote-jm:8081");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkCommand(Mockito.anyList());
+
+        task.savePoint();
+
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef -m remote-jm:8081",
+                String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
     public void testSavePointFailWhenCommandFailed() throws Exception {
         TaskExecutionContext context = buildSavepointTaskExecutionContext(
                 "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
