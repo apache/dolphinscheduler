@@ -34,11 +34,14 @@ import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -133,19 +136,34 @@ class WorkflowSeaTunnelE2ETest {
         instances.selectType("Batch");
         // Positive loaded-table witness: the BATCH predecessor must execute before
         // the source SeaTunnel task can be submitted. Avoid an empty-table false pass.
-        WebDriverWaitFactory.createWebDriverWait(browser, Duration.ofSeconds(120)).until(
-                unused -> instances.instances().stream().anyMatch(row -> row.taskInstanceName().equals("before")));
-        assertThat(instances.instances()).noneMatch(row -> row.taskInstanceName().equals("seatunnel")
-                || row.taskInstanceName().equals(copyName));
+        WebDriverWaitFactory.createWebDriverWait(browser, Duration.ofSeconds(120))
+                .ignoring(StaleElementReferenceException.class)
+                .until(unused -> {
+                    List<String> names = instances.instances().stream().map(TaskInstanceTab.Row::taskInstanceName)
+                            .collect(Collectors.toList());
+                    if (!names.contains("before")) {
+                        return false;
+                    }
+                    assertThat(names).doesNotContain("seatunnel", copyName);
+                    return true;
+                });
         // Testcontainers disposes this isolated project's workflow and instances.
     }
 
     private void waitForStreamInstance(TaskInstanceTab instances, String name) {
-        TaskInstanceTab.Row instance = WebDriverWaitFactory.createWebDriverWait(browser, Duration.ofSeconds(120))
-                .until(unused -> instances.streamInstances().stream()
-                        .filter(row -> row.taskInstanceName().equals(name)).findFirst().orElse(null));
-        assertThat(instance.taskType()).isEqualTo("SEATUNNEL");
-        assertThat(instance.dryRun()).isEqualTo("NO");
+        // Refreshes can replace rows between locating them and reading their cells.
+        WebDriverWaitFactory.createWebDriverWait(browser, Duration.ofSeconds(120))
+                .ignoring(StaleElementReferenceException.class)
+                .until(unused -> {
+                    TaskInstanceTab.Row instance = instances.streamInstances().stream()
+                            .filter(row -> row.taskInstanceName().equals(name)).findFirst().orElse(null);
+                    if (instance == null) {
+                        return false;
+                    }
+                    assertThat(instance.taskType()).isEqualTo("SEATUNNEL");
+                    assertThat(instance.dryRun()).isEqualTo("NO");
+                    return true;
+                });
     }
 
     private SeaTunnelTaskForm openTask(WorkflowForm form, String code) {
