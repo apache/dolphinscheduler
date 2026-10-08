@@ -163,8 +163,10 @@ public final class WorkflowForm {
 
     public void openTask(String code) {
         new Actions(driver).doubleClick(taskBodyInView(code)).perform();
+        // Visible controls still move while their modal is entering or leaving.
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector(".input-node-name input")));
+                By.cssSelector(".n-modal:not(.fade-in-scale-up-transition-enter-active)"
+                        + ":not(.fade-in-scale-up-transition-leave-active) .input-node-name input")));
     }
 
     public String copyTask(String code) {
