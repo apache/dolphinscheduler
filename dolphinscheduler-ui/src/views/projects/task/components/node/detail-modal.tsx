@@ -51,6 +51,7 @@ import type {
 } from './types'
 import { queryProjectPreferenceByProjectCode } from '@/service/modules/projects-preference'
 import { INodeData } from './types'
+import { nodeDetailModalStyle } from './modal-style'
 
 const props = {
   show: {
@@ -264,11 +265,7 @@ const NodeDetailModal = defineComponent({
     return () => (
       <Modal
         show={props.show}
-        width={
-          ['SQL', 'SHELL'].includes(props.data.taskType || '')
-            ? 1400
-            : undefined
-        }
+        style={nodeDetailModalStyle(props.data.taskType)}
         title={
           props.from === 1
             ? `${t('project.task.current_task_settings')}`
