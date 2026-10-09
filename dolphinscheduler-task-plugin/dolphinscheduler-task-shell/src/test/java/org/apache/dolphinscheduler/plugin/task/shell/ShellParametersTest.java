@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.plugin.task.shell;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -72,6 +74,40 @@ class ShellParametersTest {
         List<Property> varPool = shellParameters.getVarPool();
         assertEquals(1, varPool.size());
         assertEquals("b", varPool.get(0).getValue());
+    }
+
+    @Test
+    void checkParametersTest_nullScript() {
+        ShellParameters shellParameters = new ShellParameters();
+        assertFalse(shellParameters.checkParameters());
+    }
+
+    @Test
+    void checkParametersTest_emptyScript() {
+        ShellParameters shellParameters = new ShellParameters();
+        shellParameters.setRawScript("");
+        assertFalse(shellParameters.checkParameters());
+    }
+
+    @Test
+    void checkParametersTest_whitespaceOnlyScript() {
+        ShellParameters shellParameters = new ShellParameters();
+        shellParameters.setRawScript("   \n\t  ");
+        assertFalse(shellParameters.checkParameters());
+    }
+
+    @Test
+    void checkParametersTest_validScript() {
+        ShellParameters shellParameters = new ShellParameters();
+        shellParameters.setRawScript("echo hello");
+        assertTrue(shellParameters.checkParameters());
+    }
+
+    @Test
+    void checkParametersTest_scriptWithSurroundingWhitespace() {
+        ShellParameters shellParameters = new ShellParameters();
+        shellParameters.setRawScript("  \n echo hello \t ");
+        assertTrue(shellParameters.checkParameters());
     }
 
 }
