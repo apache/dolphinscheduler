@@ -12,7 +12,11 @@ Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 She
 ## 任务参数
 
 - 默认参数说明请参考 [DolphinScheduler 任务参数附录](appendix.md) 的 `默认任务参数` 一栏。
-- 除上述默认参数，此任务没有其他参数
+
+| **参数** | **描述** |
+| --- | --- |
+| 脚本 | 用户开发的 SHELL 程序。 |
+| 自定义参数 | Shell 的用户自定义参数，将使用 `${variable}` 替换脚本中的内容。 |
 
 ## 任务样例
 
@@ -34,3 +38,5 @@ Shell 任务类型，用于创建 Shell 类型的任务并执行一系列的 She
 Shell 任务类型通过解析任务日志是否包含 ```application_xxx_xxx``` 的内容来判断是否 Yarn 任务，如果是则会将相应的 ```application_id``` 的状态作为当前 Shell 节点的运行状态判断，此时如果操作停止工作流则会 Kill 相应的 ```application_id```
 
 如果 Shell 任务中需要使用到用户自定义的脚本，可通过资源中心来上传对应的文件然后在 Shell 任务中引用他们，可参考：[文件管理](../resource/file-manage.md)。
+
+通过 API 引用资源时，请使用 `resourceName` 字段指定资源路径。`ResourceInfo` 中的 `id` 和 `res` 字段已废弃（@Deprecated），不再推荐使用。
