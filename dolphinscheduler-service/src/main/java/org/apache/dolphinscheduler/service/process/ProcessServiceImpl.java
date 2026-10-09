@@ -64,6 +64,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.TaskTimeoutParameter;
+import org.apache.dolphinscheduler.service.exceptions.ServiceException;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.utils.ClusterConfUtils;
 import org.apache.dolphinscheduler.service.utils.DagHelper;
@@ -700,6 +701,10 @@ public class ProcessServiceImpl implements ProcessService {
                 taskNode.setVersion(taskDefinitionLog.getVersion());
                 taskNode.setName(taskDefinitionLog.getName());
                 taskNode.setDesc(taskDefinitionLog.getDescription());
+                if (taskDefinitionLog.getTaskType() == null) {
+                    throw new ServiceException("The taskType of taskDefinition is null, taskCode: "
+                            + taskDefinitionLog.getCode() + ", taskName: " + taskDefinitionLog.getName());
+                }
                 taskNode.setType(taskDefinitionLog.getTaskType().toUpperCase());
                 taskNode.setRunFlag(taskDefinitionLog.getFlag() == Flag.YES ? Constants.FLOWNODE_RUN_FLAG_NORMAL
                         : Constants.FLOWNODE_RUN_FLAG_FORBIDDEN);
@@ -714,8 +719,21 @@ public class ProcessServiceImpl implements ProcessService {
                                 taskDefinitionLog.getTimeoutNotifyStrategy(),
                                 taskDefinitionLog.getTimeout())));
                 taskNode.setDelayTime(taskDefinitionLog.getDelayTime());
-                taskNode.setPreTasks(JSONUtils.toJsonString(code.getValue().stream().map(taskDefinitionLogMap::get)
-                        .map(TaskDefinition::getCode).collect(Collectors.toList())));
+                List<Long> missedPreTaskCodes = new ArrayList<>();
+                List<Long> preTaskCodes = new ArrayList<>();
+                for (Long preTaskCode : code.getValue()) {
+                    if (taskDefinitionLogMap.containsKey(preTaskCode)) {
+                        preTaskCodes.add(preTaskCode);
+                    } else {
+                        missedPreTaskCodes.add(preTaskCode);
+                    }
+                }
+                if (!missedPreTaskCodes.isEmpty()) {
+                    throw new ServiceException("The task definitions of pre taskCodes: " + missedPreTaskCodes
+                            + " do not exist, postTaskCode: " + code.getKey()
+                            + ", please check the task taskRelation");
+                }
+                taskNode.setPreTasks(JSONUtils.toJsonString(preTaskCodes));
                 taskNode.setTaskGroupId(taskDefinitionLog.getTaskGroupId());
                 taskNode.setTaskGroupPriority(taskDefinitionLog.getTaskGroupPriority());
                 taskNode.setCpuQuota(taskDefinitionLog.getCpuQuota());
