@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -74,11 +76,11 @@ public interface TaskDefinitionService {
      * @param pageSize page size
      * @return the pagination task definition versions info of the certain task definition
      */
-    Result queryTaskDefinitionVersions(User loginUser,
-                                       long projectCode,
-                                       long taskCode,
-                                       int pageNo,
-                                       int pageSize);
+    Result<PageInfo<TaskDefinitionLog>> queryTaskDefinitionVersions(User loginUser,
+                                                                    long projectCode,
+                                                                    long taskCode,
+                                                                    int pageNo,
+                                                                    int pageSize);
 
     /**
      * delete the certain task definition version by version and code

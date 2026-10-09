@@ -239,12 +239,12 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     }
 
     @Override
-    public Result queryTaskDefinitionVersions(User loginUser,
-                                              long projectCode,
-                                              long taskCode,
-                                              int pageNo,
-                                              int pageSize) {
-        Result result = new Result();
+    public Result<PageInfo<TaskDefinitionLog>> queryTaskDefinitionVersions(User loginUser,
+                                                                           long projectCode,
+                                                                           long taskCode,
+                                                                           int pageNo,
+                                                                           int pageSize) {
+        Result<PageInfo<TaskDefinitionLog>> result = new Result<>();
         Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_VERSION_VIEW);

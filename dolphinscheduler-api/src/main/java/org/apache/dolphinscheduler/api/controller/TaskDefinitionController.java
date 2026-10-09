@@ -28,13 +28,17 @@ import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -82,13 +86,21 @@ public class TaskDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_DEFINITION_VERSIONS_ERROR)
-    public Result queryTaskDefinitionVersions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @PathVariable(value = "code") long code,
-                                              @RequestParam(value = "pageNo") int pageNo,
-                                              @RequestParam(value = "pageSize") int pageSize) {
+    public Result<PageInfo<TaskDefinitionLog>> queryTaskDefinitionVersions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                           @PathVariable(value = "code") long code,
+                                                                           @RequestParam(value = "pageNo") int pageNo,
+                                                                           @RequestParam(value = "pageSize") int pageSize) {
         checkPageParams(pageNo, pageSize);
-        return taskDefinitionService.queryTaskDefinitionVersions(loginUser, projectCode, code, pageNo, pageSize);
+        Result<PageInfo<TaskDefinitionLog>> result = taskDefinitionService.queryTaskDefinitionVersions(loginUser,
+                projectCode, code, pageNo, pageSize);
+        PageInfo<TaskDefinitionLog> pageInfo = result.getData();
+        if (pageInfo != null && pageInfo.getTotalList() != null) {
+            pageInfo.setTotalList(pageInfo.getTotalList().stream()
+                    .map(log -> (TaskDefinitionLog) SensitivePropertyUtils.mask(log))
+                    .collect(Collectors.toList()));
+        }
+        return result;
     }
 
     /**
@@ -163,7 +175,7 @@ public class TaskDefinitionController extends BaseController {
                                                               @PathVariable(value = "code") long code) {
         TaskDefinitionVO taskDefinitionVO =
                 taskDefinitionService.queryTaskDefinitionDetail(loginUser, projectCode, code);
-        return Result.success(taskDefinitionVO);
+        return Result.success((TaskDefinitionVO) SensitivePropertyUtils.mask(taskDefinitionVO));
     }
 
     /**

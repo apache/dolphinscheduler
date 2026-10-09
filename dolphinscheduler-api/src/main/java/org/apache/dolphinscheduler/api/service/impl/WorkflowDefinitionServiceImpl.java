@@ -49,6 +49,7 @@ import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -98,6 +99,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.SwitchResultVo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -262,6 +264,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
+        SensitivePropertyUtils.requireNoPlaceholder(GlobalParameterUtils.deserializeGlobalParameter(globalParams));
+        for (TaskDefinitionLog taskDefinitionLog : CollectionUtils.emptyIfNull(taskDefinitionLogs)) {
+            taskDefinitionLog.setTaskParams(
+                    SensitivePropertyUtils.mergeLocalParams(taskDefinitionLog.getTaskParams(), null));
+        }
 
         long workflowDefinitionCode = CodeGenerateUtils.genCode();
         WorkflowDefinition workflowDefinition =
@@ -499,14 +506,16 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                                           String otherParamsJson,
                                                                           Integer userId,
                                                                           Integer pageNo,
-                                                                          Integer pageSize) {
+                                                                          Integer pageSize,
+                                                                          String sortField,
+                                                                          String sortOrder) {
 
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_DEFINITION);
 
         PageListingResult<WorkflowDefinition> workflowDefinitionPageListingResult =
                 workflowDefinitionDao.listingWorkflowDefinition(
-                        pageNo, pageSize, searchVal, userId, projectCode);
+                        pageNo, pageSize, searchVal, userId, projectCode, sortField, sortOrder);
         List<WorkflowDefinition> workflowDefinitions = workflowDefinitionPageListingResult.getRecords();
 
         List<Long> workflowDefinitionCodes =
@@ -655,6 +664,34 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                         definition.getCode());
                 throw new ServiceException(Status.WORKFLOW_DEFINITION_NAME_EXIST, name);
             }
+        }
+        List<Property> submittedGlobalParams =
+                GlobalParameterUtils.deserializeGlobalParameter(globalParams);
+        if (CollectionUtils.isNotEmpty(submittedGlobalParams)) {
+            globalParams = GlobalParameterUtils.serializeGlobalParameter(
+                    SensitivePropertyUtils.merge(submittedGlobalParams,
+                            GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams())));
+        }
+        List<TaskDefinition> versionKeys = new ArrayList<>();
+        for (TaskDefinitionLog taskDefinitionLog : CollectionUtils.emptyIfNull(taskDefinitionLogs)) {
+            if (taskDefinitionLog.getCode() > 0 && taskDefinitionLog.getVersion() > 0) {
+                versionKeys.add(new TaskDefinition(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion()));
+            }
+        }
+        List<TaskDefinitionLog> existingTaskLogs = CollectionUtils.isEmpty(versionKeys)
+                ? Collections.emptyList()
+                : taskDefinitionLogMapper.queryByTaskDefinitions(versionKeys);
+        Map<String, String> existingTaskParamsMap = existingTaskLogs.stream()
+                .collect(Collectors.toMap(
+                        log -> log.getCode() + "_" + log.getVersion(),
+                        TaskDefinitionLog::getTaskParams,
+                        (left, right) -> left));
+        for (TaskDefinitionLog submitted : CollectionUtils.emptyIfNull(taskDefinitionLogs)) {
+            String existingTaskParams = submitted.getCode() <= 0 || submitted.getVersion() <= 0
+                    ? null
+                    : existingTaskParamsMap.get(submitted.getCode() + "_" + submitted.getVersion());
+            submitted.setTaskParams(SensitivePropertyUtils.mergeLocalParams(
+                    submitted.getTaskParams(), existingTaskParams));
         }
         WorkflowDefinition workflowDefinitionDeepCopy =
                 JSONUtils.parseObject(JSONUtils.toJsonString(workflowDefinition), WorkflowDefinition.class);
@@ -1693,9 +1730,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
      * @return the pagination workflow definition versions info of the certain workflow definition
      */
     @Override
-    public Result queryWorkflowDefinitionVersions(User loginUser, long projectCode, int pageNo, int pageSize,
-                                                  long code) {
-        Result result = new Result();
+    public Result<PageInfo<WorkflowDefinitionLog>> queryWorkflowDefinitionVersions(User loginUser, long projectCode,
+                                                                                   int pageNo, int pageSize,
+                                                                                   long code) {
+        Result<PageInfo<WorkflowDefinitionLog>> result = new Result<>();
         Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, VERSION_LIST);

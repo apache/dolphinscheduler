@@ -121,6 +121,58 @@ public abstract class RegistryTestCase<R extends Registry> {
 
     @SneakyThrows
     @Test
+    public void testSubscribeEventData() {
+        registry.start();
+
+        // Futures safely publish each first event and its payload to the test thread.
+        final CompletableFuture<Event> subscribeAdded = new CompletableFuture<>();
+        final CompletableFuture<Event> subscribeRemoved = new CompletableFuture<>();
+        final CompletableFuture<Event> subscribeUpdated = new CompletableFuture<>();
+
+        final SubscribeListener subscribeListener = new SubscribeListener() {
+
+            @Override
+            public void notify(Event event) {
+                // Keep assertions on the test thread so callback error handling cannot hide failures.
+                if (event.getType() == Event.Type.ADD) {
+                    subscribeAdded.complete(event);
+                }
+                if (event.getType() == Event.Type.REMOVE) {
+                    subscribeRemoved.complete(event);
+                }
+                if (event.getType() == Event.Type.UPDATE) {
+                    subscribeUpdated.complete(event);
+                }
+            }
+
+            @Override
+            public SubscribeScope getSubscribeScope() {
+                return SubscribeScope.PATH_ONLY;
+            }
+        };
+        String key = "/nodes/master" + System.nanoTime();
+        registry.subscribe(key, subscribeListener);
+        // Wait after each change so polling registries cannot collapse consecutive operations.
+        registry.put(key, "v1", true);
+        assertSubscribeEvent(subscribeAdded.get(10, TimeUnit.SECONDS), Event.Type.ADD, key, "v1");
+
+        registry.put(key, "v2", true);
+        assertSubscribeEvent(subscribeUpdated.get(10, TimeUnit.SECONDS), Event.Type.UPDATE, key, "v2");
+
+        // REMOVE must retain the last value before deletion, not the initial value.
+        registry.delete(key);
+        assertSubscribeEvent(subscribeRemoved.get(10, TimeUnit.SECONDS), Event.Type.REMOVE, key, "v2");
+    }
+
+    private void assertSubscribeEvent(Event event, Event.Type expectedType, String key, String expectedData) {
+        Assertions.assertEquals(expectedType, event.getType());
+        Assertions.assertEquals(key, event.getWatchedPath());
+        Assertions.assertEquals(key, event.getEventPath());
+        Assertions.assertEquals(expectedData, event.getEventData());
+    }
+
+    @SneakyThrows
+    @Test
     public void testAddConnectionStateListener() {
 
         AtomicReference<ConnectionState> connectionState = new AtomicReference<>();
