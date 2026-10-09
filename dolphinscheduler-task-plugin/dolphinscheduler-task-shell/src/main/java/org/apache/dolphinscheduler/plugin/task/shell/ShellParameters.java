@@ -33,7 +33,7 @@ public class ShellParameters extends AbstractParameters {
 
     @Override
     public boolean checkParameters() {
-        return rawScript != null && !rawScript.isEmpty();
+        return rawScript != null && !rawScript.trim().isEmpty();
     }
 
     @Override
