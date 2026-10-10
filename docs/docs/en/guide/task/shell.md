@@ -2,12 +2,12 @@
 
 ## Overview
 
-Shell task type, used to create a shell type task and execute a series of shell scripts. When the worker executes this task, a temporary shell script is generated and executed using the linux user with the same name as the tenant.
+The Shell task type is used to create Shell tasks and execute a series of shell scripts. When the worker executes this task, a temporary shell script is generated and executed using the linux user with the same name as the tenant.
 
 ## Create Task
 
 - Click `Project Management -> Project Name -> Workflow Definition`, and click the `Create Workflow` button to enter the DAG editing page.
-- Drag  from the toolbar <img src="../../../../img/tasks/icons/shell.png" width="15"/> to the canvas.
+- Drag <img src="../../../../img/tasks/icons/shell.png" width="15"/> from the toolbar to the canvas.
 
 ## Task Parameters
 
@@ -34,8 +34,10 @@ This example simulates a custom parameter task. In order to reuse existing tasks
 
 ## Note
 
-The shell task type resolves whether the task log contains ```application_xxx_xxx``` to determine whether is the yarn task. If so, the corresponding application
-will be use to judge the running state of the current shell node. At this time, if stops the operation of the workflow, the corresponding ```application_id```
+The shell task type resolves whether the task log contains ```application_xxx_xxx``` to determine whether it is a Yarn task. If so, the corresponding application
+will be used to judge the running state of the current shell node. At this time, if the operation of the workflow is stopped, the corresponding ```application_id```
 will be killed.
 
 If you want to use resource files in Shell tasks, you can upload corresponding files through the resource center and then use the resources in the Shell task. Reference: [file-manage](../resource/file-manage.md).
+
+When referencing resources via API, use the `resourceName` field to specify the resource path. The `id` and `res` fields in `ResourceInfo` are deprecated (@Deprecated) and no longer recommended.
