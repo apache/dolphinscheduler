@@ -59,6 +59,7 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
         // insertOne
         EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
         relation.setEnvironmentCode(1L);
+        relation.setWorkerGroupId(1);
         relation.setWorkerGroup("default");
         relation.setOperator(1);
         relation.setUpdateTime(new Date());
@@ -76,6 +77,24 @@ public class EnvironmentWorkerGroupRelationMapperTest extends BaseDaoTest {
         // query
         List<EnvironmentWorkerGroupRelation> relations = environmentWorkerGroupRelationMapper.selectList(null);
         Assertions.assertEquals(relations.size(), 1);
+        Assertions.assertEquals(1, relations.get(0).getWorkerGroupId());
+    }
+
+    @Test
+    public void testPersistConfigWorkerGroupWithoutId() {
+        EnvironmentWorkerGroupRelation relation = new EnvironmentWorkerGroupRelation();
+        relation.setEnvironmentCode(2L);
+        relation.setWorkerGroup("configured");
+        relation.setOperator(1);
+        relation.setCreateTime(new Date());
+        relation.setUpdateTime(new Date());
+        environmentWorkerGroupRelationMapper.insert(relation);
+
+        List<EnvironmentWorkerGroupRelation> relations =
+                environmentWorkerGroupRelationMapper.queryByEnvironmentCode(2L);
+        Assertions.assertEquals(1, relations.size());
+        Assertions.assertEquals("configured", relations.get(0).getWorkerGroup());
+        Assertions.assertNull(relations.get(0).getWorkerGroupId());
     }
 
     @Test
