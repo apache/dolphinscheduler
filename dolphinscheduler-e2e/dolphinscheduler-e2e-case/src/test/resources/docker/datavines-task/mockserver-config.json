@@ -1,0 +1,98 @@
+[
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/api/v1/openapi/job/execute/1"
+    },
+    "httpResponse": {
+      "body": "{\"code\":200,\"msg\":\"success\",\"data\":\"1\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/api/v1/openapi/job/execution/status/1"
+    },
+    "httpResponse": {
+      "body": "{\"code\":200,\"msg\":\"success\",\"data\":\"SUCCESS\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/api/v1/openapi/job/execution/result/1"
+    },
+    "httpResponse": {
+      "body": "{\"code\":200,\"msg\":\"success\",\"data\":\"SUCCESS\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/api/v1/openapi/job/execute/3"
+    },
+    "httpResponse": {
+      "body": "{\"code\":200,\"msg\":\"success\",\"data\":\"3\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/api/v1/openapi/job/execution/status/3"
+    },
+    "httpResponse": {
+      "body": "{\"code\":200,\"msg\":\"success\",\"data\":\"SUCCESS\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/api/v1/openapi/job/execution/result/3"
+    },
+    "httpResponse": {
+      "body": "{\"code\":200,\"msg\":\"success\",\"data\":\"FAILURE\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "POST",
+      "path": "/api/v1/openapi/job/execute/2"
+    },
+    "httpResponse": {
+      "body": "{\"code\":200,\"msg\":\"success\",\"data\":\"2\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  },
+  {
+    "httpRequest": {
+      "method": "GET",
+      "path": "/api/v1/openapi/job/execution/status/2"
+    },
+    "httpResponse": {
+      "body": "{\"code\":200,\"msg\":\"success\",\"data\":\"FAILURE\"}",
+      "headers": {
+        "Content-Type": "application/json"
+      }
+    }
+  }
+]

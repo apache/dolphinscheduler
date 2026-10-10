@@ -52,6 +52,7 @@ import { useLinkis } from './use-linkis'
 import { useDataFactory } from './use-data-factory'
 import { useRemoteShell } from './use-remote-shell'
 import { useAliyunServerlessSpark } from './use-aliyun-serverless-spark'
+import { useDatavines } from './use-datavines'
 
 export default {
   SHELL: useShell,
@@ -79,6 +80,7 @@ export default {
   OPENMLDB: useOpenmldb,
   DVC: useDvc,
   DINKY: useDinky,
+  DATAVINES: useDatavines,
   SAGEMAKER: userSagemaker,
   CHUNJUN: useChunjun,
   FLINK_STREAM: useFlinkStream,

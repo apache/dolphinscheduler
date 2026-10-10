@@ -70,6 +70,10 @@ export const TASK_TYPES_MAP = {
   CONDITIONS: {
     alias: 'CONDITIONS'
   },
+  DATAVINES: {
+    alias: 'DATAVINES',
+    helperLinkDisable: true
+  },
   SWITCH: {
     alias: 'SWITCH'
   },
