@@ -377,6 +377,7 @@ export default {
     name_tips: '请输入名称(必填)',
     task_type: '任务类型',
     task_type_tips: '请选择任务类型(必选)',
+    task_execute_type: '任务执行类型',
     child_node: '子节点',
     child_node_tips: '请选择子节点(必选)',
     run_flag: '运行标志',
