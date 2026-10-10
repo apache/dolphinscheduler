@@ -16,5 +16,5 @@
 */
 
 -- If the table already has duplicate rows, index creation will fail; resolve them manually first.
-ALTER TABLE `t_ds_alert` ADD UNIQUE INDEX `uk_alert_dedup` (`sign`, `workflow_instance_id`, `alert_type`);
+ALTER TABLE `t_ds_alert` ADD UNIQUE INDEX `uk_alert_dedup` (`sign`);
 

@@ -292,7 +292,7 @@ CREATE TABLE `t_ds_alert` (
   PRIMARY KEY (`id`),
   KEY `idx_status` (`alert_status`) USING BTREE,
   KEY `idx_sign` (`sign`) USING BTREE,
-  UNIQUE KEY `uk_alert_dedup` (`sign`, `workflow_instance_id`, `alert_type`)
+  UNIQUE KEY `uk_alert_dedup` (`sign`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------

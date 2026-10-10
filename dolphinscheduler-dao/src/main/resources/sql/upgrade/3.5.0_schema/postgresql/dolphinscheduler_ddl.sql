@@ -16,4 +16,4 @@
 */
 
 -- If the table already has duplicate rows, index creation will fail; resolve them manually first.
-CREATE UNIQUE INDEX IF NOT EXISTS uk_alert_dedup ON t_ds_alert (sign, workflow_instance_id, alert_type);
+CREATE UNIQUE INDEX IF NOT EXISTS uk_alert_dedup ON t_ds_alert (sign);

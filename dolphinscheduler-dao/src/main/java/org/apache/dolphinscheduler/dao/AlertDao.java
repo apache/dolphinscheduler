@@ -117,7 +117,7 @@ public class AlertDao {
 
     /**
      * Insert a task-result alert idempotently. The uk_alert_dedup unique constraint on
-     * (sign, workflow_instance_id, alert_type) rejects duplicates; a DuplicateKeyException
+     * sign rejects duplicates; a DuplicateKeyException
      * is caught here and treated as a skip.
      *
      * @return insert count (1 if inserted, 0 if skipped)
