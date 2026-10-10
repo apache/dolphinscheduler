@@ -18,12 +18,39 @@
 package org.apache.dolphinscheduler.common.sql;
 
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class ClasspathSqlScriptParserTest {
+
+    @Test
+    void testStatementTerminatorsWithTrailingWhitespace(@TempDir Path directory) throws IOException {
+        ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
+        try (
+                URLClassLoader classLoader =
+                        new URLClassLoader(new URL[]{directory.toUri().toURL()}, originalClassLoader)) {
+            Thread.currentThread().setContextClassLoader(classLoader);
+            for (String whitespace : Arrays.asList("", " ", "\t", " \t ")) {
+                List<String> statements =
+                        Arrays.asList("SELECT 1;" + whitespace, "SELECT\n2;" + whitespace, "SELECT 3;");
+                Files.write(directory.resolve("trailing_whitespace.sql"),
+                        String.join("\n", statements).getBytes(StandardCharsets.UTF_8));
+                Assertions.assertEquals(statements,
+                        new ClasspathSqlScriptParser("trailing_whitespace.sql").getAllSql());
+            }
+        } finally {
+            Thread.currentThread().setContextClassLoader(originalClassLoader);
+        }
+    }
 
     @Test
     void testMysqlDmlSql() throws IOException {
