@@ -34,9 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractTaskExecutor implements ITaskExecutor {
 
-    private static final long DEFAULT_TRACK_INTERVAL = 10_000;
-
-    private long latestStateTrackTime;
+    private volatile long latestStateTrackTime;
 
     private boolean startFlag;
 
@@ -99,10 +97,25 @@ public abstract class AbstractTaskExecutor implements ITaskExecutor {
 
     @Override
     public long getRemainingTrackDelay() {
-        if (latestStateTrackTime == 0) {
+        final long stateTrackTime = latestStateTrackTime;
+        if (stateTrackTime == 0) {
             return 0;
         }
-        return latestStateTrackTime + DEFAULT_TRACK_INTERVAL - System.currentTimeMillis();
+        return stateTrackTime + getStateTrackInterval() - System.currentTimeMillis();
+    }
+
+    /**
+     * Get the interval between task state checks in milliseconds.
+     */
+    protected long getStateTrackInterval() {
+        return DEFAULT_STATE_TRACK_INTERVAL.toMillis();
+    }
+
+    /**
+     * Request an immediate state check after a task control operation.
+     */
+    protected void resetStateTrackTime() {
+        latestStateTrackTime = 0;
     }
 
     @Override
