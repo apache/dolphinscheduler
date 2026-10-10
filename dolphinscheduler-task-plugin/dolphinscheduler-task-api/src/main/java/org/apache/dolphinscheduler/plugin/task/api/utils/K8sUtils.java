@@ -29,8 +29,8 @@ import io.fabric8.kubernetes.api.model.batch.v1.Job;
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.KubernetesClientBuilder;
-import io.fabric8.kubernetes.client.Watch;
-import io.fabric8.kubernetes.client.Watcher;
+import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
+import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 
 @Slf4j
 public class K8sUtils {
@@ -62,24 +62,37 @@ public class K8sUtils {
         }
     }
 
-    public Boolean jobExist(String jobName, String namespace) {
-        try {
-            Job job = client.batch().v1().jobs().inNamespace(namespace).withName(jobName).get();
-            return job != null;
-        } catch (Exception e) {
-            throw new TaskException("fail to check job: ", e);
-        }
-    }
-
-    public Watch createBatchJobWatcher(String jobName, Watcher<Job> watcher) {
+    public Job getJob(String jobName, String namespace) {
         try {
             return client.batch()
                     .v1()
                     .jobs()
+                    .inNamespace(namespace)
                     .withName(jobName)
-                    .watch(watcher);
+                    .get();
         } catch (Exception e) {
-            throw new TaskException("fail to register batch job watcher", e);
+            throw new TaskException("fail to get job: " + jobName, e);
+        }
+    }
+
+    public Boolean jobExist(String jobName, String namespace) {
+        return getJob(jobName, namespace) != null;
+    }
+
+    public SharedIndexInformer<Job> createBatchJobInformer(String jobName,
+                                                           String namespace,
+                                                           ResourceEventHandler<Job> handler) {
+        try {
+            SharedIndexInformer<Job> informer = client.batch()
+                    .v1()
+                    .jobs()
+                    .inNamespace(namespace)
+                    .withName(jobName)
+                    .runnableInformer(0L);
+            informer.addEventHandler(handler);
+            return informer;
+        } catch (Exception e) {
+            throw new TaskException("fail to register batch job informer", e);
         }
     }
 
