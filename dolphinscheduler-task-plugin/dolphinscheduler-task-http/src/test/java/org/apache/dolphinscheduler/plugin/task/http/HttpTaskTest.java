@@ -108,6 +108,82 @@ public class HttpTaskTest {
     }
 
     @Test
+    public void testCreatedResponsePreservesOutputBody() throws Exception {
+        String responseBody = "{\"id\":42,\"status\":\"created\"}";
+        HttpTask task = generateHttpTask(DEFAULT_MOCK_PATH, HttpRequestMethod.POST, "{\"name\":\"report\"}",
+                new ArrayList<>(), null, HttpCheckCondition.STATUS_CODE_CUSTOM, "201",
+                HttpStatus.SC_CREATED, responseBody);
+
+        task.handle(null);
+
+        Assertions.assertEquals("POST", getLatestMockWebServer().takeRequest(1, TimeUnit.SECONDS).getMethod());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, task.getExitStatusCode());
+        String output = task.getParameters().getVarPool().get(0).getValue();
+        Assertions.assertEquals(responseBody, new ObjectMapper().readTree(output).get("body").asText());
+    }
+
+    @Test
+    public void testAcceptedResponseChecksActualBody() throws Exception {
+        HttpTask task = generateHttpTask(DEFAULT_MOCK_PATH, HttpRequestMethod.POST, "{\"name\":\"report\"}",
+                new ArrayList<>(), null, HttpCheckCondition.BODY_CONTAINS, "queued",
+                HttpStatus.SC_ACCEPTED, "{\"id\":42,\"status\":\"queued\"}");
+
+        task.handle(null);
+
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, task.getExitStatusCode());
+    }
+
+    @Test
+    public void testNonOkResponsePreservesBodyAndDefaultStatusCheck() throws Exception {
+        for (int statusCode : new int[]{HttpStatus.SC_CREATED, HttpStatus.SC_BAD_REQUEST,
+                HttpStatus.SC_INTERNAL_SERVER_ERROR}) {
+            String responseBody = "{\"message\":\"details\"}";
+            HttpTask task = generateHttpTask(DEFAULT_MOCK_PATH, HttpRequestMethod.GET, "",
+                    new ArrayList<>(), null, HttpCheckCondition.STATUS_CODE_DEFAULT, "",
+                    statusCode, responseBody);
+
+            task.handle(null);
+
+            Assertions.assertEquals(EXIT_CODE_FAILURE, task.getExitStatusCode());
+            String output = task.getParameters().getVarPool().get(0).getValue();
+            Assertions.assertEquals(responseBody, new ObjectMapper().readTree(output).get("body").asText());
+        }
+    }
+
+    @Test
+    public void testErrorResponseBodyChecksUseActualContent() throws Exception {
+        for (int statusCode : new int[]{HttpStatus.SC_BAD_REQUEST, HttpStatus.SC_INTERNAL_SERVER_ERROR}) {
+            for (HttpCheckCondition check : new HttpCheckCondition[]{HttpCheckCondition.BODY_CONTAINS,
+                    HttpCheckCondition.BODY_NOT_CONTAINS}) {
+                for (String body : new String[]{"{\"status\":\"success\"}", "{\"status\":\"error\"}", ""}) {
+                    HttpTask task = generateHttpTask(HttpRequestMethod.GET, check, "success", statusCode, body);
+                    task.handle(null);
+                    boolean matches = check == HttpCheckCondition.BODY_CONTAINS
+                            ? body.contains("success")
+                            : !body.contains("success");
+                    int expected = !body.isEmpty() && matches ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE;
+                    Assertions.assertEquals(expected, task.getExitStatusCode(),
+                            "status=" + statusCode + ", check=" + check + ", body=" + body);
+                    String output = task.getParameters().getVarPool().get(0).getValue();
+                    Assertions.assertEquals(body, new ObjectMapper().readTree(output).get("body").asText());
+                }
+            }
+        }
+    }
+
+    @Test
+    public void testNoContentResponsePreservesEmptyBody() throws Exception {
+        HttpTask task = generateHttpTask(HttpRequestMethod.DELETE, HttpCheckCondition.STATUS_CODE_CUSTOM,
+                "204", HttpStatus.SC_NO_CONTENT, "");
+
+        task.handle(null);
+
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, task.getExitStatusCode());
+        String output = task.getParameters().getVarPool().get(0).getValue();
+        Assertions.assertEquals("", new ObjectMapper().readTree(output).get("body").asText());
+    }
+
+    @Test
     public void testHandleCheckBodyContains() throws Exception {
         HttpTask httpTask = generateHttpTask(HttpRequestMethod.GET, HttpCheckCondition.BODY_CONTAINS,
                 "success", HttpStatus.SC_OK, "{\"status\": \"success\"}");

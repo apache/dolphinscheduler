@@ -46,6 +46,7 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.4.3
 
+* HTTP tasks now preserve the real response body for non-200 statuses, including 4xx/5xx, instead of a synthetic error string. `BODY_CONTAINS` and `BODY_NOT_CONTAINS` evaluate this real body without checking the status code, so existing body checks may produce different task results. Use status-code validation when error statuses must fail the task. Missing bodies are returned as empty strings; both body checks reject empty bodies. ([#18688](https://github.com/apache/dolphinscheduler/pull/18688))
 * Add the `missed_fire_policy` column to `t_ds_schedules`. Existing schedules default to `FIRE_ALL_MISSED` to preserve the previous Quartz `IgnoreMisfires` behavior. ([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
 * Remove the obsolete Dynamic Task query API. ([#18556](https://github.com/apache/dolphinscheduler/issues/18556))
 * Remove the obsolete task update-with-upstream API `PUT /projects/{projectCode}/task-definition/{code}/with-upstream`. ([#18568](https://github.com/apache/dolphinscheduler/issues/18568))
