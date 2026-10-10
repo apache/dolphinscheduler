@@ -90,6 +90,17 @@ export function formatParams(data: INodeData): {
     taskParams.taskManager = data.taskManager
     taskParams.parallelism = data.parallelism
   }
+  if (data.taskType === 'FLINK_SGW') {
+    taskParams.flinkJdbcUrl = data.flinkJdbcUrl
+    taskParams.statementSeparator = data.statementSeparator
+    taskParams.maxPrintRows = data.maxPrintRows
+    taskParams.rawScriptType = data.rawScriptType
+    taskParams.initScriptType = data.initScriptType
+    taskParams.initScript =
+      data.initScriptType === 'FILE' ? '' : (data.initScript ?? '')
+    taskParams.rawScript =
+      data.rawScriptType === 'FILE' ? '' : (data.rawScript ?? '')
+  }
   if (data.taskType === 'GRPC') {
     taskParams.url = data.url
     taskParams.grpcCredentialType = data.grpcCredentialType
@@ -508,13 +519,22 @@ export function formatParams(data: INodeData): {
           item.value = item.value || ''
           return item
         }),
-        initScript: data.initScript,
-        rawScript: data.rawScript,
+        initScript:
+          data.initScriptType === 'FILE' ? '' : (data.initScript ?? ''),
+        rawScript:
+          data.rawScriptType === 'FILE' ? '' : (data.rawScript ?? ''),
         resourceList: data.resourceList?.length
           ? data.resourceList.map((fullName: string) => ({
               resourceName: `${fullName}`
             }))
           : [],
+        initScriptType: data.initScriptType,
+        initScriptResourceList:
+          (data.initScriptResourceList as string[] | undefined)?.length
+            ? (data.initScriptResourceList as string[]).map((fullName) => ({
+                resourceName: `${fullName}`
+              }))
+            : [],
         ...taskParams
       },
       taskPriority: data.taskPriority,
@@ -547,7 +567,12 @@ export function formatModel(data: ITaskData) {
       'timeoutNotifyStrategy',
       'taskParams'
     ]),
-    ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
+    ...omit(data.taskParams, [
+      'resourceList',
+      'mainJar',
+      'localParams',
+      'initScriptResourceList'
+    ]),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
     timeoutFlag: data.timeoutFlag === 'OPEN',
     timeoutNotifyStrategy: data.timeoutNotifyStrategy
@@ -563,6 +588,12 @@ export function formatModel(data: ITaskData) {
     params.resourceList = data.taskParams.resourceList.map(
       (item: { resourceName: string }) => `${item.resourceName}`
     )
+  }
+  if (data.taskParams?.initScriptResourceList) {
+    (params as INodeData).initScriptResourceList =
+      data.taskParams.initScriptResourceList.map(
+        (item: { resourceName: string }) => `${item.resourceName}`
+      )
   }
   if (data.taskParams?.mainJar) {
     params.mainJar = data.taskParams?.mainJar.resourceName

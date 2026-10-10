@@ -436,6 +436,7 @@ export default {
     master_tips: '请输入master url（选填）',
     init_script: '初始化脚本',
     init_script_tips: '请输入初始化脚本',
+    init_script_source: 'Init Script 来源',
     resources: '资源',
     resources_tips: '请选择资源',
     resources_limit_tips: '请重新选择，资源个数限制:',

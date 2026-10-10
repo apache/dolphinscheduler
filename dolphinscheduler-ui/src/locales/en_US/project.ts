@@ -449,6 +449,7 @@ export default {
     master_tips: 'Please enter master url(optional)',
     init_script: 'Initialization script',
     init_script_tips: 'Please enter initialization script',
+    init_script_source: 'Init Script Source',
     resources: 'Resources',
     resources_tips: 'Please select resources',
     resources_limit_tips: 'Please select again, resource limit:',

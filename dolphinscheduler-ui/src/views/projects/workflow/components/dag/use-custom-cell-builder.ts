@@ -94,7 +94,9 @@ export function useCustomCellBuilder() {
           // Use href instead of xlink:href, you may lose the icon when downloadPNG
           'xlink:href': `${
             import.meta.env.BASE_URL
-          }images/task-icons/${(type !== ('FLINK_STREAM' as TaskType)
+          }images/task-icons/${(
+            (type !== ('FLINK_STREAM' as TaskType) &&
+            type !== ('FLINK_SGW' as TaskType))
             ? type
             : 'FLINK'
           ).toLocaleLowerCase()}.png`

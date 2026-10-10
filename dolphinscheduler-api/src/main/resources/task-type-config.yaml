@@ -23,6 +23,7 @@ task:
     - 'PROCEDURE'
     - 'SQL'
     - 'SPARK'
+    - 'FLINK_SGW'
     - 'FLINK'
     - 'GRPC'
     - 'HTTP'

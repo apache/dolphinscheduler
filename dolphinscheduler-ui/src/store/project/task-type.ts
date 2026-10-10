@@ -44,6 +44,9 @@ export const TASK_TYPES_MAP = {
   FLINK: {
     alias: 'FLINK'
   },
+  FLINK_SGW: {
+    alias: 'FLINK_SGW'
+  },
   MR: {
     alias: 'MapReduce',
     helperLinkDisable: true

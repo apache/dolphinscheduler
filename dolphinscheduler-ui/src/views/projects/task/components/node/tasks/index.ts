@@ -52,6 +52,7 @@ import { useLinkis } from './use-linkis'
 import { useDataFactory } from './use-data-factory'
 import { useRemoteShell } from './use-remote-shell'
 import { useAliyunServerlessSpark } from './use-aliyun-serverless-spark'
+import { useFlinkSqlGateway } from './use-flink-sqlgateway'
 
 export default {
   SHELL: useShell,
@@ -90,5 +91,6 @@ export default {
   LINKIS: useLinkis,
   DATA_FACTORY: useDataFactory,
   REMOTESHELL: useRemoteShell,
-  ALIYUN_SERVERLESS_SPARK: useAliyunServerlessSpark
+  ALIYUN_SERVERLESS_SPARK: useAliyunServerlessSpark,
+  FLINK_SGW: useFlinkSqlGateway
 }
