@@ -135,7 +135,8 @@ public class HttpTaskTest {
 
     @Test
     public void testNonOkResponsePreservesBodyAndDefaultStatusCheck() throws Exception {
-        for (int statusCode : new int[]{HttpStatus.SC_CREATED, HttpStatus.SC_BAD_REQUEST}) {
+        for (int statusCode : new int[]{HttpStatus.SC_CREATED, HttpStatus.SC_BAD_REQUEST,
+                HttpStatus.SC_INTERNAL_SERVER_ERROR}) {
             String responseBody = "{\"message\":\"details\"}";
             HttpTask task = generateHttpTask(DEFAULT_MOCK_PATH, HttpRequestMethod.GET, "",
                     new ArrayList<>(), null, HttpCheckCondition.STATUS_CODE_DEFAULT, "",
@@ -146,6 +147,27 @@ public class HttpTaskTest {
             Assertions.assertEquals(EXIT_CODE_FAILURE, task.getExitStatusCode());
             String output = task.getParameters().getVarPool().get(0).getValue();
             Assertions.assertEquals(responseBody, new ObjectMapper().readTree(output).get("body").asText());
+        }
+    }
+
+    @Test
+    public void testErrorResponseBodyChecksUseActualContent() throws Exception {
+        for (int statusCode : new int[]{HttpStatus.SC_BAD_REQUEST, HttpStatus.SC_INTERNAL_SERVER_ERROR}) {
+            for (HttpCheckCondition check : new HttpCheckCondition[]{HttpCheckCondition.BODY_CONTAINS,
+                    HttpCheckCondition.BODY_NOT_CONTAINS}) {
+                for (String body : new String[]{"{\"status\":\"success\"}", "{\"status\":\"error\"}", ""}) {
+                    HttpTask task = generateHttpTask(HttpRequestMethod.GET, check, "success", statusCode, body);
+                    task.handle(null);
+                    boolean matches = check == HttpCheckCondition.BODY_CONTAINS
+                            ? body.contains("success")
+                            : !body.contains("success");
+                    int expected = !body.isEmpty() && matches ? EXIT_CODE_SUCCESS : EXIT_CODE_FAILURE;
+                    Assertions.assertEquals(expected, task.getExitStatusCode(),
+                            "status=" + statusCode + ", check=" + check + ", body=" + body);
+                    String output = task.getParameters().getVarPool().get(0).getValue();
+                    Assertions.assertEquals(body, new ObjectMapper().readTree(output).get("body").asText());
+                }
+            }
         }
     }
 

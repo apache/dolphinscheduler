@@ -303,11 +303,10 @@ public class OkHttpUtils {
         headers.forEach(requestBuilder::addHeader);
     }
 
-    private static String getResponseBody(@NonNull Response response) throws IOException {
+    @VisibleForTesting
+    static String getResponseBody(@NonNull Response response) throws IOException {
         if (response.body() == null) {
-            return String.format("Request execute failed, httpCode: %s, httpBody: %s",
-                    response.code(),
-                    response.body());
+            return "";
         }
         return response.body().string();
     }
