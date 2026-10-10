@@ -199,7 +199,8 @@ public class CuringParamsServiceImpl implements CuringParamsService {
             safePutAll(prepareParamsMap, commandParamsMap);
         }
 
-        // 6. VarPool: override values only for existing IN-direction parameters
+        // 6. VarPool: override values for existing IN-direction parameters,
+        // and inject new parameters that only exist in VarPool for placeholder resolution
         List<Property> varPools = parseVarPool(taskInstance);
         if (CollectionUtils.isNotEmpty(varPools)) {
             for (Property varPool : varPools) {
@@ -208,7 +209,16 @@ public class CuringParamsServiceImpl implements CuringParamsService {
                 }
                 Property targetParam = prepareParamsMap.get(varPool.getProp());
                 if (targetParam != null && Direct.IN.equals(targetParam.getDirect())) {
+                    // Existing IN parameter: override its value
                     targetParam.setValue(varPool.getValue());
+                } else if (targetParam == null) {
+                    // Parameter not in map: announce as IN parameter from varPool for placeholder resolution
+                    Property newParam = new Property();
+                    newParam.setProp(varPool.getProp());
+                    newParam.setValue(varPool.getValue());
+                    newParam.setType(varPool.getType());
+                    newParam.setDirect(Direct.IN);
+                    prepareParamsMap.put(varPool.getProp(), newParam);
                 }
             }
         }
