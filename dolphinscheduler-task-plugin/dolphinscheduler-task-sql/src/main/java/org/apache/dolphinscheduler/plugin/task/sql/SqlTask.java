@@ -47,7 +47,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -60,8 +59,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -335,9 +332,9 @@ public class SqlTask extends AbstractTask {
     }
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
-        try (PreparedStatement statement = prepareStatementAndBind(connection, sqlBinds)) {
+        try (Statement statement = createStatement(connection)) {
             log.info("{} statement execute query, for sql: {}", handlerType, sqlBinds.getSql());
-            ResultSet resultSet = statement.executeQuery();
+            ResultSet resultSet = statement.executeQuery(sqlBinds.getSql());
             return resultProcess(resultSet);
         }
     }
@@ -346,8 +343,8 @@ public class SqlTask extends AbstractTask {
                                  String handlerType) throws Exception {
         int result = 0;
         for (SqlBinds sqlBind : statementsBinds) {
-            try (PreparedStatement tmpStatement = prepareStatementAndBind(connection, sqlBind)) {
-                result = tmpStatement.executeUpdate();
+            try (Statement tmpStatement = createStatement(connection)) {
+                result = tmpStatement.executeUpdate(sqlBind.getSql());
                 log.info("{} statement execute update result: {}, for sql: {}", handlerType, result,
                         sqlBind.getSql());
             }
@@ -356,61 +353,27 @@ public class SqlTask extends AbstractTask {
     }
 
     /**
-     * preparedStatement bind
+     * create statement
      *
      * @param connection connection
-     * @param sqlBinds   sqlBinds
-     * @return PreparedStatement
-     * @throws Exception Exception
+     * @return Statement
      */
-    private PreparedStatement prepareStatementAndBind(Connection connection, SqlBinds sqlBinds) {
+    private Statement createStatement(Connection connection) {
         // is the timeout set
         // todo: we need control the timeout at master side.
         boolean timeoutFlag = taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.FAILED
                 || taskExecutionContext.getTaskTimeoutStrategy() == TaskTimeoutStrategy.WARNFAILED;
         try {
-            PreparedStatement stmt = connection.prepareStatement(sqlBinds.getSql());
+            Statement stmt = connection.createStatement();
             if (timeoutFlag) {
                 stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
             stmt.setMaxRows(sqlParameters.getLimit() <= 0 ? QUERY_LIMIT : sqlParameters.getLimit());
-            Map<Integer, Property> params = sqlBinds.getParamsMap();
-            if (params != null) {
-                for (Map.Entry<Integer, Property> entry : params.entrySet()) {
-                    Property prop = entry.getValue();
-                    ParameterUtils.setInParameter(entry.getKey(), stmt, prop.getType(), prop.getValue());
-                }
-            }
-            log.info("prepare statement replace sql : {}, sql parameters : {}", sqlBinds.getSql(),
-                    sqlBinds.getParamsMap());
             sessionStatement = stmt;
             return stmt;
         } catch (Exception exception) {
-            throw new TaskException("SQL task prepareStatementAndBind error", exception);
+            throw new TaskException("SQL task createStatement error", exception);
         }
-    }
-
-    /**
-     * print replace sql
-     *
-     * @param content      content
-     * @param formatSql    format sql
-     * @param rgex         rgex
-     * @param sqlParamsMap sql params map
-     */
-    private void printReplacedSql(String content, String formatSql, String rgex, Map<Integer, Property> sqlParamsMap) {
-        // parameter print style
-        log.info("after replace sql , preparing : {}", formatSql);
-        StringBuilder logPrint = new StringBuilder("replaced sql , parameters:");
-        if (sqlParamsMap == null) {
-            log.info("printReplacedSql: sqlParamsMap is null.");
-        } else {
-            for (int i = 1; i <= sqlParamsMap.size(); i++) {
-                logPrint.append(sqlParamsMap.get(i).getValue()).append("(").append(sqlParamsMap.get(i).getType())
-                        .append(")");
-            }
-        }
-        log.info("Sql Params are {}", logPrint);
     }
 
     private void ensureSqlContent() {
@@ -445,9 +408,6 @@ public class SqlTask extends AbstractTask {
      * @return SqlBinds
      */
     private SqlBinds getSqlAndSqlParamsMap(String sql) {
-        Map<Integer, Property> sqlParamsMap = new HashMap<>();
-        StringBuilder sqlBuilder = new StringBuilder();
-        // new
         // replace variable TIME with $[YYYYmmddd...] in sql when history run job and batch complement job
         sql = ParameterUtils.replaceScheduleTime(sql,
                 DateUtils.timeStampToDate(taskExecutionContext.getScheduleTime()));
@@ -464,38 +424,9 @@ public class SqlTask extends AbstractTask {
             sqlParameters.setTitle(title);
         }
 
-        // spell SQL according to the final user-defined variable
-        if (paramsMap == null) {
-            sqlBuilder.append(sql);
-            return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
-        }
-
-        // special characters need to be escaped, ${} needs to be escaped
-        setSqlParamsMap(sql, sqlParamsMap, paramsMap, taskExecutionContext.getTaskInstanceId());
-        // Replace the original value in sql ！{...} ，Does not participate in precompilation
-        String rgexo = "['\"]*\\!\\{(.*?)\\}['\"]*";
-        sql = replaceOriginalValue(sql, rgexo, paramsMap);
-        // replace the ${} of the SQL statement with the Placeholder
-        // Convert the list parameter
-        String formatSql = ParameterUtils.expandListParameter(sqlParamsMap, sql);
-        sqlBuilder.append(formatSql);
-        // print replace sql
-        printReplacedSql(sql, formatSql, TaskConstants.SQL_PARAMS_REGEX, sqlParamsMap);
-        return new SqlBinds(sqlBuilder.toString(), sqlParamsMap);
-    }
-
-    private String replaceOriginalValue(String content, String rgex, Map<String, Property> sqlParamsMap) {
-        Pattern pattern = Pattern.compile(rgex);
-        while (true) {
-            Matcher m = pattern.matcher(content);
-            if (!m.find()) {
-                break;
-            }
-            String paramName = m.group(1);
-            String paramValue = sqlParamsMap.get(paramName).getValue();
-            content = m.replaceFirst(paramValue);
-        }
-        return content;
+        String renderedSql = SqlTaskParameterRenderer.render(sql, paramsMap, taskExecutionContext.getTaskInstanceId());
+        log.info("rendered sql : {}", renderedSql);
+        return new SqlBinds(renderedSql, Collections.emptyMap());
     }
 
 }
