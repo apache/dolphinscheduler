@@ -61,15 +61,27 @@ export default {
     gantt_updated: 'Updated',
     gantt_duration: 'Duration',
     gantt_elapsed: 'Workflow elapsed',
+    gantt_elapsed_approximate: 'Workflow elapsed (approx.)',
+    gantt_task_span: 'Task time span',
     gantt_task: 'Task / state',
     gantt_duration_share: 'Duration / share',
     gantt_start: 'Start',
     gantt_end: 'End',
     gantt_share: 'Share of workflow elapsed',
+    gantt_approximate_share: 'Share of approximate workflow elapsed',
+    gantt_task_span_share: 'Share of task time span',
     gantt_axis_note:
       'Time is relative to workflow start. Select task names to copy; use the icons to view logs or configuration.',
     gantt_share_note:
       'Share = task duration / workflow elapsed. Parallel tasks may sum to more than 100%.',
+    gantt_approximate_axis_note:
+      'Workflow dates have second precision, so the displayed timeline bounds are approximate.',
+    gantt_approximate_share_note:
+      'Share uses the approximate workflow elapsed time because no complete millisecond task range is available.',
+    gantt_task_span_axis_note:
+      'Time covers the first task start through the last task end. Select task names to copy; use the icons to view logs or configuration.',
+    gantt_task_span_share_note:
+      'Share = task duration / task time span. Parallel tasks may sum to more than 100%.',
     gantt_no_log: 'No log available yet',
     gantt_view_config: 'View configuration',
     gantt_no_config: 'Configuration unavailable',

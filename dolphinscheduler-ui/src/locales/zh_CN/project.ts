@@ -61,15 +61,27 @@ export default {
     gantt_updated: '更新于',
     gantt_duration: '耗时',
     gantt_elapsed: '工作流耗时',
+    gantt_elapsed_approximate: '工作流耗时（近似）',
+    gantt_task_span: '任务时间跨度',
     gantt_task: '任务名称 / 状态',
     gantt_duration_share: '耗时 / 占比',
     gantt_start: '开始',
     gantt_end: '结束',
     gantt_share: '占工作流耗时',
+    gantt_approximate_share: '占近似工作流耗时',
+    gantt_task_span_share: '占任务时间跨度',
     gantt_axis_note:
       '从工作流开始计时；任务名称可复制，点击状态信息右侧图标查看日志或任务配置。',
     gantt_share_note:
       '占比 = 任务耗时 / 工作流耗时，并行任务占比之和可能超过 100%。',
+    gantt_approximate_axis_note:
+      '工作流日期只有秒级精度，因此当前展示的时间轴边界为近似值。',
+    gantt_approximate_share_note:
+      '缺少完整的毫秒级任务范围时，占比使用近似工作流耗时计算。',
+    gantt_task_span_axis_note:
+      '时间范围从首个任务开始至最后任务结束；任务名称可复制，点击状态信息右侧图标查看日志或任务配置。',
+    gantt_task_span_share_note:
+      '占比 = 任务耗时 / 任务时间跨度，并行任务占比之和可能超过 100%。',
     gantt_no_log: '暂无日志',
     gantt_view_config: '查看配置',
     gantt_no_config: '暂无任务配置',

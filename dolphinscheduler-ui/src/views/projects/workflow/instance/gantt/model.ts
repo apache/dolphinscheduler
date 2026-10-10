@@ -50,6 +50,12 @@ function timestamp(value?: DateValue): number | null {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+function hasMillisecondPrecision(value?: DateValue) {
+  if (typeof value === 'number') return true
+  if (typeof value !== 'string') return false
+  return /\.\d+(?:Z|[+-]\d{2}:?\d{2})?$/i.test(value.replace(' ', 'T'))
+}
+
 export function buildGanttModel(
   workflow: WorkflowInstance,
   tasks: TaskInstance[],
@@ -108,6 +114,7 @@ export function buildGanttModel(
   const order = new Map(
     (gantt?.taskNames || []).map((code, index) => [code, index])
   )
+  const preciseTaskBounds = new Map<number, boolean>()
   const rows: GanttRow[] = [...definitions.values()]
     .sort(
       (a, b) =>
@@ -117,6 +124,8 @@ export function buildGanttModel(
       const task = latest.get(definition.code)
       let start = date(task?.startTime)
       let end = date(task?.endTime)
+      let startPrecise = hasMillisecondPrecision(task?.startTime)
+      let endPrecise = hasMillisecondPrecision(task?.endTime)
       const precise =
         task && nameCounts.get(task.name) === 1
           ? ganttTasksByName
@@ -130,17 +139,26 @@ export function buildGanttModel(
         Math.abs(precise.startDate[0] - start) < 1000
       ) {
         start = precise.startDate[0]
-        if (end !== null && Number.isFinite(precise.endDate[0]))
+        startPrecise = true
+        if (end !== null && Number.isFinite(precise.endDate[0])) {
           end = precise.endDate[0]
+          endPrecise = true
+        }
       }
       if (
         start !== null &&
         end === null &&
         task &&
         !terminalTaskStates.has(task.state)
-      )
+      ) {
         end = now
+        endPrecise = true
+      }
       if (start !== null && end !== null) end = Math.max(start, end)
+      preciseTaskBounds.set(
+        definition.code,
+        start !== null && end !== null && startPrecise && endPrecise
+      )
       return {
         code: definition.code,
         name: task?.name || definition.name,
@@ -158,16 +176,29 @@ export function buildGanttModel(
       }
     })
   const starts = rows.flatMap((row) => (row.start === null ? [] : [row.start]))
-  const workflowStart = date(workflow.startTime)
-  const start = Math.min(...starts, workflowStart ?? Infinity)
-  const safeStart = Number.isFinite(start) ? start : now
   const ends = rows.flatMap((row) => (row.end === null ? [] : [row.end]))
-  const end = Math.max(
-    safeStart,
-    ...ends,
-    date(workflow.endTime) ??
-      (isWorkflowActive(workflow.state) ? now : safeStart)
-  )
+  const timedRows = rows.filter((row) => row.start !== null && row.end !== null)
+  const workflowBoundsPrecise =
+    hasMillisecondPrecision(workflow.startTime) &&
+    (hasMillisecondPrecision(workflow.endTime) ||
+      (workflow.endTime == null && isWorkflowActive(workflow.state)))
+  const useTaskRange =
+    !workflowBoundsPrecise &&
+    timedRows.length > 0 &&
+    timedRows.every((row) => preciseTaskBounds.get(row.code))
+  const workflowStart = date(workflow.startTime)
+  const start = useTaskRange
+    ? Math.min(...starts)
+    : Math.min(...starts, workflowStart ?? Infinity)
+  const safeStart = Number.isFinite(start) ? start : now
+  const end = useTaskRange
+    ? Math.max(safeStart, ...ends)
+    : Math.max(
+        safeStart,
+        ...ends,
+        date(workflow.endTime) ??
+          (isWorkflowActive(workflow.state) ? now : safeStart)
+      )
   const duration = end - safeStart
   rows.forEach((row) => {
     row.percent =
@@ -198,7 +229,9 @@ export function buildGanttModel(
     start: safeStart,
     end,
     duration,
-    axisDuration: duration > 0 ? duration : 1000
+    axisDuration: duration > 0 ? duration : 1000,
+    rangeSource: useTaskRange ? ('tasks' as const) : ('workflow' as const),
+    rangeApproximate: !useTaskRange && !workflowBoundsPrecise
   }
 }
 

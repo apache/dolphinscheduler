@@ -82,6 +82,30 @@ export default defineComponent({
       return Array.from({ length: count + 1 }, (_, index) => index / count)
     })
     const taskStates = computed(() => tasksState(t))
+    const rangeLabel = () =>
+      props.model.rangeSource === 'tasks'
+        ? 'project.workflow.gantt_task_span'
+        : props.model.rangeApproximate
+        ? 'project.workflow.gantt_elapsed_approximate'
+        : 'project.workflow.gantt_elapsed'
+    const shareLabel = () =>
+      props.model.rangeSource === 'tasks'
+        ? 'project.workflow.gantt_task_span_share'
+        : props.model.rangeApproximate
+        ? 'project.workflow.gantt_approximate_share'
+        : 'project.workflow.gantt_share'
+    const axisNote = () =>
+      props.model.rangeSource === 'tasks'
+        ? 'project.workflow.gantt_task_span_axis_note'
+        : props.model.rangeApproximate
+        ? 'project.workflow.gantt_approximate_axis_note'
+        : 'project.workflow.gantt_axis_note'
+    const shareNote = () =>
+      props.model.rangeSource === 'tasks'
+        ? 'project.workflow.gantt_task_span_share_note'
+        : props.model.rangeApproximate
+        ? 'project.workflow.gantt_approximate_share_note'
+        : 'project.workflow.gantt_share_note'
     const state = (row: GanttRow) =>
       taskStates.value[row.state as ITaskState]?.desc ||
       (row.state === 'NOT_SUBMITTED'
@@ -120,7 +144,7 @@ export default defineComponent({
           {t('project.workflow.gantt_duration')}: {formatDuration(row.duration)}
         </div>
         <div>
-          {t('project.workflow.gantt_share')}: {row.percent.toFixed(2)}%
+          {t(shareLabel())}: {row.percent.toFixed(2)}%
         </div>
       </div>
     )
@@ -144,15 +168,15 @@ export default defineComponent({
                 ),
                 default: () => (
                   <div class={styles.help}>
-                    <div>{t('project.workflow.gantt_axis_note')}</div>
-                    <div>{t('project.workflow.gantt_share_note')}</div>
+                    <div>{t(axisNote())}</div>
+                    <div>{t(shareNote())}</div>
                   </div>
                 )
               }}
             </NTooltip>
           </div>
           <span class={styles.elapsed}>
-            {t('project.workflow.gantt_elapsed')}{' '}
+            {t(rangeLabel())}{' '}
             <strong>{formatDuration(props.model.duration)}</strong>
           </span>
         </div>

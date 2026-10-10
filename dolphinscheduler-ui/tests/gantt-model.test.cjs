@@ -280,3 +280,96 @@ test('a subsecond workflow fills the percentage axis without an artificial one-s
   assert.equal(result.axisDuration, 500)
   assert.equal(result.rows[0].percent, 100)
 })
+
+test('uses the precise task span when workflow API dates lose milliseconds', () => {
+  const result = build(
+    {
+      state: 'SUCCESS',
+      startTime: '1970-01-01 00:00:00',
+      endTime: '1970-01-01 00:00:00'
+    },
+    [
+      {
+        id: 1,
+        taskCode: 1,
+        name: 'short',
+        state: 'SUCCESS',
+        startTime: '1970-01-01 00:00:00',
+        endTime: '1970-01-01 00:00:00'
+      }
+    ],
+    {
+      taskNames: [1],
+      tasks: [
+        {
+          taskName: 'short',
+          startDate: [900],
+          endDate: [908],
+          isoStart: '1970-01-01T00:00:00Z',
+          status: 'SUCCESS'
+        }
+      ]
+    }
+  )
+
+  assert.equal(result.start, 900)
+  assert.equal(result.end, 908)
+  assert.equal(result.duration, 8)
+  assert.equal(result.rows[0].percent, 100)
+  assert.equal(result.rangeSource, 'tasks')
+  assert.equal(result.rangeApproximate, false)
+})
+
+test('uses the precise task span for short work that crosses a second boundary', () => {
+  const result = build(
+    {
+      state: 'SUCCESS',
+      startTime: '1970-01-01 00:00:00',
+      endTime: '1970-01-01 00:00:01'
+    },
+    [
+      {
+        id: 1,
+        taskCode: 1,
+        name: 'short',
+        state: 'SUCCESS',
+        startTime: '1970-01-01 00:00:00',
+        endTime: '1970-01-01 00:00:01'
+      }
+    ],
+    {
+      taskNames: [1],
+      tasks: [
+        {
+          taskName: 'short',
+          startDate: [900],
+          endDate: [1100],
+          isoStart: '1970-01-01T00:00:00Z',
+          status: 'SUCCESS'
+        }
+      ]
+    }
+  )
+
+  assert.equal(result.start, 900)
+  assert.equal(result.end, 1100)
+  assert.equal(result.duration, 200)
+  assert.equal(result.rows[0].percent, 100)
+  assert.equal(result.rangeSource, 'tasks')
+  assert.equal(result.rangeApproximate, false)
+})
+
+test('marks second-precision workflow bounds as approximate without precise tasks', () => {
+  const result = build(
+    {
+      state: 'SUCCESS',
+      startTime: '1970-01-01 00:00:00',
+      endTime: '1970-01-01 00:00:01'
+    },
+    []
+  )
+
+  assert.equal(result.duration, 1000)
+  assert.equal(result.rangeSource, 'workflow')
+  assert.equal(result.rangeApproximate, true)
+})
