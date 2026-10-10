@@ -285,7 +285,7 @@ CREATE TABLE t_ds_alert
     workflow_instance_id     int(11) DEFAULT NULL,
     alert_type     int(11) DEFAULT NULL,
     PRIMARY KEY (id),
-    KEY            idx_sign (sign)
+    UNIQUE KEY     uk_alert_dedup (sign)
 );
 
 -- ----------------------------

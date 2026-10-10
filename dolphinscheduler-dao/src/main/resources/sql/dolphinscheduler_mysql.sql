@@ -291,7 +291,7 @@ CREATE TABLE `t_ds_alert` (
   `alert_type` int(11) DEFAULT NULL COMMENT 'alert_type',
   PRIMARY KEY (`id`),
   KEY `idx_status` (`alert_status`) USING BTREE,
-  KEY `idx_sign` (`sign`) USING BTREE
+  UNIQUE KEY `uk_alert_dedup` (`sign`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------

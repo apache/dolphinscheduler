@@ -56,3 +56,9 @@
   * **移除的派生属性**：`cmdTypeIfComplement`、`complementData`（补数执行相关，如需获取请使用详情接口）
   * 如需获取这些字段，请使用详情接口 `GET /projects/{projectCode}/workflow-instances/{id}`，该接口仍返回完整的 `WorkflowInstance` 对象 ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
 
+## 3.5.0
+
+* 为 `t_ds_alert` 表的 `sign` 新增唯一约束 `uk_alert_dedup`。升级脚本不会删除任何已有数据；如果已存在重复行，索引创建将失败，需要由用户自行处理。任务结果告警由应用代码插入，重复插入由该约束拒绝，DAO 层将产生的 `DuplicateKeyException` 视为跳过。 ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
+* 删除 `t_ds_alert` 表上旧的 `idx_sign` 索引，同列上新增的 `uk_alert_dedup` 唯一索引已完全覆盖其用途。 ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
+* `AlertSender#getAlertData` 对 null `alertType` 增加了显式拒绝（抛 `IllegalArgumentException` 并记录错误日志），而非直接抛 `NullPointerException`。滚动升级时**必须先升级 Alert Server，再升级 Master/Worker**，否则旧 Alert Server 无法识别新增的 `alert_type` 枚举值（如 `TASK_RESULT`），会导致告警投递失败。详见[升级文档](upgrade.md#滚动升降级顺序)。([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
+
