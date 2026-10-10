@@ -486,6 +486,7 @@ interface ITaskParams {
   initScriptResourceList?: ISourceItem[]
   statementSeparator?: string
   maxPrintRows?: number
+  jdbcProperties?: Record<string, string>
 }
 
 interface INodeData
