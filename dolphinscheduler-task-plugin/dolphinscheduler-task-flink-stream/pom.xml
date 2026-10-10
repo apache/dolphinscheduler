@@ -50,6 +50,12 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-task-flink</artifactId>
             <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.flink</groupId>
+                    <artifactId>flink-sql-jdbc-driver</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
