@@ -118,6 +118,8 @@ public enum Status {
     DELETE_USER_BY_ID_ERROR(10093, "delete user by id error", "删除用户错误"),
     GRANT_PROJECT_ERROR(10094, "grant project error", "授权项目错误"),
     GRANT_RESOURCE_ERROR(10095, "grant resource error", "授权资源错误"),
+    OPERATION_NOT_ALLOWED_IN_NON_PASSWORD_MODE(10096, "operation not allowed in non-password authentication mode",
+            "非密码认证模式下不允许此操作"),
     GRANT_DATASOURCE_ERROR(10097, "grant datasource error", "授权数据源错误"),
     GET_USER_INFO_ERROR(10098, "get user info error", "获取用户信息错误"),
     USER_LIST_ERROR(10099, "user list error", "查询用户列表错误"),
