@@ -413,12 +413,13 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         }
 
         List<Property> submittedGlobalParams = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
+        String instanceGlobalParams = globalParams;
         if (CollectionUtils.isNotEmpty(submittedGlobalParams)) {
-            globalParams = GlobalParameterUtils.serializeGlobalParameter(
+            instanceGlobalParams = GlobalParameterUtils.serializeGlobalParameter(
                     SensitivePropertyUtils.merge(submittedGlobalParams,
                             GlobalParameterUtils.deserializeGlobalParameter(workflowInstance.getGlobalParams())));
         }
-        setWorkflowInstance(workflowInstance, scheduleTime, globalParams, timeout, timezoneId);
+        setWorkflowInstance(workflowInstance, scheduleTime, instanceGlobalParams, timeout, timezoneId);
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         if (taskDefinitionLogs.isEmpty()) {
             log.warn("Parameter taskDefinitionJson is empty");
@@ -449,7 +450,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                     ? null
                     : existingTaskParamsMap.get(submitted.getCode() + "_" + submitted.getVersion());
             submitted.setTaskParams(SensitivePropertyUtils.mergeLocalParams(
-                    submitted.getTaskParams(), existingTaskParams, false));
+                    submitted.getTaskParams(), existingTaskParams));
         }
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
@@ -466,8 +467,14 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         // check workflow json is valid (throws ServiceException on validation failures)
         workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs);
 
+        String definitionGlobalParams = globalParams;
+        if (CollectionUtils.isNotEmpty(submittedGlobalParams)) {
+            definitionGlobalParams = GlobalParameterUtils.serializeGlobalParameter(
+                    SensitivePropertyUtils.mergeAndEncode(submittedGlobalParams,
+                            GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams())));
+        }
         workflowDefinition.set(projectCode, workflowDefinition.getName(), workflowDefinition.getDescription(),
-                globalParams, locations, timeout);
+                definitionGlobalParams, locations, timeout);
         workflowDefinition.setUpdateTime(new Date());
         int insertVersion = processService.saveWorkflowDefine(loginUser, workflowDefinition, syncDefine, Boolean.FALSE);
         if (insertVersion == 0) {

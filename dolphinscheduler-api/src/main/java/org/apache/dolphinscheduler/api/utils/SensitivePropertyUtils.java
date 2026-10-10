@@ -91,7 +91,8 @@ public class SensitivePropertyUtils {
      * Update definition params: restore DB value for keep-original {@code ******}, then encode.
      * Empty / null is a real empty value. {@code false→true} + {@code ******} is allowed;
      * {@code true→false} + {@code ******} is rejected.
-     * Runtime instance updates should call {@link #merge} only (no encode).
+     * Instance {@code global_params} stay plaintext via {@link #merge}. Copies written to a workflow
+     * definition must use this method against the definition's stored values, not the instance plaintext.
      */
     public List<Property> mergeAndEncode(List<Property> submittedProperties, List<Property> existingProperties) {
         List<Property> merged = merge(submittedProperties, existingProperties);
@@ -161,28 +162,17 @@ public class SensitivePropertyUtils {
         return PropertySensitiveUtils.transformSensitiveValues(properties, PasswordUtils::decodePassword);
     }
 
-    public String mergeLocalParams(String submittedTaskParams, String existingTaskParams) {
-        return mergeLocalParams(submittedTaskParams, existingTaskParams, true);
-    }
-
     /**
-     * @param encodeForDefinition when true, encode after merge (workflow/task definition persist);
-     *                            when false, merge only (runtime instance edit).
+     * Merge task {@code localParams} and encode sensitive values for definition persist.
+     * Instance edits also persist task-definition snapshots, so this always encodes.
      */
-    public String mergeLocalParams(String submittedTaskParams, String existingTaskParams,
-                                   boolean encodeForDefinition) {
+    public String mergeLocalParams(String submittedTaskParams, String existingTaskParams) {
         return rewriteLocalParams(submittedTaskParams, submitted -> {
             if (StringUtils.isEmpty(existingTaskParams)) {
-                return encodeForDefinition ? encodeForCreate(submitted) : requireNoPlaceholderAndReturn(submitted);
+                return encodeForCreate(submitted);
             }
-            List<Property> existing = getLocalParams(existingTaskParams);
-            return encodeForDefinition ? mergeAndEncode(submitted, existing) : merge(submitted, existing);
+            return mergeAndEncode(submitted, getLocalParams(existingTaskParams));
         });
-    }
-
-    private List<Property> requireNoPlaceholderAndReturn(List<Property> submitted) {
-        requireNoPlaceholder(submitted);
-        return submitted;
     }
 
     /**
