@@ -32,6 +32,8 @@ import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskPar
 import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 
+import java.time.Duration;
+
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -77,6 +79,12 @@ public class DependentLogicTask extends AbstractLogicTask<DependentParameters> {
             return taskExecutionStatus;
         }
         return taskExecutionStatus;
+    }
+
+    @Override
+    public Duration getTaskExecutionStateCheckInterval() {
+        Integer checkInterval = taskParameters.getDependence().getCheckInterval();
+        return checkInterval == null ? super.getTaskExecutionStateCheckInterval() : Duration.ofSeconds(checkInterval);
     }
 
     @Override

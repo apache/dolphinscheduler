@@ -17,7 +17,11 @@
 
 package org.apache.dolphinscheduler.task.executor;
 
+import java.time.Duration;
+
 public interface ITaskExecutorStateTracker {
+
+    Duration DEFAULT_STATE_TRACK_INTERVAL = Duration.ofSeconds(10);
 
     /**
      * Track the state of the task executor.
