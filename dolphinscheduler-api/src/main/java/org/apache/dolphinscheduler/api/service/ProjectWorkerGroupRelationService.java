@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
+import java.util.Set;
 
 public interface ProjectWorkerGroupRelationService {
 
@@ -42,5 +43,23 @@ public interface ProjectWorkerGroupRelationService {
      * @return assigned worker group relations
      */
     List<ProjectWorkerGroup> queryAssignedWorkerGroupsByProject(User loginUser, Long projectCode);
+
+    /**
+     * check if worker group is assigned to project
+     *
+     * @param projectCode project code
+     * @param workerGroup worker group name
+     * @return true if worker group is assigned to project
+     */
+    boolean isWorkerGroupAssignedToProject(Long projectCode, String workerGroup);
+
+    /**
+     * get all assigned worker group names for a project
+     * This includes both directly assigned worker groups and worker groups used by tasks/schedules
+     *
+     * @param projectCode project code
+     * @return set of all assigned worker group names
+     */
+    Set<String> getAllAssignedWorkerGroupNames(Long projectCode);
 
 }

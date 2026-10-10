@@ -42,7 +42,7 @@ export function useRemoteShell({
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
-    workerGroup: 'default',
+    workerGroup: null,
     delayTime: 0,
     type: 'SSH',
     rawScript: ''

@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
+import org.apache.dolphinscheduler.e2e.pages.security.WorkerGroupPage;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -78,9 +79,18 @@ public class WorkflowHttpTaskE2ETest {
         WebDriverWaitFactory.createWebDriverWait(userPage.driver()).until(ExpectedConditions.visibilityOfElementLocated(
                 new By.ByClassName("name")));
 
-        userPage.update(user, user, email, phone, tenant)
+        WorkerGroupPage workerGroupPage = userPage.update(user, user, email, phone, tenant)
+                .goToNav(SecurityPage.class)
+                .goToTab(WorkerGroupPage.class);
+
+        if (workerGroupPage.workerGroupList().stream()
+                .noneMatch(it -> it.getText().contains("default"))) {
+            workerGroupPage.create("default");
+        }
+
+        workerGroupPage
                 .goToNav(ProjectPage.class)
-                .create(project);
+                .createProjectUntilSuccess(project);
     }
 
     @AfterAll
@@ -117,6 +127,7 @@ public class WorkflowHttpTaskE2ETest {
                 .url(mockServerUrl)
                 .name("test-1")
                 .addParam("today", "${system.datetime}")
+                .setWorkerGroup("default")
                 .submit()
 
                 .submit()

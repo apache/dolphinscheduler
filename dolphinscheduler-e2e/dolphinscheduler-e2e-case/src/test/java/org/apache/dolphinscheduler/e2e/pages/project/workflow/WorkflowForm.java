@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SubWorkflowTa
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SwitchTaskForm;
 
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.List;
 
 import lombok.Getter;
@@ -111,6 +112,8 @@ public final class WorkflowForm {
     }
 
     public WorkflowSaveDialog submit() {
+        WebDriverWaitFactory.createWebDriverWait(driver, Duration.ofSeconds(5))
+                .until(ExpectedConditions.invisibilityOfElementLocated(By.className("n-modal-mask")));
         buttonSave().click();
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(.,'Basic Information')]")));

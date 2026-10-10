@@ -40,7 +40,7 @@ export function useMlflow({
     environmentCode: null,
     failRetryInterval: 1,
     failRetryTimes: 0,
-    workerGroup: 'default',
+    workerGroup: null,
     algorithm: 'svm',
     mlflowTrackingUri: 'http://127.0.0.1:5000',
     mlflowTaskType: 'MLflow Projects',

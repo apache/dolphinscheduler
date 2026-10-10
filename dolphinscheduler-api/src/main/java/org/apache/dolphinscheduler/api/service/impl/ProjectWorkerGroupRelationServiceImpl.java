@@ -208,6 +208,22 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
         }).distinct().collect(Collectors.toList());
     }
 
+    @Override
+    public Set<String> getAllAssignedWorkerGroupNames(Long projectCode) {
+        Project project = projectDao.queryByCode(projectCode);
+        Set<String> assignedWorkerGroups = new TreeSet<>();
+
+        if (project != null) {
+            assignedWorkerGroups.addAll(getAllUsedWorkerGroups(project));
+        }
+
+        Set<String> directlyAssignedGroups =
+                projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(projectCode);
+        assignedWorkerGroups.addAll(directlyAssignedGroups);
+
+        return assignedWorkerGroups;
+    }
+
     private Set<String> getAllUsedWorkerGroups(Project project) {
         Set<String> usedWorkerGroups = new TreeSet<>();
         // query all worker groups that tasks depend on
@@ -224,6 +240,14 @@ public class ProjectWorkerGroupRelationServiceImpl extends BaseServiceImpl
                 .forEach(schedule -> usedWorkerGroups.add(schedule.getWorkerGroup()));
 
         return usedWorkerGroups;
+    }
+
+    @Override
+    public boolean isWorkerGroupAssignedToProject(Long projectCode, String workerGroup) {
+        if (StringUtils.isEmpty(workerGroup)) {
+            return false;
+        }
+        return getAllAssignedWorkerGroupNames(projectCode).contains(workerGroup);
     }
 
 }
