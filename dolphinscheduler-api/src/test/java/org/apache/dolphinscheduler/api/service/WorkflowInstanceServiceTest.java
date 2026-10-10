@@ -49,6 +49,7 @@ import org.apache.dolphinscheduler.common.graph.DAG;
 import org.apache.dolphinscheduler.common.model.TaskNodeRelation;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.DependentResultTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -74,6 +75,8 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
@@ -81,6 +84,7 @@ import org.apache.dolphinscheduler.plugin.task.api.enums.DependResult;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
@@ -804,6 +808,118 @@ public class WorkflowInstanceServiceTest {
         Assertions.assertFalse(updated.getGlobalParams().contains("old-secret"));
         Assertions.assertTrue(persisted.getValue().getGlobalParams().contains("new-secret"));
         Assertions.assertSame(updated, persisted.getValue());
+    }
+
+    @Test
+    public void testUpdateWorkflowInstanceEncryptsDefinitionSnapshotsForBothSyncDefine() {
+        try (
+                MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class);
+                MockedStatic<TaskPluginManager> taskPluginManager = Mockito.mockStatic(TaskPluginManager.class)) {
+            propertyUtils.when(() -> PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, false))
+                    .thenReturn(true);
+            propertyUtils.when(() -> PropertyUtils.getString(DataSourceConstants.DATASOURCE_ENCRYPTION_SALT,
+                    DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT))
+                    .thenReturn(DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
+            taskPluginManager.when(() -> TaskPluginManager.checkTaskParameters(any(), any())).thenReturn(true);
+            when(curingGlobalParamsService.curingGlobalParams(any(), any(), any(), any(), any(), any()))
+                    .thenAnswer(invocation -> GlobalParameterUtils.serializeGlobalParameter(invocation.getArgument(2)));
+
+            String keptGlobalCipher = PasswordUtils.encodePassword("kept-secret");
+            String keptLocalCipher = PasswordUtils.encodePassword("kept-local");
+            assertInstanceEditEncryptsDefinitionSnapshot(Boolean.TRUE, keptGlobalCipher, keptLocalCipher);
+            assertInstanceEditEncryptsDefinitionSnapshot(Boolean.FALSE, keptGlobalCipher, keptLocalCipher);
+        }
+    }
+
+    private void assertInstanceEditEncryptsDefinitionSnapshot(Boolean syncDefine, String keptGlobalCipher,
+                                                              String keptLocalCipher) {
+        Mockito.clearInvocations(processService);
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(projectCode);
+        workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
+        workflowInstance.setTimeout(3000);
+        workflowInstance.setCommandType(CommandType.STOP);
+        workflowInstance.setWorkflowDefinitionCode(46L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
+        workflowInstance.setGlobalParams(
+                "[{\"prop\":\"kept\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"kept-secret\",\"sensitive\":true}]");
+        WorkflowDefinition workflowDefinition = getProcessDefinition();
+        workflowDefinition.setProjectCode(projectCode);
+        workflowDefinition.setGlobalParams(
+                "[{\"prop\":\"kept\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"" + keptGlobalCipher
+                        + "\",\"sensitive\":true}]");
+
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
+        when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowInstanceDao.updateById(workflowInstance)).thenReturn(true);
+        Mockito.doNothing().when(workflowDefinitionService).checkWorkflowNodeList(any(), any());
+        Mockito.doNothing().when(taskDatasourcePermissionChecker).checkPermission(any(), any());
+        when(processService.saveTaskRelation(any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt(), any(),
+                any(), any())).thenReturn(Constants.EXIT_CODE_SUCCESS);
+
+        TaskDefinitionLog existingTaskLog = new TaskDefinitionLog();
+        existingTaskLog.setCode(4254862762304L);
+        existingTaskLog.setVersion(1);
+        existingTaskLog.setTaskParams(
+                "{\"localParams\":[{\"prop\":\"keptLocal\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\""
+                        + keptLocalCipher + "\",\"sensitive\":true}],\"rawScript\":\"echo 1\"}");
+        when(taskDefinitionLogMapper.queryByTaskDefinitions(any()))
+                .thenReturn(Collections.singletonList(existingTaskLog));
+
+        String submittedGlobalParams =
+                "[{\"prop\":\"kept\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"******\",\"sensitive\":true},"
+                        + "{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"new-global\",\"sensitive\":true}]";
+        String submittedTaskDefinitionJson =
+                "[{\"code\":4254862762304,\"name\":\"test1\",\"version\":1,\"description\":\"\",\"delayTime\":0,"
+                        + "\"taskType\":\"SHELL\",\"taskParams\":{\"resourceList\":[],\"localParams\":["
+                        + "{\"prop\":\"keptLocal\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"******\",\"sensitive\":true},"
+                        + "{\"prop\":\"apiKey\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"new-local\",\"sensitive\":true}"
+                        + "],\"rawScript\":\"echo 1\"},\"flag\":\"YES\",\"taskPriority\":\"MEDIUM\",\"workerGroup\":\"default\","
+                        + "\"failRetryTimes\":0,\"failRetryInterval\":1,\"timeoutFlag\":\"CLOSE\",\"timeoutNotifyStrategy\":null,"
+                        + "\"timeout\":0,\"environmentCode\":-1}]";
+
+        ArgumentCaptor<List> savedTaskLogs = ArgumentCaptor.forClass(List.class);
+        when(processService.saveTaskDefine(any(), Mockito.anyLong(), savedTaskLogs.capture(), eq(syncDefine)))
+                .thenReturn(1);
+        when(processService.saveWorkflowDefine(any(), eq(workflowDefinition), eq(syncDefine), eq(Boolean.FALSE)))
+                .thenReturn(1);
+
+        workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                taskRelationJson, submittedTaskDefinitionJson, "2020-02-21 00:00:00", syncDefine,
+                submittedGlobalParams, "", 0);
+
+        List<Property> instanceGlobals =
+                GlobalParameterUtils.deserializeGlobalParameter(workflowInstance.getGlobalParams());
+        Assertions.assertEquals("kept-secret", findProperty(instanceGlobals, "kept").getValue());
+        Assertions.assertEquals("new-global", findProperty(instanceGlobals, "pwd").getValue());
+
+        List<Property> definitionGlobals =
+                GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams());
+        Assertions.assertEquals(keptGlobalCipher, findProperty(definitionGlobals, "kept").getValue());
+        Property encodedGlobal = findProperty(definitionGlobals, "pwd");
+        Assertions.assertNotEquals("new-global", encodedGlobal.getValue());
+        Assertions.assertEquals("new-global", PasswordUtils.decodePassword(encodedGlobal.getValue()));
+        Assertions.assertFalse(workflowDefinition.getGlobalParams().contains("kept-secret"));
+
+        TaskDefinitionLog savedTask = ((List<TaskDefinitionLog>) savedTaskLogs.getValue()).get(0);
+        List<Property> localParams = JSONUtils.toList(
+                JSONUtils.getNodeString(savedTask.getTaskParams(), "localParams"), Property.class);
+        Assertions.assertEquals(keptLocalCipher, findProperty(localParams, "keptLocal").getValue());
+        Property encodedLocal = findProperty(localParams, "apiKey");
+        Assertions.assertNotEquals("new-local", encodedLocal.getValue());
+        Assertions.assertEquals("new-local", PasswordUtils.decodePassword(encodedLocal.getValue()));
+        verify(processService).saveTaskDefine(eq(loginUser), eq(projectCode), any(), eq(syncDefine));
+        verify(processService).saveWorkflowDefine(any(), eq(workflowDefinition), eq(syncDefine), eq(Boolean.FALSE));
+    }
+
+    private static Property findProperty(List<Property> properties, String prop) {
+        return properties.stream()
+                .filter(property -> prop.equals(property.getProp()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError(prop));
     }
 
     @Test
