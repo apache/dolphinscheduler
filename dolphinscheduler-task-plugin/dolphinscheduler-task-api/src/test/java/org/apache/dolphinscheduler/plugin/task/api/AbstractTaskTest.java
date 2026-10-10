@@ -32,14 +32,18 @@ public class AbstractTaskTest {
     @Test
     public void testFindFlinkJobId() {
         String jobId = "cca7bc1061d61cf15238e92312c2fc20";
-        Pattern FLINK_APPLICATION_REGEX = Pattern.compile(TaskConstants.FLINK_APPLICATION_REGEX);
-        Matcher matcher = FLINK_APPLICATION_REGEX.matcher("Job has been submitted with JobID " + jobId);
-        String str = null;
-        if (matcher.find()) {
-            str = matcher.group();
-        }
-        Assertions.assertNotNull(str);
-        Assertions.assertEquals(jobId, str.substring(6));
+        Pattern flinkJobIdRegex = Pattern.compile(TaskConstants.FLINK_JOB_ID_REGEX);
+        // the `flink run` format
+        Matcher matcher = flinkJobIdRegex.matcher("Job has been submitted with JobID " + jobId);
+        Assertions.assertTrue(matcher.find());
+        Assertions.assertEquals(jobId, matcher.group(1));
+        // the flink SQL Client format
+        matcher = flinkJobIdRegex.matcher("Job ID: " + jobId);
+        Assertions.assertTrue(matcher.find());
+        Assertions.assertEquals(jobId, matcher.group(1));
+        // a line which only mentions a job id is not a Flink JobID
+        Assertions.assertFalse(flinkJobIdRegex.matcher("Job ID: 12345").find());
+        Assertions.assertFalse(flinkJobIdRegex.matcher("Job ID: " + jobId + "0").find());
     }
 
     @Test

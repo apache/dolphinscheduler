@@ -33,7 +33,13 @@ public class TaskConstants {
 
     public static final String YARN_APPLICATION_REGEX = "application_\\d+_\\d+";
 
-    public static final String FLINK_APPLICATION_REGEX = "JobID \\w+";
+    /**
+     * The Flink JobID printed by `flink run` ("JobID" followed by the id) or by the Flink SQL
+     * Client ("Job ID:" followed by the id). A Flink JobID is a 32 character hexadecimal string,
+     * which is required here so that an unrelated line containing "Job ID" is not mistaken for a
+     * JobID. The first group is the JobID, which is not the YARN/K8s application id.
+     */
+    public static final String FLINK_JOB_ID_REGEX = "Job\\s*ID:?\\s+([0-9a-fA-F]{32})(?![0-9a-fA-F])";
 
     public static final String DATASOURCE_PASSWORD_REGEX =
             "(?<=((?i)password((\" : \")|(\":\")|(\\\\\":\\\\\")|(=')))).*?(?=((\")|(\\\\\")|(')))";
