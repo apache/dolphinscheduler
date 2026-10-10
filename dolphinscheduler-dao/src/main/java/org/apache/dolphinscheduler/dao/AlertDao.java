@@ -131,7 +131,7 @@ public class AlertDao {
         String sign = generateSign(alert);
         alert.setSign(sign);
         try {
-            int count = alertMapper.insertTaskResultAlert(alert);
+            int count = alertMapper.insert(alert);
             log.info("add task result alert to db , alert: {}", alert);
             return count;
         } catch (DuplicateKeyException e) {
