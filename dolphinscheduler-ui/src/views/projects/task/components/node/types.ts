@@ -480,12 +480,21 @@ interface ITaskParams {
   yarnQueue?: string
   awsRegion?: string
   kubeConfig?: string
+  sqlSubmitType?: 'CLIENT' | 'SQL_GATEWAY'
+  flinkJdbcUrl?: string
+  rawScriptType?: 'SCRIPT' | 'FILE'
+  initScriptType?: 'SCRIPT' | 'FILE'
+  initScriptResourceList?: ISourceItem[]
+  statementSeparator?: string
+  maxPrintRows?: number
+  jdbcProperties?: Record<string, string>
 }
 
 interface INodeData
   extends Omit<
       ITaskParams,
       | 'resourceList'
+      | 'initScriptResourceList'
       | 'mainJar'
       | 'targetParams'
       | 'sourceParams'
@@ -522,6 +531,7 @@ interface INodeData
   preTaskOptions?: []
   postTaskOptions?: []
   resourceList?: string[]
+  initScriptResourceList?: string[]
   mainJar?: string
   timeoutSetting?: boolean
   isCustomTask?: boolean
