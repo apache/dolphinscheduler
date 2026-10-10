@@ -44,6 +44,58 @@ export default {
     total_items: 'Total Item is'
   },
   workflow: {
+    gantt_help: 'Timeline help',
+    gantt_timeline: 'Task execution timeline',
+    gantt_instance: 'Workflow instance',
+    gantt_live: 'Running',
+    gantt_finished: 'Finished',
+    gantt_total: 'Total tasks',
+    gantt_submitted: 'Submitted',
+    gantt_pending: 'Not submitted',
+    gantt_waiting: 'Queued / waiting',
+    gantt_running: 'Running',
+    gantt_success: 'Succeeded',
+    gantt_failed: 'Failed',
+    gantt_stopped: 'Paused / stopped',
+    gantt_auto_refresh: 'Refresh every 5s while running',
+    gantt_updated: 'Updated',
+    gantt_duration: 'Duration',
+    gantt_elapsed: 'Workflow elapsed',
+    gantt_elapsed_approximate: 'Workflow elapsed (approx.)',
+    gantt_task_span: 'Task time span',
+    gantt_task: 'Task / state',
+    gantt_duration_share: 'Duration / share',
+    gantt_start: 'Start',
+    gantt_end: 'End',
+    gantt_share: 'Share of workflow elapsed',
+    gantt_approximate_share: 'Share of approximate workflow elapsed',
+    gantt_task_span_share: 'Share of task time span',
+    gantt_axis_note:
+      'Time is relative to workflow start. Select task names to copy; use the icons to view logs or configuration.',
+    gantt_share_note:
+      'Share = task duration / workflow elapsed. Parallel tasks may sum to more than 100%.',
+    gantt_approximate_axis_note:
+      'Workflow dates have second precision, so the displayed timeline bounds are approximate.',
+    gantt_approximate_share_note:
+      'Share uses the approximate workflow elapsed time because no complete millisecond task range is available.',
+    gantt_task_span_axis_note:
+      'Time covers the first task start through the last task end. Select task names to copy; use the icons to view logs or configuration.',
+    gantt_task_span_share_note:
+      'Share = task duration / task time span. Parallel tasks may sum to more than 100%.',
+    gantt_no_log: 'No log available yet',
+    gantt_view_config: 'View configuration',
+    gantt_no_config: 'Configuration unavailable',
+    gantt_time_unavailable: 'Execution time unavailable',
+    gantt_log_limit:
+      'Showing the first 20,000 lines. Download for the complete log.',
+    gantt_log_error: 'Unable to load logs. Click refresh to retry.',
+    gantt_stale:
+      'Refresh failed. Showing the last successful snapshot; please retry.',
+    gantt_load_error:
+      'Unable to load workflow. Check the connection and permissions, then retry.',
+    gantt_empty: 'This workflow instance has no tasks.',
+    gantt_loading: 'Loading task execution…',
+
     on_line: 'Online',
     test: 'Test',
     operating_environment: 'Operating Environment',
@@ -545,7 +597,6 @@ export default {
     http_condition_tips: 'Please Enter Http Condition',
     timeout_settings: 'Timeout Settings',
     connect_timeout: 'Connect Timeout',
-    keep_alive: 'TCP Keepalive',
     ms: 'ms',
     status_code_default: 'Default response code 200',
     status_code_custom: 'Custom response code',
