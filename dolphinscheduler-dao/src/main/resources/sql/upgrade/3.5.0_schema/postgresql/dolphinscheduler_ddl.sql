@@ -17,3 +17,5 @@
 
 -- If the table already has duplicate rows, index creation will fail; resolve them manually first.
 CREATE UNIQUE INDEX IF NOT EXISTS uk_alert_dedup ON t_ds_alert (sign);
+-- The new unique index fully covers the legacy idx_sign index on the same column; drop the redundant one.
+DROP INDEX IF EXISTS idx_sign;

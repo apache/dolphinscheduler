@@ -17,4 +17,6 @@
 
 -- If the table already has duplicate rows, index creation will fail; resolve them manually first.
 ALTER TABLE `t_ds_alert` ADD UNIQUE INDEX `uk_alert_dedup` (`sign`);
+-- The new unique index fully covers the legacy idx_sign index on the same column; drop the redundant one.
+ALTER TABLE `t_ds_alert` DROP INDEX `idx_sign`;
 

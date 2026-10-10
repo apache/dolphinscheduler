@@ -225,7 +225,6 @@ CREATE TABLE t_ds_alert (
 comment on column t_ds_alert.sign is 'sign=sha1(content)';
 
 create index idx_status on t_ds_alert (alert_status);
-create index idx_sign on t_ds_alert (sign);
 create unique index uk_alert_dedup on t_ds_alert (sign);
 
 --
