@@ -17,10 +17,15 @@
 import { computed, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useMainJar, useResources, useYarnQueue } from '.'
+import { useFlinkSqlGatewayFields } from './use-flink-sql-gateway'
 import type { IJsonItem } from '../types'
 
 export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
+  const gateway = useFlinkSqlGatewayFields(model)
+  const isSqlGateway = computed(
+    () => model.programType === 'SQL' && model.sqlSubmitType === 'SQL_GATEWAY'
+  )
   const mainClassSpan = computed(() =>
     model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
   )
@@ -39,9 +44,28 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
     model.flinkVersion === '<1.10' && model.deployMode !== 'local' ? 12 : 0
   )
 
-  const deployModeSpan = computed(() => (model.deployMode !== 'local' ? 12 : 0))
+  const deployModeSpan = computed(() =>
+    isSqlGateway.value || model.deployMode === 'local' ? 0 : 12
+  )
 
-  const appNameSpan = computed(() => (model.deployMode !== 'local' ? 24 : 0))
+  const appNameSpan = computed(() =>
+    isSqlGateway.value || model.deployMode === 'local' ? 0 : 24
+  )
+  const deployModeRadioSpan = computed(() => (isSqlGateway.value ? 0 : 24))
+  const parallelismSpan = computed(() => (isSqlGateway.value ? 0 : 12))
+  const othersSpan = computed(() => (isSqlGateway.value ? 0 : 24))
+  const resourceSpan = computed(() => {
+    if (!isSqlGateway.value) {
+      return 24
+    }
+    return model.rawScriptType === 'FILE' ? 24 : 0
+  })
+  const resourceRequired = computed(
+    () => isSqlGateway.value && model.rawScriptType === 'FILE'
+  )
+  const resourceLimit = computed(() =>
+    isSqlGateway.value && model.rawScriptType === 'FILE' ? 1 : -1
+  )
 
   const deployModeOptions = computed(() => {
     if (model.programType === 'SQL') {
@@ -142,32 +166,40 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
         }
       }
     },
+    gateway.submitType,
     useMainJar(model),
     {
       type: 'radio',
       field: 'deployMode',
       name: t('project.node.deploy_mode'),
       options: deployModeOptions,
-      span: 24
+      span: deployModeRadioSpan
     },
+    ...gateway.beforeInit,
     {
       type: 'editor',
       field: 'initScript',
       span: scriptSpan,
       name: t('project.node.init_script'),
+      props: {
+        language: 'sql',
+        readOnly: gateway.initScriptReadOnly
+      },
       validate: {
         trigger: ['input', 'trigger'],
         required: false,
         message: t('project.node.init_script_tips')
       }
     },
+    ...gateway.beforeScript,
     {
       type: 'editor',
       field: 'rawScript',
       span: scriptSpan,
       name: t('project.node.script'),
       props: {
-        language: 'sql'
+        language: 'sql',
+        readOnly: gateway.scriptReadOnly
       },
       validate: {
         trigger: ['input', 'trigger'],
@@ -266,7 +298,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       type: 'input-number',
       field: 'parallelism',
       name: t('project.node.parallelism'),
-      span: 12,
+      span: parallelismSpan,
       props: {
         placeholder: t('project.node.parallelism_tips'),
         min: 1
@@ -282,7 +314,7 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       },
       value: model.parallelism
     },
-    useYarnQueue(),
+    { ...useYarnQueue(), span: computed(() => (isSqlGateway.value ? 0 : 12)) },
     {
       type: 'input',
       field: 'mainArgs',
@@ -297,12 +329,13 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       type: 'input',
       field: 'others',
       name: t('project.node.option_parameters'),
+      span: othersSpan,
       props: {
         type: 'textarea',
         placeholder: t('project.node.option_parameters_tips')
       }
     },
-    useResources(),
+    useResources(resourceSpan, resourceRequired, resourceLimit),
     ...useCustomParams({
       model,
       field: 'localParams',

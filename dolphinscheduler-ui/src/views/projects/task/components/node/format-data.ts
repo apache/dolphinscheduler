@@ -90,6 +90,24 @@ export function formatParams(data: INodeData): {
     taskParams.taskManager = data.taskManager
     taskParams.parallelism = data.parallelism
   }
+  if (data.taskType === 'FLINK' && data.sqlSubmitType === 'SQL_GATEWAY') {
+    taskParams.sqlSubmitType = 'SQL_GATEWAY'
+    taskParams.flinkJdbcUrl = data.flinkJdbcUrl
+    taskParams.statementSeparator = data.statementSeparator
+    taskParams.maxPrintRows = data.maxPrintRows
+    taskParams.rawScriptType = data.rawScriptType
+    taskParams.initScriptType = data.initScriptType
+    taskParams.jdbcProperties = data.jdbcProperties
+    taskParams.initScript =
+      data.initScriptType === 'FILE' ? '' : (data.initScript ?? '')
+    taskParams.rawScript =
+      data.rawScriptType === 'FILE' ? '' : (data.rawScript ?? '')
+    taskParams.initScriptResourceList = data.initScriptResourceList?.length
+      ? data.initScriptResourceList.map((fullName: string) => ({
+          resourceName: `${fullName}`
+        }))
+      : []
+  }
   if (data.taskType === 'GRPC') {
     taskParams.url = data.url
     taskParams.grpcCredentialType = data.grpcCredentialType
@@ -547,7 +565,12 @@ export function formatModel(data: ITaskData) {
       'timeoutNotifyStrategy',
       'taskParams'
     ]),
-    ...omit(data.taskParams, ['resourceList', 'mainJar', 'localParams']),
+    ...omit(data.taskParams, [
+      'resourceList',
+      'mainJar',
+      'localParams',
+      'initScriptResourceList'
+    ]),
     environmentCode: data.environmentCode === -1 ? null : data.environmentCode,
     timeoutFlag: data.timeoutFlag === 'OPEN',
     timeoutNotifyStrategy: data.timeoutNotifyStrategy
@@ -561,6 +584,11 @@ export function formatModel(data: ITaskData) {
   }
   if (data.taskParams?.resourceList) {
     params.resourceList = data.taskParams.resourceList.map(
+      (item: { resourceName: string }) => `${item.resourceName}`
+    )
+  }
+  if (data.taskParams?.initScriptResourceList) {
+    params.initScriptResourceList = data.taskParams.initScriptResourceList.map(
       (item: { resourceName: string }) => `${item.resourceName}`
     )
   }
