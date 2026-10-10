@@ -17,9 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.engine.executor.plugin;
 
+import static org.apache.dolphinscheduler.task.executor.ITaskExecutorStateTracker.DEFAULT_STATE_TRACK_INTERVAL;
+
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
+
+import java.time.Duration;
 
 public interface ILogicTask<T extends AbstractParameters> {
 
@@ -30,6 +34,10 @@ public interface ILogicTask<T extends AbstractParameters> {
     void kill() throws MasterTaskExecuteException;
 
     TaskExecutionStatus getTaskExecutionState();
+
+    default Duration getTaskExecutionStateCheckInterval() {
+        return DEFAULT_STATE_TRACK_INTERVAL;
+    }
 
     ITaskParameterDeserializer<T> getTaskParameterDeserializer();
 
