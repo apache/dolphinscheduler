@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
+import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -42,6 +44,8 @@ public class FlinkTask extends AbstractYarnTask {
 
     private TaskExecutionContext taskExecutionContext;
 
+    private FlinkSqlGatewayExecutor sqlGatewayExecutor;
+
     /**
      * rules for flink application ID
      */
@@ -61,6 +65,29 @@ public class FlinkTask extends AbstractYarnTask {
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
         }
+    }
+
+    @Override
+    public void handle(TaskCallBack taskCallBack) throws TaskException {
+        if (flinkParameters != null && flinkParameters.isSqlGateway()) {
+            sqlGatewayExecutor = new FlinkSqlGatewayExecutor(taskExecutionContext, flinkParameters, this);
+            sqlGatewayExecutor.handle();
+            return;
+        }
+        super.handle(taskCallBack);
+    }
+
+    @Override
+    public void cancelApplication() throws TaskException {
+        if (flinkParameters != null && flinkParameters.isSqlGateway()) {
+            if (sqlGatewayExecutor != null) {
+                sqlGatewayExecutor.cancel();
+            } else {
+                setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
+            }
+            return;
+        }
+        super.cancelApplication();
     }
 
     /**

@@ -55,4 +55,68 @@ public class FlinkParametersTest {
         Assertions.assertNotNull(resourceFilesList);
         Assertions.assertEquals(3, resourceFilesList.size());
     }
+
+    @Test
+    public void checkParametersShouldKeepClientPathWhenSqlSubmitTypeIsAbsent() {
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setRawScript("SELECT 1");
+        Assertions.assertTrue(parameters.checkParameters());
+        Assertions.assertFalse(parameters.isSqlGateway());
+    }
+
+    @Test
+    public void checkParametersShouldFailWhenSqlGatewayJdbcUrlIsBlank() {
+        FlinkParameters parameters = gatewayFileParameters();
+        parameters.setFlinkJdbcUrl(" ");
+        Assertions.assertFalse(parameters.checkParameters());
+    }
+
+    @Test
+    public void checkParametersShouldPassWhenSqlGatewayInlineScriptIsPresent() {
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setSqlSubmitType(FlinkSqlSubmitType.SQL_GATEWAY);
+        parameters.setFlinkJdbcUrl("jdbc:flink://localhost:8083");
+        parameters.setRawScriptType(org.apache.dolphinscheduler.plugin.task.api.enums.SqlSourceType.SCRIPT);
+        parameters.setRawScript("SELECT 1");
+        parameters.setInitScriptType(org.apache.dolphinscheduler.plugin.task.api.enums.SqlSourceType.SCRIPT);
+        Assertions.assertTrue(parameters.checkParameters());
+        Assertions.assertEquals(0, parameters.getResourceFilesList().size());
+    }
+
+    @Test
+    public void getResourceFilesListShouldReturnGatewayScriptFilesOnly() {
+        FlinkParameters parameters = gatewayFileParameters();
+        Assertions.assertEquals(2, parameters.getResourceFilesList().size());
+    }
+
+    @Test
+    public void toJdbcPropertiesShouldFilterNullKeysAndValues() {
+        FlinkParameters parameters = new FlinkParameters();
+        Assertions.assertEquals(0, parameters.toJdbcProperties().size());
+
+        java.util.Map<String, String> jdbcProperties = new java.util.HashMap<>();
+        jdbcProperties.put("user", "flink");
+        jdbcProperties.put("badKey", null);
+        jdbcProperties.put(null, "badValue");
+        parameters.setJdbcProperties(jdbcProperties);
+        java.util.Properties properties = parameters.toJdbcProperties();
+        Assertions.assertEquals(1, properties.size());
+        Assertions.assertEquals("flink", properties.getProperty("user"));
+    }
+
+    private FlinkParameters gatewayFileParameters() {
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setSqlSubmitType(FlinkSqlSubmitType.SQL_GATEWAY);
+        parameters.setFlinkJdbcUrl("jdbc:flink://localhost:8083");
+        parameters.setRawScriptType(org.apache.dolphinscheduler.plugin.task.api.enums.SqlSourceType.FILE);
+        ResourceInfo mainResource = new ResourceInfo();
+        mainResource.setResourceName("main.sql");
+        parameters.setResourceList(java.util.Collections.singletonList(mainResource));
+        parameters.setInitScriptType(org.apache.dolphinscheduler.plugin.task.api.enums.SqlSourceType.FILE);
+        ResourceInfo initResource = new ResourceInfo();
+        initResource.setResourceName("init.sql");
+        parameters.setInitScriptResourceList(java.util.Collections.singletonList(initResource));
+        return parameters;
+    }
 }
