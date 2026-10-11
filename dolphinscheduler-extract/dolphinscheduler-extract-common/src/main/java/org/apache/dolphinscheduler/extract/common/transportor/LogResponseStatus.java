@@ -32,4 +32,11 @@ public enum LogResponseStatus {
      * Log file not found status code.
      */
     LOG_FILE_NOT_FOUND,
+
+    /**
+     * The log file shrank below the requested offset while streaming — e.g. log rotation
+     * renamed the active file and a fresh one started from 0. The download the caller is
+     * assembling is truncated and must fail explicitly instead of silently ending.
+     */
+    LOG_TRUNCATED,
 }

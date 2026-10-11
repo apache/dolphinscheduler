@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.api.executor.logging;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -71,10 +70,10 @@ public class LocalLogClientTest {
             @Override
             public TaskInstanceLogFileDownloadResponse getTaskInstanceWholeLogFileBytes(TaskInstanceLogFileDownloadRequest taskInstanceLogFileDownloadRequest) {
                 if (taskInstanceLogFileDownloadRequest.getTaskInstanceId() == 1) {
-                    return new TaskInstanceLogFileDownloadResponse(new byte[0], LogResponseStatus.SUCCESS, "");
+                    return new TaskInstanceLogFileDownloadResponse(new byte[0], LogResponseStatus.SUCCESS, "", true);
                 } else if (taskInstanceLogFileDownloadRequest.getTaskInstanceId() == 10) {
                     return new TaskInstanceLogFileDownloadResponse("log content".getBytes(), LogResponseStatus.SUCCESS,
-                            "");
+                            "", true);
                 }
 
                 throw new ServiceException("download error");
@@ -98,6 +97,12 @@ public class LocalLogClientTest {
             public void removeTaskInstanceLog(String taskInstanceLogAbsolutePath) {
 
             }
+
+            @Override
+            public TaskInstanceLogFileDownloadResponse getTaskInstanceLogFileChunk(
+                                                                                   TaskInstanceLogFileDownloadRequest request) {
+                return new TaskInstanceLogFileDownloadResponse();
+            }
         });
         springServerMethodInvokerDiscovery.start();
     }
@@ -107,19 +112,6 @@ public class LocalLogClientTest {
         if (springServerMethodInvokerDiscovery != null) {
             springServerMethodInvokerDiscovery.close();
         }
-    }
-
-    @Test
-    public void testGetWholeLogSuccess() {
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setHost("127.0.0.1:" + nettyServerPort);
-        taskInstance.setId(1);
-        taskInstance.setLogPath("/path/to/log");
-
-        TaskInstanceLogFileDownloadResponse actualResponse = localLogClient.getWholeLog(taskInstance);
-
-        assertNotNull(actualResponse);
-        assertArrayEquals("".getBytes(), actualResponse.getLogBytes());
     }
 
     @Test

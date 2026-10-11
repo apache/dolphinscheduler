@@ -38,14 +38,15 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.google.common.primitives.Bytes;
 
 @Service
 @Slf4j
@@ -100,24 +101,6 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     }
 
     /**
-     * get log size
-     *
-     * @param loginUser  login user
-     * @param taskInstId task instance id
-     * @return log byte array
-     */
-    @Override
-    public byte[] getLogBytes(User loginUser, int taskInstId) {
-        TaskInstance taskInstance = taskInstanceDao.queryById(taskInstId);
-        if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
-            throw new ServiceException("task instance is null or host is null");
-        }
-        Project project = projectDao.queryProjectByTaskInstanceId(taskInstId);
-        projectService.checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
-        return getLogBytes(taskInstance);
-    }
-
-    /**
      * query log
      *
      * @param loginUser   login user
@@ -143,32 +126,6 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND, taskInstId);
         }
         return queryLog(task, skipLineNum, limit);
-    }
-
-    /**
-     * get log bytes
-     *
-     * @param loginUser   login user
-     * @param projectCode project code
-     * @param taskInstId  task instance id
-     * @return log byte array
-     */
-    @Override
-    public byte[] getLogBytes(User loginUser, long projectCode, int taskInstId) {
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, DOWNLOAD_LOG);
-
-        // check whether the task instance can be found
-        TaskInstance task = taskInstanceDao.queryById(taskInstId);
-        if (task == null || StringUtils.isBlank(task.getHost())) {
-            throw new ServiceException("task instance is null or host is null");
-        }
-
-        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(task.getTaskCode());
-        if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
-            throw new ServiceException("task instance does not exist in project");
-        }
-        return getLogBytes(task);
     }
 
     /**
@@ -208,29 +165,66 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         }
     }
 
-    /**
-     * get log bytes
-     *
-     * @param taskInstance task instance
-     * @return log byte array
-     */
-    private byte[] getLogBytes(TaskInstance taskInstance) {
-        String host = taskInstance.getHost();
-        String logPath = taskInstance.getLogPath();
-
-        byte[] head = String.format(LOG_HEAD_FORMAT,
-                logPath,
-                host,
-                Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
-
-        byte[] logBytes;
-
-        try {
-            logBytes = logClientDelegate.getWholeLogBytes(taskInstance);
-            return Bytes.concat(head, logBytes);
-        } catch (Exception ex) {
-            log.error("Download TaskInstance: {} Log Error", taskInstance.getName(), ex);
-            throw new ServiceException(Status.DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR);
+    @Override
+    public TaskInstance checkDownloadLogAuth(final User loginUser, final int taskInstId) {
+        final TaskInstance taskInstance = taskInstanceDao.queryById(taskInstId);
+        if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
+            throw new ServiceException("task instance is null or host is null");
         }
+        if (StringUtils.isBlank(taskInstance.getLogPath())) {
+            throw new ServiceException("task instance log path is empty");
+        }
+        final Project project = projectDao.queryProjectByTaskInstanceId(taskInstId);
+        projectService.checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
+        return taskInstance;
+    }
+
+    @Override
+    public void streamLogBytes(final TaskInstance taskInstance,
+                               final OutputStream outputStream) throws IOException {
+        final byte[] head = String.format(LOG_HEAD_FORMAT,
+                taskInstance.getLogPath(),
+                taskInstance.getHost(),
+                Constants.SYSTEM_LINE_SEPARATOR).getBytes(StandardCharsets.UTF_8);
+        // Write the head LAZILY, right before the first log byte: writing it up front commits
+        // the HTTP response, and any startup failure in the fallback chain (missing log on the
+        // worker AND no remote archive) would then degrade to a broken 200 with a header-only
+        // .log body instead of a proper JSON error.
+        final AtomicBoolean headWritten = new AtomicBoolean(false);
+        final OutputStream lazyHead = new OutputStream() {
+
+            private void ensureHead() throws IOException {
+                if (headWritten.compareAndSet(false, true)) {
+                    outputStream.write(head);
+                }
+            }
+
+            @Override
+            public void write(final int b) throws IOException {
+                ensureHead();
+                outputStream.write(b);
+            }
+
+            @Override
+            public void write(final byte[] b, final int off, final int len) throws IOException {
+                if (len > 0) {
+                    ensureHead();
+                    outputStream.write(b, off, len);
+                }
+            }
+
+            @Override
+            public void flush() throws IOException {
+                if (headWritten.get()) {
+                    outputStream.flush();
+                }
+            }
+        };
+        logClientDelegate.streamWholeLog(taskInstance, lazyHead);
+        if (!headWritten.get()) {
+            // Valid empty log: keep the legacy head-only body.
+            outputStream.write(head);
+        }
+        outputStream.flush();
     }
 }

@@ -85,9 +85,15 @@ class JdkDynamicServerHandler extends ChannelInboundHandlerAdapter {
         ServerMethodInvoker methodInvoker = methodInvokerMap.get(methodIdentifier);
         try {
             if (methodInvoker == null) {
-                log.error("Cannot find the ServerMethodInvoker of : {}", transporter);
+                // Log the identifier, not the transporter: its Lombok toString renders the
+                // request body, which can be large.
+                log.error("Cannot find the ServerMethodInvoker of : {}", methodIdentifier);
+                // Typed failure: the peer must be able to tell "this server does not have the
+                // method" (an old server during a rolling upgrade) apart from any other
+                // invocation failure.
                 StandardRpcResponse iRpcResponse =
-                        StandardRpcResponse.fail("Cannot find the ServerMethodInvoker of " + methodIdentifier);
+                        StandardRpcResponse
+                                .methodNotFound("Cannot find the ServerMethodInvoker of " + methodIdentifier);
                 TransporterHeader transporterHeader =
                         TransporterHeader.of(transporter.getHeader().getOpaque(), methodIdentifier);
                 Transporter response = Transporter.of(transporterHeader, iRpcResponse);

@@ -27,4 +27,12 @@ public interface IRpcResponse {
 
     byte[] toBytes();
 
+    /**
+     * Whether the failure is specifically "the server does not have this method" (an old server
+     * during a rolling upgrade) rather than any other invocation failure.
+     */
+    default boolean isMethodNotFound() {
+        return false;
+    }
+
 }

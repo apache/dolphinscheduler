@@ -34,18 +34,6 @@ import org.springframework.stereotype.Component;
 public class LocalLogClient {
 
     /**
-     * Download the complete log of a task instance.
-     * This method is used to retrieve all log information from the start to the end of a task instance,
-     * suitable for scenarios where a complete log record is required.
-     *
-     * @param taskInstance The task instance object, containing information needed to retrieve the log.
-     * @return The complete log file download response of the task instance, including log content and metadata.
-     */
-    public TaskInstanceLogFileDownloadResponse getWholeLog(TaskInstance taskInstance) {
-        return getLocalWholeLog(taskInstance);
-    }
-
-    /**
      * Query a portion of the log of a task instance.
      * This method is used to query log information of a task instance in a paginated manner,
      * suitable for scenarios where the log content is large and needs to be retrieved in batches.
@@ -59,11 +47,14 @@ public class LocalLogClient {
         return getLocalPartLog(taskInstance, skipLineNum, limit);
     }
 
-    private TaskInstanceLogFileDownloadResponse getLocalWholeLog(TaskInstance taskInstance) {
-        TaskInstanceLogFileDownloadRequest request = new TaskInstanceLogFileDownloadRequest(
-                taskInstance.getId(),
-                taskInstance.getLogPath());
-        return getProxyLogService(taskInstance).getTaskInstanceWholeLogFileBytes(request);
+    /**
+     * Fetch a single bounded chunk of the task instance log from the worker via chunked RPC.
+     */
+    public TaskInstanceLogFileDownloadResponse getLogChunk(final TaskInstance taskInstance,
+                                                           final long offset, final int length) {
+        final TaskInstanceLogFileDownloadRequest request = new TaskInstanceLogFileDownloadRequest(
+                taskInstance.getId(), taskInstance.getLogPath(), offset, length);
+        return getProxyLogService(taskInstance).getTaskInstanceLogFileChunk(request);
     }
 
     private TaskInstanceLogPageQueryResponse getLocalPartLog(TaskInstance taskInstance, int skipLineNum,
