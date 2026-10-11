@@ -56,3 +56,4 @@
   * **移除的派生属性**：`cmdTypeIfComplement`、`complementData`（补数执行相关，如需获取请使用详情接口）
   * 如需获取这些字段，请使用详情接口 `GET /projects/{projectCode}/workflow-instances/{id}`，该接口仍返回完整的 `WorkflowInstance` 对象 ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
 
+* `dolphinscheduler-common` 中的 `RemoteLogHandler#getRemoteLog` 现在声明 `throws IOException` 并向上传播下载失败（不再吞掉异常）；`LogUtils#getFileContentBytesFromRemote` 已移除。仓库外的实现与调用方需要相应调整。([#18459](https://github.com/apache/dolphinscheduler/issues/18459))

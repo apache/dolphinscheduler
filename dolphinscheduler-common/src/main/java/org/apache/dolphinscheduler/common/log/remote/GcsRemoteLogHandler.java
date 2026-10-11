@@ -96,17 +96,17 @@ public class GcsRemoteLogHandler implements RemoteLogHandler, Closeable {
     }
 
     @Override
-    public void getRemoteLog(String logPath) {
+    public void getRemoteLog(String logPath) throws IOException {
         String objectName = RemoteLogUtils.getObjectNameFromLogPath(logPath);
+        log.info("get remote log on GCS {} to {}", objectName, logPath);
 
-        try {
-            log.info("get remote log on GCS {} to {}", objectName, logPath);
-
+        RemoteLogUtils.downloadToLocalFileAtomically(logPath, staging -> {
             Blob blob = gcsStorage.get(BlobId.of(bucketName, objectName));
-            blob.downloadTo(Paths.get(logPath));
-        } catch (Exception e) {
-            log.error("error while getting remote log on GCS {} to {}", objectName, logPath, e);
-        }
+            if (blob == null) {
+                throw new IOException("Remote log object not found on GCS: " + objectName);
+            }
+            blob.downloadTo(staging);
+        });
     }
 
     protected Storage buildGcsStorage(String credential) throws IOException {

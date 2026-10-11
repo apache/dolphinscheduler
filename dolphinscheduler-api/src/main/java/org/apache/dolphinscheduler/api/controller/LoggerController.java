@@ -25,11 +25,16 @@ import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
@@ -38,6 +43,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.async.StandardServletAsyncWebRequest;
+import org.springframework.web.context.request.async.WebAsyncUtils;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -49,6 +57,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @RestController
 @RequestMapping("/log")
 public class LoggerController extends BaseController {
+
+    /**
+     * Endpoint-scoped async timeout for the log download: {@link StreamingResponseBody} runs on
+     * the async request path where the servlet container's default timeout (30s in Jetty/Tomcat)
+     * SILENTLY truncates any download that takes longer — large log downloads regularly exceed
+     * it. Scoped to THIS endpoint instead of the global {@code spring.mvc.async.request-timeout}
+     * so that no other endpoint ever inherits a 1-hour async timeout.
+     */
+    private static final long LOG_DOWNLOAD_ASYNC_TIMEOUT_MILLIS = 60 * 60 * 1000L;
 
     @Autowired
     private LoggerService loggerService;
@@ -92,14 +109,30 @@ public class LoggerController extends BaseController {
     @GetMapping(value = "/download-log")
     @ResponseBody
     @ApiException(DOWNLOAD_TASK_INSTANCE_LOG_FILE_ERROR)
-    public ResponseEntity downloadTaskLog(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                          @RequestParam(value = "taskInstanceId") int taskInstanceId) {
-        byte[] logBytes = loggerService.getLogBytes(loginUser, taskInstanceId);
+    public ResponseEntity<StreamingResponseBody> downloadTaskLog(
+                                                                 @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                 @RequestParam(value = "taskInstanceId") int taskInstanceId,
+                                                                 @Parameter(hidden = true) HttpServletRequest request,
+                                                                 @Parameter(hidden = true) HttpServletResponse response) {
+        // Sync auth check — throws ServiceException BEFORE response is committed,
+        // so @ApiException can still return a proper JSON error
+        final TaskInstance taskInstance = loggerService.checkDownloadLogAuth(loginUser, taskInstanceId);
+        // Scope a long async timeout to THIS request only (after the auth check, so failures
+        // stay on the non-async JSON error path). The servlet container's default async
+        // timeout (30s in Jetty/Tomcat) silently truncates StreamingResponseBody downloads
+        // that take longer. The WebAsyncManager is request-scoped: installing a custom
+        // AsyncWebRequest here affects only this endpoint — unlike the global
+        // spring.mvc.async.request-timeout.
+        final StandardServletAsyncWebRequest asyncWebRequest = new StandardServletAsyncWebRequest(request, response);
+        asyncWebRequest.setTimeout(LOG_DOWNLOAD_ASYNC_TIMEOUT_MILLIS);
+        WebAsyncUtils.getAsyncManager(request).setAsyncWebRequest(asyncWebRequest);
+        final StreamingResponseBody body = outputStream -> loggerService.streamLogBytes(taskInstance, outputStream);
         return ResponseEntity
                 .ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .header(HttpHeaders.CONTENT_DISPOSITION,
                         "attachment; filename=\"" + System.currentTimeMillis() + ".log" + "\"")
-                .body(logBytes);
+                .body(body);
     }
 
 }

@@ -56,3 +56,4 @@ This document records the incompatible updates between each version. You need to
   * **Removed derived properties**: `cmdTypeIfComplement`, `complementData` (related to complement-data executions; use the detail API to obtain them)
   * To obtain any of these fields, use the detail API `GET /projects/{projectCode}/workflow-instances/{id}` instead, which continues to return the full `WorkflowInstance` object. ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
 
+* `RemoteLogHandler#getRemoteLog` in `dolphinscheduler-common` now declares `throws IOException` and propagates download failures instead of swallowing them; `LogUtils#getFileContentBytesFromRemote` was removed. Out-of-tree implementations and callers of these APIs must be updated. ([#18459](https://github.com/apache/dolphinscheduler/issues/18459))

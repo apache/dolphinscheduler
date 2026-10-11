@@ -134,7 +134,7 @@ class NettyRemotingServer {
     private void initNettyChannel(SocketChannel ch) {
         ch.pipeline()
                 .addLast("encoder", new TransporterEncoder())
-                .addLast("decoder", new TransporterDecoder())
+                .addLast("decoder", new TransporterDecoder(serverConfig.getMaxFrameSize()))
                 .addLast("server-idle-handle",
                         new IdleStateHandler(serverConfig.getConnectionIdleTime(), 0, 0, TimeUnit.MILLISECONDS))
                 .addLast("handler", channelHandler);

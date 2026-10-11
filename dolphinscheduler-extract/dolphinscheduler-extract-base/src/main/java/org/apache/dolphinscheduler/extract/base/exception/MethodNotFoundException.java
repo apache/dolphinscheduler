@@ -15,28 +15,19 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.extract.common.transportor;
+package org.apache.dolphinscheduler.extract.base.exception;
 
-public enum LogResponseStatus {
-    /**
-     * Success status code.
-     */
-    SUCCESS,
+/**
+ * The server answered that it does not have the requested method — the old-server signal during
+ * a rolling upgrade. A subclass of {@link MethodInvocationException} so existing callers keep
+ * working; only callers that must distinguish "outdated peer" from "the invocation failed" (e.g.
+ * the worker-upgrade guidance of the chunked log download) need to check for this type: every
+ * other server-side failure — the method threw, the server's invocation pool is full — is
+ * reported as a plain {@link MethodInvocationException}.
+ */
+public class MethodNotFoundException extends MethodInvocationException {
 
-    /**
-     * General error status code.
-     */
-    ERROR,
-
-    /**
-     * Log file not found status code.
-     */
-    LOG_FILE_NOT_FOUND,
-
-    /**
-     * The log file shrank below the requested offset while streaming — e.g. log rotation
-     * renamed the active file and a fresh one started from 0. The download the caller is
-     * assembling is truncated and must fail explicitly instead of silently ending.
-     */
-    LOG_TRUNCATED,
+    public MethodNotFoundException(String message) {
+        super(message);
+    }
 }

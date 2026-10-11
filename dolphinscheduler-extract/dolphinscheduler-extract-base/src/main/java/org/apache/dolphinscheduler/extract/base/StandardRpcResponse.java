@@ -32,6 +32,14 @@ public class StandardRpcResponse implements IRpcResponse {
 
     private Class<?> bodyType;
 
+    /**
+     * True only when the failure is specifically "the server does not have this method" — the
+     * old-server signal during a rolling upgrade. Every other failure (the method threw, the
+     * server's invocation pool is full) leaves it false, so a caller must never mistake a
+     * saturated or broken server for an outdated one. Older peers ignore the field.
+     */
+    private boolean methodNotFound;
+
     public static StandardRpcResponse success(byte[] body, Class<?> bodyType) {
         StandardRpcResponse rpcResponse = new StandardRpcResponse();
         rpcResponse.setSuccess(true);
@@ -44,6 +52,15 @@ public class StandardRpcResponse implements IRpcResponse {
         StandardRpcResponse rpcResponse = new StandardRpcResponse();
         rpcResponse.setSuccess(false);
         rpcResponse.setMessage(message);
+        return rpcResponse;
+    }
+
+    /**
+     * The server answered that it does not know the requested method (see {@link #isMethodNotFound()}).
+     */
+    public static StandardRpcResponse methodNotFound(String message) {
+        StandardRpcResponse rpcResponse = fail(message);
+        rpcResponse.setMethodNotFound(true);
         return rpcResponse;
     }
 
