@@ -117,6 +117,11 @@ public class LogClientDelegate {
      *       preserved either.</li>
      *   <li>If a failure happens mid-stream (bytes already written), throw IOException to avoid
      *       corrupting the download.</li>
+     *   <li>A download that cannot deliver the full pinned snapshot — the worker reports a file
+     *       shorter than the pin, or the stream ends before the pin is reached — throws instead of
+     *       publishing a short log as a successful download. When the worker does not report a
+     *       length at all (the pin stays 0, e.g. an old worker during a rolling upgrade),
+     *       completeness cannot be enforced and the eof-only termination above applies.</li>
      * </ul>
      */
     public void streamWholeLog(final TaskInstance taskInstance, final OutputStream outputStream) throws IOException {
@@ -194,13 +199,35 @@ public class LogClientDelegate {
             if (snapshotLength < 0) {
                 // Pin the snapshot from the worker's first stat; 0 keeps the eof-only behavior.
                 snapshotLength = chunk.getObservedLength();
+            } else if (snapshotLength > 0 && chunk.getObservedLength() > 0
+                    && chunk.getObservedLength() < snapshotLength) {
+                // The file at the log path is now shorter than the pinned snapshot: the remaining
+                // bytes can no longer complete the download this response promised (in-place
+                // truncation, or rotation to a shorter file). Reject before writing anything.
+                throw new IOException("Log file shrank below the pinned snapshot length (truncated/rotated) for task "
+                        + "instance " + taskInstance.getId() + " on " + taskInstance.getHost() + ": offset "
+                        + offset + ", observed " + chunk.getObservedLength() + " < pinned " + snapshotLength);
             }
             final byte[] data = chunk.getLogBytes();
-            if (data != null && data.length > 0) {
-                outputStream.write(data);
-                offset += data.length;
+            final int dataLength = data == null ? 0 : data.length;
+            if ((chunk.isEof() || dataLength == 0) && snapshotLength > 0
+                    && offset + dataLength < snapshotLength) {
+                // The chunk declares the end of the log while the pinned snapshot still has
+                // undelivered bytes: returning here would publish an incomplete download as a
+                // success. With a current worker the shrink guard above rejects this shape first
+                // (it reports observedLength on every chunk); this branch is the safety net for a
+                // chunk that does not report it (observedLength 0 = unknown, no comparison
+                // possible). The check runs before the write — a doomed chunk's bytes are never
+                // emitted into the response.
+                throw new IOException("Log stream ended before the pinned snapshot was fully delivered for task "
+                        + "instance " + taskInstance.getId() + " on " + taskInstance.getHost() + ": ended at "
+                        + (offset + dataLength) + " of " + snapshotLength + " bytes");
             }
-            if (chunk.isEof() || (data == null || data.length == 0)) {
+            if (dataLength > 0) {
+                outputStream.write(data);
+                offset += dataLength;
+            }
+            if (chunk.isEof() || dataLength == 0) {
                 return;
             }
         }

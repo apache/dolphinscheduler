@@ -37,6 +37,7 @@ import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.RandomAccessFile;
 import java.net.ServerSocket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -234,6 +235,95 @@ class LogStreamingIntegrationTest {
         assertEquals(8 * 1024 * 1024, written.get());
 
         Files.deleteIfExists(rotatedFile);
+    }
+
+    /**
+     * End-to-end regression for TRUNCATION above the delivered offset during a download: the file
+     * shrinks in place to a length that is still >= the bytes already delivered, so the worker's
+     * own offset > fileLength truncation check does NOT fire — it reports SUCCESS with the
+     * remaining bytes and eof. Only the pinned snapshot length (8.5 MiB < 9 MiB) reveals that the
+     * download cannot complete, so the API must fail instead of publishing a short log as a
+     * complete download.
+     *
+     * <p>Deterministic timing via the same gate as the rotation test: the streaming thread blocks
+     * inside the first 8 MB write until the test thread has truncated the file.
+     */
+    @Test
+    void streamWholeLog_logTruncatedAboveOffsetMidDownload_failsExplicitly() throws Exception {
+        final CountDownLatch firstChunkArrived = new CountDownLatch(1);
+        final CountDownLatch truncationDone = new CountDownLatch(1);
+        final AtomicLong written = new AtomicLong();
+
+        final OutputStream gatedOutput = new OutputStream() {
+
+            private final AtomicBoolean firstWrite = new AtomicBoolean(true);
+
+            @Override
+            public void write(final int b) {
+                written.incrementAndGet();
+            }
+
+            @Override
+            public void write(final byte[] b, final int off, final int len) throws IOException {
+                written.addAndGet(len);
+                if (firstWrite.compareAndSet(true, false)) {
+                    // First chunk (8 MB) has arrived — hold the stream while the log is truncated.
+                    firstChunkArrived.countDown();
+                    try {
+                        if (!truncationDone.await(15, TimeUnit.SECONDS)) {
+                            throw new IOException("Test gate timed out waiting for truncation");
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new IOException("Test gate interrupted", e);
+                    }
+                }
+            }
+        };
+
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(3);
+        taskInstance.setHost("127.0.0.1:" + nettyServerPort);
+        taskInstance.setLogPath(tempLogFile.getAbsolutePath());
+        taskInstance.setTaskType("SHELL");
+        when(registryClient.checkNodeExists(eq(taskInstance.getHost()), any(RegistryNodeType.class))).thenReturn(true);
+
+        final ExecutorService pool = Executors.newSingleThreadExecutor();
+        final Future<Throwable> download;
+        try {
+            download = pool.submit(() -> {
+                try {
+                    logClientDelegate.streamWholeLog(taskInstance, gatedOutput);
+                    return null;
+                } catch (Throwable t) {
+                    return t;
+                }
+            });
+
+            // Wait until the first 8 MB chunk was written, then truncate the file in place to
+            // 8.5 MiB: still >= the delivered 8 MiB (so the worker's truncation check stays
+            // silent) but below the pinned 9 MiB snapshot. The latch is released in a finally:
+            // a failure on the way must not leave the streaming thread blocked in the gate.
+            try {
+                assertTrue(firstChunkArrived.await(15, TimeUnit.SECONDS),
+                        "First chunk never arrived — streaming did not start");
+                try (RandomAccessFile raf = new RandomAccessFile(tempLogFile, "rw")) {
+                    raf.setLength(8 * 1024 * 1024 + 512 * 1024);
+                }
+            } finally {
+                truncationDone.countDown();
+            }
+        } finally {
+            pool.shutdown();
+        }
+
+        final Throwable thrown = download.get(30, TimeUnit.SECONDS);
+        assertNotNull(thrown, "Download must fail after truncation — not return a short file as complete");
+        assertTrue(thrown instanceof IOException, "Expected IOException but got: " + thrown);
+        assertTrue(causeChainContains(thrown, "shrank below the pinned snapshot"),
+                "Error chain must identify the pinned-length shrink, got: " + thrown);
+        // Exactly the first 8 MB chunk was delivered; the replacement file's bytes never were.
+        assertEquals(8 * 1024 * 1024, written.get());
     }
 
     private static boolean causeChainContains(final Throwable throwable, final String needle) {

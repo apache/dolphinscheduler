@@ -504,6 +504,90 @@ public class LogClientDelegateTest {
     }
 
     /**
+     * Truncation to a length ABOVE the delivered offset: the worker's own truncation check only
+     * rejects offset > fileLength, so a file that shrank to between the offset already delivered
+     * and the pinned snapshot length is reported as SUCCESS with the remaining bytes and eof.
+     * The API must compare the delivered bytes against the pinned length and fail instead of
+     * publishing a short download as complete.
+     */
+    @Test
+    public void testStreamWholeLogShrinkToLengthAboveOffsetFails() throws Exception {
+        TaskInstance ti = newTaskInstance();
+        final int chunkSize = 8 * 1024 * 1024;
+
+        when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
+        // The first chunk pins a 20-byte snapshot after delivering 8 bytes.
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize)))
+                .thenReturn(chunkWithLength("ABCDEFGH".getBytes(StandardCharsets.UTF_8), false, 20));
+        // The file then shrank to 10 bytes - still >= the 8 bytes already delivered, so the
+        // worker's offset > fileLength check does NOT fire: it reports the two remaining bytes
+        // with SUCCESS + eof. Only the pinned length (10 < 20) reveals the truncation.
+        when(localLogClient.getLogChunk(eq(ti), eq(8L), eq(12)))
+                .thenReturn(chunkWithLength("IJ".getBytes(StandardCharsets.UTF_8), true, 10));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        IOException thrown = assertThrows(IOException.class, () -> logClientDelegate.streamWholeLog(ti, out));
+
+        assertTrue(thrown.getMessage().contains("shrank below the pinned snapshot"),
+                "Truncation must be reported, got: " + thrown.getMessage());
+        assertEquals(8, out.toByteArray().length,
+                "The replacement file's bytes must never be written to the response");
+        verify(remoteLogClient, never()).streamWholeLog(any(), any(OutputStream.class));
+    }
+
+    /**
+     * Truncation to EXACTLY the delivered offset: the worker treats offset == fileLength as its
+     * normal clean EOF (SUCCESS + empty + eof), so only the pinned length (8 < 20) can reveal
+     * that the snapshot this download promised no longer exists.
+     */
+    @Test
+    public void testStreamWholeLogShrinkToExactlyOffsetFails() throws Exception {
+        TaskInstance ti = newTaskInstance();
+        final int chunkSize = 8 * 1024 * 1024;
+
+        when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize)))
+                .thenReturn(chunkWithLength("ABCDEFGH".getBytes(StandardCharsets.UTF_8), false, 20));
+        when(localLogClient.getLogChunk(eq(ti), eq(8L), eq(12)))
+                .thenReturn(chunkWithLength(new byte[0], true, 8));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        IOException thrown = assertThrows(IOException.class, () -> logClientDelegate.streamWholeLog(ti, out));
+
+        assertTrue(thrown.getMessage().contains("shrank below the pinned snapshot"),
+                "Truncation must be reported, got: " + thrown.getMessage());
+        assertEquals(8, out.toByteArray().length);
+        verify(remoteLogClient, never()).streamWholeLog(any(), any(OutputStream.class));
+    }
+
+    /**
+     * A later chunk that does not report the observed length (0 = unknown; the DTO contract
+     * allows it even though the current worker reports it on every chunk) ends early with eof:
+     * the terminal guard must still reject it against the pinned length, before writing the
+     * doomed chunk's bytes.
+     */
+    @Test
+    public void testStreamWholeLogPrematureEofWithoutObservedLengthFails() throws Exception {
+        TaskInstance ti = newTaskInstance();
+        final int chunkSize = 8 * 1024 * 1024;
+
+        when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize)))
+                .thenReturn(chunkWithLength("ABCDEFGH".getBytes(StandardCharsets.UTF_8), false, 20));
+        when(localLogClient.getLogChunk(eq(ti), eq(8L), eq(12)))
+                .thenReturn(chunkWithLength("IJ".getBytes(StandardCharsets.UTF_8), true, 0));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        IOException thrown = assertThrows(IOException.class, () -> logClientDelegate.streamWholeLog(ti, out));
+
+        assertTrue(thrown.getMessage().contains("ended before the pinned snapshot"),
+                "Premature EOF must be reported, got: " + thrown.getMessage());
+        // The doomed chunk's bytes were never written: both guards reject before writing.
+        assertEquals(8, out.toByteArray().length);
+        verify(remoteLogClient, never()).streamWholeLog(any(), any(OutputStream.class));
+    }
+
+    /**
      * The remote fallback must stream into the response's own OutputStream: the delegate must not
      * buffer the archive (the OOM shape this PR removes) and must not wrap the stream. The
      * byte-level "bounded writes, never one giant array" property is asserted where it actually
