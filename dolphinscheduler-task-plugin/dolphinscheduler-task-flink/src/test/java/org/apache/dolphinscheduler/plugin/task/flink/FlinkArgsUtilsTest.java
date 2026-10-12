@@ -245,6 +245,21 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsKeepsRestTlsConfigs() {
+        // a submission over TLS has to keep the REST TLS settings on the cancel / savepoint command
+        // as well, otherwise it falls back to a plain connection
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-m remote-jm:8081 -Dsecurity.ssl.rest.enabled=true "
+                        + "-Dsecurity.ssl.rest.truststore=/opt/flink/truststore "
+                        + "-Dparallelism.default=4");
+
+        Assertions.assertEquals(
+                Arrays.asList("-m", "remote-jm:8081", "-Dsecurity.ssl.rest.enabled=true",
+                        "-Dsecurity.ssl.rest.truststore=/opt/flink/truststore"),
+                options);
+    }
+
+    @Test
     public void testExtractClusterConnectionOptionsDropsSubmissionOnlyOptions() {
         // the parallelism, slots, memory, application name, main class, savepoint and configuration
         // of the submission only matter at submission time

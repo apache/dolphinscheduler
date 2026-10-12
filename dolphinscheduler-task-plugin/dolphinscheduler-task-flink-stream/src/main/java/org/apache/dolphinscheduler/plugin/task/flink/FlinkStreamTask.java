@@ -78,7 +78,6 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         for (String jobId : jobIds) {
             List<String> args = FlinkArgsUtils.buildSavePointCommandLine(jobId, yarnApplicationId,
                     clusterConnectionOptions);
-            log.info("savepoint args:{}", args);
 
             if (!executeFlinkSavepointCommand(args)) {
                 throw new TaskException("Trigger savepoint for flink job " + jobId + " failed, taskInstanceId: "

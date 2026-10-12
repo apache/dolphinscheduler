@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -94,6 +96,14 @@ public class FlinkArgsUtils {
             "kubernetes.context",
             "kubernetes.config.file",
             "execution.target"));
+
+    /**
+     * The prefixes of the configuration keys which identify the cluster. Each
+     * {@code security.ssl.rest.} key is needed as well, otherwise a submission to a REST endpoint
+     * over TLS can connect, while the cancel / savepoint command falls back to a plain connection.
+     */
+    private static final List<String> CLUSTER_CONNECTION_CONFIG_PREFIXES =
+            Collections.singletonList("security.ssl.rest.");
 
     /**
      * The {@code -D} option of the flink CLI, which allows specifying a configuration value.
@@ -241,7 +251,10 @@ public class FlinkArgsUtils {
         String config = token.substring(DYNAMIC_PROPERTY_OPTION.length());
         int separator = config.indexOf('=');
         String key = separator < 0 ? config : config.substring(0, separator);
-        return CLUSTER_CONNECTION_CONFIG_KEYS.contains(key);
+        if (CLUSTER_CONNECTION_CONFIG_KEYS.contains(key)) {
+            return true;
+        }
+        return CLUSTER_CONNECTION_CONFIG_PREFIXES.stream().anyMatch(key::startsWith);
     }
 
     /**
@@ -288,8 +301,8 @@ public class FlinkArgsUtils {
      * @return true if the command finished successfully
      */
     public static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args) {
-        return executeCommand(taskExecutionContext, args, OSUtils.isSudoEnable(),
-                FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS);
+        return executeCommandWithOutput(taskExecutionContext, args, OSUtils.isSudoEnable(),
+                FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS).isSuccess();
     }
 
     /**
@@ -298,7 +311,16 @@ public class FlinkArgsUtils {
      */
     public static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args,
                                          int timeoutSeconds) {
-        return executeCommand(taskExecutionContext, args, OSUtils.isSudoEnable(), timeoutSeconds);
+        return executeCommandWithOutput(taskExecutionContext, args, timeoutSeconds).isSuccess();
+    }
+
+    /**
+     * Same as {@link #executeCommand(TaskExecutionContext, List, int)}, and keep the output of the
+     * command so that the caller can classify a failure.
+     */
+    public static FlinkCommandResult executeCommandWithOutput(TaskExecutionContext taskExecutionContext,
+                                                              List<String> args, int timeoutSeconds) {
+        return executeCommandWithOutput(taskExecutionContext, args, OSUtils.isSudoEnable(), timeoutSeconds);
     }
 
     /**
@@ -315,6 +337,15 @@ public class FlinkArgsUtils {
      */
     static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args, boolean sudoEnable,
                                   int timeoutSeconds) {
+        return executeCommandWithOutput(taskExecutionContext, args, sudoEnable, timeoutSeconds).isSuccess();
+    }
+
+    /**
+     * Execute a flink command and keep its output, so that the caller can tell a command which failed
+     * because the job is already in a terminal state from a real failure.
+     */
+    static FlinkCommandResult executeCommandWithOutput(TaskExecutionContext taskExecutionContext, List<String> args,
+                                                       boolean sudoEnable, int timeoutSeconds) {
         Process process = null;
         try {
             IShellInterceptorBuilder shellInterceptorBuilder = ShellInterceptorBuilderFactory.newBuilder()
@@ -332,14 +363,15 @@ public class FlinkArgsUtils {
                 shellInterceptorBuilder.appendCustomEnvScript(taskExecutionContext.getEnvironmentConfig());
             }
             process = shellInterceptorBuilder.build().execute();
-            return waitForCommand(process, args, taskExecutionContext, timeoutSeconds);
+            return waitForCommand(process, taskExecutionContext, timeoutSeconds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            log.error("Execute flink command interrupted, args: {}", args, e);
-            return false;
+            log.error("Execute flink command interrupted, taskInstanceId: {}",
+                    taskExecutionContext.getTaskInstanceId(), e);
+            return FlinkCommandResult.failure("");
         } catch (Exception e) {
-            log.error("Execute flink command error, args: {}", args, e);
-            return false;
+            log.error("Execute flink command error, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
+            return FlinkCommandResult.failure("");
         } finally {
             if (process != null && process.isAlive()) {
                 destroyProcessTree(process, taskExecutionContext);
@@ -349,11 +381,12 @@ public class FlinkArgsUtils {
 
     /**
      * Wait for the command to finish, consuming its output so that the command cannot block on a full
-     * pipe, and keep the output for diagnostics.
+     * pipe, and keep the output for diagnostics. The command arguments are not logged, they may carry
+     * sensitive configuration values.
      */
-    private static boolean waitForCommand(Process process, List<String> args,
-                                          TaskExecutionContext taskExecutionContext,
-                                          int timeoutSeconds) throws InterruptedException {
+    private static FlinkCommandResult waitForCommand(Process process,
+                                                     TaskExecutionContext taskExecutionContext,
+                                                     int timeoutSeconds) throws InterruptedException {
         StringBuilder output = new StringBuilder();
         Thread outputReader = new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
@@ -373,16 +406,42 @@ public class FlinkArgsUtils {
         outputReader.join(TimeUnit.SECONDS.toMillis(OUTPUT_READER_JOIN_TIMEOUT_SECONDS));
         if (!finished) {
             destroyProcessTree(process, taskExecutionContext);
-            log.error("Execute flink command timeout after {}s, args: {}, output: {}", timeoutSeconds, args, output);
-            return false;
+            log.error("Execute flink command timeout after {}s, output: {}", timeoutSeconds, output);
+            return FlinkCommandResult.failure(output.toString());
         }
         int exitCode = process.exitValue();
         if (exitCode != 0) {
-            log.error("Execute flink command failed, exitCode: {}, args: {}, output: {}", exitCode, args, output);
-            return false;
+            log.error("Execute flink command failed, exitCode: {}, output: {}", exitCode, output);
+            return FlinkCommandResult.failure(output.toString());
         }
-        log.info("Execute flink command successfully, args: {}, output: {}", args, output);
-        return true;
+        log.info("Execute flink command successfully, output: {}", output);
+        return FlinkCommandResult.success(output.toString());
+    }
+
+    /**
+     * The result of executing a flink command: whether it succeeded and what it printed. The output is
+     * kept because a failed command has to be classified by the caller, for example cancelling a job
+     * which is already in a terminal state is not a real failure.
+     */
+    @Getter
+    public static class FlinkCommandResult {
+
+        private final boolean success;
+
+        private final String output;
+
+        private FlinkCommandResult(boolean success, String output) {
+            this.success = success;
+            this.output = output;
+        }
+
+        public static FlinkCommandResult success(String output) {
+            return new FlinkCommandResult(true, output);
+        }
+
+        public static FlinkCommandResult failure(String output) {
+            return new FlinkCommandResult(false, output);
+        }
     }
 
     /**

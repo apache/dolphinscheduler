@@ -31,6 +31,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,12 @@ public class FlinkTask extends AbstractYarnTask {
      * id.
      */
     protected static final Pattern FLINK_JOB_ID_REGEX = Pattern.compile(TaskConstants.FLINK_JOB_ID_REGEX);
+
+    /**
+     * The message the flink CLI reports when the job is already in another terminal state, so it does
+     * not have to be cancelled any more.
+     */
+    private static final String JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE = "already reached another terminal state";
 
     public FlinkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -132,18 +139,17 @@ public class FlinkTask extends AbstractYarnTask {
      *
      * <p>The process started by the worker is only the flink client, not the job itself: when the
      * client exits, or when it is killed, the job keeps running for local/standalone/session
-     * deployments. So the job is cancelled through the flink CLI first. The process tree kill and
-     * the YARN/K8s application cancellation are used when no JobID was found or when the task was
-     * submitted to a resource manager, and they are always used to stop the client process when the
-     * CLI fails.
+     * deployments. So the job is cancelled through the flink CLI first. The client process is stopped
+     * as well, whatever the result of the cancellation is: a multi statement SQL script can submit
+     * another job after the cancelled statement, and the process tree kill plus the YARN/K8s
+     * application cancellation are needed when no JobID was found or when the task was submitted to a
+     * resource manager.
      */
     @Override
     public void cancelApplication() throws TaskException {
         TaskException cancelFailure = null;
         try {
-            if (cancelFlinkJob()) {
-                return;
-            }
+            cancelFlinkJob();
         } catch (TaskException e) {
             cancelFailure = e;
         }
@@ -173,44 +179,63 @@ public class FlinkTask extends AbstractYarnTask {
     }
 
     /**
-     * Cancel the flink job through the flink CLI.
+     * Cancel the flink jobs through the flink CLI.
      *
      * <p>Tasks submitted to YARN are not handled here: their application id is known and cancelling
      * the application through the resource manager is the reliable way. A Kubernetes cluster is
      * identified by a cluster id rather than by an application id, so a job submitted to Kubernetes
      * is cancelled through the CLI, with the cluster connection options of the submission.
      *
-     * @return true if the job was cancelled through the CLI, false if the caller should fall back
-     * @throws TaskException if a cancelable job was found but could not be cancelled, so that the
-     *         failure is not hidden by the fallback
+     * <p>Every collected JobID is attempted. A job which is already in a terminal state cannot be
+     * cancelled any more, which is not a failure, so it is not reported as one.
+     *
+     * @throws TaskException if at least one job which is not in a terminal state could not be
+     *         cancelled
      */
-    protected boolean cancelFlinkJob() throws TaskException {
+    protected void cancelFlinkJob() throws TaskException {
         try {
             if (CollectionUtils.isNotEmpty(getApplicationIds())) {
-                return false;
+                return;
             }
         } catch (Exception e) {
             log.warn("Get application ids failed, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
         }
         List<String> jobIds = getFlinkJobIds();
         if (CollectionUtils.isEmpty(jobIds)) {
-            log.info(
-                    "Cannot find flink JobID from the task log, taskInstanceId: {}, will fall back to cancel by process",
+            log.info("Cannot find flink JobID from the task log, taskInstanceId: {}",
                     taskExecutionContext.getTaskInstanceId());
-            return false;
+            return;
         }
         List<String> clusterConnectionOptions = getClusterConnectionOptions();
+        List<String> failedJobIds = new ArrayList<>();
         for (String jobId : jobIds) {
             List<String> args = FlinkArgsUtils.buildCancelCommandLine(jobId, clusterConnectionOptions);
-            log.info("Cancel flink job, jobId: {}, args: {}", jobId, args);
-            if (!executeFlinkCommand(args)) {
-                throw new TaskException(String.format(
-                        "Cancel flink job %s failed, the job may still be running, taskInstanceId: %s", jobId,
-                        taskExecutionContext.getTaskInstanceId()));
+            FlinkArgsUtils.FlinkCommandResult result = executeFlinkCancelCommand(args);
+            if (result.isSuccess()) {
+                log.info("Cancelled flink job: {}", jobId);
+                continue;
             }
+            if (isJobAlreadyInTerminalState(result.getOutput())) {
+                log.info("Flink job {} is already in a terminal state, it does not need to be cancelled", jobId);
+                continue;
+            }
+            log.error("Cancel flink job {} failed, the job may still be running", jobId);
+            failedJobIds.add(jobId);
+        }
+        if (CollectionUtils.isNotEmpty(failedJobIds)) {
+            throw new TaskException(
+                    String.format("Cancel flink jobs %s failed, they may still be running, taskInstanceId: %s",
+                            failedJobIds, taskExecutionContext.getTaskInstanceId()));
         }
         log.info("Successfully cancelled flink jobs: {}", jobIds);
-        return true;
+    }
+
+    /**
+     * The flink CLI reports a job which is already in a terminal state instead of cancelling it. See
+     * the {@code JobCancellationHandler} of flink.
+     */
+    private boolean isJobAlreadyInTerminalState(String output) {
+        return StringUtils.contains(output, JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE);
     }
 
     /**
@@ -248,10 +273,13 @@ public class FlinkTask extends AbstractYarnTask {
     }
 
     /**
-     * Execute the given flink command, kept as a separate method so it can be verified in tests.
+     * Execute a cancel command and keep its output, so that a job which is already in a terminal state
+     * can be told apart from a real cancellation failure. It is kept as a separate method so that it
+     * can be verified in tests.
      */
-    protected boolean executeFlinkCommand(List<String> args) {
-        return FlinkArgsUtils.executeCommand(taskExecutionContext, args);
+    protected FlinkArgsUtils.FlinkCommandResult executeFlinkCancelCommand(List<String> args) {
+        return FlinkArgsUtils.executeCommandWithOutput(taskExecutionContext, args,
+                FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS);
     }
 
     /**

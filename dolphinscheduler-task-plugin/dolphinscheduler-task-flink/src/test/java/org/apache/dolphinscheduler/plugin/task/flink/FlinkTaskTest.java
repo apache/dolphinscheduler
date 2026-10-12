@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -124,17 +125,34 @@ public class FlinkTaskTest {
         return context;
     }
 
+    /**
+     * Stub the cancel commands with the given results, in order, and record the executed commands.
+     */
+    private List<List<String>> stubCancelCommands(FlinkTask task, FlinkArgsUtils.FlinkCommandResult... results) {
+        List<List<String>> executedCommands = new ArrayList<>();
+        AtomicInteger index = new AtomicInteger();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return results[Math.min(index.getAndIncrement(), results.length - 1)];
+        }).when(task).executeFlinkCancelCommand(Mockito.anyList());
+        return executedCommands;
+    }
+
+    private FlinkArgsUtils.FlinkCommandResult cancelSucceeded() {
+        return FlinkArgsUtils.FlinkCommandResult.success("");
+    }
+
+    private FlinkArgsUtils.FlinkCommandResult cancelFailed(String output) {
+        return FlinkArgsUtils.FlinkCommandResult.failure(output);
+    }
+
     @Test
     public void testCancelApplicationCancelJobThroughFlinkCli() throws Exception {
         TaskExecutionContext context = buildTaskExecutionContext(
                 "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
         FlinkTask task = Mockito.spy(new FlinkTask(context));
 
-        List<List<String>> executedCommands = new ArrayList<>();
-        Mockito.doAnswer(invocation -> {
-            executedCommands.add(invocation.getArgument(0));
-            return true;
-        }).when(task).executeFlinkCommand(Mockito.anyList());
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
 
         task.cancelApplication();
 
@@ -143,6 +161,8 @@ public class FlinkTaskTest {
                 String.join(" ", executedCommands.get(0)));
         // the Flink JobID must not leak into the application ids used by the YARN/K8s fallback
         Assertions.assertNull(context.getAppIds());
+        // the client is stopped even when the remote job was cancelled, it may submit another job
+        Mockito.verify(task).cancelClientByProcess();
     }
 
     @Test
@@ -152,11 +172,7 @@ public class FlinkTaskTest {
                 "Job ID: 1234567890abcdef1234567890abcdef");
         FlinkTask task = Mockito.spy(new FlinkTask(context));
 
-        List<List<String>> executedCommands = new ArrayList<>();
-        Mockito.doAnswer(invocation -> {
-            executedCommands.add(invocation.getArgument(0));
-            return true;
-        }).when(task).executeFlinkCommand(Mockito.anyList());
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
 
         task.cancelApplication();
 
@@ -181,11 +197,7 @@ public class FlinkTaskTest {
         FlinkTask task = Mockito.spy(new FlinkTask(context));
         task.init();
 
-        List<List<String>> executedCommands = new ArrayList<>();
-        Mockito.doAnswer(invocation -> {
-            executedCommands.add(invocation.getArgument(0));
-            return true;
-        }).when(task).executeFlinkCommand(Mockito.anyList());
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
 
         task.cancelApplication();
 
@@ -201,7 +213,7 @@ public class FlinkTaskTest {
                 "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
         FlinkTask task = Mockito.spy(new FlinkTask(context));
 
-        Mockito.doReturn(false).when(task).executeFlinkCommand(Mockito.anyList());
+        stubCancelCommands(task, cancelFailed("Could not cancel job."));
         Mockito.doNothing().when(task).cancelClientByProcess();
 
         // the job was found but could not be cancelled, the failure must not be hidden
@@ -213,16 +225,43 @@ public class FlinkTaskTest {
     }
 
     @Test
-    public void testCancelApplicationDoesNotKillClientWhenCliSucceeded() throws Exception {
+    public void testCancelApplicationAttemptsEveryJobId() throws Exception {
+        // a SQL script can submit several jobs, a failure of the first one must not leave the others
+        // running
         TaskExecutionContext context = buildTaskExecutionContext(
-                "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
+                "Job has been submitted with JobID 11111111111111111111111111111111\n"
+                        + "Job has been submitted with JobID 22222222222222222222222222222222");
         FlinkTask task = Mockito.spy(new FlinkTask(context));
 
-        Mockito.doReturn(true).when(task).executeFlinkCommand(Mockito.anyList());
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelFailed("Could not cancel job."),
+                cancelSucceeded());
+
+        Assertions.assertThrows(TaskException.class, task::cancelApplication);
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 11111111111111111111111111111111",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222",
+                String.join(" ", executedCommands.get(1)));
+    }
+
+    @Test
+    public void testCancelApplicationIgnoresJobAlreadyInTerminalState() throws Exception {
+        // cancelling a job which already finished fails, but there is nothing left to cancel, so the
+        // job which is still running must be cancelled without reporting a failure
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 11111111111111111111111111111111\n"
+                        + "Job has been submitted with JobID 22222222222222222222222222222222");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        List<List<String>> executedCommands = stubCancelCommands(task,
+                cancelFailed("Job cancellation failed because the job has already reached another terminal state "
+                        + "(FINISHED)."),
+                cancelSucceeded());
 
         task.cancelApplication();
 
-        Mockito.verify(task, Mockito.never()).cancelClientByProcess();
+        Assertions.assertEquals(2, executedCommands.size());
     }
 
     @Test
@@ -233,7 +272,7 @@ public class FlinkTaskTest {
         // the task has never been started, so falling back must neither throw nor kill anything
         task.cancelApplication();
 
-        Mockito.verify(task, Mockito.never()).executeFlinkCommand(Mockito.anyList());
+        Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
     }
 
     @Test
@@ -245,6 +284,6 @@ public class FlinkTaskTest {
         task.cancelApplication();
 
         // the YARN application is cancelled through the resource manager by the fallback
-        Mockito.verify(task, Mockito.never()).executeFlinkCommand(Mockito.anyList());
+        Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
     }
 }
