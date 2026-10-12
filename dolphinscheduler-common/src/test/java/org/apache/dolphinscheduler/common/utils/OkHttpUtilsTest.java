@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import okhttp3.OkHttpClient;
+import okhttp3.Protocol;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,6 +41,19 @@ import com.sun.net.httpserver.HttpServer;
 class OkHttpUtilsTest {
 
     private static final int TIMEOUT = 10_000;
+
+    @Test
+    void testAbsentResponseBodyReturnsEmptyString() throws Exception {
+        for (int statusCode : new int[]{200, 204, 400, 500}) {
+            Response response = new Response.Builder()
+                    .request(new Request.Builder().url("http://localhost/").build())
+                    .protocol(Protocol.HTTP_1_1)
+                    .code(statusCode)
+                    .message("test")
+                    .build();
+            Assertions.assertEquals("", OkHttpUtils.getResponseBody(response));
+        }
+    }
 
     @Test
     void testKeepAliveAndPlainClientsAreSeparated() throws Exception {
