@@ -38,6 +38,7 @@ import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -53,6 +54,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -542,9 +544,10 @@ class SqlTaskTest {
     }
 
     @Test
-    void testPrepareTaskResultAlertKeepsFullContentRegardlessOfDisplayRows() {
+    void testPrepareTaskResultAlertKeepsFullContentRegardlessOfDisplayRows() throws Exception {
+        int totalRows = readStaticIntConstant("ALERT_MAX_ROWS") - 1;
         ArrayNode resultArray = JSONUtils.createArrayNode();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < totalRows; i++) {
             resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
         }
 
@@ -555,15 +558,16 @@ class SqlTaskTest {
         Assertions.assertNotNull(alertInfo);
 
         ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
-        Assertions.assertEquals(50, contentArray.size());
+        Assertions.assertEquals(totalRows, contentArray.size());
         Assertions.assertEquals("0", contentArray.get(0).get("id").asText());
-        Assertions.assertEquals("49", contentArray.get(49).get("id").asText());
+        Assertions.assertEquals(String.valueOf(totalRows - 1), contentArray.get(totalRows - 1).get("id").asText());
     }
 
     @Test
-    void testPrepareTaskResultAlertKeepsFullContentWhenDisplayRowsUnset() {
+    void testPrepareTaskResultAlertKeepsFullContentWhenDisplayRowsUnset() throws Exception {
+        int totalRows = readStaticIntConstant("ALERT_MAX_ROWS") - 1;
         ArrayNode resultArray = JSONUtils.createArrayNode();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < totalRows; i++) {
             resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
         }
 
@@ -574,7 +578,7 @@ class SqlTaskTest {
         Assertions.assertNotNull(alertInfo);
 
         ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
-        Assertions.assertEquals(20, contentArray.size());
+        Assertions.assertEquals(totalRows, contentArray.size());
     }
 
     @Test
@@ -599,6 +603,52 @@ class SqlTaskTest {
         TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
         Assertions.assertNotNull(alertInfo);
         Assertions.assertEquals("test_sql_task query result sets", alertInfo.getTitle());
+    }
+
+    @Test
+    void testPrepareTaskResultAlertTruncatesRowsBeyondMax() throws Exception {
+        int maxRows = readStaticIntConstant("ALERT_MAX_ROWS");
+        int totalRows = maxRows + 10;
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        for (int i = 0; i < totalRows; i++) {
+            resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
+        }
+
+        TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "truncate rows test", 1);
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
+        Assertions.assertEquals(maxRows + 1, contentArray.size());
+        Assertions.assertEquals("0", contentArray.get(0).get("id").asText());
+        JsonNode last = contentArray.get(contentArray.size() - 1);
+        Assertions.assertTrue(last.has("..."));
+        Assertions.assertEquals((totalRows - maxRows) + " more rows omitted", last.get("...").asText());
+    }
+
+    @Test
+    void testPrepareTaskResultAlertTruncatesLongFieldValue() throws Exception {
+        int maxLen = readStaticIntConstant("ALERT_MAX_ROW_VALUE_LENGTH");
+        StringBuilder longValue = new StringBuilder();
+        for (int i = 0; i < maxLen + 50; i++) {
+            longValue.append("x");
+        }
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        resultArray.add(JSONUtils.parseObject("{\"id\":\"1\",\"payload\":\"" + longValue + "\"}"));
+
+        TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "truncate field test", 1);
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
+        Assertions.assertEquals(1, contentArray.size());
+        String payload = contentArray.get(0).get("payload").asText();
+        Assertions.assertEquals(maxLen + 3, payload.length());
+        Assertions.assertTrue(payload.endsWith("..."));
+    }
+
+    private int readStaticIntConstant(String name) throws Exception {
+        Field field = SqlTask.class.getDeclaredField(name);
+        field.setAccessible(true);
+        return field.getInt(null);
     }
 
     @Test

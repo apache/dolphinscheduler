@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -67,6 +68,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -90,6 +92,16 @@ public class SqlTask extends AbstractTask {
      * default query sql limit
      */
     private static final int QUERY_LIMIT = 10000;
+
+    /**
+     * max rows kept in the task-result alert content; rows beyond this are replaced by an omission marker
+     */
+    private static final int ALERT_MAX_ROWS = 30;
+
+    /**
+     * max length of a single string field value kept in the alert content; longer values are truncated with an ellipsis
+     */
+    private static final int ALERT_MAX_ROW_VALUE_LENGTH = 100;
 
     private final SQLTaskExecutionContext sqlTaskExecutionContext;
 
@@ -334,7 +346,7 @@ public class SqlTask extends AbstractTask {
         taskAlertInfo.setTitle(StringUtils.isNotEmpty(sqlParameters.getTitle())
                 ? sqlParameters.getTitle()
                 : taskExecutionContext.getTaskName() + " query result sets");
-        taskAlertInfo.setContent(JSONUtils.toJsonString(resultJSONArray));
+        taskAlertInfo.setContent(limitAlertContent(resultJSONArray));
         taskAlertInfo.setAlertType(AlertType.TASK_RESULT);
 
         taskExecutionContext.setNeedAlert(true);
@@ -342,6 +354,45 @@ public class SqlTask extends AbstractTask {
         log.debug("Prepare task result alert: title={}, alertGroupId={}, alertType={}, totalRows={}",
                 taskAlertInfo.getTitle(), taskAlertInfo.getAlertGroupId(), taskAlertInfo.getAlertType(),
                 resultJSONArray.size());
+    }
+
+    /**
+     * Build a size-limited alert content that stays a valid JSON array.
+     * Rows beyond {@link #ALERT_MAX_ROWS} are dropped and a trailing marker object is appended;
+     * string field values longer than {@link #ALERT_MAX_ROW_VALUE_LENGTH} are truncated with an ellipsis.
+     */
+    private String limitAlertContent(ArrayNode resultJSONArray) {
+        int totalRows = resultJSONArray.size();
+        ArrayNode limited = JSONUtils.createArrayNode();
+        int rowsToKeep = Math.min(totalRows, ALERT_MAX_ROWS);
+        for (int i = 0; i < rowsToKeep; i++) {
+            limited.add(limitRowValues(resultJSONArray.get(i)));
+        }
+        if (totalRows > ALERT_MAX_ROWS) {
+            ObjectNode omitted = JSONUtils.createObjectNode();
+            omitted.put("...", (totalRows - ALERT_MAX_ROWS) + " more rows omitted");
+            limited.add(omitted);
+        }
+        return JSONUtils.toJsonString(limited);
+    }
+
+    private JsonNode limitRowValues(JsonNode row) {
+        if (!row.isObject()) {
+            return row;
+        }
+        ObjectNode limitedRow = JSONUtils.createObjectNode();
+        Iterator<Map.Entry<String, JsonNode>> fields = row.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> entry = fields.next();
+            JsonNode value = entry.getValue();
+            if (value.isTextual() && value.textValue().length() > ALERT_MAX_ROW_VALUE_LENGTH) {
+                limitedRow.put(entry.getKey(),
+                        value.textValue().substring(0, ALERT_MAX_ROW_VALUE_LENGTH) + "...");
+            } else {
+                limitedRow.set(entry.getKey(), value);
+            }
+        }
+        return limitedRow;
     }
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {
