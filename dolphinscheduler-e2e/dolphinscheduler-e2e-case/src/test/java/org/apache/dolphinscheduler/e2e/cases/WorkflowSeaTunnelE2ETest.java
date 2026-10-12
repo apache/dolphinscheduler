@@ -352,7 +352,6 @@ class WorkflowSeaTunnelE2ETest {
                 .findFirst().orElseThrow(IllegalStateException::new);
         browser.close();
         browser.switchTo().window(detailWindow);
-        browser.navigate().refresh();
         return new WorkflowForm(browser);
     }
 }
