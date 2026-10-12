@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.models.users.AdminUser;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
+import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
@@ -44,7 +45,9 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.StaleElementReferenceException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
@@ -72,11 +75,8 @@ class WorkflowSeaTunnelE2ETest {
         if (tenants.tenants().stream().noneMatch(tenant -> tenant.tenantCode().equals(admin.getTenant()))) {
             tenants.create(admin.getTenant()).goToNav(SecurityPage.class).goToTab(UserPage.class).update(admin);
         }
-        WorkflowDefinitionTab definitions = tenants
-                .goToNav(ProjectPage.class)
-                .create(PROJECT)
-                .goTo(PROJECT)
-                .goToTab(WorkflowDefinitionTab.class);
+        tenants.goToNav(ProjectPage.class).create(PROJECT);
+        WorkflowDefinitionTab definitions = openProject().goToTab(WorkflowDefinitionTab.class);
         WorkflowForm form = definitions.createWorkflow();
         form.<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL, 100, 100)
                 .script("echo batch-control\n").name("before").submit();
@@ -196,8 +196,7 @@ class WorkflowSeaTunnelE2ETest {
         List<String> streamNames = instances.streamInstances().stream().map(TaskInstanceTab.Row::taskInstanceName)
                 .collect(Collectors.toList());
         assertThat(streamNames).contains("seatunnel-stream").doesNotContain("seatunnel-batch", copyName);
-        WorkflowInstanceTab workflows = new ProjectPage(browser).goToNav(ProjectPage.class).goTo(PROJECT)
-                .goToTab(WorkflowInstanceTab.class);
+        WorkflowInstanceTab workflows = project().goToTab(WorkflowInstanceTab.class);
         WebDriverWaitFactory.createWebDriverWait(browser, Duration.ofSeconds(120))
                 .ignoring(StaleElementReferenceException.class)
                 .withMessage("The finite SeaTunnel BATCH workflow must succeed")
@@ -288,12 +287,32 @@ class WorkflowSeaTunnelE2ETest {
     }
 
     private WorkflowDefinitionTab definitions() {
-        return new ProjectPage(browser).goToNav(ProjectPage.class).goTo(PROJECT)
-                .goToTab(WorkflowDefinitionTab.class);
+        return project().goToTab(WorkflowDefinitionTab.class);
     }
 
     private TaskInstanceTab taskInstances() {
-        return new ProjectPage(browser).goToNav(ProjectPage.class).goTo(PROJECT).goToTab(TaskInstanceTab.class);
+        return project().goToTab(TaskInstanceTab.class);
+    }
+
+    private ProjectDetailPage project() {
+        new ProjectPage(browser).goToNav(ProjectPage.class);
+        return openProject();
+    }
+
+    private ProjectDetailPage openProject() {
+        By project = By.xpath("//*[contains(@class, 'project-name')]//button[normalize-space(.)='" + PROJECT + "']");
+        WebDriverWaitFactory.createWebDriverWait(browser)
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementClickInterceptedException.class)
+                .until(driver -> {
+                    WebElement button = ExpectedConditions.elementToBeClickable(project).apply(driver);
+                    if (button == null) {
+                        return false;
+                    }
+                    button.click();
+                    return true;
+                });
+        return new ProjectDetailPage(browser);
     }
 
     private SeaTunnelTaskForm openTask(WorkflowForm form, String code) {
