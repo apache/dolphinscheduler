@@ -145,7 +145,7 @@ public class FlinkParameters extends AbstractParameters {
     private int maxPrintRows;
 
     public boolean isSqlGateway() {
-        return sqlSubmitType == FlinkSqlSubmitType.SQL_GATEWAY;
+        return sqlSubmitType == FlinkSqlSubmitType.SQL_GATEWAY && programType == ProgramType.SQL;
     }
 
     public Properties toJdbcProperties() {

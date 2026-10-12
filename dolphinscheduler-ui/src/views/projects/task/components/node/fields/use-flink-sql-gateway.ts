@@ -36,19 +36,28 @@ export function useFlinkSqlGatewayFields(model: { [field: string]: any }): {
   const resourceContentLoading = ref(false)
   const initResourceContentLoading = ref(false)
 
+  const isBatchSql = computed(
+    () => model.taskType === 'FLINK' && model.programType === 'SQL'
+  )
   const gatewaySpan = computed(() =>
-    model.programType === 'SQL' && model.sqlSubmitType === 'SQL_GATEWAY' ? 24 : 0
+    isBatchSql.value && model.sqlSubmitType === 'SQL_GATEWAY' ? 24 : 0
   )
   const initResourcesSpan = computed(() =>
-    model.sqlSubmitType === 'SQL_GATEWAY' && model.initScriptType === FILE ? 24 : 0
+    isBatchSql.value && model.sqlSubmitType === 'SQL_GATEWAY' && model.initScriptType === FILE
+      ? 24
+      : 0
   )
   const scriptReadOnly = computed(
     () =>
-      model.sqlSubmitType === 'SQL_GATEWAY' && model.rawScriptType === FILE
+      isBatchSql.value &&
+      model.sqlSubmitType === 'SQL_GATEWAY' &&
+      model.rawScriptType === FILE
   )
   const initScriptReadOnly = computed(
     () =>
-      model.sqlSubmitType === 'SQL_GATEWAY' && model.initScriptType === FILE
+      isBatchSql.value &&
+      model.sqlSubmitType === 'SQL_GATEWAY' &&
+      model.initScriptType === FILE
   )
 
   const loadResourceContent = (
@@ -153,7 +162,7 @@ export function useFlinkSqlGatewayFields(model: { [field: string]: any }): {
     submitType: {
       type: 'select',
       field: 'sqlSubmitType',
-      span: computed(() => (model.programType === 'SQL' ? 24 : 0)),
+      span: computed(() => (isBatchSql.value ? 24 : 0)),
       name: t('project.node.sql_submit_type'),
       options: [
         { label: t('project.node.sql_submit_client'), value: 'CLIENT' },

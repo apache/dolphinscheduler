@@ -24,7 +24,10 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const gateway = useFlinkSqlGatewayFields(model)
   const isSqlGateway = computed(
-    () => model.programType === 'SQL' && model.sqlSubmitType === 'SQL_GATEWAY'
+    () =>
+      model.taskType === 'FLINK' &&
+      model.programType === 'SQL' &&
+      model.sqlSubmitType === 'SQL_GATEWAY'
   )
   const mainClassSpan = computed(() =>
     model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
@@ -138,9 +141,12 @@ export function useFlink(model: { [field: string]: any }): IJsonItem[] {
       name: t('project.node.program_type'),
       options: PROGRAM_TYPES,
       props: {
-        'on-update:value': () => {
+        'on-update:value': (value: string) => {
           model.mainJar = null
           model.mainClass = ''
+          if (value !== 'SQL') {
+            model.sqlSubmitType = 'CLIENT'
+          }
         }
       }
     },

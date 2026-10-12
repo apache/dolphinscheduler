@@ -72,4 +72,72 @@ public class FlinkSqlGatewayExecutorTest {
         String sql = FlinkSqlGatewayExecutor.stripLeadingCommentsAndBlanks("SELECT 1 -- trailing comment");
         Assertions.assertEquals("SELECT 1 -- trailing comment", sql);
     }
+
+    @Test
+    public void splitSqlShouldKeepSeparatorInsideQuotedLiteral() {
+        List<String> sqlList = FlinkSqlGatewayExecutor.splitSql("SELECT 'a;b';SELECT 2", ";");
+        Assertions.assertEquals(2, sqlList.size());
+        Assertions.assertEquals("SELECT 'a;b'", sqlList.get(0));
+        Assertions.assertEquals("SELECT 2", sqlList.get(1));
+    }
+
+    @Test
+    public void splitSqlShouldKeepEscapedQuoteAndDoubledQuote() {
+        List<String> sqlList = FlinkSqlGatewayExecutor.splitSql("SELECT 'a\\';b';SELECT 2", ";");
+        Assertions.assertEquals(2, sqlList.size());
+        Assertions.assertEquals("SELECT 'a\\';b'", sqlList.get(0));
+
+        List<String> doubled = FlinkSqlGatewayExecutor.splitSql("SELECT 'a'';b';SELECT 2", ";");
+        Assertions.assertEquals(2, doubled.size());
+        Assertions.assertEquals("SELECT 'a'';b'", doubled.get(0));
+    }
+
+    @Test
+    public void splitSqlShouldKeepSeparatorInsideLineAndBlockComments() {
+        List<String> lineComment = FlinkSqlGatewayExecutor.splitSql("SELECT 1 -- a;b\n;SELECT 2", ";");
+        Assertions.assertEquals(2, lineComment.size());
+        Assertions.assertEquals("SELECT 1 -- a;b\n", lineComment.get(0));
+
+        List<String> blockComment = FlinkSqlGatewayExecutor.splitSql("SELECT 1 /* a;b */;SELECT 2", ";");
+        Assertions.assertEquals(2, blockComment.size());
+        Assertions.assertEquals("SELECT 1 /* a;b */", blockComment.get(0));
+        Assertions.assertEquals("SELECT 2", blockComment.get(1));
+    }
+
+    @Test
+    public void interpretStatusSequenceShouldFailWhenJobFailsAfterSubmit() {
+        Assertions.assertEquals(
+                FlinkSqlGatewayExecutor.SubmitOutcome.FAILURE,
+                FlinkSqlGatewayExecutor.interpretStatusSequence(java.util.Arrays.asList("RUNNING", "FAILED")));
+        Assertions.assertEquals(
+                FlinkSqlGatewayExecutor.SubmitOutcome.FAILURE,
+                FlinkSqlGatewayExecutor.interpretStatusSequence(java.util.Arrays.asList("RUNNING", "CANCELED")));
+    }
+
+    @Test
+    public void interpretStatusSequenceShouldSucceedOnlyOnFinished() {
+        Assertions.assertEquals(
+                FlinkSqlGatewayExecutor.SubmitOutcome.SUCCESS,
+                FlinkSqlGatewayExecutor.interpretStatusSequence(java.util.Arrays.asList("RUNNING", "FINISHED")));
+        Assertions.assertEquals(
+                FlinkSqlGatewayExecutor.SubmitOutcome.NOT_FINISHED,
+                FlinkSqlGatewayExecutor.interpretStatusSequence(java.util.Arrays.asList("RUNNING")));
+    }
+
+    @Test
+    public void interpretSubmitResultShouldNotTreatJobIdAloneAsSuccess() {
+        Assertions.assertEquals(
+                FlinkSqlGatewayExecutor.SubmitOutcome.NOT_FINISHED,
+                FlinkSqlGatewayExecutor.interpretSubmitResult(true, true, false, null, false));
+        Assertions.assertEquals(
+                FlinkSqlGatewayExecutor.SubmitOutcome.SUCCESS,
+                FlinkSqlGatewayExecutor.interpretSubmitResult(true, true, false, null, true));
+    }
+
+    @Test
+    public void isJava8OrOlderShouldMatchSpecificationVersion() {
+        Assertions.assertTrue(FlinkSqlGatewayExecutor.isJava8OrOlder("1.8"));
+        Assertions.assertFalse(FlinkSqlGatewayExecutor.isJava8OrOlder("11"));
+        Assertions.assertFalse(FlinkSqlGatewayExecutor.isJava8OrOlder("17"));
+    }
 }

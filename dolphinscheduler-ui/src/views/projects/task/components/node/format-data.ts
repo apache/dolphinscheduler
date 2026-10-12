@@ -90,7 +90,7 @@ export function formatParams(data: INodeData): {
     taskParams.taskManager = data.taskManager
     taskParams.parallelism = data.parallelism
   }
-  if (data.taskType === 'FLINK' && data.sqlSubmitType === 'SQL_GATEWAY') {
+  if (data.taskType === 'FLINK' && data.programType === 'SQL' && data.sqlSubmitType === 'SQL_GATEWAY') {
     taskParams.sqlSubmitType = 'SQL_GATEWAY'
     taskParams.flinkJdbcUrl = data.flinkJdbcUrl
     taskParams.statementSeparator = data.statementSeparator
@@ -107,6 +107,8 @@ export function formatParams(data: INodeData): {
           resourceName: `${fullName}`
         }))
       : []
+  } else if (data.taskType === 'FLINK' && data.sqlSubmitType === 'SQL_GATEWAY') {
+    taskParams.sqlSubmitType = 'CLIENT'
   }
   if (data.taskType === 'GRPC') {
     taskParams.url = data.url
