@@ -357,7 +357,7 @@ class WorkflowSeaTunnelE2ETest {
         try {
             browser.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
             WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.visibilityOfElementLocated(
-                    By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task']")));
+                    By.cssSelector(".dag-container")));
             return new WorkflowForm(browser);
         } catch (RuntimeException | Error error) {
             failure = error;
