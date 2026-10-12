@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilde
 import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -42,8 +43,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -100,12 +99,6 @@ public class FlinkArgsUtils {
      * The {@code -D} option of the flink CLI, which allows specifying a configuration value.
      */
     private static final String DYNAMIC_PROPERTY_OPTION = "-D";
-
-    /**
-     * The tokens of the extra options of the submission. A quoted value is kept as a single token,
-     * so that a value which contains whitespace is not split.
-     */
-    private static final Pattern OPTION_TOKEN_REGEX = Pattern.compile("\"[^\"]*\"|'[^']*'|\\S+");
 
     private static final long OUTPUT_READER_JOIN_TIMEOUT_SECONDS = 1L;
 
@@ -184,11 +177,44 @@ public class FlinkArgsUtils {
         return options;
     }
 
+    /**
+     * Split the extra options of the submission into tokens. A whitespace inside a quoted segment
+     * does not separate two tokens, and the quotes are kept so that the generated command stays
+     * quoted for the shell. A quote may appear inside a token, for example
+     * {@code -Dkubernetes.config.file="/opt/flink configs/kube.yaml"}.
+     */
     private static List<String> tokenizeOptions(String others) {
         List<String> tokens = new ArrayList<>();
-        Matcher matcher = OPTION_TOKEN_REGEX.matcher(others);
-        while (matcher.find()) {
-            tokens.add(matcher.group());
+        StringBuilder token = new StringBuilder();
+        char quote = 0;
+        boolean escaped = false;
+        for (int i = 0; i < others.length(); i++) {
+            char current = others.charAt(i);
+            if (escaped) {
+                token.append(current);
+                escaped = false;
+            } else if (current == '\\') {
+                token.append(current);
+                escaped = true;
+            } else if (quote != 0) {
+                token.append(current);
+                if (current == quote) {
+                    quote = 0;
+                }
+            } else if (current == '"' || current == '\'') {
+                token.append(current);
+                quote = current;
+            } else if (Character.isWhitespace(current)) {
+                if (token.length() > 0) {
+                    tokens.add(token.toString());
+                    token.setLength(0);
+                }
+            } else {
+                token.append(current);
+            }
+        }
+        if (token.length() > 0) {
+            tokens.add(token.toString());
         }
         return tokens;
     }
@@ -291,7 +317,7 @@ public class FlinkArgsUtils {
                 shellInterceptorBuilder.appendCustomEnvScript(taskExecutionContext.getEnvironmentConfig());
             }
             process = shellInterceptorBuilder.build().execute();
-            return waitForCommand(process, args, timeoutSeconds);
+            return waitForCommand(process, args, taskExecutionContext, timeoutSeconds);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             log.error("Execute flink command interrupted, args: {}", args, e);
@@ -301,7 +327,7 @@ public class FlinkArgsUtils {
             return false;
         } finally {
             if (process != null && process.isAlive()) {
-                process.destroyForcibly();
+                destroyProcessTree(process, taskExecutionContext);
             }
         }
     }
@@ -311,6 +337,7 @@ public class FlinkArgsUtils {
      * pipe, and keep the output for diagnostics.
      */
     private static boolean waitForCommand(Process process, List<String> args,
+                                          TaskExecutionContext taskExecutionContext,
                                           int timeoutSeconds) throws InterruptedException {
         StringBuilder output = new StringBuilder();
         Thread outputReader = new Thread(() -> {
@@ -330,7 +357,7 @@ public class FlinkArgsUtils {
         // both streams are merged into stdout by the shell interceptor, so joining the reader is enough
         outputReader.join(TimeUnit.SECONDS.toMillis(OUTPUT_READER_JOIN_TIMEOUT_SECONDS));
         if (!finished) {
-            process.destroyForcibly();
+            destroyProcessTree(process, taskExecutionContext);
             log.error("Execute flink command timeout after {}s, args: {}, output: {}", timeoutSeconds, args, output);
             return false;
         }
@@ -341,6 +368,31 @@ public class FlinkArgsUtils {
         }
         log.info("Execute flink command successfully, args: {}, output: {}", args, output);
         return true;
+    }
+
+    /**
+     * Terminate the process tree of the command and wait for it to be gone.
+     *
+     * <p>The process returned by the shell interceptor is the bootstrap shell (or the sudo process),
+     * the flink CLI itself runs as its descendant, so killing only that process would leave the CLI
+     * running and holding the output pipe.
+     */
+    private static void destroyProcessTree(Process process, TaskExecutionContext taskExecutionContext) {
+        int processId = ProcessUtils.getProcessId(process);
+        if (processId > 0) {
+            ProcessUtils.kill(processId, taskExecutionContext.getTenantCode());
+        }
+        if (process.isAlive()) {
+            process.destroyForcibly();
+        }
+        try {
+            if (!process.waitFor(OUTPUT_READER_JOIN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                log.warn("The flink command process {} did not terminate within {}s", processId,
+                        OUTPUT_READER_JOIN_TIMEOUT_SECONDS);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     /**

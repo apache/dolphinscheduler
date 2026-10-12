@@ -42,6 +42,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -109,9 +110,20 @@ public final class ProcessUtils {
      * @return Whether the process was successfully terminated
      */
     public static boolean kill(@NonNull TaskExecutionContext request) {
+        log.info("Begin killing task instance, processId: {}", request.getProcessId());
+        return kill(request.getProcessId(), request.getTenantCode());
+    }
+
+    /**
+     * Terminate the process tree which starts at the given process id, support multi-level signal
+     * processing and fallback strategy.
+     *
+     * @param processId the root process id, 0 means the process already finished
+     * @param tenantCode the tenant which runs the process, may be null
+     * @return Whether the process was successfully terminated
+     */
+    public static boolean kill(int processId, String tenantCode) {
         try {
-            log.info("Begin killing task instance, processId: {}", request.getProcessId());
-            int processId = request.getProcessId();
             if (processId == 0) {
                 log.info("Task instance has already finished, no need to kill");
                 return true;
@@ -121,14 +133,14 @@ public final class ProcessUtils {
             List<Integer> pidList = getPidList(processId);
 
             // 1. Try to terminate gracefully `kill -2`
-            boolean gracefulKillSuccess = sendKillSignal(SIGINT, pidList, request.getTenantCode());
+            boolean gracefulKillSuccess = sendKillSignal(SIGINT, pidList, tenantCode);
             if (gracefulKillSuccess) {
                 log.info("Successfully killed process tree by SIGINT, processId: {}", processId);
                 return true;
             }
 
             // 2. Try to terminate gracefully `kill -15`
-            boolean termKillSuccess = sendKillSignal(SIGTERM, pidList, request.getTenantCode());
+            boolean termKillSuccess = sendKillSignal(SIGTERM, pidList, tenantCode);
             if (termKillSuccess) {
                 log.info("Successfully killed process tree by SIGTERM, processId: {}", processId);
                 return true;
@@ -137,7 +149,7 @@ public final class ProcessUtils {
             // 3. As a last resort, use `kill -9`
             log.warn("Killing process by SIGINT & SIGTERM failed, using SIGKILL as a last resort for processId: {}",
                     processId);
-            boolean forceKillSuccess = sendKillSignal(SIGKILL, pidList, request.getTenantCode());
+            boolean forceKillSuccess = sendKillSignal(SIGKILL, pidList, tenantCode);
             if (forceKillSuccess) {
                 log.info("Successfully killed process tree by SIGKILL, processId: {}", processId);
             } else {
@@ -146,8 +158,28 @@ public final class ProcessUtils {
             return forceKillSuccess;
 
         } catch (Exception e) {
-            log.error("Kill task instance error, processId: {}", request.getProcessId(), e);
+            log.error("Kill task instance error, processId: {}", processId, e);
             return false;
+        }
+    }
+
+    /**
+     * Get the process id of a process which was started by this JVM.
+     *
+     * @param process the process, may be null
+     * @return the process id, or 0 when it cannot be determined
+     */
+    public static int getProcessId(Process process) {
+        if (process == null) {
+            return 0;
+        }
+        try {
+            Field field = process.getClass().getDeclaredField(TaskConstants.PID);
+            field.setAccessible(true);
+            return field.getInt(process);
+        } catch (Exception e) {
+            log.error("Get process id failed", e);
+            return 0;
         }
     }
 

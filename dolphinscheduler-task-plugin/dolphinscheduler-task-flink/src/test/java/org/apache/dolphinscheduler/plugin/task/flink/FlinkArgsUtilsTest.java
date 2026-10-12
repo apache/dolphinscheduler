@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -29,8 +31,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 public class FlinkArgsUtilsTest {
 
@@ -262,6 +267,26 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsKeepsQuotesInsideTokens() {
+        // the quote does not start the token, the value with a space stays in the same token
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-Dkubernetes.config.file=\"/opt/flink configs/kube.yaml\" -Dparallelism.default=4");
+
+        Assertions.assertEquals(
+                Collections.singletonList("-Dkubernetes.config.file=\"/opt/flink configs/kube.yaml\""), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsKeepsSeparatedQuotedValues() {
+        // the value of a separated -D option may contain a quoted segment with a space as well
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-D kubernetes.config.file=\"/opt/flink configs/kube.yaml\"");
+
+        Assertions.assertEquals(
+                Arrays.asList("-D", "kubernetes.config.file=\"/opt/flink configs/kube.yaml\""), options);
+    }
+
+    @Test
     public void testExtractClusterConnectionOptionsWithoutOthers() {
         Assertions.assertTrue(FlinkArgsUtils.extractClusterConnectionOptions(null).isEmpty());
         Assertions.assertTrue(FlinkArgsUtils.extractClusterConnectionOptions("   ").isEmpty());
@@ -328,5 +353,88 @@ public class FlinkArgsUtilsTest {
         Assertions.assertFalse(success);
         // the command is killed when the timeout expires, it does not wait for the command to finish
         Assertions.assertTrue(elapsed < 20_000, "the command must be killed on timeout, elapsed: " + elapsed + "ms");
+    }
+
+    @Test
+    public void testExecuteCommandTimeoutTerminatesTheProcessTree() throws Exception {
+        // the started process is the bootstrap shell, the flink CLI runs as its descendant, so the
+        // process tree has to be terminated instead of only the bootstrap process
+        Path executePath = tempDir.resolve("tree-execute");
+        Files.createDirectories(executePath);
+        Path flinkHome = tempDir.resolve("flink-tree");
+        Files.createDirectories(flinkHome.resolve("bin"));
+        Path flinkCommand = flinkHome.resolve("bin/flink");
+        Files.write(flinkCommand, Arrays.asList("#!/bin/bash", "sleep 30"));
+        Assertions.assertTrue(flinkCommand.toFile().setExecutable(true));
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(16789);
+        taskExecutionContext.setTaskAppId("16789");
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTenantCode("");
+        taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
+        taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
+
+        try (MockedStatic<ProcessUtils> processUtils = Mockito.mockStatic(ProcessUtils.class)) {
+            processUtils.when(() -> ProcessUtils.getProcessId(Mockito.any())).thenReturn(4321);
+            processUtils.when(() -> ProcessUtils.kill(4321, "")).thenReturn(true);
+
+            boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
+                    FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList()),
+                    false, 1);
+
+            Assertions.assertFalse(success);
+            processUtils.verify(() -> ProcessUtils.kill(4321, ""));
+        }
+    }
+
+    @Test
+    public void testExecuteCommandTimeoutStopsTheDescendantProcess() throws Exception {
+        Assumptions.assumeTrue(canEnumerateProcessTree(),
+                "terminating the process tree needs a process tree listing like pstree");
+
+        Path executePath = tempDir.resolve("descendant-execute");
+        Files.createDirectories(executePath);
+        Path flinkHome = tempDir.resolve("flink-descendant");
+        Files.createDirectories(flinkHome.resolve("bin"));
+        Path descendantPidFile = tempDir.resolve("descendant.pid");
+        Path flinkCommand = flinkHome.resolve("bin/flink");
+        // the background process is the descendant which must not outlive the timed out command
+        Files.write(flinkCommand, Arrays.asList(
+                "#!/bin/bash",
+                "sleep 300 &",
+                "echo $! > " + descendantPidFile,
+                "wait"));
+        Assertions.assertTrue(flinkCommand.toFile().setExecutable(true));
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(16789);
+        taskExecutionContext.setTaskAppId("16789");
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTenantCode("");
+        taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
+        taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
+
+        boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList()),
+                false, 1);
+
+        Assertions.assertFalse(success);
+        int descendantPid = Integer
+                .parseInt(new String(Files.readAllBytes(descendantPidFile), StandardCharsets.UTF_8).trim());
+        Assertions.assertFalse(isProcessAlive(descendantPid),
+                "the descendant process " + descendantPid + " must be terminated with the command");
+    }
+
+    private static boolean canEnumerateProcessTree() {
+        try {
+            return !ProcessUtils.getPidList(OSUtils.getProcessID()).isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    private static boolean isProcessAlive(int processId) throws Exception {
+        return new ProcessBuilder("/bin/kill", "-0", String.valueOf(processId)).start().waitFor() == 0;
     }
 }

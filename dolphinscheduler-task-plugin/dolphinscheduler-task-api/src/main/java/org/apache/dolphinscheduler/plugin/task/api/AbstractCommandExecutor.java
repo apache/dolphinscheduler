@@ -39,7 +39,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -266,18 +265,7 @@ public abstract class AbstractCommandExecutor {
      * @return process id
      */
     private int getProcessId(Process process) {
-        int processId = 0;
-
-        try {
-            Field f = process.getClass().getDeclaredField(TaskConstants.PID);
-            f.setAccessible(true);
-
-            processId = f.getInt(process);
-        } catch (Exception e) {
-            log.error("Get task pid failed", e);
-        }
-
-        return processId;
+        return ProcessUtils.getProcessId(process);
     }
 
 }
