@@ -46,6 +46,8 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -219,8 +221,7 @@ class WorkflowSeaTunnelE2ETest {
     private void createEngineWorkflow(String workflow, String name, String executionType, String script,
                                       String predecessor, String predecessorScript) {
         WorkflowForm form = definitions().createWorkflow();
-        form.<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL, 100, 100)
-                .script(predecessorScript).name(predecessor).submit();
+        addShellTask(form, predecessorScript).name(predecessor).submit();
         browser.findElement(By.cssSelector(".task-cate-di .n-collapse-item__header")).click();
         form.<SeaTunnelTaskForm>addTask(WorkflowForm.TaskType.SEATUNNEL, 350, 100)
                 .executionType(executionType).script(script).deployMode("local")
@@ -231,10 +232,28 @@ class WorkflowSeaTunnelE2ETest {
 
     private void createShellWorkflow(String workflow, String name, String script) {
         WorkflowForm form = definitions().createWorkflow();
-        form.<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL, 100, 100)
-                .script(script).name(name).submit();
+        addShellTask(form, script).name(name).submit();
         form.submit().name(workflow).submit();
         definitions().publish(workflow).run(workflow).submit();
+    }
+
+    private ShellTaskForm addShellTask(WorkflowForm form, String script) {
+        ShellTaskForm task = form.addTask(WorkflowForm.TaskType.SHELL, 100, 100);
+        WebElement input = WebDriverWaitFactory.createWebDriverWait(browser)
+                .until(ExpectedConditions
+                        .elementToBeClickable(By.cssSelector(".n-modal .monaco-editor textarea.inputarea")));
+        Keys modifier = browser.getCapabilities().getPlatformName().is(Platform.MAC) ? Keys.COMMAND : Keys.CONTROL;
+        input.sendKeys(Keys.chord(modifier, "a"), Keys.BACK_SPACE);
+        String[] lines = script.split("\n", -1);
+        for (int i = 0; i < lines.length; i++) {
+            input.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END), Keys.DELETE, lines[i],
+                    Keys.chord(Keys.SHIFT, Keys.END), Keys.DELETE);
+            if (i + 1 < lines.length) {
+                // Insert a line without accepting Monaco's word suggestions.
+                input.sendKeys(Keys.chord(modifier, Keys.ENTER));
+            }
+        }
+        return task;
     }
 
     private void waitForInstance(TaskInstanceTab instances, String name, boolean stream,
