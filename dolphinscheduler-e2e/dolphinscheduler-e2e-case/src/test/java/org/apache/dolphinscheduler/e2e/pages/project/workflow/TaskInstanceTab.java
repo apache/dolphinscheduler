@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -76,6 +77,7 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
 
     private void clickOperation(String name, boolean stream, int index) {
         WebDriverWaitFactory.createWebDriverWait(driver).ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementClickInterceptedException.class)
                 .until(unused -> {
                     WebElement button = (stream ? streamInstances() : instances()).stream()
                             .filter(row -> row.taskInstanceName().equals(name))
