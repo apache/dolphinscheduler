@@ -259,23 +259,30 @@ class WorkflowSeaTunnelE2ETest {
 
     private void waitForInstance(TaskInstanceTab instances, String name, boolean stream,
                                  Predicate<TaskInstanceTab.Row> state) {
+        boolean[] refreshPending = {false};
         WebDriverWaitFactory.createWebDriverWait(browser, Duration.ofSeconds(120))
                 .ignoring(StaleElementReferenceException.class)
                 .withMessage("Expected task state was not reached: " + name)
                 .until(unused -> {
-                    instances.refresh();
+                    if (!refreshPending[0]) {
+                        instances.refresh();
+                        refreshPending[0] = true;
+                    }
                     List<TaskInstanceTab.Row> rows = stream ? instances.streamInstances() : instances.instances();
                     TaskInstanceTab.Row instance = rows.stream()
                             .filter(row -> row.taskInstanceName().equals(name)).findFirst().orElse(null);
-                    if (instance == null) {
-                        return false;
+                    if (instance != null) {
+                        assertThat(instance.dryRun()).isEqualTo("NO");
+                        assertThat(instance.isFailed()).as("Task failed: %s", name).isFalse();
+                        if (name.startsWith("seatunnel-")) {
+                            assertThat(instance.taskType()).isEqualTo("SEATUNNEL");
+                        }
                     }
-                    assertThat(instance.dryRun()).isEqualTo("NO");
-                    assertThat(instance.isFailed()).as("Task failed: %s", name).isFalse();
-                    if (name.startsWith("seatunnel-")) {
-                        assertThat(instance.taskType()).isEqualTo("SEATUNNEL");
-                    }
-                    return state.test(instance);
+                    boolean reachedState = instance != null && state.test(instance);
+                    refreshPending[0] = browser.findElements(By.cssSelector(".n-tab-pane .n-data-table"))
+                            .stream().filter(WebElement::isDisplayed)
+                            .anyMatch(table -> table.getDomAttribute("class").contains("n-data-table--loading"));
+                    return reachedState && !refreshPending[0];
                 });
     }
 
