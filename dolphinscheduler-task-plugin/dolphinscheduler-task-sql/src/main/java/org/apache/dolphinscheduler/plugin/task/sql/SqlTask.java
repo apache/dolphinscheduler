@@ -103,6 +103,12 @@ public class SqlTask extends AbstractTask {
      */
     private static final int ALERT_MAX_ROW_VALUE_LENGTH = 100;
 
+    /**
+     * max serialized UTF-8 bytes of the alert content, kept below the 65535-byte capacity
+     * of the MySQL TEXT column that stores t_ds_alert.content
+     */
+    private static final int ALERT_MAX_CONTENT_BYTES = 60000;
+
     private final SQLTaskExecutionContext sqlTaskExecutionContext;
 
     private final DbType dbType;
@@ -358,8 +364,11 @@ public class SqlTask extends AbstractTask {
 
     /**
      * Build a size-limited alert content that stays a valid JSON array.
-     * Rows beyond {@link #ALERT_MAX_ROWS} are dropped and a trailing marker object is appended;
-     * string field values longer than {@link #ALERT_MAX_ROW_VALUE_LENGTH} are truncated with an ellipsis.
+     * At most {@link #ALERT_MAX_ROWS} rows are kept; string field values longer than
+     * {@link #ALERT_MAX_ROW_VALUE_LENGTH} are truncated with an ellipsis. The serialized
+     * content is bounded by {@link #ALERT_MAX_CONTENT_BYTES} UTF-8 bytes: rows are dropped
+     * from the tail until it fits; a row that alone exceeds the budget is replaced by the
+     * omission marker.
      */
     private String limitAlertContent(ArrayNode resultJSONArray) {
         int totalRows = resultJSONArray.size();
@@ -368,12 +377,38 @@ public class SqlTask extends AbstractTask {
         for (int i = 0; i < rowsToKeep; i++) {
             limited.add(limitRowValues(resultJSONArray.get(i)));
         }
-        if (totalRows > ALERT_MAX_ROWS) {
-            ObjectNode omitted = JSONUtils.createObjectNode();
-            omitted.put("...", (totalRows - ALERT_MAX_ROWS) + " more rows omitted");
-            limited.add(omitted);
+
+        int omittedRows = totalRows - rowsToKeep;
+        while (true) {
+            if (omittedRows > 0) {
+                limited.add(createOmissionMarker(omittedRows));
+            }
+            String content = JSONUtils.toJsonString(limited);
+            if (content.getBytes(StandardCharsets.UTF_8).length <= ALERT_MAX_CONTENT_BYTES) {
+                return content;
+            }
+            if (omittedRows > 0) {
+                limited.remove(limited.size() - 1);
+            }
+            if (limited.isEmpty()) {
+                // Even a lone marker exceeds the budget (pathological budget); return the minimal notice.
+                return JSONUtils.toJsonString(createOmissionMarkerArray(totalRows));
+            }
+            limited.remove(limited.size() - 1);
+            omittedRows++;
         }
-        return JSONUtils.toJsonString(limited);
+    }
+
+    private ObjectNode createOmissionMarker(int omittedRows) {
+        ObjectNode omitted = JSONUtils.createObjectNode();
+        omitted.put("...", omittedRows + " more rows omitted");
+        return omitted;
+    }
+
+    private ArrayNode createOmissionMarkerArray(int totalRows) {
+        ArrayNode markerArray = JSONUtils.createArrayNode();
+        markerArray.add(createOmissionMarker(totalRows));
+        return markerArray;
     }
 
     private JsonNode limitRowValues(JsonNode row) {
@@ -387,12 +422,22 @@ public class SqlTask extends AbstractTask {
             JsonNode value = entry.getValue();
             if (value.isTextual() && value.textValue().length() > ALERT_MAX_ROW_VALUE_LENGTH) {
                 limitedRow.put(entry.getKey(),
-                        value.textValue().substring(0, ALERT_MAX_ROW_VALUE_LENGTH) + "...");
+                        truncateAtCodePointBoundary(value.textValue(), ALERT_MAX_ROW_VALUE_LENGTH) + "...");
             } else {
                 limitedRow.set(entry.getKey(), value);
             }
         }
         return limitedRow;
+    }
+
+    /**
+     * Cut a string to at most maxChars characters without splitting a surrogate pair.
+     */
+    private String truncateAtCodePointBoundary(String text, int maxChars) {
+        if (text.codePointCount(0, text.length()) <= maxChars) {
+            return text;
+        }
+        return text.substring(0, text.offsetByCodePoints(0, maxChars));
     }
 
     private String executeQuery(Connection connection, SqlBinds sqlBinds, String handlerType) throws Exception {

@@ -60,5 +60,5 @@ This document records the incompatible updates between each version. You need to
 ## 3.5.0
 
 * `AlertSender#getAlertData` now explicitly rejects a null `alertType` by throwing `IllegalArgumentException` with an error log, instead of throwing a raw `NullPointerException`. During a rolling upgrade, **the Alert Server must be upgraded before Master/Worker**, otherwise an old Alert Server cannot recognize newly introduced `alert_type` enum values (e.g. `TASK_RESULT`) and alert delivery will fail. See the [upgrade guide](upgrade.md#rolling-upgrade-order) for details.([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
-* SQL task-result alert content is size-limited: at most 30 rows are kept, string field values longer than 100 characters are truncated with an ellipsis, and rows beyond 30 are represented by an omission marker. ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
+* SQL task-result alert content is size-limited: at most 30 rows are kept, string field values longer than 100 characters are truncated with an ellipsis, and the serialized content is bounded to 60000 UTF-8 bytes (below the 65535-byte capacity of the MySQL TEXT column); rows beyond the budget are represented by an omission marker. ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 

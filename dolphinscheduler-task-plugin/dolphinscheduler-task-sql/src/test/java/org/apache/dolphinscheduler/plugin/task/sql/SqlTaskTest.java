@@ -645,6 +645,115 @@ class SqlTaskTest {
         Assertions.assertTrue(payload.endsWith("..."));
     }
 
+    @Test
+    void testPrepareTaskResultAlertBoundsTotalBytesWithWideRows() throws Exception {
+        int maxRows = readStaticIntConstant("ALERT_MAX_ROWS");
+        int maxLen = readStaticIntConstant("ALERT_MAX_ROW_VALUE_LENGTH");
+        int budget = readStaticIntConstant("ALERT_MAX_CONTENT_BYTES");
+
+        // Wide rows: enough columns that keeping all rows overflows the byte budget
+        // even though every single value stays under the per-value character limit.
+        int columns = budget / (maxRows * (maxLen - 1)) + 5;
+        int totalRows = maxRows;
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        for (int i = 0; i < totalRows; i++) {
+            ObjectNode row = JSONUtils.createObjectNode();
+            for (int c = 0; c < columns; c++) {
+                row.put("col_" + c, repeatChar('v', maxLen - 1));
+            }
+            resultArray.add(row);
+        }
+
+        TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "wide rows test", 1);
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        int contentBytes = alertInfo.getContent().getBytes(StandardCharsets.UTF_8).length;
+        Assertions.assertTrue(contentBytes <= budget,
+                "serialized alert content must stay within the byte budget: " + contentBytes);
+
+        ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
+        int keptRows = contentArray.size() - 1;
+        Assertions.assertTrue(keptRows < totalRows, "rows must be dropped from the tail to fit the budget");
+        Assertions.assertTrue(contentArray.get(0).has("col_0"));
+        JsonNode last = contentArray.get(contentArray.size() - 1);
+        Assertions.assertTrue(last.has("..."));
+        Assertions.assertEquals((totalRows - keptRows) + " more rows omitted", last.get("...").asText());
+    }
+
+    @Test
+    void testPrepareTaskResultAlertBoundsTotalBytesWithMultibyteText() throws Exception {
+        int maxRows = readStaticIntConstant("ALERT_MAX_ROWS");
+        int maxLen = readStaticIntConstant("ALERT_MAX_ROW_VALUE_LENGTH");
+        int budget = readStaticIntConstant("ALERT_MAX_CONTENT_BYTES");
+
+        // Each character is 3 UTF-8 bytes, so rows within the character limits still
+        // overflow the byte budget and rows must be dropped from the tail.
+        char cjk = '\u4e2d';
+        int columns = budget / (maxRows * 3 * maxLen) + 5;
+        int totalRows = maxRows;
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        for (int i = 0; i < totalRows; i++) {
+            ObjectNode row = JSONUtils.createObjectNode();
+            for (int c = 0; c < columns; c++) {
+                row.put("col_" + c, repeatChar(cjk, maxLen));
+            }
+            resultArray.add(row);
+        }
+
+        TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "multibyte test", 1);
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        int contentBytes = alertInfo.getContent().getBytes(StandardCharsets.UTF_8).length;
+        Assertions.assertTrue(contentBytes <= budget,
+                "multibyte alert content must stay within the byte budget: " + contentBytes);
+
+        ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
+        int keptRows = contentArray.size() - 1;
+        Assertions.assertTrue(keptRows < totalRows, "rows must be dropped from the tail to fit the budget");
+        // Kept values are exactly at the character limit, so they must stay complete.
+        String firstValue = contentArray.get(0).get("col_0").asText();
+        Assertions.assertEquals(repeatChar(cjk, maxLen), firstValue);
+        JsonNode last = contentArray.get(contentArray.size() - 1);
+        Assertions.assertTrue(last.has("..."));
+        Assertions.assertEquals((totalRows - keptRows) + " more rows omitted", last.get("...").asText());
+    }
+
+    @Test
+    void testPrepareTaskResultAlertReplacesRowExceedingByteBudgetAlone() throws Exception {
+        int budget = readStaticIntConstant("ALERT_MAX_CONTENT_BYTES");
+
+        // Nested values are not truncated per-field, so a single row can exceed the
+        // budget alone; it must be replaced by the omission marker.
+        ObjectNode row = JSONUtils.createObjectNode();
+        row.put("id", "1");
+        ObjectNode payload = JSONUtils.createObjectNode();
+        payload.put("blob", repeatChar('n', budget * 2));
+        row.set("payload", payload);
+
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        resultArray.add(row);
+
+        TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "huge nested value test", 1);
+
+        TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+        int contentBytes = alertInfo.getContent().getBytes(StandardCharsets.UTF_8).length;
+        Assertions.assertTrue(contentBytes <= budget);
+
+        ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
+        Assertions.assertEquals(1, contentArray.size());
+        JsonNode only = contentArray.get(0);
+        Assertions.assertTrue(only.has("..."));
+        Assertions.assertEquals("1 more rows omitted", only.get("...").asText());
+    }
+
+    private String repeatChar(char c, int count) {
+        StringBuilder builder = new StringBuilder(count);
+        for (int i = 0; i < count; i++) {
+            builder.append(c);
+        }
+        return builder.toString();
+    }
+
     private int readStaticIntConstant(String name) throws Exception {
         Field field = SqlTask.class.getDeclaredField(name);
         field.setAccessible(true);
