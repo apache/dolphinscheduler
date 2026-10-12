@@ -76,6 +76,7 @@ public class FlinkParametersTest {
     public void checkParametersShouldPassWhenSqlGatewayInlineScriptIsPresent() {
         FlinkParameters parameters = new FlinkParameters();
         parameters.setSqlSubmitType(FlinkSqlSubmitType.SQL_GATEWAY);
+        parameters.setProgramType(ProgramType.SQL);
         parameters.setFlinkJdbcUrl("jdbc:flink://localhost:8083");
         parameters.setRawScriptType(org.apache.dolphinscheduler.plugin.task.api.enums.SqlSourceType.SCRIPT);
         parameters.setRawScript("SELECT 1");
@@ -105,9 +106,19 @@ public class FlinkParametersTest {
         Assertions.assertEquals("flink", properties.getProperty("user"));
     }
 
+    @Test
+    public void isSqlGatewayShouldRejectGatewayModeWhenProgramTypeIsNotSql() {
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setSqlSubmitType(FlinkSqlSubmitType.SQL_GATEWAY);
+        parameters.setProgramType(ProgramType.JAVA);
+        parameters.setFlinkJdbcUrl("jdbc:flink://localhost:8083");
+        Assertions.assertFalse(parameters.isSqlGateway());
+    }
+
     private FlinkParameters gatewayFileParameters() {
         FlinkParameters parameters = new FlinkParameters();
         parameters.setSqlSubmitType(FlinkSqlSubmitType.SQL_GATEWAY);
+        parameters.setProgramType(ProgramType.SQL);
         parameters.setFlinkJdbcUrl("jdbc:flink://localhost:8083");
         parameters.setRawScriptType(org.apache.dolphinscheduler.plugin.task.api.enums.SqlSourceType.FILE);
         ResourceInfo mainResource = new ResourceInfo();
