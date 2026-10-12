@@ -21,7 +21,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -37,26 +36,21 @@ import org.apache.dolphinscheduler.server.master.engine.executor.plugin.dependen
 import org.apache.dolphinscheduler.server.master.engine.executor.plugin.dependent.DependentTaskTracker;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorState;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedConstruction;
 
 class LogicTaskExecutorTest {
 
-    private static final int ASYNC_TEST_TIMEOUT_SECONDS = 5;
+    private static final long FRAMEWORK_CHECK_INTERVAL_MILLIS = TimeUnit.SECONDS.toMillis(10);
 
     private MockedConstruction<DependentTaskTracker> dependentTaskTrackers;
 
@@ -73,8 +67,9 @@ class LogicTaskExecutorTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {"null, 10000", "1, 10000", "5, 10000", "10, 10000", "20, 20000"}, nullValues = "null")
-    void dependentTaskUsesConfiguredCheckInterval(Integer checkInterval, long expectedInterval) throws Exception {
+    @NullSource
+    @ValueSource(ints = {1, 5, 10, 20})
+    void frameworkUsesFixedCheckInterval(Integer checkInterval) throws Exception {
         LogicTaskExecutor taskExecutor = createDependentTaskExecutor(checkInterval);
 
         assertThat(taskExecutor.getRemainingTrackDelay()).isZero();
@@ -83,18 +78,20 @@ class LogicTaskExecutorTest {
         long remainingDelay = taskExecutor.getRemainingTrackDelay();
         long afterTrack = System.currentTimeMillis();
 
-        assertThat(remainingDelay).isBetween(expectedInterval - (afterTrack - beforeTrack), expectedInterval);
+        assertThat(remainingDelay).isBetween(
+                FRAMEWORK_CHECK_INTERVAL_MILLIS - (afterTrack - beforeTrack), FRAMEWORK_CHECK_INTERVAL_MILLIS);
         verify(dependentTaskTrackers.constructed().get(0)).getDependentTaskStatus();
     }
 
     @Test
-    void pauseDoesNotWaitForDependentCheckInterval() throws Exception {
+    void pauseIsReportedOnNextFrameworkCheck() throws Exception {
         LogicTaskExecutor taskExecutor = createDependentTaskExecutor(20);
         taskExecutor.trackTaskExecutorState();
 
         taskExecutor.pause();
 
-        assertThat(taskExecutor.getRemainingTrackDelay()).isZero();
+        assertThat(taskExecutor.getRemainingTrackDelay()).isPositive()
+                .isLessThanOrEqualTo(FRAMEWORK_CHECK_INTERVAL_MILLIS);
         assertThat(taskExecutor.trackTaskExecutorState()).isEqualTo(TaskExecutorState.PAUSED);
         DependentTaskTracker tracker = dependentTaskTrackers.constructed().get(0);
         verify(tracker).getDependentTaskStatus();
@@ -102,105 +99,18 @@ class LogicTaskExecutorTest {
     }
 
     @Test
-    void killDoesNotWaitForDependentCheckInterval() throws Exception {
+    void killIsReportedOnNextFrameworkCheck() throws Exception {
         LogicTaskExecutor taskExecutor = createDependentTaskExecutor(20);
         taskExecutor.trackTaskExecutorState();
 
         taskExecutor.kill();
 
-        assertThat(taskExecutor.getRemainingTrackDelay()).isZero();
+        assertThat(taskExecutor.getRemainingTrackDelay()).isPositive()
+                .isLessThanOrEqualTo(FRAMEWORK_CHECK_INTERVAL_MILLIS);
         assertThat(taskExecutor.trackTaskExecutorState()).isEqualTo(TaskExecutorState.KILLED);
         DependentTaskTracker tracker = dependentTaskTrackers.constructed().get(0);
         verify(tracker).getDependentTaskStatus();
         verifyNoMoreInteractions(tracker);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"PAUSED, RUNNING_EXECUTION", "PAUSED, SUCCESS", "PAUSED, FAILURE",
-            "KILLED, RUNNING_EXECUTION", "KILLED, SUCCESS", "KILLED, FAILURE"})
-    void dependentCheckDoesNotOverwriteConcurrentControlState(TaskExecutorState expectedState,
-                                                              TaskExecutionStatus dependentState) throws Exception {
-        LogicTaskExecutor taskExecutor = createDependentTaskExecutor(20);
-        DependentTaskTracker tracker = dependentTaskTrackers.constructed().get(0);
-        CountDownLatch checkStarted = new CountDownLatch(1);
-        CountDownLatch finishCheck = new CountDownLatch(1);
-        when(tracker.getDependentTaskStatus()).thenAnswer(invocation -> {
-            checkStarted.countDown();
-            assertThat(finishCheck.await(ASYNC_TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
-            return dependentState;
-        });
-
-        ExecutorService stateTracker = Executors.newSingleThreadExecutor();
-        try {
-            Future<TaskExecutorState> trackedState = stateTracker.submit(taskExecutor::trackTaskExecutorState);
-            assertThat(checkStarted.await(ASYNC_TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
-
-            controlTaskExecutor(taskExecutor, expectedState);
-            assertThat(taskExecutor.getRemainingTrackDelay()).isZero();
-            finishCheck.countDown();
-
-            assertThat(trackedState.get(ASYNC_TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)).isEqualTo(expectedState);
-            assertThat(taskExecutor.trackTaskExecutorState()).isEqualTo(expectedState);
-            verify(tracker).getDependentTaskStatus();
-            verifyNoMoreInteractions(tracker);
-        } finally {
-            finishCheck.countDown();
-            stateTracker.shutdownNow();
-            assertThat(stateTracker.awaitTermination(ASYNC_TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
-        }
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = TaskExecutorState.class, names = {"PAUSED", "KILLED"})
-    void controlDuringStateCheckRequestsOneAdditionalCheck(TaskExecutorState controlState) throws Exception {
-        ILogicTask<? extends AbstractParameters> logicTask = mock(ILogicTask.class);
-        when(logicTask.getTaskExecutionStateCheckInterval()).thenReturn(Duration.ofSeconds(20));
-        CountDownLatch checkStarted = new CountDownLatch(1);
-        CountDownLatch finishCheck = new CountDownLatch(1);
-        when(logicTask.getTaskExecutionState()).thenAnswer(invocation -> {
-            checkStarted.countDown();
-            assertThat(finishCheck.await(ASYNC_TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
-            return TaskExecutionStatus.RUNNING_EXECUTION;
-        });
-
-        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
-        taskExecutionContext.setTaskType("SUB_WORKFLOW");
-        taskExecutionContext.setTaskName("sub_workflow");
-        taskExecutionContext.setDryRun(Flag.NO.getCode());
-        LogicTaskExecutor taskExecutor = createTaskExecutor(taskExecutionContext, logicTask);
-
-        ExecutorService stateTracker = Executors.newSingleThreadExecutor();
-        try {
-            Future<TaskExecutorState> trackedState = stateTracker.submit(taskExecutor::trackTaskExecutorState);
-            assertThat(checkStarted.await(ASYNC_TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
-
-            controlTaskExecutor(taskExecutor, controlState);
-            finishCheck.countDown();
-
-            assertThat(trackedState.get(ASYNC_TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS))
-                    .isEqualTo(TaskExecutorState.RUNNING);
-            assertThat(taskExecutor.getRemainingTrackDelay()).isZero();
-
-            long beforeTrack = System.currentTimeMillis();
-            assertThat(taskExecutor.trackTaskExecutorState()).isEqualTo(TaskExecutorState.RUNNING);
-            long remainingDelay = taskExecutor.getRemainingTrackDelay();
-            long afterTrack = System.currentTimeMillis();
-            long expectedInterval = Duration.ofSeconds(20).toMillis();
-            assertThat(remainingDelay).isBetween(expectedInterval - (afterTrack - beforeTrack), expectedInterval);
-            verify(logicTask, times(2)).getTaskExecutionState();
-        } finally {
-            finishCheck.countDown();
-            stateTracker.shutdownNow();
-            assertThat(stateTracker.awaitTermination(ASYNC_TEST_TIMEOUT_SECONDS, TimeUnit.SECONDS)).isTrue();
-        }
-    }
-
-    private void controlTaskExecutor(LogicTaskExecutor taskExecutor, TaskExecutorState controlState) {
-        if (controlState == TaskExecutorState.PAUSED) {
-            taskExecutor.pause();
-        } else {
-            taskExecutor.kill();
-        }
     }
 
     private LogicTaskExecutor createDependentTaskExecutor(Integer checkInterval) throws Exception {

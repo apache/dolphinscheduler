@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.task.executor.eventbus.TaskExecutorEventBus;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorStartedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorRuntimeException;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import lombok.SneakyThrows;
@@ -35,9 +34,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractTaskExecutor implements ITaskExecutor {
 
-    private long latestStateTrackTime;
+    private static final long DEFAULT_TRACK_INTERVAL = 10_000;
 
-    private final AtomicBoolean stateTrackRequested = new AtomicBoolean();
+    private long latestStateTrackTime;
 
     private boolean startFlag;
 
@@ -89,8 +88,6 @@ public abstract class AbstractTaskExecutor implements ITaskExecutor {
 
     @Override
     public TaskExecutorState trackTaskExecutorState() {
-        // Consume before polling so requests made during the check remain pending.
-        stateTrackRequested.getAndSet(false);
         final TaskExecutorState state = taskExecutorState.get();
         if (state.isFinalState()) {
             return state;
@@ -102,25 +99,10 @@ public abstract class AbstractTaskExecutor implements ITaskExecutor {
 
     @Override
     public long getRemainingTrackDelay() {
-        final long stateTrackTime = latestStateTrackTime;
-        if (stateTrackRequested.get() || stateTrackTime == 0) {
+        if (latestStateTrackTime == 0) {
             return 0;
         }
-        return stateTrackTime + getStateTrackInterval() - System.currentTimeMillis();
-    }
-
-    /**
-     * Get the interval between task state checks in milliseconds.
-     */
-    protected long getStateTrackInterval() {
-        return DEFAULT_STATE_TRACK_INTERVAL.toMillis();
-    }
-
-    /**
-     * Request an immediate state check without changing the periodic tracking timestamp.
-     */
-    protected void requestStateTrack() {
-        stateTrackRequested.set(true);
+        return latestStateTrackTime + DEFAULT_TRACK_INTERVAL - System.currentTimeMillis();
     }
 
     @Override

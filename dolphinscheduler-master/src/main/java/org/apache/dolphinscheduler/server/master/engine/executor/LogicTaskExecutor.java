@@ -24,15 +24,11 @@ import org.apache.dolphinscheduler.task.executor.AbstractTaskExecutor;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorState;
 import org.apache.dolphinscheduler.task.executor.TaskExecutorStateMappings;
 
-import java.util.concurrent.TimeUnit;
-
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class LogicTaskExecutor extends AbstractTaskExecutor {
-
-    private static final long MIN_STATE_TRACK_INTERVAL_MILLIS = TimeUnit.SECONDS.toMillis(10);
 
     private ILogicTask<? extends AbstractParameters> logicTask;
 
@@ -46,11 +42,6 @@ public class LogicTaskExecutor extends AbstractTaskExecutor {
     @Override
     protected TaskExecutorState doTrackTaskPluginStatus() {
         return TaskExecutorStateMappings.mapState(logicTask.getTaskExecutionState());
-    }
-
-    @Override
-    protected long getStateTrackInterval() {
-        return Math.max(logicTask.getTaskExecutionStateCheckInterval().toMillis(), MIN_STATE_TRACK_INTERVAL_MILLIS);
     }
 
     @SneakyThrows
@@ -75,7 +66,6 @@ public class LogicTaskExecutor extends AbstractTaskExecutor {
         // if the status is initialized, then we can directly change to paused
         if (logicTask != null) {
             logicTask.pause();
-            requestStateTrack();
         }
     }
 
@@ -84,7 +74,6 @@ public class LogicTaskExecutor extends AbstractTaskExecutor {
     public void kill() {
         if (logicTask != null) {
             logicTask.kill();
-            requestStateTrack();
         }
     }
 
