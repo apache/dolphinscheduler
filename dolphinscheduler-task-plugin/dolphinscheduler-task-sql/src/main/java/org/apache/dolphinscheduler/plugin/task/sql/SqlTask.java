@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.sql;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourceClientProvider;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourcePluginManager;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -94,20 +96,32 @@ public class SqlTask extends AbstractTask {
     private static final int QUERY_LIMIT = 10000;
 
     /**
-     * max rows kept in the task-result alert content; rows beyond this are replaced by an omission marker
+     * default max rows kept in the task-result alert content; rows beyond this are replaced by an omission marker,
+     * overridable via the sql.task.alert.max.rows property in common.properties
      */
-    private static final int ALERT_MAX_ROWS = 30;
+    private static final int DEFAULT_ALERT_MAX_ROWS = 30;
 
     /**
-     * max length of a single string field value kept in the alert content; longer values are truncated with an ellipsis
+     * default max length of a single string field value kept in the alert content; longer values are truncated
+     * with an ellipsis, overridable via the sql.task.alert.max.row.value.length property in common.properties
      */
-    private static final int ALERT_MAX_ROW_VALUE_LENGTH = 100;
+    private static final int DEFAULT_ALERT_MAX_ROW_VALUE_LENGTH = 100;
 
     /**
-     * max serialized UTF-8 bytes of the alert content, kept below the 65535-byte capacity
-     * of the MySQL TEXT column that stores t_ds_alert.content
+     * default max serialized UTF-8 bytes of the alert content, kept below the 65535-byte capacity
+     * of the MySQL TEXT column that stores t_ds_alert.content, overridable via the
+     * sql.task.alert.max.content.bytes property in common.properties
      */
-    private static final int ALERT_MAX_CONTENT_BYTES = 60000;
+    private static final int DEFAULT_ALERT_MAX_CONTENT_BYTES = 60000;
+
+    private final int alertMaxRows =
+            PropertyUtils.getInt(Constants.SQL_TASK_ALERT_MAX_ROWS, DEFAULT_ALERT_MAX_ROWS);
+
+    private final int alertMaxRowValueLength =
+            PropertyUtils.getInt(Constants.SQL_TASK_ALERT_MAX_ROW_VALUE_LENGTH, DEFAULT_ALERT_MAX_ROW_VALUE_LENGTH);
+
+    private final int alertMaxContentBytes =
+            PropertyUtils.getInt(Constants.SQL_TASK_ALERT_MAX_CONTENT_BYTES, DEFAULT_ALERT_MAX_CONTENT_BYTES);
 
     private final SQLTaskExecutionContext sqlTaskExecutionContext;
 
@@ -364,16 +378,15 @@ public class SqlTask extends AbstractTask {
 
     /**
      * Build a size-limited alert content that stays a valid JSON array.
-     * At most {@link #ALERT_MAX_ROWS} rows are kept; string field values longer than
-     * {@link #ALERT_MAX_ROW_VALUE_LENGTH} are truncated with an ellipsis. The serialized
-     * content is bounded by {@link #ALERT_MAX_CONTENT_BYTES} UTF-8 bytes: rows are dropped
-     * from the tail until it fits; a row that alone exceeds the budget is replaced by the
-     * omission marker.
+     * At most the configured max rows are kept; string field values longer than the configured
+     * max value length are truncated with an ellipsis. The serialized content is bounded by
+     * the configured max UTF-8 bytes: rows are dropped from the tail until it fits; a row that
+     * alone exceeds the budget is replaced by the omission marker.
      */
     private String limitAlertContent(ArrayNode resultJSONArray) {
         int totalRows = resultJSONArray.size();
         ArrayNode limited = JSONUtils.createArrayNode();
-        int rowsToKeep = Math.min(totalRows, ALERT_MAX_ROWS);
+        int rowsToKeep = Math.min(totalRows, alertMaxRows);
         for (int i = 0; i < rowsToKeep; i++) {
             limited.add(limitRowValues(resultJSONArray.get(i)));
         }
@@ -384,7 +397,7 @@ public class SqlTask extends AbstractTask {
                 limited.add(createOmissionMarker(omittedRows));
             }
             String content = JSONUtils.toJsonString(limited);
-            if (content.getBytes(StandardCharsets.UTF_8).length <= ALERT_MAX_CONTENT_BYTES) {
+            if (content.getBytes(StandardCharsets.UTF_8).length <= alertMaxContentBytes) {
                 return content;
             }
             if (omittedRows > 0) {
@@ -420,9 +433,9 @@ public class SqlTask extends AbstractTask {
         while (fields.hasNext()) {
             Map.Entry<String, JsonNode> entry = fields.next();
             JsonNode value = entry.getValue();
-            if (value.isTextual() && value.textValue().length() > ALERT_MAX_ROW_VALUE_LENGTH) {
+            if (value.isTextual() && value.textValue().length() > alertMaxRowValueLength) {
                 limitedRow.put(entry.getKey(),
-                        truncateAtCodePointBoundary(value.textValue(), ALERT_MAX_ROW_VALUE_LENGTH) + "...");
+                        truncateAtCodePointBoundary(value.textValue(), alertMaxRowValueLength) + "...");
             } else {
                 limitedRow.set(entry.getKey(), value);
             }

@@ -23,6 +23,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.common.enums.AlertType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -53,6 +54,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -545,7 +548,7 @@ class SqlTaskTest {
 
     @Test
     void testPrepareTaskResultAlertKeepsFullContentRegardlessOfDisplayRows() throws Exception {
-        int totalRows = readStaticIntConstant("ALERT_MAX_ROWS") - 1;
+        int totalRows = readStaticIntConstant("DEFAULT_ALERT_MAX_ROWS") - 1;
         ArrayNode resultArray = JSONUtils.createArrayNode();
         for (int i = 0; i < totalRows; i++) {
             resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
@@ -565,7 +568,7 @@ class SqlTaskTest {
 
     @Test
     void testPrepareTaskResultAlertKeepsFullContentWhenDisplayRowsUnset() throws Exception {
-        int totalRows = readStaticIntConstant("ALERT_MAX_ROWS") - 1;
+        int totalRows = readStaticIntConstant("DEFAULT_ALERT_MAX_ROWS") - 1;
         ArrayNode resultArray = JSONUtils.createArrayNode();
         for (int i = 0; i < totalRows; i++) {
             resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
@@ -607,7 +610,7 @@ class SqlTaskTest {
 
     @Test
     void testPrepareTaskResultAlertTruncatesRowsBeyondMax() throws Exception {
-        int maxRows = readStaticIntConstant("ALERT_MAX_ROWS");
+        int maxRows = readStaticIntConstant("DEFAULT_ALERT_MAX_ROWS");
         int totalRows = maxRows + 10;
         ArrayNode resultArray = JSONUtils.createArrayNode();
         for (int i = 0; i < totalRows; i++) {
@@ -627,7 +630,7 @@ class SqlTaskTest {
 
     @Test
     void testPrepareTaskResultAlertTruncatesLongFieldValue() throws Exception {
-        int maxLen = readStaticIntConstant("ALERT_MAX_ROW_VALUE_LENGTH");
+        int maxLen = readStaticIntConstant("DEFAULT_ALERT_MAX_ROW_VALUE_LENGTH");
         StringBuilder longValue = new StringBuilder();
         for (int i = 0; i < maxLen + 50; i++) {
             longValue.append("x");
@@ -647,9 +650,9 @@ class SqlTaskTest {
 
     @Test
     void testPrepareTaskResultAlertBoundsTotalBytesWithWideRows() throws Exception {
-        int maxRows = readStaticIntConstant("ALERT_MAX_ROWS");
-        int maxLen = readStaticIntConstant("ALERT_MAX_ROW_VALUE_LENGTH");
-        int budget = readStaticIntConstant("ALERT_MAX_CONTENT_BYTES");
+        int maxRows = readStaticIntConstant("DEFAULT_ALERT_MAX_ROWS");
+        int maxLen = readStaticIntConstant("DEFAULT_ALERT_MAX_ROW_VALUE_LENGTH");
+        int budget = readStaticIntConstant("DEFAULT_ALERT_MAX_CONTENT_BYTES");
 
         // Wide rows: enough columns that keeping all rows overflows the byte budget
         // even though every single value stays under the per-value character limit.
@@ -682,9 +685,9 @@ class SqlTaskTest {
 
     @Test
     void testPrepareTaskResultAlertBoundsTotalBytesWithMultibyteText() throws Exception {
-        int maxRows = readStaticIntConstant("ALERT_MAX_ROWS");
-        int maxLen = readStaticIntConstant("ALERT_MAX_ROW_VALUE_LENGTH");
-        int budget = readStaticIntConstant("ALERT_MAX_CONTENT_BYTES");
+        int maxRows = readStaticIntConstant("DEFAULT_ALERT_MAX_ROWS");
+        int maxLen = readStaticIntConstant("DEFAULT_ALERT_MAX_ROW_VALUE_LENGTH");
+        int budget = readStaticIntConstant("DEFAULT_ALERT_MAX_CONTENT_BYTES");
 
         // Each character is 3 UTF-8 bytes, so rows within the character limits still
         // overflow the byte budget and rows must be dropped from the tail.
@@ -720,7 +723,7 @@ class SqlTaskTest {
 
     @Test
     void testPrepareTaskResultAlertReplacesRowExceedingByteBudgetAlone() throws Exception {
-        int budget = readStaticIntConstant("ALERT_MAX_CONTENT_BYTES");
+        int budget = readStaticIntConstant("DEFAULT_ALERT_MAX_CONTENT_BYTES");
 
         // Nested values are not truncated per-field, so a single row can exceed the
         // budget alone; it must be replaced by the omission marker.
@@ -752,6 +755,37 @@ class SqlTaskTest {
             builder.append(c);
         }
         return builder.toString();
+    }
+
+    @Test
+    void testPrepareTaskResultAlertRespectsConfiguredLimits() throws Exception {
+        int configuredMaxRows = 3;
+        int configuredMaxValueLength = 10;
+        int configuredMaxBytes = 60000;
+        int totalRows = 10;
+
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        for (int i = 0; i < totalRows; i++) {
+            resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
+        }
+
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.rows", 30)).thenReturn(configuredMaxRows);
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.row.value.length", 100))
+                    .thenReturn(configuredMaxValueLength);
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.content.bytes", 60000))
+                    .thenReturn(configuredMaxBytes);
+
+            TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "configured limits test", 1);
+
+            TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+            ArrayNode contentArray = JSONUtils.parseArray(alertInfo.getContent());
+            Assertions.assertEquals(configuredMaxRows + 1, contentArray.size());
+            JsonNode last = contentArray.get(contentArray.size() - 1);
+            Assertions.assertTrue(last.has("..."));
+            Assertions.assertEquals((totalRows - configuredMaxRows) + " more rows omitted",
+                    last.get("...").asText());
+        }
     }
 
     private int readStaticIntConstant(String name) throws Exception {
