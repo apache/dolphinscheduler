@@ -39,6 +39,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -306,7 +307,8 @@ class WorkflowSeaTunnelE2ETest {
     }
 
     private WorkflowDefinitionTab definitions() {
-        return project().goToTab(WorkflowDefinitionTab.class);
+        ProjectDetailPage page = project();
+        return withPageLoadTimeout(Duration.ofSeconds(10), () -> page.goToTab(WorkflowDefinitionTab.class));
     }
 
     private TaskInstanceTab taskInstances() {
@@ -352,13 +354,19 @@ class WorkflowSeaTunnelE2ETest {
                 .findFirst().orElseThrow(IllegalStateException::new);
         browser.close();
         browser.switchTo().window(detailWindow);
-        Duration pageLoadTimeout = browser.manage().timeouts().getPageLoadTimeout();
-        Throwable failure = null;
-        try {
-            browser.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
+        return withPageLoadTimeout(Duration.ofSeconds(10), () -> {
             WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.visibilityOfElementLocated(
                     By.cssSelector(".dag-container")));
             return new WorkflowForm(browser);
+        });
+    }
+
+    private <T> T withPageLoadTimeout(Duration timeout, Supplier<T> action) {
+        Duration pageLoadTimeout = browser.manage().timeouts().getPageLoadTimeout();
+        Throwable failure = null;
+        try {
+            browser.manage().timeouts().pageLoadTimeout(timeout);
+            return action.get();
         } catch (RuntimeException | Error error) {
             failure = error;
             throw error;
