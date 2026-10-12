@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.task.executor.eventbus.TaskExecutorEventBus;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorStartedLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorRuntimeException;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import lombok.SneakyThrows;
@@ -34,7 +35,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public abstract class AbstractTaskExecutor implements ITaskExecutor {
 
-    private volatile long latestStateTrackTime;
+    private long latestStateTrackTime;
+
+    private final AtomicBoolean stateTrackRequested = new AtomicBoolean();
 
     private boolean startFlag;
 
@@ -86,6 +89,8 @@ public abstract class AbstractTaskExecutor implements ITaskExecutor {
 
     @Override
     public TaskExecutorState trackTaskExecutorState() {
+        // Consume before polling so requests made during the check remain pending.
+        stateTrackRequested.getAndSet(false);
         final TaskExecutorState state = taskExecutorState.get();
         if (state.isFinalState()) {
             return state;
@@ -98,7 +103,7 @@ public abstract class AbstractTaskExecutor implements ITaskExecutor {
     @Override
     public long getRemainingTrackDelay() {
         final long stateTrackTime = latestStateTrackTime;
-        if (stateTrackTime == 0) {
+        if (stateTrackRequested.get() || stateTrackTime == 0) {
             return 0;
         }
         return stateTrackTime + getStateTrackInterval() - System.currentTimeMillis();
@@ -112,10 +117,10 @@ public abstract class AbstractTaskExecutor implements ITaskExecutor {
     }
 
     /**
-     * Request an immediate state check after a task control operation.
+     * Request an immediate state check without changing the periodic tracking timestamp.
      */
-    protected void resetStateTrackTime() {
-        latestStateTrackTime = 0;
+    protected void requestStateTrack() {
+        stateTrackRequested.set(true);
     }
 
     @Override

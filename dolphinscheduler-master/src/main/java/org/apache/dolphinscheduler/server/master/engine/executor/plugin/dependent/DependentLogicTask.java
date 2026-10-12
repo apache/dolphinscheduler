@@ -74,11 +74,19 @@ public class DependentLogicTask extends AbstractLogicTask<DependentParameters> {
 
     @Override
     public TaskExecutionStatus getTaskExecutionState() {
-        if (isRunning()) {
-            taskExecutionStatus = dependentTaskTracker.getDependentTaskStatus();
+        synchronized (this) {
+            if (!isRunning()) {
+                return taskExecutionStatus;
+            }
+        }
+        final TaskExecutionStatus dependentState = dependentTaskTracker.getDependentTaskStatus();
+        synchronized (this) {
+            // A pause or kill may have completed while the dependency query was running.
+            if (isRunning()) {
+                taskExecutionStatus = dependentState;
+            }
             return taskExecutionStatus;
         }
-        return taskExecutionStatus;
     }
 
     @Override
@@ -89,13 +97,17 @@ public class DependentLogicTask extends AbstractLogicTask<DependentParameters> {
 
     @Override
     public void pause() throws MasterTaskExecuteException {
-        onTaskPaused();
+        synchronized (this) {
+            onTaskPaused();
+        }
         log.info("Pause task : {} success", taskExecutionContext.getTaskName());
     }
 
     @Override
     public void kill() throws MasterTaskExecuteException {
-        onTaskKilled();
+        synchronized (this) {
+            onTaskKilled();
+        }
         log.info("Kill task : {} success", taskExecutionContext.getTaskName());
     }
 

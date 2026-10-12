@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class LogicTaskExecutor extends AbstractTaskExecutor {
 
-    private static final long MIN_STATE_TRACK_INTERVAL_MILLIS = TimeUnit.SECONDS.toMillis(1);
+    private static final long MIN_STATE_TRACK_INTERVAL_MILLIS = TimeUnit.SECONDS.toMillis(10);
 
     private ILogicTask<? extends AbstractParameters> logicTask;
 
@@ -75,7 +75,7 @@ public class LogicTaskExecutor extends AbstractTaskExecutor {
         // if the status is initialized, then we can directly change to paused
         if (logicTask != null) {
             logicTask.pause();
-            resetStateTrackTime();
+            requestStateTrack();
         }
     }
 
@@ -84,7 +84,7 @@ public class LogicTaskExecutor extends AbstractTaskExecutor {
     public void kill() {
         if (logicTask != null) {
             logicTask.kill();
-            resetStateTrackTime();
+            requestStateTrack();
         }
     }
 
