@@ -52,6 +52,7 @@ import org.openqa.selenium.Platform;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @DolphinScheduler(composeFiles = "docker/seatunnel-task/docker-compose.yaml")
@@ -286,11 +287,43 @@ class WorkflowSeaTunnelE2ETest {
                 });
     }
 
+    private void openLog(String name, boolean stream) {
+        // These task names belong to this case; locate their operation cell directly.
+        String rows = stream
+                ? "//div[contains(concat(' ', normalize-space(@class), ' '), ' n-tab-pane ')]"
+                        + "//*[contains(concat(' ', normalize-space(@class), ' '), ' n-data-table-tbody ')]"
+                        + "//tr[td[@data-col-key='workflowDefinitionName']]"
+                : "//*[contains(concat(' ', normalize-space(@class), ' '), ' batch-task-instance-items ')]";
+        By operation = By.xpath(rows + "[td[@data-col-key='name' and normalize-space(.)='" + name + "']]"
+                + "/td[@data-col-key='operation']");
+        ExpectedCondition<WebElement> completion = ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".logModalRef:not(.fade-in-scale-up-transition-enter-active) .n-log"));
+        boolean[] clicked = {false};
+        WebDriverWaitFactory.createWebDriverWait(browser)
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementClickInterceptedException.class)
+                .until(unused -> {
+                    if (clicked[0] && completion.apply(browser) != null) {
+                        return true;
+                    }
+                    WebElement button = browser.findElements(operation).stream()
+                            .filter(WebElement::isDisplayed)
+                            .map(cell -> cell.findElements(By.cssSelector(".n-button")).get(stream ? 2 : 1))
+                            .filter(WebElement::isEnabled).findFirst().orElse(null);
+                    if (button == null) {
+                        return false;
+                    }
+                    button.click();
+                    clicked[0] = true;
+                    return completion.apply(browser) != null;
+                });
+    }
+
     private void assertConsoleOutput(TaskInstanceTab instances, String name, boolean stream, String marker) {
         // Match the sink logger and row indexes, not DolphinScheduler's rawScript echo.
         Pattern first = consoleRow(1, marker);
         Pattern second = consoleRow(2, marker);
-        instances.openLog(name, stream);
+        openLog(name, stream);
         try {
             WebDriverWaitFactory.createWebDriverWait(browser, Duration.ofSeconds(120))
                     .ignoring(StaleElementReferenceException.class)
