@@ -352,6 +352,25 @@ class WorkflowSeaTunnelE2ETest {
                 .findFirst().orElseThrow(IllegalStateException::new);
         browser.close();
         browser.switchTo().window(detailWindow);
-        return new WorkflowForm(browser);
+        Duration pageLoadTimeout = browser.manage().timeouts().getPageLoadTimeout();
+        Throwable failure = null;
+        try {
+            browser.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
+            WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.visibilityOfElementLocated(
+                    By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task']")));
+            return new WorkflowForm(browser);
+        } catch (RuntimeException | Error error) {
+            failure = error;
+            throw error;
+        } finally {
+            try {
+                browser.manage().timeouts().pageLoadTimeout(pageLoadTimeout);
+            } catch (RuntimeException | Error restoreError) {
+                if (failure == null) {
+                    throw restoreError;
+                }
+                failure.addSuppressed(restoreError);
+            }
+        }
     }
 }
