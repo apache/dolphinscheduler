@@ -59,8 +59,6 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.5.0
 
-* Add a unique constraint `uk_alert_dedup` on `sign` to the `t_ds_alert` table. The upgrade script does not remove any existing data; if duplicate rows already exist, the index creation will fail and you need to resolve them manually. Task-result alerts are inserted by application code; the constraint rejects duplicates and the DAO layer treats the resulting `DuplicateKeyException` as a skip. ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
-* Drop the legacy `idx_sign` index on `t_ds_alert`; the new `uk_alert_dedup` unique index on the same column fully covers it. ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 * `AlertSender#getAlertData` now explicitly rejects a null `alertType` by throwing `IllegalArgumentException` with an error log, instead of throwing a raw `NullPointerException`. During a rolling upgrade, **the Alert Server must be upgraded before Master/Worker**, otherwise an old Alert Server cannot recognize newly introduced `alert_type` enum values (e.g. `TASK_RESULT`) and alert delivery will fail. See the [upgrade guide](upgrade.md#rolling-upgrade-order) for details.([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 * SQL task-result alert content is size-limited: at most 30 rows are kept, string field values longer than 100 characters are truncated with an ellipsis, and rows beyond 30 are represented by an omission marker. ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 

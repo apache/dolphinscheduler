@@ -135,8 +135,8 @@ class TaskSuccessLifecycleEventHandlerTest {
         taskSuccessLifecycleEventHandler.handle(
                 taskStateAction, workflowExecution, taskExecution, taskSuccessEvent);
 
-        // Repeated success events are accepted idempotently: the alert is sent again and
-        // deduplicated by the DB unique constraint.
+        // Repeated success events are accepted idempotently: the alert is sent again,
+        // which may insert a duplicate row; occasional duplicates are accepted.
         verify(workflowAlertManager).sendTaskResultAlert(
                 any(), eq(taskInstance), any());
         verify(taskExecutorClient).ackTaskExecutorLifecycleEvent(
