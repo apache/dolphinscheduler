@@ -80,7 +80,8 @@ public final class WorkflowForm {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public <T> T addTask(TaskType type, Integer x, Integer y) {
-        final WebElement task = driver.findElement(By.className("task-item-" + type.name()));
+        final WebElement task = WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(By.className("task-item-" + type.name())));
         final WebElement canvas = driver.findElement(By.className("dag-container"));
 
         final JavascriptExecutor js = (JavascriptExecutor) driver;
