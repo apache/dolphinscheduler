@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
@@ -31,7 +30,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
@@ -287,6 +285,20 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsKeepsWholeQuotedOptions() {
+        // the quotes may wrap the whole key=value pair, or the whole option
+        Assertions.assertEquals(
+                Arrays.asList("-D", "\"kubernetes.config.file=/opt/flink configs/kube.yaml\""),
+                FlinkArgsUtils.extractClusterConnectionOptions(
+                        "-D \"kubernetes.config.file=/opt/flink configs/kube.yaml\""));
+
+        Assertions.assertEquals(
+                Collections.singletonList("\"-Dkubernetes.config.file=/opt/flink configs/kube.yaml\""),
+                FlinkArgsUtils.extractClusterConnectionOptions(
+                        "\"-Dkubernetes.config.file=/opt/flink configs/kube.yaml\""));
+    }
+
+    @Test
     public void testExtractClusterConnectionOptionsWithoutOthers() {
         Assertions.assertTrue(FlinkArgsUtils.extractClusterConnectionOptions(null).isEmpty());
         Assertions.assertTrue(FlinkArgsUtils.extractClusterConnectionOptions("   ").isEmpty());
@@ -390,9 +402,6 @@ public class FlinkArgsUtilsTest {
 
     @Test
     public void testExecuteCommandTimeoutStopsTheDescendantProcess() throws Exception {
-        Assumptions.assumeTrue(canEnumerateProcessTree(),
-                "terminating the process tree needs a process tree listing like pstree");
-
         Path executePath = tempDir.resolve("descendant-execute");
         Files.createDirectories(executePath);
         Path flinkHome = tempDir.resolve("flink-descendant");
@@ -424,14 +433,6 @@ public class FlinkArgsUtilsTest {
                 .parseInt(new String(Files.readAllBytes(descendantPidFile), StandardCharsets.UTF_8).trim());
         Assertions.assertFalse(isProcessAlive(descendantPid),
                 "the descendant process " + descendantPid + " must be terminated with the command");
-    }
-
-    private static boolean canEnumerateProcessTree() {
-        try {
-            return !ProcessUtils.getPidList(OSUtils.getProcessID()).isEmpty();
-        } catch (Exception e) {
-            return false;
-        }
     }
 
     private static boolean isProcessAlive(int processId) throws Exception {

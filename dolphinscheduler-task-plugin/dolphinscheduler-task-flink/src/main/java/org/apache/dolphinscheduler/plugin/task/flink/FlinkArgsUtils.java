@@ -156,25 +156,40 @@ public class FlinkArgsUtils {
         List<String> tokens = tokenizeOptions(others);
         for (int i = 0; i < tokens.size(); i++) {
             String token = tokens.get(i);
-            String option = token.contains("=") ? token.substring(0, token.indexOf('=')) : token;
-            if (CLUSTER_CONNECTION_OPTIONS.contains(option)) {
+            String option = unquoteToken(token);
+            int separator = option.indexOf('=');
+            String optionName = separator < 0 ? option : option.substring(0, separator);
+            if (CLUSTER_CONNECTION_OPTIONS.contains(optionName)) {
                 options.add(token);
                 // the value may be given as a separate argument, for example "-m <jobmanager>"
-                if (option.equals(token) && i + 1 < tokens.size()) {
+                if (separator < 0 && i + 1 < tokens.size()) {
                     options.add(tokens.get(++i));
                 }
-            } else if (isClusterConnectionConfig(token)) {
+            } else if (isClusterConnectionConfig(option)) {
                 options.add(token);
-            } else if (DYNAMIC_PROPERTY_OPTION.equals(token) && i + 1 < tokens.size()) {
+            } else if (DYNAMIC_PROPERTY_OPTION.equals(option) && i + 1 < tokens.size()) {
                 // the configuration may also be given as a separate argument, "-D <key>=<value>"
                 String value = tokens.get(++i);
-                if (isClusterConnectionConfig(DYNAMIC_PROPERTY_OPTION + value)) {
+                if (isClusterConnectionConfig(DYNAMIC_PROPERTY_OPTION + unquoteToken(value))) {
                     options.add(token);
                     options.add(value);
                 }
             }
         }
         return options;
+    }
+
+    /**
+     * Remove the quotes which surround a whole token, so that an option or a value which is entirely
+     * quoted is still recognized. The original token is kept in the generated command, the shell
+     * removes the quotes.
+     */
+    private static String unquoteToken(String token) {
+        if (token.length() > 1 && (token.charAt(0) == '"' || token.charAt(0) == '\'')
+                && token.charAt(token.length() - 1) == token.charAt(0)) {
+            return token.substring(1, token.length() - 1);
+        }
+        return token;
     }
 
     /**

@@ -47,10 +47,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -99,6 +101,12 @@ public final class ProcessUtils {
      * PID recognition pattern
      */
     private static final Pattern PID_PATTERN = Pattern.compile("\\s+");
+
+    /**
+     * The command which lists the pid and the parent pid of every process. It is used when pstree is
+     * not available, otherwise no process tree could be terminated on such a host.
+     */
+    private static final String PS_PID_LIST_COMMAND = "ps -eo pid,ppid";
 
     private static final String SIGINT = "2";
     private static final String SIGTERM = "15";
@@ -301,14 +309,14 @@ public final class ProcessUtils {
                 rawPidStr = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
             }
         } catch (Exception ex) {
-            log.error("Failed to execute 'pstree' command for process ID: {}", processId, ex);
-            throw ex;
+            log.warn("Failed to execute 'pstree' command for process ID: {}, falling back to 'ps'", processId, ex);
+            return getPidListByPs(processId);
         }
 
         String pidsStr = parsePidStr(rawPidStr);
         if (StringUtils.isBlank(pidsStr)) {
-            log.warn("No PIDs found for process: {}", processId);
-            return Collections.emptyList();
+            log.warn("No PIDs found for process: {} with pstree, falling back to 'ps'", processId);
+            return getPidListByPs(processId);
         }
 
         String[] pidArray = PID_PATTERN.split(pidsStr.trim());
@@ -344,6 +352,49 @@ public final class ProcessUtils {
         }
 
         return pidList;
+    }
+
+    /**
+     * Get the descendant process IDs (including the given process) with {@code ps}, which is used
+     * when {@code pstree} is not available.
+     *
+     * @param processId the root process ID
+     * @return list of process IDs; returns empty list if the process does not exist
+     * @throws Exception if command execution fails unexpectedly
+     */
+    private static List<Integer> getPidListByPs(int processId) throws Exception {
+        String rawPidStr = OSUtils.exeCmd(PS_PID_LIST_COMMAND);
+        Map<Integer, List<Integer>> childrenByParentPid = new HashMap<>();
+        Set<Integer> allPids = new HashSet<>();
+        for (String line : rawPidStr.split("\\r?\\n")) {
+            String[] columns = line.trim().split("\\s+");
+            if (columns.length != 2) {
+                continue;
+            }
+            try {
+                int pid = Integer.parseInt(columns[0]);
+                int parentPid = Integer.parseInt(columns[1]);
+                allPids.add(pid);
+                childrenByParentPid.computeIfAbsent(parentPid, key -> new ArrayList<>()).add(pid);
+            } catch (NumberFormatException e) {
+                // the header of ps and any other non numeric line
+            }
+        }
+        if (!allPids.contains(processId)) {
+            log.warn("No PIDs found for process: {}", processId);
+            return Collections.emptyList();
+        }
+        List<Integer> pidList = new ArrayList<>();
+        collectPidAndDescendants(processId, childrenByParentPid, pidList);
+        return pidList;
+    }
+
+    private static void collectPidAndDescendants(int processId, Map<Integer, List<Integer>> childrenByParentPid,
+                                                 List<Integer> pidList) {
+        pidList.add(processId);
+        for (Integer childPid : childrenByParentPid.getOrDefault(processId, Collections.emptyList())) {
+            collectPidAndDescendants(childPid, childrenByParentPid, pidList);
+        }
     }
 
     public static String parsePidStr(String rawPidStr) {
