@@ -35,10 +35,14 @@ import lombok.Getter;
 import lombok.SneakyThrows;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Rectangle;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.WheelInput;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -130,39 +134,39 @@ public final class WorkflowForm {
                 .findFirst().orElse(null));
     }
 
-    private WebElement taskBodyInView(String code) {
-        By body = By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task'][data-cell-id='"
-                + code + "'] > .dag-task-body");
+    private WebElement taskLabelInView(String code) {
+        By label = By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task'][data-cell-id='"
+                + code + "'] > text > tspan");
         return WebDriverWaitFactory.createWebDriverWait(driver)
-                .withMessage("Task body is hidden or its center is covered: " + code).until(unused -> {
-                    WebElement node = ExpectedConditions.visibilityOfElementLocated(body).apply(driver);
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementClickInterceptedException.class)
+                .withMessage("Task label is hidden or its center is covered: " + code).until(unused -> {
+                    WebElement node = ExpectedConditions.elementToBeClickable(label).apply(driver);
                     if (node == null) {
                         return null;
                     }
-                    // Require an unclipped center so the hit test matches the native pointer location.
-                    boolean target = Boolean.TRUE.equals(((JavascriptExecutor) driver).executeScript(
-                            "const node = arguments[0]; node.scrollIntoView({block: 'center', inline: 'center'});"
-                                    + "const firstRect = el => Array.from(el.getClientRects())"
-                                    + ".find(r => r.width > 0 && r.height > 0); const r = firstRect(node);"
-                                    + "if (!r || r.left < 0 || r.top < 0 || r.right > innerWidth"
-                                    + " || r.bottom > innerHeight) return false;"
-                                    + "const clips = value => ['auto', 'scroll', 'hidden'].includes(value);"
-                                    + "for (let p = node.parentElement; p && p !== document.body; p = p.parentElement) {"
-                                    + "const rects = p.getClientRects(); if (!rects.length) break;"
-                                    + "const q = firstRect(p) || rects[0], s = getComputedStyle(p);"
-                                    + "if ((clips(s.overflowX) && (r.left < q.left || r.right > q.right))"
-                                    + " || (clips(s.overflowY) && (r.top < q.top || r.bottom > q.bottom))) return false; }"
-                                    + "const x = Math.floor((r.left + r.right) / 2);"
-                                    + "const y = Math.floor((r.top + r.bottom) / 2);"
-                                    + "const hit = document.elementFromPoint(x, y);"
-                                    + "return hit && hit.closest('g[data-shape=\"dag-task\"]') === node.parentElement;",
-                            node));
-                    return target ? node : null;
+                    WebElement scroller = driver.findElement(By.cssSelector(".dag-container .x6-graph-scroller"));
+                    Rectangle view = scroller.getRect();
+                    Rectangle text = node.getRect();
+                    int deltaX = text.x + text.width / 2 - view.x - view.width / 2;
+                    int deltaY = text.y + text.height / 2 - view.y - view.height / 2;
+                    // Center inside the nested scroller, away from its fixed minimap.
+                    if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
+                        new Actions(driver)
+                                .scrollFromOrigin(WheelInput.ScrollOrigin.fromElement(scroller), deltaX, deltaY)
+                                .perform();
+                        return null;
+                    }
+                    // Target the rendered text span: the body is covered by this task label.
+                    // Native click scrolls the label into view and rejects an intercepted pointer.
+                    // Reuse this span for Actions so SVG text-container bounds cannot shift the pointer.
+                    node.click();
+                    return node;
                 });
     }
 
     public void openTask(String code) {
-        new Actions(driver).doubleClick(taskBodyInView(code)).perform();
+        new Actions(driver).doubleClick(taskLabelInView(code)).perform();
         // Visible controls still move while their modal is entering or leaving.
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
                 By.cssSelector(".n-modal:not(.fade-in-scale-up-transition-enter-active)"
@@ -173,7 +177,7 @@ public final class WorkflowForm {
         Set<String> existing = driver
                 .findElements(By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task']")).stream()
                 .map(node -> node.getAttribute("data-cell-id")).collect(Collectors.toSet());
-        new Actions(driver).contextClick(taskBodyInView(code)).perform();
+        new Actions(driver).contextClick(taskLabelInView(code)).perform();
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(By.xpath(
                 "//div[contains(@class, 'dag-context-menu')]//button[normalize-space(.)='Copy']"))).click();
         return WebDriverWaitFactory.createWebDriverWait(driver).until(unused -> {

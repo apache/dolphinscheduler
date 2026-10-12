@@ -28,6 +28,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
@@ -66,6 +67,59 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
                 .map(Row::new).collect(Collectors.toList());
     }
 
+    public TaskInstanceTab refresh() {
+        driver.findElements(By.cssSelector(".n-tab-pane .n-button--primary-type")).stream()
+                .filter(WebElement::isDisplayed).findFirst()
+                .orElseThrow(() -> new IllegalStateException("Task search button is not visible")).click();
+        return this;
+    }
+
+    private void clickOperation(String name, boolean stream, int index) {
+        WebDriverWaitFactory.createWebDriverWait(driver).ignoring(StaleElementReferenceException.class)
+                .until(unused -> {
+                    WebElement button = (stream ? streamInstances() : instances()).stream()
+                            .filter(row -> row.taskInstanceName().equals(name))
+                            .map(row -> row.row.findElement(By.cssSelector("td[data-col-key=operation]"))
+                                    .findElements(By.cssSelector(".n-button")).get(index))
+                            .filter(WebElement::isEnabled).findFirst().orElse(null);
+                    if (button == null) {
+                        return false;
+                    }
+                    button.click();
+                    return true;
+                });
+    }
+
+    public TaskInstanceTab openLog(String name, boolean stream) {
+        clickOperation(name, stream, stream ? 2 : 1);
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
+                By.cssSelector(".logModalRef:not(.fade-in-scale-up-transition-enter-active) .n-log")));
+        return this;
+    }
+
+    public String logText() {
+        return driver.findElements(By.cssSelector(".logModalRef .n-log pre")).stream()
+                .map(line -> line.getDomProperty("textContent")).collect(Collectors.joining("\n"));
+    }
+
+    public TaskInstanceTab refreshLog() {
+        driver.findElement(By.xpath("//*[contains(@class,'logModalRef')]//*[contains(@class,'n-card-header__extra')]"
+                + "//*[normalize-space(text())='Refresh']")).click();
+        return this;
+    }
+
+    public TaskInstanceTab closeLog() {
+        driver.findElement(By.cssSelector(".logModalRef .btn-submit")).click();
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".logModalRef")));
+        return this;
+    }
+
+    public TaskInstanceTab stopStream(String name) {
+        clickOperation(name, true, 1);
+        return this;
+    }
+
     @RequiredArgsConstructor
     public static class Row {
 
@@ -89,6 +143,14 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
 
         public int retryTimes() {
             return Integer.parseInt(row.findElement(By.cssSelector("td[data-col-key=retryTimes]")).getText());
+        }
+
+        public boolean isRunning() {
+            return !row.findElements(By.className("running_execution")).isEmpty();
+        }
+
+        public boolean isStopped() {
+            return !row.findElements(By.className("kill")).isEmpty();
         }
 
         public boolean isSuccess() {
