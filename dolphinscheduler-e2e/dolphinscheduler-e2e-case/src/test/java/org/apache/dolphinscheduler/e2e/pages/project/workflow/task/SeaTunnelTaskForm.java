@@ -43,7 +43,8 @@ public class SeaTunnelTaskForm extends TaskNodeForm {
             input.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END), Keys.DELETE, lines[i],
                     Keys.chord(Keys.SHIFT, Keys.END), Keys.DELETE);
             if (i + 1 < lines.length) {
-                input.sendKeys(Keys.ENTER);
+                // Insert a line without accepting Monaco's word suggestions.
+                input.sendKeys(Keys.chord(selectAllKey(), Keys.ENTER));
             }
         }
         return this;
