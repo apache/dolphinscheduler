@@ -23,7 +23,8 @@ ENV SEATUNNEL_HOME=/opt/seatunnel
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ca-certificates curl procps psmisc \
     && rm -rf /var/lib/apt/lists/* \
-    && curl --fail --location --retry 3 \
+    && curl --fail --location --connect-timeout 30 --max-time 3600 \
+        --speed-limit 1024 --speed-time 60 --retry 3 --retry-max-time 120 \
         https://archive.apache.org/dist/seatunnel/2.3.3/apache-seatunnel-2.3.3-bin.tar.gz \
         --output /tmp/seatunnel.tar.gz \
     && echo "e82ad8335c3a8cd332a4c0626629cb48ad330474207f3ea4260eddf60869302c188d184b2f3c9c8f755ace91736cdf2a5b1b4283677426562feee1a9cb9ddcaa  /tmp/seatunnel.tar.gz" | sha512sum --check \
@@ -44,7 +45,8 @@ RUN apt-get update \
         > /etc/profile.d/seatunnel.sh
 
 # SeaTunnel 2.3.3's CheckpointPlan uses Jersey's CopyOnWriteHashMap even with localfile storage.
-RUN curl --fail --location --retry 3 \
+RUN curl --fail --location --connect-timeout 30 --max-time 120 \
+        --speed-limit 1024 --speed-time 30 --retry 3 --retry-max-time 120 \
         https://repo.maven.apache.org/maven2/com/sun/jersey/jersey-client/1.19/jersey-client-1.19.jar \
         --output /opt/seatunnel/lib/jersey-client-1.19.jar \
     && echo "591118924e4ecad37b25d2e955ae9531f4f7752aed587f99c6ccc98e03aaae5e  /opt/seatunnel/lib/jersey-client-1.19.jar" | sha256sum --check

@@ -79,7 +79,10 @@ class WorkflowSeaTunnelE2ETest {
         if (tenants.tenants().stream().noneMatch(tenant -> tenant.tenantCode().equals(admin.getTenant()))) {
             tenants.create(admin.getTenant()).goToNav(SecurityPage.class).goToTab(UserPage.class).update(admin);
         }
-        tenants.goToNav(ProjectPage.class).create(PROJECT);
+        ProjectPage projects = tenants.goToNav(ProjectPage.class);
+        projects.buttonCreateProject().click();
+        projects.createProjectForm().inputProjectName().sendKeys(PROJECT);
+        projects.createProjectForm().buttonSubmit().sendKeys(Keys.ENTER);
         WorkflowDefinitionTab definitions = openProject().goToTab(WorkflowDefinitionTab.class);
         WorkflowForm form = definitions.createWorkflow();
         form.<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL, 100, 100)

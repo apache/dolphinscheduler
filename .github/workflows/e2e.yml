@@ -96,7 +96,7 @@ jobs:
     name: ${{ matrix.case.name }}
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: ${{ matrix.case.name == 'WorkflowSeaTunnelE2ETest' && 90 || 30 }}
     strategy:
       matrix:
         case:
