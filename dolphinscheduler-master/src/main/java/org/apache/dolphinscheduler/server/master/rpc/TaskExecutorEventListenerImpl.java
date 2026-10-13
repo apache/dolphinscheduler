@@ -116,6 +116,8 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
                     .taskExecution(taskExecution)
                     .endTime(new Date(taskExecutorSuccessLifecycleEvent.getEndTime()))
                     .varPool(taskExecutorSuccessLifecycleEvent.getVarPool())
+                    .needAlert(taskExecutorSuccessLifecycleEvent.isNeedAlert())
+                    .taskAlertInfo(taskExecutorSuccessLifecycleEvent.getTaskAlertInfo())
                     .build();
             taskExecution.getWorkflowEventBus().publish(taskSuccessEvent);
         } finally {

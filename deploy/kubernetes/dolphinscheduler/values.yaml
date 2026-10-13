@@ -393,6 +393,15 @@ conf:
     # -- way to collect applicationId: log, aop
     appId.collect: log
 
+    # -- max rows kept in the SQL task-result alert content, rows beyond this are replaced by an omission marker
+    sql.task.alert.max.rows: 30
+
+    # -- max chars of a single string value kept in the SQL task-result alert content, longer values are truncated with an ellipsis
+    sql.task.alert.max.row.value.length: 100
+
+    # -- max serialized UTF-8 bytes of the SQL task-result alert content, kept below the 65535-byte capacity of the MySQL TEXT column
+    sql.task.alert.max.content.bytes: 60000
+
 common:
   ## Configmap
   configmap:
