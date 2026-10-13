@@ -206,6 +206,7 @@ The paths above match the API and Worker server classpaths. Check the configurat
 | conf.common."sql.task.alert.max.content.bytes" | int | `60000` | max serialized UTF-8 bytes of the SQL task-result alert content, kept below the 65535-byte capacity of the MySQL TEXT column |
 | conf.common."sql.task.alert.max.row.value.length" | int | `100` | max chars of a single string value kept in the SQL task-result alert content, longer values are truncated with an ellipsis |
 | conf.common."sql.task.alert.max.rows" | int | `30` | max rows kept in the SQL task-result alert content, rows beyond this are replaced by an omission marker |
+| conf.common."sql.task.query.max.rows" | int | `10000` | max rows fetched from the datasource when the SQL task-level "limit" parameter is not set |
 | conf.common."sudo.enable" | bool | `true` | use sudo or not, if set true, executing user is tenant user and deploy user needs sudo permissions; if set false, executing user is the deploy user and doesn't need sudo permissions |
 | conf.common."support.hive.oneSession" | bool | `false` | Whether hive SQL is executed in the same session |
 | conf.common."task.resource.limit.state" | bool | `false` | Task resource limit state |

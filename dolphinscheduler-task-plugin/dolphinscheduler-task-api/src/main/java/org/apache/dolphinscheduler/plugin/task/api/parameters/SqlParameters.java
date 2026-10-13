@@ -95,6 +95,11 @@ public class SqlParameters extends AbstractParameters {
     private int groupId;
     private String title;
 
+    /**
+     * max rows fetched for query sql
+     * takes precedence over the sql.task.query.max.rows property when positive, otherwise falls back to it
+     * only settable via the taskParams JSON of the API, there is no form field for it in the web UI
+     */
     private int limit;
 
     @Override
