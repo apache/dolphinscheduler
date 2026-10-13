@@ -135,7 +135,7 @@ public class DinkyTask extends AbstractRemoteTask {
                 }
             }
         } catch (Exception ex) {
-            Thread.currentThread().interrupt();
+            // Thread.currentThread().interrupt();
             log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
@@ -166,7 +166,7 @@ public class DinkyTask extends AbstractRemoteTask {
                         DinkyTaskConstants.SUBMIT_FAILED_MSG + result.get(DinkyTaskConstants.API_RESULT_MSG));
             }
         } catch (Exception ex) {
-            Thread.currentThread().interrupt();
+            // Thread.currentThread().interrupt();
             log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
