@@ -17,15 +17,15 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
-import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 
 import lombok.Getter;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
 public final class SwitchTaskIfBranch {
@@ -33,21 +33,26 @@ public final class SwitchTaskIfBranch {
     private final WebDriver driver;
     private final SwitchTaskForm parent;
 
-    private final CodeEditor codeEditor;
+    @FindBy(xpath = "(" + SwitchTaskForm.CONDITION_FORM + "//textarea)[last()]")
+    private WebElement inputCondition;
 
-    @FindBys({
-            @FindBy(className = "switch-task"),
-            @FindBy(className = "switch-list"),
-            @FindBy(className = "el-input")
-    })
+    @FindBy(xpath = "(" + SwitchTaskForm.CONDITION_FORM
+            + "//div[contains(concat(' ', normalize-space(@class), ' '), ' n-form-item ')]"
+            + "[./label[normalize-space(.)='Branch Flow']]"
+            + "//div[contains(concat(' ', normalize-space(@class), ' '), ' n-base-selection ')])[last()]")
     private WebElement inputIfBranch;
 
     public SwitchTaskIfBranch(SwitchTaskForm parent) {
         this.parent = parent;
         this.driver = parent.parent().driver();
-
-        this.codeEditor = new CodeEditor(driver);
-
         PageFactory.initElements(driver, this);
+    }
+
+    public SwitchTaskIfBranch condition(String condition) {
+        WebElement input = WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(inputCondition()));
+        input.clear();
+        input.sendKeys(condition);
+        return this;
     }
 }

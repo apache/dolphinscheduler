@@ -57,7 +57,8 @@ public final class WorkflowForm {
     private final WorkflowSaveDialog saveForm;
     private final WorkflowFormatDialog formatDialog;
 
-    @FindBy(className = "graph-format")
+    @FindBy(xpath = "//button[contains(concat(' ', normalize-space(@class), ' '), ' btn-save ')]"
+            + "/preceding-sibling::button[1]")
     private WebElement formatBtn;
 
     @FindBy(className = "btn-save")
@@ -80,8 +81,16 @@ public final class WorkflowForm {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public <T> T addTask(TaskType type, Integer x, Integer y) {
+        final String category = "." + type.categoryClass;
+        final By taskSelector = By.cssSelector(category + " .task-item-" + type.name());
+        final WebElement categoryHeader = WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(
+                        By.cssSelector(category + " .n-collapse-item__header")));
+        if (!categoryHeader.getAttribute("class").contains("n-collapse-item__header--active")) {
+            categoryHeader.click();
+        }
         final WebElement task = WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(By.className("task-item-" + type.name())));
+                .until(ExpectedConditions.elementToBeClickable(taskSelector));
         final WebElement canvas = driver.findElement(By.className("dag-container"));
 
         final JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -111,19 +120,10 @@ public final class WorkflowForm {
     }
 
     public WebElement getTask(String taskName) {
-        List<WebElement> tasks = WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.visibilityOfAllElementsLocatedBy(
-                        By.cssSelector("svg > g > g[class^='x6-graph-svg-stage'] > g[data-shape^='dag-task']")));
-
-        WebElement task = tasks.stream()
-                .filter(t -> t.getText().contains(taskName))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No such task: " + taskName));
-
-        Actions action = new Actions(driver);
-        action.doubleClick(task).build().perform();
-
-        return task;
+        final String code = taskCode(taskName);
+        openTask(code);
+        return driver.findElement(By.cssSelector(
+                ".dag-container .x6-graph-scroller g[data-shape='dag-task'][data-cell-id='" + code + "']"));
     }
 
     public String taskCode(String taskName) {
@@ -212,18 +212,33 @@ public final class WorkflowForm {
     }
 
     public WorkflowFormatDialog formatDAG() {
-        formatBtn.click();
+        final WebElement button = WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.elementToBeClickable(formatBtn));
+        // In the create toolbar Format precedes Save; confirm its tooltip before clicking.
+        new Actions(driver).moveToElement(button).perform();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//div[contains(@class, 'n-tooltip') and normalize-space(.)='Format']")));
+        button.click();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath(WorkflowFormatDialog.MODAL)));
 
         return new WorkflowFormatDialog(this);
     }
 
     public enum TaskType {
-        SHELL,
-        SUB_WORKFLOW,
-        SWITCH,
-        HTTP,
-        JAVA,
-        PYTHON,
-        SEATUNNEL
+
+        SHELL("task-cate-universal"),
+        SUB_WORKFLOW("task-cate-logic"),
+        SWITCH("task-cate-logic"),
+        HTTP("task-cate-universal"),
+        JAVA("task-cate-universal"),
+        PYTHON("task-cate-universal"),
+        SEATUNNEL("task-cate-di");
+
+        private final String categoryClass;
+
+        TaskType(String categoryClass) {
+            this.categoryClass = categoryClass;
+        }
     }
 }
