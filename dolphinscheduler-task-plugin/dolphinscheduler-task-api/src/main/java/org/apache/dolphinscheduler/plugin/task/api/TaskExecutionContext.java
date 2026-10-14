@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
@@ -129,6 +130,10 @@ public class TaskExecutionContext implements Serializable {
     private int dispatchFailTimes;
 
     private final long firstDispatchTime = System.currentTimeMillis();
+
+    private boolean needAlert;
+
+    private TaskAlertInfo taskAlertInfo;
 
     public int increaseDispatchFailTimes() {
         return ++dispatchFailTimes;
