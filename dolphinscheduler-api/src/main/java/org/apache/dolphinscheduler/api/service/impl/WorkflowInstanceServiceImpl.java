@@ -449,33 +449,44 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             String existingTaskParams = submitted.getCode() <= 0 || submitted.getVersion() <= 0
                     ? null
                     : existingTaskParamsMap.get(submitted.getCode() + "_" + submitted.getVersion());
+            // Keep plaintext through permission / DAG checks; encode only at each save* below.
             submitted.setTaskParams(SensitivePropertyUtils.mergeLocalParams(
                     submitted.getTaskParams(), existingTaskParams));
         }
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
+        List<WorkflowTaskRelationLog> taskRelationList =
+                JSONUtils.toList(taskRelationJson, WorkflowTaskRelationLog.class);
+        // Validate on plaintext before any definition persist.
+        workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs);
+
+        WorkflowDefinition workflowDefinition =
+                workflowDefinitionDao.queryByCode(workflowInstance.getWorkflowDefinitionCode()).orElse(null);
+        // Definition snapshot uses instance-resolved globals (****** already merged); do not merge again
+        // against the latest definition, or syncDefine would diverge when instance overrode a secret.
+        String definitionGlobalParams = CollectionUtils.isNotEmpty(submittedGlobalParams)
+                ? instanceGlobalParams
+                : globalParams;
+        workflowDefinition.set(projectCode, workflowDefinition.getName(), workflowDefinition.getDescription(),
+                definitionGlobalParams, locations, timeout);
+        workflowDefinition.setUpdateTime(new Date());
+
+        // Persist boundary: encode definition snapshots immediately before each DB write.
+        // Instance global_params stay plaintext; only the definition copy is encoded here.
+        for (TaskDefinitionLog submitted : taskDefinitionLogs) {
+            submitted.setTaskParams(
+                    SensitivePropertyUtils.encodeLocalParamsInTaskParams(submitted.getTaskParams()));
+        }
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs, syncDefine);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             log.error("Update task definition error, projectCode:{}, workflowInstanceId:{}", projectCode,
                     workflowInstanceId);
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
         }
-        WorkflowDefinition workflowDefinition =
-                workflowDefinitionDao.queryByCode(workflowInstance.getWorkflowDefinitionCode()).orElse(null);
-        List<WorkflowTaskRelationLog> taskRelationList =
-                JSONUtils.toList(taskRelationJson, WorkflowTaskRelationLog.class);
-        // check workflow json is valid (throws ServiceException on validation failures)
-        workflowDefinitionService.checkWorkflowNodeList(taskRelationJson, taskDefinitionLogs);
-
-        String definitionGlobalParams = globalParams;
         if (CollectionUtils.isNotEmpty(submittedGlobalParams)) {
-            definitionGlobalParams = GlobalParameterUtils.serializeGlobalParameter(
-                    SensitivePropertyUtils.mergeAndEncode(submittedGlobalParams,
-                            GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams())));
+            workflowDefinition.setGlobalParams(
+                    SensitivePropertyUtils.encodeGlobalParams(workflowDefinition.getGlobalParams()));
         }
-        workflowDefinition.set(projectCode, workflowDefinition.getName(), workflowDefinition.getDescription(),
-                definitionGlobalParams, locations, timeout);
-        workflowDefinition.setUpdateTime(new Date());
         int insertVersion = processService.saveWorkflowDefine(loginUser, workflowDefinition, syncDefine, Boolean.FALSE);
         if (insertVersion == 0) {
             log.error("Update workflow definition error, projectCode:{}, workflowDefinitionName:{}.", projectCode,

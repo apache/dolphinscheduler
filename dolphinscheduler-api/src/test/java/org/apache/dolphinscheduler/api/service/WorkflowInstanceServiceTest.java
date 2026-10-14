@@ -828,6 +828,8 @@ public class WorkflowInstanceServiceTest {
             String keptLocalCipher = PasswordUtils.encodePassword("kept-local");
             assertInstanceEditEncryptsDefinitionSnapshot(Boolean.TRUE, keptGlobalCipher, keptLocalCipher);
             assertInstanceEditEncryptsDefinitionSnapshot(Boolean.FALSE, keptGlobalCipher, keptLocalCipher);
+            assertInstanceEditUsesInstanceOverrideForDefinitionSnapshot(Boolean.TRUE);
+            assertInstanceEditUsesInstanceOverrideForDefinitionSnapshot(Boolean.FALSE);
         }
     }
 
@@ -913,6 +915,66 @@ public class WorkflowInstanceServiceTest {
         Assertions.assertEquals("new-local", PasswordUtils.decodePassword(encodedLocal.getValue()));
         verify(processService).saveTaskDefine(eq(loginUser), eq(projectCode), any(), eq(syncDefine));
         verify(processService).saveWorkflowDefine(any(), eq(workflowDefinition), eq(syncDefine), eq(Boolean.FALSE));
+    }
+
+    /**
+     * Definition has secret A, instance was started with override B. Unchanged ****** must keep B on the
+     * instance and encode B (not A) into the definition snapshot for both syncDefine values.
+     */
+    private void assertInstanceEditUsesInstanceOverrideForDefinitionSnapshot(Boolean syncDefine) {
+        Mockito.clearInvocations(processService);
+        long projectCode = 1L;
+        User loginUser = getAdminUser();
+        String definitionCipher = PasswordUtils.encodePassword("definition-secret-A");
+        String instancePlain = "instance-secret-B";
+
+        WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(projectCode);
+        workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
+        workflowInstance.setTimeout(3000);
+        workflowInstance.setCommandType(CommandType.STOP);
+        workflowInstance.setWorkflowDefinitionCode(46L);
+        workflowInstance.setWorkflowDefinitionVersion(1);
+        workflowInstance.setGlobalParams(
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"" + instancePlain
+                        + "\",\"sensitive\":true}]");
+        WorkflowDefinition workflowDefinition = getProcessDefinition();
+        workflowDefinition.setProjectCode(projectCode);
+        workflowDefinition.setGlobalParams(
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"" + definitionCipher
+                        + "\",\"sensitive\":true}]");
+
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
+        when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowInstanceDao.updateById(workflowInstance)).thenReturn(true);
+        Mockito.doNothing().when(workflowDefinitionService).checkWorkflowNodeList(any(), any());
+        Mockito.doNothing().when(taskDatasourcePermissionChecker).checkPermission(any(), any());
+        when(processService.saveTaskRelation(any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt(), any(),
+                any(), any())).thenReturn(Constants.EXIT_CODE_SUCCESS);
+        when(processService.saveTaskDefine(any(), Mockito.anyLong(), any(), eq(syncDefine))).thenReturn(1);
+        when(processService.saveWorkflowDefine(any(), eq(workflowDefinition), eq(syncDefine), eq(Boolean.FALSE)))
+                .thenReturn(1);
+
+        String submittedGlobalParams =
+                "[{\"prop\":\"pwd\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"******\",\"sensitive\":true}]";
+
+        workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
+                taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", syncDefine,
+                submittedGlobalParams, "", 0);
+
+        List<Property> instanceGlobals =
+                GlobalParameterUtils.deserializeGlobalParameter(workflowInstance.getGlobalParams());
+        Assertions.assertEquals(instancePlain, findProperty(instanceGlobals, "pwd").getValue());
+
+        List<Property> definitionGlobals =
+                GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams());
+        Property definitionPwd = findProperty(definitionGlobals, "pwd");
+        Assertions.assertNotEquals(definitionCipher, definitionPwd.getValue());
+        Assertions.assertNotEquals(instancePlain, definitionPwd.getValue());
+        Assertions.assertEquals(instancePlain, PasswordUtils.decodePassword(definitionPwd.getValue()));
+        Assertions.assertFalse(workflowDefinition.getGlobalParams().contains(instancePlain));
+        Assertions.assertFalse(workflowDefinition.getGlobalParams().contains("definition-secret-A"));
     }
 
     private static Property findProperty(List<Property> properties, String prop) {

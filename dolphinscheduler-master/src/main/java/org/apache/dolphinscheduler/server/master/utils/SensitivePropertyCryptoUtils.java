@@ -19,15 +19,20 @@ package org.apache.dolphinscheduler.server.master.utils;
 
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
 import lombok.experimental.UtilityClass;
 
 /**
- * Decrypt definition-time sensitive values for execution.
- * API/UI still mask; Worker receives plaintext copies only.
+ * Load-boundary decrypt for definition-time sensitive values at execution.
+ * Call immediately after loading workflow/task definition rows into the run context;
+ * subsequent engine logic stays on plaintext. Worker receives plaintext copies only.
  */
 @UtilityClass
 public class SensitivePropertyCryptoUtils {
@@ -39,5 +44,17 @@ public class SensitivePropertyCryptoUtils {
     public String decodeLocalParamsInTaskParams(String taskParams) {
         return PropertySensitiveUtils.transformLocalParamsInTaskParams(taskParams,
                 SensitivePropertyCryptoUtils::decodeSensitiveValues);
+    }
+
+    /** Load-boundary helper for workflow definition {@code globalParams} JSON. */
+    public String decodeGlobalParams(String globalParams) {
+        if (StringUtils.isEmpty(globalParams)) {
+            return globalParams;
+        }
+        List<Property> properties = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
+        if (CollectionUtils.isEmpty(properties)) {
+            return globalParams;
+        }
+        return GlobalParameterUtils.serializeGlobalParameter(decodeSensitiveValues(properties));
     }
 }
