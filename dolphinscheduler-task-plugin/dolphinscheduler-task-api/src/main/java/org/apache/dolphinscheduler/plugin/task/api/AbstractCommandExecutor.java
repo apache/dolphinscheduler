@@ -203,8 +203,15 @@ public abstract class AbstractCommandExecutor {
                 } else {
                     String line;
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
-                        while ((line = reader.readLine()) != null) {
-                            log.info("[K8S-pod-log-{}]: {}", taskRequest.getTaskName(), line);
+                        LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
+                        LogUtils.setTaskInstanceIdMDC(taskRequest.getTaskInstanceId());
+                        try {
+                            while ((line = reader.readLine()) != null) {
+                                log.info("[K8S-pod-log-{}]: {}", taskRequest.getTaskName(), line);
+                            }
+                        } finally {
+                            LogUtils.removeTaskInstanceIdMDC();
+                            LogUtils.removeTaskInstanceLogFullPathMDC();
                         }
                     }
                 }
@@ -226,6 +233,8 @@ public abstract class AbstractCommandExecutor {
             TaskOutputParameterParser taskOutputParameterParser = new TaskOutputParameterParser();
             try (BufferedReader inReader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
+                // Needed so SensitiveDataConverter can apply per-task sensitive value masks.
+                LogUtils.setTaskInstanceIdMDC(taskRequest.getTaskInstanceId());
                 String line;
                 while ((line = inReader.readLine()) != null) {
                     log.info(" -> {}", line);
@@ -234,6 +243,7 @@ public abstract class AbstractCommandExecutor {
             } catch (Exception e) {
                 log.error("Parse var pool error", e);
             } finally {
+                LogUtils.removeTaskInstanceIdMDC();
                 LogUtils.removeTaskInstanceLogFullPathMDC();
             }
             taskOutputParams = taskOutputParameterParser.getTaskOutputParams();

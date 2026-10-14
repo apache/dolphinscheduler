@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
@@ -116,7 +117,12 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     public void finalizeTask() {
-        clearTaskInstanceWorkingDirectoryIfNeeded();
+        try {
+            clearTaskInstanceWorkingDirectoryIfNeeded();
+        } finally {
+            // Must clear on success / failure / kill so later tasks are not polluted.
+            SensitiveDataConverter.clearTaskSensitiveValues(taskExecutionContext.getTaskInstanceId());
+        }
     }
 
     private void clearTaskInstanceWorkingDirectoryIfNeeded() {
@@ -144,6 +150,11 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
                 taskExecutionContext);
         taskExecutionContext.setResourceContext(resourceContext);
         log.info("Download resources successfully: {}", taskExecutionContext.getResourceContext());
+
+        // Per-task log masking for sensitive prepareParams (DSIP-105 / #18588).
+        SensitiveDataConverter.registerTaskSensitiveValues(
+                taskExecutionContext.getTaskInstanceId(),
+                taskExecutionContext.getPrepareParamsMap());
 
         log.info(TaskLogMarkers.excludeInTaskLog(), "Initialized Task Context{}",
                 JSONUtils.toPrettyJsonString(taskExecutionContext));
