@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.server.master.engine.workflow.execution.Workf
 import org.apache.dolphinscheduler.server.master.engine.workflow.listener.IWorkflowLifecycleListener;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext;
 import org.apache.dolphinscheduler.server.master.runner.WorkflowExecuteContext.WorkflowExecuteContextBuilder;
+import org.apache.dolphinscheduler.server.master.utils.SensitivePropertyCryptoUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -112,6 +113,9 @@ public abstract class AbstractCommandHandler implements ICommandHandler {
         checkArgument(workflowDefinition != null,
                 "Cannot find the WorkflowDefinition: [" + workflowDefinitionCode + ":" + workflowDefinitionVersion
                         + "]");
+        // Load boundary: decrypt definition globals once; engine logic uses plaintext.
+        workflowDefinition.setGlobalParams(
+                SensitivePropertyCryptoUtils.decodeGlobalParams(workflowDefinition.getGlobalParams()));
         workflowExecuteContextBuilder.setWorkflowDefinition(workflowDefinition);
 
     }

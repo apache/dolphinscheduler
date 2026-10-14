@@ -286,10 +286,10 @@ class SensitivePropertyUtilsTest {
     }
 
     @Test
-    void encodeForCreateEncryptsWhenEnabled() {
+    void encodeForPersistEncryptsWhenEnabled() {
         try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
             mockEncryptionEnabled(mocked);
-            List<Property> encoded = SensitivePropertyUtils.encodeForCreate(
+            List<Property> encoded = SensitivePropertyUtils.encodeForPersist(
                     Collections.singletonList(sensitive("pwd", "Secret123")));
             Assertions.assertNotEquals("Secret123", encoded.get(0).getValue());
             Assertions.assertEquals("Secret123", PasswordUtils.decodePassword(encoded.get(0).getValue()));
@@ -297,34 +297,37 @@ class SensitivePropertyUtilsTest {
     }
 
     @Test
-    void encodeForCreateSkipsWhenDisabled() {
+    void encodeForPersistSkipsWhenDisabled() {
         try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
             mockEncryptionDisabled(mocked);
-            List<Property> encoded = SensitivePropertyUtils.encodeForCreate(
+            List<Property> encoded = SensitivePropertyUtils.encodeForPersist(
                     Collections.singletonList(sensitive("pwd", "Secret123")));
             Assertions.assertEquals("Secret123", encoded.get(0).getValue());
         }
     }
 
     @Test
-    void mergeAndEncodeDoesNotDoubleEncryptKeepOriginal() {
+    void mergeThenEncodeKeepOriginalIsDeterministic() {
         try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
             mockEncryptionEnabled(mocked);
             String ciphertext = PasswordUtils.encodePassword("Secret123");
-            List<Property> encoded = SensitivePropertyUtils.mergeAndEncode(
+            List<Property> existingRaw = Collections.singletonList(sensitive("pwd", ciphertext));
+            List<Property> merged = SensitivePropertyUtils.merge(
                     Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
-                    Collections.singletonList(sensitive("pwd", ciphertext)));
+                    SensitivePropertyUtils.decodeAfterLoad(existingRaw));
+            List<Property> encoded = SensitivePropertyUtils.encodeForPersist(merged);
             Assertions.assertEquals(ciphertext, encoded.get(0).getValue());
         }
     }
 
     @Test
-    void mergeAndEncodeFalseToTrueWithPlaceholderThenEncrypts() {
+    void mergeThenEncodeFalseToTrueWithPlaceholderThenEncrypts() {
         try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
             mockEncryptionEnabled(mocked);
-            List<Property> encoded = SensitivePropertyUtils.mergeAndEncode(
+            List<Property> merged = SensitivePropertyUtils.merge(
                     Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
                     Collections.singletonList(nonSensitive("pwd", "plain")));
+            List<Property> encoded = SensitivePropertyUtils.encodeForPersist(merged);
             Assertions.assertNotEquals("plain", encoded.get(0).getValue());
             Assertions.assertEquals("plain", PasswordUtils.decodePassword(encoded.get(0).getValue()));
             Assertions.assertTrue(encoded.get(0).isSensitive());
@@ -332,26 +335,30 @@ class SensitivePropertyUtilsTest {
     }
 
     @Test
-    void mergeAndEncodeTrueToFalseDecodesWhenCiphertextResubmitted() {
+    void normalizeResubmittedCiphertextTrueToFalse() {
         try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
             mockEncryptionEnabled(mocked);
             String ciphertext = PasswordUtils.encodePassword("Secret123");
-            List<Property> encoded = SensitivePropertyUtils.mergeAndEncode(
+            List<Property> existingRaw = Collections.singletonList(sensitive("pwd", ciphertext));
+            List<Property> merged = SensitivePropertyUtils.merge(
                     Collections.singletonList(nonSensitive("pwd", ciphertext)),
-                    Collections.singletonList(sensitive("pwd", ciphertext)));
-            Assertions.assertEquals("Secret123", encoded.get(0).getValue());
-            Assertions.assertFalse(encoded.get(0).isSensitive());
+                    SensitivePropertyUtils.decodeAfterLoad(existingRaw));
+            List<Property> normalized =
+                    SensitivePropertyUtils.normalizeResubmittedCiphertext(merged, existingRaw);
+            Assertions.assertEquals("Secret123", normalized.get(0).getValue());
+            Assertions.assertFalse(normalized.get(0).isSensitive());
         }
     }
 
     @Test
-    void restoreStartParamsDecryptsDefinitionGlobals() {
+    void restoreStartParamsUsesDecodedDefinitionGlobals() {
         try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
             mockEncryptionEnabled(mocked);
             String ciphertext = PasswordUtils.encodePassword("Secret123");
             List<Property> restored = SensitivePropertyUtils.restoreStartParams(
                     Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
-                    Collections.singletonList(sensitive("pwd", ciphertext)));
+                    SensitivePropertyUtils.decodeAfterLoad(
+                            Collections.singletonList(sensitive("pwd", ciphertext))));
             Assertions.assertEquals("Secret123", restored.get(0).getValue());
             Assertions.assertTrue(restored.get(0).isSensitive());
         }

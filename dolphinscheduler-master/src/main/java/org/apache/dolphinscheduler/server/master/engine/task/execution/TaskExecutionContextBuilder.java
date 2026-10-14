@@ -82,6 +82,7 @@ public class TaskExecutionContextBuilder {
                         (int) Math.min(TimeUnit.MINUTES.toSeconds(taskDefinition.getTimeout()), Integer.MAX_VALUE));
             }
         }
+        // Load/outbound boundary: decrypt for worker context; graph/task_instance keep ciphertext.
         taskExecutionContext.setTaskParams(
                 SensitivePropertyCryptoUtils.decodeLocalParamsInTaskParams(taskDefinition.getTaskParams()));
         return this;
