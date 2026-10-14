@@ -23,8 +23,11 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,9 +52,15 @@ public class SensitiveDataConverter extends MessageConverter {
     private static final Set<String> maskPatterns = new HashSet<>();
 
     /**
-     * taskInstanceId -> sensitive plaintext values for that task only.
+     * Skip very short literals to avoid over-masking common tokens (e.g. "1", "ab").
      */
-    private static final ConcurrentHashMap<Integer, Set<String>> TASK_SENSITIVE_VALUES = new ConcurrentHashMap<>();
+    private static final int MIN_SENSITIVE_LITERAL_LENGTH = 3;
+
+    /**
+     * taskInstanceId -> sensitive plaintext values for that task only.
+     * Values are stored longest-first so longer secrets are masked before their prefixes.
+     */
+    private static final ConcurrentHashMap<Integer, List<String>> TASK_SENSITIVE_VALUES = new ConcurrentHashMap<>();
 
     static {
         addMaskPattern(TaskConstants.DATASOURCE_PASSWORD_REGEX);
@@ -74,7 +83,8 @@ public class SensitiveDataConverter extends MessageConverter {
 
     /**
      * Register sensitive plaintext values from this task's prepareParamsMap.
-     * Empty / {@code ******} are skipped. Safe to call multiple times (replaces prior set).
+     * Empty / {@code ******} / values shorter than {@link #MIN_SENSITIVE_LITERAL_LENGTH} are skipped.
+     * Safe to call multiple times (replaces prior set).
      */
     public static void registerTaskSensitiveValues(final int taskInstanceId,
                                                    final Map<String, Property> prepareParamsMap) {
@@ -88,7 +98,9 @@ public class SensitiveDataConverter extends MessageConverter {
                 continue;
             }
             String value = property.getValue();
-            if (StringUtils.isEmpty(value) || TaskConstants.SENSITIVE_DATA_MASK.equals(value)) {
+            if (StringUtils.isEmpty(value)
+                    || TaskConstants.SENSITIVE_DATA_MASK.equals(value)
+                    || value.length() < MIN_SENSITIVE_LITERAL_LENGTH) {
                 continue;
             }
             values.add(value);
@@ -97,7 +109,9 @@ public class SensitiveDataConverter extends MessageConverter {
             clearTaskSensitiveValues(taskInstanceId);
             return;
         }
-        TASK_SENSITIVE_VALUES.put(taskInstanceId, Collections.unmodifiableSet(values));
+        List<String> ordered = new ArrayList<>(values);
+        ordered.sort(Comparator.comparingInt(String::length).reversed());
+        TASK_SENSITIVE_VALUES.put(taskInstanceId, Collections.unmodifiableList(ordered));
     }
 
     public static void clearTaskSensitiveValues(final int taskInstanceId) {
@@ -106,8 +120,8 @@ public class SensitiveDataConverter extends MessageConverter {
 
     /** @return unmodifiable view for tests; empty when none registered */
     static Set<String> getTaskSensitiveValues(final int taskInstanceId) {
-        Set<String> values = TASK_SENSITIVE_VALUES.get(taskInstanceId);
-        return values == null ? Collections.emptySet() : values;
+        List<String> values = TASK_SENSITIVE_VALUES.get(taskInstanceId);
+        return values == null ? Collections.emptySet() : Collections.unmodifiableSet(new HashSet<>(values));
     }
 
     public static String maskSensitiveData(final String logMsg) {
@@ -140,7 +154,7 @@ public class SensitiveDataConverter extends MessageConverter {
         if (taskInstanceId == null) {
             return logMsg;
         }
-        Set<String> values = TASK_SENSITIVE_VALUES.get(taskInstanceId);
+        List<String> values = TASK_SENSITIVE_VALUES.get(taskInstanceId);
         if (CollectionUtils.isEmpty(values)) {
             return logMsg;
         }
