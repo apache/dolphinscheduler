@@ -163,13 +163,27 @@ class SensitiveDataConverterTest {
     }
 
     @Test
-    void registerSkipsEmptyAndPlaceholder() {
+    void registerSkipsEmptyPlaceholderAndShortValues() {
         Map<String, Property> params = new HashMap<>();
         params.put("empty", sensitive("empty", ""));
         params.put("mask", sensitive("mask", TaskConstants.SENSITIVE_DATA_MASK));
+        params.put("one", sensitive("one", "1"));
+        params.put("two", sensitive("two", "ab"));
         SensitiveDataConverter.registerTaskSensitiveValues(101, params);
 
         assertTrue(SensitiveDataConverter.getTaskSensitiveValues(101).isEmpty());
+        assertEquals("echo 1 ab", SensitiveDataConverter.maskSensitiveData("echo 1 ab", 101));
+    }
+
+    @Test
+    void longerSecretMaskedBeforePrefix() {
+        Map<String, Property> params = new HashMap<>();
+        params.put("short", sensitive("short", "sec"));
+        params.put("long", sensitive("long", "secret-token"));
+        SensitiveDataConverter.registerTaskSensitiveValues(101, params);
+
+        assertEquals("******", SensitiveDataConverter.maskSensitiveData("secret-token", 101));
+        assertFalse(SensitiveDataConverter.maskSensitiveData("secret-token", 101).contains("******ret-token"));
     }
 
     @Test

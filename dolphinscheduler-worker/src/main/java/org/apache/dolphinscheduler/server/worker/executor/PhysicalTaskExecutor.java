@@ -134,6 +134,11 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     protected void initializeTaskContext() {
+        // Register before any context logging (including super) so worker logs are masked too.
+        SensitiveDataConverter.registerTaskSensitiveValues(
+                taskExecutionContext.getTaskInstanceId(),
+                taskExecutionContext.getPrepareParamsMap());
+
         super.initializeTaskContext();
 
         taskExecutionContext.setTaskAppId(String.valueOf(taskExecutionContext.getTaskInstanceId()));
@@ -150,11 +155,6 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
                 taskExecutionContext);
         taskExecutionContext.setResourceContext(resourceContext);
         log.info("Download resources successfully: {}", taskExecutionContext.getResourceContext());
-
-        // Per-task log masking for sensitive prepareParams (DSIP-105 / #18588).
-        SensitiveDataConverter.registerTaskSensitiveValues(
-                taskExecutionContext.getTaskInstanceId(),
-                taskExecutionContext.getPrepareParamsMap());
 
         log.info(TaskLogMarkers.excludeInTaskLog(), "Initialized Task Context{}",
                 JSONUtils.toPrettyJsonString(taskExecutionContext));
