@@ -195,8 +195,9 @@ public class HttpTask extends AbstractTask {
         OkHttpRequestHeaders okHttpRequestHeaders = new OkHttpRequestHeaders();
         okHttpRequestHeaders.setHeaders(getHeaders());
         okHttpRequestHeaders.setOkHttpRequestHeaderContentType(getContentType());
+        Map<String, Object> requestParams = getRequestParams();
 
-        OkHttpResponse okHttpResponse = OkHttpUtils.delete(httpParameters.getUrl(), okHttpRequestHeaders,
+        OkHttpResponse okHttpResponse = OkHttpUtils.delete(httpParameters.getUrl(), okHttpRequestHeaders, requestParams,
                 httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout(),
                 httpParameters.getConnectTimeout(), httpParameters.isSocketKeepAlive());
         addDefaultOutput(JSONUtils.toJsonString(okHttpResponse));

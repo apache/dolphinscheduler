@@ -59,6 +59,23 @@ public final class Constants {
      */
     public static final String SHELL_KILL_WAIT_TIMEOUT = "shell.kill.wait.timeout";
 
+    /**
+     * sql.task.alert.max.rows: this property defines the max rows kept in the task-result alert content.
+     */
+    public static final String SQL_TASK_ALERT_MAX_ROWS = "sql.task.alert.max.rows";
+
+    /**
+     * sql.task.alert.max.row.value.length: this property defines the max chars of a single string value kept in the
+     * task-result alert content.
+     */
+    public static final String SQL_TASK_ALERT_MAX_ROW_VALUE_LENGTH = "sql.task.alert.max.row.value.length";
+
+    /**
+     * sql.task.alert.max.content.bytes: this property defines the max serialized UTF-8 bytes of the task-result alert
+     * content.
+     */
+    public static final String SQL_TASK_ALERT_MAX_CONTENT_BYTES = "sql.task.alert.max.content.bytes";
+
     public static final String SUDO_ENABLE = "sudo.enable";
 
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
