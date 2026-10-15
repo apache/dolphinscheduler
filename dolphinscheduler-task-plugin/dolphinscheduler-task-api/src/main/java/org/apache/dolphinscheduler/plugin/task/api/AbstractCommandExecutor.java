@@ -180,7 +180,18 @@ public abstract class AbstractCommandExecutor {
      * @return true if the output was collected, false if the wait timed out
      */
     public boolean awaitOutputCollected(long timeoutMillis) {
-        CompletableFuture<Void> future = collectProcessLogFuture;
+        return awaitCollected(collectProcessLogFuture, timeoutMillis);
+    }
+
+    /**
+     * Wait until the given output collection completes, at most the given time. Kept as a static
+     * method so that the waiting itself can be verified without starting a process.
+     *
+     * @param future the output collection, may be null when no process was started
+     * @param timeoutMillis the maximum time to wait
+     * @return true if the output was collected, false if the wait timed out
+     */
+    static boolean awaitCollected(CompletableFuture<Void> future, long timeoutMillis) {
         if (future == null) {
             return true;
         }

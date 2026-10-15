@@ -116,6 +116,10 @@ public class FlinkArgsUtils {
      * {@code SELECT 'SET rest.address=x'}. Only the single quoted form is a SQL Client string, the
      * double quoted form is not part of its syntax. Of the four groups the first two are the key
      * (quoted and unquoted form) and the last two its value.
+     *
+     * <p>The script is scanned with a pattern, not with a SQL parser, so a string literal which spans
+     * several lines and whose line begins with a {@code SET} statement is indistinguishable from a
+     * statement.
      */
     private static final Pattern SQL_SET_STATEMENT_REGEX =
             Pattern.compile("(?im)(?:^|;)\\s*SET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'([^']*)'|([^;'\\s]+))");
@@ -238,6 +242,9 @@ public class FlinkArgsUtils {
      * Merge the cluster connection options, a later option for the same key wins. A connection setting
      * which is given both as a CLI option and as a SQL {@code SET} statement is therefore passed once,
      * with the value which is effective for the submitted job.
+     *
+     * <p>Note that a script which changes the connection between two submitted jobs can only be
+     * represented by one configuration, the value of the last statement is used.
      */
     public static List<String> mergeClusterConnectionOptions(List<String> first, List<String> second) {
         Map<String, String> optionsByKey = new LinkedHashMap<>();

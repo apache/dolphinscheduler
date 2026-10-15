@@ -265,6 +265,7 @@ public class FlinkTaskTest {
         // which is not part of the snapshot
         InOrder inOrder = Mockito.inOrder(task);
         inOrder.verify(task).cancelClientByProcess();
+        inOrder.verify(task).awaitSubmissionOutputCollected(Mockito.anyLong());
         inOrder.verify(task, Mockito.atLeastOnce()).executeFlinkCancelCommand(Mockito.anyList());
     }
 

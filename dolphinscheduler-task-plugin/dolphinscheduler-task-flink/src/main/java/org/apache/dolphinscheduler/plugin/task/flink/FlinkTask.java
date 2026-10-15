@@ -190,10 +190,18 @@ public class FlinkTask extends AbstractYarnTask {
      * bounded, a command which does not release its output pipe must not block the cancellation.
      */
     private void awaitBufferedSubmissionOutput() {
-        if (!awaitTaskOutputCollected(SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS)) {
+        if (!awaitSubmissionOutputCollected(SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS)) {
             log.warn("The submission output could not be collected within {}ms, collect the JobIDs anyway",
                     SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS);
         }
+    }
+
+    /**
+     * Wait for the output of the submission to be written to the task log, kept as a separate method so
+     * that the wait can be verified in tests.
+     */
+    protected boolean awaitSubmissionOutputCollected(long timeoutMillis) {
+        return awaitTaskOutputCollected(timeoutMillis);
     }
 
     /**
