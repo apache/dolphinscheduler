@@ -20,9 +20,11 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.serial;
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
 import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowSerialCoordinator;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -33,6 +35,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -55,6 +59,9 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
 
     @Autowired
     private WorkflowDefinitionLogDao workflowDefinitionLogDao;
+
+    @Autowired
+    private WorkflowInstanceDao workflowInstanceDao;
 
     @Autowired
     private SerialCommandWaitHandler serialCommandWaitHandler;
@@ -94,7 +101,9 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
         while (flag) {
             try {
                 final StopWatch workflowSerialCoordinatorRoundCost = StopWatch.createStarted();
-                final List<SerialCommandsGroup> serialCommandsGroups = fetchSerialCommands();
+                final List<SerialCommandDto> serialCommands = serialCommandDao.fetchSerialCommands(DEFAULT_FETCH_SIZE);
+                final List<SerialCommandDto> liveSerialCommands = reconcileStaleSerialCommands(serialCommands);
+                final List<SerialCommandsGroup> serialCommandsGroups = groupSerialCommands(liveSerialCommands);
                 serialCommandsGroups.forEach(this::handleSerialCommand);
                 log.debug("WorkflowSerialCoordinator handled SerialCommandsGroup size: {}, cost: {}/ms ",
                         serialCommandsGroups.size(),
@@ -136,9 +145,61 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
         }
     }
 
-    private List<SerialCommandsGroup> fetchSerialCommands() {
-        // todo: set a limit here and fetch by incremental id
-        final List<SerialCommandDto> serialCommands = serialCommandDao.fetchSerialCommands(DEFAULT_FETCH_SIZE);
+    /**
+     * Recycles serial commands whose workflow instance has already reached a final state, or is gone (#18698).
+     * <p> The normal cleanup deletes a workflow's serial command in the same transaction as its finish, but if the
+     * master dies before that transaction runs, the row survives a terminal (or deleted) instance and the queue for
+     * that workflow definition never drains again. This reconciliation is idempotent with the transactional delete:
+     * both target the same rows. A live queue entry is never touched: while an entry waits, its instance holds the
+     * non-final SERIAL_WAIT state (persisted before the row is inserted, in one transaction), and while it runs the
+     * instance is RUNNING_EXECUTION.
+     */
+    List<SerialCommandDto> reconcileStaleSerialCommands(final List<SerialCommandDto> serialCommands) {
+        if (CollectionUtils.isEmpty(serialCommands)) {
+            return Collections.emptyList();
+        }
+        final Set<Integer> workflowInstanceIds = serialCommands.stream()
+                .map(SerialCommandDto::getWorkflowInstanceId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+        final Map<Integer, WorkflowInstance> workflowInstances = workflowInstanceIds.isEmpty()
+                ? Collections.emptyMap()
+                : workflowInstanceDao.queryByIds(workflowInstanceIds).stream()
+                        .collect(Collectors.toMap(WorkflowInstance::getId, workflowInstance -> workflowInstance));
+        // Recycled rows are removed from this round's list as well: a group
+        // assembled from a recycled row would hand a dead workflow instance to
+        // the handlers below.
+        final List<SerialCommandDto> liveSerialCommands = new ArrayList<>(serialCommands.size());
+        for (final SerialCommandDto serialCommand : serialCommands) {
+            final Integer workflowInstanceId = serialCommand.getWorkflowInstanceId();
+            if (workflowInstanceId == null) {
+                log.warn(
+                        "Recycle stale SerialCommand: {}, since its workflowInstanceId is not set, this shouldn't happen",
+                        serialCommand.getId());
+                serialCommandDao.deleteById(serialCommand.getId());
+                continue;
+            }
+            final WorkflowInstance workflowInstance = workflowInstances.get(workflowInstanceId);
+            if (workflowInstance == null) {
+                log.warn(
+                        "Recycle stale SerialCommand: {}, since its workflowInstance: {} does not exist",
+                        serialCommand.getId(), workflowInstanceId);
+                serialCommandDao.deleteById(serialCommand.getId());
+                continue;
+            }
+            if (workflowInstance.getState().isFinalState()) {
+                log.warn(
+                        "Recycle stale SerialCommand: {}, since its workflowInstance: {} is already in final state: {}",
+                        serialCommand.getId(), workflowInstanceId, workflowInstance.getState());
+                serialCommandDao.deleteById(serialCommand.getId());
+                continue;
+            }
+            liveSerialCommands.add(serialCommand);
+        }
+        return liveSerialCommands;
+    }
+
+    private List<SerialCommandsGroup> groupSerialCommands(final List<SerialCommandDto> serialCommands) {
         if (CollectionUtils.isEmpty(serialCommands)) {
             return Collections.emptyList();
         }
