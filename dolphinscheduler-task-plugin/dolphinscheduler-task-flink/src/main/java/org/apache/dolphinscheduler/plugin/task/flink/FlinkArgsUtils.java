@@ -39,11 +39,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -104,6 +107,14 @@ public class FlinkArgsUtils {
      */
     private static final List<String> CLUSTER_CONNECTION_CONFIG_PREFIXES =
             Collections.singletonList("security.ssl.rest.");
+
+    /**
+     * A {@code SET} statement of the Flink SQL Client, in the quoted form
+     * {@code SET 'rest.address' = 'remote-jm'} and in the unquoted form
+     * {@code SET rest.port = 8081}. The first group is the key, the second one its value.
+     */
+    private static final Pattern SQL_SET_STATEMENT_REGEX =
+            Pattern.compile("(?i)\\bSET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'([^']*)'|([^;'\\s]+))");
 
     /**
      * The {@code -D} option of the flink CLI, which allows specifying a configuration value.
@@ -187,6 +198,57 @@ public class FlinkArgsUtils {
             }
         }
         return options;
+    }
+
+    /**
+     * Extract the cluster connection options from the SQL scripts of the submission. A SQL task
+     * configures its connection with {@code SET} statements as well, for example
+     * {@code SET 'rest.address' = 'remote-jm'}, which the cancel / savepoint command has to repeat.
+     *
+     * @param scripts the init script and the raw script of the submission, may be null
+     * @return the cluster connection options, in the order they appear in the scripts
+     */
+    public static List<String> extractClusterConnectionOptionsFromSql(String... scripts) {
+        List<String> options = new ArrayList<>();
+        for (String script : scripts) {
+            if (StringUtils.isBlank(script)) {
+                continue;
+            }
+            Matcher matcher = SQL_SET_STATEMENT_REGEX.matcher(script);
+            while (matcher.find()) {
+                String key = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
+                String value = matcher.group(3) != null ? matcher.group(3) : matcher.group(4);
+                if (value == null) {
+                    continue;
+                }
+                String option = DYNAMIC_PROPERTY_OPTION + key + "=" + value;
+                if (isClusterConnectionConfig(option)) {
+                    options.add(option);
+                }
+            }
+        }
+        return options;
+    }
+
+    /**
+     * Merge the cluster connection options, a later option for the same key wins. A connection setting
+     * which is given both as a CLI option and as a SQL {@code SET} statement is therefore passed once,
+     * with the value which is effective for the submitted job.
+     */
+    public static List<String> mergeClusterConnectionOptions(List<String> first, List<String> second) {
+        Map<String, String> optionsByKey = new LinkedHashMap<>();
+        for (String option : first) {
+            optionsByKey.put(clusterConnectionOptionKey(option), option);
+        }
+        for (String option : second) {
+            optionsByKey.put(clusterConnectionOptionKey(option), option);
+        }
+        return new ArrayList<>(optionsByKey.values());
+    }
+
+    private static String clusterConnectionOptionKey(String option) {
+        int separator = option.indexOf('=');
+        return separator < 0 ? option : option.substring(0, separator);
     }
 
     /**

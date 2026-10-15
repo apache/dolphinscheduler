@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -61,6 +62,14 @@ public class FlinkTask extends AbstractYarnTask {
      * not have to be cancelled any more.
      */
     private static final String JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE = "already reached another terminal state";
+
+    /**
+     * The maximum time to wait for the submission output which is still buffered when the client is
+     * stopped to be written to the task log.
+     */
+    private static final long SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS = 2_000L;
+
+    private static final long SUBMISSION_OUTPUT_DRAIN_INTERVAL_MILLIS = 100L;
 
     public FlinkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -139,25 +148,25 @@ public class FlinkTask extends AbstractYarnTask {
      *
      * <p>The process started by the worker is only the flink client, not the job itself: when the
      * client exits, or when it is killed, the job keeps running for local/standalone/session
-     * deployments. So the job is cancelled through the flink CLI first. The client process is stopped
-     * as well, whatever the result of the cancellation is: a multi statement SQL script can submit
-     * another job after the cancelled statement, and the process tree kill plus the YARN/K8s
-     * application cancellation are needed when no JobID was found or when the task was submitted to a
-     * resource manager.
+     * deployments. So the jobs are cancelled through the flink CLI.
+     *
+     * <p>The client is stopped before the JobIDs are collected: while it is running it can submit
+     * further jobs, which would be missing from an earlier snapshot. The client stop also cancels the
+     * YARN/K8s application of the task.
      */
     @Override
     public void cancelApplication() throws TaskException {
         TaskException cancelFailure = null;
         try {
-            cancelFlinkJob();
+            cancelClientByProcess();
         } catch (TaskException e) {
             cancelFailure = e;
         }
-        // The client process has to be stopped even when the remote job could not be cancelled,
-        // otherwise the worker keeps the task executor running and the task instance cannot reach a
-        // final state. The failure is still propagated afterwards.
+        // the submission output is collected asynchronously, its tail has to reach the task log before
+        // the JobIDs are collected from it
+        awaitBufferedSubmissionOutput();
         try {
-            cancelClientByProcess();
+            cancelFlinkJob();
         } catch (TaskException e) {
             if (cancelFailure == null) {
                 cancelFailure = e;
@@ -176,6 +185,31 @@ public class FlinkTask extends AbstractYarnTask {
      */
     protected void cancelClientByProcess() throws TaskException {
         super.cancelApplication();
+    }
+
+    /**
+     * Wait until the task log stops growing, so that the submission output which is still buffered when
+     * the client was stopped is written before the JobIDs are collected from the log. The wait is
+     * bounded, a log which is still being appended to must not block the cancellation.
+     */
+    private void awaitBufferedSubmissionOutput() {
+        String logPath = taskExecutionContext.getLogPath();
+        if (StringUtils.isEmpty(logPath)) {
+            return;
+        }
+        File logFile = new File(logPath);
+        long length = logFile.length();
+        long deadline = System.currentTimeMillis() + SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS;
+        while (System.currentTimeMillis() < deadline) {
+            ThreadUtils.sleep(SUBMISSION_OUTPUT_DRAIN_INTERVAL_MILLIS);
+            long currentLength = logFile.length();
+            if (currentLength == length) {
+                return;
+            }
+            length = currentLength;
+        }
+        log.warn("The submission output of the task is still growing, collect the JobIDs anyway, logPath: {}",
+                logPath);
     }
 
     /**
@@ -269,7 +303,12 @@ public class FlinkTask extends AbstractYarnTask {
         if (!(parameters instanceof FlinkParameters)) {
             return Collections.emptyList();
         }
-        return FlinkArgsUtils.extractClusterConnectionOptions(((FlinkParameters) parameters).getOthers());
+        FlinkParameters flinkParameters = (FlinkParameters) parameters;
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(flinkParameters.getOthers());
+        // a SQL task can also configure its connection with SET statements in its scripts
+        List<String> sqlOptions = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                flinkParameters.getInitScript(), flinkParameters.getRawScript());
+        return FlinkArgsUtils.mergeClusterConnectionOptions(options, sqlOptions);
     }
 
     /**

@@ -28,6 +28,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 public class FlinkTaskTest {
@@ -205,6 +207,65 @@ public class FlinkTaskTest {
         Assertions.assertEquals(
                 "${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef -m remote-jm:8081",
                 String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
+    public void testCancelApplicationKeepsConnectionOptionsFromSqlScripts() throws Exception {
+        // a SQL task can select the endpoint with SET statements instead of the extra options
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job ID: 1234567890abcdef1234567890abcdef");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setInitScript("SET 'rest.address' = 'remote-jm';\nSET 'rest.port' = '8081';");
+        parameters.setRawScript("INSERT INTO t SELECT * FROM s;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
+        task.cancelApplication();
+
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef -Drest.address=remote-jm "
+                        + "-Drest.port=8081",
+                String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
+    public void testCancelApplicationCollectsJobIdSubmittedWhileTheClientIsStopped() throws Exception {
+        // a multi statement SQL script can submit another job while the client is being stopped, the
+        // final snapshot has to contain it
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 11111111111111111111111111111111");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        Mockito.doAnswer(invocation -> {
+            Files.write(Paths.get(context.getLogPath()),
+                    "\nJob has been submitted with JobID 22222222222222222222222222222222"
+                            .getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.APPEND);
+            return null;
+        }).when(task).cancelClientByProcess();
+
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded(), cancelSucceeded());
+
+        task.cancelApplication();
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 11111111111111111111111111111111",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222",
+                String.join(" ", executedCommands.get(1)));
+
+        // the client has to be stopped before the jobs are cancelled, otherwise it could submit a job
+        // which is not part of the snapshot
+        InOrder inOrder = Mockito.inOrder(task);
+        inOrder.verify(task).cancelClientByProcess();
+        inOrder.verify(task, Mockito.atLeastOnce()).executeFlinkCancelCommand(Mockito.anyList());
     }
 
     @Test

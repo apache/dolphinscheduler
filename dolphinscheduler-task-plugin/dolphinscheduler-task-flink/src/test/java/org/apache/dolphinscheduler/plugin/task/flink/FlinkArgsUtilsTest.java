@@ -260,6 +260,30 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsFromSqlScripts() {
+        // a SQL task configures its connection with SET statements as well
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'rest.address' = 'remote-jm';\nSET 'rest.port'='8081';",
+                "set security.ssl.rest.enabled=true;\nset parallelism.default=4;");
+
+        Assertions.assertEquals(
+                Arrays.asList("-Drest.address=remote-jm", "-Drest.port=8081", "-Dsecurity.ssl.rest.enabled=true"),
+                options);
+    }
+
+    @Test
+    public void testMergeClusterConnectionOptions() {
+        // a later option for the same key wins, so a connection setting is passed once
+        List<String> options = FlinkArgsUtils.mergeClusterConnectionOptions(
+                Arrays.asList("-m", "default-jm:8081", "-Drest.port=8081"),
+                Arrays.asList("-Drest.address=remote-jm", "-Drest.port=8082"));
+
+        Assertions.assertEquals(
+                Arrays.asList("-m", "default-jm:8081", "-Drest.port=8082", "-Drest.address=remote-jm"),
+                options);
+    }
+
+    @Test
     public void testExtractClusterConnectionOptionsDropsSubmissionOnlyOptions() {
         // the parallelism, slots, memory, application name, main class, savepoint and configuration
         // of the submission only matter at submission time
