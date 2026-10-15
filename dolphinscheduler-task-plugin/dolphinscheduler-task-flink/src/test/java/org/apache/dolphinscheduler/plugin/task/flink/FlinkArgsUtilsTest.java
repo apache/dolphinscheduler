@@ -272,6 +272,19 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsFromSqlScriptsOnlyMatchesStatements() {
+        // a SET inside a string literal or a comment is not a statement, the double quoted form is not
+        // the SQL Client syntax, and several statements on one line are all matched
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "INSERT INTO t SELECT 'SET rest.address=literal';\n"
+                        + "SET \"rest.address\" = \"quoted\";\n"
+                        + "-- SET rest.port = 9999;\n"
+                        + "SET rest.address = remote-jm; SET rest.port = 8081;");
+
+        Assertions.assertEquals(Arrays.asList("-Drest.address=remote-jm", "-Drest.port=8081"), options);
+    }
+
+    @Test
     public void testMergeClusterConnectionOptions() {
         // a later option for the same key wins, so a connection setting is passed once
         List<String> options = FlinkArgsUtils.mergeClusterConnectionOptions(

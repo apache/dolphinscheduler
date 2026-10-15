@@ -109,12 +109,16 @@ public class FlinkArgsUtils {
             Collections.singletonList("security.ssl.rest.");
 
     /**
-     * A {@code SET} statement of the Flink SQL Client, in the quoted form
-     * {@code SET 'rest.address' = 'remote-jm'} and in the unquoted form
-     * {@code SET rest.port = 8081}. The first group is the key, the second one its value.
+     * A {@code SET} statement of the Flink SQL Client, at the beginning of a statement. The quoted
+     * form {@code SET 'rest.address' = 'remote-jm'} and the unquoted form {@code SET rest.port = 8081}
+     * are both supported, and so is a statement which follows another one on the same line. Anchoring
+     * the statement avoids matching the text of a string literal, for example
+     * {@code SELECT 'SET rest.address=x'}. Only the single quoted form is a SQL Client string, the
+     * double quoted form is not part of its syntax. Of the four groups the first two are the key
+     * (quoted and unquoted form) and the last two its value.
      */
     private static final Pattern SQL_SET_STATEMENT_REGEX =
-            Pattern.compile("(?i)\\bSET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'([^']*)'|([^;'\\s]+))");
+            Pattern.compile("(?im)(?:^|;)\\s*SET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'([^']*)'|([^;'\\s]+))");
 
     /**
      * The {@code -D} option of the flink CLI, which allows specifying a configuration value.

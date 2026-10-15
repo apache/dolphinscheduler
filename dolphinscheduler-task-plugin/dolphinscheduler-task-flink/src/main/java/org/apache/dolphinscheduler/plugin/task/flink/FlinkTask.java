@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
@@ -68,8 +67,6 @@ public class FlinkTask extends AbstractYarnTask {
      * stopped to be written to the task log.
      */
     private static final long SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS = 2_000L;
-
-    private static final long SUBMISSION_OUTPUT_DRAIN_INTERVAL_MILLIS = 100L;
 
     public FlinkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -188,28 +185,15 @@ public class FlinkTask extends AbstractYarnTask {
     }
 
     /**
-     * Wait until the task log stops growing, so that the submission output which is still buffered when
-     * the client was stopped is written before the JobIDs are collected from the log. The wait is
-     * bounded, a log which is still being appended to must not block the cancellation.
+     * Wait until the output of the submission has been written to the task log, so that the JobIDs of
+     * the jobs which were submitted right before the client was stopped are not missed. The wait is
+     * bounded, a command which does not release its output pipe must not block the cancellation.
      */
     private void awaitBufferedSubmissionOutput() {
-        String logPath = taskExecutionContext.getLogPath();
-        if (StringUtils.isEmpty(logPath)) {
-            return;
+        if (!awaitTaskOutputCollected(SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS)) {
+            log.warn("The submission output could not be collected within {}ms, collect the JobIDs anyway",
+                    SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS);
         }
-        File logFile = new File(logPath);
-        long length = logFile.length();
-        long deadline = System.currentTimeMillis() + SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS;
-        while (System.currentTimeMillis() < deadline) {
-            ThreadUtils.sleep(SUBMISSION_OUTPUT_DRAIN_INTERVAL_MILLIS);
-            long currentLength = logFile.length();
-            if (currentLength == length) {
-                return;
-            }
-            length = currentLength;
-        }
-        log.warn("The submission output of the task is still growing, collect the JobIDs anyway, logPath: {}",
-                logPath);
     }
 
     /**
