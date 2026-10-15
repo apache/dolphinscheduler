@@ -242,6 +242,31 @@ public class HttpTaskTest {
     }
 
     @Test
+    public void testDeleteRequestSendsHttpParameterParamsAsQuery() throws Exception {
+        // #18696: the DELETE path used to drop PARAMETER-typed HTTP Parameters
+        // entirely; it must append them to the url like the GET path does
+        List<HttpProperty> httpParams = new ArrayList<>();
+        HttpProperty property = new HttpProperty();
+        property.setProp("day");
+        property.setValue("${day}");
+        property.setHttpParametersType(HttpParametersType.PARAMETER);
+        httpParams.add(property);
+
+        Map<String, String> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("day", "20220812");
+
+        HttpTask httpTask = generateHttpTask(DEFAULT_MOCK_PATH, HttpRequestMethod.DELETE, null,
+                httpParams, prepareParamsMap, HttpCheckCondition.STATUS_CODE_DEFAULT, null,
+                HttpStatus.SC_OK, "{}");
+        httpTask.handle(null);
+
+        RecordedRequest request = getLatestMockWebServer().takeRequest(1, TimeUnit.SECONDS);
+        Assertions.assertEquals("DELETE", request.getMethod());
+        Assertions.assertEquals("/test?day=20220812", request.getPath());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+    }
+
+    @Test
     public void testHandleWithHttpParameterParams() throws Exception {
         List<HttpProperty> httpParams = new ArrayList<>();
         HttpProperty property = new HttpProperty();
