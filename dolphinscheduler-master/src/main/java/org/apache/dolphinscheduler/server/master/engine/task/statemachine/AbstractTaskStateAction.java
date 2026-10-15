@@ -52,6 +52,7 @@ import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
@@ -249,12 +250,21 @@ public abstract class AbstractTaskStateAction implements ITaskStateAction {
     protected void persistentTaskInstanceSuccessEventToDB(final ITaskExecution taskExecution,
                                                           final TaskSuccessLifecycleEvent taskSuccessEvent) {
         final TaskInstance taskInstance = taskExecution.getTaskInstance();
-        taskInstance.setState(TaskExecutionStatus.SUCCESS);
-        taskInstance.setEndTime(taskSuccessEvent.getEndTime());
         final List<Property> finalVarPool = VarPoolUtils.mergeVarPoolJsonString(taskInstance.getVarPool(),
                 JSONUtils.toJsonString(taskSuccessEvent.getVarPool()));
-        taskInstance.setVarPool(VarPoolUtils.serializeVarPool(finalVarPool));
-        taskInstanceDao.updateById(taskInstance);
+        final String serializedFinalVarPool = VarPoolUtils.serializeVarPool(finalVarPool);
+
+        // Keep the shared state retryable if persisting the success result throws.
+        final TaskInstance taskInstanceToUpdate = new TaskInstance();
+        BeanUtils.copyProperties(taskInstance, taskInstanceToUpdate);
+        taskInstanceToUpdate.setState(TaskExecutionStatus.SUCCESS);
+        taskInstanceToUpdate.setEndTime(taskSuccessEvent.getEndTime());
+        taskInstanceToUpdate.setVarPool(serializedFinalVarPool);
+        taskInstanceDao.updateById(taskInstanceToUpdate);
+
+        taskInstance.setState(TaskExecutionStatus.SUCCESS);
+        taskInstance.setEndTime(taskSuccessEvent.getEndTime());
+        taskInstance.setVarPool(serializedFinalVarPool);
     }
 
     /**
