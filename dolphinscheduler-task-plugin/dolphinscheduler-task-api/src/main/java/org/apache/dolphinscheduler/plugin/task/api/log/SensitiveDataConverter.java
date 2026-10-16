@@ -45,6 +45,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
  * Static regex patterns (e.g. datasource password) are global.
  * Per-task sensitive parameter plaintext values are registered dynamically and
  * must be cleared when the task ends to avoid cross-task pollution.
+ * <p>
+ * Note: task process output (stdout, K8s pod logs) is intentionally not masked, it is
+ * the task's own output; only logs printed by the worker server itself are masked.
  */
 public class SensitiveDataConverter extends MessageConverter {
 
