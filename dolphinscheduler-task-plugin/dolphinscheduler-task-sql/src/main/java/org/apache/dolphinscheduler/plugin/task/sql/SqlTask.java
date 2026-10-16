@@ -384,43 +384,69 @@ public class SqlTask extends AbstractTask {
      */
     private String limitAlertContent(ArrayNode resultJSONArray) {
         int totalRows = resultJSONArray.size();
-        ArrayNode limited = JSONUtils.createArrayNode();
-        int rowsToKeep = Math.min(totalRows, alertMaxRows);
-        for (int i = 0; i < rowsToKeep; i++) {
-            limited.add(limitRowValues(resultJSONArray.get(i)));
+
+        // Serialize each kept row once and track its UTF-8 size, so the byte budget is
+        // enforced by arithmetic instead of re-serializing the whole array per iteration.
+        List<String> serializedRows = new ArrayList<>(Math.min(totalRows, alertMaxRows));
+        int rowsBytes = 0;
+        for (int i = 0; i < totalRows && i < alertMaxRows; i++) {
+            String rowJson = JSONUtils.toJsonString(limitRowValues(resultJSONArray.get(i)));
+            serializedRows.add(rowJson);
+            rowsBytes += rowJson.getBytes(StandardCharsets.UTF_8).length;
         }
 
-        int omittedRows = totalRows - rowsToKeep;
-        while (true) {
-            if (omittedRows > 0) {
-                limited.add(createOmissionMarker(omittedRows));
-            }
-            String content = JSONUtils.toJsonString(limited);
-            if (content.getBytes(StandardCharsets.UTF_8).length <= alertMaxContentBytes) {
-                return content;
-            }
-            if (omittedRows > 0) {
-                limited.remove(limited.size() - 1);
-            }
-            if (limited.isEmpty()) {
-                // Even a lone marker exceeds the budget (pathological budget); return the minimal notice.
-                return JSONUtils.toJsonString(createOmissionMarkerArray(totalRows));
-            }
-            limited.remove(limited.size() - 1);
+        int omittedRows = totalRows - serializedRows.size();
+        while (!serializedRows.isEmpty()
+                && serializedContentSize(rowsBytes, serializedRows.size(), omittedRows) > alertMaxContentBytes) {
+            rowsBytes -= serializedRows.remove(serializedRows.size() - 1).getBytes(StandardCharsets.UTF_8).length;
             omittedRows++;
         }
+        return buildAlertContent(serializedRows, omittedRows);
+    }
+
+    /**
+     * UTF-8 byte size of the alert content built from the kept rows and the omission marker,
+     * i.e. "[" + rows joined by "," + ("," + marker) + "]".
+     */
+    private int serializedContentSize(int rowsBytes, int rowCount, int omittedRows) {
+        int bytes = 2; // '[' and ']'
+        if (rowCount > 0) {
+            bytes += rowsBytes + rowCount - 1; // rows plus ',' separators
+        }
+        if (omittedRows > 0) {
+            bytes += (rowCount > 0 ? 1 : 0)
+                    + JSONUtils.toJsonString(createOmissionMarker(omittedRows)).getBytes(StandardCharsets.UTF_8).length;
+        }
+        return bytes;
+    }
+
+    /**
+     * Assemble the alert content from the kept rows and the omission marker,
+     * i.e. "[" + rows joined by "," + ("," + marker)? + "]".
+     */
+    private String buildAlertContent(List<String> serializedRows, int omittedRows) {
+        StringBuilder content = new StringBuilder();
+        content.append('[');
+        for (int i = 0; i < serializedRows.size(); i++) {
+            if (i > 0) {
+                content.append(',');
+            }
+            content.append(serializedRows.get(i));
+        }
+        if (omittedRows > 0) {
+            if (!serializedRows.isEmpty()) {
+                content.append(',');
+            }
+            content.append(JSONUtils.toJsonString(createOmissionMarker(omittedRows)));
+        }
+        content.append(']');
+        return content.toString();
     }
 
     private ObjectNode createOmissionMarker(int omittedRows) {
         ObjectNode omitted = JSONUtils.createObjectNode();
         omitted.put("...", omittedRows + " more rows omitted");
         return omitted;
-    }
-
-    private ArrayNode createOmissionMarkerArray(int totalRows) {
-        ArrayNode markerArray = JSONUtils.createArrayNode();
-        markerArray.add(createOmissionMarker(totalRows));
-        return markerArray;
     }
 
     private JsonNode limitRowValues(JsonNode row) {

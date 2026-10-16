@@ -896,6 +896,53 @@ class SqlTaskTest {
         Assertions.assertEquals("1 more rows omitted", only.get("...").asText());
     }
 
+    @Test
+    void testPrepareTaskResultAlertKeepsMaxRowsFittingExactByteBudget() throws Exception {
+        // each row {"id":"N"} serializes to 10 UTF-8 bytes and the marker row to 29 bytes,
+        // so keeping 2 rows costs exactly 53 bytes: brackets(2) + rows(20) + separator(1) + marker(30)
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        for (int i = 0; i < 5; i++) {
+            resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
+        }
+
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.rows", 30)).thenReturn(5);
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.row.value.length", 100))
+                    .thenReturn(100);
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.content.bytes", 60000)).thenReturn(53);
+
+            TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "exact byte budget test", 1);
+
+            TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+            Assertions.assertEquals("[{\"id\":\"0\"},{\"id\":\"1\"},{\"...\":\"3 more rows omitted\"}]",
+                    alertInfo.getContent());
+        }
+    }
+
+    @Test
+    void testPrepareTaskResultAlertMeasuresUtf8BytesNotChars() throws Exception {
+        // each row {"id":"中中中"} is 12 chars but 18 UTF-8 bytes, so a char-based budget
+        // check would keep 2 rows while the byte-based check keeps only 1
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        for (int i = 0; i < 5; i++) {
+            resultArray.add(JSONUtils.parseObject("{\"id\":\"" + repeatChar('\u4e2d', 3) + "\"}"));
+        }
+
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.rows", 30)).thenReturn(5);
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.row.value.length", 100))
+                    .thenReturn(100);
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.content.bytes", 60000)).thenReturn(60);
+
+            TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "utf8 bytes test", 1);
+
+            TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+            Assertions.assertEquals(
+                    "[{\"id\":\"\u4e2d\u4e2d\u4e2d\"},{\"...\":\"4 more rows omitted\"}]",
+                    alertInfo.getContent());
+        }
+    }
+
     private String repeatChar(char c, int count) {
         StringBuilder builder = new StringBuilder(count);
         for (int i = 0; i < count; i++) {
