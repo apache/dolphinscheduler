@@ -28,7 +28,8 @@ public enum StorageType {
     GCS,
     ABS,
     OBS,
-    COS;
+    COS,
+    GIT;
 
     public static Optional<StorageType> getStorageType(String name) {
         try {

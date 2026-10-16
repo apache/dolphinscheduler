@@ -67,6 +67,11 @@
             <artifactId>dolphinscheduler-storage-cos</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dolphinscheduler</groupId>
+            <artifactId>dolphinscheduler-storage-git</artifactId>
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
 </project>

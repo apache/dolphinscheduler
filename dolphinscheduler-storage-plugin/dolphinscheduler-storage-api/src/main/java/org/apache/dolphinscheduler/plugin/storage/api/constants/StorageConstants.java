@@ -66,4 +66,14 @@ public final class StorageConstants {
     public static final String HUAWEI_CLOUD_OBS_BUCKET_NAME = "resource.huawei.cloud.obs.bucket.name";
     public static final String HUAWEI_CLOUD_OBS_END_POINT = "resource.huawei.cloud.obs.endpoint";
 
+    /**
+     * git storage configuration
+     */
+    public static final String GIT_PROVIDER = "resource.git.provider";
+    public static final String GIT_API_URL = "resource.git.api.url";
+    public static final String GIT_REPOSITORY = "resource.git.repository";
+    public static final String GIT_BRANCH = "resource.git.branch";
+    public static final String GIT_AUTH_TOKEN = "resource.git.auth.token";
+    public static final String GIT_COMMIT_MESSAGE = "resource.git.commit.message";
+
 }
