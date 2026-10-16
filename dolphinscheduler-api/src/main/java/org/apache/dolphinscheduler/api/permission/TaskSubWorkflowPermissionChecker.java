@@ -20,15 +20,19 @@ package org.apache.dolphinscheduler.api.permission;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,16 +48,45 @@ public class TaskSubWorkflowPermissionChecker {
 
     private final WorkflowDefinitionDao workflowDefinitionDao;
     private final ProjectService projectService;
+    private final TaskDefinitionLogDao taskDefinitionLogDao;
+    private final TaskResourcePermissionChecker taskResourcePermissionChecker;
 
     public TaskSubWorkflowPermissionChecker(WorkflowDefinitionDao workflowDefinitionDao,
-                                            ProjectService projectService) {
+                                            ProjectService projectService,
+                                            TaskDefinitionLogDao taskDefinitionLogDao,
+                                            TaskResourcePermissionChecker taskResourcePermissionChecker) {
         this.workflowDefinitionDao = workflowDefinitionDao;
         this.projectService = projectService;
+        this.taskDefinitionLogDao = taskDefinitionLogDao;
+        this.taskResourcePermissionChecker = taskResourcePermissionChecker;
     }
 
     public void checkPermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions) {
+        queryAuthorizedSubWorkflows(loginUser, taskDefinitions, new HashSet<>());
+    }
+
+    public void checkExecutionPermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions) {
+        Collection<? extends TaskDefinition> pendingTasks = taskDefinitions;
+        Set<Long> visitedWorkflows = new HashSet<>();
+        while (pendingTasks != null && !pendingTasks.isEmpty()) {
+            List<WorkflowDefinition> subWorkflows =
+                    queryAuthorizedSubWorkflows(loginUser, pendingTasks, visitedWorkflows);
+            List<TaskDefinition> nextTasks = new ArrayList<>();
+            for (WorkflowDefinition workflow : subWorkflows) {
+                List<? extends TaskDefinition> tasks = taskDefinitionLogDao
+                        .queryByWorkflowDefinitionCodeAndVersion(workflow.getCode(), workflow.getVersion());
+                taskResourcePermissionChecker.checkPermission(workflow.getProjectCode(), tasks);
+                nextTasks.addAll(tasks);
+            }
+            pendingTasks = nextTasks;
+        }
+    }
+
+    private List<WorkflowDefinition> queryAuthorizedSubWorkflows(User loginUser,
+                                                                 Collection<? extends TaskDefinition> taskDefinitions,
+                                                                 Set<Long> visitedWorkflows) {
         if (taskDefinitions == null || taskDefinitions.isEmpty()) {
-            return;
+            return Collections.emptyList();
         }
 
         Set<Long> subWorkflowDefinitionCodes = new HashSet<>();
@@ -68,9 +101,12 @@ public class TaskSubWorkflowPermissionChecker {
             }
         }
 
+        subWorkflowDefinitionCodes.removeAll(visitedWorkflows);
+
         if (subWorkflowDefinitionCodes.isEmpty()) {
-            return;
+            return Collections.emptyList();
         }
+        visitedWorkflows.addAll(subWorkflowDefinitionCodes);
 
         List<WorkflowDefinition> subWorkflowDefinitions =
                 workflowDefinitionDao.queryByCodes(subWorkflowDefinitionCodes);
@@ -90,11 +126,12 @@ public class TaskSubWorkflowPermissionChecker {
                 .collect(Collectors.toSet());
         try {
             for (Long projectCode : subWorkflowProjectCodes) {
-                projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+                projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.EXECUTE);
             }
         } catch (ServiceException ex) {
             log.warn("Referenced sub workflow is unavailable, userId:{}.", loginUser.getId());
             throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
         }
+        return subWorkflowDefinitions;
     }
 }

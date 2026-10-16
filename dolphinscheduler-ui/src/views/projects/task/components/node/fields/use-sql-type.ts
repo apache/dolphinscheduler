@@ -21,7 +21,10 @@ import { listAlertGroupById } from '@/service/modules/alert-group'
 import styles from '../index.module.scss'
 import type { IJsonItem } from '../types'
 
-export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
+export function useSqlType(
+  model: { [field: string]: any },
+  projectCode: number
+): IJsonItem[] {
   const { t } = useI18n()
   const querySpan = computed(() => (model.sqlType === '0' ? 6 : 0))
   const emailSpan = computed(() =>
@@ -43,7 +46,7 @@ export function useSqlType(model: { [field: string]: any }): IJsonItem[] {
   const getGroups = async () => {
     if (groupsLoading.value) return
     groupsLoading.value = true
-    const res = await listAlertGroupById()
+    const res = await listAlertGroupById(projectCode)
     groups.value = res.map((item: { id: number; groupName: string }) => ({
       label: item.groupName,
       value: item.id

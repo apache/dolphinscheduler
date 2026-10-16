@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServi
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.k8s.K8sClientService;
+import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.impl.K8SNamespaceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -63,6 +64,9 @@ public class K8SNamespaceServiceTest {
 
     @Mock
     private K8sNamespaceDao k8sNamespaceDao;
+
+    @Mock
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Mock
     private ClusterDao clusterDao;
@@ -137,42 +141,6 @@ public class K8SNamespaceServiceTest {
     }
 
     @Test
-    public void testQueryAuthorizedNamespace() {
-        Mockito.when(k8sNamespaceDao.queryAuthedNamespaceListByUserId(2)).thenReturn(getNamespaceList());
-
-        User loginUser = getLoginUser();
-
-        // test admin user
-        loginUser.setUserType(UserType.ADMIN_USER);
-        List<K8sNamespace> namespaces = k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2);
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(namespaces));
-
-        // test non-admin user
-        loginUser.setUserType(UserType.GENERAL_USER);
-        loginUser.setId(3);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> k8sNamespaceService.queryAuthorizedNamespace(loginUser, 2));
-    }
-
-    @Test
-    public void testQueryUnAuthorizedNamespace() {
-        Mockito.when(k8sNamespaceDao.queryAuthedNamespaceListByUserId(2)).thenReturn(new ArrayList<>());
-        Mockito.when(k8sNamespaceDao.queryAll()).thenReturn(getNamespaceList());
-
-        // test admin user
-        User loginUser = new User();
-        loginUser.setUserType(UserType.ADMIN_USER);
-        List<K8sNamespace> namespaces = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 2);
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(namespaces));
-
-        // test non-admin user
-        loginUser.setId(2);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> k8sNamespaceService.queryUnauthorizedNamespace(loginUser, 3));
-    }
-
-    @Test
     public void testQueryNamespaceAvailable() {
         List<K8sNamespace> k8sNamespaces = new ArrayList<>();
         K8sNamespace k8sNamespace = new K8sNamespace();
@@ -185,9 +153,10 @@ public class K8SNamespaceServiceTest {
         cluster.setName("test");
         clusters.add(cluster);
 
-        Mockito.when(k8sNamespaceDao.queryAll()).thenReturn(k8sNamespaces);
+        k8sNamespace.setClusterName("test");
+        Mockito.when(k8sNamespaceDao.queryByProject(100L)).thenReturn(k8sNamespaces);
         Mockito.when(clusterDao.queryAllClusterList()).thenReturn(clusters);
-        List<K8sNamespace> result = k8sNamespaceService.queryNamespaceAvailable(getLoginUser());
+        List<K8sNamespace> result = k8sNamespaceService.queryNamespaceAvailable(getLoginUser(), 100L);
         Assertions.assertEquals(result.get(0).getClusterName(), cluster.getName());
     }
 

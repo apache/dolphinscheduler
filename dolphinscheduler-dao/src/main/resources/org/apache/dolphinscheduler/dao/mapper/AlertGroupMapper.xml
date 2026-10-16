@@ -104,4 +104,15 @@
             </foreach>
         </if>
     </select>
+    <select id="queryByProject" resultType="org.apache.dolphinscheduler.dao.entity.AlertGroup">
+        select resource.* from t_ds_alertgroup resource
+        where exists (
+            select 1 from t_ds_project_resource_authorization grant_auth
+            where grant_auth.project_code = #{projectCode}
+                and grant_auth.resource_type = 'ALERT_GROUP'
+                and grant_auth.resource_key = concat('', resource.id)
+        )
+        order by resource.id
+    </select>
+
 </mapper>

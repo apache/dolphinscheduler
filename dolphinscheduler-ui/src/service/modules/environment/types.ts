@@ -24,6 +24,7 @@ interface EnvironmentReq {
 
 interface EnvironmentCodeReq {
   environmentCode: number
+  projectCode?: number
 }
 
 interface EnvironmentNameReq {

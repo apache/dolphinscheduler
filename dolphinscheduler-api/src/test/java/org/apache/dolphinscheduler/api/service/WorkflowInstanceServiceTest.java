@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_INSTANCE;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -32,7 +31,7 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTask
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.LoggerServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -43,6 +42,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.ContextType;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.graph.DAG;
@@ -155,7 +155,7 @@ public class WorkflowInstanceServiceTest {
     TaskDefinitionLogMapper taskDefinitionLogMapper;
 
     @Mock
-    TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
+    TaskResourcePermissionChecker taskResourcePermissionChecker;
 
     @Mock
     TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
@@ -210,7 +210,7 @@ public class WorkflowInstanceServiceTest {
         // project auth fail
         doThrow(new ServiceException())
                 .when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+                .checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         assertThrows(ServiceException.class, () -> {
             workflowInstanceService.queryWorkflowInstanceList(
                     loginUser,
@@ -238,9 +238,8 @@ public class WorkflowInstanceServiceTest {
 
         // data parameter check
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(Mockito.any(),
-                Mockito.any(Project.class),
-                Mockito.any());
+        Mockito.doNothing().when(projectService).checkProjectPermission(Mockito.any(), Mockito.any(Project.class),
+                eq(ProjectPermission.VIEW));
         when(workflowDefinitionDao.queryById(Mockito.any())).thenReturn(getProcessDefinition());
         when(workflowInstanceDao.queryWorkflowInstanceListPaging(Mockito.any(Page.class), Mockito.any(),
                 Mockito.any(),
@@ -261,7 +260,7 @@ public class WorkflowInstanceServiceTest {
                 10));
 
         // project auth success
-        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+        doNothing().when(projectService).checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
         when(workflowInstanceDao.queryWorkflowInstanceListPaging(
@@ -323,13 +322,12 @@ public class WorkflowInstanceServiceTest {
         // project auth fail
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
-                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+                .when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
                 () -> workflowInstanceService.queryByTriggerCode(loginUser, projectCode, 999L));
 
         // project auth success, trigger code null returns empty list
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
-                WORKFLOW_INSTANCE);
+        Mockito.doNothing().when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         List<WorkflowInstanceSummaryVO> nullTriggerRes =
                 workflowInstanceService.queryByTriggerCode(loginUser, projectCode, null);
         Assertions.assertTrue(nullTriggerRes.isEmpty());
@@ -352,13 +350,12 @@ public class WorkflowInstanceServiceTest {
         // project auth fail
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
-                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+                .when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         assertThrowsServiceException(Status.PROJECT_NOT_FOUND, () -> workflowInstanceService
                 .queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, size, startTime, endTime));
 
         // project auth success
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
-                WORKFLOW_INSTANCE);
+        Mockito.doNothing().when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         assertThrowsServiceException(Status.NEGTIVE_SIZE_NUMBER_ERROR, () -> workflowInstanceService
                 .queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, -1, startTime, endTime));
 
@@ -382,8 +379,7 @@ public class WorkflowInstanceServiceTest {
         String endTime = "2020-08-02 00:00:00";
 
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
-                WORKFLOW_INSTANCE);
+        Mockito.doNothing().when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
 
         assertThrowsServiceException(Status.START_TIME_BIGGER_THAN_END_TIME_ERROR,
                 () -> workflowInstanceService.queryTopNLongestRunningWorkflowInstance(loginUser, projectCode, size,
@@ -407,7 +403,7 @@ public class WorkflowInstanceServiceTest {
         // project auth fail
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
-                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+                .when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
                 () -> workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1));
 
@@ -415,8 +411,7 @@ public class WorkflowInstanceServiceTest {
         WorkflowInstance workflowInstance = getProcessInstance();
         WorkflowDefinition workflowDefinition = getProcessDefinition();
         workflowDefinition.setProjectCode(projectCode);
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
-                WORKFLOW_INSTANCE);
+        Mockito.doNothing().when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         when(processService.findWorkflowInstanceDetailById(workflowInstance.getId()))
                 .thenReturn(Optional.of(workflowInstance));
         when(processService.findWorkflowDefinition(workflowInstance.getWorkflowDefinitionCode(),
@@ -448,13 +443,12 @@ public class WorkflowInstanceServiceTest {
         // project auth fail
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
-                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+                .when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
                 () -> workflowInstanceService.queryTaskListByWorkflowInstanceId(loginUser, projectCode, 1));
 
         // project auth success
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
-                WORKFLOW_INSTANCE);
+        Mockito.doNothing().when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         WorkflowInstance workflowInstance = getProcessInstance();
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
         TaskInstance taskInstance = new TaskInstance();
@@ -500,13 +494,12 @@ public class WorkflowInstanceServiceTest {
         // project auth fail
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
-                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+                .when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
                 () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
 
         // task null
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
-                WORKFLOW_INSTANCE);
+        Mockito.doNothing().when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         when(taskInstanceDao.queryById(1)).thenReturn(null);
         assertThrowsServiceException(Status.TASK_INSTANCE_NOT_EXISTS,
                 () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
@@ -557,7 +550,7 @@ public class WorkflowInstanceServiceTest {
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, projectCode))
                 .when(projectService)
-                .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+                .checkProjectPermission(loginUser, projectCode, ProjectPermission.DEVELOP);
         assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
                 () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
                         shellJson, taskJson, "2020-02-21 00:00:00", true, "", "", 0));
@@ -568,7 +561,7 @@ public class WorkflowInstanceServiceTest {
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         doNothing()
                 .when(projectService)
-                .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+                .checkProjectPermission(loginUser, projectCode, ProjectPermission.DEVELOP);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.empty());
         assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
                 () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
@@ -638,8 +631,8 @@ public class WorkflowInstanceServiceTest {
                     taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", Boolean.FALSE, "", "", 0);
             Assertions.assertNotNull(successRes);
         }
-        Mockito.verify(taskDatasourcePermissionChecker, Mockito.times(3))
-                .checkPermission(eq(loginUser), Mockito.anyList());
+        Mockito.verify(taskResourcePermissionChecker, Mockito.times(3))
+                .checkPermission(eq(projectCode), Mockito.anyList());
         Mockito.verify(taskSubWorkflowPermissionChecker, Mockito.times(3))
                 .checkPermission(eq(loginUser), Mockito.anyList());
     }
@@ -652,7 +645,7 @@ public class WorkflowInstanceServiceTest {
         workflowInstance.setProjectCode(projectCode);
         workflowInstance.setState(WorkflowExecutionStatus.SUCCESS);
 
-        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        doNothing().when(projectService).checkProjectPermission(loginUser, projectCode, ProjectPermission.DEVELOP);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
                 .when(taskSubWorkflowPermissionChecker).checkPermission(eq(loginUser), Mockito.anyList());
@@ -701,14 +694,14 @@ public class WorkflowInstanceServiceTest {
         WorkflowDefinition workflowDefinition = getProcessDefinition();
         workflowDefinition.setProjectCode(projectCode);
 
-        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        doNothing().when(projectService).checkProjectPermission(loginUser, projectCode, ProjectPermission.DEVELOP);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
         when(workflowInstanceDao.updateById(workflowInstance)).thenReturn(true);
         when(processService.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.FALSE))
                 .thenReturn(1);
         Mockito.doNothing().when(workflowDefinitionService).checkWorkflowNodeList(any(), any());
-        Mockito.doNothing().when(taskDatasourcePermissionChecker).checkPermission(any(), any());
+        Mockito.doNothing().when(taskResourcePermissionChecker).checkPermission(Mockito.anyLong(), any());
 
         TaskDefinitionLog version1Log = new TaskDefinitionLog();
         version1Log.setCode(4254862762304L);
@@ -773,13 +766,13 @@ public class WorkflowInstanceServiceTest {
         WorkflowDefinition workflowDefinition = getProcessDefinition();
         workflowDefinition.setProjectCode(projectCode);
 
-        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        doNothing().when(projectService).checkProjectPermission(loginUser, projectCode, ProjectPermission.DEVELOP);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
         when(workflowInstanceDao.updateById(workflowInstance)).thenReturn(true);
         when(processService.saveTaskDefine(any(), Mockito.anyLong(), any(), any())).thenReturn(1);
         Mockito.doNothing().when(workflowDefinitionService).checkWorkflowNodeList(any(), any());
-        Mockito.doNothing().when(taskDatasourcePermissionChecker).checkPermission(any(), any());
+        Mockito.doNothing().when(taskResourcePermissionChecker).checkPermission(Mockito.anyLong(), any());
         when(processService.saveTaskRelation(any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.anyInt(), any(),
                 any(), any())).thenReturn(Constants.EXIT_CODE_SUCCESS);
 
@@ -815,13 +808,12 @@ public class WorkflowInstanceServiceTest {
         // project auth fail
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.PROJECT_NOT_FOUND))
-                .when(projectService).checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
+                .when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
                 () -> workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1));
 
         // process instance null
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, project,
-                WORKFLOW_INSTANCE);
+        Mockito.doNothing().when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.empty());
         assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
                 () -> workflowInstanceService.queryParentInstanceBySubId(loginUser, projectCode, 1));
@@ -905,7 +897,7 @@ public class WorkflowInstanceServiceTest {
                 .thenReturn(workflowDefinitionLog);
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkHasProjectWritePermissionThrowException(loginUser, project);
+                .when(projectService).checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
 
         assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
                 () -> workflowInstanceService.deleteWorkflowInstanceById(loginUser, 1));
@@ -917,7 +909,7 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+                .checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
 
         // process instance not null
         WorkflowInstance workflowInstance = getProcessInstance();
@@ -936,7 +928,7 @@ public class WorkflowInstanceServiceTest {
         doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
                 loginUser.getUserName(), projectCode))
                         .when(projectService)
-                        .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+                        .checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
                 () -> workflowInstanceService.viewVariables(loginUser, projectCode, 1));
     }
@@ -946,7 +938,7 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+                .checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
 
         String globalParamsJson = "[{\"prop\":\"biz_date\",\"value\":\"$[yyyyMMdd]\",\"type\":\"VARCHAR\"}," +
                 "{\"prop\":\"env\",\"value\":\"${ENV_TYPE}\",\"type\":\"VARCHAR\"}]";
@@ -994,7 +986,7 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+                .checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
 
         when(workflowInstanceDao.queryDetailById(999)).thenReturn(null);
 
@@ -1007,7 +999,7 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+                .checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
 
         WorkflowInstance workflowInstance = getProcessInstance();
         workflowInstance.setId(2);
@@ -1034,7 +1026,7 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 0L;
         User loginUser = getAdminUser();
         doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+                .checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
 
         WorkflowInstance workflowInstance = getProcessInstance();
         TaskInstance taskInstance = getTaskInstance();
@@ -1063,7 +1055,7 @@ public class WorkflowInstanceServiceTest {
         doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
                 loginUser.getUserName(), projectCode))
                         .when(projectService)
-                        .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+                        .checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
                 () -> workflowInstanceService.viewGantt(loginUser, projectCode, 1));
     }
@@ -1073,7 +1065,7 @@ public class WorkflowInstanceServiceTest {
         long projectCode = 1L;
         User loginUser = getAdminUser();
         doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(loginUser, projectCode, WORKFLOW_INSTANCE);
+                .checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
 
         final RunWorkflowCommandParam runWorkflowCommandParam = RunWorkflowCommandParam.builder()
                 .commandParams(Lists.newArrayList(Property.builder()

@@ -86,24 +86,13 @@ public class AlertGroupServiceTest {
     @Test
     public void testQueryAlertGroup() {
         User user = getLoginUser();
-
         when(alertGroupDao.queryAllGroupList()).thenReturn(getList());
-        List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(user);
-        Assertions.assertEquals(1, alertGroups.size());
-
+        Assertions.assertEquals(1, alertGroupService.queryAllAlertGroup(user).size());
         user.setUserType(UserType.GENERAL_USER);
-        user.setId(2);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> alertGroupService.queryAllAlertGroup(user));
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
 
-        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, 2,
-                alertGroupServiceLogger))
-                        .thenReturn(Collections.emptySet());
-        Assertions.assertEquals(alertGroupService.queryAllAlertGroup(user).size(), 0);
-
-        user.setId(3);
-        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP, 3,
-                alertGroupServiceLogger))
-                        .thenReturn(Collections.singleton(1));
-        assertDoesNotThrow(() -> alertGroupService.queryAllAlertGroup(user));
     }
 
     @Test

@@ -23,11 +23,13 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.DataSourceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.vo.DataSourceSimpleInfoVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
@@ -50,9 +52,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,6 +71,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Service
 @Slf4j
 public class DataSourceServiceImpl extends BaseServiceImpl implements DataSourceService {
+
+    @Autowired
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Autowired
     private DataSourceDao dataSourceDao;
@@ -243,22 +246,21 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public List<DataSource> queryDataSourceList(User loginUser, Integer type) {
-
-        List<DataSource> datasourceList;
-        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            datasourceList = dataSourceDao.queryDataSourceByType(0, type);
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE, loginUser.getId(), log);
-            if (ids.isEmpty()) {
-                return Collections.emptyList();
-            }
-            datasourceList = dataSourceDao.queryByIds(ids).stream()
-                    .filter(dataSource -> dataSource.getType().getCode() == type).collect(Collectors.toList());
+    public List<DataSource> queryDataSourceList(User loginUser, Integer type, Long projectCode) {
+        if (projectCode == null) {
+            return queryDataSourceList(loginUser, type);
         }
+        projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
+        return dataSourceDao.queryByProject(projectCode).stream()
+                .filter(source -> source.getType().getCode() == type).collect(Collectors.toList());
+    }
 
-        return datasourceList;
+    @Override
+    public List<DataSource> queryDataSourceList(User loginUser, Integer type) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+        return dataSourceDao.queryDataSourceByType(0, type);
     }
 
     @Override
@@ -270,7 +272,10 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public void checkConnection(DbType type, ConnectionParam connectionParam) {
+    public void checkConnection(User loginUser, DbType type, ConnectionParam connectionParam) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         DataSourceProcessor sshDataSourceProcessor = DataSourceUtils.getDatasourceProcessor(type);
         boolean connectivity = sshDataSourceProcessor.checkDataSourceConnectivity(connectionParam);
         if (connectivity) {
@@ -292,7 +297,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
 
-        checkConnection(dataSource.getType(),
+        checkConnection(loginUser, dataSource.getType(),
                 DataSourceUtils.buildConnectionParams(dataSource.getType(), dataSource.getConnectionParams()));
     }
 
@@ -316,48 +321,25 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public List<DataSourceSimpleInfoVO> unAuthDatasource(User loginUser, Integer userId) {
-        if (isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-        List<DataSource> datasourceList = dataSourceDao.queryDatasourceExceptUserId(userId);
-        List<DataSource> resultList = new ArrayList<>();
-        Set<DataSource> datasourceSet;
-        if (datasourceList != null && !datasourceList.isEmpty()) {
-            datasourceSet = new HashSet<>(datasourceList);
-
-            List<DataSource> authedDataSourceList = dataSourceDao.queryAuthedDatasource(userId);
-
-            Set<DataSource> authedDataSourceSet;
-            if (authedDataSourceList != null && !authedDataSourceList.isEmpty()) {
-                authedDataSourceSet = new HashSet<>(authedDataSourceList);
-                datasourceSet.removeAll(authedDataSourceSet);
-            }
-            resultList = new ArrayList<>(datasourceSet);
-        }
-        return resultList.stream().map(DataSourceSimpleInfoVO::new).collect(Collectors.toList());
-    }
-
-    @Override
-    public List<DataSourceSimpleInfoVO> authedDatasource(User loginUser, Integer userId) {
-        if (isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-        List<DataSource> authedDatasourceList = dataSourceDao.queryAuthedDatasource(userId);
-        return authedDatasourceList.stream().map(DataSourceSimpleInfoVO::new).collect(Collectors.toList());
-    }
-
-    @Override
     public List<ParamsOptions> getTables(User loginUser, Integer datasourceId, String database) {
+        return getTables(loginUser, datasourceId, database, null);
+    }
+
+    @Override
+    public List<ParamsOptions> getTables(User loginUser, Integer datasourceId, String database, Long projectCode) {
         DataSource dataSource = dataSourceDao.queryById(datasourceId);
 
         if (dataSource == null) {
             throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
         }
 
-        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
-                ApiFuncIdentificationConstant.DATASOURCE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        if (projectCode == null) {
+            if (isNotAdmin(loginUser)) {
+                throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            }
+        } else {
+            projectAuthorizationService.requireResourceUse(loginUser, projectCode, ProjectPermission.VIEW,
+                    ProjectResourceType.DATASOURCE, datasourceId.toString());
         }
 
         List<String> tableList;
@@ -419,15 +401,25 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     @Override
     public List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database,
                                                String tableName) {
+        return getTableColumns(loginUser, datasourceId, database, tableName, null);
+    }
+
+    @Override
+    public List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database,
+                                               String tableName, Long projectCode) {
         DataSource dataSource = dataSourceDao.queryById(datasourceId);
 
         if (dataSource == null) {
             throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
         }
 
-        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
-                ApiFuncIdentificationConstant.DATASOURCE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        if (projectCode == null) {
+            if (isNotAdmin(loginUser)) {
+                throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            }
+        } else {
+            projectAuthorizationService.requireResourceUse(loginUser, projectCode, ProjectPermission.VIEW,
+                    ProjectResourceType.DATASOURCE, datasourceId.toString());
         }
 
         BaseConnectionParam connectionParam =
@@ -475,6 +467,11 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
 
     @Override
     public List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId) {
+        return getDatabases(loginUser, datasourceId, null);
+    }
+
+    @Override
+    public List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId, Long projectCode) {
 
         DataSource dataSource = dataSourceDao.queryById(datasourceId);
 
@@ -482,9 +479,13 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             throw new ServiceException(Status.QUERY_DATASOURCE_ERROR);
         }
 
-        if (!canOperatorPermissions(loginUser, new Object[]{datasourceId}, AuthorizationType.DATASOURCE,
-                ApiFuncIdentificationConstant.DATASOURCE)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        if (projectCode == null) {
+            if (isNotAdmin(loginUser)) {
+                throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            }
+        } else {
+            projectAuthorizationService.requireResourceUse(loginUser, projectCode, ProjectPermission.VIEW,
+                    ProjectResourceType.DATASOURCE, datasourceId.toString());
         }
 
         List<String> tableList;
