@@ -93,6 +93,15 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
         return this;
     }
 
+    public boolean isSavepointEnabled(String name) {
+        Row instance = streamInstances().stream()
+                .filter(row -> row.taskInstanceName().equals(name)).findFirst()
+                .orElseThrow(() -> new IllegalStateException("Stream task instance not found: " + name));
+        WebElement savepoint = instance.row.findElement(By.cssSelector("td[data-col-key=operation]"))
+                .findElements(By.cssSelector(".n-button")).get(0);
+        return !savepoint.getAttribute("class").contains("n-button--disabled");
+    }
+
     public TaskInstanceTab stopStream(String name) {
         WebDriverWaitFactory.createWebDriverWait(driver).ignoring(StaleElementReferenceException.class)
                 .ignoring(ElementClickInterceptedException.class)

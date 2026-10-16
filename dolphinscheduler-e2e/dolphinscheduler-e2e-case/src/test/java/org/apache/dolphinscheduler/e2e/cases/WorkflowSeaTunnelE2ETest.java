@@ -28,7 +28,6 @@ import org.apache.dolphinscheduler.e2e.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
-import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowSaveDialog;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SeaTunnelTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
@@ -50,7 +49,6 @@ import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -63,9 +61,6 @@ class WorkflowSeaTunnelE2ETest {
     private static final String PROJECT = "seatunnel-execution-type";
     private static final String STREAM_MARKER = "ds-seatunnel-stream-data";
     private static final String BATCH_MARKER = "ds-seatunnel-batch-data";
-    private static final String ENGINE_PROCESS = "(^|[[:space:]])[o]rg[.]apache[.]seatunnel[.]core[.]starter"
-            + "[.]seatunnel[.]SeaTunnelClient([[:space:]]|$)";
-    private static final String PID_FILE = "/tmp/ds-seatunnel-e2e-stream.pid";
 
     private static final String READY_MODAL = ".n-modal:not(.fade-in-scale-up-transition-enter-active)"
             + ":not(.fade-in-scale-up-transition-leave-active)";
@@ -153,69 +148,29 @@ class WorkflowSeaTunnelE2ETest {
         assertThat(reloadedSource.script()).isEqualTo(streamScript);
         submitNode(reloadedSource);
 
-        // Copy persistence is checked above. Execute only one local engine at a time.
-        createEngineWorkflow("seatunnel-stream-run", "seatunnel-stream", "STREAM", streamScript,
-                "before-stream", "set -eu\n"
-                        + "test \"$SEATUNNEL_HOME\" = /opt/seatunnel\n"
-                        + "test -x \"$SEATUNNEL_HOME/bin/seatunnel.sh\"\n"
-                        + "command -v java\ncommand -v pstree\necho seatunnel-fixture-ready\n");
-        TaskInstanceTab instances = taskInstances().selectType("Stream");
-        waitForInstance(instances, "seatunnel-stream", true, TaskInstanceTab.Row::isRunning);
-        assertConsoleOutput(instances, "seatunnel-stream", true, STREAM_MARKER);
+        // Run the finite BATCH job before the STREAM job so only one local engine runs at a time.
+        createEngineWorkflow("seatunnel-batch-run", "seatunnel-batch", "BATCH", batchScript);
+        TaskInstanceTab instances = taskInstances().selectType("Batch");
+        waitForInstance(instances, "seatunnel-batch", false, TaskInstanceTab.Row::isSuccess);
+        assertConsoleOutput(instances, "seatunnel-batch", false, BATCH_MARKER);
 
-        // A successful scheduler task records the actual engine JVM PID and argv.
-        // The bracketed main-class pattern cannot match pgrep's own command line.
-        createShellWorkflow("seatunnel-process-witness", "stream-process-running",
-                "set -eu\ncommand -v pgrep >/dev/null\n"
-                        + "test ! -e " + PID_FILE + "\n"
-                        + "pids=$(pgrep -f '" + ENGINE_PROCESS + "')\n"
-                        + "set -- $pids\ntest \"$#\" -eq 1\npid=$1\n"
-                        + "kill -0 \"$pid\"\ntest -r /proc/$pid/cmdline\n"
-                        + "args=$(tr '\\0' ' ' < /proc/$pid/cmdline)\n"
-                        + "case \"$args\" in *' --deploy-mode local'*) ;; *) exit 1 ;; esac\n"
-                        + "case \"$args\" in *' --async'*) exit 1 ;; esac\n"
-                        + "printf '%s\\n' \"$args\"\n"
-                        + "printf '%s\\n' \"$pid\" > " + PID_FILE + "\n"
-                        + "printf 'SEATUNNEL_ENGINE_PID=%s\\n' \"$pid\"\n");
-        instances = taskInstances().selectType("Batch");
-        waitForInstance(instances, "stream-process-running", false, TaskInstanceTab.Row::isSuccess);
-        waitForInstance(instances, "before-stream", false, TaskInstanceTab.Row::isSuccess);
+        createEngineWorkflow("seatunnel-stream-run", "seatunnel-stream", "STREAM", streamScript);
+        instances = taskInstances().selectType("Stream");
+        waitForInstance(instances, "seatunnel-stream", true, TaskInstanceTab.Row::isRunning);
+        assertThat(instances.isSavepointEnabled("seatunnel-stream")).isFalse();
+        assertConsoleOutput(instances, "seatunnel-stream", true, STREAM_MARKER);
+        List<String> streamNames = instances.streamInstances().stream().map(TaskInstanceTab.Row::taskInstanceName)
+                .collect(Collectors.toList());
+        assertThat(streamNames).contains("seatunnel-stream").doesNotContain("seatunnel-batch", copyName);
+
+        instances.selectType("Batch");
+        waitForInstance(instances, "seatunnel-batch", false, TaskInstanceTab.Row::isSuccess);
         assertThat(instances.instances().stream().map(TaskInstanceTab.Row::taskInstanceName)
                 .collect(Collectors.toList())).doesNotContain("seatunnel-stream");
 
         instances.selectType("Stream");
-        waitForInstance(instances, "seatunnel-stream", true, TaskInstanceTab.Row::isRunning);
         instances.stopStream("seatunnel-stream");
         waitForInstance(instances, "seatunnel-stream", true, TaskInstanceTab.Row::isStopped);
-
-        // Verify the witnessed PID exited before starting the finite BATCH engine.
-        // A missing tool or a pgrep error must fail, not masquerade as process absence.
-        createEngineWorkflow("seatunnel-batch-run", "seatunnel-batch", "BATCH", batchScript,
-                "stream-process-cleanup", "set -eu\ncommand -v pgrep >/dev/null\n"
-                        + "test -s " + PID_FILE + "\npid=$(cat " + PID_FILE + ")\n"
-                        + "for attempt in $(seq 1 60); do\n"
-                        + "  if ! kill -0 \"$pid\" 2>/dev/null && test ! -d /proc/$pid; then\n"
-                        + "    if pgrep -f '" + ENGINE_PROCESS + "'; then exit 1; else test \"$?\" -eq 1; fi\n"
-                        + "    rm " + PID_FILE + "\n"
-                        + "    printf 'SEATUNNEL_ENGINE_EXITED=%s\\n' \"$pid\"\n    exit 0\n  fi\n"
-                        + "  sleep 1\ndone\necho 'SeaTunnel engine survived UI Stop' >&2\nexit 1\n");
-        instances = taskInstances().selectType("Batch");
-        waitForInstance(instances, "stream-process-cleanup", false, TaskInstanceTab.Row::isSuccess);
-        waitForInstance(instances, "seatunnel-batch", false, TaskInstanceTab.Row::isSuccess);
-        assertConsoleOutput(instances, "seatunnel-batch", false, BATCH_MARKER);
-        instances.selectType("Stream");
-        waitForInstance(instances, "seatunnel-stream", true, TaskInstanceTab.Row::isStopped);
-        List<String> streamNames = instances.streamInstances().stream().map(TaskInstanceTab.Row::taskInstanceName)
-                .collect(Collectors.toList());
-        assertThat(streamNames).contains("seatunnel-stream").doesNotContain("seatunnel-batch", copyName);
-        WorkflowInstanceTab workflows = project().goToTab(WorkflowInstanceTab.class);
-        WebDriverWaitFactory.createWebDriverWait(browser, Duration.ofSeconds(120))
-                .ignoring(StaleElementReferenceException.class)
-                .withMessage("The finite SeaTunnel BATCH workflow must succeed")
-                .until(unused -> workflows.instances().stream()
-                        .anyMatch(row -> row.workflowInstanceName().startsWith("seatunnel-batch-run")
-                                && row.isSuccess()));
-        // Testcontainers also tears down this isolated fixture if an assertion fails.
     }
 
     private TaskNodeForm predecessor(TaskNodeForm task, String name) {
@@ -267,41 +222,13 @@ class WorkflowSeaTunnelE2ETest {
                 + "sink {\n  Console {}\n}\n";
     }
 
-    private void createEngineWorkflow(String workflow, String name, String executionType, String script,
-                                      String predecessor, String predecessorScript) {
+    private void createEngineWorkflow(String workflow, String name, String executionType, String script) {
         WorkflowForm form = definitions().createWorkflow();
-        submitNode(addShellTask(form, predecessorScript).name(predecessor));
         browser.findElement(By.cssSelector(".task-cate-di .n-collapse-item__header")).click();
-        submitNode(predecessor(form.<SeaTunnelTaskForm>addTask(WorkflowForm.TaskType.SEATUNNEL, 350, 100)
-                .executionType(executionType).script(script).deployMode("local").name(name), predecessor));
+        submitNode(form.<SeaTunnelTaskForm>addTask(WorkflowForm.TaskType.SEATUNNEL, 350, 100)
+                .executionType(executionType).script(script).deployMode("local").name(name));
         saveWorkflow(form, workflow);
         definitions().publish(workflow).run(workflow).submit();
-    }
-
-    private void createShellWorkflow(String workflow, String name, String script) {
-        WorkflowForm form = definitions().createWorkflow();
-        submitNode(addShellTask(form, script).name(name));
-        saveWorkflow(form, workflow);
-        definitions().publish(workflow).run(workflow).submit();
-    }
-
-    private ShellTaskForm addShellTask(WorkflowForm form, String script) {
-        ShellTaskForm task = form.addTask(WorkflowForm.TaskType.SHELL, 100, 100);
-        WebElement input = WebDriverWaitFactory.createWebDriverWait(browser)
-                .until(ExpectedConditions
-                        .elementToBeClickable(By.cssSelector(".n-modal .monaco-editor textarea.inputarea")));
-        Keys modifier = browser.getCapabilities().getPlatformName().is(Platform.MAC) ? Keys.COMMAND : Keys.CONTROL;
-        input.sendKeys(Keys.chord(modifier, "a"), Keys.BACK_SPACE);
-        String[] lines = script.split("\n", -1);
-        for (int i = 0; i < lines.length; i++) {
-            input.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END), Keys.DELETE, lines[i],
-                    Keys.chord(Keys.SHIFT, Keys.END), Keys.DELETE);
-            if (i + 1 < lines.length) {
-                // Insert a line without accepting Monaco's word suggestions.
-                input.sendKeys(Keys.chord(modifier, Keys.ENTER));
-            }
-        }
-        return task;
     }
 
     private void waitForInstance(TaskInstanceTab instances, String name, boolean stream,

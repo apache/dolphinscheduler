@@ -22,10 +22,11 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.HasCapabilities;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.WheelInput;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class SeaTunnelTaskForm extends TaskNodeForm {
@@ -112,8 +113,9 @@ public class SeaTunnelTaskForm extends TaskNodeForm {
     public SeaTunnelTaskForm executionType(String executionType) {
         WebElement input = executionTypeInput(executionType);
         WebElement label = input.findElement(By.xpath(".."));
-        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].scrollIntoView({block: 'center'});",
-                label);
+        // Scroll past the bottom edge so the modal footer does not cover the option.
+        new Actions(parent().driver()).scrollToElement(label)
+                .scrollFromOrigin(WheelInput.ScrollOrigin.fromElement(label), 0, 200).perform();
         label.click();
         WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.elementToBeSelected(input));
