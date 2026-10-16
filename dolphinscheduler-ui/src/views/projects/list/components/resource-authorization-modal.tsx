@@ -195,7 +195,11 @@ export default defineComponent({
           >
             {{
               trigger: () => (
-                <NButton size='small' disabled={saving.value}>
+                <NButton
+                  class='revoke-project-resource'
+                  size='small'
+                  disabled={saving.value}
+                >
                   {t('project.authorization.revoke')}
                 </NButton>
               ),
@@ -207,6 +211,7 @@ export default defineComponent({
     ])
     return () => (
       <Modal
+        class='project-resource-authorization-modal'
         show={props.showModalRef}
         title={t('project.authorization.resources')}
         confirmShow={false}
@@ -216,6 +221,7 @@ export default defineComponent({
       >
         <NSpace vertical>
           <NSelect
+            class='select-resource-type'
             value={resourceType.value}
             onUpdateValue={(value) => {
               resourceType.value = value
@@ -224,6 +230,7 @@ export default defineComponent({
             disabled={loading.value || saving.value}
           />
           <NSelect
+            class='select-project-resource'
             v-model:value={resourceKey.value}
             options={availableOptions.value}
             filterable
@@ -233,6 +240,7 @@ export default defineComponent({
             placeholder={t('project.authorization.select_resource')}
           />
           <NButton
+            class='grant-project-resource'
             type='primary'
             onClick={grant}
             loading={saving.value}
@@ -243,6 +251,7 @@ export default defineComponent({
             {t('project.authorization.grant')}
           </NButton>
           <NDataTable
+            class='project-resource-grants'
             loading={loading.value}
             columns={columns.value}
             data={grants.value}
