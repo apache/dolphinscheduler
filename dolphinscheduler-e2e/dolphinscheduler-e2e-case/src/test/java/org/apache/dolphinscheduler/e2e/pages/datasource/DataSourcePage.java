@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.e2e.pages.datasource;
 
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
@@ -63,13 +64,10 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     public DataSourcePage createDataSource(String dataSourceType, String dataSourceName, String dataSourceDescription,
                                            String ip, String port, String userName, String password, String database,
                                            String jdbcParams) {
-        buttonCreateDataSource().click();
+        UiInteraction.click(driver, ".btn-create-data-source");
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOf(dataSourceModal));
-        By dataSourceTypeBox = By.className(dataSourceType.toUpperCase() + "-box");
-        WebElement dataSourceTypeButton = WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(dataSourceTypeBox));
-        dataSourceTypeButton.click();
+        UiInteraction.click(driver, ".dialog-source-modal ." + dataSourceType.toUpperCase() + "-box");
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.textToBePresentInElementLocated(
                 By.className("dialog-create-data-source"), dataSourceType.toUpperCase()));
@@ -90,7 +88,9 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
             createDataSourceForm().inputJdbcParams().sendKeys(jdbcParams);
         }
 
-        createDataSourceForm().buttonSubmit().click();
+        UiInteraction.click(driver, ".dialog-create-data-source .btn-submit");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.invisibilityOfElementLocated(
+                By.cssSelector(".dialog-create-data-source")));
 
         return this;
     }
