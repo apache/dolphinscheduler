@@ -145,15 +145,14 @@ public abstract class TaskNodeForm {
     public TaskNodeForm preTask(String preTaskName) {
         ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectPreTasks);
 
-        final By optionsLocator = By.cssSelector(".n-base-select-menu .n-base-select-option__content");
+        final By optionsLocator = By.className("option-pre-tasks");
 
         WebDriverWaitFactory.createWebDriverWait(parent.driver())
                 .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
 
         List<WebElement> webElements = parent.driver().findElements(optionsLocator);
         webElements.stream()
-                .filter(WebElement::isDisplayed)
-                .filter(it -> it.getText().equals(preTaskName))
+                .filter(it -> it.getText().contains(preTaskName))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No such task: " + preTaskName))
                 .click();
@@ -185,8 +184,6 @@ public abstract class TaskNodeForm {
 
     public WorkflowForm submit() {
         buttonSubmit.click();
-        WebDriverWaitFactory.createWebDriverWait(parent.driver())
-                .until(ExpectedConditions.invisibilityOf(inputNodeName));
 
         return parent();
     }

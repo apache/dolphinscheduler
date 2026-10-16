@@ -33,7 +33,6 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
@@ -76,34 +75,6 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
         return this;
     }
 
-    private void clickOperation(String name, boolean stream, int index, ExpectedCondition<WebElement> completion) {
-        boolean[] clicked = {false};
-        WebDriverWaitFactory.createWebDriverWait(driver).ignoring(StaleElementReferenceException.class)
-                .ignoring(ElementClickInterceptedException.class)
-                .until(unused -> {
-                    if (clicked[0] && completion != null && completion.apply(driver) != null) {
-                        return true;
-                    }
-                    WebElement button = (stream ? streamInstances() : instances()).stream()
-                            .filter(row -> row.taskInstanceName().equals(name))
-                            .map(row -> row.row.findElement(By.cssSelector("td[data-col-key=operation]"))
-                                    .findElements(By.cssSelector(".n-button")).get(index))
-                            .filter(WebElement::isEnabled).findFirst().orElse(null);
-                    if (button == null) {
-                        return false;
-                    }
-                    button.click();
-                    clicked[0] = true;
-                    return completion == null;
-                });
-    }
-
-    public TaskInstanceTab openLog(String name, boolean stream) {
-        clickOperation(name, stream, stream ? 2 : 1, ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector(".logModalRef:not(.fade-in-scale-up-transition-enter-active) .n-log")));
-        return this;
-    }
-
     public String logText() {
         return driver.findElements(By.cssSelector(".logModalRef .n-log pre")).stream()
                 .map(line -> line.getDomProperty("textContent")).collect(Collectors.joining("\n"));
@@ -123,7 +94,20 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
     }
 
     public TaskInstanceTab stopStream(String name) {
-        clickOperation(name, true, 1, null);
+        WebDriverWaitFactory.createWebDriverWait(driver).ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementClickInterceptedException.class)
+                .until(unused -> {
+                    WebElement button = streamInstances().stream()
+                            .filter(row -> row.taskInstanceName().equals(name))
+                            .map(row -> row.row.findElement(By.cssSelector("td[data-col-key=operation]"))
+                                    .findElements(By.cssSelector(".n-button")).get(1))
+                            .filter(WebElement::isEnabled).findFirst().orElse(null);
+                    if (button == null) {
+                        return false;
+                    }
+                    button.click();
+                    return true;
+                });
         return this;
     }
 

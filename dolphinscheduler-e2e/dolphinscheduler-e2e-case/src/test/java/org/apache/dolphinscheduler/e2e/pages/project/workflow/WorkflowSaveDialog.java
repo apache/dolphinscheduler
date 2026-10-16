@@ -41,11 +41,7 @@ public final class WorkflowSaveDialog {
     })
     private WebElement inputName;
 
-    // The modal transition moves this button even while it is visible and enabled.
-    @FindBy(xpath = "//div[contains(concat(' ', normalize-space(@class), ' '), ' n-modal ')"
-            + " and not(contains(@class, 'fade-in-scale-up-transition-enter-active'))"
-            + " and not(contains(@class, 'fade-in-scale-up-transition-leave-active'))]"
-            + "//div[contains(text(), 'Basic Information')]/../following-sibling::div[contains(@class, 'n-card__footer')]//button[contains(@class, 'btn-submit')]")
+    @FindBy(xpath = "//div[contains(text(), 'Basic Information')]/../following-sibling::div[contains(@class, 'n-card__footer')]//button[contains(@class, 'btn-submit')]")
     private WebElement buttonSubmit;
 
     @FindBys({

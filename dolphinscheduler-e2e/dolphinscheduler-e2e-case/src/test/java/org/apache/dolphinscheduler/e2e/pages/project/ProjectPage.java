@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.e2e.pages.project;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
-import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage.NavBarItem;
 
@@ -29,13 +28,11 @@ import java.util.List;
 import lombok.Getter;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
 public final class ProjectPage extends NavBarPage implements NavBarItem {
@@ -68,23 +65,7 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
     public ProjectPage create(String project) {
         buttonCreateProject().click();
         createProjectForm().inputProjectName().sendKeys(project);
-        final By modalSelector = By.xpath(
-                "//div[contains(concat(' ', normalize-space(@class), ' '), ' n-modal ')"
-                        + " and not(contains(@class, 'fade-in-scale-up-transition-enter-active'))"
-                        + " and not(contains(@class, 'fade-in-scale-up-transition-leave-active'))]"
-                        + "[.//*[contains(concat(' ', normalize-space(@class), ' '), ' input-project-name ')]]");
-        final WebElement modal = WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.visibilityOfElementLocated(modalSelector));
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(
-                        modal.findElement(By.cssSelector("button.btn-submit"))))
-                .click();
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.invisibilityOf(modal));
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .ignoring(StaleElementReferenceException.class)
-                .until(unused -> projectList().stream().filter(WebElement::isDisplayed)
-                        .anyMatch(it -> it.getText().contains(project)));
+        createProjectForm().buttonSubmit().click();
         return this;
     }
 

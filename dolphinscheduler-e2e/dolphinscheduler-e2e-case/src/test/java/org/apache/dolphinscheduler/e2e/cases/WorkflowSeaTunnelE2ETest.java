@@ -29,8 +29,10 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowInstanceTab;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowSaveDialog;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SeaTunnelTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.TaskNodeForm;
 import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
@@ -65,6 +67,9 @@ class WorkflowSeaTunnelE2ETest {
             + "[.]seatunnel[.]SeaTunnelClient([[:space:]]|$)";
     private static final String PID_FILE = "/tmp/ds-seatunnel-e2e-stream.pid";
 
+    private static final String READY_MODAL = ".n-modal:not(.fade-in-scale-up-transition-enter-active)"
+            + ":not(.fade-in-scale-up-transition-leave-active)";
+
     private static RemoteWebDriver browser;
 
     @Test
@@ -85,18 +90,18 @@ class WorkflowSeaTunnelE2ETest {
         projects.createProjectForm().buttonSubmit().sendKeys(Keys.ENTER);
         WorkflowDefinitionTab definitions = openProject().goToTab(WorkflowDefinitionTab.class);
         WorkflowForm form = definitions.createWorkflow();
-        form.<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL, 100, 100)
-                .script("echo batch-control\n").name("before").submit();
+        submitNode(form.<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL, 100, 100)
+                .script("echo batch-control\n").name("before"));
         browser.findElement(By.cssSelector(".task-cate-di .n-collapse-item__header")).click();
 
         SeaTunnelTaskForm task = form.addTask(WorkflowForm.TaskType.SEATUNNEL, 350, 100);
         assertThat(task.isExecutionType("BATCH")).isTrue();
-        task.script(batchScript).deployMode("local").name("seatunnel").preTask("before").submit();
+        submitNode(predecessor(task.script(batchScript).deployMode("local").name("seatunnel"), "before"));
         browser.findElement(By.cssSelector(".task-cate-universal .n-collapse-item__header")).click();
-        form.<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL, 600, 100)
-                .script("echo after\n").name("after").preTask("seatunnel").submit();
+        submitNode(predecessor(form.<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL, 600, 100)
+                .script("echo after\n").name("after"), "seatunnel"));
         form.waitForEdgeStyle(2, false);
-        form.submit().name(workflow).submit();
+        saveWorkflow(form, workflow);
 
         form = reopenWorkflow(workflow);
         String sourceCode = form.taskCode("seatunnel");
@@ -108,24 +113,24 @@ class WorkflowSeaTunnelE2ETest {
         savedBatch = openTask(form, sourceCode);
         assertThat(savedBatch.isExecutionType("BATCH")).isTrue();
         assertThat(savedBatch.script()).isEqualTo(batchScript);
-        savedBatch.executionType("STREAM").script(streamScript).submit();
+        submitNode(savedBatch.executionType("STREAM").script(streamScript));
         form.waitForEdgeStyle(2, true);
-        form.submit().submit();
+        saveWorkflow(form, null);
 
         form = reopenWorkflow(workflow);
         form.waitForEdgeStyle(2, true);
         SeaTunnelTaskForm savedStream = openTask(form, sourceCode);
         assertThat(savedStream.isExecutionType("STREAM")).isTrue();
         assertThat(savedStream.script()).isEqualTo(streamScript);
-        savedStream.executionType("BATCH").script(batchScript).submit();
+        submitNode(savedStream.executionType("BATCH").script(batchScript));
         form.waitForEdgeStyle(2, false);
-        form.submit().submit();
+        saveWorkflow(form, null);
 
         form = reopenWorkflow(workflow);
         form.waitForEdgeStyle(2, false);
         SeaTunnelTaskForm edited = openTask(form, sourceCode);
         assertThat(edited.isExecutionType("BATCH")).isTrue();
-        edited.executionType("STREAM").script(streamScript).submit();
+        submitNode(edited.executionType("STREAM").script(streamScript));
         form.waitForEdgeStyle(2, true);
         String copyCode = form.copyTask(sourceCode);
         assertThat(copyCode).isNotEqualTo(sourceCode);
@@ -133,8 +138,8 @@ class WorkflowSeaTunnelE2ETest {
         assertThat(copy.isExecutionType("STREAM")).isTrue();
         String copyName = copy.inputNodeName().getAttribute("value");
         assertThat(copyName).startsWith("seatunnel_");
-        copy.submit();
-        form.submit().submit();
+        submitNode(copy);
+        saveWorkflow(form, null);
 
         form = reopenWorkflow(workflow);
         form.waitForEdgeStyle(2, true);
@@ -142,11 +147,11 @@ class WorkflowSeaTunnelE2ETest {
         assertThat(reloadedCopy.isExecutionType("STREAM")).isTrue();
         assertThat(reloadedCopy.script()).isEqualTo(streamScript);
         assertThat(reloadedCopy.deployMode()).isEqualTo("local");
-        reloadedCopy.submit();
+        submitNode(reloadedCopy);
         SeaTunnelTaskForm reloadedSource = openTask(form, sourceCode);
         assertThat(reloadedSource.isExecutionType("STREAM")).isTrue();
         assertThat(reloadedSource.script()).isEqualTo(streamScript);
-        reloadedSource.submit();
+        submitNode(reloadedSource);
 
         // Copy persistence is checked above. Execute only one local engine at a time.
         createEngineWorkflow("seatunnel-stream-run", "seatunnel-stream", "STREAM", streamScript,
@@ -213,6 +218,45 @@ class WorkflowSeaTunnelE2ETest {
         // Testcontainers also tears down this isolated fixture if an assertion fails.
     }
 
+    private TaskNodeForm predecessor(TaskNodeForm task, String name) {
+        WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(READY_MODAL + " .pre-tasks-model .n-base-selection"))).click();
+        WebDriverWaitFactory.createWebDriverWait(browser)
+                .ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementClickInterceptedException.class)
+                .until(unused -> {
+                    WebElement option = browser.findElements(
+                            By.cssSelector(".n-base-select-menu .n-base-select-option__content")).stream()
+                            .filter(WebElement::isDisplayed).filter(WebElement::isEnabled)
+                            .filter(element -> element.getText().equals(name)).findFirst().orElse(null);
+                    if (option == null) {
+                        return false;
+                    }
+                    option.click();
+                    return true;
+                });
+        task.inputNodeName().click();
+        return task;
+    }
+
+    private void submitNode(TaskNodeForm task) {
+        WebElement name = task.inputNodeName();
+        WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(READY_MODAL + " .input-node-name input")));
+        task.submit();
+        WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.invisibilityOf(name));
+    }
+
+    private void saveWorkflow(WorkflowForm form, String name) {
+        WorkflowSaveDialog dialog = form.submit();
+        WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.elementToBeClickable(
+                By.cssSelector(READY_MODAL + " .input-name input")));
+        if (name != null) {
+            dialog.name(name);
+        }
+        dialog.submit();
+    }
+
     private String engineScript(String mode, String marker) {
         // In SeaTunnel 2.3.3 FakeSource signals completion only for BATCH.
         // STREAMING emits these four split rows, then stays alive until UI Stop.
@@ -226,19 +270,18 @@ class WorkflowSeaTunnelE2ETest {
     private void createEngineWorkflow(String workflow, String name, String executionType, String script,
                                       String predecessor, String predecessorScript) {
         WorkflowForm form = definitions().createWorkflow();
-        addShellTask(form, predecessorScript).name(predecessor).submit();
+        submitNode(addShellTask(form, predecessorScript).name(predecessor));
         browser.findElement(By.cssSelector(".task-cate-di .n-collapse-item__header")).click();
-        form.<SeaTunnelTaskForm>addTask(WorkflowForm.TaskType.SEATUNNEL, 350, 100)
-                .executionType(executionType).script(script).deployMode("local")
-                .name(name).preTask(predecessor).submit();
-        form.submit().name(workflow).submit();
+        submitNode(predecessor(form.<SeaTunnelTaskForm>addTask(WorkflowForm.TaskType.SEATUNNEL, 350, 100)
+                .executionType(executionType).script(script).deployMode("local").name(name), predecessor));
+        saveWorkflow(form, workflow);
         definitions().publish(workflow).run(workflow).submit();
     }
 
     private void createShellWorkflow(String workflow, String name, String script) {
         WorkflowForm form = definitions().createWorkflow();
-        addShellTask(form, script).name(name).submit();
-        form.submit().name(workflow).submit();
+        submitNode(addShellTask(form, script).name(name));
+        saveWorkflow(form, workflow);
         definitions().publish(workflow).run(workflow).submit();
     }
 

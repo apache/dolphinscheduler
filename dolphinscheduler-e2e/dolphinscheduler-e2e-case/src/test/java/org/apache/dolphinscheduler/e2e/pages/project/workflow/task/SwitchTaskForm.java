@@ -20,31 +20,28 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
+import java.util.List;
+
 import lombok.Getter;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
 public final class SwitchTaskForm extends TaskNodeForm {
 
-    static final String NODE_MODAL = "//div[contains(concat(' ', normalize-space(@class), ' '), ' n-modal ')"
-            + " and not(contains(@class, 'fade-in-scale-up-transition-enter-active'))"
-            + " and not(contains(@class, 'fade-in-scale-up-transition-leave-active'))]";
-    static final String CONDITION_FORM = NODE_MODAL
-            + "//div[contains(concat(' ', normalize-space(@class), ' '), ' n-form-item ')]"
-            + "[./label[normalize-space(.)='Condition']]";
-
-    @FindBy(xpath = CONDITION_FORM + "//button[contains(@class, 'btn-create-custom-parameter')]")
+    @FindBy(id = "btnAddIfBranch")
     private WebElement buttonAddBranch;
 
-    @FindBy(xpath = NODE_MODAL
-            + "//div[contains(concat(' ', normalize-space(@class), ' '), ' n-form-item ')]"
-            + "[./label[normalize-space(.)='Default Branch Flow']]"
-            + "//div[contains(concat(' ', normalize-space(@class), ' '), ' n-base-selection ')]")
+    @FindBys({
+            @FindBy(className = "switch-task"),
+            @FindBy(className = "switch-else"),
+            @FindBy(className = "el-input__inner")
+    })
     private WebElement inputElseBranch;
 
     public SwitchTaskForm(WorkflowForm parent) {
@@ -52,30 +49,47 @@ public final class SwitchTaskForm extends TaskNodeForm {
     }
 
     public SwitchTaskForm elseBranch(String elseBranchName) {
-        selectBranch(inputElseBranch(), elseBranchName);
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", inputElseBranch());
+
+        final By optionsLocator = By.className("option-else-branches");
+
+        WebDriverWaitFactory.createWebDriverWait(parent().driver())
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        List<WebElement> webElements = parent().driver().findElements(optionsLocator);
+        webElements.stream()
+                .filter(it -> it.getText().contains(elseBranchName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such else branch: " + elseBranchName))
+                .click();
+
         inputNodeName().click();
+
         return this;
     }
 
     public SwitchTaskForm addIfBranch(String switchScript, String ifBranchName) {
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", buttonAddBranch);
+
+        SwitchTaskIfBranch switchTaskIfBranch = new SwitchTaskIfBranch(this);
+        switchTaskIfBranch.codeEditor().content(switchScript);
+
+        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();",
+                switchTaskIfBranch.inputIfBranch());
+
+        final By optionsLocator = By.className("option-if-branches");
+
         WebDriverWaitFactory.createWebDriverWait(parent().driver())
-                .until(ExpectedConditions.elementToBeClickable(buttonAddBranch())).click();
-        SwitchTaskIfBranch branch = new SwitchTaskIfBranch(this);
-        branch.condition(switchScript);
-        selectBranch(branch.inputIfBranch(), ifBranchName);
+                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
+
+        List<WebElement> webElements = parent().driver().findElements(optionsLocator);
+        webElements.stream()
+                .filter(it -> it.getText().contains(ifBranchName))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No such if branch: " + ifBranchName))
+                .click();
+
         inputNodeName().click();
         return this;
-    }
-
-    private void selectBranch(WebElement selection, String name) {
-        final WebDriver driver = parent().driver();
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(selection)).click();
-        WebDriverWaitFactory.createWebDriverWait(driver).until(unused -> driver
-                .findElements(By.className("n-base-select-option")).stream()
-                .filter(WebElement::isDisplayed)
-                .filter(WebElement::isEnabled)
-                .filter(option -> option.getText().trim().equals(name))
-                .findFirst().orElse(null)).click();
     }
 }

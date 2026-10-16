@@ -17,43 +17,43 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
-import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
+import java.util.List;
 
 import lombok.Getter;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
 public final class WorkflowFormatDialog {
 
-    static final String MODAL = "//div[contains(concat(' ', normalize-space(@class), ' '), ' n-modal ')"
-            + " and not(contains(@class, 'fade-in-scale-up-transition-enter-active'))"
-            + " and not(contains(@class, 'fade-in-scale-up-transition-leave-active'))]"
-            + "[.//*[contains(@class, 'n-card-header__main') and normalize-space(.)='Format']]";
-
     private final WebDriver driver;
     private final WorkflowForm parent;
 
-    @FindBy(xpath = MODAL + "//button[contains(concat(' ', normalize-space(@class), ' '), ' btn-submit ')]")
-    private WebElement buttonConfirm;
+    @FindBys({
+            @FindBy(className = "el-dialog__wrapper"),
+            @FindBy(className = "el-button--primary"),
+    })
+    private List<WebElement> buttonConfirm;
 
     public WorkflowFormatDialog(WorkflowForm parent) {
         this.parent = parent;
         this.driver = parent.driver();
+
         PageFactory.initElements(driver, this);
     }
 
     public WorkflowForm confirm() {
-        final WebElement modal = driver.findElement(By.xpath(MODAL));
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(buttonConfirm)).click();
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.invisibilityOf(modal));
+        buttonConfirm()
+                .stream()
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No confirm button when confirm"))
+                .click();
+
         return parent;
     }
 }
