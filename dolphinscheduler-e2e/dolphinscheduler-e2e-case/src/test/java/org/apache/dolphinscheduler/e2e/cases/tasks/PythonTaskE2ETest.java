@@ -279,7 +279,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
                 .script(pythonScripts)
                 .name(taskName)
-                .selectResource(testFileName)
+                .selectResource(testFileName + ".sh")
                 .addParam("file_name", String.format("%s.sh", testFileName))
                 .submit()
 

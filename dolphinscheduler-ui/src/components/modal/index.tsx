@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { defineComponent, PropType, renderSlot, Ref } from 'vue'
+import { defineComponent, PropType, renderSlot, Ref, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { NModal, NCard, NButton, NSpace } from 'naive-ui'
 import ButtonLink from '@/components/button-link'
@@ -77,6 +77,18 @@ const Modal = defineComponent({
   emits: ['cancel', 'confirm', 'jumpLink', 'maskClick'],
   setup(props, ctx) {
     const { t } = useI18n()
+    // NModal does not animate an initially visible modal on its first mount.
+    const entered = ref(props.show)
+    watch(
+      () => props.show,
+      () => {
+        entered.value = false
+      },
+      { flush: 'sync' }
+    )
+    const onAfterEnter = () => {
+      entered.value = props.show
+    }
 
     const onCancel = () => {
       ctx.emit('cancel')
@@ -90,7 +102,7 @@ const Modal = defineComponent({
       ctx.emit('maskClick')
     }
 
-    return { t, onCancel, onConfirm, onMaskClick }
+    return { t, entered, onAfterEnter, onCancel, onConfirm, onMaskClick }
   },
   render() {
     const {
@@ -110,10 +122,12 @@ const Modal = defineComponent({
         mask-closable={false}
         auto-focus={this.autoFocus}
         onMaskClick={onMaskClick}
+        onAfterEnter={this.onAfterEnter}
       >
         <NCard
           title={this.title}
           class={styles['modal-card']}
+          data-modal-ready={this.entered}
           contentStyle={{ overflowY: 'auto' }}
         >
           {{
