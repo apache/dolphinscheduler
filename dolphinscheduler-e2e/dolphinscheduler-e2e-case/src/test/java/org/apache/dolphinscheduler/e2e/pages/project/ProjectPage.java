@@ -96,7 +96,8 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
 
     public ProjectPage assignResource(String project, String type, String resource) {
         openResourceAuthorization(project, type);
-        selectAuthorizationOption(".select-project-resource:not(.n-select--disabled)", resource);
+        selectAuthorizationOption(".select-project-resource .n-base-selection:not(.n-base-selection--disabled)",
+                resource);
         UiInteraction.click(driver, ".project-resource-authorization-modal .grant-project-resource");
         await().untilAsserted(() -> assertThat(grantedResources())
                 .anyMatch(row -> row.findElement(By.tagName("td")).getText().equals(resource)));
@@ -130,7 +131,7 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
         openResourceAuthorization(project, "Worker Group");
         WebDriverWaitFactory.createWebDriverWait(driver).until(ignored -> driver
                 .findElements(By.cssSelector(
-                        ".project-resource-authorization-modal .select-project-resource.n-select--disabled"))
+                        ".project-resource-authorization-modal .select-project-resource .n-base-selection--disabled"))
                 .isEmpty());
         assertThat(grantedResources())
                 .noneMatch(it -> it.findElement(By.tagName("td")).getText().equals(workerGroup));
@@ -142,7 +143,7 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
         projectList().stream().filter(it -> it.getText().contains(project)).findFirst()
                 .orElseThrow(() -> new RuntimeException("Cannot find project: " + project))
                 .findElement(By.className("assign-project-resource-btn")).click();
-        selectAuthorizationOption(".select-resource-type:not(.n-select--disabled)", type);
+        selectAuthorizationOption(".select-resource-type .n-base-selection:not(.n-base-selection--disabled)", type);
     }
 
     private void selectAuthorizationOption(String selector, String label) {
