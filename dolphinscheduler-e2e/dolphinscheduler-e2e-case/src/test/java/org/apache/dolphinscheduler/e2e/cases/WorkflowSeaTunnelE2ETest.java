@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.e2e.pages.project.workflow.TaskInstanceTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowDefinitionTab;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowSaveDialog;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.FlinkStreamTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.SeaTunnelTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.ShellTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.TaskNodeForm;
@@ -61,6 +62,7 @@ class WorkflowSeaTunnelE2ETest {
     private static final String PROJECT = "seatunnel-execution-type";
     private static final String STREAM_MARKER = "ds-seatunnel-stream-data";
     private static final String BATCH_MARKER = "ds-seatunnel-batch-data";
+    private static final String FLINK_MARKER = "ds-flink-stream";
 
     private static final String READY_MODAL = ".n-modal:not(.fade-in-scale-up-transition-enter-active)"
             + ":not(.fade-in-scale-up-transition-leave-active)";
@@ -171,6 +173,17 @@ class WorkflowSeaTunnelE2ETest {
         instances.selectType("Stream");
         instances.stopStream("seatunnel-stream");
         waitForInstance(instances, "seatunnel-stream", true, TaskInstanceTab.Row::isStopped);
+
+        // Flink stream tasks keep their savepoint action. Run a real local-mode Flink SQL job.
+        createFlinkStreamWorkflow("flink-stream-run", "flink-stream");
+        instances = taskInstances().selectType("Stream");
+        waitForInstance(instances, "flink-stream", true, TaskInstanceTab.Row::isRunning);
+        assertThat(instances.isSavepointEnabled("flink-stream")).isTrue();
+        Pattern flinkRow = Pattern.compile(Pattern.quote(FLINK_MARKER + "> +I["));
+        assertLogOutput(instances, "flink-stream", true, "Expected two real Flink print sink rows",
+                output -> flinkRow.matcher(output).results().count() >= 2);
+        // FlinkStreamTask cancels only jobs whose Flink job ID it finds in the log, which a local-mode
+        // job does not print; the job ends when the test container is torn down.
     }
 
     private TaskNodeForm predecessor(TaskNodeForm task, String name) {
@@ -227,6 +240,20 @@ class WorkflowSeaTunnelE2ETest {
         browser.findElement(By.cssSelector(".task-cate-di .n-collapse-item__header")).click();
         submitNode(form.<SeaTunnelTaskForm>addTask(WorkflowForm.TaskType.SEATUNNEL, 350, 100)
                 .executionType(executionType).script(script).deployMode("local").name(name));
+        saveWorkflow(form, workflow);
+        definitions().publish(workflow).run(workflow).submit();
+    }
+
+    private void createFlinkStreamWorkflow(String workflow, String name) {
+        // dml-sync keeps the local-mode job attached to the task, like the SeaTunnel STREAM job.
+        String script = "SET 'table.dml-sync' = 'true';\n"
+                + "CREATE TABLE src (message STRING) WITH ('connector' = 'datagen', 'rows-per-second' = '1');\n"
+                + "CREATE TABLE snk (message STRING) WITH ('connector' = 'print', 'print-identifier' = '"
+                + FLINK_MARKER + "');\n"
+                + "INSERT INTO snk SELECT message FROM src;";
+        WorkflowForm form = definitions().createWorkflow();
+        submitNode(form.<FlinkStreamTaskForm>addTask(WorkflowForm.TaskType.FLINK_STREAM, 350, 100)
+                .programType("SQL").deployMode("local").script(script).name(name));
         saveWorkflow(form, workflow);
         definitions().publish(workflow).run(workflow).submit();
     }
@@ -296,14 +323,19 @@ class WorkflowSeaTunnelE2ETest {
         // Match the sink logger and row indexes, not DolphinScheduler's rawScript echo.
         Pattern first = consoleRow(1, marker);
         Pattern second = consoleRow(2, marker);
+        assertLogOutput(instances, name, stream, "Expected two real ConsoleSinkWriter data rows",
+                output -> first.matcher(output).find() && second.matcher(output).find());
+    }
+
+    private void assertLogOutput(TaskInstanceTab instances, String name, boolean stream, String message,
+                                 Predicate<String> expected) {
         openLog(name, stream);
         try {
             WebDriverWaitFactory.createWebDriverWait(browser, Duration.ofSeconds(120))
                     .ignoring(StaleElementReferenceException.class)
-                    .withMessage("Expected two real ConsoleSinkWriter data rows: " + name)
+                    .withMessage(message + ": " + name)
                     .until(unused -> {
-                        String output = instances.logText();
-                        if (first.matcher(output).find() && second.matcher(output).find()) {
+                        if (expected.test(instances.logText())) {
                             return true;
                         }
                         instances.refreshLog();

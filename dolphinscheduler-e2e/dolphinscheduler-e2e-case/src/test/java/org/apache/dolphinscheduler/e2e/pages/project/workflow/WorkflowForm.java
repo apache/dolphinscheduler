@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
+import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.FlinkStreamTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.JavaTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.PythonTaskForm;
@@ -105,6 +106,8 @@ public final class WorkflowForm {
                 return (T) new PythonTaskForm(this);
             case SEATUNNEL:
                 return (T) new SeaTunnelTaskForm(this);
+            case FLINK_STREAM:
+                return (T) new FlinkStreamTaskForm(this);
         }
         throw new UnsupportedOperationException("Unknown task type");
     }
@@ -223,6 +226,7 @@ public final class WorkflowForm {
         HTTP,
         JAVA,
         PYTHON,
-        SEATUNNEL
+        SEATUNNEL,
+        FLINK_STREAM
     }
 }

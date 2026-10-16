@@ -50,3 +50,20 @@ RUN curl --fail --location --connect-timeout 30 --max-time 120 \
         https://repo.maven.apache.org/maven2/com/sun/jersey/jersey-client/1.19/jersey-client-1.19.jar \
         --output /opt/seatunnel/lib/jersey-client-1.19.jar \
     && echo "591118924e4ecad37b25d2e955ae9531f4f7752aed587f99c6ccc98e03aaae5e  /opt/seatunnel/lib/jersey-client-1.19.jar" | sha256sum --check
+
+ENV FLINK_HOME=/opt/flink
+
+# FLINK_STREAM runs as a local-mode Flink SQL job; bsdextrautils provides the rev used by Flink's scripts.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends bsdextrautils \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl --fail --location --connect-timeout 30 --max-time 900 \
+        --speed-limit 1024 --speed-time 60 --retry 0 \
+        https://dlcdn.apache.org/flink/flink-1.20.3/flink-1.20.3-bin-scala_2.12.tgz \
+        --output /tmp/flink.tgz \
+    && echo "a26e9b970d1d390000bf1c5ce41455906f1a05c453538f974d2c63a36242ee922301c27578810bf549c274b3f2ff8d9da97f04eeae6926cfa81fe7e4b96ea203  /tmp/flink.tgz" | sha512sum --check \
+    && mkdir -p /opt/flink \
+    && tar -xzf /tmp/flink.tgz --strip-components=1 -C /opt/flink \
+    && rm /tmp/flink.tgz \
+    && chmod 1777 /opt/flink/log \
+    && printf '%s\n' 'export FLINK_HOME=/opt/flink' > /etc/profile.d/flink.sh
