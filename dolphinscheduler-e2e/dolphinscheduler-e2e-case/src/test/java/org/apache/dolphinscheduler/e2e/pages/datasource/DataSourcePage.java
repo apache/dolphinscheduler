@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
+import java.util.Locale;
 
 import lombok.Getter;
 
@@ -67,10 +68,13 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         UiInteraction.click(driver, ".btn-create-data-source");
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOf(dataSourceModal));
-        UiInteraction.click(driver, ".dialog-source-modal ." + dataSourceType.toUpperCase() + "-box");
+        String typeLabel = dataSourceType.toUpperCase(Locale.ROOT);
+        // Labels such as HIVE/IMPALA are class tokens, but not valid unescaped CSS identifiers.
+        String typeClass = typeLabel.replace("\\", "\\\\").replace("'", "\\'") + "-box";
+        UiInteraction.click(driver, ".dialog-source-modal [class~='" + typeClass + "']");
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.textToBePresentInElementLocated(
-                By.className("dialog-create-data-source"), dataSourceType.toUpperCase()));
+                By.className("dialog-create-data-source"), typeLabel));
 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
