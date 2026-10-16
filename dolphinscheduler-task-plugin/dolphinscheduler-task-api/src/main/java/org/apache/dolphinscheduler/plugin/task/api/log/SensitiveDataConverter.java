@@ -55,9 +55,11 @@ public class SensitiveDataConverter extends MessageConverter {
     private static final Set<String> maskPatterns = new HashSet<>();
 
     /**
-     * Skip very short literals to avoid over-masking common tokens (e.g. "1", "ab").
+     * Skip literals shorter than this to avoid over-masking common log text (e.g. "123"
+     * matching inside timestamps or numeric IDs). Very short secrets provide little
+     * security value while their literal masking destroys log readability.
      */
-    private static final int MIN_SENSITIVE_LITERAL_LENGTH = 3;
+    private static final int MIN_SENSITIVE_LITERAL_LENGTH = 6;
 
     /**
      * taskInstanceId -> sensitive plaintext values for that task only.
