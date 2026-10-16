@@ -34,7 +34,7 @@ concurrency:
 jobs:
   paths-filter:
     name: API-Test-Path-Filter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
@@ -51,7 +51,7 @@ jobs:
     name: API-Test-Build
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - run: df -h
@@ -100,7 +100,7 @@ jobs:
   api-test:
     name: ${{ matrix.case.name }}
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       matrix:
@@ -144,7 +144,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: 11
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Collect Workflow Metrics
         uses: ./.github/actions/actions-workflow-metrics
       - name: Cache local Maven repository
@@ -178,7 +178,7 @@ jobs:
           retention-days: 1
   result:
     name: API-Test-Result
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: [ api-test, paths-filter ]
     if: always()
