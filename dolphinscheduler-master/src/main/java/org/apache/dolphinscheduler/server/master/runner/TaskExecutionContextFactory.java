@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.server.master.engine.graph.IWorkflowExecution
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionContextBuilder;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.TaskExecutionContextCreateRequest;
+import org.apache.dolphinscheduler.server.master.utils.SensitivePropertyCryptoUtils;
 import org.apache.dolphinscheduler.service.expand.CuringParamsService;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -170,7 +171,7 @@ public class TaskExecutionContextFactory {
                                                    final Project project) {
         final AbstractParameters baseParam = TaskPluginManager.parseTaskParameters(
                 taskInstance.getTaskType(),
-                taskInstance.getTaskParams());
+                SensitivePropertyCryptoUtils.decodeLocalParamsInTaskParams(taskInstance.getTaskParams()));
 
         return curingParamsService.paramParsingPreparation(
                 taskInstance,

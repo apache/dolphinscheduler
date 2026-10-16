@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -30,6 +32,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Mask / merge helpers for {@link Property#isSensitive()}.
@@ -83,6 +88,28 @@ public class PropertySensitiveUtils {
         return properties.stream()
                 .map(PropertySensitiveUtils::maskSensitiveValue)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Deep-copy then apply {@code transformer} to each non-empty {@code sensitive=true} value.
+     * Used for definition-time encode / execution-time decode without pulling crypto deps into task-api.
+     */
+    public List<Property> transformSensitiveValues(List<Property> properties,
+                                                   Function<String, String> transformer) {
+        if (CollectionUtils.isEmpty(properties)) {
+            return Collections.emptyList();
+        }
+        return properties.stream()
+                .map(property -> transformSensitiveValue(property, transformer))
+                .collect(Collectors.toList());
+    }
+
+    public Property transformSensitiveValue(Property property, Function<String, String> transformer) {
+        Property copied = copy(property);
+        if (isSensitive(copied) && StringUtils.isNotEmpty(copied.getValue())) {
+            copied.setValue(transformer.apply(copied.getValue()));
+        }
+        return copied;
     }
 
     public List<Property> mergeSensitiveValuePlaceholders(List<Property> submittedProperties,
@@ -156,5 +183,27 @@ public class PropertySensitiveUtils {
                 .filter(Objects::nonNull)
                 .filter(property -> property.getProp() != null)
                 .collect(Collectors.toMap(Property::getProp, Function.identity(), (left, right) -> right));
+    }
+
+    /**
+     * Rewrite {@code localParams} inside a taskParams JSON string.
+     * Returns the original string when missing / unparsable.
+     */
+    public String transformLocalParamsInTaskParams(String taskParams,
+                                                   Function<List<Property>, List<Property>> transform) {
+        if (StringUtils.isEmpty(taskParams) || transform == null) {
+            return taskParams;
+        }
+        ObjectNode taskParamsNode = JSONUtils.parseObject(taskParams);
+        if (taskParamsNode == null) {
+            return taskParams;
+        }
+        JsonNode localParamsNode = taskParamsNode.findValue("localParams");
+        if (localParamsNode == null || localParamsNode.isNull()) {
+            return taskParams;
+        }
+        List<Property> localParams = JSONUtils.toList(localParamsNode.toString(), Property.class);
+        taskParamsNode.set("localParams", JSONUtils.toJsonNode(transform.apply(localParams)));
+        return JSONUtils.toJsonString(taskParamsNode);
     }
 }
