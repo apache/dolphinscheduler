@@ -85,6 +85,8 @@ public interface TenantService {
      */
     List<Tenant> queryTenantList(User loginUser);
 
+    List<Tenant> queryTenantList(User loginUser, Long projectCode);
+
     /**
      * verify tenant code
      *

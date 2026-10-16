@@ -20,16 +20,12 @@ import {
   PropType,
   toRefs,
   onMounted,
-  ref,
-  Ref,
   getCurrentInstance
 } from 'vue'
-import { NForm, NFormItem, NInput, NSelect, NInputNumber } from 'naive-ui'
+import { NForm, NFormItem, NInput, NInputNumber } from 'naive-ui'
 import { useForm } from '../use-form'
 import Modal from '@/components/modal'
 import { createTaskGroup, updateTaskGroup } from '@/service/modules/task-group'
-import { queryProjectCreatedAndAuthorizedByUser } from '@/service/modules/projects'
-import { SelectMixedOption } from 'naive-ui/lib/select/src/interface'
 
 const props = {
   show: {
@@ -51,22 +47,10 @@ const FormModal = defineComponent({
   emits: ['confirm', 'cancel'],
   setup(props, { emit }) {
     const { state, t } = useForm()
-    const projectOptions: Ref<Array<SelectMixedOption>> = ref([])
-
     onMounted(() => {
-      queryProjectCreatedAndAuthorizedByUser().then((res: any[]) => {
-        res.map((item) => {
-          const option: SelectMixedOption = {
-            label: item.name,
-            value: item.code
-          }
-          projectOptions.value.push(option)
-        })
-      })
       if (props.status === 1) {
         state.formData.id = props.data.id
         state.formData.name = props.data.name
-        state.formData.projectCode = props.data.projectCode
         state.formData.groupSize = String(props.data.groupSize)
         state.formData.status = props.data.status
         state.formData.description = props.data.description
@@ -90,17 +74,16 @@ const FormModal = defineComponent({
     }
 
     const onCancel = () => {
-      state.formData.projectCode = ''
       state.formData.description = ''
       emit('cancel')
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
 
-    return { ...toRefs(state), t, onConfirm, onCancel, projectOptions, trim }
+    return { ...toRefs(state), t, onConfirm, onCancel, trim }
   },
   render() {
-    const { t, onConfirm, onCancel, show, status, projectOptions } = this
+    const { t, onConfirm, onCancel, show, status } = this
     return (
       <Modal
         title={
@@ -111,11 +94,7 @@ const FormModal = defineComponent({
         show={show}
         onConfirm={onConfirm}
         onCancel={onCancel}
-        confirmDisabled={
-          !this.formData.name ||
-          !this.formData.groupSize ||
-          !this.formData.projectCode
-        }
+        confirmDisabled={!this.formData.name || !this.formData.groupSize}
         confirmLoading={this.saving}
       >
         <NForm rules={this.rules} ref='formRef'>
@@ -126,20 +105,6 @@ const FormModal = defineComponent({
               placeholder={t('resource.task_group_option.please_enter_name')}
             />
           </NFormItem>
-          {this.status === 0 && (
-            <NFormItem
-              label={t('resource.task_group_option.project_name')}
-              path='projectCode'
-            >
-              <NSelect
-                options={projectOptions}
-                v-model:value={this.formData.projectCode}
-                placeholder={t(
-                  'resource.task_group_option.please_select_project'
-                )}
-              />
-            </NFormItem>
-          )}
           <NFormItem
             label={t('resource.task_group_option.resource_pool_size')}
             path='groupSize'

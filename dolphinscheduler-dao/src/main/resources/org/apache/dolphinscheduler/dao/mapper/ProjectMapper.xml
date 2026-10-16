@@ -101,6 +101,96 @@
         group by p.id
         order by p.id desc
     </select>
+    <sql id="projectAuthorizationLevels">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        , case
+            when (select count(*) from t_ds_project_user_permission target
+                where target.project_code = p.code and target.user_id = #{targetUserId}
+                    and target.permission in ('VIEW', 'DEVELOP', 'PUBLISH', 'EXECUTE', 'MANAGE_SCHEDULES')) = 5 then 7
+            when exists (select 1 from t_ds_project_user_permission target
+                where target.project_code = p.code and target.user_id = #{targetUserId}
+                    and target.permission = 'VIEW') then 2
+            else 0
+        end as perm
+        from t_ds_project p
+        where 1 = 1
+        <if test="!admin">
+            and exists (select 1 from t_ds_project_user_permission operator_permission
+                where operator_permission.project_code = p.code
+                    and operator_permission.user_id = #{operatorUserId}
+                    and operator_permission.permission = 'MANAGE_MEMBERS')
+        </if>
+    </sql>
+
+    <select id="queryProjectAuthorizationLevelsPaging" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        <include refid="projectAuthorizationLevels"/>
+        <if test="searchName != null and searchName != ''">
+            and (p.name like concat('%', #{searchName}, '%')
+                or p.description like concat('%', #{searchName}, '%'))
+        </if>
+        order by p.id desc
+    </select>
+
+    <select id="queryProjectAuthorizationLevels" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        <include refid="projectAuthorizationLevels"/>
+        order by p.id desc
+    </select>
+
+    <sql id="visibleProjectFrom">
+        from t_ds_project p
+        where 1 = 1
+        <if test="!admin">
+            and exists (
+                select 1 from t_ds_project_user_permission permission
+                where permission.project_code = p.code
+                    and permission.user_id = #{userId}
+                    and permission.permission = 'VIEW'
+            )
+        </if>
+    </sql>
+
+    <sql id="visibleProjectSelect">
+        <bind name="allPermissions" value="@org.apache.dolphinscheduler.common.constants.Constants@ALL_PERMISSIONS"/>
+        <bind name="readPermission" value="@org.apache.dolphinscheduler.common.constants.Constants@READ_PERMISSION"/>
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        ,
+        <choose>
+            <when test="admin">
+                ${allPermissions} as perm
+            </when>
+            <otherwise>
+                ${readPermission} as perm
+            </otherwise>
+        </choose>
+        <include refid="visibleProjectFrom"/>
+    </sql>
+
+    <select id="queryVisibleProjectListPaging" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        <include refid="visibleProjectSelect"/>
+        <if test="searchName != null and searchName != ''">
+            and (p.name like concat('%', #{searchName}, '%')
+                or p.description like concat('%', #{searchName}, '%'))
+        </if>
+        order by p.id desc
+    </select>
+
+    <select id="queryVisibleProjects" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        <include refid="visibleProjectSelect"/>
+        order by p.id desc
+    </select>
+
+    <select id="queryVisibleProjectCodes" resultType="java.lang.Long">
+        select p.code
+        <include refid="visibleProjectFrom"/>
+        order by p.id desc
+    </select>
+
     <select id="queryAuthedProjectListByUserId" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
         <include refid="baseSqlV2">

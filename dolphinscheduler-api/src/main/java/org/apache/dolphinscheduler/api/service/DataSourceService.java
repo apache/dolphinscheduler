@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.api.vo.DataSourceSimpleInfoVO;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
@@ -80,6 +79,8 @@ public interface DataSourceService {
      */
     List<DataSource> queryDataSourceList(User loginUser, Integer type);
 
+    List<DataSource> queryDataSourceList(User loginUser, Integer type, Long projectCode);
+
     /**
      * verify whether a datasource name already exists
      * <p>
@@ -102,7 +103,7 @@ public interface DataSourceService {
      * @param connectionParam the connection parameters containing host, port, credentials, etc.
      * @throws ServiceException if the connection test fails (Status.CONNECTION_TEST_FAILURE)
      */
-    void checkConnection(DbType type, ConnectionParam connectionParam);
+    void checkConnection(User loginUser, DbType type, ConnectionParam connectionParam);
 
     /**
      * test the connectivity of a specific data source
@@ -123,24 +124,6 @@ public interface DataSourceService {
     void delete(User loginUser, int datasourceId);
 
     /**
-     * query the list of unauthorized data sources for a specific user
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return a list of data sources that are available to be authorized to the target user
-     */
-    List<DataSourceSimpleInfoVO> unAuthDatasource(User loginUser, Integer userId);
-
-    /**
-     * query the list of data sources authorized for a specific user
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return a list of data sources that are authorized to the target user
-     */
-    List<DataSourceSimpleInfoVO> authedDatasource(User loginUser, Integer userId);
-
-    /**
      * query the list of tables from a specific database within a data source
      *
      * @param loginUser    the current logged-in user (required for permission check)
@@ -150,6 +133,8 @@ public interface DataSourceService {
      * @throws ServiceException if permission denied, resource not found, or connection fails
      */
     List<ParamsOptions> getTables(User loginUser, Integer datasourceId, String database);
+
+    List<ParamsOptions> getTables(User loginUser, Integer datasourceId, String database, Long projectCode);
 
     /**
      * query the list of columns for a specific table in a data source
@@ -163,6 +148,9 @@ public interface DataSourceService {
      */
     List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database, String tableName);
 
+    List<ParamsOptions> getTableColumns(User loginUser, Integer datasourceId, String database, String tableName,
+                                        Long projectCode);
+
     /**
      * query the list of databases (or schemas) available in a specific data source
      *
@@ -172,5 +160,7 @@ public interface DataSourceService {
      * @throws ServiceException if permission denied, resource not found, or connection fails
      */
     List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId);
+
+    List<ParamsOptions> getDatabases(User loginUser, Integer datasourceId, Long projectCode);
 
 }

@@ -17,24 +17,18 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
-import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
-import org.apache.dolphinscheduler.dao.repository.ProjectDao;
-import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,13 +53,10 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupService {
 
     @Autowired
+    private ProjectAuthorizationService projectAuthorizationService;
+
+    @Autowired
     private TaskGroupMapper taskGroupMapper;
-
-    @Autowired
-    private ProjectDao projectDao;
-
-    @Autowired
-    private ProjectUserDao projectUserDao;
 
     @Autowired
     private TaskGroupQueueService taskGroupQueueService;
@@ -76,7 +67,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     @Override
     @Transactional
     public TaskGroup createTaskGroup(User loginUser, Long projectCode, String name, String description, int groupSize) {
-        requireProjectPerm(loginUser, projectCode, true);
+        requireAdministrator(loginUser);
         if (checkDescriptionLength(description)) {
             log.warn("Parameter description is too long.");
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
@@ -97,7 +88,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         Date now = new Date();
         TaskGroup taskGroup = TaskGroup.builder()
                 .name(name)
-                .projectCode(projectCode)
+                .projectCode(0L)
                 .description(description)
                 .groupSize(groupSize)
                 .userId(loginUser.getId())
@@ -116,8 +107,11 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
     @Override
     public TaskGroup updateTaskGroup(User loginUser, int id, String name, String description, int groupSize) {
+        requireAdministrator(loginUser);
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
-        requireProjectPerm(loginUser, taskGroup.getProjectCode(), true);
+        if (taskGroup == null) {
+            throw new ServiceException(Status.RESOURCE_NOT_EXIST);
+        }
         if (checkDescriptionLength(description)) {
             log.warn("Parameter description is too long.");
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
@@ -170,7 +164,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
     @Override
     public PageInfo<TaskGroup> queryTaskGroupByProjectCode(User loginUser, int pageNo, int pageSize, Long projectCode) {
-        requireProjectPerm(loginUser, projectCode, false);
+        projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroup> taskGroupPaging =
                 taskGroupMapper.queryTaskGroupPagingByProjectCode(page, projectCode);
@@ -189,12 +183,14 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
     @Override
     public TaskGroup queryTaskGroupById(User loginUser, int id) {
+        requireAdministrator(loginUser);
         return taskGroupMapper.selectById(id);
     }
 
     @Override
     public PageInfo<TaskGroup> doQuery(User loginUser, int pageNo, int pageSize, int userId, String name,
                                        Integer status) {
+        requireAdministrator(loginUser);
         Page<TaskGroup> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroup> taskGroupPaging =
                 taskGroupMapper.queryTaskGroupPaging(page, name, status);
@@ -204,10 +200,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
     @Override
     public void closeTaskGroup(User loginUser, int id) {
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
-                ApiFuncIdentificationConstant.TASK_GROUP_CLOSE)) {
-            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION);
-        }
+        requireAdministrator(loginUser);
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.NO) {
             log.info("Task group has been closed, taskGroupId:{}.", id);
@@ -223,10 +216,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
     @Override
     public void startTaskGroup(User loginUser, int id) {
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
-                ApiFuncIdentificationConstant.TASK_GROUP_CLOSE)) {
-            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION);
-        }
+        requireAdministrator(loginUser);
         TaskGroup taskGroup = taskGroupMapper.selectById(id);
         if (taskGroup.getStatus() == Flag.YES) {
             log.info("Task group has been started, taskGroupId:{}.", id);
@@ -243,20 +233,12 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
 
     @Override
     public void forceStartTask(User loginUser, int queueId) {
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
-                ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_START)) {
-            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION);
-        }
         executorService.forceStartTaskInstance(loginUser, queueId);
     }
 
     @Override
     public void modifyPriority(User loginUser, Integer queueId, Integer priority) {
-        if (!canOperatorPermissions(loginUser, null, AuthorizationType.TASK_GROUP,
-                ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_PRIORITY)) {
-            throw new ServiceException(Status.NO_CURRENT_OPERATING_PERMISSION);
-        }
-        taskGroupQueueService.modifyPriority(queueId, priority);
+        taskGroupQueueService.modifyPriority(loginUser, queueId, priority);
         log.info("Modify task group queue priority complete, queueId:{}, priority:{}.", queueId, priority);
     }
 
@@ -273,30 +255,9 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
         taskGroupMapper.deleteBatchIds(taskGroupIds);
     }
 
-    private void requireProjectPerm(User loginUser, long projectCode, boolean writePermission) {
-        if (loginUser.getUserType() == UserType.ADMIN_USER) {
-            return;
-        }
-        Project project = projectDao.queryByCode(projectCode);
-        if (project == null) {
-            log.warn("Project does not exist, projectCode:{}.", projectCode);
-            throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
-        }
-        if (project.getUserId().equals(loginUser.getId())) {
-            return;
-        }
-        ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), loginUser.getId());
-        if (projectUser == null) {
-            log.warn("User {} does not have operation permission for project {}", loginUser.getUserName(),
-                    project.getCode());
-            throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(),
-                    project.getCode());
-        }
-        if (writePermission && projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
-            log.warn("User {} does not have write permission for project {}", loginUser.getUserName(),
-                    project.getCode());
-            throw new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(),
-                    project.getCode());
+    private void requireAdministrator(User loginUser) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
     }
 }

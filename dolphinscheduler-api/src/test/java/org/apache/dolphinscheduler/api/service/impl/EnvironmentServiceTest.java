@@ -29,11 +29,15 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.utils.ServiceTestUtil;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
@@ -78,6 +82,9 @@ public class EnvironmentServiceTest {
 
     @InjectMocks
     private EnvironmentServiceImpl environmentService;
+
+    @Mock
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Mock
     private EnvironmentMapper environmentMapper;
@@ -204,12 +211,12 @@ public class EnvironmentServiceTest {
         ids.add(1);
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT,
                 1, environmentServiceLogger)).thenReturn(ids);
-        when(environmentMapper.selectBatchIds(ids)).thenReturn(Lists.newArrayList(getEnvironment()));
+        when(environmentMapper.queryAllEnvironmentList()).thenReturn(Lists.newArrayList(getEnvironment()));
 
         List<EnvironmentDto> oneResult = environmentService.queryAllEnvironmentList(getAdminUser());
         assertEquals(1, oneResult.size());
 
-        when(environmentMapper.selectBatchIds(ids)).thenReturn(Collections.emptyList());
+        when(environmentMapper.queryAllEnvironmentList()).thenReturn(Collections.emptyList());
         List<EnvironmentDto> noneResult = environmentService.queryAllEnvironmentList(getAdminUser());
         assertEquals(0, noneResult.size());
     }
@@ -262,12 +269,65 @@ public class EnvironmentServiceTest {
     public void testQueryEnvironmentByCode() {
         when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(null);
         assertThrowsServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR,
-                () -> environmentService.queryEnvironmentByCode(1L));
+                () -> environmentService.queryEnvironmentByCode(getAdminUser(), 1L, null));
 
         when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(getEnvironment());
-        EnvironmentDto dto = environmentService.queryEnvironmentByCode(1L);
+        EnvironmentDto dto = environmentService.queryEnvironmentByCode(getAdminUser(), 1L, null);
         Assertions.assertEquals(1L, dto.getCode());
+        Assertions.assertEquals(getConfig(), dto.getConfig());
         Assertions.assertNotNull(dto.getWorkerGroups());
+    }
+
+    @Test
+    public void environmentDetailsRequireProjectResourceGrant() {
+        User user = getGeneralUser();
+        Environment environment = getEnvironment();
+        environment.setId(42);
+        environment.setCode(900L);
+        when(environmentMapper.queryByEnvironmentCode(900L)).thenReturn(environment);
+        Mockito.doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(projectAuthorizationService).requireResourceUse(user, 100L, ProjectPermission.VIEW,
+                        ProjectResourceType.ENVIRONMENT, "42");
+
+        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION,
+                () -> environmentService.queryEnvironmentByCode(user, 900L, 100L));
+        Mockito.verifyNoInteractions(relationMapper);
+
+        Mockito.doNothing().when(projectAuthorizationService).requireResourceUse(user, 100L, ProjectPermission.VIEW,
+                ProjectResourceType.ENVIRONMENT, "42");
+        EnvironmentDto metadata = environmentService.queryEnvironmentByCode(user, 900L, 100L);
+        assertEquals(900L, metadata.getCode());
+        Assertions.assertNull(metadata.getConfig());
+        Assertions.assertEquals(getConfig(), environment.getConfig());
+    }
+
+    @Test
+    public void environmentDetailsWithoutProjectRequireAdministrator() {
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> environmentService.queryEnvironmentByCode(getGeneralUser(), 1L, null));
+        Mockito.verifyNoInteractions(environmentMapper, relationMapper);
+    }
+
+    @Test
+    public void environmentDetailsRequireProjectVisibilityBeforeLookup() {
+        User user = getGeneralUser();
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM))
+                .when(projectAuthorizationService).requirePermission(user, 100L, ProjectPermission.VIEW);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> environmentService.queryEnvironmentByCode(user, 900L, 100L));
+        Mockito.verifyNoInteractions(environmentMapper, relationMapper);
+    }
+
+    @Test
+    public void administratorAlsoRequiresProjectEnvironmentGrant() {
+        User user = getAdminUser();
+        when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(getEnvironment());
+        Mockito.doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(projectAuthorizationService).requireResourceUse(user, 100L, ProjectPermission.VIEW,
+                        ProjectResourceType.ENVIRONMENT, "1");
+        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION,
+                () -> environmentService.queryEnvironmentByCode(user, 1L, 100L));
+        Mockito.verifyNoInteractions(relationMapper);
     }
 
     @Test

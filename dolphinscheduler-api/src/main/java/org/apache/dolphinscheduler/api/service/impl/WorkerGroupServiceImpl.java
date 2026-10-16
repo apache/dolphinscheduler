@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -56,7 +55,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -213,21 +211,16 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     @Override
     public Result queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         // list from index
         int fromIndex = (pageNo - 1) * pageSize;
         // list to index
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
         Result result = new Result();
-        List<WorkerGroupPageDetail> workerGroupPageDetails;
-        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroupPageDetails = getUiWorkerGroupPageDetails(null);
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), log);
-            workerGroupPageDetails =
-                    getUiWorkerGroupPageDetails(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
-        }
+        List<WorkerGroupPageDetail> workerGroupPageDetails = getUiWorkerGroupPageDetails();
         List<WorkerGroupPageDetail> resultDataList = new ArrayList<>();
         int total = 0;
 
@@ -271,14 +264,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     @Override
     public List<String> queryAllGroup(User loginUser) {
-        List<WorkerGroupPageDetail> workerGroups;
-        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroups = getUiWorkerGroupPageDetails(null);
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), log);
-            workerGroups = getUiWorkerGroupPageDetails(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
+        List<WorkerGroupPageDetail> workerGroups = getUiWorkerGroupPageDetails();
         List<String> configWorkerGroupNames = getConfigWorkerGroupPageDetail().stream()
                 .map(WorkerGroupPageDetail::getName)
                 .collect(Collectors.toList());
@@ -289,13 +278,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         return availableWorkerGroupList.stream().distinct().collect(Collectors.toList());
     }
 
-    private List<WorkerGroupPageDetail> getUiWorkerGroupPageDetails(List<Integer> ids) {
-        List<WorkerGroup> workerGroups;
-        if (ids != null) {
-            workerGroups = ids.isEmpty() ? new ArrayList<>() : workerGroupDao.queryByIds(ids);
-        } else {
-            workerGroups = workerGroupDao.queryAllWorkerGroup();
-        }
+    private List<WorkerGroupPageDetail> getUiWorkerGroupPageDetails() {
+        List<WorkerGroup> workerGroups = workerGroupDao.queryAllWorkerGroup();
         return workerGroups.stream()
                 .map(workerGroup -> {
                     WorkerGroupPageDetail workerGroupPageDetail = new WorkerGroupPageDetail(workerGroup);

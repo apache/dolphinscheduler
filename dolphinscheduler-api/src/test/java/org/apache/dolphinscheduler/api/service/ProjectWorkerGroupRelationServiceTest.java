@@ -20,25 +20,22 @@ package org.apache.dolphinscheduler.api.service;
 import static org.apache.dolphinscheduler.api.utils.ServiceTestUtil.getAdminUser;
 import static org.apache.dolphinscheduler.api.utils.ServiceTestUtil.getGeneralUser;
 
-import org.apache.dolphinscheduler.api.AssertionsHelper;
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.ProjectResourceAuthorizationService;
 import org.apache.dolphinscheduler.api.service.impl.ProjectWorkerGroupRelationServiceImpl;
-import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectWorkerGroup;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
-import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectWorkerGroupDao;
-import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
-import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,216 +44,90 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
 
 @ExtendWith(MockitoExtension.class)
-@MockitoSettings(strictness = Strictness.LENIENT)
-public class ProjectWorkerGroupRelationServiceTest {
+class ProjectWorkerGroupRelationServiceTest {
 
     @InjectMocks
-    private ProjectWorkerGroupRelationServiceImpl projectWorkerGroupRelationService;
-
-    @Mock
-    private WorkerGroupService workerGroupService;
-
+    private ProjectWorkerGroupRelationServiceImpl service;
     @Mock
     private ProjectDao projectDao;
-
-    @Mock
-    private ProjectWorkerGroupDao projectWorkerGroupDao;
-
-    @Mock
-    private WorkerGroupDao workerGroupDao;
-
     @Mock
     private ProjectService projectService;
-
+    @Mock
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
+    @Mock
+    private ProjectResourceAuthorizationService resourceAuthorizationService;
+    @Mock
+    private ProjectWorkerGroupDao legacyDao;
     @Mock
     private TaskDefinitionDao taskDefinitionDao;
 
-    @Mock
-    private ScheduleDao scheduleDao;
-
-    protected final static long projectCode = 1L;
-
     @Test
-    public void testAssignWorkerGroupsToProject() {
-        User generalUser = getGeneralUser();
-        User loginUser = getAdminUser();
-
-        // no permission
-        Result result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(generalUser, projectCode,
-                getWorkerGroups());
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), result.getCode());
-
-        // project code is null
-        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, null,
-                getWorkerGroups());
-        Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), result.getCode());
-
-        // project not exists
-        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(null);
-        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                getWorkerGroups());
-        Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), result.getCode());
-
-        // worker group not exists
-        WorkerGroup workerGroup = new WorkerGroup();
-        workerGroup.setName("test");
-        WorkerGroupPageDetail workerGroupPageDetail = new WorkerGroupPageDetail();
-        workerGroupPageDetail.setName("test1");
-        Mockito.when(projectDao.queryByCode(Mockito.anyLong())).thenReturn(getProject());
-        Mockito.when(workerGroupDao.queryAllWorkerGroup()).thenReturn(Collections.singletonList(workerGroup));
-        Mockito.when(workerGroupService.getConfigWorkerGroupPageDetail())
-                .thenReturn(Collections.singletonList(workerGroupPageDetail));
-        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                getDiffWorkerGroups());
-        Assertions.assertEquals(Status.WORKER_GROUP_NOT_EXIST.getCode(), result.getCode());
-
-        // success
-        Mockito.when(workerGroupDao.queryAllWorkerGroupNames()).thenReturn(getWorkerGroups());
-        Mockito.when(projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(Mockito.any(), Mockito.any()))
-                .thenReturn(true);
-        Mockito.when(projectWorkerGroupDao.insert(Mockito.any())).thenReturn(1);
-        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                getWorkerGroups());
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
-
-        // success when there is diff between current wg and assigned wg
-        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(Mockito.any()))
-                .thenReturn(Sets.newHashSet(getDiffProjectWorkerGroup().getWorkerGroup()));
-        Mockito.when(projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(getProjectWorkerGroup().getProjectCode(),
-                Collections.singletonList(getDiffProjectWorkerGroup().getWorkerGroup()))).thenReturn(true);
-        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                getWorkerGroups());
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
-
-        // success when no task referenced any wg
-        Mockito.when(projectWorkerGroupDao.deleteByProjectCode(projectCode))
-                .thenReturn(true);
-        result = projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                new ArrayList<>());
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
-
-        // db deletion fail
-        Mockito.when(projectWorkerGroupDao.deleteByProjectCodeAndWorkerGroups(Mockito.any(), Mockito.any()))
-                .thenReturn(false);
-        AssertionsHelper.assertThrowsServiceException(Status.ASSIGN_WORKER_GROUP_TO_PROJECT_ERROR,
-                () -> projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                        getWorkerGroups()));
-
-        // fail when wg is referenced by task definition
-        // test case: project all wg: test, task used wg: test, new wg: test1
-        Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(Mockito.anyLong()))
-                .thenReturn(Collections.singletonList(getProjectWorkerGroup().getWorkerGroup()));
-        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(Mockito.any()))
-                .thenReturn(Sets.newHashSet(getProjectWorkerGroup().getWorkerGroup()));
-        AssertionsHelper.assertThrowsServiceException(Status.USED_WORKER_GROUP_EXISTS,
-                () -> projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                        getUnusedWorkerGroups()));
-
-        // test clear all wg and fail when wg is referenced by task definition
-        // test case: project all wg: test, task used wg: test, new wg: null
-        Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(Mockito.anyLong()))
-                .thenReturn(Collections.singletonList(getProjectWorkerGroup().getWorkerGroup()));
-        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(Mockito.any()))
-                .thenReturn(Sets.newHashSet(getProjectWorkerGroup().getWorkerGroup()));
-        AssertionsHelper.assertThrowsServiceException(Status.USED_WORKER_GROUP_EXISTS,
-                () -> projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                        new ArrayList<>()));
-
-        // test delete superset of the used wg collection and fail when wg is referenced by task definition
-        // test case: project all wg: test,test1,test2. task used wg: test. new wg: test1, delete test2 and test
-        Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(Mockito.anyLong()))
-                .thenReturn(Collections.singletonList(getProjectWorkerGroup().getWorkerGroup()));
-        Mockito.when(projectWorkerGroupDao.queryAssignedWorkerGroupNamesByProjectCode(Mockito.any()))
-                .thenReturn(Sets.newHashSet("test", "test1", "test2"));
-        AssertionsHelper.assertThrowsServiceException(Status.USED_WORKER_GROUP_EXISTS,
-                () -> projectWorkerGroupRelationService.assignWorkerGroupsToProject(loginUser, projectCode,
-                        getUnusedWorkerGroups()));
+    void onlyAdminCanAssignAndProjectMustExist() {
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(),
+                service.assignWorkerGroupsToProject(getGeneralUser(), 100L, Collections.emptyList()).getCode());
+        Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(),
+                service.assignWorkerGroupsToProject(getAdminUser(), 100L, Collections.emptyList()).getCode());
+        Mockito.verifyNoInteractions(resourceAuthorizationDao, resourceAuthorizationService, legacyDao);
     }
 
     @Test
-    public void testQueryAssignedWorkerGroupsByProject() {
-        // no permission - checkProjectAndAuthThrowException throws ServiceException
-        Mockito.doThrow(new org.apache.dolphinscheduler.api.exceptions.ServiceException(
-                Status.USER_NO_OPERATION_PROJECT_PERM))
-                .when(projectService).checkProjectAndAuthThrowException(Mockito.any(), Mockito.<Project>any(),
-                        Mockito.any());
-        AssertionsHelper.assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
-                () -> projectWorkerGroupRelationService.queryAssignedWorkerGroupsByProject(getGeneralUser(),
-                        projectCode));
+    void assignmentReplacesNewGrantsWithoutChangingLegacyRelations() {
+        User admin = getAdminUser();
+        Mockito.when(projectDao.queryByCode(100L)).thenReturn(new Project());
+        ProjectResourceAuthorization old = new ProjectResourceAuthorization();
+        old.setResourceKey("old");
+        Mockito.when(resourceAuthorizationDao.queryByProjectAndType(100L, ProjectResourceType.WORKER_GROUP))
+                .thenReturn(Collections.singletonList(old));
 
-        // success
-        Mockito.doNothing().when(projectService).checkProjectAndAuthThrowException(Mockito.any(),
-                Mockito.<Project>any(), Mockito.any());
+        Assertions.assertEquals(Status.SUCCESS.getCode(),
+                service.assignWorkerGroupsToProject(admin, 100L, Arrays.asList("new", "new")).getCode());
 
-        Mockito.when(projectDao.queryByCode(projectCode))
-                .thenReturn(getProject());
-
-        Mockito.when(projectWorkerGroupDao.queryByProjectCode(Mockito.any()))
-                .thenReturn(Collections.singletonList(getProjectWorkerGroup()));
-
-        Mockito.when(taskDefinitionDao.queryAllTaskDefinitionWorkerGroups(Mockito.anyLong()))
-                .thenReturn(new ArrayList<>());
-
-        Mockito.when(scheduleDao.querySchedulerListByProjectName(Mockito.any()))
-                .thenReturn(Lists.newArrayList());
-
-        List<ProjectWorkerGroup> projectWorkerGroups =
-                projectWorkerGroupRelationService.queryAssignedWorkerGroupsByProject(getGeneralUser(), projectCode);
-
-        Assertions.assertEquals(1, projectWorkerGroups.size());
-        Assertions.assertEquals(getProjectWorkerGroup().getWorkerGroup(),
-                projectWorkerGroups.get(0).getWorkerGroup());
+        Mockito.verify(resourceAuthorizationService).grantResource(admin, 100L, ProjectResourceType.WORKER_GROUP,
+                "new");
+        Mockito.verify(resourceAuthorizationService).revokeResource(admin, 100L, ProjectResourceType.WORKER_GROUP,
+                "old");
+        Mockito.verifyNoInteractions(legacyDao, taskDefinitionDao);
     }
 
-    private List<String> getWorkerGroups() {
-        return Lists.newArrayList("test");
+    @Test
+    void clearingGrantsDoesNotConsultHistoricalResourceUse() {
+        User admin = getAdminUser();
+        Mockito.when(projectDao.queryByCode(100L)).thenReturn(new Project());
+        ProjectResourceAuthorization grant = new ProjectResourceAuthorization();
+        grant.setResourceKey("used-before");
+        Mockito.when(resourceAuthorizationDao.queryByProjectAndType(100L, ProjectResourceType.WORKER_GROUP))
+                .thenReturn(Collections.singletonList(grant));
+        service.assignWorkerGroupsToProject(admin, 100L, Collections.emptyList());
+        Mockito.verify(resourceAuthorizationService).revokeResource(admin, 100L,
+                ProjectResourceType.WORKER_GROUP, "used-before");
+        Mockito.verifyNoInteractions(legacyDao, taskDefinitionDao);
     }
 
-    private List<String> getUnusedWorkerGroups() {
-        return Lists.newArrayList("test1");
-    }
-
-    private List<String> getDiffWorkerGroups() {
-        return Lists.newArrayList("test3", "new");
-    }
-
-    private Project getProject() {
+    @Test
+    void queryReturnsOnlyExplicitNewGrants() {
+        User user = getGeneralUser();
         Project project = new Project();
-        project.setCode(projectCode);
-        project.setId(1);
-        project.setName("test");
-        project.setUserId(1);
-        return project;
+        Mockito.when(projectDao.queryByCode(100L)).thenReturn(project);
+        ProjectResourceAuthorization grant = new ProjectResourceAuthorization();
+        grant.setResourceKey("allowed");
+        Mockito.when(resourceAuthorizationDao.queryByProjectAndType(100L, ProjectResourceType.WORKER_GROUP))
+                .thenReturn(Collections.singletonList(grant));
+        Assertions.assertEquals("allowed",
+                service.queryAssignedWorkerGroupsByProject(user, 100L).get(0).getWorkerGroup());
+        Mockito.verify(projectService).checkProjectPermission(user, project, ProjectPermission.VIEW);
+        Mockito.verifyNoInteractions(legacyDao, taskDefinitionDao);
     }
 
-    private ProjectWorkerGroup getProjectWorkerGroup() {
-        ProjectWorkerGroup projectWorkerGroup = new ProjectWorkerGroup();
-        projectWorkerGroup.setId(1);
-        projectWorkerGroup.setProjectCode(projectCode);
-        projectWorkerGroup.setWorkerGroup("test");
-        return projectWorkerGroup;
-    }
-
-    private ProjectWorkerGroup getDiffProjectWorkerGroup() {
-        ProjectWorkerGroup projectWorkerGroup = new ProjectWorkerGroup();
-        projectWorkerGroup.setId(2);
-        projectWorkerGroup.setProjectCode(projectCode);
-        projectWorkerGroup.setWorkerGroup("new");
-        return projectWorkerGroup;
-    }
-
-    private TaskDefinition getTaskDefinitionWithDiffWorkerGroup() {
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setProjectCode(projectCode);
-        taskDefinition.setId(1);
-        taskDefinition.setWorkerGroup("new");
-        return taskDefinition;
+    @Test
+    void queryChecksProjectPermissionBeforeReadingGrants() {
+        User user = getGeneralUser();
+        Project project = new Project();
+        Mockito.when(projectDao.queryByCode(100L)).thenReturn(project);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectPermission(user, project, ProjectPermission.VIEW);
+        Assertions.assertThrows(ServiceException.class, () -> service.queryAssignedWorkerGroupsByProject(user, 100L));
+        Mockito.verifyNoInteractions(resourceAuthorizationDao);
     }
 }

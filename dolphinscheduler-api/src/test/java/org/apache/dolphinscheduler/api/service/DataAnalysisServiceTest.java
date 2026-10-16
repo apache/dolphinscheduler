@@ -142,7 +142,7 @@ public class DataAnalysisServiceTest {
         String startDate = "2020-02-11 16:02:18";
         String endDate = "2020-02-11 16:03:18";
 
-        doNothing().when(projectService).checkProjectAndAuthThrowException(any(), anyLong(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), anyLong(), any());
 
         // SUCCESS
         assertDoesNotThrow(
@@ -156,14 +156,14 @@ public class DataAnalysisServiceTest {
 
         // checkProject false
         doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, 1)).when(projectService)
-                .checkProjectAndAuthThrowException(any(), anyLong(), any());
+                .checkProjectPermission(any(), anyLong(), any());
         assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
                 () -> dataAnalysisServiceImpl.getTaskInstanceStateCountByProject(user, 1L, startDate, endDate));
     }
 
     @Test
     public void testCountTaskStateByProject_paramValid() {
-        doNothing().when(projectService).checkProjectAndAuthThrowException(any(), anyLong(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), anyLong(), any());
 
         // when date in illegal format then return error message
         String startDate2 = "illegalDateString";
@@ -186,7 +186,7 @@ public class DataAnalysisServiceTest {
 
     @Test
     public void testCountTaskStateByProject_allCountZero() {
-        doNothing().when(projectService).checkProjectAndAuthThrowException(any(), anyLong(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), anyLong(), any());
 
         // when general user doesn't have any task then return all count are 0
         user.setUserType(UserType.GENERAL_USER);
@@ -200,7 +200,7 @@ public class DataAnalysisServiceTest {
 
     @Test
     public void testCountTaskStateByProject_noData() {
-        doNothing().when(projectService).checkProjectAndAuthThrowException(any(), anyLong(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), anyLong(), any());
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1,
                 serviceLogger)).thenReturn(projectIds());
 
@@ -220,11 +220,11 @@ public class DataAnalysisServiceTest {
 
         // checkProject false
         doThrow(new ServiceException(Status.PROJECT_NOT_FOUND, 1)).when(projectService)
-                .checkProjectAndAuthThrowException(any(), anyLong(), any());
+                .checkProjectPermission(any(), anyLong(), any());
         assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
                 () -> dataAnalysisServiceImpl.getWorkflowInstanceStateCountByProject(user, 1L, startDate, endDate));
 
-        doNothing().when(projectService).checkProjectAndAuthThrowException(any(), anyLong(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), anyLong(), any());
 
         // SUCCESS
         assertDoesNotThrow(
@@ -233,7 +233,7 @@ public class DataAnalysisServiceTest {
 
     @Test
     public void testCountDefinitionByUser() {
-        doNothing().when(projectService).checkProjectAndAuthThrowException(any(), anyLong(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), anyLong(), any());
 
         when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, 1,
                 serviceLogger)).thenReturn(projectIds());
@@ -251,6 +251,9 @@ public class DataAnalysisServiceTest {
         user.setId(1);
 
         assertDoesNotThrow(() -> dataAnalysisServiceImpl.countCommandState(user));
+
+        org.mockito.Mockito.verifyNoInteractions(commandMapper, errorCommandMapper);
+        when(projectService.getAuthorizedProjectCodes(user)).thenReturn(Collections.singletonList(1L));
 
         // when no command found then return all count are 0
         when(commandMapper.countCommandState(any(), any(), any())).thenReturn(Collections.emptyList());

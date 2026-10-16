@@ -27,6 +27,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 
 public interface ProjectDao extends IDao<Project> {
 
+    IPage<Project> queryProjectAuthorizationLevelsPaging(IPage<Project> page, int operatorUserId, boolean admin,
+                                                         int targetUserId, String searchName);
+
+    List<Project> queryProjectAuthorizationLevels(int operatorUserId, boolean admin, int targetUserId);
+
     List<Project> queryByCodes(Collection<Long> projectCodes);
 
     Project queryByCode(Long projectCode);
@@ -38,6 +43,12 @@ public interface ProjectDao extends IDao<Project> {
     IPage<Project> queryProjectListPaging(IPage<Project> page,
                                           List<Integer> projectsIds,
                                           String searchName);
+
+    IPage<Project> queryVisibleProjectListPaging(IPage<Project> page, int userId, boolean admin, String searchName);
+
+    List<Project> queryVisibleProjects(int userId, boolean admin);
+
+    List<Long> queryVisibleProjectCodes(int userId, boolean admin);
 
     List<Project> queryProjectCreatedByUser(int userId);
 

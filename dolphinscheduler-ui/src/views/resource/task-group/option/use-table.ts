@@ -19,9 +19,7 @@ import { h, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format } from 'date-fns'
 import { queryTaskGroupListPaging } from '@/service/modules/task-group'
-import { queryProjectCreatedAndAuthorizedByUser } from '@/service/modules/projects'
 import TableAction from './components/table-action'
-import _ from 'lodash'
 import { parseTime } from '@/common/common'
 import {
   COLUMN_WIDTH_CONFIG,
@@ -53,11 +51,6 @@ export function useTable(
     {
       title: t('resource.task_group_option.name'),
       key: 'name',
-      ...COLUMN_WIDTH_CONFIG['name']
-    },
-    {
-      title: t('resource.task_group_option.project_name'),
-      key: 'projectName',
       ...COLUMN_WIDTH_CONFIG['name']
     },
     {
@@ -125,36 +118,22 @@ export function useTable(
   const getTableData = (params: any) => {
     if (variables.loadingRef) return
     variables.loadingRef = true
-    Promise.all([
-      queryTaskGroupListPaging(params),
-      queryProjectCreatedAndAuthorizedByUser()
-    ]).then((values: any[]) => {
-      variables.totalPage = values[0].totalPage
-      variables.tableData = values[0].totalList.map(
-        (item: any, unused: number) => {
-          let projectName = ''
-          if (values[1]) {
-            const project = _.find(values[1], { code: item.projectCode })
-            if (project) {
-              projectName = project.name
-            }
-          }
-
-          item.projectName = projectName
-          item.createTime = format(
-            parseTime(item.createTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
-          item.updateTime = format(
-            parseTime(item.updateTime),
-            'yyyy-MM-dd HH:mm:ss'
-          )
-          item.status = item.status == 'YES' ? 1 : 0
-          return {
-            ...item
-          }
+    queryTaskGroupListPaging(params).then((result: any) => {
+      variables.totalPage = result.totalPage
+      variables.tableData = result.totalList.map((item: any) => {
+        item.createTime = format(
+          parseTime(item.createTime),
+          'yyyy-MM-dd HH:mm:ss'
+        )
+        item.updateTime = format(
+          parseTime(item.updateTime),
+          'yyyy-MM-dd HH:mm:ss'
+        )
+        item.status = item.status == 'YES' ? 1 : 0
+        return {
+          ...item
         }
-      )
+      })
       variables.loadingRef = false
     })
   }

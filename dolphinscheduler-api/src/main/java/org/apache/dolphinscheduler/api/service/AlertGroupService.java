@@ -33,6 +33,8 @@ public interface AlertGroupService {
      */
     List<AlertGroup> queryAllAlertGroup(User loginUser);
 
+    List<AlertGroup> queryAllAlertGroup(User loginUser, Long projectCode);
+
     /**
      * query alert group by id
      *

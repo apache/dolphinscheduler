@@ -17,13 +17,10 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_VERSION_VIEW;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.PermissionCheck;
-import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
@@ -34,6 +31,7 @@ import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -101,7 +99,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private ProcessService processService;
 
     @Autowired
-    private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
+    private TaskResourcePermissionChecker taskResourcePermissionChecker;
 
     @Autowired
     private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
@@ -119,7 +117,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                                                     String taskName) {
         Project project = projectDao.queryByCode(projectCode);
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
 
         TaskDefinition taskDefinition =
                 taskDefinitionDao.queryByName(project.getCode(), workflowDefinitionCode, taskName);
@@ -179,7 +177,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCode);
         }
         Project project = projectDao.queryByCode(taskDefinition.getProjectCode());
-        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         return taskDefinition;
     }
 
@@ -195,7 +193,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Override
     public void switchVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
 
         if (processService.isTaskOnline(taskCode)) {
             log.warn(
@@ -210,7 +208,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinitionLog taskDefinitionUpdate =
                 taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
-        taskDatasourcePermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinitionUpdate));
+        taskResourcePermissionChecker.checkPermission(projectCode, Collections.singletonList(taskDefinitionUpdate));
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinitionUpdate));
         taskDefinitionUpdate.setUserId(loginUser.getId());
         taskDefinitionUpdate.setUpdateTime(new Date());
@@ -247,7 +245,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         Result<PageInfo<TaskDefinitionLog>> result = new Result<>();
         Project project = projectDao.queryByCode(projectCode);
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_VERSION_VIEW);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
 
         PageInfo<TaskDefinitionLog> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<TaskDefinitionLog> page = new Page<>(pageNo, pageSize);
@@ -266,7 +264,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public void deleteByCodeAndVersion(User loginUser, long projectCode, long taskCode, int version) {
         Project project = projectDao.queryByCode(projectCode);
         // check if user have write perm for project
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
 
         TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskCode);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
@@ -294,7 +292,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     public TaskDefinitionVO queryTaskDefinitionDetail(User loginUser, long projectCode, long taskCode) {
         Project project = projectDao.queryByCode(projectCode);
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project, TASK_DEFINITION);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
 
         TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskCode);
         if (taskDefinition == null || projectCode != taskDefinition.getProjectCode()) {
@@ -337,7 +335,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Override
     public void releaseTaskDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.PUBLISH);
 
         if (null == releaseState) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);
@@ -358,7 +356,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                 taskDefinitionLog.setFlag(Flag.NO);
                 break;
             case ONLINE:
-                taskDatasourcePermissionChecker.checkPermission(loginUser,
+                taskResourcePermissionChecker.checkPermission(projectCode,
                         Collections.singletonList(taskDefinitionLog));
                 taskSubWorkflowPermissionChecker.checkPermission(loginUser,
                         Collections.singletonList(taskDefinitionLog));

@@ -17,9 +17,12 @@
 import type { IJsonItem } from '../types'
 import { useCustomParams, useNamespace } from '.'
 
-export function useKubeflow(model: { [field: string]: any }): IJsonItem[] {
+export function useKubeflow(
+  model: { [field: string]: any },
+  projectCode: number
+): IJsonItem[] {
   return [
-    useNamespace(),
+    useNamespace(projectCode),
     {
       type: 'editor',
       field: 'yamlContent',
