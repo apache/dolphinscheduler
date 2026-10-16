@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.ElementClickInterceptedException;
@@ -52,6 +53,7 @@ import com.google.common.io.Resources;
 
 @SuppressWarnings("UnstableApiUsage")
 @Getter
+@Slf4j
 public final class WorkflowForm {
 
     private WebDriver driver;
@@ -81,15 +83,28 @@ public final class WorkflowForm {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public <T> T addTask(TaskType type, Integer x, Integer y) {
-        final WebElement task = driver.findElement(By.className("task-item-" + type.name()));
+        log.info("Waiting for DAG canvas and task menu: type={}, url={}", type, driver.getCurrentUrl());
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .withMessage("DAG graph has not mounted before adding task " + type)
+                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".dag-container .x6-graph-svg")));
+        // Task entries are populated by the asynchronous DAG menu request after navigation.
+        final WebElement task = WebDriverWaitFactory.createWebDriverWait(driver)
+                .withMessage("DAG task menu has not rendered a draggable entry for " + type)
+                .until(ExpectedConditions.visibilityOfElementLocated(
+                        By.cssSelector(".task-item-" + type.name() + "[draggable='true']")));
         final WebElement canvas = driver.findElement(By.className("dag-container"));
+        log.info("Dragging DAG task: type={}, sourceLocation={}, sourceSize={}, canvasLocation={}, canvasSize={}",
+                type, task.getLocation(), task.getSize(), canvas.getLocation(), canvas.getSize());
 
         final JavascriptExecutor js = (JavascriptExecutor) driver;
         final String dragAndDrop = String.join("\n",
                 Resources.readLines(Resources.getResource("dragAndDrop.js"), StandardCharsets.UTF_8));
         js.executeScript(dragAndDrop, task, canvas, x, y);
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions
-                .visibilityOfElementLocated(By.xpath("//*[contains(text(), 'Current node settings')]")));
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .withMessage("Task settings did not open after dragging " + type)
+                .until(ExpectedConditions
+                        .visibilityOfElementLocated(By.xpath("//*[contains(text(), 'Current node settings')]")));
+        log.info("DAG task settings opened: type={}", type);
 
         switch (type) {
             case SHELL:
