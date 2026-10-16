@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
+import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import org.openqa.selenium.By;
@@ -36,18 +38,7 @@ public class SeaTunnelTaskForm extends TaskNodeForm {
     }
 
     public SeaTunnelTaskForm script(String script) {
-        WebElement input = editorInput();
-        input.sendKeys(Keys.chord(selectAllKey(), "a"), Keys.BACK_SPACE);
-        String[] lines = script.split("\n", -1);
-        for (int i = 0; i < lines.length; i++) {
-            // Replace automatic indentation, then remove any auto-closed suffix.
-            input.sendKeys(Keys.HOME, Keys.chord(Keys.SHIFT, Keys.END), Keys.DELETE, lines[i],
-                    Keys.chord(Keys.SHIFT, Keys.END), Keys.DELETE);
-            if (i + 1 < lines.length) {
-                // Insert a line without accepting Monaco's word suggestions.
-                input.sendKeys(Keys.chord(selectAllKey(), Keys.ENTER));
-            }
-        }
+        new CodeEditor(parent().driver()).content(script);
         return this;
     }
 
@@ -104,7 +95,7 @@ public class SeaTunnelTaskForm extends TaskNodeForm {
     }
 
     public WorkflowForm cancel() {
-        parent().driver().findElement(By.cssSelector(".n-modal .btn-cancel")).click();
+        UiInteraction.click(parent().driver(), "[data-modal-ready] .btn-cancel");
         WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.invisibilityOf(inputNodeName()));
         return parent();
@@ -129,6 +120,6 @@ public class SeaTunnelTaskForm extends TaskNodeForm {
     private WebElement executionTypeInput(String executionType) {
         return WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(
-                        ".seatunnel-execute-type input[value='" + executionType + "']")));
+                        "[data-modal-ready='true'] .seatunnel-execute-type input[value='" + executionType + "']")));
     }
 }

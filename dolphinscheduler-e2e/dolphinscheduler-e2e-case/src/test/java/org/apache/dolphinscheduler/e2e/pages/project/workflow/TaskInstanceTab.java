@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
@@ -87,7 +88,7 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
     }
 
     public TaskInstanceTab closeLog() {
-        driver.findElement(By.cssSelector(".logModalRef .btn-submit")).click();
+        UiInteraction.click(driver, ".logModalRef .btn-submit");
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".logModalRef")));
         return this;

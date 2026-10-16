@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.e2e.cases;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.apache.dolphinscheduler.e2e.core.DolphinScheduler;
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.models.users.AdminUser;
 import org.apache.dolphinscheduler.e2e.pages.LoginPage;
@@ -63,9 +64,6 @@ class WorkflowSeaTunnelE2ETest {
     private static final String STREAM_MARKER = "ds-seatunnel-stream-data";
     private static final String BATCH_MARKER = "ds-seatunnel-batch-data";
     private static final String FLINK_MARKER = "ds-flink-stream";
-
-    private static final String READY_MODAL = ".n-modal:not(.fade-in-scale-up-transition-enter-active)"
-            + ":not(.fade-in-scale-up-transition-leave-active)";
 
     private static RemoteWebDriver browser;
 
@@ -182,13 +180,12 @@ class WorkflowSeaTunnelE2ETest {
         Pattern flinkRow = Pattern.compile(Pattern.quote(FLINK_MARKER + "> +I["));
         assertLogOutput(instances, "flink-stream", true, "Expected two real Flink print sink rows",
                 output -> flinkRow.matcher(output).results().count() >= 2);
-        // FlinkStreamTask cancels only jobs whose Flink job ID it finds in the log, which a local-mode
-        // job does not print; the job ends when the test container is torn down.
+        // FlinkStreamTask cancels only jobs whose YARN application ID it finds in the task log. A local-mode
+        // job has none, so the job ends when the test container is torn down.
     }
 
     private TaskNodeForm predecessor(TaskNodeForm task, String name) {
-        WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(READY_MODAL + " .pre-tasks-model .n-base-selection"))).click();
+        UiInteraction.click(browser, ".pre-tasks-model .n-base-selection");
         WebDriverWaitFactory.createWebDriverWait(browser)
                 .ignoring(StaleElementReferenceException.class)
                 .ignoring(ElementClickInterceptedException.class)
@@ -209,16 +206,14 @@ class WorkflowSeaTunnelE2ETest {
 
     private void submitNode(TaskNodeForm task) {
         WebElement name = task.inputNodeName();
-        WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(READY_MODAL + " .input-node-name input")));
-        task.submit();
+        UiInteraction.click(browser, "[data-modal-ready] .btn-submit");
         WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.invisibilityOf(name));
     }
 
     private void saveWorkflow(WorkflowForm form, String name) {
         WorkflowSaveDialog dialog = form.submit();
         WebDriverWaitFactory.createWebDriverWait(browser).until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector(READY_MODAL + " .input-name input")));
+                By.cssSelector("[data-modal-ready='true'] .input-name input")));
         if (name != null) {
             dialog.name(name);
         }
@@ -297,7 +292,7 @@ class WorkflowSeaTunnelE2ETest {
         By operation = By.xpath(rows + "[td[@data-col-key='name' and normalize-space(.)='" + name + "']]"
                 + "/td[@data-col-key='operation']");
         ExpectedCondition<WebElement> completion = ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector(".logModalRef:not(.fade-in-scale-up-transition-enter-active) .n-log"));
+                By.cssSelector("[data-modal-ready='true'] .n-log"));
         boolean[] clicked = {false};
         WebDriverWaitFactory.createWebDriverWait(browser)
                 .ignoring(StaleElementReferenceException.class)

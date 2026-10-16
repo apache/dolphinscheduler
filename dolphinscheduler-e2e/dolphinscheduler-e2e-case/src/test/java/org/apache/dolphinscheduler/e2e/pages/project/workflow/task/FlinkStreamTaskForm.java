@@ -36,9 +36,11 @@ public class FlinkStreamTaskForm extends TaskNodeForm {
     }
 
     public FlinkStreamTaskForm programType(String programType) {
+        WebDriverWaitFactory.createWebDriverWait(parent().driver()).until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector("[data-modal-ready='true'] .input-node-name input")));
         WebElement selection = WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.elementToBeClickable(formItem("Program Type", "n-base-selection")));
-        scrollIntoView(selection);
+        scrollToControl(selection);
         selection.click();
         WebDriverWaitFactory.createWebDriverWait(parent().driver()).until(ExpectedConditions.elementToBeClickable(
                 By.xpath("//div[contains(@class, 'n-base-select-menu')]"
@@ -56,17 +58,18 @@ public class FlinkStreamTaskForm extends TaskNodeForm {
                 .until(ExpectedConditions.presenceOfElementLocated(
                         By.cssSelector(".n-modal input[type=radio][value='" + deployMode + "']")));
         WebElement label = input.findElement(By.xpath(".."));
-        scrollIntoView(label);
+        scrollToControl(label);
         label.click();
         WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.elementToBeSelected(input));
         return this;
     }
 
+    // CodeEditor needs exactly one visible editor, but SQL mode also shows the initialization script editor.
     public FlinkStreamTaskForm script(String script) {
         WebElement editor = WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.elementToBeClickable(formItem("Script", "monaco-editor")));
-        scrollIntoView(editor);
+        scrollToControl(editor);
         editor.click();
         WebElement input = editor.findElement(By.cssSelector("textarea.inputarea"));
         Keys modifier = ((HasCapabilities) parent().driver()).getCapabilities().getPlatformName().is(Platform.MAC)
@@ -92,7 +95,7 @@ public class FlinkStreamTaskForm extends TaskNodeForm {
                 + " and .//*[normalize-space(text())='" + label + "']]//div[contains(@class, '" + control + "')]");
     }
 
-    private void scrollIntoView(WebElement element) {
+    private void scrollToControl(WebElement element) {
         // Scroll past the bottom edge so the modal footer does not cover the control.
         new Actions(parent().driver()).scrollToElement(element)
                 .scrollFromOrigin(WheelInput.ScrollOrigin.fromElement(element), 0, 200).perform();
