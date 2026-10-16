@@ -76,7 +76,9 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
 
         tenantPage
                 .goToNav(ProjectPage.class)
-                .createProjectUntilSuccess(projectName);
+                .createProjectUntilSuccess(projectName)
+                .assignResource(projectName, "Tenant", adminUser.getTenant())
+                .assignResource(projectName, "Queue", "default");
     }
 
     @Test
