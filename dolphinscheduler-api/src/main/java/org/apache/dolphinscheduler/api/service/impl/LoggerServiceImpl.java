@@ -17,9 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.logging.LogClientDelegate;
@@ -27,18 +24,16 @@ import org.apache.dolphinscheduler.api.service.LoggerService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.dao.entity.ResponseTaskLog;
-import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.repository.ProjectDao;
-import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -57,13 +52,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     private TaskInstanceDao taskInstanceDao;
 
     @Autowired
-    private ProjectDao projectDao;
-
-    @Autowired
     private ProjectService projectService;
-
-    @Autowired
-    private TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
     private LogClientDelegate logClientDelegate;
@@ -91,7 +80,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             log.error("Host of task instance is null, taskInstanceId:{}.", taskInstId);
             return Result.error(Status.TASK_INSTANCE_HOST_IS_NULL);
         }
-        projectService.checkProjectAndAuthThrowException(loginUser, taskInstance.getProjectCode(), VIEW_LOG);
+        projectService.checkProjectPermission(loginUser, taskInstance.getProjectCode(), ProjectPermission.VIEW);
         Result<ResponseTaskLog> result = new Result<>(Status.SUCCESS.getCode(), Status.SUCCESS.getMsg());
         String log = queryLog(taskInstance, skipLineNum, limit);
         int lineNum = log.split("\\r\\n").length;
@@ -112,8 +101,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
         if (taskInstance == null || StringUtils.isBlank(taskInstance.getHost())) {
             throw new ServiceException("task instance is null or host is null");
         }
-        Project project = projectDao.queryProjectByTaskInstanceId(taskInstId);
-        projectService.checkProjectAndAuthThrowException(loginUser, project, DOWNLOAD_LOG);
+        projectService.checkProjectPermission(loginUser, taskInstance.getProjectCode(), ProjectPermission.VIEW);
         return getLogBytes(taskInstance);
     }
 
@@ -131,15 +119,14 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     @SuppressWarnings("unchecked")
     public String queryLog(User loginUser, long projectCode, int taskInstId, int skipLineNum, int limit) {
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, VIEW_LOG);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         // check whether the task instance can be found
         TaskInstance task = taskInstanceDao.queryById(taskInstId);
         if (task == null || StringUtils.isBlank(task.getHost())) {
             throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND);
         }
 
-        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(task.getTaskCode());
-        if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
+        if (!Objects.equals(projectCode, task.getProjectCode())) {
             throw new ServiceException(Status.TASK_INSTANCE_NOT_FOUND, taskInstId);
         }
         return queryLog(task, skipLineNum, limit);
@@ -156,7 +143,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
     @Override
     public byte[] getLogBytes(User loginUser, long projectCode, int taskInstId) {
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, DOWNLOAD_LOG);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
 
         // check whether the task instance can be found
         TaskInstance task = taskInstanceDao.queryById(taskInstId);
@@ -164,8 +151,7 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
             throw new ServiceException("task instance is null or host is null");
         }
 
-        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(task.getTaskCode());
-        if (taskDefinition != null && projectCode != taskDefinition.getProjectCode()) {
+        if (!Objects.equals(projectCode, task.getProjectCode())) {
             throw new ServiceException("task instance does not exist in project");
         }
         return getLogBytes(task);

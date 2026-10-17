@@ -45,10 +45,8 @@ import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -185,17 +183,8 @@ public class WorkerGroupServiceTest {
     @Test
     public void giveValidParams_whenQueryAllGroupPaging_expectSuccess() {
         User loginUser = getLoginUser();
-        Set<Integer> ids = new HashSet<>();
-        ids.add(1);
-        List<WorkerGroup> workerGroups = new ArrayList<>();
-        workerGroups.add(getWorkerGroup(1));
-        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP,
-                loginUser.getId(), serviceLogger)).thenReturn(ids);
-        when(workerGroupDao.queryByIds(ids)).thenReturn(workerGroups);
-        Set<String> activeWorkerNodes = new HashSet<>();
-        activeWorkerNodes.add("localhost:12345");
-        activeWorkerNodes.add("localhost:23456");
-        when(registryClient.getServerNodeSet(RegistryNodeType.WORKER)).thenReturn(activeWorkerNodes);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        when(workerGroupDao.queryAllWorkerGroup()).thenReturn(java.util.Collections.singletonList(getWorkerGroup(1)));
 
         Result result = workerGroupService.queryAllGroupPaging(loginUser, 1, 1, null);
         Assertions.assertEquals(result.getCode(), Status.SUCCESS.getCode());
@@ -203,8 +192,9 @@ public class WorkerGroupServiceTest {
 
     @Test
     public void testQueryAllGroup() {
-        List<String> workerGroups = workerGroupService.queryAllGroup(getLoginUser());
-        Assertions.assertEquals(0, workerGroups.size());
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> workerGroupService.queryAllGroup(getLoginUser()));
+        Mockito.verifyNoInteractions(workerGroupDao, registryClient, resourcePermissionCheckService);
     }
 
     @Test
@@ -261,9 +251,20 @@ public class WorkerGroupServiceTest {
     }
 
     @Test
-    public void testQueryAllGroupWithDefault() {
-        List<String> workerGroups = workerGroupService.queryAllGroup(getLoginUser());
-        Assertions.assertEquals(0, workerGroups.size());
+    public void administratorCanQueryWorkerGroupCatalog() {
+        User user = getLoginUser();
+        user.setUserType(UserType.ADMIN_USER);
+        when(workerGroupDao.queryAllWorkerGroup()).thenReturn(java.util.Collections.singletonList(getWorkerGroup(1)));
+        Assertions.assertEquals(java.util.Collections.singletonList(GROUP_NAME),
+                workerGroupService.queryAllGroup(user));
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
+    }
+
+    @Test
+    public void workerGroupCatalogPagingRequiresAdministratorBeforeQueryingRegistry() {
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> workerGroupService.queryAllGroupPaging(getLoginUser(), 1, 10, null));
+        Mockito.verifyNoInteractions(workerGroupDao, registryClient, resourcePermissionCheckService);
     }
 
     /**

@@ -66,28 +66,10 @@ public interface K8sNamespaceService {
     void deleteNamespaceById(User loginUser, int id);
 
     /**
-     * query unauthorized namespace
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return the namespaces which user have not permission to see
-     */
-    List<K8sNamespace> queryUnauthorizedNamespace(User loginUser, Integer userId);
-
-    /**
-     * query unauthorized namespace
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return namespaces which the user have permission to see
-     */
-    List<K8sNamespace> queryAuthorizedNamespace(User loginUser, Integer userId);
-
-    /**
      * query namespace can use
      *
      * @param loginUser login user
      * @return namespace list
      */
-    List<K8sNamespace> queryNamespaceAvailable(User loginUser);
+    List<K8sNamespace> queryNamespaceAvailable(User loginUser, long projectCode);
 }

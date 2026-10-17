@@ -1102,7 +1102,7 @@ INSERT INTO t_ds_queue(queue_name, queue, create_time, update_time)
 VALUES ('default', 'default', '2018-11-29 10:22:33', '2018-11-29 10:22:33');
 
 -- Records of t_ds_queue,default queue name : default
-INSERT INTO t_ds_version(version) VALUES ('3.3.0');
+INSERT INTO t_ds_version(version) VALUES ('3.5.0');
 
 --
 -- Table structure for table t_ds_plugin_define
@@ -1412,3 +1412,30 @@ create table t_ds_jdbc_registry_data_change_event
     create_time        timestamp not null default current_timestamp,
     primary key (id)
 );
+
+
+-- Project-scoped operation permissions. Legacy authorization tables are retained.
+DROP TABLE IF EXISTS t_ds_project_user_permission;
+CREATE TABLE t_ds_project_user_permission (
+    id SERIAL NOT NULL,
+    project_code BIGINT NOT NULL,
+    user_id INT NOT NULL,
+    permission VARCHAR(32) NOT NULL,
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT uk_project_user_permission UNIQUE (project_code, user_id, permission)
+);
+CREATE INDEX idx_user_permission_project ON t_ds_project_user_permission (user_id, permission, project_code);
+
+-- Presence of a row grants the project use of the resource.
+DROP TABLE IF EXISTS t_ds_project_resource_authorization;
+CREATE TABLE t_ds_project_resource_authorization (
+    id SERIAL NOT NULL,
+    project_code BIGINT NOT NULL,
+    resource_type VARCHAR(32) NOT NULL,
+    resource_key VARCHAR(255) NOT NULL,
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT uk_project_resource_authorization UNIQUE (project_code, resource_type, resource_key)
+);
+CREATE INDEX idx_resource_authorization_project ON t_ds_project_resource_authorization (resource_type, resource_key, project_code);

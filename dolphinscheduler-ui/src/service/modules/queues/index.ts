@@ -34,10 +34,11 @@ export function createQueue(data: QueueReq): any {
   })
 }
 
-export function queryList(): any {
+export function queryList(projectCode?: number): any {
   return axios({
     url: '/queues/list',
-    method: 'get'
+    method: 'get',
+    params: { projectCode }
   })
 }
 

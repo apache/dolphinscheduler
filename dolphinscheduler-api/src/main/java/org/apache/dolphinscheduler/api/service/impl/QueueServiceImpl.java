@@ -23,11 +23,12 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -39,7 +40,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -55,6 +55,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Service
 @Slf4j
 public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
+
+    @Autowired
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Autowired
     private QueueDao queueDao;
@@ -117,14 +120,20 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return queue list
      */
     @Override
-    public List<Queue> queryList(User loginUser) {
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
-                loginUser.getId(), log);
-        if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
-            ids = ids.isEmpty() ? new HashSet<>() : ids;
-            ids.add(Constants.DEFAULT_QUEUE_ID);
+    public List<Queue> queryList(User loginUser, Long projectCode) {
+        if (projectCode == null) {
+            return queryList(loginUser);
         }
-        return queueDao.queryByIds(ids);
+        projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
+        return queueDao.queryByProject(projectCode);
+    }
+
+    @Override
+    public List<Queue> queryList(User loginUser) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+        return queueDao.queryAll();
     }
 
     /**

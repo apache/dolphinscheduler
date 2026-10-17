@@ -30,6 +30,16 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 
 public interface ProjectMapper extends BaseMapper<Project> {
 
+    IPage<Project> queryProjectAuthorizationLevelsPaging(IPage<Project> page,
+                                                         @Param("operatorUserId") int operatorUserId,
+                                                         @Param("admin") boolean admin,
+                                                         @Param("targetUserId") int targetUserId,
+                                                         @Param("searchName") String searchName);
+
+    List<Project> queryProjectAuthorizationLevels(@Param("operatorUserId") int operatorUserId,
+                                                  @Param("admin") boolean admin,
+                                                  @Param("targetUserId") int targetUserId);
+
     /**
      * query project detail by code
      * @param projectCode projectCode
@@ -76,6 +86,15 @@ public interface ProjectMapper extends BaseMapper<Project> {
     IPage<Project> queryProjectListPaging(IPage<Project> page,
                                           @Param("projectsIds") List<Integer> projectsIds,
                                           @Param("searchName") String searchName);
+
+    IPage<Project> queryVisibleProjectListPaging(IPage<Project> page,
+                                                 @Param("userId") int userId,
+                                                 @Param("admin") boolean admin,
+                                                 @Param("searchName") String searchName);
+
+    List<Project> queryVisibleProjects(@Param("userId") int userId, @Param("admin") boolean admin);
+
+    List<Long> queryVisibleProjectCodes(@Param("userId") int userId, @Param("admin") boolean admin);
 
     /**
      *  query create project user

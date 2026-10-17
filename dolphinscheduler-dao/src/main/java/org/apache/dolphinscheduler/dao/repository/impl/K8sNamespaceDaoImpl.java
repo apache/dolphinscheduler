@@ -39,6 +39,11 @@ public class K8sNamespaceDaoImpl extends BaseDao<K8sNamespace, K8sNamespaceMappe
     }
 
     @Override
+    public List<K8sNamespace> queryByProject(long projectCode) {
+        return mybatisMapper.queryByProject(projectCode);
+    }
+
+    @Override
     public IPage<K8sNamespace> queryK8sNamespacePaging(IPage<K8sNamespace> page, String searchVal) {
         return mybatisMapper.queryK8sNamespacePaging(page, searchVal);
     }

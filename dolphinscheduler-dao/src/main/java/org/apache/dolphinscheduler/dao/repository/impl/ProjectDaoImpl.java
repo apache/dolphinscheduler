@@ -40,6 +40,18 @@ public class ProjectDaoImpl extends BaseDao<Project, ProjectMapper> implements P
     }
 
     @Override
+    public IPage<Project> queryProjectAuthorizationLevelsPaging(IPage<Project> page, int operatorUserId, boolean admin,
+                                                                int targetUserId, String searchName) {
+        return mybatisMapper.queryProjectAuthorizationLevelsPaging(page, operatorUserId, admin, targetUserId,
+                searchName);
+    }
+
+    @Override
+    public List<Project> queryProjectAuthorizationLevels(int operatorUserId, boolean admin, int targetUserId) {
+        return mybatisMapper.queryProjectAuthorizationLevels(operatorUserId, admin, targetUserId);
+    }
+
+    @Override
     public List<Project> queryByCodes(Collection<Long> projectCodes) {
         return mybatisMapper.queryByCodes(projectCodes);
     }
@@ -64,6 +76,22 @@ public class ProjectDaoImpl extends BaseDao<Project, ProjectMapper> implements P
                                                  List<Integer> projectsIds,
                                                  String searchName) {
         return mybatisMapper.queryProjectListPaging(page, projectsIds, searchName);
+    }
+
+    @Override
+    public IPage<Project> queryVisibleProjectListPaging(IPage<Project> page, int userId, boolean admin,
+                                                        String searchName) {
+        return mybatisMapper.queryVisibleProjectListPaging(page, userId, admin, searchName);
+    }
+
+    @Override
+    public List<Project> queryVisibleProjects(int userId, boolean admin) {
+        return mybatisMapper.queryVisibleProjects(userId, admin);
+    }
+
+    @Override
+    public List<Long> queryVisibleProjectCodes(int userId, boolean admin) {
+        return mybatisMapper.queryVisibleProjectCodes(userId, admin);
     }
 
     @Override

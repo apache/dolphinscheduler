@@ -19,7 +19,10 @@ import { useI18n } from 'vue-i18n'
 import { useCustomParams, useSourceType, useTargetType } from '.'
 import type { IJsonItem, ModelType } from '../types'
 
-export function useSqoop(model: { [field: string]: any }): IJsonItem[] {
+export function useSqoop(
+  model: { [field: string]: any },
+  projectCode: number
+): IJsonItem[] {
   const { t } = useI18n()
   const customSpan = computed(() => (model.isCustomTask ? 24 : 0))
   const unCustomSpan = computed(() => (model.isCustomTask ? 0 : 24))
@@ -71,8 +74,8 @@ export function useSqoop(model: { [field: string]: any }): IJsonItem[] {
       isSimple: true,
       span: unCustomSpan
     }),
-    ...useSourceType(model, unCustomSpan),
-    ...useTargetType(model, unCustomSpan),
+    ...useSourceType(model, unCustomSpan, projectCode),
+    ...useTargetType(model, unCustomSpan, projectCode),
     {
       type: 'input-number',
       field: 'concurrency',

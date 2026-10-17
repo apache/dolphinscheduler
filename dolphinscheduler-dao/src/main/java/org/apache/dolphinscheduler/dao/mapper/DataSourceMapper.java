@@ -32,6 +32,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 public interface DataSourceMapper extends BaseMapper<DataSource> {
 
+    List<DataSource> queryByProject(@Param("projectCode") long projectCode);
+
     /**
      * query datasource by type
      * @param userId userId

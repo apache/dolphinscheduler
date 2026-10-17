@@ -34,10 +34,11 @@ export function createAlertGroup(data: GroupReq): any {
   })
 }
 
-export function listAlertGroupById(): any {
+export function listAlertGroupById(projectCode?: number): any {
   return axios({
     url: '/alert-groups/list',
-    method: 'get'
+    method: 'get',
+    params: { projectCode }
   })
 }
 

@@ -216,32 +216,14 @@ public class DataSourceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testAuthedDatasource() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "2");
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/authed-datasource")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        mockMvc.perform(get("/datasources/authed-datasource").header(SESSION_ID, sessionId).param("userId", "2"))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
     public void testUnauthDatasource() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "2");
-        MvcResult mvcResult = mockMvc.perform(get("/datasources/unauth-datasource")
-                .header("sessionId", sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        mockMvc.perform(get("/datasources/unauth-datasource").header(SESSION_ID, sessionId).param("userId", "2"))
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
