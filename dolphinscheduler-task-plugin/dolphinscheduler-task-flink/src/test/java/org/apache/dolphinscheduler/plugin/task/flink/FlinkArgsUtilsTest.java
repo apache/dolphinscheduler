@@ -297,6 +297,87 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testMergeClusterConnectionOptionsKeepsSeparatedOptions() {
+        // "-D <key>=<value>" is one option which is given as two arguments, merging it must not drop
+        // the second -D and leave its value behind as a bare argument
+        List<String> options = FlinkArgsUtils.mergeClusterConnectionOptions(
+                FlinkArgsUtils.extractClusterConnectionOptions("-D rest.address=remote-jm -D rest.port=8081"),
+                Collections.emptyList());
+
+        Assertions.assertEquals(
+                Arrays.asList("-D", "rest.address=remote-jm", "-D", "rest.port=8081"), options);
+
+        List<String> commandLine =
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", options);
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef "
+                        + "-D rest.address=remote-jm -D rest.port=8081",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsFromSqlScriptsQuotesShellValues() {
+        // a value which contains a space or a shell metacharacter has to reach the flink CLI as a
+        // single argument, while a plain value is left as it is
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'security.ssl.rest.truststore' = '/opt/flink configs/client.jks';",
+                "SET 'security.ssl.rest.keystore' = '/opt/($HOME)/client.jks';",
+                "SET 'rest.address' = 'plain-host';");
+
+        Assertions.assertEquals(
+                Arrays.asList("-Dsecurity.ssl.rest.truststore='/opt/flink configs/client.jks'",
+                        "-Dsecurity.ssl.rest.keystore='/opt/($HOME)/client.jks'",
+                        "-Drest.address=plain-host"),
+                options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJob() {
+        // the SQL Client executes the statements in order, so a script which changes the connection
+        // between two jobs keeps the settings which were effective for each of them
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob("-m cli-jm:8081",
+                "SET 'rest.address'='cluster-a';\nINSERT INTO t SELECT * FROM s;",
+                "SET 'rest.address'='cluster-b';\nINSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-m", "cli-jm:8081", "-Drest.address=cluster-a"),
+                optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-m", "cli-jm:8081", "-Drest.address=cluster-b"),
+                optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobIgnoresStatementsWhichSubmitNoJob() {
+        // a statement which does not submit a job must not consume a snapshot, otherwise the settings
+        // of the jobs which follow it would be shifted
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\nCREATE TABLE t (x INT);\nSELECT * FROM t;",
+                "INSERT INTO t SELECT * FROM s;");
+
+        Assertions.assertEquals(1, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobCountsAStatementSetAsOneJob() {
+        // the update statements of a statement set are submitted as a single job, so the settings of
+        // the job which follows the set are not shifted
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "EXECUTE STATEMENT SET\n"
+                        + "BEGIN\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "INSERT INTO u SELECT * FROM v;\n"
+                        + "END;\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO w SELECT * FROM x;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
     public void testExtractClusterConnectionOptionsDropsSubmissionOnlyOptions() {
         // the parallelism, slots, memory, application name, main class, savepoint and configuration
         // of the submission only matter at submission time

@@ -232,9 +232,16 @@ public class FlinkTask extends AbstractYarnTask {
                     taskExecutionContext.getTaskInstanceId());
             return;
         }
-        List<String> clusterConnectionOptions = getClusterConnectionOptions();
+        List<List<String>> clusterConnectionOptionsPerJob = getClusterConnectionOptionsPerJob();
+        // a job which the scripts do not describe, for example one submitted from another file, uses
+        // the last configuration of the submission
+        List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
         List<String> failedJobIds = new ArrayList<>();
-        for (String jobId : jobIds) {
+        for (int i = 0; i < jobIds.size(); i++) {
+            String jobId = jobIds.get(i);
+            List<String> clusterConnectionOptions = i < clusterConnectionOptionsPerJob.size()
+                    ? clusterConnectionOptionsPerJob.get(i)
+                    : lastClusterConnectionOptions;
             List<String> args = FlinkArgsUtils.buildCancelCommandLine(jobId, clusterConnectionOptions);
             FlinkArgsUtils.FlinkCommandResult result = executeFlinkCancelCommand(args);
             if (result.isSuccess()) {
@@ -285,10 +292,29 @@ public class FlinkTask extends AbstractYarnTask {
     }
 
     /**
+     * The cluster connection options which are effective for each job the SQL scripts submit, in the
+     * order the jobs are submitted. A script can submit a job to one cluster, change the connection
+     * and submit the next job to another cluster, so the options have to be kept per job, otherwise
+     * the first job would be cancelled against the cluster of the second one.
+     */
+    protected List<List<String>> getClusterConnectionOptionsPerJob() {
+        AbstractParameters parameters = getParameters();
+        if (!(parameters instanceof FlinkParameters)) {
+            return Collections.emptyList();
+        }
+        FlinkParameters flinkParameters = (FlinkParameters) parameters;
+        return FlinkArgsUtils.extractClusterConnectionOptionsPerJob(flinkParameters.getOthers(),
+                flinkParameters.getInitScript(), flinkParameters.getRawScript());
+    }
+
+    /**
      * The cluster connection options of the submission, for example {@code -m <jobmanager>} or
      * {@code -t <target>}. They have to be repeated on the cancel / savepoint command, otherwise
      * that command targets the default cluster of the worker instead of the cluster the job was
      * submitted to.
+     *
+     * <p>This is the last configuration of the submission, it is used for a job which
+     * {@link #getClusterConnectionOptionsPerJob()} does not describe.
      */
     protected List<String> getClusterConnectionOptions() {
         AbstractParameters parameters = getParameters();

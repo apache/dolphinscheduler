@@ -221,6 +221,43 @@ public class FlinkStreamTaskTest {
     }
 
     @Test
+    public void testSavePointUsesTheConnectionOptionsOfEachJob() throws Exception {
+        // a savepoint has to target the cluster which runs the job, not the last cluster the script
+        // selected
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Job ID: 11111111111111111111111111111111\n"
+                        + "Job ID: 22222222222222222222222222222222");
+
+        FlinkStreamParameters parameters = new FlinkStreamParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'rest.address'='cluster-a';\n"
+                + "INSERT INTO t SELECT * FROM s;\n"
+                + "SET 'rest.address'='cluster-b';\n"
+                + "INSERT INTO u SELECT * FROM v;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
+
+        task.savePoint();
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 11111111111111111111111111111111 -Drest.address=cluster-a",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 22222222222222222222222222222222 -Drest.address=cluster-b",
+                String.join(" ", executedCommands.get(1)));
+    }
+
+    @Test
     public void testSavePointFailWhenCommandFailed() throws Exception {
         TaskExecutionContext context = buildSavepointTaskExecutionContext(
                 "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");

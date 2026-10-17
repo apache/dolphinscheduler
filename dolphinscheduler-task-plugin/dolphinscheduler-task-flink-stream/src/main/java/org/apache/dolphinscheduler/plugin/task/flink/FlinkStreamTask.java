@@ -74,8 +74,14 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
                             + taskExecutionContext.getTaskInstanceId());
         }
         String yarnApplicationId = getYarnApplicationId();
-        List<String> clusterConnectionOptions = getClusterConnectionOptions();
-        for (String jobId : jobIds) {
+        List<List<String>> clusterConnectionOptionsPerJob = getClusterConnectionOptionsPerJob();
+        // a job which the scripts do not describe uses the last configuration of the submission
+        List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
+        for (int i = 0; i < jobIds.size(); i++) {
+            String jobId = jobIds.get(i);
+            List<String> clusterConnectionOptions = i < clusterConnectionOptionsPerJob.size()
+                    ? clusterConnectionOptionsPerJob.get(i)
+                    : lastClusterConnectionOptions;
             List<String> args = FlinkArgsUtils.buildSavePointCommandLine(jobId, yarnApplicationId,
                     clusterConnectionOptions);
 

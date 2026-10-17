@@ -109,20 +109,49 @@ public class FlinkArgsUtils {
             Collections.singletonList("security.ssl.rest.");
 
     /**
-     * A {@code SET} statement of the Flink SQL Client, at the beginning of a statement. The quoted
-     * form {@code SET 'rest.address' = 'remote-jm'} and the unquoted form {@code SET rest.port = 8081}
-     * are both supported, and so is a statement which follows another one on the same line. Anchoring
-     * the statement avoids matching the text of a string literal, for example
+     * The statements of the Flink SQL Client which matter for the cancellation of the submitted jobs,
+     * matched at the beginning of a statement:
+     *
+     * <ul>
+     *     <li>a {@code SET} statement, in the quoted form {@code SET 'rest.address' = 'remote-jm'} and
+     *         in the unquoted form {@code SET rest.port = 8081}, which selects the connection;</li>
+     *     <li>an update statement ({@code INSERT}, {@code UPDATE} or {@code DELETE}), which submits a
+     *         job and makes the SQL Client print the JobID of that job;</li>
+     *     <li>the boundaries of a statement set, which submits all its update statements as a single
+     *         job.</li>
+     * </ul>
+     *
+     * <p>Anchoring the statement avoids matching the text of a string literal, for example
      * {@code SELECT 'SET rest.address=x'}. Only the single quoted form is a SQL Client string, the
-     * double quoted form is not part of its syntax. Of the four groups the first two are the key
-     * (quoted and unquoted form) and the last two its value.
+     * double quoted form is not part of its syntax.
      *
      * <p>The script is scanned with a pattern, not with a SQL parser, so a string literal which spans
-     * several lines and whose line begins with a {@code SET} statement is indistinguishable from a
-     * statement.
+     * several lines and whose line begins with a statement is indistinguishable from a statement.
      */
-    private static final Pattern SQL_SET_STATEMENT_REGEX =
-            Pattern.compile("(?im)(?:^|;)\\s*SET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'([^']*)'|([^;'\\s]+))");
+    private static final Pattern SQL_STATEMENT_REGEX = Pattern.compile(
+            "(?im)(?:^|;)\\s*(?:SET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'([^']*)'|([^;'\\s]+))"
+                    + "|(INSERT|UPDATE|DELETE)\\b"
+                    + "|(BEGIN\\s+STATEMENT\\s+SET|EXECUTE\\s+STATEMENT\\s+SET)\\b"
+                    + "|(END)\\b)");
+
+    /**
+     * The groups of {@link #SQL_STATEMENT_REGEX}: the key and the value of a {@code SET} statement,
+     * the keyword of an update statement, and the boundaries of a statement set.
+     */
+    private static final int SET_QUOTED_KEY_GROUP = 1;
+    private static final int SET_KEY_GROUP = 2;
+    private static final int SET_QUOTED_VALUE_GROUP = 3;
+    private static final int SET_VALUE_GROUP = 4;
+    private static final int JOB_STATEMENT_GROUP = 5;
+    private static final int STATEMENT_SET_GROUP = 6;
+    private static final int STATEMENT_SET_END_GROUP = 7;
+
+    /**
+     * The characters which are not interpreted by the shell when a value is given as a single word.
+     * A value which contains anything else is quoted, otherwise the shell would split it or expand it
+     * before the flink CLI receives it.
+     */
+    private static final Pattern SHELL_SAFE_VALUE_REGEX = Pattern.compile("[A-Za-z0-9_./:@%+=-]+");
 
     /**
      * The {@code -D} option of the flink CLI, which allows specifying a configuration value.
@@ -222,15 +251,10 @@ public class FlinkArgsUtils {
             if (StringUtils.isBlank(script)) {
                 continue;
             }
-            Matcher matcher = SQL_SET_STATEMENT_REGEX.matcher(script);
+            Matcher matcher = SQL_STATEMENT_REGEX.matcher(script);
             while (matcher.find()) {
-                String key = matcher.group(1) != null ? matcher.group(1) : matcher.group(2);
-                String value = matcher.group(3) != null ? matcher.group(3) : matcher.group(4);
-                if (value == null) {
-                    continue;
-                }
-                String option = DYNAMIC_PROPERTY_OPTION + key + "=" + value;
-                if (isClusterConnectionConfig(option)) {
+                String option = clusterConnectionOptionOfSqlSet(matcher);
+                if (option != null) {
                     options.add(option);
                 }
             }
@@ -239,27 +263,150 @@ public class FlinkArgsUtils {
     }
 
     /**
+     * Extract the cluster connection options which are effective for each job the SQL scripts submit,
+     * in the order the jobs are submitted. The scripts are scanned statement by statement and the
+     * options are snapshotted when an update statement is found, so a script which changes the
+     * connection between two jobs is not collapsed into its last configuration.
+     *
+     * <p>The Flink SQL Client executes the statements in order and prints the JobID of an update
+     * statement when that statement is submitted, so the JobIDs of the task log are in the same order
+     * as the snapshots. A job whose statement is not recognized, for example when a script is executed
+     * from another file, is not represented and uses the last configuration.
+     *
+     * @param others the extra options of the submission, may be null
+     * @param scripts the init script and the raw script of the submission, may be null
+     * @return the options for each submitted job, in the order the jobs are submitted
+     */
+    public static List<List<String>> extractClusterConnectionOptionsPerJob(String others, String... scripts) {
+        List<List<String>> optionsPerJob = new ArrayList<>();
+        List<String> current =
+                mergeClusterConnectionOptions(extractClusterConnectionOptions(others), Collections.emptyList());
+        for (String script : scripts) {
+            if (StringUtils.isBlank(script)) {
+                continue;
+            }
+            Matcher matcher = SQL_STATEMENT_REGEX.matcher(script);
+            boolean inStatementSet = false;
+            boolean statementSetRecorded = false;
+            while (matcher.find()) {
+                if (matcher.group(JOB_STATEMENT_GROUP) != null) {
+                    if (inStatementSet && statementSetRecorded) {
+                        // the statements of a statement set are submitted as a single job
+                        continue;
+                    }
+                    optionsPerJob.add(new ArrayList<>(current));
+                    statementSetRecorded = inStatementSet;
+                    continue;
+                }
+                if (matcher.group(STATEMENT_SET_GROUP) != null) {
+                    inStatementSet = true;
+                    statementSetRecorded = false;
+                    continue;
+                }
+                if (matcher.group(STATEMENT_SET_END_GROUP) != null) {
+                    inStatementSet = false;
+                    statementSetRecorded = false;
+                    continue;
+                }
+                String option = clusterConnectionOptionOfSqlSet(matcher);
+                if (option != null) {
+                    current = mergeClusterConnectionOptions(current, Collections.singletonList(option));
+                }
+            }
+        }
+        return optionsPerJob;
+    }
+
+    /**
+     * The cluster connection option of a {@code SET} statement of a matched SQL statement, or null when
+     * the statement is not a {@code SET} statement or does not configure the connection. The value is
+     * quoted for the shell when the generated command needs it.
+     */
+    private static String clusterConnectionOptionOfSqlSet(Matcher matcher) {
+        String key = matcher.group(SET_QUOTED_KEY_GROUP) != null
+                ? matcher.group(SET_QUOTED_KEY_GROUP)
+                : matcher.group(SET_KEY_GROUP);
+        String value = matcher.group(SET_QUOTED_VALUE_GROUP) != null
+                ? matcher.group(SET_QUOTED_VALUE_GROUP)
+                : matcher.group(SET_VALUE_GROUP);
+        if (key == null || value == null || !isClusterConnectionConfig(DYNAMIC_PROPERTY_OPTION + key + "=" + value)) {
+            return null;
+        }
+        return DYNAMIC_PROPERTY_OPTION + key + "=" + quoteForShell(value);
+    }
+
+    /**
+     * Quote a configuration value for the shell when it contains a character which the shell would
+     * interpret, so that the value reaches the flink CLI as a single argument. A plain value, such as
+     * a host name or a path, is left as it is.
+     */
+    private static String quoteForShell(String value) {
+        if (SHELL_SAFE_VALUE_REGEX.matcher(value).matches()) {
+            return value;
+        }
+        // a single quote inside the value is closed, escaped and reopened
+        return "'" + value.replace("'", "'\\''") + "'";
+    }
+
+    /**
      * Merge the cluster connection options, a later option for the same key wins. A connection setting
      * which is given both as a CLI option and as a SQL {@code SET} statement is therefore passed once,
      * with the value which is effective for the submitted job.
      *
-     * <p>Note that a script which changes the connection between two submitted jobs can only be
-     * represented by one configuration, the value of the last statement is used.
+     * <p>The options are merged as complete option units: an option which is given as two arguments,
+     * for example {@code -D <key>=<value>}, keeps both of them, otherwise merging would leave a value
+     * without its {@code -D}.
      */
     public static List<String> mergeClusterConnectionOptions(List<String> first, List<String> second) {
-        Map<String, String> optionsByKey = new LinkedHashMap<>();
-        for (String option : first) {
-            optionsByKey.put(clusterConnectionOptionKey(option), option);
-        }
-        for (String option : second) {
-            optionsByKey.put(clusterConnectionOptionKey(option), option);
-        }
-        return new ArrayList<>(optionsByKey.values());
+        Map<String, List<String>> optionsByKey = new LinkedHashMap<>();
+        collectClusterConnectionOptions(first, optionsByKey);
+        collectClusterConnectionOptions(second, optionsByKey);
+        List<String> options = new ArrayList<>();
+        optionsByKey.values().forEach(options::addAll);
+        return options;
     }
 
-    private static String clusterConnectionOptionKey(String option) {
+    /**
+     * Group the tokens into the options they belong to, so that an option which is given as two
+     * arguments, for example {@code -m <jobmanager>} or {@code -D <key>=<value>}, is merged as a single
+     * unit. The key of a {@code -D} option is the configuration key it sets, the key of the other
+     * options is the option itself.
+     */
+    private static void collectClusterConnectionOptions(List<String> tokens, Map<String, List<String>> optionsByKey) {
+        for (int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+            String option = unquoteToken(token);
+            int separator = option.indexOf('=');
+            String optionName = separator < 0 ? option : option.substring(0, separator);
+            if (CLUSTER_CONNECTION_OPTIONS.contains(optionName)) {
+                List<String> unit = new ArrayList<>();
+                unit.add(token);
+                // the value may be given as a separate argument, for example "-m <jobmanager>"
+                if (separator < 0 && i + 1 < tokens.size()) {
+                    unit.add(tokens.get(++i));
+                }
+                optionsByKey.put(optionName, unit);
+            } else if (DYNAMIC_PROPERTY_OPTION.equals(option) && i + 1 < tokens.size()) {
+                // the configuration may also be given as two arguments, "-D <key>=<value>"
+                String value = tokens.get(++i);
+                optionsByKey.put(configurationKeyOf(DYNAMIC_PROPERTY_OPTION + unquoteToken(value)),
+                        Arrays.asList(token, value));
+            } else if (isClusterConnectionConfig(option)) {
+                optionsByKey.put(configurationKeyOf(option), Collections.singletonList(token));
+            }
+        }
+    }
+
+    /**
+     * The configuration key of a {@code -D<key>=<value>} option, used to merge two options which set
+     * the same configuration.
+     */
+    private static String configurationKeyOf(String option) {
         int separator = option.indexOf('=');
-        return separator < 0 ? option : option.substring(0, separator);
+        if (!option.startsWith(DYNAMIC_PROPERTY_OPTION) || separator < 0) {
+            return option;
+        }
+        return option.substring(DYNAMIC_PROPERTY_OPTION.length(), separator);
     }
 
     /**
