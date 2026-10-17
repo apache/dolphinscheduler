@@ -46,6 +46,7 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.4.3
 
+* HTTP tasks now preserve the real response body for non-200 statuses, including 4xx/5xx, instead of a synthetic error string. `BODY_CONTAINS` and `BODY_NOT_CONTAINS` evaluate this real body without checking the status code, so existing body checks may produce different task results. Use status-code validation when error statuses must fail the task. Missing bodies are returned as empty strings; both body checks reject empty bodies. ([#18688](https://github.com/apache/dolphinscheduler/pull/18688))
 * Add the `missed_fire_policy` column to `t_ds_schedules`. Existing schedules default to `FIRE_ALL_MISSED` to preserve the previous Quartz `IgnoreMisfires` behavior. ([#18464](https://github.com/apache/dolphinscheduler/pull/18464))
 * Remove the obsolete Dynamic Task query API. ([#18556](https://github.com/apache/dolphinscheduler/issues/18556))
 * Remove the obsolete task update-with-upstream API `PUT /projects/{projectCode}/task-definition/{code}/with-upstream`. ([#18568](https://github.com/apache/dolphinscheduler/issues/18568))
@@ -55,4 +56,9 @@ This document records the incompatible updates between each version. You need to
   * **Removed transient fields**: `stateDescList`, `workflowDefinition`, `dagData`, `queue`, `locations`, `dependenceScheduleTimes`
   * **Removed derived properties**: `cmdTypeIfComplement`, `complementData` (related to complement-data executions; use the detail API to obtain them)
   * To obtain any of these fields, use the detail API `GET /projects/{projectCode}/workflow-instances/{id}` instead, which continues to return the full `WorkflowInstance` object. ([#18444](https://github.com/apache/dolphinscheduler/pull/18444))
+
+## 3.5.0
+
+* `AlertSender#getAlertData` now explicitly rejects a null `alertType` by throwing `IllegalArgumentException` with an error log, instead of throwing a raw `NullPointerException`. During a rolling upgrade, **the Alert Server must be upgraded before Master/Worker**, otherwise an old Alert Server cannot recognize newly introduced `alert_type` enum values (e.g. `TASK_RESULT`) and alert delivery will fail. See the [upgrade guide](upgrade.md#rolling-upgrade-order) for details.([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
+* SQL task-result alert content is size-limited: by default at most 30 rows are kept, string field values longer than 100 characters are truncated with an ellipsis, and the serialized content is bounded to 60000 UTF-8 bytes (below the 65535-byte capacity of the MySQL TEXT column); rows beyond the budget are represented by an omission marker. These defaults are tunable via `sql.task.alert.max.rows`, `sql.task.alert.max.row.value.length` and `sql.task.alert.max.content.bytes` in `common.properties` (worker restart required). ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 

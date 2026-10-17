@@ -32,16 +32,28 @@ import org.apache.dolphinscheduler.server.master.engine.executor.plugin.ITaskPar
 import org.apache.dolphinscheduler.server.master.engine.workflow.execution.IWorkflowExecution;
 import org.apache.dolphinscheduler.server.master.exception.MasterTaskExecuteException;
 
+import java.util.concurrent.TimeUnit;
+import java.util.function.LongSupplier;
+
 import lombok.extern.slf4j.Slf4j;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.annotations.VisibleForTesting;
 
 @Slf4j
 public class DependentLogicTask extends AbstractLogicTask<DependentParameters> {
 
+    private static final int DEFAULT_CHECK_INTERVAL_SECONDS = 10;
+
     private final TaskExecutionContext taskExecutionContext;
 
     private final DependentTaskTracker dependentTaskTracker;
+
+    private final long checkIntervalNanos;
+
+    private final LongSupplier nanoTimeSupplier;
+
+    private Long lastCheckTimeNanos;
 
     public DependentLogicTask(TaskExecutionContext taskExecutionContext,
                               ProjectDao projectDao,
@@ -51,8 +63,26 @@ public class DependentLogicTask extends AbstractLogicTask<DependentParameters> {
                               WorkflowInstanceDao workflowInstanceDao,
                               IWorkflowExecution workflowExecution,
                               TaskInstanceContextDao taskInstanceContextDao) {
+        this(taskExecutionContext, projectDao, workflowDefinitionDao, taskDefinitionDao, taskInstanceDao,
+                workflowInstanceDao, workflowExecution, taskInstanceContextDao, System::nanoTime);
+    }
+
+    @VisibleForTesting
+    DependentLogicTask(TaskExecutionContext taskExecutionContext,
+                       ProjectDao projectDao,
+                       WorkflowDefinitionDao workflowDefinitionDao,
+                       TaskDefinitionDao taskDefinitionDao,
+                       TaskInstanceDao taskInstanceDao,
+                       WorkflowInstanceDao workflowInstanceDao,
+                       IWorkflowExecution workflowExecution,
+                       TaskInstanceContextDao taskInstanceContextDao,
+                       LongSupplier nanoTimeSupplier) {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
+        this.nanoTimeSupplier = nanoTimeSupplier;
+        final Integer checkInterval = taskParameters.getDependence().getCheckInterval();
+        this.checkIntervalNanos = TimeUnit.SECONDS.toNanos(
+                checkInterval == null ? DEFAULT_CHECK_INTERVAL_SECONDS : checkInterval);
         this.dependentTaskTracker = new DependentTaskTracker(
                 taskExecutionContext,
                 taskParameters,
@@ -72,22 +102,39 @@ public class DependentLogicTask extends AbstractLogicTask<DependentParameters> {
 
     @Override
     public TaskExecutionStatus getTaskExecutionState() {
-        if (isRunning()) {
-            taskExecutionStatus = dependentTaskTracker.getDependentTaskStatus();
+        synchronized (this) {
+            if (!isRunning()) {
+                return taskExecutionStatus;
+            }
+            final long now = nanoTimeSupplier.getAsLong();
+            if (lastCheckTimeNanos != null && now - lastCheckTimeNanos < checkIntervalNanos) {
+                return taskExecutionStatus;
+            }
+            lastCheckTimeNanos = now;
+        }
+        final TaskExecutionStatus dependentState = dependentTaskTracker.getDependentTaskStatus();
+        synchronized (this) {
+            // A pause or kill may have completed while the dependency query was running.
+            if (isRunning()) {
+                taskExecutionStatus = dependentState;
+            }
             return taskExecutionStatus;
         }
-        return taskExecutionStatus;
     }
 
     @Override
     public void pause() throws MasterTaskExecuteException {
-        onTaskPaused();
+        synchronized (this) {
+            onTaskPaused();
+        }
         log.info("Pause task : {} success", taskExecutionContext.getTaskName());
     }
 
     @Override
     public void kill() throws MasterTaskExecuteException {
-        onTaskKilled();
+        synchronized (this) {
+            onTaskKilled();
+        }
         log.info("Kill task : {} success", taskExecutionContext.getTaskName());
     }
 

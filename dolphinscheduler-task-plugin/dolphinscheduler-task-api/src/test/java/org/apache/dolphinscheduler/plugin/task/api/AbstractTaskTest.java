@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api;
 
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 
@@ -62,10 +63,63 @@ public class AbstractTaskTest {
         Assertions.assertEquals(TaskExecutionStatus.FAILURE, task.getExitStatus());
     }
 
+    @Test
+    public void testDirectFieldAssignmentIsExposedByGetters() {
+        AbstractTask task = new TestTask();
+        // legacy plugins may assign the protected fields directly
+        task.needAlert = true;
+        TaskAlertInfo alertInfo = new TaskAlertInfo();
+        alertInfo.setTitle("legacy alert");
+        task.taskAlertInfo = alertInfo;
+
+        Assertions.assertTrue(task.getNeedAlert());
+        Assertions.assertSame(alertInfo, task.getTaskAlertInfo());
+    }
+
+    @Test
+    public void testSettersWriteBothFieldAndContext() {
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        AbstractTask task = new TestTask(ctx);
+        task.setNeedAlert(true);
+        TaskAlertInfo alertInfo = new TaskAlertInfo();
+        alertInfo.setTitle("setter alert");
+        task.setTaskAlertInfo(alertInfo);
+
+        Assertions.assertTrue(ctx.isNeedAlert());
+        Assertions.assertSame(alertInfo, ctx.getTaskAlertInfo());
+        Assertions.assertTrue(task.getNeedAlert());
+        Assertions.assertSame(alertInfo, task.getTaskAlertInfo());
+    }
+
+    @Test
+    public void testGettersFallBackToContextWhenFieldNotSet() {
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        AbstractTask task = new TestTask(ctx);
+        ctx.setNeedAlert(true);
+        TaskAlertInfo alertInfo = new TaskAlertInfo();
+        alertInfo.setTitle("context alert");
+        ctx.setTaskAlertInfo(alertInfo);
+
+        Assertions.assertTrue(task.getNeedAlert());
+        Assertions.assertSame(alertInfo, task.getTaskAlertInfo());
+    }
+
+    @Test
+    public void testGettersReturnDefaultsWhenNothingSet() {
+        AbstractTask task = new TestTask();
+
+        Assertions.assertFalse(task.getNeedAlert());
+        Assertions.assertNull(task.getTaskAlertInfo());
+    }
+
     private static final class TestTask extends AbstractTask {
 
         private TestTask() {
             super(new TaskExecutionContext());
+        }
+
+        private TestTask(TaskExecutionContext taskExecutionContext) {
+            super(taskExecutionContext);
         }
 
         @Override
