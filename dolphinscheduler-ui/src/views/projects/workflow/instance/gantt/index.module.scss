@@ -1,0 +1,407 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+.page {
+  padding: 6px 8px;
+  color: var(--gantt-text);
+  container-type: inline-size;
+  min-width: 0;
+}
+.heading,
+.toolbar,
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.heading {
+  margin-bottom: 12px;
+}
+.heading h3 {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 2px;
+}
+.muted {
+  color: var(--gantt-muted);
+  font-size: 11px;
+}
+.autoRefresh {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+}
+.stats {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--gantt-hover) 55%, var(--gantt-surface));
+  border-radius: 6px;
+}
+.statOverview {
+  display: flex;
+  gap: 22px;
+  padding-right: 16px;
+  border-right: 1px solid var(--gantt-border);
+  flex-shrink: 0;
+}
+.statPrimary {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.statPrimary > span {
+  font-size: 11px;
+  color: var(--gantt-muted);
+  white-space: nowrap;
+}
+.statPrimary strong {
+  color: var(--stat-color);
+  font: 600 24px/1.1 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.statStates {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 6px 10px;
+  flex: 1;
+  min-width: 0;
+}
+.stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+  padding: 3px 7px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--stat-color) 9%, transparent);
+}
+.stat > span {
+  color: var(--gantt-text);
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+.stat i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--stat-color);
+  flex-shrink: 0;
+}
+.stat strong {
+  color: var(--stat-color);
+  font: 600 15px/1.2 ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+}
+.statEmpty {
+  background: transparent;
+}
+.statEmpty > span,
+.statEmpty strong {
+  color: var(--gantt-muted);
+}
+@container (max-width: 1000px) {
+  .statStates {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@container (max-width: 480px) {
+  .stats {
+    gap: 8px;
+    padding: 8px;
+  }
+  .statOverview {
+    gap: 12px;
+    padding-right: 8px;
+  }
+  .statStates {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3px;
+  }
+}
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  color: var(--gantt-muted);
+  font-size: 11px;
+}
+.updatedAt {
+  border-left: 1px solid var(--gantt-border);
+  padding-left: 8px;
+  font-variant-numeric: tabular-nums;
+}
+.timelineTitle {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+.timelineTitle :global(.n-button) {
+  color: var(--gantt-muted);
+}
+.elapsed {
+  color: var(--gantt-muted);
+  font-size: 11px;
+}
+.elapsed strong {
+  margin-left: 5px;
+  color: var(--gantt-text);
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+.help {
+  max-width: 320px;
+  font-size: 12px;
+  line-height: 1.8;
+}
+.chart {
+  --gantt-min-bar-width: 5px;
+  --gantt-guide: color-mix(in srgb, var(--gantt-border) 35%, transparent);
+  border: 1px solid var(--gantt-border);
+  border-radius: 4px;
+  overflow: hidden;
+  min-width: 0;
+}
+.toolbar {
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--gantt-border);
+  font-size: 12px;
+}
+.controls {
+  justify-content: flex-end;
+  gap: 8px;
+}
+.viewport {
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  overscroll-behavior: contain;
+}
+.grid {
+  display: grid;
+  position: relative;
+  width: 100%;
+  grid-template-columns: clamp(160px, 40%, 280px) minmax(0, 1fr);
+}
+.row {
+  display: contents;
+}
+.nameCell {
+  z-index: 2;
+  background: var(--gantt-surface);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  height: 42px;
+  padding: 0 10px;
+  min-width: 0;
+  box-sizing: border-box;
+  border-right: 1px solid var(--gantt-guide);
+}
+.corner {
+  border-bottom: 1px solid var(--gantt-border);
+  position: sticky;
+  top: 0;
+  z-index: 4;
+  height: 40px;
+  font-size: 11px;
+  color: var(--gantt-muted);
+  justify-content: space-between;
+  background: var(--gantt-hover);
+}
+.axis {
+  position: sticky;
+  top: 0;
+  height: 40px;
+  z-index: 3;
+  background: var(--gantt-surface);
+  border-bottom: 1px solid var(--gantt-border);
+  box-sizing: border-box;
+  min-width: 0;
+}
+.tick {
+  position: absolute;
+  top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  font: 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--gantt-text);
+  white-space: nowrap;
+  padding: 0 5px;
+}
+.tick small {
+  color: var(--gantt-muted);
+  font-size: 10px;
+}
+.index {
+  color: var(--gantt-muted);
+  font: 9px/14px ui-monospace, SFMono-Regular, Menlo, monospace;
+  height: 14px;
+  width: 24px;
+  padding: 0 4px;
+  border-radius: 7px;
+  text-align: center;
+  box-sizing: border-box;
+  background: color-mix(in srgb, var(--gantt-muted) 10%, transparent);
+  flex-shrink: 0;
+}
+.taskActions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.actionButton {
+  width: 18px;
+  height: 18px;
+  color: var(--gantt-primary);
+}
+.taskInfo {
+  min-width: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.taskTitle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.taskName {
+  color: var(--gantt-text);
+  cursor: text;
+  user-select: text;
+  -webkit-user-select: text;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.taskState {
+  font-size: 10px;
+  color: var(--gantt-muted);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  min-width: 0;
+}
+.stateText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+.taskState i {
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.metrics {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font: 11px ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+.metrics small {
+  color: var(--gantt-muted);
+  font-size: 10px;
+}
+.lane {
+  position: relative;
+  height: 42px;
+  min-width: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  background-image: linear-gradient(
+    to right,
+    var(--gantt-guide) 1px,
+    transparent 1px
+  );
+}
+.row:hover .lane,
+.row:hover .nameCell {
+  background-color: var(--gantt-hover);
+}
+.bar {
+  position: absolute;
+  top: 12px;
+  height: 18px;
+  line-height: 18px;
+  text-align: center;
+  box-sizing: border-box;
+  min-width: var(--gantt-min-bar-width);
+  max-width: 100%;
+  border-radius: 3px;
+  color: white;
+  font-size: 10px;
+  overflow: hidden;
+}
+.running {
+  background-image: repeating-linear-gradient(
+    120deg,
+    transparent,
+    transparent 8px,
+    rgba(255, 255, 255, 0.18) 8px,
+    rgba(255, 255, 255, 0.18) 16px
+  );
+}
+.noBar {
+  position: absolute;
+  left: 10px;
+  top: 12px;
+  font-size: 11px;
+  color: var(--gantt-muted);
+}
+.tooltip {
+  font-size: 12px;
+  line-height: 1.8;
+}
+.empty {
+  padding: 40px 12px;
+  text-align: center;
+  color: var(--gantt-muted);
+}
+.alert {
+  margin-bottom: 10px;
+}
+.viewport:focus-visible {
+  outline: 2px solid var(--gantt-primary);
+  outline-offset: -2px;
+}
+@container (max-width: 560px) {
+  .nameCell {
+    padding: 0 6px;
+    gap: 4px;
+  }
+}

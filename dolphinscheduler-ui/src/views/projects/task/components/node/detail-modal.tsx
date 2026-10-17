@@ -51,6 +51,7 @@ import type {
 } from './types'
 import { queryProjectPreferenceByProjectCode } from '@/service/modules/projects-preference'
 import { INodeData } from './types'
+import { nodeDetailModalStyle } from './modal-style'
 
 const props = {
   show: {
@@ -86,6 +87,10 @@ const props = {
   saving: {
     type: Boolean,
     default: false
+  },
+  confirmShow: {
+    type: Boolean,
+    default: true
   }
 }
 
@@ -241,7 +246,7 @@ const NodeDetailModal = defineComponent({
     )
 
     onMounted(() => {
-      initProjectPreferences(props.projectCode)
+      if (!props.readonly) initProjectPreferences(props.projectCode)
     })
 
     watch(
@@ -252,7 +257,7 @@ const NodeDetailModal = defineComponent({
         taskStore.init()
         const nodeData = formatModel(props.data)
         await nextTick()
-        restructureNodeData(nodeData)
+        if (!props.readonly) restructureNodeData(nodeData)
         detailRef.value.value.setValues(nodeData)
       }
     )
@@ -260,12 +265,14 @@ const NodeDetailModal = defineComponent({
     return () => (
       <Modal
         show={props.show}
+        style={nodeDetailModalStyle(props.data.taskType)}
         title={
           props.from === 1
             ? `${t('project.task.current_task_settings')}`
             : `${t('project.node.current_node_settings')}`
         }
         onConfirm={onConfirm}
+        confirmShow={props.confirmShow}
         confirmLoading={props.saving}
         confirmDisabled={props.readonly}
         onCancel={onCancel}
