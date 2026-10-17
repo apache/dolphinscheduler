@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import java.util.Map;
 
 /**
- * Used to contains both prepared sql string and its to-be-bind parameters
+ * Used to contain the rendered SQL string and legacy parameter map.
  */
 public class SqlBinds {
 
