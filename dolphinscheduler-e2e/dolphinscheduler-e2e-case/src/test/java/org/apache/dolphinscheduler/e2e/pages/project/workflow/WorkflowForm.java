@@ -39,10 +39,12 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.WheelInput;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -130,7 +132,7 @@ public final class WorkflowForm {
     }
 
     public WebElement getTask(String taskName) {
-        WebElement task = findTask(taskName);
+        WebElement task = taskInView(taskName);
 
         Actions action = new Actions(driver);
         action.doubleClick(task).build().perform();
@@ -139,7 +141,7 @@ public final class WorkflowForm {
     }
 
     public String copyTask(String taskName) {
-        WebElement source = findTask(taskName);
+        WebElement source = taskInView(taskName);
         Set<String> existing = taskNames();
         new Actions(driver).contextClick(source).perform();
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(
@@ -171,6 +173,28 @@ public final class WorkflowForm {
                         .filter(task -> taskName.equals(title(task)))
                         .findFirst()
                         .orElse(null));
+    }
+
+    private WebElement taskInView(String taskName) {
+        // Formatting or adding nodes can leave a node outside the scrolled canvas. Scroll until the node is
+        // in the middle of the canvas, away from its edges and the minimap in the bottom-right corner.
+        return WebDriverWaitFactory.createWebDriverWait(driver)
+                .withMessage("Task is outside the canvas view: " + taskName)
+                .ignoring(StaleElementReferenceException.class)
+                .until(ignored -> {
+                    WebElement task = findTask(taskName);
+                    WebElement scroller = driver.findElement(By.cssSelector(MAIN_GRAPH));
+                    Rectangle view = scroller.getRect();
+                    Rectangle node = task.getRect();
+                    int deltaX = node.x + node.width / 2 - view.x - view.width / 2;
+                    int deltaY = node.y + node.height / 2 - view.y - view.height / 2;
+                    if (Math.abs(deltaX) < view.width / 4 && Math.abs(deltaY) < view.height / 4) {
+                        return task;
+                    }
+                    new Actions(driver).scrollFromOrigin(WheelInput.ScrollOrigin.fromElement(scroller), deltaX, deltaY)
+                            .perform();
+                    return null;
+                });
     }
 
     private Set<String> taskNames() {
