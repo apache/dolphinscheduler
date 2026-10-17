@@ -71,7 +71,9 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
                 }
             }
             session = sessionList.get(0);
-            if (isSessionExpire(session)) {
+            // An unexpired session is reused (its last-login time refreshed); an
+            // expired one is deleted so a new session is created below
+            if (!isSessionExpire(session)) {
                 session.setLastLoginTime(new Date());
                 sessionDao.updateById(session);
                 return session;
