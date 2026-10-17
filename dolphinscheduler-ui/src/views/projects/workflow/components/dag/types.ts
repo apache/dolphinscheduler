@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import type { TaskType } from '@/store/project/types'
+import type { TaskType, TaskExecuteType } from '@/store/project/types'
 export type { ITaskState } from '@/common/types'
 
 export interface WorkflowDefinition {
@@ -70,6 +70,7 @@ export interface TaskDefinition {
   projectCode: any
   userId: number
   taskType: TaskType
+  taskExecuteType?: TaskExecuteType
   taskParams: any
   taskParamList: any[]
   taskParamMap: any

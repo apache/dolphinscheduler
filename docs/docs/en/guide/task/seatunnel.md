@@ -13,6 +13,8 @@ Click [here](https://seatunnel.apache.org/) for more information about `Apache S
 ## Task Parameter
 
 - Please refer to [DolphinScheduler Task Parameters Appendix](appendix.md) `Default Task Parameters` section for default parameters.
+- Task execution type: Defaults to `Batch Task`. For a streaming SeaTunnel job, select `Stream Task` to list its workflow task instances under `Task Instance -> Stream Task`. This selection is saved separately from the SeaTunnel configuration and applies to both custom scripts and resource files. Configure SeaTunnel's `env.job.mode = "STREAMING"` in the selected configuration as well.
+  Streaming tasks are started through their workflow and must use an attached SeaTunnel submission; detached submission (such as `--async`) does not let the task track the running job. SeaTunnel savepoint is not supported by this task plugin.
 - Startup script: Select script name to start the task (it may vary across SeaTunnel distributions, please check `${SEATUNNEL_HOME}/bin/`), including `seatunnel.sh`, `start-seatunnel-flink-13-connector-v2.sh`, `start-seatunnel-flink-15-connector-v2.sh`, `start-seatunnel-flink-connector-v2.sh`, `start-seatunnel-flink.sh`, `start-seatunnel-spark-2-connector-v2.sh`, `start-seatunnel-spark-3-connector-v2.sh`, `start-seatunnel-spark-connector-v2.sh`, `start-seatunnel-spark.sh`
 - FLINK
 - Run model: supports `run` and `run-application` modes

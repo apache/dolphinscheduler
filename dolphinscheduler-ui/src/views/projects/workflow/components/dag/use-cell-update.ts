@@ -17,7 +17,7 @@
 
 import type { Ref } from 'vue'
 import type { Graph } from '@antv/x6'
-import type { TaskType } from '@/store/project/types'
+import type { TaskType, TaskExecuteType } from '@/store/project/types'
 import type { Coordinate } from './types'
 import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import { useCustomCellBuilder } from './dag-hooks'
@@ -64,6 +64,16 @@ export function useCellUpdate(options: Options) {
     node.attr('rect/fill', color)
   }
 
+  function setNodeExecuteType(id: string, taskExecuteType: TaskExecuteType) {
+    graph.value?.getCellById(id)?.setData({ taskExecuteType })
+    getNodeEdge(id).forEach((edge) => {
+      const isStream =
+        edge.getSourceNode()?.getData().taskExecuteType === 'STREAM' ||
+        edge.getTargetNode()?.getData().taskExecuteType === 'STREAM'
+      edge.attr('line/strokeDasharray', isStream ? '5 5' : 'none')
+    })
+  }
+
   /**
    * Add a node to the graph
    * @param {string} id
@@ -75,12 +85,13 @@ export function useCellUpdate(options: Options) {
     type: TaskType,
     name: string,
     flag: string,
-    coordinate: Coordinate = { x: 100, y: 100 }
+    coordinate: Coordinate = { x: 100, y: 100 },
+    taskExecuteType?: TaskExecuteType
   ) {
     if (!TASK_TYPES_MAP[type as TaskType]) {
       return
     }
-    const node = buildNode(id, type, name, flag, coordinate)
+    const node = buildNode(id, type, name, flag, coordinate, taskExecuteType)
     graph.value?.addNode(node)
   }
 
@@ -138,6 +149,7 @@ export function useCellUpdate(options: Options) {
   return {
     setNodeName,
     setNodeFillColor,
+    setNodeExecuteType,
     setNodeEdge,
     addNode,
     removeNode,

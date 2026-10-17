@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 
@@ -27,9 +29,12 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.ElementClickInterceptedException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
 public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPage.Tab {
@@ -49,6 +54,72 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
                 .collect(Collectors.toList());
     }
 
+    public TaskInstanceTab selectType(String type) {
+        By tab = By.cssSelector(".n-tabs-tab[data-name='" + type + "']");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(tab)).click();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.attributeContains(
+                tab, "class", "n-tabs-tab--active"));
+        return this;
+    }
+
+    public List<Row> streamInstances() {
+        return driver.findElements(By.cssSelector(".n-tab-pane .n-data-table-tbody tr")).stream()
+                .filter(WebElement::isDisplayed)
+                .filter(row -> !row.findElements(By.cssSelector("td[data-col-key=workflowDefinitionName]")).isEmpty())
+                .map(Row::new).collect(Collectors.toList());
+    }
+
+    public String log(String taskName) {
+        boolean stream = "Stream".equals(WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".n-tabs-tab--active")))
+                .getDomAttribute("data-name"));
+        Row instance = WebDriverWaitFactory.createWebDriverWait(driver)
+                .withMessage("Task instance not found: " + taskName)
+                .ignoring(StaleElementReferenceException.class)
+                .until(ignored -> (stream ? streamInstances() : instances()).stream()
+                        .filter(row -> row.taskInstanceName().equals(taskName)).findFirst().orElse(null));
+        // The log button follows the savepoint and stop buttons in the stream table.
+        instance.row.findElement(By.cssSelector("td[data-col-key=operation]"))
+                .findElements(By.cssSelector(".n-button")).get(stream ? 2 : 1).click();
+        try {
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions
+                    .visibilityOfElementLocated(By.cssSelector("[data-modal-ready='true'] .n-log")));
+            return driver.findElements(By.cssSelector(".logModalRef .n-log pre")).stream()
+                    .map(line -> line.getDomProperty("textContent")).collect(Collectors.joining("\n"));
+        } finally {
+            UiInteraction.click(driver, ".logModalRef .btn-submit");
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".logModalRef")));
+        }
+    }
+
+    public boolean isSavepointEnabled(String name) {
+        Row instance = streamInstances().stream()
+                .filter(row -> row.taskInstanceName().equals(name)).findFirst()
+                .orElseThrow(() -> new IllegalStateException("Stream task instance not found: " + name));
+        WebElement savepoint = instance.row.findElement(By.cssSelector("td[data-col-key=operation]"))
+                .findElements(By.cssSelector(".n-button")).get(0);
+        return !savepoint.getAttribute("class").contains("n-button--disabled");
+    }
+
+    public TaskInstanceTab stopStream(String name) {
+        WebDriverWaitFactory.createWebDriverWait(driver).ignoring(StaleElementReferenceException.class)
+                .ignoring(ElementClickInterceptedException.class)
+                .until(unused -> {
+                    WebElement button = streamInstances().stream()
+                            .filter(row -> row.taskInstanceName().equals(name))
+                            .map(row -> row.row.findElement(By.cssSelector("td[data-col-key=operation]"))
+                                    .findElements(By.cssSelector(".n-button")).get(1))
+                            .filter(WebElement::isEnabled).findFirst().orElse(null);
+                    if (button == null) {
+                        return false;
+                    }
+                    button.click();
+                    return true;
+                });
+        return this;
+    }
+
     @RequiredArgsConstructor
     public static class Row {
 
@@ -64,6 +135,14 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
 
         public int retryTimes() {
             return Integer.parseInt(row.findElement(By.cssSelector("td[data-col-key=retryTimes]")).getText());
+        }
+
+        public boolean isRunning() {
+            return !row.findElements(By.className("running_execution")).isEmpty();
+        }
+
+        public boolean isStopped() {
+            return !row.findElements(By.className("kill")).isEmpty();
         }
 
         public boolean isSuccess() {

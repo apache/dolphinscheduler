@@ -17,15 +17,14 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
-import java.util.List;
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 
 import lombok.Getter;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
-import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
 public final class WorkflowFormatDialog {
@@ -33,26 +32,15 @@ public final class WorkflowFormatDialog {
     private final WebDriver driver;
     private final WorkflowForm parent;
 
-    @FindBys({
-            @FindBy(className = "el-dialog__wrapper"),
-            @FindBy(className = "el-button--primary"),
-    })
-    private List<WebElement> buttonConfirm;
-
     public WorkflowFormatDialog(WorkflowForm parent) {
         this.parent = parent;
         this.driver = parent.driver();
-
-        PageFactory.initElements(driver, this);
     }
 
     public WorkflowForm confirm() {
-        buttonConfirm()
-                .stream()
-                .filter(WebElement::isDisplayed)
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No confirm button when confirm"))
-                .click();
+        UiInteraction.click(driver, "[data-modal-ready] .btn-submit");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions
+                .invisibilityOfElementLocated(By.cssSelector("[data-modal-ready] .btn-submit")));
 
         return parent;
     }
