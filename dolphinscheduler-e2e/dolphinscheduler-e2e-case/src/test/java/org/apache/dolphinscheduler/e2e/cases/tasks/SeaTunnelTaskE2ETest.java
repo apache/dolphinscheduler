@@ -37,7 +37,6 @@ import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -302,14 +301,14 @@ public class SeaTunnelTaskE2ETest extends BaseWorkflowE2ETest {
     }
 
     private TaskInstanceTab untilStreamTaskInstance(String taskName, Predicate<TaskInstanceTab.Row> state) {
-        final ProjectDetailPage projectPage = projectPage();
-        return await("Stream task instance should reach the expected state: " + taskName)
+        // The Stream table reloads itself every few seconds, so poll it instead of reloading the page.
+        // Reloading the page made every read race with the table's first render.
+        TaskInstanceTab taskInstanceTab = projectPage()
+                .goToTab(TaskInstanceTab.class)
+                .selectType("Stream");
+        await("Stream task instance should reach the expected state: " + taskName)
                 .ignoreExceptionsInstanceOf(StaleElementReferenceException.class)
                 .until(() -> {
-                    browser.navigate().refresh();
-                    TaskInstanceTab taskInstanceTab = projectPage
-                            .goToTab(TaskInstanceTab.class)
-                            .selectType("Stream");
                     TaskInstanceTab.Row instance = taskInstanceTab.streamInstances()
                             .stream()
                             .filter(it -> it.taskInstanceName().equals(taskName))
@@ -318,8 +317,9 @@ public class SeaTunnelTaskE2ETest extends BaseWorkflowE2ETest {
                     if (instance != null && instance.isFailed()) {
                         throw new IllegalStateException("Stream task instance failed: " + taskName);
                     }
-                    return instance != null && state.test(instance) ? taskInstanceTab : null;
-                }, Objects::nonNull);
+                    return instance != null && state.test(instance);
+                });
+        return taskInstanceTab;
     }
 
     private void untilEdgeStyle(WorkflowForm workflowForm, String style) {
