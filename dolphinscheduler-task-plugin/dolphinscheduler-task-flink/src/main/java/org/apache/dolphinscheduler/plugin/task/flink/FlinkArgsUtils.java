@@ -17,20 +17,41 @@
 
 package org.apache.dolphinscheduler.plugin.task.flink;
 
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
+import org.apache.dolphinscheduler.plugin.task.api.shell.ShellInterceptorBuilderFactory;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ArgsUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class FlinkArgsUtils {
 
     private FlinkArgsUtils() {
@@ -45,6 +66,113 @@ public class FlinkArgsUtils {
      *  default flink deploy mode
      */
     public static final FlinkDeployMode DEFAULT_DEPLOY_MODE = FlinkDeployMode.CLUSTER;
+
+    /**
+     * The name suffix of the generated script which executes a flink command, it is suffixed with a
+     * unique value because a script can only be created once in the task working directory.
+     */
+    private static final String FLINK_COMMAND_SHELL_NAME_SUFFIX = "_flink_command_";
+
+    /**
+     * The short and the long form of the options which select the cluster a job was submitted to.
+     * They are accepted by the cancel / savepoint command as well, so they are repeated there.
+     */
+    private static final List<String> CLUSTER_CONNECTION_OPTIONS = Arrays.asList(
+            "-m", "--jobmanager",
+            "-t", "--target");
+
+    /**
+     * The configuration keys which identify the cluster a job was submitted to. They may be given as
+     * {@code -D<key>=<value>}. The other {@code -D} options configure the submission only and are
+     * not repeated on the cancel / savepoint command.
+     */
+    private static final Set<String> CLUSTER_CONNECTION_CONFIG_KEYS = new HashSet<>(Arrays.asList(
+            "rest.address",
+            "rest.port",
+            "rest.bind-address",
+            "rest.bind-port",
+            "jobmanager.rpc.address",
+            "jobmanager.rpc.port",
+            "yarn.application.id",
+            "kubernetes.cluster-id",
+            "kubernetes.namespace",
+            "kubernetes.context",
+            "kubernetes.config.file",
+            "execution.target"));
+
+    /**
+     * The prefixes of the configuration keys which identify the cluster. Each
+     * {@code security.ssl.rest.} key is needed as well, otherwise a submission to a REST endpoint
+     * over TLS can connect, while the cancel / savepoint command falls back to a plain connection.
+     */
+    private static final List<String> CLUSTER_CONNECTION_CONFIG_PREFIXES =
+            Collections.singletonList("security.ssl.rest.");
+
+    /**
+     * The {@code SET} statement of the Flink SQL Client, in the quoted form
+     * {@code SET 'rest.address' = 'remote-jm'} and in the unquoted form
+     * {@code SET rest.port = 8081}, which selects the connection of the following jobs. The statement
+     * is matched at its beginning, so the text of a string literal, for example
+     * {@code SELECT 'SET rest.address=x'}, is not a statement.
+     */
+    private static final Pattern SQL_SET_STATEMENT_REGEX = Pattern.compile(
+            "(?is)^\\s*SET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'([^']*)'|([^;'\\s]+))");
+
+    /**
+     * The {@code RESET} statement of the Flink SQL Client: the keyed form {@code RESET 'rest.address'},
+     * which restores the default value of one configuration key, and the {@code RESET} form without a
+     * key, which restores all of them.
+     */
+    private static final Pattern SQL_RESET_STATEMENT_REGEX = Pattern.compile(
+            "(?is)^\\s*RESET(?:\\s+(?:'([^']+)'|([\\w.-]+)))?\\s*;?\\s*$");
+
+    /**
+     * An update statement ({@code INSERT}, {@code UPDATE} or {@code DELETE}), which submits a job and
+     * makes the SQL Client print the JobID of that job.
+     */
+    private static final Pattern SQL_JOB_STATEMENT_REGEX =
+            Pattern.compile("(?is)^\\s*(?:INSERT|UPDATE|DELETE)\\b");
+
+    /**
+     * The beginning of a statement set, whose update statements are submitted as a single job.
+     */
+    private static final Pattern SQL_STATEMENT_SET_START_REGEX =
+            Pattern.compile("(?is)^\\s*(?:BEGIN\\s+STATEMENT\\s+SET|EXECUTE\\s+STATEMENT\\s+SET)\\b");
+
+    /**
+     * The end of a statement set.
+     */
+    private static final Pattern SQL_STATEMENT_SET_END_REGEX = Pattern.compile("(?is)^\\s*END\\b");
+
+    /**
+     * The groups of {@link #SQL_SET_STATEMENT_REGEX}: the quoted and the unquoted key of a
+     * {@code SET} statement, and the quoted and the unquoted value of a {@code SET} statement.
+     */
+    private static final int SET_QUOTED_KEY_GROUP = 1;
+    private static final int SET_KEY_GROUP = 2;
+    private static final int SET_QUOTED_VALUE_GROUP = 3;
+    private static final int SET_VALUE_GROUP = 4;
+
+    /**
+     * The groups of {@link #SQL_RESET_STATEMENT_REGEX}: the quoted and the unquoted key of a
+     * {@code RESET} statement.
+     */
+    private static final int RESET_QUOTED_KEY_GROUP = 1;
+    private static final int RESET_KEY_GROUP = 2;
+
+    /**
+     * The characters which are not interpreted by the shell when a value is given as a single word.
+     * A value which contains anything else is quoted, otherwise the shell would split it or expand it
+     * before the flink CLI receives it.
+     */
+    private static final Pattern SHELL_SAFE_VALUE_REGEX = Pattern.compile("[A-Za-z0-9_./:@%+=-]+");
+
+    /**
+     * The {@code -D} option of the flink CLI, which allows specifying a configuration value.
+     */
+    private static final String DYNAMIC_PROPERTY_OPTION = "-D";
+
+    private static final long OUTPUT_READER_JOIN_TIMEOUT_SECONDS = 1L;
 
     /**
      * build flink run command line
@@ -63,27 +191,655 @@ public class FlinkArgsUtils {
 
     /**
      * build flink cancel command line
-     * @param taskExecutionContext
-     * @return
+     *
+     * @param jobId the Flink JobID printed by `flink run`, it is not the YARN/K8s application id
+     * @param clusterConnectionOptions the cluster connection options of the submission, may be empty
+     * @return argument list
      */
-    public static List<String> buildCancelCommandLine(TaskExecutionContext taskExecutionContext) {
+    public static List<String> buildCancelCommandLine(String jobId, List<String> clusterConnectionOptions) {
         List<String> args = new ArrayList<>();
         args.add(FlinkConstants.FLINK_COMMAND);
         args.add(FlinkConstants.FLINK_CANCEL);
-        args.add(taskExecutionContext.getAppIds());
+        args.add(jobId);
+        if (CollectionUtils.isNotEmpty(clusterConnectionOptions)) {
+            args.addAll(clusterConnectionOptions);
+        }
         return args;
     }
 
     /**
-     * build flink savepoint command line, the savepoint folder should be set in flink conf
-     * @return
+     * Extract the cluster connection options from the extra options of the submission, so that the
+     * cancel / savepoint command targets the same cluster as the submission.
+     *
+     * <p>Only the options which identify the cluster are kept: {@code -m}/{@code --jobmanager},
+     * {@code -t}/{@code --target} and the {@code -D} options which configure the cluster address or
+     * the execution target. Submission-only arguments, such as the parallelism, the slots, the
+     * memory, the application name, the main class or the savepoint to restore from, are not copied.
+     * Reusing the task environment does not preserve the command line connection options.
+     *
+     * @param others the extra options of the submission, may be null
+     * @return the cluster connection options, in the order they appear in the submission
      */
-    public static List<String> buildSavePointCommandLine(TaskExecutionContext taskExecutionContext) {
+    public static List<String> extractClusterConnectionOptions(String others) {
+        List<String> options = new ArrayList<>();
+        if (StringUtils.isBlank(others)) {
+            return options;
+        }
+        List<String> tokens = tokenizeOptions(others);
+        for (int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+            String option = unquoteToken(token);
+            int separator = option.indexOf('=');
+            String optionName = separator < 0 ? option : option.substring(0, separator);
+            if (CLUSTER_CONNECTION_OPTIONS.contains(optionName)) {
+                options.add(token);
+                // the value may be given as a separate argument, for example "-m <jobmanager>"
+                if (separator < 0 && i + 1 < tokens.size()) {
+                    options.add(tokens.get(++i));
+                }
+            } else if (isClusterConnectionConfig(option)) {
+                options.add(token);
+            } else if (DYNAMIC_PROPERTY_OPTION.equals(option) && i + 1 < tokens.size()) {
+                // the configuration may also be given as a separate argument, "-D <key>=<value>"
+                String value = tokens.get(++i);
+                if (isClusterConnectionConfig(DYNAMIC_PROPERTY_OPTION + unquoteToken(value))) {
+                    options.add(token);
+                    options.add(value);
+                }
+            }
+        }
+        return options;
+    }
+
+    /**
+     * Extract the cluster connection options from the SQL scripts of the submission. A SQL task
+     * configures its connection with {@code SET} statements as well, for example
+     * {@code SET 'rest.address' = 'remote-jm'}, which the cancel / savepoint command has to repeat. A
+     * {@code RESET} statement drops the setting it resets again.
+     *
+     * @param scripts the init script and the raw script of the submission, may be null
+     * @return the cluster connection options, in the order they appear in the scripts
+     */
+    public static List<String> extractClusterConnectionOptionsFromSql(String... scripts) {
+        SqlClusterConnectionTracker tracker = new SqlClusterConnectionTracker(null);
+        applySqlScripts(tracker, scripts);
+        return tracker.currentOptions();
+    }
+
+    /**
+     * Extract the cluster connection options which are effective for each job the SQL scripts submit,
+     * in the order the jobs are submitted. The scripts are scanned statement by statement and the
+     * options are snapshotted when an update statement is found, so a script which changes the
+     * connection between two jobs is not collapsed into its last configuration.
+     *
+     * <p>The Flink SQL Client executes the statements in order and prints the JobID of an update
+     * statement when that statement is submitted, so the JobIDs of the task log are in the same order
+     * as the snapshots. A job whose statement is not recognized, for example when a script is executed
+     * from another file, is not represented and uses the last configuration.
+     *
+     * @param others the extra options of the submission, may be null
+     * @param scripts the init script and the raw script of the submission, may be null
+     * @return the options for each submitted job, in the order the jobs are submitted
+     */
+    public static List<List<String>> extractClusterConnectionOptionsPerJob(String others, String... scripts) {
+        SqlClusterConnectionTracker tracker = new SqlClusterConnectionTracker(others);
+        applySqlScripts(tracker, scripts);
+        return tracker.optionsPerJob();
+    }
+
+    /**
+     * Scan the SQL scripts statement by statement and update the tracker: a {@code SET} or
+     * {@code RESET} statement changes the effective configuration, an update statement or a
+     * statement set submits a job whose configuration is snapshotted.
+     */
+    private static void applySqlScripts(SqlClusterConnectionTracker tracker, String... scripts) {
+        for (String script : scripts) {
+            if (StringUtils.isBlank(script)) {
+                continue;
+            }
+            for (String statement : splitSqlStatements(script)) {
+                Matcher setMatcher = SQL_SET_STATEMENT_REGEX.matcher(statement);
+                if (setMatcher.find()) {
+                    String option = clusterConnectionOptionOfSqlSet(setMatcher);
+                    if (option != null) {
+                        tracker.set(option);
+                    }
+                    continue;
+                }
+                Matcher resetMatcher = SQL_RESET_STATEMENT_REGEX.matcher(statement);
+                if (resetMatcher.find()) {
+                    String key = resetMatcher.group(RESET_QUOTED_KEY_GROUP) != null
+                            ? resetMatcher.group(RESET_QUOTED_KEY_GROUP)
+                            : resetMatcher.group(RESET_KEY_GROUP);
+                    if (key == null) {
+                        tracker.resetAll();
+                    } else {
+                        tracker.reset(key);
+                    }
+                    continue;
+                }
+                if (SQL_STATEMENT_SET_START_REGEX.matcher(statement).find()) {
+                    tracker.beginStatementSet();
+                    continue;
+                }
+                if (SQL_STATEMENT_SET_END_REGEX.matcher(statement).find()) {
+                    tracker.endStatementSet();
+                    continue;
+                }
+                if (SQL_JOB_STATEMENT_REGEX.matcher(statement).find()) {
+                    tracker.submit();
+                }
+            }
+        }
+    }
+
+    /**
+     * Split a SQL script into its statements with a comment- and string-aware scan: a line comment
+     * starting with two dashes and a block comment are ignored, and a semicolon inside a quoted string
+     * does not end a statement. A comment which precedes a statement therefore does not hide it.
+     */
+    private static List<String> splitSqlStatements(String script) {
+        List<String> statements = new ArrayList<>();
+        StringBuilder statement = new StringBuilder();
+        int i = 0;
+        while (i < script.length()) {
+            char current = script.charAt(i);
+            if (current == '-' && i + 1 < script.length() && script.charAt(i + 1) == '-') {
+                int end = script.indexOf('\n', i + 2);
+                i = end < 0 ? script.length() : end;
+            } else if (current == '/' && i + 1 < script.length() && script.charAt(i + 1) == '*') {
+                int end = script.indexOf("*/", i + 2);
+                i = end < 0 ? script.length() : end + 2;
+            } else if (current == '\'' || current == '"') {
+                i = appendQuotedSql(script, i, statement);
+            } else if (current == ';') {
+                addSqlStatement(statements, statement);
+                i++;
+            } else {
+                statement.append(current);
+                i++;
+            }
+        }
+        addSqlStatement(statements, statement);
+        return statements;
+    }
+
+    /**
+     * Append a quoted SQL string to the statement and return the index after its closing quote. A
+     * doubled quote inside the string is part of the value.
+     */
+    private static int appendQuotedSql(String script, int start, StringBuilder statement) {
+        char quote = script.charAt(start);
+        statement.append(quote);
+        int i = start + 1;
+        while (i < script.length()) {
+            char current = script.charAt(i);
+            statement.append(current);
+            i++;
+            if (current == quote) {
+                if (i < script.length() && script.charAt(i) == quote) {
+                    statement.append(quote);
+                    i++;
+                } else {
+                    break;
+                }
+            }
+        }
+        return i;
+    }
+
+    private static void addSqlStatement(List<String> statements, StringBuilder statement) {
+        String sql = statement.toString().trim();
+        if (!sql.isEmpty()) {
+            statements.add(sql);
+        }
+        statement.setLength(0);
+    }
+
+    /**
+     * The effective cluster connection configuration while a SQL script is scanned, so that the
+     * settings which are in effect when a job is submitted can be snapshotted for that job. The
+     * baseline is the configuration of the submission options, a {@code RESET} restores it.
+     */
+    private static final class SqlClusterConnectionTracker {
+
+        private final Map<String, List<String>> baseline;
+        private Map<String, List<String>> current;
+        private final List<List<String>> optionsPerJob = new ArrayList<>();
+        private boolean inStatementSet;
+        private boolean statementSetRecorded;
+
+        private SqlClusterConnectionTracker(String others) {
+            baseline = clusterConnectionOptionsByKey(extractClusterConnectionOptions(others));
+            current = new LinkedHashMap<>(baseline);
+        }
+
+        private void set(String option) {
+            current.put(configurationKeyOf(option), Collections.singletonList(option));
+        }
+
+        private void reset(String key) {
+            if (baseline.containsKey(key)) {
+                current.put(key, baseline.get(key));
+            } else {
+                current.remove(key);
+            }
+        }
+
+        private void resetAll() {
+            current = new LinkedHashMap<>(baseline);
+        }
+
+        private void beginStatementSet() {
+            inStatementSet = true;
+            statementSetRecorded = false;
+        }
+
+        private void endStatementSet() {
+            inStatementSet = false;
+            statementSetRecorded = false;
+        }
+
+        private void submit() {
+            if (inStatementSet && statementSetRecorded) {
+                // the update statements of a statement set are submitted as a single job
+                return;
+            }
+            optionsPerJob.add(currentOptions());
+            statementSetRecorded = inStatementSet;
+        }
+
+        private List<String> currentOptions() {
+            List<String> options = new ArrayList<>();
+            current.values().forEach(options::addAll);
+            return options;
+        }
+
+        private List<List<String>> optionsPerJob() {
+            return optionsPerJob;
+        }
+    }
+
+    /**
+     * The cluster connection option of a {@code SET} statement of a matched SQL statement, or null when
+     * the statement is not a {@code SET} statement or does not configure the connection. The value is
+     * quoted for the shell when the generated command needs it.
+     */
+    private static String clusterConnectionOptionOfSqlSet(Matcher matcher) {
+        String key = matcher.group(SET_QUOTED_KEY_GROUP) != null
+                ? matcher.group(SET_QUOTED_KEY_GROUP)
+                : matcher.group(SET_KEY_GROUP);
+        String value = matcher.group(SET_QUOTED_VALUE_GROUP) != null
+                ? matcher.group(SET_QUOTED_VALUE_GROUP)
+                : matcher.group(SET_VALUE_GROUP);
+        if (key == null || value == null || !isClusterConnectionConfig(DYNAMIC_PROPERTY_OPTION + key + "=" + value)) {
+            return null;
+        }
+        return DYNAMIC_PROPERTY_OPTION + key + "=" + quoteForShell(value);
+    }
+
+    /**
+     * Quote a configuration value for the shell when it contains a character which the shell would
+     * interpret, so that the value reaches the flink CLI as a single argument. A plain value, such as
+     * a host name or a path, is left as it is.
+     */
+    private static String quoteForShell(String value) {
+        if (SHELL_SAFE_VALUE_REGEX.matcher(value).matches()) {
+            return value;
+        }
+        // a single quote inside the value is closed, escaped and reopened
+        return "'" + value.replace("'", "'\\''") + "'";
+    }
+
+    /**
+     * Merge the cluster connection options, a later option for the same key wins. A connection setting
+     * which is given both as a CLI option and as a SQL {@code SET} statement is therefore passed once,
+     * with the value which is effective for the submitted job.
+     *
+     * <p>The options are merged as complete option units: an option which is given as two arguments,
+     * for example {@code -D <key>=<value>}, keeps both of them, otherwise merging would leave a value
+     * without its {@code -D}.
+     */
+    public static List<String> mergeClusterConnectionOptions(List<String> first, List<String> second) {
+        Map<String, List<String>> optionsByKey = new LinkedHashMap<>();
+        collectClusterConnectionOptions(first, optionsByKey);
+        collectClusterConnectionOptions(second, optionsByKey);
+        List<String> options = new ArrayList<>();
+        optionsByKey.values().forEach(options::addAll);
+        return options;
+    }
+
+    /**
+     * Group the cluster connection options by the key they configure, so that a later option for the
+     * same key can replace an earlier one while the order of the options is kept.
+     */
+    private static Map<String, List<String>> clusterConnectionOptionsByKey(List<String> options) {
+        Map<String, List<String>> optionsByKey = new LinkedHashMap<>();
+        collectClusterConnectionOptions(options, optionsByKey);
+        return optionsByKey;
+    }
+
+    /**
+     * Group the tokens into the options they belong to, so that an option which is given as two
+     * arguments, for example {@code -m <jobmanager>} or {@code -D <key>=<value>}, is merged as a single
+     * unit. The key of a {@code -D} option is the configuration key it sets, the key of the other
+     * options is the option itself.
+     */
+    private static void collectClusterConnectionOptions(List<String> tokens, Map<String, List<String>> optionsByKey) {
+        for (int i = 0; i < tokens.size(); i++) {
+            String token = tokens.get(i);
+            String option = unquoteToken(token);
+            int separator = option.indexOf('=');
+            String optionName = separator < 0 ? option : option.substring(0, separator);
+            if (CLUSTER_CONNECTION_OPTIONS.contains(optionName)) {
+                List<String> unit = new ArrayList<>();
+                unit.add(token);
+                // the value may be given as a separate argument, for example "-m <jobmanager>"
+                if (separator < 0 && i + 1 < tokens.size()) {
+                    unit.add(tokens.get(++i));
+                }
+                optionsByKey.put(optionName, unit);
+            } else if (DYNAMIC_PROPERTY_OPTION.equals(option) && i + 1 < tokens.size()) {
+                // the configuration may also be given as two arguments, "-D <key>=<value>"
+                String value = tokens.get(++i);
+                optionsByKey.put(configurationKeyOf(DYNAMIC_PROPERTY_OPTION + unquoteToken(value)),
+                        Arrays.asList(token, value));
+            } else if (isClusterConnectionConfig(option)) {
+                optionsByKey.put(configurationKeyOf(option), Collections.singletonList(token));
+            }
+        }
+    }
+
+    /**
+     * The configuration key of a {@code -D<key>=<value>} option, used to merge two options which set
+     * the same configuration.
+     */
+    private static String configurationKeyOf(String option) {
+        int separator = option.indexOf('=');
+        if (!option.startsWith(DYNAMIC_PROPERTY_OPTION) || separator < 0) {
+            return option;
+        }
+        return option.substring(DYNAMIC_PROPERTY_OPTION.length(), separator);
+    }
+
+    /**
+     * Remove the quotes which surround a whole token, so that an option or a value which is entirely
+     * quoted is still recognized. The original token is kept in the generated command, the shell
+     * removes the quotes.
+     */
+    private static String unquoteToken(String token) {
+        if (token.length() > 1 && (token.charAt(0) == '"' || token.charAt(0) == '\'')
+                && token.charAt(token.length() - 1) == token.charAt(0)) {
+            return token.substring(1, token.length() - 1);
+        }
+        return token;
+    }
+
+    /**
+     * Split the extra options of the submission into tokens. A whitespace inside a quoted segment
+     * does not separate two tokens, and the quotes are kept so that the generated command stays
+     * quoted for the shell. A quote may appear inside a token, for example
+     * {@code -Dkubernetes.config.file="/opt/flink configs/kube.yaml"}.
+     */
+    private static List<String> tokenizeOptions(String others) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder token = new StringBuilder();
+        char quote = 0;
+        boolean escaped = false;
+        for (int i = 0; i < others.length(); i++) {
+            char current = others.charAt(i);
+            if (escaped) {
+                token.append(current);
+                escaped = false;
+            } else if (current == '\\') {
+                token.append(current);
+                escaped = true;
+            } else if (quote != 0) {
+                token.append(current);
+                if (current == quote) {
+                    quote = 0;
+                }
+            } else if (current == '"' || current == '\'') {
+                token.append(current);
+                quote = current;
+            } else if (Character.isWhitespace(current)) {
+                if (token.length() > 0) {
+                    tokens.add(token.toString());
+                    token.setLength(0);
+                }
+            } else {
+                token.append(current);
+            }
+        }
+        if (token.length() > 0) {
+            tokens.add(token.toString());
+        }
+        return tokens;
+    }
+
+    private static boolean isClusterConnectionConfig(String token) {
+        if (!token.startsWith(DYNAMIC_PROPERTY_OPTION) || token.length() <= DYNAMIC_PROPERTY_OPTION.length()) {
+            return false;
+        }
+        String config = token.substring(DYNAMIC_PROPERTY_OPTION.length());
+        int separator = config.indexOf('=');
+        String key = separator < 0 ? config : config.substring(0, separator);
+        if (CLUSTER_CONNECTION_CONFIG_KEYS.contains(key)) {
+            return true;
+        }
+        return CLUSTER_CONNECTION_CONFIG_PREFIXES.stream().anyMatch(key::startsWith);
+    }
+
+    /**
+     * build flink savepoint command line, the savepoint folder should be set in flink conf
+     *
+     * <p>The Flink JobID identifies the job, the YARN application id only identifies the cluster
+     * which runs it, so they are passed as different arguments. The YARN application id is passed
+     * as the {@code -yid} targeting option, as documented by "Trigger a Savepoint with YARN":
+     * {@code flink savepoint :jobId [:targetDirectory] -yid :yarnAppId}. The cluster connection
+     * options of the submission are repeated as well, otherwise the savepoint is triggered against
+     * the default cluster of the worker instead of the cluster which runs the job.
+     *
+     * @param jobId the Flink JobID printed by `flink run`, it is not the YARN/K8s application id
+     * @param yarnApplicationId the YARN application id used to target the cluster, may be null
+     * @param clusterConnectionOptions the cluster connection options of the submission, may be empty
+     * @return argument list
+     */
+    public static List<String> buildSavePointCommandLine(String jobId, String yarnApplicationId,
+                                                         List<String> clusterConnectionOptions) {
         List<String> args = new ArrayList<>();
         args.add(FlinkConstants.FLINK_COMMAND);
         args.add(FlinkConstants.FLINK_SAVEPOINT);
-        args.add(taskExecutionContext.getAppIds());
+        args.add(jobId);
+        if (StringUtils.isNotBlank(yarnApplicationId)) {
+            args.add(FlinkConstants.FLINK_YARN_APPLICATION_ID);
+            args.add(yarnApplicationId);
+        }
+        if (CollectionUtils.isNotEmpty(clusterConnectionOptions)) {
+            args.addAll(clusterConnectionOptions);
+        }
         return args;
+    }
+
+    /**
+     * Execute a flink command in the same environment as the task itself.
+     *
+     * <p>The task script is executed by a shell interceptor which sources shell.env_source_list and the
+     * task's custom environment, resolves the task parameters and runs as the task's tenant. The
+     * cancel / savepoint commands must reuse that environment, otherwise placeholders like
+     * ${FLINK_HOME} cannot be resolved when they are only defined in the selected task environment.
+     *
+     * @param taskExecutionContext task execution context
+     * @param args the command arguments
+     * @return true if the command finished successfully
+     */
+    public static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args) {
+        return executeCommandWithOutput(taskExecutionContext, args, OSUtils.isSudoEnable(),
+                FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS).isSuccess();
+    }
+
+    /**
+     * Same as {@link #executeCommand(TaskExecutionContext, List)}, with a custom timeout. The
+     * savepoint command uses a much longer timeout than the cancel command.
+     */
+    public static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args,
+                                         int timeoutSeconds) {
+        return executeCommandWithOutput(taskExecutionContext, args, timeoutSeconds).isSuccess();
+    }
+
+    /**
+     * Same as {@link #executeCommand(TaskExecutionContext, List, int)}, and keep the output of the
+     * command so that the caller can classify a failure.
+     */
+    public static FlinkCommandResult executeCommandWithOutput(TaskExecutionContext taskExecutionContext,
+                                                              List<String> args, int timeoutSeconds) {
+        return executeCommandWithOutput(taskExecutionContext, args, OSUtils.isSudoEnable(), timeoutSeconds);
+    }
+
+    /**
+     * Same as {@link #executeCommand(TaskExecutionContext, List)}, with the sudo mode injected so that
+     * the command execution can be verified without requiring sudo permissions.
+     */
+    static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args, boolean sudoEnable) {
+        return executeCommand(taskExecutionContext, args, sudoEnable, FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS);
+    }
+
+    /**
+     * Same as {@link #executeCommand(TaskExecutionContext, List, int)}, with the sudo mode injected so
+     * that the command execution can be verified without requiring sudo permissions.
+     */
+    static boolean executeCommand(TaskExecutionContext taskExecutionContext, List<String> args, boolean sudoEnable,
+                                  int timeoutSeconds) {
+        return executeCommandWithOutput(taskExecutionContext, args, sudoEnable, timeoutSeconds).isSuccess();
+    }
+
+    /**
+     * Execute a flink command and keep its output, so that the caller can tell a command which failed
+     * because the job is already in a terminal state from a real failure.
+     */
+    static FlinkCommandResult executeCommandWithOutput(TaskExecutionContext taskExecutionContext, List<String> args,
+                                                       boolean sudoEnable, int timeoutSeconds) {
+        Process process = null;
+        try {
+            IShellInterceptorBuilder shellInterceptorBuilder = ShellInterceptorBuilderFactory.newBuilder()
+                    .shellDirectory(taskExecutionContext.getExecutePath())
+                    .shellName(taskExecutionContext.getTaskInstanceId() + FLINK_COMMAND_SHELL_NAME_SUFFIX
+                            + System.nanoTime())
+                    .properties(ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap()))
+                    .appendScript(String.join(" ", args))
+                    .sudoMode(sudoEnable)
+                    .runUser(taskExecutionContext.getTenantCode());
+            if (CollectionUtils.isNotEmpty(ShellUtils.ENV_SOURCE_LIST)) {
+                ShellUtils.ENV_SOURCE_LIST.forEach(shellInterceptorBuilder::appendSystemEnv);
+            }
+            if (StringUtils.isNotBlank(taskExecutionContext.getEnvironmentConfig())) {
+                shellInterceptorBuilder.appendCustomEnvScript(taskExecutionContext.getEnvironmentConfig());
+            }
+            process = shellInterceptorBuilder.build().execute();
+            return waitForCommand(process, taskExecutionContext, timeoutSeconds);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Execute flink command interrupted, taskInstanceId: {}",
+                    taskExecutionContext.getTaskInstanceId(), e);
+            return FlinkCommandResult.failure("");
+        } catch (Exception e) {
+            log.error("Execute flink command error, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
+            return FlinkCommandResult.failure("");
+        } finally {
+            if (process != null && process.isAlive()) {
+                destroyProcessTree(process, taskExecutionContext);
+            }
+        }
+    }
+
+    /**
+     * Wait for the command to finish, consuming its output so that the command cannot block on a full
+     * pipe, and keep the output for diagnostics. The command arguments are not logged, they may carry
+     * sensitive configuration values.
+     */
+    private static FlinkCommandResult waitForCommand(Process process,
+                                                     TaskExecutionContext taskExecutionContext,
+                                                     int timeoutSeconds) throws InterruptedException {
+        StringBuilder output = new StringBuilder();
+        Thread outputReader = new Thread(() -> {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append(System.lineSeparator());
+                }
+            } catch (IOException e) {
+                // the process has exited and its streams are closed
+            }
+        }, "flink-command-output-reader");
+        outputReader.setDaemon(true);
+        outputReader.start();
+
+        boolean finished = process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
+        // both streams are merged into stdout by the shell interceptor, so joining the reader is enough
+        outputReader.join(TimeUnit.SECONDS.toMillis(OUTPUT_READER_JOIN_TIMEOUT_SECONDS));
+        if (!finished) {
+            destroyProcessTree(process, taskExecutionContext);
+            log.error("Execute flink command timeout after {}s, output: {}", timeoutSeconds, output);
+            return FlinkCommandResult.failure(output.toString());
+        }
+        int exitCode = process.exitValue();
+        if (exitCode != 0) {
+            log.error("Execute flink command failed, exitCode: {}, output: {}", exitCode, output);
+            return FlinkCommandResult.failure(output.toString());
+        }
+        log.info("Execute flink command successfully, output: {}", output);
+        return FlinkCommandResult.success(output.toString());
+    }
+
+    /**
+     * The result of executing a flink command: whether it succeeded and what it printed. The output is
+     * kept because a failed command has to be classified by the caller, for example cancelling a job
+     * which is already in a terminal state is not a real failure.
+     */
+    @Getter
+    public static class FlinkCommandResult {
+
+        private final boolean success;
+
+        private final String output;
+
+        private FlinkCommandResult(boolean success, String output) {
+            this.success = success;
+            this.output = output;
+        }
+
+        public static FlinkCommandResult success(String output) {
+            return new FlinkCommandResult(true, output);
+        }
+
+        public static FlinkCommandResult failure(String output) {
+            return new FlinkCommandResult(false, output);
+        }
+    }
+
+    /**
+     * Terminate the process tree of the command and wait for it to be gone.
+     *
+     * <p>The process returned by the shell interceptor is the bootstrap shell (or the sudo process),
+     * the flink CLI itself runs as its descendant, so killing only that process would leave the CLI
+     * running and holding the output pipe.
+     */
+    private static void destroyProcessTree(Process process, TaskExecutionContext taskExecutionContext) {
+        int processId = ProcessUtils.getProcessId(process);
+        if (processId > 0) {
+            ProcessUtils.kill(processId, taskExecutionContext.getTenantCode());
+        }
+        if (process.isAlive()) {
+            process.destroyForcibly();
+        }
+        try {
+            if (!process.waitFor(OUTPUT_READER_JOIN_TIMEOUT_SECONDS, TimeUnit.SECONDS)) {
+                log.warn("The flink command process {} did not terminate within {}s", processId,
+                        OUTPUT_READER_JOIN_TIMEOUT_SECONDS);
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     /**

@@ -20,18 +20,26 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,9 +51,22 @@ public class FlinkTask extends AbstractYarnTask {
     private TaskExecutionContext taskExecutionContext;
 
     /**
-     * rules for flink application ID
+     * The pattern of the Flink JobID printed by the submission, it is not the YARN/K8s application
+     * id.
      */
-    protected static final Pattern FLINK_APPLICATION_REGEX = Pattern.compile(TaskConstants.FLINK_APPLICATION_REGEX);
+    protected static final Pattern FLINK_JOB_ID_REGEX = Pattern.compile(TaskConstants.FLINK_JOB_ID_REGEX);
+
+    /**
+     * The message the flink CLI reports when the job is already in another terminal state, so it does
+     * not have to be cancelled any more.
+     */
+    private static final String JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE = "already reached another terminal state";
+
+    /**
+     * The maximum time to wait for the submission output which is still buffered when the client is
+     * stopped to be written to the task log.
+     */
+    private static final long SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS = 2_000L;
 
     public FlinkTask(TaskExecutionContext taskExecutionContext) {
         super(taskExecutionContext);
@@ -104,17 +125,227 @@ public class FlinkTask extends AbstractYarnTask {
     }
 
     /**
-     * find app id
+     * Find the Flink JobID in a log line. Both the {@code flink run} format (JobID) and the Flink
+     * SQL Client format (Job ID:) are supported. The returned id is the Flink JobID, it is not the
+     * YARN/K8s application id.
      *
      * @param line line
-     * @return appid
+     * @return the Flink JobID, or null when the line does not contain one
      */
-    protected String findAppId(String line) {
-        Matcher matcher = FLINK_APPLICATION_REGEX.matcher(line);
+    protected String findFlinkJobId(String line) {
+        Matcher matcher = FLINK_JOB_ID_REGEX.matcher(line);
         if (matcher.find()) {
-            String str = matcher.group();
-            return str.substring(6);
+            return matcher.group(1);
         }
         return null;
+    }
+
+    /**
+     * Cancel the flink task.
+     *
+     * <p>The process started by the worker is only the flink client, not the job itself: when the
+     * client exits, or when it is killed, the job keeps running for local/standalone/session
+     * deployments. So the jobs are cancelled through the flink CLI.
+     *
+     * <p>The client is stopped before the JobIDs are collected: while it is running it can submit
+     * further jobs, which would be missing from an earlier snapshot. The client stop also cancels the
+     * YARN/K8s application of the task.
+     */
+    @Override
+    public void cancelApplication() throws TaskException {
+        TaskException cancelFailure = null;
+        try {
+            cancelClientByProcess();
+        } catch (TaskException e) {
+            cancelFailure = e;
+        }
+        // the submission output is collected asynchronously, its tail has to reach the task log before
+        // the JobIDs are collected from it
+        awaitBufferedSubmissionOutput();
+        try {
+            cancelFlinkJob();
+        } catch (TaskException e) {
+            if (cancelFailure == null) {
+                cancelFailure = e;
+            } else {
+                cancelFailure.addSuppressed(e);
+            }
+        }
+        if (cancelFailure != null) {
+            throw cancelFailure;
+        }
+    }
+
+    /**
+     * Stop the flink client process of the task, kept as a separate method so that the fallback can
+     * be verified in tests.
+     */
+    protected void cancelClientByProcess() throws TaskException {
+        super.cancelApplication();
+    }
+
+    /**
+     * Wait until the output of the submission has been written to the task log, so that the JobIDs of
+     * the jobs which were submitted right before the client was stopped are not missed. The wait is
+     * bounded, a command which does not release its output pipe must not block the cancellation.
+     */
+    private void awaitBufferedSubmissionOutput() {
+        if (!awaitSubmissionOutputCollected(SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS)) {
+            log.warn("The submission output could not be collected within {}ms, collect the JobIDs anyway",
+                    SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS);
+        }
+    }
+
+    /**
+     * Wait for the output of the submission to be written to the task log, kept as a separate method so
+     * that the wait can be verified in tests.
+     */
+    protected boolean awaitSubmissionOutputCollected(long timeoutMillis) {
+        return awaitTaskOutputCollected(timeoutMillis);
+    }
+
+    /**
+     * Cancel the flink jobs through the flink CLI.
+     *
+     * <p>Tasks submitted to YARN are not handled here: their application id is known and cancelling
+     * the application through the resource manager is the reliable way. A Kubernetes cluster is
+     * identified by a cluster id rather than by an application id, so a job submitted to Kubernetes
+     * is cancelled through the CLI, with the cluster connection options of the submission.
+     *
+     * <p>Every collected JobID is attempted. A job which is already in a terminal state cannot be
+     * cancelled any more, which is not a failure, so it is not reported as one.
+     *
+     * @throws TaskException if at least one job which is not in a terminal state could not be
+     *         cancelled
+     */
+    protected void cancelFlinkJob() throws TaskException {
+        try {
+            if (CollectionUtils.isNotEmpty(getApplicationIds())) {
+                return;
+            }
+        } catch (Exception e) {
+            log.warn("Get application ids failed, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
+        }
+        List<String> jobIds = getFlinkJobIds();
+        if (CollectionUtils.isEmpty(jobIds)) {
+            log.info("Cannot find flink JobID from the task log, taskInstanceId: {}",
+                    taskExecutionContext.getTaskInstanceId());
+            return;
+        }
+        List<List<String>> clusterConnectionOptionsPerJob = getClusterConnectionOptionsPerJob();
+        // a job which the scripts do not describe, for example one submitted from another file, uses
+        // the last configuration of the submission
+        List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
+        List<String> failedJobIds = new ArrayList<>();
+        for (int i = 0; i < jobIds.size(); i++) {
+            String jobId = jobIds.get(i);
+            List<String> clusterConnectionOptions = i < clusterConnectionOptionsPerJob.size()
+                    ? clusterConnectionOptionsPerJob.get(i)
+                    : lastClusterConnectionOptions;
+            List<String> args = FlinkArgsUtils.buildCancelCommandLine(jobId, clusterConnectionOptions);
+            FlinkArgsUtils.FlinkCommandResult result = executeFlinkCancelCommand(args);
+            if (result.isSuccess()) {
+                log.info("Cancelled flink job: {}", jobId);
+                continue;
+            }
+            if (isJobAlreadyInTerminalState(result.getOutput())) {
+                log.info("Flink job {} is already in a terminal state, it does not need to be cancelled", jobId);
+                continue;
+            }
+            log.error("Cancel flink job {} failed, the job may still be running", jobId);
+            failedJobIds.add(jobId);
+        }
+        if (CollectionUtils.isNotEmpty(failedJobIds)) {
+            throw new TaskException(
+                    String.format("Cancel flink jobs %s failed, they may still be running, taskInstanceId: %s",
+                            failedJobIds, taskExecutionContext.getTaskInstanceId()));
+        }
+        log.info("Successfully cancelled flink jobs: {}", jobIds);
+    }
+
+    /**
+     * The flink CLI reports a job which is already in a terminal state instead of cancelling it. See
+     * the {@code JobCancellationHandler} of flink.
+     */
+    private boolean isJobAlreadyInTerminalState(String output) {
+        return StringUtils.contains(output, JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE);
+    }
+
+    /**
+     * The flink JobID is printed by `flink run` and is the id which `flink cancel` accepts.
+     */
+    protected List<String> getFlinkJobIds() {
+        String logPath = taskExecutionContext.getLogPath();
+        File logFile = StringUtils.isEmpty(logPath) ? null : new File(logPath);
+        if (logFile == null || !logFile.isFile()) {
+            return Collections.emptyList();
+        }
+        try (Stream<String> lines = Files.lines(logFile.toPath())) {
+            return lines.map(this::findFlinkJobId)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("Read task log failed, logPath: {}", logPath, e);
+            return Collections.emptyList();
+        }
+    }
+
+    /**
+     * The cluster connection options which are effective for each job the SQL scripts submit, in the
+     * order the jobs are submitted. A script can submit a job to one cluster, change the connection
+     * and submit the next job to another cluster, so the options have to be kept per job, otherwise
+     * the first job would be cancelled against the cluster of the second one.
+     */
+    protected List<List<String>> getClusterConnectionOptionsPerJob() {
+        AbstractParameters parameters = getParameters();
+        if (!(parameters instanceof FlinkParameters)) {
+            return Collections.emptyList();
+        }
+        FlinkParameters flinkParameters = (FlinkParameters) parameters;
+        return FlinkArgsUtils.extractClusterConnectionOptionsPerJob(flinkParameters.getOthers(),
+                flinkParameters.getInitScript(), flinkParameters.getRawScript());
+    }
+
+    /**
+     * The cluster connection options of the submission, for example {@code -m <jobmanager>} or
+     * {@code -t <target>}. They have to be repeated on the cancel / savepoint command, otherwise
+     * that command targets the default cluster of the worker instead of the cluster the job was
+     * submitted to.
+     *
+     * <p>This is the last configuration of the submission, it is used for a job which
+     * {@link #getClusterConnectionOptionsPerJob()} does not describe.
+     */
+    protected List<String> getClusterConnectionOptions() {
+        AbstractParameters parameters = getParameters();
+        if (!(parameters instanceof FlinkParameters)) {
+            return Collections.emptyList();
+        }
+        FlinkParameters flinkParameters = (FlinkParameters) parameters;
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(flinkParameters.getOthers());
+        // a SQL task can also configure its connection with SET statements in its scripts
+        List<String> sqlOptions = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                flinkParameters.getInitScript(), flinkParameters.getRawScript());
+        return FlinkArgsUtils.mergeClusterConnectionOptions(options, sqlOptions);
+    }
+
+    /**
+     * Execute a cancel command and keep its output, so that a job which is already in a terminal state
+     * can be told apart from a real cancellation failure. It is kept as a separate method so that it
+     * can be verified in tests.
+     */
+    protected FlinkArgsUtils.FlinkCommandResult executeFlinkCancelCommand(List<String> args) {
+        return FlinkArgsUtils.executeCommandWithOutput(taskExecutionContext, args,
+                FlinkConstants.FLINK_COMMAND_TIMEOUT_SECONDS);
+    }
+
+    /**
+     * Execute the savepoint command. It is kept as a separate method so it can be verified in tests,
+     * and it gets its own timeout because a savepoint of a large stateful job takes much longer than
+     * a cancel.
+     */
+    protected boolean executeFlinkSavepointCommand(List<String> args) {
+        return FlinkArgsUtils.executeCommand(taskExecutionContext, args,
+                FlinkConstants.FLINK_SAVEPOINT_TIMEOUT_SECONDS);
     }
 }

@@ -106,6 +106,18 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
     }
 
     /**
+     * Wait until the output of the task process has been written to the task log, at most the given
+     * time. A task which stops the process outside of the normal run, for example to cancel a remote
+     * job, uses it to make sure that the tail of the output is available in the task log.
+     *
+     * @param timeoutMillis the maximum time to wait
+     * @return true if the output was collected, false if the wait timed out
+     */
+    protected boolean awaitTaskOutputCollected(long timeoutMillis) {
+        return shellCommandExecutor.awaitOutputCollected(timeoutMillis);
+    }
+
+    /**
      * Get the script used to bootstrap the task
      */
     protected abstract String getScript();
