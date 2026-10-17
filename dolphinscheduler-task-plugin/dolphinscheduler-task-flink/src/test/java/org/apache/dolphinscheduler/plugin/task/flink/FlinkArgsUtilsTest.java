@@ -347,6 +347,24 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsFromSqlScriptsAppliesReset() {
+        // a reset setting is not part of the final configuration of the submission
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'rest.address'='cluster-b';\nRESET 'rest.address';\nSET 'rest.port'='8081';");
+
+        Assertions.assertEquals(Arrays.asList("-Drest.port=8081"), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsFromSqlScriptsKeepsSemicolonInsideValue() {
+        // a semicolon inside a quoted value does not end the statement
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'rest.address' = 'remote;host';\nINSERT INTO t SELECT * FROM s;");
+
+        Assertions.assertEquals(Arrays.asList("-Drest.address='remote;host'"), options);
+    }
+
+    @Test
     public void testExtractClusterConnectionOptionsPerJobIgnoresStatementsWhichSubmitNoJob() {
         // a statement which does not submit a job must not consume a snapshot, otherwise the settings
         // of the jobs which follow it would be shifted
@@ -375,6 +393,70 @@ public class FlinkArgsUtilsTest {
         Assertions.assertEquals(2, optionsPerJob.size());
         Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
         Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobIgnoresComments() {
+        // a comment which precedes an INSERT must not hide the statement, otherwise the snapshots are
+        // associated with the wrong JobID
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "/* first job */ INSERT INTO t SELECT * FROM s;\n"
+                        + "-- switch the endpoint before the second job\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobAppliesReset() {
+        // RESET restores the baseline configuration of the submission, so the job which follows it is
+        // not cancelled against the endpoint of the job before it
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(
+                "-Drest.address=default-jm",
+                "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "RESET 'rest.address';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=default-jm"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobAppliesResetAll() {
+        // RESET without a key restores the whole baseline configuration
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(
+                "-Drest.address=default-jm -Drest.port=8081",
+                "SET 'rest.address'='cluster-b';\nSET 'rest.port'='9999';\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "RESET;\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b", "-Drest.port=9999"),
+                optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=default-jm", "-Drest.port=8081"),
+                optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobResetWithoutBaselineUsesDefault() {
+        // without a baseline option the reset key falls back to the default configuration, so no
+        // endpoint is passed for the job which follows it
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "RESET 'rest.address';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(0));
+        Assertions.assertTrue(optionsPerJob.get(1).isEmpty());
     }
 
     @Test

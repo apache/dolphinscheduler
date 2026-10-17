@@ -109,42 +109,56 @@ public class FlinkArgsUtils {
             Collections.singletonList("security.ssl.rest.");
 
     /**
-     * The statements of the Flink SQL Client which matter for the cancellation of the submitted jobs,
-     * matched at the beginning of a statement:
-     *
-     * <ul>
-     *     <li>a {@code SET} statement, in the quoted form {@code SET 'rest.address' = 'remote-jm'} and
-     *         in the unquoted form {@code SET rest.port = 8081}, which selects the connection;</li>
-     *     <li>an update statement ({@code INSERT}, {@code UPDATE} or {@code DELETE}), which submits a
-     *         job and makes the SQL Client print the JobID of that job;</li>
-     *     <li>the boundaries of a statement set, which submits all its update statements as a single
-     *         job.</li>
-     * </ul>
-     *
-     * <p>Anchoring the statement avoids matching the text of a string literal, for example
-     * {@code SELECT 'SET rest.address=x'}. Only the single quoted form is a SQL Client string, the
-     * double quoted form is not part of its syntax.
-     *
-     * <p>The script is scanned with a pattern, not with a SQL parser, so a string literal which spans
-     * several lines and whose line begins with a statement is indistinguishable from a statement.
+     * The {@code SET} statement of the Flink SQL Client, in the quoted form
+     * {@code SET 'rest.address' = 'remote-jm'} and in the unquoted form
+     * {@code SET rest.port = 8081}, which selects the connection of the following jobs. The statement
+     * is matched at its beginning, so the text of a string literal, for example
+     * {@code SELECT 'SET rest.address=x'}, is not a statement.
      */
-    private static final Pattern SQL_STATEMENT_REGEX = Pattern.compile(
-            "(?im)(?:^|;)\\s*(?:SET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'([^']*)'|([^;'\\s]+))"
-                    + "|(INSERT|UPDATE|DELETE)\\b"
-                    + "|(BEGIN\\s+STATEMENT\\s+SET|EXECUTE\\s+STATEMENT\\s+SET)\\b"
-                    + "|(END)\\b)");
+    private static final Pattern SQL_SET_STATEMENT_REGEX = Pattern.compile(
+            "(?is)^\\s*SET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'([^']*)'|([^;'\\s]+))");
 
     /**
-     * The groups of {@link #SQL_STATEMENT_REGEX}: the key and the value of a {@code SET} statement,
-     * the keyword of an update statement, and the boundaries of a statement set.
+     * The {@code RESET} statement of the Flink SQL Client: the keyed form {@code RESET 'rest.address'},
+     * which restores the default value of one configuration key, and the {@code RESET} form without a
+     * key, which restores all of them.
+     */
+    private static final Pattern SQL_RESET_STATEMENT_REGEX = Pattern.compile(
+            "(?is)^\\s*RESET(?:\\s+(?:'([^']+)'|([\\w.-]+)))?\\s*;?\\s*$");
+
+    /**
+     * An update statement ({@code INSERT}, {@code UPDATE} or {@code DELETE}), which submits a job and
+     * makes the SQL Client print the JobID of that job.
+     */
+    private static final Pattern SQL_JOB_STATEMENT_REGEX =
+            Pattern.compile("(?is)^\\s*(?:INSERT|UPDATE|DELETE)\\b");
+
+    /**
+     * The beginning of a statement set, whose update statements are submitted as a single job.
+     */
+    private static final Pattern SQL_STATEMENT_SET_START_REGEX =
+            Pattern.compile("(?is)^\\s*(?:BEGIN\\s+STATEMENT\\s+SET|EXECUTE\\s+STATEMENT\\s+SET)\\b");
+
+    /**
+     * The end of a statement set.
+     */
+    private static final Pattern SQL_STATEMENT_SET_END_REGEX = Pattern.compile("(?is)^\\s*END\\b");
+
+    /**
+     * The groups of {@link #SQL_SET_STATEMENT_REGEX}: the quoted and the unquoted key of a
+     * {@code SET} statement, and the quoted and the unquoted value of a {@code SET} statement.
      */
     private static final int SET_QUOTED_KEY_GROUP = 1;
     private static final int SET_KEY_GROUP = 2;
     private static final int SET_QUOTED_VALUE_GROUP = 3;
     private static final int SET_VALUE_GROUP = 4;
-    private static final int JOB_STATEMENT_GROUP = 5;
-    private static final int STATEMENT_SET_GROUP = 6;
-    private static final int STATEMENT_SET_END_GROUP = 7;
+
+    /**
+     * The groups of {@link #SQL_RESET_STATEMENT_REGEX}: the quoted and the unquoted key of a
+     * {@code RESET} statement.
+     */
+    private static final int RESET_QUOTED_KEY_GROUP = 1;
+    private static final int RESET_KEY_GROUP = 2;
 
     /**
      * The characters which are not interpreted by the shell when a value is given as a single word.
@@ -240,26 +254,16 @@ public class FlinkArgsUtils {
     /**
      * Extract the cluster connection options from the SQL scripts of the submission. A SQL task
      * configures its connection with {@code SET} statements as well, for example
-     * {@code SET 'rest.address' = 'remote-jm'}, which the cancel / savepoint command has to repeat.
+     * {@code SET 'rest.address' = 'remote-jm'}, which the cancel / savepoint command has to repeat. A
+     * {@code RESET} statement drops the setting it resets again.
      *
      * @param scripts the init script and the raw script of the submission, may be null
      * @return the cluster connection options, in the order they appear in the scripts
      */
     public static List<String> extractClusterConnectionOptionsFromSql(String... scripts) {
-        List<String> options = new ArrayList<>();
-        for (String script : scripts) {
-            if (StringUtils.isBlank(script)) {
-                continue;
-            }
-            Matcher matcher = SQL_STATEMENT_REGEX.matcher(script);
-            while (matcher.find()) {
-                String option = clusterConnectionOptionOfSqlSet(matcher);
-                if (option != null) {
-                    options.add(option);
-                }
-            }
-        }
-        return options;
+        SqlClusterConnectionTracker tracker = new SqlClusterConnectionTracker(null);
+        applySqlScripts(tracker, scripts);
+        return tracker.currentOptions();
     }
 
     /**
@@ -278,43 +282,182 @@ public class FlinkArgsUtils {
      * @return the options for each submitted job, in the order the jobs are submitted
      */
     public static List<List<String>> extractClusterConnectionOptionsPerJob(String others, String... scripts) {
-        List<List<String>> optionsPerJob = new ArrayList<>();
-        List<String> current =
-                mergeClusterConnectionOptions(extractClusterConnectionOptions(others), Collections.emptyList());
+        SqlClusterConnectionTracker tracker = new SqlClusterConnectionTracker(others);
+        applySqlScripts(tracker, scripts);
+        return tracker.optionsPerJob();
+    }
+
+    /**
+     * Scan the SQL scripts statement by statement and update the tracker: a {@code SET} or
+     * {@code RESET} statement changes the effective configuration, an update statement or a
+     * statement set submits a job whose configuration is snapshotted.
+     */
+    private static void applySqlScripts(SqlClusterConnectionTracker tracker, String... scripts) {
         for (String script : scripts) {
             if (StringUtils.isBlank(script)) {
                 continue;
             }
-            Matcher matcher = SQL_STATEMENT_REGEX.matcher(script);
-            boolean inStatementSet = false;
-            boolean statementSetRecorded = false;
-            while (matcher.find()) {
-                if (matcher.group(JOB_STATEMENT_GROUP) != null) {
-                    if (inStatementSet && statementSetRecorded) {
-                        // the statements of a statement set are submitted as a single job
-                        continue;
+            for (String statement : splitSqlStatements(script)) {
+                Matcher setMatcher = SQL_SET_STATEMENT_REGEX.matcher(statement);
+                if (setMatcher.find()) {
+                    String option = clusterConnectionOptionOfSqlSet(setMatcher);
+                    if (option != null) {
+                        tracker.set(option);
                     }
-                    optionsPerJob.add(new ArrayList<>(current));
-                    statementSetRecorded = inStatementSet;
                     continue;
                 }
-                if (matcher.group(STATEMENT_SET_GROUP) != null) {
-                    inStatementSet = true;
-                    statementSetRecorded = false;
+                Matcher resetMatcher = SQL_RESET_STATEMENT_REGEX.matcher(statement);
+                if (resetMatcher.find()) {
+                    String key = resetMatcher.group(RESET_QUOTED_KEY_GROUP) != null
+                            ? resetMatcher.group(RESET_QUOTED_KEY_GROUP)
+                            : resetMatcher.group(RESET_KEY_GROUP);
+                    if (key == null) {
+                        tracker.resetAll();
+                    } else {
+                        tracker.reset(key);
+                    }
                     continue;
                 }
-                if (matcher.group(STATEMENT_SET_END_GROUP) != null) {
-                    inStatementSet = false;
-                    statementSetRecorded = false;
+                if (SQL_STATEMENT_SET_START_REGEX.matcher(statement).find()) {
+                    tracker.beginStatementSet();
                     continue;
                 }
-                String option = clusterConnectionOptionOfSqlSet(matcher);
-                if (option != null) {
-                    current = mergeClusterConnectionOptions(current, Collections.singletonList(option));
+                if (SQL_STATEMENT_SET_END_REGEX.matcher(statement).find()) {
+                    tracker.endStatementSet();
+                    continue;
+                }
+                if (SQL_JOB_STATEMENT_REGEX.matcher(statement).find()) {
+                    tracker.submit();
                 }
             }
         }
-        return optionsPerJob;
+    }
+
+    /**
+     * Split a SQL script into its statements with a comment- and string-aware scan: a line comment
+     * starting with two dashes and a block comment are ignored, and a semicolon inside a quoted string
+     * does not end a statement. A comment which precedes a statement therefore does not hide it.
+     */
+    private static List<String> splitSqlStatements(String script) {
+        List<String> statements = new ArrayList<>();
+        StringBuilder statement = new StringBuilder();
+        int i = 0;
+        while (i < script.length()) {
+            char current = script.charAt(i);
+            if (current == '-' && i + 1 < script.length() && script.charAt(i + 1) == '-') {
+                int end = script.indexOf('\n', i + 2);
+                i = end < 0 ? script.length() : end;
+            } else if (current == '/' && i + 1 < script.length() && script.charAt(i + 1) == '*') {
+                int end = script.indexOf("*/", i + 2);
+                i = end < 0 ? script.length() : end + 2;
+            } else if (current == '\'' || current == '"') {
+                i = appendQuotedSql(script, i, statement);
+            } else if (current == ';') {
+                addSqlStatement(statements, statement);
+                i++;
+            } else {
+                statement.append(current);
+                i++;
+            }
+        }
+        addSqlStatement(statements, statement);
+        return statements;
+    }
+
+    /**
+     * Append a quoted SQL string to the statement and return the index after its closing quote. A
+     * doubled quote inside the string is part of the value.
+     */
+    private static int appendQuotedSql(String script, int start, StringBuilder statement) {
+        char quote = script.charAt(start);
+        statement.append(quote);
+        int i = start + 1;
+        while (i < script.length()) {
+            char current = script.charAt(i);
+            statement.append(current);
+            i++;
+            if (current == quote) {
+                if (i < script.length() && script.charAt(i) == quote) {
+                    statement.append(quote);
+                    i++;
+                } else {
+                    break;
+                }
+            }
+        }
+        return i;
+    }
+
+    private static void addSqlStatement(List<String> statements, StringBuilder statement) {
+        String sql = statement.toString().trim();
+        if (!sql.isEmpty()) {
+            statements.add(sql);
+        }
+        statement.setLength(0);
+    }
+
+    /**
+     * The effective cluster connection configuration while a SQL script is scanned, so that the
+     * settings which are in effect when a job is submitted can be snapshotted for that job. The
+     * baseline is the configuration of the submission options, a {@code RESET} restores it.
+     */
+    private static final class SqlClusterConnectionTracker {
+
+        private final Map<String, List<String>> baseline;
+        private Map<String, List<String>> current;
+        private final List<List<String>> optionsPerJob = new ArrayList<>();
+        private boolean inStatementSet;
+        private boolean statementSetRecorded;
+
+        private SqlClusterConnectionTracker(String others) {
+            baseline = clusterConnectionOptionsByKey(extractClusterConnectionOptions(others));
+            current = new LinkedHashMap<>(baseline);
+        }
+
+        private void set(String option) {
+            current.put(configurationKeyOf(option), Collections.singletonList(option));
+        }
+
+        private void reset(String key) {
+            if (baseline.containsKey(key)) {
+                current.put(key, baseline.get(key));
+            } else {
+                current.remove(key);
+            }
+        }
+
+        private void resetAll() {
+            current = new LinkedHashMap<>(baseline);
+        }
+
+        private void beginStatementSet() {
+            inStatementSet = true;
+            statementSetRecorded = false;
+        }
+
+        private void endStatementSet() {
+            inStatementSet = false;
+            statementSetRecorded = false;
+        }
+
+        private void submit() {
+            if (inStatementSet && statementSetRecorded) {
+                // the update statements of a statement set are submitted as a single job
+                return;
+            }
+            optionsPerJob.add(currentOptions());
+            statementSetRecorded = inStatementSet;
+        }
+
+        private List<String> currentOptions() {
+            List<String> options = new ArrayList<>();
+            current.values().forEach(options::addAll);
+            return options;
+        }
+
+        private List<List<String>> optionsPerJob() {
+            return optionsPerJob;
+        }
     }
 
     /**
@@ -364,6 +507,16 @@ public class FlinkArgsUtils {
         List<String> options = new ArrayList<>();
         optionsByKey.values().forEach(options::addAll);
         return options;
+    }
+
+    /**
+     * Group the cluster connection options by the key they configure, so that a later option for the
+     * same key can replace an earlier one while the order of the options is kept.
+     */
+    private static Map<String, List<String>> clusterConnectionOptionsByKey(List<String> options) {
+        Map<String, List<String>> optionsByKey = new LinkedHashMap<>();
+        collectClusterConnectionOptions(options, optionsByKey);
+        return optionsByKey;
     }
 
     /**

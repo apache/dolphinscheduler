@@ -269,6 +269,40 @@ public class FlinkTaskTest {
     }
 
     @Test
+    public void testCancelApplicationKeepsTheEndpointOfEachJobWithCommentsAndReset() throws Exception {
+        // a comment before the INSERT must not shift the snapshots, and RESET must restore the
+        // endpoint of the submission for the job which follows it
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 11111111111111111111111111111111\n"
+                        + "Job has been submitted with JobID 22222222222222222222222222222222");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setOthers("-Drest.address=default-jm");
+        parameters.setRawScript("/* first job */ SET 'rest.address' = 'cluster-b';\n"
+                + "INSERT INTO t SELECT * FROM s;\n"
+                + "-- back to the default endpoint\n"
+                + "RESET 'rest.address';\n"
+                + "INSERT INTO u SELECT * FROM v;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded(), cancelSucceeded());
+        task.cancelApplication();
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 11111111111111111111111111111111 -Drest.address=cluster-b",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222 -Drest.address=default-jm",
+                String.join(" ", executedCommands.get(1)));
+    }
+
+    @Test
     public void testCancelApplicationCollectsJobIdSubmittedWhileTheClientIsStopped() throws Exception {
         // a multi statement SQL script can submit another job while the client is being stopped, the
         // final snapshot has to contain it
