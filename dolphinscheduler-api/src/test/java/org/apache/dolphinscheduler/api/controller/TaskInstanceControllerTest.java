@@ -30,14 +30,11 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.TaskInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
-
-import java.util.Collections;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
@@ -61,31 +58,23 @@ public class TaskInstanceControllerTest extends AbstractControllerTest {
     @Test
     public void testQueryTaskListPaging() {
 
-        Result<PageInfo<TaskInstance>> result = new Result<>();
         Integer pageNo = 1;
         Integer pageSize = 20;
-        TaskInstance taskInstance = new TaskInstance();
-        taskInstance.setTaskParams("{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
-                + "\"value\":\"abc\",\"sensitive\":true}]}");
-        PageInfo<TaskInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
-        pageInfo.setTotalList(Collections.singletonList(taskInstance));
-        result.setData(pageInfo);
-        result.setCode(Status.SUCCESS.getCode());
-        result.setMsg(Status.SUCCESS.getMsg());
+        PageInfo<TaskInstanceSummaryVO> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Result<PageInfo<TaskInstanceSummaryVO>> mockResult = new Result<>();
+        mockResult.setData(pageInfo);
+        mockResult.setCode(Status.SUCCESS.getCode());
+        mockResult.setMsg(Status.SUCCESS.getMsg());
 
         when(taskInstanceService.queryTaskListPaging(any(), eq(1L), eq(1), eq(""), eq(""), eq(""), any(), eq(""), any(),
                 any(),
                 eq(""), Mockito.any(), eq("192.168.xx.xx"), eq(TaskExecuteType.BATCH), any(), any()))
-                        .thenReturn(result);
-        Result<PageInfo<TaskInstance>> taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "", "", "",
+                        .thenReturn(mockResult);
+        Result<PageInfo<TaskInstanceSummaryVO>> taskResult = taskInstanceController.queryTaskListPaging(null, 1L, 1, "",
+                "", "",
                 "", 1L, "", TaskExecutionStatus.SUCCESS, "192.168.xx.xx", "2020-01-01 00:00:00", "2020-01-02 00:00:00",
                 TaskExecuteType.BATCH, pageNo, pageSize);
         Assertions.assertEquals(Integer.valueOf(Status.SUCCESS.getCode()), taskResult.getCode());
-        PageInfo<TaskInstance> maskedPage = taskResult.getData();
-        Assertions.assertTrue(
-                maskedPage.getTotalList().get(0).getTaskParams().contains(TaskConstants.SENSITIVE_DATA_MASK));
-        Assertions.assertFalse(maskedPage.getTotalList().get(0).getTaskParams().contains("abc"));
-        Assertions.assertTrue(taskInstance.getTaskParams().contains("abc"));
     }
 
     @Disabled
