@@ -76,6 +76,12 @@ public final class Constants {
      */
     public static final String SQL_TASK_ALERT_MAX_CONTENT_BYTES = "sql.task.alert.max.content.bytes";
 
+    /**
+     * sql.task.query.max.rows: this property defines the max rows fetched by the SQL task when the task-level
+     * "limit" parameter is not set.
+     */
+    public static final String SQL_TASK_QUERY_MAX_ROWS = "sql.task.query.max.rows";
+
     public static final String SUDO_ENABLE = "sudo.enable";
 
     public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
