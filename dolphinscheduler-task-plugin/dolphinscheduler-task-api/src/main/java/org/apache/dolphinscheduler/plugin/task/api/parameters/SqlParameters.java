@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.SqlSourceType;
@@ -31,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -38,12 +40,12 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.collect.Lists;
 
-/**
- * Sql/Hql parameter
- */
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class SqlParameters extends AbstractParameters {
 
@@ -131,7 +133,11 @@ public class SqlParameters extends AbstractParameters {
             varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
             return;
         }
-        List<Map<String, String>> sqlResult = getListMapByString(result);
+        // Read numeric tokens directly as strings: a JsonNode round-trip can convert
+        // scientific notation to double and lose precision before OUT type conversion.
+        List<Map<String, String>> sqlResult = JSONUtils.parseObject(result,
+                new TypeReference<List<Map<String, String>>>() {
+                });
         if (CollectionUtils.isEmpty(sqlResult)) {
             return;
         }
@@ -157,7 +163,16 @@ public class SqlParameters extends AbstractParameters {
             // result only one line
             Map<String, String> firstRow = sqlResult.get(0);
             for (Property info : outProperty) {
-                info.setValue(String.valueOf(firstRow.get(info.getProp())));
+                String value = String.valueOf(firstRow.get(info.getProp()));
+                if (info.getType() == DataType.LONG) {
+                    try {
+                        value = Long.toString(new BigDecimal(value).longValueExact());
+                    } catch (NumberFormatException | ArithmeticException e) {
+                        throw new TaskException("Invalid SQL OUT parameter '" + info.getProp()
+                                + "' of type LONG: '" + value + "' must be an integer within the LONG range", e);
+                    }
+                }
+                info.setValue(value);
             }
         }
         varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));

@@ -33,7 +33,7 @@ concurrency:
 jobs:
   paths-filter:
     name: Backend-Path-Filter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
       db-schema: ${{ steps.filter.outputs.db-schema }}
@@ -53,7 +53,7 @@ jobs:
     name: Backend-Build
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         java: [ '8', '11' ]
@@ -71,7 +71,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
         with:
@@ -101,7 +101,7 @@ jobs:
   cluster-test:
     name: ${{ matrix.case.name }}
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       matrix:
@@ -139,7 +139,7 @@ jobs:
   schema-check:
     name: ${{ matrix.case.name }}-${{ matrix.version }}
     needs: [ build ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     strategy:
       matrix:
@@ -165,7 +165,7 @@ jobs:
           /bin/bash ${{ matrix.case.script }} ${{ matrix.version }}
   result:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: [ build, paths-filter, cluster-test, schema-check ]
     if: always()
