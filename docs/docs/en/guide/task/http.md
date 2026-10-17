@@ -22,6 +22,15 @@ This node is used to perform http type tasks and also supports http request vali
 | Verification content    | When the verification condition selects a custom response code, the content contains, and the content does not contain, the verification content is required. |
 | Custom parameter        | It is a user-defined parameter of http part, which will replace the content with `${variable}` in the script.                                                 |
 
+## Response validation
+
+The response body is preserved for all HTTP status codes, including 4xx and 5xx. A missing body is represented as an empty string.
+
+- Default status validation requires HTTP 200; custom status validation requires the configured code.
+- Content-included and content-not-included validation check only the response body, without checking the status code. A 4xx or 5xx response can therefore pass a body check. Both body checks fail for an empty body.
+
+Choose status-code validation when an error status must fail the task. These validation modes are alternatives; selecting a body check does not also enforce HTTP 200.
+
 ## Task Output Parameters
 
 | **Task Parameter** |           **Description**           |

@@ -93,7 +93,7 @@ public class ClasspathSqlScriptParser implements SqlScriptParser {
             // begin to parse sql until;
             List<String> sqlLines = new ArrayList<>();
             sqlLines.add(line);
-            while (!line.endsWith(";")) {
+            while (!line.trim().endsWith(";")) {
                 line = lineNumberReader.readLine();
                 if (line == null) {
                     break;
