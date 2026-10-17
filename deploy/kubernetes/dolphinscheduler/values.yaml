@@ -170,8 +170,12 @@ zookeeper:
     storageClass: "-"
   image:
     registry: docker.io
-    repository: bitnamilegacy/zookeeper
-    tag: 3.9.3-debian-12-r21
+    repository: soldevelo/zookeeper
+    tag: 3.9.6-debian-12-r1
+  # -- Extra environment variables for ZooKeeper. ZooKeeper images since 3.9.4 require ALLOW_EMPTY_PASSWORD instead of ALLOW_ANONYMOUS_LOGIN, which the bundled chart still sets
+  extraEnvVars:
+    - name: ALLOW_EMPTY_PASSWORD
+      value: "yes"
 
 registryEtcd:
   # -- If you want to use Etcd for your registry center, change this value to true. And set zookeeper.enabled to false
@@ -388,6 +392,15 @@ conf:
 
     # -- way to collect applicationId: log, aop
     appId.collect: log
+
+    # -- max rows kept in the SQL task-result alert content, rows beyond this are replaced by an omission marker
+    sql.task.alert.max.rows: 30
+
+    # -- max chars of a single string value kept in the SQL task-result alert content, longer values are truncated with an ellipsis
+    sql.task.alert.max.row.value.length: 100
+
+    # -- max serialized UTF-8 bytes of the SQL task-result alert content, kept below the 65535-byte capacity of the MySQL TEXT column
+    sql.task.alert.max.content.bytes: 60000
 
 common:
   ## Configmap

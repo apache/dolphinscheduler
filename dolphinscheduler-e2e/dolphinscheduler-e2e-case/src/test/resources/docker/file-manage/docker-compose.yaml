@@ -46,34 +46,40 @@ services:
     depends_on:
       s3:
         condition: service_healthy
-      mc:
+      s3-init:
         condition: service_completed_successfully
   s3:
-    image: quay.io/minio/minio:RELEASE.2022-01-25T19-56-04Z
+    image: chrislusf/seaweedfs:4.48
     hostname: s3
-    tty: true
-    stdin_open: true
-    command: server /data --console-address ":9001"
+    command: ["mini", "-dir=/data", "-s3.port=9000"]
     ports:
       - "9000:9000"
     networks:
       - e2e
     environment:
-      MINIO_ROOT_USER: accessKey123
-      MINIO_ROOT_PASSWORD: secretKey123
+      AWS_ACCESS_KEY_ID: accessKey123
+      AWS_SECRET_ACCESS_KEY: secretKey123
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/readyz"]
       interval: 5s
       timeout: 5s
       retries: 120
-  mc:
-    image: quay.io/minio/mc:RELEASE.2022-01-07T06-01-38Z
-    entrypoint: bash
+  s3-init:
+    image: public.ecr.aws/aws-cli/aws-cli:2.37.4
+    environment:
+      AWS_ACCESS_KEY_ID: accessKey123
+      AWS_SECRET_ACCESS_KEY: secretKey123
+      AWS_DEFAULT_REGION: us-east-1
+      AWS_EC2_METADATA_DISABLED: 'true'
     networks:
       - e2e
     command:
-      - -c
-      - mc alias set s3 http://s3:9000 accessKey123 secretKey123 && mc mb s3/dolphinscheduler
+      - --endpoint-url
+      - http://s3:9000
+      - s3api
+      - create-bucket
+      - --bucket
+      - dolphinscheduler
     depends_on:
       s3:
         condition: service_healthy

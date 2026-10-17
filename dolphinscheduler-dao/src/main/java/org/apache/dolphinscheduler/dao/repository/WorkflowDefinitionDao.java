@@ -42,7 +42,9 @@ public interface WorkflowDefinitionDao extends IDao<WorkflowDefinition> {
                                                                     int pageSize,
                                                                     @Nullable String searchVal,
                                                                     int userId,
-                                                                    long projectCode);
+                                                                    long projectCode,
+                                                                    @Nullable String sortField,
+                                                                    @Nullable String sortOrder);
 
     Optional<WorkflowDefinition> queryByCode(long code);
 

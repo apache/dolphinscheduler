@@ -124,6 +124,7 @@
         <aliyun-voice.version>2.1.4</aliyun-voice.version>
         <nashorn-sandbox.version>0.3.2</nashorn-sandbox.version>
         <brace-expansion.version>2.0.1</brace-expansion.version>
+        <minimatch.version>5.1.6</minimatch.version>
         <protoc.version>3.17.3</protoc.version>
         <j2objc.version>1.3</j2objc.version>
         <guice.version>7.0.0</guice.version>
@@ -1023,6 +1024,12 @@
                 <groupId>org.webjars.npm</groupId>
                 <artifactId>brace-expansion</artifactId>
                 <version>${brace-expansion.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.webjars.npm</groupId>
+                <artifactId>minimatch</artifactId>
+                <version>${minimatch.version}</version>
             </dependency>
 
             <dependency>

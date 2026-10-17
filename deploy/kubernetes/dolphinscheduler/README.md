@@ -203,6 +203,9 @@ The paths above match the API and Worker server classpaths. Check the configurat
 | conf.common."resource.storage.type" | string | `"S3"` | resource storage type: HDFS, S3, OSS, GCS, ABS, NONE |
 | conf.common."resource.storage.upload.base.path" | string | `"/dolphinscheduler"` | resource store on HDFS/S3 path, resource file will store to this base path, self configuration, please make sure the directory exists on hdfs and have read write permissions. "/dolphinscheduler" is recommended |
 | conf.common."shell.kill.wait.timeout" | int | `10` | If the shell process is still active after this timeout value (in seconds), then will use kill -9 to kill it |
+| conf.common."sql.task.alert.max.content.bytes" | int | `60000` | max serialized UTF-8 bytes of the SQL task-result alert content, kept below the 65535-byte capacity of the MySQL TEXT column |
+| conf.common."sql.task.alert.max.row.value.length" | int | `100` | max chars of a single string value kept in the SQL task-result alert content, longer values are truncated with an ellipsis |
+| conf.common."sql.task.alert.max.rows" | int | `30` | max rows kept in the SQL task-result alert content, rows beyond this are replaced by an omission marker |
 | conf.common."sudo.enable" | bool | `true` | use sudo or not, if set true, executing user is tenant user and deploy user needs sudo permissions; if set false, executing user is the deploy user and doesn't need sudo permissions |
 | conf.common."support.hive.oneSession" | bool | `false` | Whether hive SQL is executed in the same session |
 | conf.common."task.resource.limit.state" | bool | `false` | Task resource limit state |
@@ -425,10 +428,11 @@ The paths above match the API and Worker server classpaths. Check the configurat
 | worker.tolerations | list | `[]` | Tolerations are appended (excluding duplicates) to pods running with this RuntimeClass during admission, effectively unioning the set of nodes tolerated by the pod and the RuntimeClass. |
 | worker.updateStrategy.type | string | `"RollingUpdate"` |  |
 | zookeeper.enabled | bool | `true` | If not exists external registry, the zookeeper registry will be used by default. |
+| zookeeper.extraEnvVars | list | `[{"name":"ALLOW_EMPTY_PASSWORD","value":"yes"}]` | Extra environment variables for ZooKeeper. ZooKeeper images since 3.9.4 require ALLOW_EMPTY_PASSWORD instead of ALLOW_ANONYMOUS_LOGIN, which the bundled chart still sets |
 | zookeeper.fourlwCommandsWhitelist | string | `"srvr,ruok,wchs,cons"` | A list of comma separated Four Letter Words commands to use |
 | zookeeper.image.registry | string | `"docker.io"` |  |
-| zookeeper.image.repository | string | `"bitnamilegacy/zookeeper"` |  |
-| zookeeper.image.tag | string | `"3.9.3-debian-12-r21"` |  |
+| zookeeper.image.repository | string | `"soldevelo/zookeeper"` |  |
+| zookeeper.image.tag | string | `"3.9.6-debian-12-r1"` |  |
 | zookeeper.persistence.enabled | bool | `false` | Set `zookeeper.persistence.enabled` to true to mount a new volume for internal ZooKeeper |
 | zookeeper.persistence.size | string | `"20Gi"` | PersistentVolumeClaim size |
 | zookeeper.persistence.storageClass | string | `"-"` | ZooKeeper data persistent volume storage class. If set to "-", storageClassName: "", which disables dynamic provisioning |

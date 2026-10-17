@@ -52,10 +52,11 @@ public class WorkflowDefinitionDaoImpl extends BaseDao<WorkflowDefinition, Workf
     @Override
     public PageListingResult<WorkflowDefinition> listingWorkflowDefinition(int pageNumber, int pageSize,
                                                                            String searchVal,
-                                                                           int userId, long projectCode) {
+                                                                           int userId, long projectCode,
+                                                                           String sortField, String sortOrder) {
         Page<WorkflowDefinition> page = new Page<>(pageNumber, pageSize);
         IPage<WorkflowDefinition> processDefinitions =
-                mybatisMapper.queryDefineListPaging(page, searchVal, userId, projectCode);
+                mybatisMapper.queryDefineListPaging(page, searchVal, userId, projectCode, sortField, sortOrder);
 
         return PageListingResult.<WorkflowDefinition>builder()
                 .totalCount(processDefinitions.getTotal())

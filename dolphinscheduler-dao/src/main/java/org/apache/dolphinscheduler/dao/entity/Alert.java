@@ -84,6 +84,12 @@ public class Alert {
     @TableField("alert_type")
     private AlertType alertType;
 
+    /**
+     * Transient — used only for sign generation in idempotent task-result alert inserts.
+     */
+    @TableField(exist = false)
+    private Integer taskInstanceId;
+
     @TableField(exist = false)
     private Map<String, Object> info = new HashMap<>();
 

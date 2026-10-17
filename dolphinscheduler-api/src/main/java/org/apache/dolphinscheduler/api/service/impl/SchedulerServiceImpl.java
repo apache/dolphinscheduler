@@ -129,10 +129,12 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
 
-        // check workflow define release state
-        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode).orElse(null);
-        executorService.checkWorkflowDefinitionValid(projectCode, workflowDefinition, workflowDefinitionCode,
-                workflowDefinition.getVersion());
+        // check workflow definition exists
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
+                .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode));
+        if (projectCode != workflowDefinition.getProjectCode()) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode);
+        }
 
         Schedule scheduleExists =
                 scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
@@ -475,6 +477,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                 workflowDefinitionDao.queryByCode(schedule.getWorkflowDefinitionCode()).orElse(null);
         if (!ReleaseState.ONLINE.equals(workflowDefinition.getReleaseState())) {
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_RELEASE, workflowDefinition.getName());
+        }
+        if (!executorService.checkSubWorkflowDefinitionValid(workflowDefinition)) {
+            throw new ServiceException(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE);
         }
 
         schedule.setReleaseState(ReleaseState.ONLINE);
