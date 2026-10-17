@@ -23,9 +23,6 @@ import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.HasCapabilities;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.WheelInput;
@@ -43,39 +40,7 @@ public class SeaTunnelTaskForm extends TaskNodeForm {
     }
 
     public String script() {
-        WebElement input = editorInput();
-        input.sendKeys(Keys.chord(selectAllKey(), "a"), Keys.ARROW_LEFT);
-        StringBuilder script = new StringBuilder();
-        // Monaco abbreviates a selection spanning several screen-reader pages.
-        // Read native single-line selections to preserve the complete script.
-        while (true) {
-            input.sendKeys(Keys.chord(Keys.SHIFT, Keys.END));
-            String value = input.getDomProperty("value");
-            int start = Integer.parseInt(input.getDomProperty("selectionStart"));
-            int end = Integer.parseInt(input.getDomProperty("selectionEnd"));
-            script.append(value, start, end);
-            input.sendKeys(Keys.END);
-            String before = input.getDomProperty("value");
-            String position = input.getDomProperty("selectionStart");
-            input.sendKeys(Keys.ARROW_RIGHT);
-            if (before.equals(input.getDomProperty("value"))
-                    && position.equals(input.getDomProperty("selectionStart"))) {
-                return script.toString();
-            }
-            script.append('\n');
-        }
-    }
-
-    private Keys selectAllKey() {
-        return ((HasCapabilities) parent().driver()).getCapabilities().getPlatformName().is(Platform.MAC) ? Keys.COMMAND
-                : Keys.CONTROL;
-    }
-
-    private WebElement editorInput() {
-        WebElement editor = WebDriverWaitFactory.createWebDriverWait(parent().driver())
-                .until(ExpectedConditions.elementToBeClickable(By.cssSelector(".n-modal .monaco-editor")));
-        editor.click();
-        return editor.findElement(By.cssSelector("textarea.inputarea"));
+        return new CodeEditor(parent().driver()).content();
     }
 
     public SeaTunnelTaskForm deployMode(String deployMode) {
@@ -84,14 +49,6 @@ public class SeaTunnelTaskForm extends TaskNodeForm {
         WebDriverWaitFactory.createWebDriverWait(parent().driver())
                 .until(ExpectedConditions.elementToBeSelected(input));
         return this;
-    }
-
-    public String deployMode() {
-        return parent().driver().findElements(By.cssSelector(
-                ".n-modal input[type=radio][value=local], .n-modal input[type=radio][value=cluster], "
-                        + ".n-modal input[type=radio][value=client]"))
-                .stream().filter(WebElement::isSelected).map(input -> input.getAttribute("value")).findFirst()
-                .orElse("");
     }
 
     public WorkflowForm cancel() {

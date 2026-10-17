@@ -21,9 +21,7 @@ import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.HasCapabilities;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.WheelInput;
@@ -72,10 +70,7 @@ public class FlinkStreamTaskForm extends TaskNodeForm {
         scrollToControl(editor);
         editor.click();
         WebElement input = editor.findElement(By.cssSelector("textarea.inputarea"));
-        Keys modifier = ((HasCapabilities) parent().driver()).getCapabilities().getPlatformName().is(Platform.MAC)
-                ? Keys.COMMAND
-                : Keys.CONTROL;
-        input.sendKeys(Keys.chord(modifier, "a"), Keys.BACK_SPACE);
+        input.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.BACK_SPACE);
         String[] lines = script.split("\n", -1);
         for (int i = 0; i < lines.length; i++) {
             // Replace automatic indentation, then remove any auto-closed suffix.
@@ -83,7 +78,7 @@ public class FlinkStreamTaskForm extends TaskNodeForm {
                     Keys.chord(Keys.SHIFT, Keys.END), Keys.DELETE);
             if (i + 1 < lines.length) {
                 // Insert a line without accepting Monaco's word suggestions.
-                input.sendKeys(Keys.chord(modifier, Keys.ENTER));
+                input.sendKeys(Keys.chord(Keys.CONTROL, Keys.ENTER));
             }
         }
         return this;

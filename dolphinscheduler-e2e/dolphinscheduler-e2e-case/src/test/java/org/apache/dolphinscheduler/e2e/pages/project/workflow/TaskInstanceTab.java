@@ -69,29 +69,28 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
                 .map(Row::new).collect(Collectors.toList());
     }
 
-    public TaskInstanceTab refresh() {
-        driver.findElements(By.cssSelector(".n-tab-pane .n-button--primary-type")).stream()
-                .filter(WebElement::isDisplayed).findFirst()
-                .orElseThrow(() -> new IllegalStateException("Task search button is not visible")).click();
-        return this;
-    }
-
-    public String logText() {
-        return driver.findElements(By.cssSelector(".logModalRef .n-log pre")).stream()
-                .map(line -> line.getDomProperty("textContent")).collect(Collectors.joining("\n"));
-    }
-
-    public TaskInstanceTab refreshLog() {
-        driver.findElement(By.xpath("//*[contains(@class,'logModalRef')]//*[contains(@class,'n-card-header__extra')]"
-                + "//button[normalize-space(.)='Refresh']")).click();
-        return this;
-    }
-
-    public TaskInstanceTab closeLog() {
-        UiInteraction.click(driver, ".logModalRef .btn-submit");
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".logModalRef")));
-        return this;
+    public String log(String taskName) {
+        boolean stream = "Stream".equals(WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".n-tabs-tab--active")))
+                .getDomAttribute("data-name"));
+        Row instance = WebDriverWaitFactory.createWebDriverWait(driver)
+                .withMessage("Task instance not found: " + taskName)
+                .ignoring(StaleElementReferenceException.class)
+                .until(ignored -> (stream ? streamInstances() : instances()).stream()
+                        .filter(row -> row.taskInstanceName().equals(taskName)).findFirst().orElse(null));
+        // The log button follows the savepoint and stop buttons in the stream table.
+        instance.row.findElement(By.cssSelector("td[data-col-key=operation]"))
+                .findElements(By.cssSelector(".n-button")).get(stream ? 2 : 1).click();
+        try {
+            WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions
+                    .visibilityOfElementLocated(By.cssSelector("[data-modal-ready='true'] .n-log")));
+            return driver.findElements(By.cssSelector(".logModalRef .n-log pre")).stream()
+                    .map(line -> line.getDomProperty("textContent")).collect(Collectors.joining("\n"));
+        } finally {
+            UiInteraction.click(driver, ".logModalRef .btn-submit");
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector(".logModalRef")));
+        }
     }
 
     public boolean isSavepointEnabled(String name) {
@@ -132,14 +131,6 @@ public final class TaskInstanceTab extends NavBarPage implements ProjectDetailPa
 
         public String workflowInstanceName() {
             return row.findElement(By.cssSelector("td[data-col-key=workflowInstanceName]")).getText();
-        }
-
-        public String taskType() {
-            return row.findElement(By.cssSelector("td[data-col-key=taskType]")).getText();
-        }
-
-        public String dryRun() {
-            return row.findElement(By.cssSelector("td[data-col-key=dryRun]")).getText();
         }
 
         public int retryTimes() {

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.FlinkStreamTaskForm;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.task.HttpTaskForm;
@@ -37,14 +38,11 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.interactions.WheelInput;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -55,6 +53,8 @@ import com.google.common.io.Resources;
 @Getter
 @Slf4j
 public final class WorkflowForm {
+
+    private static final String MAIN_GRAPH = ".dag-container .x6-graph-scroller";
 
     private WebDriver driver;
     private final WorkflowSaveDialog saveForm;
@@ -77,12 +77,6 @@ public final class WorkflowForm {
     @SneakyThrows
     @SuppressWarnings("unchecked")
     public <T> T addTask(TaskType type) {
-        return addTask(type, null, null);
-    }
-
-    @SneakyThrows
-    @SuppressWarnings("unchecked")
-    public <T> T addTask(TaskType type, Integer x, Integer y) {
         log.info("Waiting for DAG canvas and task menu: type={}, url={}", type, driver.getCurrentUrl());
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .withMessage("DAG graph has not mounted before adding task " + type)
@@ -99,7 +93,7 @@ public final class WorkflowForm {
         final JavascriptExecutor js = (JavascriptExecutor) driver;
         final String dragAndDrop = String.join("\n",
                 Resources.readLines(Resources.getResource("dragAndDrop.js"), StandardCharsets.UTF_8));
-        js.executeScript(dragAndDrop, task, canvas, x, y);
+        js.executeScript(dragAndDrop, task, canvas);
         WebDriverWaitFactory.createWebDriverWait(driver)
                 .withMessage("Task settings did not open after dragging " + type)
                 .until(ExpectedConditions
@@ -127,15 +121,16 @@ public final class WorkflowForm {
         throw new UnsupportedOperationException("Unknown task type");
     }
 
-    public WebElement getTask(String taskName) {
-        List<WebElement> tasks = WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.visibilityOfAllElementsLocatedBy(
-                        By.cssSelector("svg > g > g[class^='x6-graph-svg-stage'] > g[data-shape^='dag-task']")));
+    public WorkflowForm openTaskCategory(String category) {
+        // The task palette is an accordion; wait until the previous task modal has closed.
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.invisibilityOfElementLocated(By.cssSelector("[data-modal-ready]")));
+        UiInteraction.click(driver, ".task-cate-" + category + " .n-collapse-item__header");
+        return this;
+    }
 
-        WebElement task = tasks.stream()
-                .filter(t -> t.getText().contains(taskName))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No such task: " + taskName));
+    public WebElement getTask(String taskName) {
+        WebElement task = findTask(taskName);
 
         Actions action = new Actions(driver);
         action.doubleClick(task).build().perform();
@@ -143,81 +138,49 @@ public final class WorkflowForm {
         return task;
     }
 
-    public String taskCode(String taskName) {
-        return WebDriverWaitFactory.createWebDriverWait(driver).until(unused -> driver
-                .findElements(By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task']")).stream()
-                .filter(node -> node.findElement(By.xpath("./*[local-name()='text']")).getText()
-                        .equals(taskName))
-                .map(node -> node.getAttribute("data-cell-id"))
-                .findFirst().orElse(null));
-    }
-
-    private WebElement taskLabelInView(String code) {
-        By label = By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task'][data-cell-id='"
-                + code + "'] > text > tspan");
+    public String copyTask(String taskName) {
+        WebElement source = findTask(taskName);
+        Set<String> existing = taskNames();
+        new Actions(driver).contextClick(source).perform();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(
+                By.xpath("//div[contains(@class, 'dag-context-menu')]//button[normalize-space(.)='Copy']")))
+                .click();
         return WebDriverWaitFactory.createWebDriverWait(driver)
+                .withMessage("Copied task did not appear: " + taskName)
+                .until(ignored -> taskNames().stream().filter(name -> !existing.contains(name)).findFirst()
+                        .orElse(null));
+    }
+
+    public List<String> edgeDashArrays() {
+        return driver.findElements(By.cssSelector(MAIN_GRAPH + " g[data-shape='dag-edge']")).stream()
+                .map(edge -> edge.findElements(By.cssSelector("path[stroke-dasharray]")).stream()
+                        .map(path -> path.getAttribute("stroke-dasharray").replace(',', ' ').trim()
+                                .replaceAll("\\s+", " "))
+                        .distinct()
+                        .collect(Collectors.joining(",")))
+                .collect(Collectors.toList());
+    }
+
+    private WebElement findTask(String taskName) {
+        // Match the full title inside the main graph; the minimap renders the same nodes.
+        return WebDriverWaitFactory.createWebDriverWait(driver)
+                .withMessage("No such task: " + taskName)
                 .ignoring(StaleElementReferenceException.class)
-                .ignoring(ElementClickInterceptedException.class)
-                .withMessage("Task label is hidden or its center is covered: " + code).until(unused -> {
-                    WebElement node = ExpectedConditions.elementToBeClickable(label).apply(driver);
-                    if (node == null) {
-                        return null;
-                    }
-                    WebElement scroller = driver.findElement(By.cssSelector(".dag-container .x6-graph-scroller"));
-                    Rectangle view = scroller.getRect();
-                    Rectangle text = node.getRect();
-                    int deltaX = text.x + text.width / 2 - view.x - view.width / 2;
-                    int deltaY = text.y + text.height / 2 - view.y - view.height / 2;
-                    // Center inside the nested scroller, away from its fixed minimap.
-                    if (Math.abs(deltaX) > 2 || Math.abs(deltaY) > 2) {
-                        new Actions(driver)
-                                .scrollFromOrigin(WheelInput.ScrollOrigin.fromElement(scroller), deltaX, deltaY)
-                                .perform();
-                        return null;
-                    }
-                    // Target the rendered text span: the body is covered by this task label.
-                    // Native click scrolls the label into view and rejects an intercepted pointer.
-                    // Reuse this span for Actions so SVG text-container bounds cannot shift the pointer.
-                    node.click();
-                    return node;
-                });
+                .until(ignored -> driver.findElements(By.cssSelector(MAIN_GRAPH + " g[data-shape='dag-task']"))
+                        .stream()
+                        .filter(task -> taskName.equals(title(task)))
+                        .findFirst()
+                        .orElse(null));
     }
 
-    public void openTask(String code) {
-        new Actions(driver).doubleClick(taskLabelInView(code)).perform();
-        // Visible controls still move while their modal is entering or leaving.
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("[data-modal-ready='true'] .input-node-name input")));
+    private Set<String> taskNames() {
+        return driver.findElements(By.cssSelector(MAIN_GRAPH + " g[data-shape='dag-task']")).stream()
+                .map(this::title)
+                .collect(Collectors.toSet());
     }
 
-    public String copyTask(String code) {
-        Set<String> existing = driver
-                .findElements(By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task']")).stream()
-                .map(node -> node.getAttribute("data-cell-id")).collect(Collectors.toSet());
-        new Actions(driver).contextClick(taskLabelInView(code)).perform();
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(By.xpath(
-                "//div[contains(@class, 'dag-context-menu')]//button[normalize-space(.)='Copy']"))).click();
-        return WebDriverWaitFactory.createWebDriverWait(driver).until(unused -> {
-            List<String> added = driver
-                    .findElements(By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-task']")).stream()
-                    .map(node -> node.getAttribute("data-cell-id"))
-                    .filter(id -> !existing.contains(id)).collect(Collectors.toList());
-            return added.size() == 1 ? added.get(0) : null;
-        });
-    }
-
-    public void waitForEdgeStyle(int count, boolean stream) {
-        WebDriverWaitFactory.createWebDriverWait(driver).until(unused -> {
-            List<WebElement> edges =
-                    driver.findElements(By.cssSelector(".dag-container .x6-graph-scroller g[data-shape='dag-edge']"));
-            return edges.size() == count && edges.stream().allMatch(edge -> {
-                List<WebElement> lines = edge.findElements(By.cssSelector("path[stroke-dasharray]"));
-                return !lines.isEmpty() && lines.stream()
-                        .allMatch(line -> line.getAttribute("stroke-dasharray").replace(',', ' ').trim()
-                                .replaceAll("\\s+", " ")
-                                .equals(stream ? "5 5" : "none"));
-            });
-        });
+    private String title(WebElement task) {
+        return task.findElement(By.xpath("./*[local-name()='text']")).getText();
     }
 
     public WorkflowSaveDialog submit() {

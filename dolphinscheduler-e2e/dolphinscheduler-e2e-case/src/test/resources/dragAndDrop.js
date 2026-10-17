@@ -41,19 +41,10 @@ function dispatchEvent(element, event, transferData) {
     }
 }
 
-function simulateHTML5DragAndDrop(element, destination, x, y) {
+function simulateHTML5DragAndDrop(element, destination) {
     const dragStartEvent = createEvent('dragstart');
-    if (x != null && y != null) {
-        dragStartEvent.offsetX = 0;
-        dragStartEvent.offsetY = 0;
-    }
     dispatchEvent(element, dragStartEvent);
     const dropEvent = createEvent('drop');
-    if (x != null && y != null) {
-        const bounds = destination.getBoundingClientRect();
-        dropEvent.clientX = bounds.left + x;
-        dropEvent.clientY = bounds.top + y;
-    }
     dispatchEvent(destination, dropEvent, dragStartEvent.dataTransfer);
     const dragEndEvent = createEvent('dragend');
     dispatchEvent(element, dragEndEvent, dropEvent.dataTransfer);
@@ -61,4 +52,4 @@ function simulateHTML5DragAndDrop(element, destination, x, y) {
 
 const source = arguments[0];
 const destination = arguments[1];
-simulateHTML5DragAndDrop(source, destination, arguments[2], arguments[3]);
+simulateHTML5DragAndDrop(source, destination);

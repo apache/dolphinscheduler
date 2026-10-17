@@ -71,19 +71,7 @@ public final class CodeEditor {
         }
 
         if (!normalized.isEmpty()) {
-            // Clear the clipboard so an unsuccessful copy cannot validate the paste payload.
-            String sentinel = UUID.randomUUID().toString();
-            clipboard(sentinel);
-            new Actions(driver)
-                    .keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL)
-                    .keyDown(Keys.CONTROL).sendKeys("c").keyUp(Keys.CONTROL)
-                    .perform();
-            String actual = WebDriverWaitFactory.createWebDriverWait(driver)
-                    .withMessage("Monaco copy did not populate the clipboard")
-                    .until(ignored -> {
-                        String copied = clipboard(null);
-                        return sentinel.equals(copied) ? null : copied;
-                    }).replace("\r\n", "\n");
+            String actual = copyContent();
             if (!normalized.equals(actual)) {
                 throw new IllegalStateException("Monaco content mismatch: expected characters=" + normalized.length()
                         + ", copied characters=" + actual.length());
@@ -92,6 +80,29 @@ public final class CodeEditor {
         new Actions(driver).sendKeys(Keys.ARROW_RIGHT).perform();
         log.info("Monaco content verified: characters={}", normalized.length());
         return this;
+    }
+
+    public String content() {
+        UiInteraction.click(driver, ".monaco-editor .overflow-guard");
+        String content = copyContent();
+        new Actions(driver).sendKeys(Keys.ARROW_RIGHT).perform();
+        return content;
+    }
+
+    private String copyContent() {
+        // Clear the clipboard so an unsuccessful copy cannot return a stale payload.
+        String sentinel = UUID.randomUUID().toString();
+        clipboard(sentinel);
+        new Actions(driver)
+                .keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL)
+                .keyDown(Keys.CONTROL).sendKeys("c").keyUp(Keys.CONTROL)
+                .perform();
+        return WebDriverWaitFactory.createWebDriverWait(driver)
+                .withMessage("Monaco copy did not populate the clipboard")
+                .until(ignored -> {
+                    String copied = clipboard(null);
+                    return sentinel.equals(copied) ? null : copied;
+                }).replace("\r\n", "\n");
     }
 
     private String clipboard(String value) {
