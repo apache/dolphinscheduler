@@ -826,7 +826,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     @Test
     public void testCheckWorkflowNodeListShouldReportMissingTaskCode() {
         // the workflow-instance update path goes through checkWorkflowNodeList -> transformTask,
-        // the missing task code must be reported as TASK_DEFINE_NOT_EXIST
+        // the missing task code must be reported as an invalid dag naming the missing definitions
         when(processService.transformTask(anyList(), anyList())).thenThrow(
                 new org.apache.dolphinscheduler.service.exceptions.ServiceException(
                         "The task definitions of pre taskCodes: [123451235] do not exist"));
@@ -838,7 +838,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                 () -> workflowDefinitionService.checkWorkflowNodeList(taskRelationJsonWithUnknownPreTaskCode,
                         taskDefinitionLogs));
-        Assertions.assertEquals(Status.TASK_DEFINE_NOT_EXIST.getCode(), exception.getCode());
+        Assertions.assertEquals(Status.WORKFLOW_DAG_IS_INVALID.getCode(), exception.getCode());
         Assertions.assertTrue(exception.getMessage().contains("123451235"));
     }
 
@@ -1070,7 +1070,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                         taskRelationJsonWithUnknownPreTaskCode, taskDefinitionJson, null,
                         WorkflowExecutionTypeEnum.PARALLEL));
 
-        Assertions.assertEquals(Status.TASK_DEFINE_NOT_EXIST.getCode(), exception.getCode());
+        Assertions.assertEquals(Status.WORKFLOW_DAG_IS_INVALID.getCode(), exception.getCode());
         Mockito.verify(processService, Mockito.never())
                 .saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE));
     }

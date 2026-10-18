@@ -427,7 +427,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             if (CollectionUtils.isNotEmpty(missedTaskCodes)) {
                 String taskCodes = StringUtils.join(missedTaskCodes, Constants.COMMA);
                 log.error("Task definitions do not exist, taskCodes:{}.", taskCodes);
-                throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCodes);
+                throw new ServiceException(Status.WORKFLOW_DAG_IS_INVALID,
+                        "the task definitions of taskCodes: [" + taskCodes + "] do not exist");
             }
             List<TaskNode> taskNodeList = processService.transformTask(workflowTaskRelations, taskDefinitionLogs);
             if (taskNodeList.size() != taskRelationList.size()) {
@@ -438,7 +439,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 if (CollectionUtils.isNotEmpty(codes)) {
                     String taskCodes = StringUtils.join(codes, Constants.COMMA);
                     log.error("Task definitions do not exist, taskCodes:{}.", taskCodes);
-                    throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCodes);
+                    throw new ServiceException(Status.WORKFLOW_DAG_IS_INVALID,
+                            "the task definitions of taskCodes: [" + taskCodes + "] do not exist");
                 }
             }
             if (graphHasCycle(taskNodeList)) {
@@ -1002,10 +1004,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             try {
                 taskNodes = processService.transformTask(taskRelationList, taskDefinitionLogsList);
             } catch (org.apache.dolphinscheduler.service.exceptions.ServiceException e) {
-                // transformTask reports task codes referenced by relations but missing in task definitions
-                log.error("Task definitions do not exist, given workflowTaskRelationJson: {}",
-                        workflowTaskRelationJson, e);
-                throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, e.getMessage());
+                // transformTask reports exactly what makes the dag inconsistent, e.g.
+                // task codes referenced by relations but missing in task definitions
+                log.error("Failed to build the workflow dag from the given workflowTaskRelationJson", e);
+                throw new ServiceException(Status.WORKFLOW_DAG_IS_INVALID, e.getMessage());
             }
 
             if (CollectionUtils.isEmpty(taskNodes)) {

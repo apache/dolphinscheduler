@@ -690,7 +690,7 @@ public class WorkflowInstanceServiceTest {
                 .thenReturn(1);
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
         // transformTask rejects the relation referencing a preTaskCode without task definition
-        doThrow(new ServiceException(Status.TASK_DEFINE_NOT_EXIST, "123451235"))
+        doThrow(new ServiceException(Status.WORKFLOW_DAG_IS_INVALID, "123451235"))
                 .when(workflowDefinitionService).checkWorkflowNodeList(Mockito.anyString(), Mockito.anyList());
 
         try (
@@ -700,7 +700,7 @@ public class WorkflowInstanceServiceTest {
                     .when(() -> TaskPluginManager.checkTaskParameters(Mockito.any(), Mockito.any()))
                     .thenReturn(true);
 
-            assertThrowsServiceException(Status.TASK_DEFINE_NOT_EXIST,
+            assertThrowsServiceException(Status.WORKFLOW_DAG_IS_INVALID,
                     () -> workflowInstanceService.updateWorkflowInstance(loginUser, projectCode, 1,
                             taskRelationJson, taskDefinitionJson, "2020-02-21 00:00:00", true, "", "", 0));
         }
