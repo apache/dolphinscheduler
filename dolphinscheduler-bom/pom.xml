@@ -53,7 +53,7 @@
         <jackson.version>2.13.4</jackson.version>
         <protostuff.version>1.7.2</protostuff.version>
         <byte-buddy.version>1.12.11</byte-buddy.version>
-        <logback.version>1.2.11</logback.version>
+        <logback.version>1.2.13</logback.version>
         <hadoop.version>3.2.4</hadoop.version>
         <cron-utils.version>9.1.6</cron-utils.version>
         <h2.version>2.2.220</h2.version>
@@ -69,7 +69,7 @@
         <activation.version>1.1</activation.version>
         <javax-mail>1.6.2</javax-mail>
         <guava.version>31.1-jre</guava.version>
-        <postgresql.version>42.4.4</postgresql.version>
+        <postgresql.version>42.7.14</postgresql.version>
         <hive-jdbc.version>2.3.9</hive-jdbc.version>
         <kyuubi-jdbc.version>1.7.0</kyuubi-jdbc.version>
         <commons-io.version>2.19.0</commons-io.version>
@@ -107,7 +107,7 @@
         <aws-java-sdk-redshift.version>1.12.300</aws-java-sdk-redshift.version>
         <azure-resourcemanager.version>2.21.0</azure-resourcemanager.version>
         <azure-resourcemanager-datafactory.version>1.0.0-beta.19</azure-resourcemanager-datafactory.version>
-        <snowflake-jdbc.version>3.13.29</snowflake-jdbc.version>
+        <snowflake-jdbc.version>3.28.0</snowflake-jdbc.version>
         <google-cloud-storage.version>2.18.0</google-cloud-storage.version>
         <sshd.version>2.8.0</sshd.version>
         <fabric8.client.version>6.0.0</fabric8.client.version>
