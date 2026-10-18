@@ -36,6 +36,8 @@ import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
@@ -43,13 +45,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -375,6 +387,107 @@ class SqlTaskTest {
         Assertions.assertTrue(
                 cause.getMessage().contains("duplicate column name"),
                 "TaskException message should mention duplicate column name");
+    }
+
+    @Test
+    void testResultProcess_LogsDisplayRowsWhileReadingResultSet() throws Exception {
+        ResultSet mockResultSet = mockResultSetWithRows(3);
+        ListAppender<ILoggingEvent> listAppender = attachListAppenderToSqlTaskLogger();
+        List<String> logsAtResultSetExhaustion = new ArrayList<>();
+        AtomicInteger nextInvocations = new AtomicInteger();
+        when(mockResultSet.next()).thenAnswer(invocation -> {
+            if (nextInvocations.incrementAndGet() <= 3) {
+                return true;
+            }
+            logsAtResultSetExhaustion.addAll(listAppender.list.stream()
+                    .map(ILoggingEvent::getFormattedMessage)
+                    .collect(Collectors.toList()));
+            return false;
+        });
+
+        try {
+            Method resultProcessMethod = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+            resultProcessMethod.setAccessible(true);
+
+            String result = (String) resultProcessMethod.invoke(sqlTask, mockResultSet);
+
+            // all rows are kept in the task result
+            Assertions.assertEquals(3, StringUtils.countMatches(result, "\"id\":"));
+
+            // all rows should already be logged once the result set is exhausted,
+            // i.e. display rows are logged while reading instead of after buffering
+            long displayedRows = logsAtResultSetExhaustion.stream()
+                    .filter(message -> message.startsWith("row "))
+                    .count();
+            Assertions.assertEquals(3, displayedRows);
+        } finally {
+            detachListAppenderFromSqlTaskLogger(listAppender);
+        }
+    }
+
+    @Test
+    void testResultProcess_DisplayRowsLimit_LogsOnlyFirstRows() throws Exception {
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams("{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\",\"displayRows\":2}");
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+        SqlTask task = new SqlTask(ctx);
+
+        ResultSet mockResultSet = mockResultSetWithRows(5);
+        when(mockResultSet.next()).thenReturn(true, true, true, true, true, false);
+
+        ListAppender<ILoggingEvent> listAppender = attachListAppenderToSqlTaskLogger();
+
+        try {
+            Method resultProcessMethod = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+            resultProcessMethod.setAccessible(true);
+
+            String result = (String) resultProcessMethod.invoke(task, mockResultSet);
+
+            // all rows are kept in the task result
+            Assertions.assertEquals(5, StringUtils.countMatches(result, "\"id\":"));
+
+            // only the first displayRows rows are logged
+            List<String> messages = listAppender.list.stream()
+                    .map(ILoggingEvent::getFormattedMessage)
+                    .collect(Collectors.toList());
+            Assertions.assertTrue(messages.stream().anyMatch(message -> message.startsWith("row 1 :")),
+                    "row 1 should be logged");
+            Assertions.assertTrue(messages.stream().anyMatch(message -> message.startsWith("row 2 :")),
+                    "row 2 should be logged");
+            Assertions.assertFalse(messages.stream().anyMatch(message -> message.startsWith("row 3 :")),
+                    "row 3 should not be logged since displayRows is 2");
+        } finally {
+            detachListAppenderFromSqlTaskLogger(listAppender);
+        }
+    }
+
+    private ResultSet mockResultSetWithRows(int rowCount) throws Exception {
+        ResultSet mockResultSet = mock(ResultSet.class);
+        ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+
+        when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+        when(mockMetaData.getColumnCount()).thenReturn(2);
+        when(mockMetaData.getColumnLabel(1)).thenReturn("id");
+        when(mockMetaData.getColumnLabel(2)).thenReturn("name");
+        when(mockResultSet.getObject(1)).thenReturn(IntStream.rangeClosed(1, rowCount).boxed().toArray());
+        when(mockResultSet.getObject(2))
+                .thenReturn(IntStream.rangeClosed(1, rowCount).mapToObj(i -> "name" + i).toArray());
+
+        return mockResultSet;
+    }
+
+    private ListAppender<ILoggingEvent> attachListAppenderToSqlTaskLogger() {
+        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+        listAppender.start();
+        Logger sqlTaskLogger = (Logger) LoggerFactory.getLogger(SqlTask.class);
+        sqlTaskLogger.addAppender(listAppender);
+        return listAppender;
+    }
+
+    private void detachListAppenderFromSqlTaskLogger(ListAppender<ILoggingEvent> listAppender) {
+        Logger sqlTaskLogger = (Logger) LoggerFactory.getLogger(SqlTask.class);
+        sqlTaskLogger.detachAppender(listAppender);
+        listAppender.stop();
     }
 
     @Test

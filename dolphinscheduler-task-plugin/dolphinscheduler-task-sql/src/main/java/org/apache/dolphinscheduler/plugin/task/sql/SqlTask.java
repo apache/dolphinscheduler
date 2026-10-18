@@ -269,21 +269,23 @@ public class SqlTask extends AbstractTask {
                 }
             }
 
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
+                    : TaskConstants.DEFAULT_DISPLAY_ROWS;
+            // The total row count is unknown before the result set is fully read, so log the
+            // configured cap here and stream the first displayRows rows while reading instead
+            // of buffering everything first and traversing the array a second time.
+            log.info("display sql result up to {} rows as follows:", displayRows);
+            int rowNumber = 0;
             while (resultSet.next()) {
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
                 for (int i = 1; i <= num; i++) {
                     mapOfColValues.set(columnLabels[i - 1], JSONUtils.toJsonNode(resultSet.getObject(i)));
                 }
                 resultJSONArray.add(mapOfColValues);
-            }
-
-            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
-                    : TaskConstants.DEFAULT_DISPLAY_ROWS;
-            displayRows = Math.min(displayRows, resultJSONArray.size());
-            log.info("display sql result {} rows as follows:", displayRows);
-            for (int i = 0; i < displayRows; i++) {
-                String row = JSONUtils.toJsonString(resultJSONArray.get(i));
-                log.info("row {} : {}", i + 1, row);
+                rowNumber++;
+                if (rowNumber <= displayRows) {
+                    log.info("row {} : {}", rowNumber, JSONUtils.toJsonString(mapOfColValues));
+                }
             }
         }
 

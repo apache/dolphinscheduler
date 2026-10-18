@@ -44,6 +44,18 @@
             <artifactId>dolphinscheduler-datasource-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <!--
+                    slf4j-reload4j would compete with logback-classic (pulled in via
+                    dolphinscheduler-common) as the SLF4J binding on the test classpath,
+                    and reload4j wins by classpath order. Exclude it so logback is the
+                    only binding and the log assertions in SqlTaskTest are deterministic.
+                -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -51,6 +63,16 @@
             <artifactId>dolphinscheduler-common</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+        </dependency>
+        <!--
+            Explicit test-scope SLF4J binding so the log assertions in SqlTaskTest
+            are deterministic (see the exclusion on dolphinscheduler-datasource-api).
+        -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.11</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
