@@ -385,23 +385,41 @@ public class SqlTask extends AbstractTask {
     private String limitAlertContent(ArrayNode resultJSONArray) {
         int totalRows = resultJSONArray.size();
 
-        // Serialize each kept row once, so dropping tail rows never re-serializes the rows.
+        // Serialize each kept row once and track the running UTF-8 byte size, so the budget
+        // check on every dropped row is O(1) instead of rebuilding and re-encoding the whole
+        // content (which would turn the drop loop into O(rows^2)).
         List<String> serializedRows = new ArrayList<>(Math.min(totalRows, alertMaxRows));
+        int rowsBytes = 0;
         for (int i = 0; i < totalRows && i < alertMaxRows; i++) {
-            serializedRows.add(JSONUtils.toJsonString(limitRowValues(resultJSONArray.get(i))));
+            String rowJson = JSONUtils.toJsonString(limitRowValues(resultJSONArray.get(i)));
+            serializedRows.add(rowJson);
+            rowsBytes += rowJson.getBytes(StandardCharsets.UTF_8).length;
         }
 
         int omittedRows = totalRows - serializedRows.size();
-        while (!serializedRows.isEmpty()) {
-            String content = buildAlertContent(serializedRows, omittedRows);
-            if (content.getBytes(StandardCharsets.UTF_8).length <= alertMaxContentBytes) {
-                return content;
-            }
-            serializedRows.remove(serializedRows.size() - 1);
+        while (!serializedRows.isEmpty()
+                && contentBytes(rowsBytes, serializedRows.size(), omittedRows) > alertMaxContentBytes) {
+            int last = serializedRows.size() - 1;
+            rowsBytes -= serializedRows.remove(last).getBytes(StandardCharsets.UTF_8).length;
             omittedRows++;
         }
-        // The budget cannot hold any data row, fall back to the marker-only content.
         return buildAlertContent(serializedRows, omittedRows);
+    }
+
+    /**
+     * UTF-8 byte size of the alert content that buildAlertContent produces from the kept rows
+     * and the omission marker, i.e. "[" + rows joined by "," + ("," + marker)? + "]".
+     */
+    private int contentBytes(int rowsBytes, int rowCount, int omittedRows) {
+        int bytes = 2; // '[' and ']'
+        if (rowCount > 0) {
+            bytes += rowsBytes + rowCount - 1; // the rows plus their ',' separators
+        }
+        if (omittedRows > 0) {
+            bytes += (rowCount > 0 ? 1 : 0)
+                    + JSONUtils.toJsonString(createOmissionMarker(omittedRows)).getBytes(StandardCharsets.UTF_8).length;
+        }
+        return bytes;
     }
 
     /**
