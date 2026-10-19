@@ -34,6 +34,10 @@ Spark task type for executing Spark application. When executing the Spark task, 
 | Yarn queue                 | Set the yarn queue, use `default` queue by default.                                                                                |
 | Main program parameters    | Set the input parameters of the Spark program and support the substitution of custom parameter variables.                          |
 | Optional parameters        | Set the spark command options, such as `--jars`, `--files`,` --archives`, `--conf`.                                                |
+| PyFiles                    | Select `.py`/`.zip`/`.egg` files from the Resource Center to distribute to executors (added to PYTHONPATH). Only for PYTHON program type. |
+| Archives                   | Select `.tar`/`.zip`/`.tgz` archives from the Resource Center to distribute to executors.                                        |
+| Principal                  | Kerberos principal for secured Hadoop clusters, e.g. `user@REALM`. Must be paired with Keytab.                                   |
+| Keytab                     | Kerberos keytab file (from the Resource Center). Must be paired with Principal.                                                   |
 | Resource                   | Appoint resource files in the `Resource` if parameters refer to them.                                                              |
 | Custom parameter           | It is a local user-defined parameter for Spark, and will replace the content with `${variable}` in the script.                     |
 | Predecessor task           | Selecting a predecessor task for the current task, will set the selected predecessor task as upstream of the current task.         |

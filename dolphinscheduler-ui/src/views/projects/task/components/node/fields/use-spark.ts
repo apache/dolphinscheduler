@@ -14,8 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { queryResourceList } from '@/service/modules/resources'
+import { useTaskNodeStore } from '@/store/project/task-node'
+import utils from '@/utils'
 import {
   useCustomParams,
   useDeployMode,
@@ -29,10 +32,25 @@ import {
   useResources,
   useYarnQueue
 } from '.'
-import type { IJsonItem } from '../types'
+import type { IJsonItem, IResource } from '../types'
 
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
+  const taskStore = useTaskNodeStore()
+  const resourcesOptions = ref<IResource[]>([])
+  const getResources = async () => {
+    if (taskStore.resources.length) {
+      resourcesOptions.value = taskStore.resources
+      return
+    }
+    const res = await queryResourceList({ type: 'FILE', fullName: '' })
+    utils.removeUselessChildren(res)
+    resourcesOptions.value = res || []
+    taskStore.updateResource(res)
+  }
+  onMounted(() => {
+    getResources()
+  })
   const mainClassSpan = computed(() =>
     model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
   )
@@ -48,6 +66,8 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const resourcesRequired = ref(
     model.programType === 'SQL' && model.sqlExecutionType === 'FILE'
   )
+
+  const pyFilesSpan = computed(() => (model.programType === 'PYTHON' ? 24 : 0))
 
   const resourcesLimit = computed(() =>
     model.programType === 'SQL' && model.sqlExecutionType === 'FILE' ? 1 : -1
@@ -87,6 +107,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         'on-update:value': () => {
           model.mainJar = null
           model.mainClass = ''
+          model.pyFiles = []
         }
       }
     },
@@ -184,6 +205,86 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       props: {
         type: 'textarea',
         placeholder: t('project.node.option_parameters_tips')
+      }
+    },
+    {
+      type: 'tree-select',
+      field: 'pyFiles',
+      span: pyFilesSpan,
+      name: t('project.node.py_files'),
+      options: resourcesOptions,
+      props: {
+        multiple: true,
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        filterable: true,
+        clearFilterAfterSelect: false,
+        checkStrategy: 'child',
+        placeholder: t('project.node.py_files_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      }
+    },
+    {
+      type: 'tree-select',
+      field: 'archives',
+      span: 24,
+      name: t('project.node.archives'),
+      options: resourcesOptions,
+      props: {
+        multiple: true,
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        filterable: true,
+        clearFilterAfterSelect: false,
+        checkStrategy: 'child',
+        placeholder: t('project.node.archives_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      }
+    },
+    {
+      type: 'input',
+      field: 'principal',
+      span: 24,
+      name: t('project.node.principal'),
+      props: {
+        placeholder: t('project.node.principal_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        validator(validate: any, value: string) {
+          if (value && !model.keytab) {
+            return new Error(t('project.node.principal_keytab_pair_tips'))
+          }
+        }
+      }
+    },
+    {
+      type: 'tree-select',
+      field: 'keytab',
+      span: 24,
+      name: t('project.node.keytab'),
+      options: resourcesOptions,
+      props: {
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        filterable: true,
+        checkStrategy: 'child',
+        placeholder: t('project.node.keytab_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      },
+      validate: {
+        trigger: ['blur'],
+        validator(validate: any, value: string) {
+          if (value && !model.principal) {
+            return new Error(t('project.node.principal_keytab_pair_tips'))
+          }
+        }
       }
     },
     useResources(24, resourcesRequired, resourcesLimit),

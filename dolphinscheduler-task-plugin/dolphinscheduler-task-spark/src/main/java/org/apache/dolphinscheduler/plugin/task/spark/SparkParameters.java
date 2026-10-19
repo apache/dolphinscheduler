@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.plugin.task.spark;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,6 +88,26 @@ public class SparkParameters extends AbstractParameters {
     private String others;
 
     /**
+     * --py-files .py/.zip/.egg files added to PYTHONPATH for the driver and executors
+     */
+    private List<ResourceInfo> pyFiles;
+
+    /**
+     * --archives archives (.tar/.zip/.tgz) distributed to executors
+     */
+    private List<ResourceInfo> archives;
+
+    /**
+     * --principal Kerberos principal, e.g. user@REALM
+     */
+    private String principal;
+
+    /**
+     * --keytab Kerberos keytab file
+     */
+    private ResourceInfo keytab;
+
+    /**
      * program type
      * 0 JAVA,1 SCALA,2 PYTHON,3 SQL
      */
@@ -116,13 +138,33 @@ public class SparkParameters extends AbstractParameters {
          * (1) When ProgramType is SQL, rawScript cannot be empty.
          * (2) When ProgramType is Java/Scala/Python, mainJar cannot be empty.
          */
-        return programType != null && (mainJar != null || rawScript != null);
+        boolean baseValid = programType != null && (mainJar != null || rawScript != null);
+        /**
+         * Kerberos principal and keytab must be configured together: either both empty or both set.
+         */
+        boolean hasPrincipal = StringUtils.isNotBlank(principal);
+        boolean hasKeytab = keytab != null && StringUtils.isNotBlank(keytab.getResourceName());
+        boolean kerberosValid = hasPrincipal == hasKeytab;
+        return baseValid && kerberosValid;
     }
 
     @Override
     public List<ResourceInfo> getResourceFilesList() {
         if (mainJar != null && !resourceList.contains(mainJar)) {
             resourceList.add(mainJar);
+        }
+        if (pyFiles != null) {
+            pyFiles.stream()
+                    .filter(pyFile -> pyFile != null && !resourceList.contains(pyFile))
+                    .forEach(resourceList::add);
+        }
+        if (archives != null) {
+            archives.stream()
+                    .filter(archive -> archive != null && !resourceList.contains(archive))
+                    .forEach(resourceList::add);
+        }
+        if (keytab != null && !resourceList.contains(keytab)) {
+            resourceList.add(keytab);
         }
         return resourceList;
     }
