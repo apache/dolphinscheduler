@@ -65,6 +65,7 @@ export default defineComponent({
     const { t } = useI18n()
     return (
       <Modal
+        class='dialog-create-directory'
         show={this.$props.show}
         title={t('resource.file.create_folder')}
         onCancel={this.hideModal}
