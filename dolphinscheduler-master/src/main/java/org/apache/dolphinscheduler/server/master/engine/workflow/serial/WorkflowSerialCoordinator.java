@@ -65,10 +65,9 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
     @Autowired
     private SerialCommandPriorityHandler serialCommandPriorityHandler;
 
-    // Desired lifecycle state; a canceled thread must finish before a requested restart.
     private volatile boolean flag = false;
 
-    private CoordinatorThread internalThread;
+    private Thread internalThread;
 
     private static final int DEFAULT_FETCH_SIZE = 1000;
 
@@ -80,53 +79,28 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
         if (flag) {
             throw new IllegalStateException("WorkflowSerialCoordinator is already started");
         }
-        flag = true;
-        if (internalThread == null) {
-            startInternalThread();
+        if (internalThread != null) {
+            throw new IllegalStateException("InternalThread is already started");
         }
-        // A canceled run may still be inside JDBC. Its finally block starts the replacement.
-    }
-
-    private void startInternalThread() {
-        internalThread = new CoordinatorThread();
+        flag = true;
+        internalThread = new BaseDaemonThread(this::doStart) {
+        };
+        internalThread.setName("WorkflowSerialCoordinator-Thread");
         internalThread.start();
         log.info("WorkflowSerialCoordinator started...");
     }
 
-    private final class CoordinatorThread extends BaseDaemonThread {
-
-        private volatile boolean running = true;
-
-        private CoordinatorThread() {
-            super("WorkflowSerialCoordinator-Thread");
-        }
-
-        @Override
-        public void run() {
-            try {
-                doStart(this);
-            } finally {
-                synchronized (WorkflowSerialCoordinator.this) {
-                    internalThread = null;
-                    if (flag) {
-                        startInternalThread();
-                    }
-                }
-            }
-        }
-    }
-
-    private void doStart(CoordinatorThread run) {
-        while (run.running) {
+    private void doStart() {
+        while (flag) {
             try {
                 final StopWatch workflowSerialCoordinatorRoundCost = StopWatch.createStarted();
                 final List<SerialCommandsGroup> serialCommandsGroups = fetchSerialCommands();
-                for (SerialCommandsGroup serialCommandsGroup : serialCommandsGroups) {
-                    if (!run.running) {
-                        return;
+                // Fetching or handling a group may outlive a stop request; check before handling the next group.
+                serialCommandsGroups.forEach(serialCommandsGroup -> {
+                    if (flag) {
+                        handleSerialCommand(serialCommandsGroup);
                     }
-                    handleSerialCommand(serialCommandsGroup);
-                }
+                });
                 log.debug("WorkflowSerialCoordinator handled SerialCommandsGroup size: {}, cost: {}/ms ",
                         serialCommandsGroups.size(),
                         workflowSerialCoordinatorRoundCost.getDuration().toMillis());
@@ -134,7 +108,7 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
                 log.error("WorkflowSerialCoordinator error", e);
             } finally {
                 // sleep 5s
-                if (run.running) {
+                if (flag) {
                     ThreadUtils.sleep(TimeUnit.SECONDS.toMillis(DEFAULT_FETCH_INTERVAL_SECONDS));
                 }
             }
@@ -202,19 +176,34 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
     }
 
     @Override
-    public synchronized void close() {
-        if (!flag) {
-            log.warn("WorkflowSerialCoordinator is already closed");
-            return;
-        }
+    public synchronized void requestStop() {
         flag = false;
-        try {
-            if (internalThread != null) {
-                internalThread.running = false;
-                internalThread.interrupt();
+        if (internalThread != null) {
+            internalThread.interrupt();
+        }
+    }
+
+    @Override
+    public synchronized void close() {
+        if (Thread.currentThread() == internalThread) {
+            throw new IllegalStateException("WorkflowSerialCoordinator cannot close its own worker thread");
+        }
+        // A prior stop request does not mean the worker has finished.
+        requestStop();
+        boolean interrupted = false;
+        if (internalThread != null) {
+            // Keep start() waiting until the old worker has finished, including any in-flight JDBC call.
+            while (internalThread.isAlive()) {
+                try {
+                    internalThread.join();
+                } catch (InterruptedException ex) {
+                    interrupted = true;
+                }
             }
-        } catch (Exception ex) {
-            log.error("Close internalThread failed", ex);
+            internalThread = null;
+        }
+        if (interrupted) {
+            Thread.currentThread().interrupt();
         }
         log.info("WorkflowSerialCoordinator closed");
     }

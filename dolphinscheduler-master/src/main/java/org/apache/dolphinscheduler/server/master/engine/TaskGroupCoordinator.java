@@ -77,10 +77,9 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    // Desired lifecycle state; a canceled thread must finish before a requested restart.
     private volatile boolean flag = false;
 
-    private CoordinatorThread internalThread;
+    private Thread internalThread;
 
     private static final int DEFAULT_LIMIT = 1000;
 
@@ -89,40 +88,15 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         if (flag) {
             throw new IllegalStateException("TaskGroupCoordinator is already started");
         }
-        flag = true;
-        if (internalThread == null) {
-            startInternalThread();
+        if (internalThread != null) {
+            throw new IllegalStateException("InternalThread is already started");
         }
-        // A canceled run may still be inside JDBC. Its finally block starts the replacement.
-    }
-
-    private void startInternalThread() {
-        internalThread = new CoordinatorThread();
+        flag = true;
+        internalThread = new BaseDaemonThread(this::doStart) {
+        };
+        internalThread.setName("TaskGroupCoordinator-Thread");
         internalThread.start();
         log.info("TaskGroupCoordinator started...");
-    }
-
-    private final class CoordinatorThread extends BaseDaemonThread {
-
-        private volatile boolean running = true;
-
-        private CoordinatorThread() {
-            super("TaskGroupCoordinator-Thread");
-        }
-
-        @Override
-        public void run() {
-            try {
-                doStart(this);
-            } finally {
-                synchronized (TaskGroupCoordinator.this) {
-                    internalThread = null;
-                    if (flag) {
-                        startInternalThread();
-                    }
-                }
-            }
-        }
     }
 
     @VisibleForTesting
@@ -130,29 +104,29 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         return flag;
     }
 
-    private void doStart(CoordinatorThread run) {
-        pauseBeforeStart();
+    private void doStart() {
+        // Sleep 1 minutes here to make sure the previous task group slot has been released.
+        // This step is not necessary, since the wakeup operation is idempotent, but we can avoid confusion warning.
+        ThreadUtils.sleep(TimeUnit.MINUTES.toMillis(1));
 
-        while (run.running) {
+        while (flag) {
             try {
                 final StopWatch taskGroupCoordinatorRoundCost = StopWatch.createStarted();
 
-                if (!run.running) {
+                // A database call may outlive a stop request; check flag before starting the next phase.
+                amendTaskGroupUseSize();
+                if (!flag) {
                     return;
                 }
-                amendTaskGroupUseSize(run);
-                if (!run.running) {
+                amendTaskGroupQueueStatus();
+                if (!flag) {
                     return;
                 }
-                amendTaskGroupQueueStatus(run);
-                if (!run.running) {
+                dealWithForceStartTaskGroupQueue();
+                if (!flag) {
                     return;
                 }
-                dealWithForceStartTaskGroupQueue(run);
-                if (!run.running) {
-                    return;
-                }
-                dealWithWaitingTaskGroupQueue(run);
+                dealWithWaitingTaskGroupQueue();
 
                 taskGroupCoordinatorRoundCost.stop();
                 log.debug("TaskGroupCoordinator round cost: {}/ms", taskGroupCoordinatorRoundCost.getTime());
@@ -160,37 +134,31 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 log.error("TaskGroupCoordinator error", e);
             } finally {
                 // sleep 5s
-                if (run.running) {
+                if (flag) {
                     ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5);
                 }
             }
         }
     }
 
-    @VisibleForTesting
-    void pauseBeforeStart() {
-        // Sleep 1 minutes here to make sure the previous task group slot has been released.
-        // This step is not necessary, since the wakeup operation is idempotent, but we can avoid confusion warning.
-        ThreadUtils.sleep(TimeUnit.MINUTES.toMillis(1));
-    }
-
     /**
      * Make sure the TaskGroup useSize is equal to the TaskGroupQueue which status is {@link TaskGroupQueueStatus#ACQUIRE_SUCCESS} and forceStart is {@link org.apache.dolphinscheduler.common.enums.Flag#NO}.
      */
-    private void amendTaskGroupUseSize(CoordinatorThread run) {
+    private void amendTaskGroupUseSize() {
         // The TaskGroup useSize should equal to the TaskGroupQueue which inQueue is YES and forceStart is NO
         List<TaskGroup> taskGroups = taskGroupDao.queryAllTaskGroups();
-        if (!run.running || CollectionUtils.isEmpty(taskGroups)) {
+        if (CollectionUtils.isEmpty(taskGroups)) {
             return;
         }
         StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
 
         for (TaskGroup taskGroup : taskGroups) {
-            if (!run.running) {
+            if (!flag) {
                 return;
             }
             int actualUseSize = taskGroupQueueDao.countUsingTaskGroupQueueByGroupId(taskGroup.getId());
-            if (!run.running) {
+            // The query may finish after a stop request; do not start the update in that case.
+            if (!flag) {
                 return;
             }
             if (taskGroup.getUseSize() == actualUseSize) {
@@ -208,17 +176,17 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     /**
      * Clear the TaskGroupQueue when the related {@link TaskInstance} is not exist or status is finished.
      */
-    private void amendTaskGroupQueueStatus(CoordinatorThread run) {
+    private void amendTaskGroupQueueStatus() {
         int minTaskGroupQueueId = -1;
         int limit = DEFAULT_LIMIT;
         StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
-        while (run.running) {
+        while (flag) {
             List<TaskGroupQueue> taskGroupQueues =
                     taskGroupQueueDao.queryInQueueTaskGroupQueue(minTaskGroupQueueId, limit);
-            if (!run.running || CollectionUtils.isEmpty(taskGroupQueues)) {
+            if (!flag || CollectionUtils.isEmpty(taskGroupQueues)) {
                 break;
             }
-            amendTaskGroupQueueStatus(taskGroupQueues, run);
+            amendTaskGroupQueueStatus(taskGroupQueues);
             if (taskGroupQueues.size() < limit) {
                 break;
             }
@@ -230,7 +198,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     /**
      * Clear the TaskGroupQueue when the related {@link TaskInstance} is not exist or status is finished.
      */
-    private void amendTaskGroupQueueStatus(List<TaskGroupQueue> taskGroupQueues, CoordinatorThread run) {
+    private void amendTaskGroupQueueStatus(List<TaskGroupQueue> taskGroupQueues) {
         final List<Integer> taskInstanceIds = taskGroupQueues.stream()
                 .map(TaskGroupQueue::getTaskId)
                 .collect(Collectors.toList());
@@ -239,7 +207,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 .collect(Collectors.toMap(TaskInstance::getId, Function.identity()));
 
         for (TaskGroupQueue taskGroupQueue : taskGroupQueues) {
-            if (!run.running) {
+            if (!flag) {
                 return;
             }
             int taskId = taskGroupQueue.getTaskId();
@@ -260,7 +228,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         }
     }
 
-    private void dealWithForceStartTaskGroupQueue(CoordinatorThread run) {
+    private void dealWithForceStartTaskGroupQueue() {
         // Find the force start task group queue(Which is inQueue and forceStart is YES)
         // Notify the related waiting task instance
         // Set the taskGroupQueue status to RELEASE and remove it from queue
@@ -268,13 +236,13 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         int minTaskGroupQueueId = -1;
         int limit = DEFAULT_LIMIT;
         StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
-        while (run.running) {
+        while (flag) {
             final List<TaskGroupQueue> taskGroupQueues =
                     taskGroupQueueDao.queryWaitNotifyForceStartTaskGroupQueue(minTaskGroupQueueId, limit);
-            if (!run.running || CollectionUtils.isEmpty(taskGroupQueues)) {
+            if (!flag || CollectionUtils.isEmpty(taskGroupQueues)) {
                 break;
             }
-            dealWithForceStartTaskGroupQueue(taskGroupQueues, run);
+            dealWithForceStartTaskGroupQueue(taskGroupQueues);
             if (taskGroupQueues.size() < limit) {
                 break;
             }
@@ -284,12 +252,12 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 taskGroupCoordinatorRoundTimeCost.getTime());
     }
 
-    private void dealWithForceStartTaskGroupQueue(List<TaskGroupQueue> taskGroupQueues, CoordinatorThread run) {
+    private void dealWithForceStartTaskGroupQueue(List<TaskGroupQueue> taskGroupQueues) {
         // Find the force start task group queue(Which is inQueue and forceStart is YES)
         // Notify the related waiting task instance
         // Set the taskGroupQueue status to RELEASE and remove it from queue
         for (final TaskGroupQueue taskGroupQueue : taskGroupQueues) {
-            if (!run.running) {
+            if (!flag) {
                 return;
             }
             try {
@@ -336,18 +304,18 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         return notified;
     }
 
-    private void dealWithWaitingTaskGroupQueue(CoordinatorThread run) {
+    private void dealWithWaitingTaskGroupQueue() {
         // Find the TaskGroup which usage < maxSize.
         // Find the highest priority inQueue task group queue(Which is inQueue and status is Waiting and force start is
         // NO) belong to the
         // task group.
         List<TaskGroup> taskGroups = taskGroupDao.queryAvailableTaskGroups();
-        if (!run.running || CollectionUtils.isEmpty(taskGroups)) {
+        if (CollectionUtils.isEmpty(taskGroups)) {
             log.debug("There is no available task group");
             return;
         }
         for (TaskGroup taskGroup : taskGroups) {
-            if (!run.running) {
+            if (!flag) {
                 return;
             }
             int availableSize = taskGroup.getGroupSize() - taskGroup.getUseSize();
@@ -362,12 +330,12 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                             .filter(taskGroupQueue -> TaskGroupQueueStatus.WAIT_QUEUE == taskGroupQueue.getStatus())
                             .limit(availableSize)
                             .collect(Collectors.toList());
-            if (!run.running || CollectionUtils.isEmpty(taskGroupQueues)) {
+            if (CollectionUtils.isEmpty(taskGroupQueues)) {
                 log.debug("There is no waiting task group queue for task group {}", taskGroup.getName());
                 continue;
             }
             for (TaskGroupQueue taskGroupQueue : taskGroupQueues) {
-                if (!run.running) {
+                if (!flag) {
                     return;
                 }
                 try {
@@ -580,19 +548,34 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     }
 
     @Override
-    public synchronized void close() {
-        if (!flag) {
-            log.warn("TaskGroupCoordinator is already closed");
-            return;
-        }
+    public synchronized void requestStop() {
         flag = false;
-        try {
-            if (internalThread != null) {
-                internalThread.running = false;
-                internalThread.interrupt();
+        if (internalThread != null) {
+            internalThread.interrupt();
+        }
+    }
+
+    @Override
+    public synchronized void close() {
+        if (Thread.currentThread() == internalThread) {
+            throw new IllegalStateException("TaskGroupCoordinator cannot close its own worker thread");
+        }
+        // A prior stop request does not mean the worker has finished.
+        requestStop();
+        boolean interrupted = false;
+        if (internalThread != null) {
+            // Keep start() waiting until the old worker has finished, including any in-flight JDBC call.
+            while (internalThread.isAlive()) {
+                try {
+                    internalThread.join();
+                } catch (InterruptedException ex) {
+                    interrupted = true;
+                }
             }
-        } catch (Exception ex) {
-            log.error("Close internalThread failed", ex);
+            internalThread = null;
+        }
+        if (interrupted) {
+            Thread.currentThread().interrupt();
         }
         log.info("TaskGroupCoordinator closed");
     }

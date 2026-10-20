@@ -42,6 +42,7 @@ public class AlertHAServer extends AbstractHAServer {
 
     @Override
     public void close() {
+        super.close();
         log.info("AlertHAServer shutdown...");
     }
 }
