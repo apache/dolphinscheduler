@@ -41,8 +41,6 @@ public abstract class AbstractHAServer implements HAServer {
 
     private volatile ServerStatus serverStatus;
 
-    private volatile boolean closed;
-
     private final List<ServerStatusChangeListener> serverStatusChangeListeners;
 
     private static final long DEFAULT_RETRY_INTERVAL = 5_000;
@@ -60,9 +58,6 @@ public abstract class AbstractHAServer implements HAServer {
 
     @Override
     public void start() {
-        if (closed) {
-            return;
-        }
         registry.subscribe(selectorPath, new SubscribeListener() {
 
             @Override
@@ -82,16 +77,9 @@ public abstract class AbstractHAServer implements HAServer {
     }
 
     private synchronized void reconcileElection() {
-        if (closed) {
-            return;
-        }
         // Serialize election and publication with callbacks, including callbacks during startup.
         // REMOVE may be delayed or have no previous value, so consult current ownership instead.
         boolean elected = participateElection();
-        // A demotion listener may close the entire server (for example, AlertServer).
-        if (closed) {
-            return;
-        }
         if (elected) {
             statusChange(ServerStatus.ACTIVE);
         } else {
@@ -111,21 +99,12 @@ public abstract class AbstractHAServer implements HAServer {
         // If meet exception during participate election, will retry.
         // This can avoid the situation that the server is not elected as leader due to network jitter.
         for (int i = 0; i < DEFAULT_MAX_RETRY_TIMES; i++) {
-            if (closed) {
-                return false;
-            }
             boolean lockAcquired = false;
             try {
                 try {
                     lockAcquired = registry.acquireLock(electionLock);
                     if (lockAcquired) {
-                        if (closed) {
-                            return false;
-                        }
                         if (!registry.exists(selectorPath)) {
-                            if (closed) {
-                                return false;
-                            }
                             registry.put(selectorPath, serverIdentify, true);
                             return true;
                         }
@@ -138,11 +117,6 @@ public abstract class AbstractHAServer implements HAServer {
                     }
                 }
             } catch (Exception e) {
-                // Do not keep coordinator services active while ownership cannot be verified.
-                statusChange(ServerStatus.STAND_BY);
-                if (closed) {
-                    return false;
-                }
                 log.error("Participate election error, meet an exception, will retry after {}ms",
                         DEFAULT_RETRY_INTERVAL, e);
                 ThreadUtils.sleep(DEFAULT_RETRY_INTERVAL);
@@ -150,16 +124,6 @@ public abstract class AbstractHAServer implements HAServer {
         }
         throw new IllegalStateException(
                 "Participate election failed after retry " + DEFAULT_MAX_RETRY_TIMES + " times");
-    }
-
-    @Override
-    public void close() {
-        // Publish shutdown before waiting for an in-flight election to release the monitor.
-        closed = true;
-        synchronized (this) {
-            // Consumers close their own services; notifying listeners here could recurse.
-            serverStatus = ServerStatus.STAND_BY;
-        }
     }
 
     @Override
@@ -173,9 +137,6 @@ public abstract class AbstractHAServer implements HAServer {
     }
 
     private synchronized void statusChange(ServerStatus targetStatus) {
-        if (closed) {
-            return;
-        }
         final ServerStatus originStatus = serverStatus;
         serverStatus = targetStatus;
         try {

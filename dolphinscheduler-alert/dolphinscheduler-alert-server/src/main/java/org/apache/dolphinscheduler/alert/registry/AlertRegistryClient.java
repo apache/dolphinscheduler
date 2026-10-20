@@ -22,8 +22,6 @@ import org.apache.dolphinscheduler.alert.service.AlertHAServer;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 
-import java.io.IOException;
-
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,16 +54,9 @@ public class AlertRegistryClient implements AutoCloseable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         log.info("AlertRegistryClient closing...");
-        try {
-            if (alertHeartbeatTask != null) {
-                alertHeartbeatTask.shutdown();
-            }
-        } finally {
-            // Stop renewing the HA selector when the entire AlertServer shuts down.
-            registryClient.close();
-        }
+        alertHeartbeatTask.shutdown();
         log.info("AlertRegistryClient closed...");
     }
 
