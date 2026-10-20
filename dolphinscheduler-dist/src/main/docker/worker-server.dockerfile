@@ -22,7 +22,7 @@ ENV TZ=Asia/Shanghai
 ENV DOLPHINSCHEDULER_HOME=/opt/dolphinscheduler
 
 RUN apt update ; \
-    apt install -y sudo ; \
+    apt install -y sudo psmisc; \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR $DOLPHINSCHEDULER_HOME
