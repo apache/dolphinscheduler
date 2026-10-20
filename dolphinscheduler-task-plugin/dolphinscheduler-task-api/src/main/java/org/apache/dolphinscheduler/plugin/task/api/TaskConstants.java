@@ -40,6 +40,7 @@ public class TaskConstants {
 
     public static final int EXIT_CODE_KILL = 137;
     public static final int EXIT_CODE_HARD_KILL = 143;
+    public static final int EXIT_CODE_SIGINT_KILL = 130;
     public static final String PID = "pid";
 
     public static final String QUESTION = "?";

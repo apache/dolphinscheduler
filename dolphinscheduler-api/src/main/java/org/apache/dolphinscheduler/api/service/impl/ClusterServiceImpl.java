@@ -106,13 +106,18 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     /**
      * query cluster paging
      *
+     * @param loginUser login user
      * @param pageNo    page number
      * @param searchVal search value
      * @param pageSize  page size
      * @return cluster list page
      */
     @Override
-    public PageInfo<ClusterDto> queryClusterListPaging(Integer pageNo, Integer pageSize, String searchVal) {
+    public PageInfo<ClusterDto> queryClusterListPaging(User loginUser, Integer pageNo, Integer pageSize,
+                                                       String searchVal) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
 
         Page<Cluster> page = new Page<>(pageNo, pageSize);
 
@@ -136,10 +141,15 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     /**
      * query all cluster
      *
+     * @param loginUser login user
      * @return all cluster list
      */
     @Override
-    public List<ClusterDto> queryAllClusterList() {
+    public List<ClusterDto> queryAllClusterList(User loginUser) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
         List<Cluster> clusterList = clusterDao.queryAllClusterList();
         if (CollectionUtils.isEmpty(clusterList)) {
             return Collections.emptyList();
@@ -152,24 +162,6 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
                     BeanUtils.copyProperties(cluster, dto);
                     return dto;
                 }).collect(Collectors.toList());
-    }
-
-    /**
-     * query cluster
-     *
-     * @param code cluster code
-     */
-    @Override
-    public ClusterDto queryClusterByCode(Long code) {
-
-        Cluster cluster = clusterDao.queryByClusterCode(code);
-
-        if (cluster == null) {
-            throw new ServiceException(Status.QUERY_CLUSTER_BY_CODE_ERROR, code);
-        }
-        ClusterDto dto = new ClusterDto();
-        BeanUtils.copyProperties(cluster, dto);
-        return dto;
     }
 
     /**
@@ -270,11 +262,15 @@ public class ClusterServiceImpl extends BaseServiceImpl implements ClusterServic
     /**
      * verify cluster name
      *
+     * @param loginUser   login user
      * @param clusterName cluster name
      * @return true if the cluster name not exists, otherwise return false
      */
     @Override
-    public void verifyCluster(String clusterName) {
+    public void verifyCluster(User loginUser, String clusterName) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
 
         if (StringUtils.isEmpty(clusterName)) {
             throw new ServiceException(Status.CLUSTER_NAME_IS_NULL);

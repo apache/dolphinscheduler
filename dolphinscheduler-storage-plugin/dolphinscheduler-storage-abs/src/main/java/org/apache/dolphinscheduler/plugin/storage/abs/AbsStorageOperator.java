@@ -73,12 +73,12 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
     @Override
     public String getStorageBaseDirectory() {
         // All directory should end with File.separator
-        if (getStorageBaseDirectory().startsWith("/")) {
+        if (resourceBaseAbsolutePath.startsWith("/")) {
             log.warn("{} -> {} should not start with / in abs", StorageConstants.RESOURCE_UPLOAD_PATH,
-                    getStorageBaseDirectory());
-            return getStorageBaseDirectory().substring(1);
+                    resourceBaseAbsolutePath);
+            return resourceBaseAbsolutePath.substring(1);
         }
-        return getStorageBaseDirectory();
+        return resourceBaseAbsolutePath;
     }
 
     @SneakyThrows

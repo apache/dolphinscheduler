@@ -44,13 +44,15 @@ public class DependentItem {
 
     public DependentItem fromKey(String key) {
         String[] parts = key.split("-");
-        if (parts.length != 4) {
+        boolean isNegativeDepTaskCode = parts.length == 5 && parts[1].isEmpty();
+        if (parts.length != 4 && !isNegativeDepTaskCode) {
             throw new IllegalArgumentException("Invalid key format");
         }
+        int offset = isNegativeDepTaskCode ? 1 : 0;
         setDefinitionCode(Long.parseLong(parts[0]));
-        setDepTaskCode(Long.parseLong(parts[1]));
-        setCycle(parts[2]);
-        setDateValue(parts[3]);
+        setDepTaskCode(Long.parseLong(isNegativeDepTaskCode ? "-" + parts[2] : parts[1]));
+        setCycle(parts[2 + offset]);
+        setDateValue(parts[3 + offset]);
         return this;
     }
 

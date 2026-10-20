@@ -27,6 +27,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -50,5 +52,19 @@ public class Property implements Serializable {
     private DataType type;
 
     private String value;
+
+    /**
+     * sensitive flag
+     */
+    @Builder.Default
+    @JsonInclude(JsonInclude.Include.NON_DEFAULT)
+    private boolean sensitive = false;
+
+    public Property(String prop, Direct direct, DataType type, String value) {
+        this.prop = prop;
+        this.direct = direct;
+        this.type = type;
+        this.value = value;
+    }
 
 }

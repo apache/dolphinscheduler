@@ -82,7 +82,8 @@ export default defineComponent({
           prop: p.key,
           value: p.value,
           direct: p.direct,
-          type: p.type
+          type: p.type,
+          sensitive: p.sensitive || false
         }
       })
 

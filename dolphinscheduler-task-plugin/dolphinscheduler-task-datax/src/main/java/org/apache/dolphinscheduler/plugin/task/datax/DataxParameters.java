@@ -25,12 +25,16 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourc
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
 import org.apache.dolphinscheduler.spi.enums.Flag;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import lombok.Data;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * DataX parameter
@@ -116,7 +120,50 @@ public class DataxParameters extends AbstractParameters {
                     && StringUtils.isNotEmpty(sql)
                     && StringUtils.isNotEmpty(targetTable);
         } else {
-            return StringUtils.isNotEmpty(json);
+            // Custom config is valid with either inline json or an attached resource file that
+            // unambiguously carries the job definition, identified as the single .json resource
+            // (issue #18389). resourceList is multi-select and also holds auxiliary files, so a
+            // non-empty list on its own is not enough.
+            return !isInlineJsonAbsent() || getJobDefinitionResource() != null;
+        }
+    }
+
+    /**
+     * When the inline json is absent the job definition must come from an attached resource file.
+     * resourceList is multi-select and also carries auxiliary files such as Kerberos keytabs and
+     * xml configs, so the job definition is identified as the single resource whose name ends with
+     * {@code .json} rather than the first entry in the list (issue #18389). Returns that resource,
+     * or {@code null} when there is not exactly one json resource, which the caller treats as a
+     * missing or ambiguous job definition.
+     */
+    public ResourceInfo getJobDefinitionResource() {
+        if (CollectionUtils.isEmpty(resourceList)) {
+            return null;
+        }
+        List<ResourceInfo> jsonResources = resourceList.stream()
+                .filter(Objects::nonNull)
+                .filter(resource -> StringUtils.endsWithIgnoreCase(resource.getResourceName(), ".json"))
+                .collect(Collectors.toList());
+        return jsonResources.size() == 1 ? jsonResources.get(0) : null;
+    }
+
+    /**
+     * Returns true when the json field carries no usable inline job definition. The UI
+     * historically stored an empty object placeholder in the json field, so a blank value
+     * and any semantically empty JSON object (for example {@code {}}, {@code { }} or a
+     * formatted multi-line empty object) are all treated as absent (issue #18389).
+     */
+    public boolean isInlineJsonAbsent() {
+        if (StringUtils.isBlank(json)) {
+            return true;
+        }
+        try {
+            ObjectNode node = JSONUtils.parseObject(json);
+            return node == null || node.isEmpty();
+        } catch (Exception e) {
+            // not parseable as a JSON object, so there is inline content: downstream
+            // validation reports the malformed definition
+            return false;
         }
     }
 

@@ -48,14 +48,6 @@ export function queryClusterListPaging(params: ListReq): any {
   })
 }
 
-export function queryClusterByCode(params: ClusterCodeReq): any {
-  return axios({
-    url: '/cluster/query-by-code',
-    method: 'get',
-    params
-  })
-}
-
 export function queryAllClusterList(): any {
   return axios({
     url: '/cluster/query-cluster-list',

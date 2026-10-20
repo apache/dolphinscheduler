@@ -169,7 +169,20 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
     }
 
     @Override
-    public void close() {
+    public synchronized void close() {
+        if (!flag) {
+            log.warn("WorkflowSerialCoordinator is already closed");
+            return;
+        }
         flag = false;
+        try {
+            if (internalThread != null) {
+                internalThread.interrupt();
+            }
+        } catch (Exception ex) {
+            log.error("Close internalThread failed", ex);
+        }
+        internalThread = null;
+        log.info("WorkflowSerialCoordinator closed");
     }
 }

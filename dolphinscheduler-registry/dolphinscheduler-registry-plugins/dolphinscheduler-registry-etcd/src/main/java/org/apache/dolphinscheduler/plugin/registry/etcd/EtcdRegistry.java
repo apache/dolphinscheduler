@@ -438,7 +438,9 @@ public class EtcdRegistry implements Registry {
                 .watchedPath(watchedPath)
                 .eventPath(Optional.ofNullable(keyValue).map(kv -> kv.getKey().toString(StandardCharsets.UTF_8))
                         .orElse(null))
-                .eventData(Optional.ofNullable(keyValue).map(kv -> kv.getValue().toString(StandardCharsets.UTF_8))
+                .eventData(Optional
+                        .ofNullable(eventType == Event.Type.REMOVE ? watchEvent.getPrevKV() : watchEvent.getKeyValue())
+                        .map(kv -> kv.getValue().toString(StandardCharsets.UTF_8))
                         .orElse(null))
                 .build();
     }

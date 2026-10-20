@@ -210,9 +210,18 @@ public class AlertPluginInstanceServiceTest {
 
     @Test
     public void testSendAlert() {
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
+                noPermUser.getId(), ALERT_INSTANCE_CREATE, baseServiceLogger)).thenReturn(false);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> alertPluginInstanceService.testSend(noPermUser, 1, uiParams));
+
+        when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
+                user.getId(), ALERT_INSTANCE_CREATE, baseServiceLogger)).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ALERT_PLUGIN_INSTANCE,
+                null, 0, baseServiceLogger)).thenReturn(true);
         Mockito.when(registryClient.getServerList(RegistryNodeType.ALERT_SERVER)).thenReturn(new ArrayList<>());
         assertThrowsServiceException(Status.ALERT_SERVER_NOT_EXIST,
-                () -> alertPluginInstanceService.testSend(1, uiParams));
+                () -> alertPluginInstanceService.testSend(user, 1, uiParams));
         Server server = new Server();
         server.setPort(50052);
         server.setHost("127.0.0.1");
@@ -220,7 +229,7 @@ public class AlertPluginInstanceServiceTest {
         Mockito.when(registryClient.getServerList(RegistryNodeType.ALERT_SERVER))
                 .thenReturn(Collections.singletonList(server));
         assertThrowsServiceException(Status.ALERT_TEST_SENDING_FAILED,
-                () -> alertPluginInstanceService.testSend(1, uiParams));
+                () -> alertPluginInstanceService.testSend(user, 1, uiParams));
     }
 
     @Test

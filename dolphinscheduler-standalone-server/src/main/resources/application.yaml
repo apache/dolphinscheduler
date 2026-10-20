@@ -260,6 +260,9 @@ alert:
 
 api:
   audit-enable: false
+  # The lifetime of a login session, measured from the moment the user logs in.
+  # Accepts a Duration, e.g. 30m, 12h, 1d. Defaults to 2h when unset.
+  session-timeout: 2h
   # Traffic control, if you turn on this config, the maximum number of request/s will be limited.
   # global max request number per second
   # default tenant-level max request number

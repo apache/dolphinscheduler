@@ -94,7 +94,10 @@ public class NetUtils {
                 if (items.length == 6 && "svc".equals(items[3])) {
                     return String.format("%s.%s", items[0], items[1]);
                 }
-                return canonicalHost;
+                if (inetAddress instanceof Inet6Address) {
+                    return normalizeV6Address((Inet6Address) inetAddress).getHostAddress();
+                }
+                return inetAddress.getHostAddress();
             }
             if (inetAddress instanceof Inet6Address) {
                 return normalizeV6Address((Inet6Address) inetAddress).getHostAddress();

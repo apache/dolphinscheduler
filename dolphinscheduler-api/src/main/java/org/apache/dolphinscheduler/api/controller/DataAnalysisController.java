@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.TaskInstanceCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
@@ -39,6 +40,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -172,6 +174,11 @@ public class DataAnalysisController extends BaseController {
         checkPageParams(pageNo, pageSize);
         PageInfo<Command> commandPageInfo =
                 dataAnalysisService.listPendingCommands(loginUser, projectCode, pageNo, pageSize);
+        if (commandPageInfo != null && commandPageInfo.getTotalList() != null) {
+            commandPageInfo.setTotalList(commandPageInfo.getTotalList().stream()
+                    .map(SensitivePropertyUtils::mask)
+                    .collect(Collectors.toList()));
+        }
         return Result.success(commandPageInfo);
     }
 
@@ -197,6 +204,11 @@ public class DataAnalysisController extends BaseController {
         checkPageParams(pageNo, pageSize);
         PageInfo<ErrorCommand> errorCommandPageInfo =
                 dataAnalysisService.listErrorCommand(loginUser, projectCode, pageNo, pageSize);
+        if (errorCommandPageInfo != null && errorCommandPageInfo.getTotalList() != null) {
+            errorCommandPageInfo.setTotalList(errorCommandPageInfo.getTotalList().stream()
+                    .map(SensitivePropertyUtils::mask)
+                    .collect(Collectors.toList()));
+        }
         return Result.success(errorCommandPageInfo);
     }
 }

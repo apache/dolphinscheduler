@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 
 import java.util.List;
 import java.util.Map;
@@ -73,7 +74,9 @@ public interface WorkflowDefinitionService {
                                                                    String otherParamsJson,
                                                                    Integer userId,
                                                                    Integer pageNo,
-                                                                   Integer pageSize);
+                                                                   Integer pageSize,
+                                                                   String sortField,
+                                                                   String sortOrder);
 
     /**
      * query detail of workflow definition
@@ -195,11 +198,11 @@ public interface WorkflowDefinitionService {
     /**
      * query the pagination versions info by one certain workflow definition code
      */
-    Result queryWorkflowDefinitionVersions(User loginUser,
-                                           long projectCode,
-                                           int pageNo,
-                                           int pageSize,
-                                           long code);
+    Result<PageInfo<WorkflowDefinitionLog>> queryWorkflowDefinitionVersions(User loginUser,
+                                                                            long projectCode,
+                                                                            int pageNo,
+                                                                            int pageSize,
+                                                                            long code);
 
     /**
      * delete one certain workflow definition by version number and workflow definition code

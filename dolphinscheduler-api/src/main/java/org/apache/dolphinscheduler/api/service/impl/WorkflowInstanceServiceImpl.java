@@ -26,14 +26,14 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SUBWORKFLOW
 import static org.apache.dolphinscheduler.common.utils.JSONUtils.parseObject;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager.checkTaskParameters;
 
-import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
-import org.apache.dolphinscheduler.api.dto.DynamicSubWorkflowDto;
 import org.apache.dolphinscheduler.api.dto.gantt.GanttDto;
 import org.apache.dolphinscheduler.api.dto.gantt.Task;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
@@ -41,7 +41,8 @@ import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.CommandKeyConstants;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
 import org.apache.dolphinscheduler.common.enums.Flag;
@@ -54,7 +55,6 @@ import org.apache.dolphinscheduler.common.utils.placeholder.BusinessTimeUtils;
 import org.apache.dolphinscheduler.dao.AlertDao;
 import org.apache.dolphinscheduler.dao.entity.AbstractTaskInstanceContext;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.RelationSubWorkflow;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -64,9 +64,9 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
-import org.apache.dolphinscheduler.dao.mapper.RelationSubWorkflowMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceContextDao;
@@ -88,7 +88,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -158,9 +157,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     TaskDefinitionDao taskDefinitionDao;
 
     @Autowired
-    private RelationSubWorkflowMapper relationSubWorkflowMapper;
-
-    @Autowired
     private AlertDao alertDao;
 
     @Autowired
@@ -169,9 +165,16 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     @Autowired
     private TaskInstanceContextDao taskInstanceContextDao;
 
+    @Autowired
+    private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
+
+    @Autowired
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
+
     @Override
-    public List<WorkflowInstance> queryTopNLongestRunningWorkflowInstance(User loginUser, long projectCode, int size,
-                                                                          String startTime, String endTime) {
+    public List<WorkflowInstanceSummaryVO> queryTopNLongestRunningWorkflowInstance(User loginUser, long projectCode,
+                                                                                   int size,
+                                                                                   String startTime, String endTime) {
         Project project = projectDao.queryByCode(projectCode);
         // check user access for project
         projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_INSTANCE);
@@ -195,7 +198,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         }
 
         return workflowInstanceDao.queryTopNWorkflowInstance(size, start, end, WorkflowExecutionStatus.SUCCESS,
-                projectCode);
+                projectCode)
+                .stream()
+                .map(WorkflowInstanceSummaryVO::fromSummaryDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -221,18 +227,18 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     }
 
     @Override
-    public Result<PageInfo<WorkflowInstance>> queryWorkflowInstanceList(User loginUser,
-                                                                        long projectCode,
-                                                                        long workflowDefinitionCode,
-                                                                        String startDate,
-                                                                        String endDate,
-                                                                        String searchVal,
-                                                                        String executorName,
-                                                                        WorkflowExecutionStatus stateType,
-                                                                        String host,
-                                                                        String otherParamsJson,
-                                                                        Integer pageNo,
-                                                                        Integer pageSize) {
+    public Result<PageInfo<WorkflowInstanceSummaryVO>> queryWorkflowInstanceList(User loginUser,
+                                                                                 long projectCode,
+                                                                                 long workflowDefinitionCode,
+                                                                                 String startDate,
+                                                                                 String endDate,
+                                                                                 String searchVal,
+                                                                                 String executorName,
+                                                                                 WorkflowExecutionStatus stateType,
+                                                                                 String host,
+                                                                                 String otherParamsJson,
+                                                                                 Integer pageNo,
+                                                                                 Integer pageSize) {
 
         Result result = new Result();
         // check user access for project
@@ -247,10 +253,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         Date start = checkAndParseDateParameters(startDate);
         Date end = checkAndParseDateParameters(endDate);
 
-        Page<WorkflowInstance> page = new Page<>(pageNo, pageSize);
-        PageInfo<WorkflowInstance> pageInfo = new PageInfo<>(pageNo, pageSize);
+        Page<WorkflowInstanceSummaryDto> page = new Page<>(pageNo, pageSize);
+        PageInfo<WorkflowInstanceSummaryVO> pageInfo = new PageInfo<>(pageNo, pageSize);
 
-        IPage<WorkflowInstance> workflowInstanceList = workflowInstanceDao.queryWorkflowInstanceListPaging(
+        IPage<WorkflowInstanceSummaryDto> workflowInstanceList = workflowInstanceDao.queryWorkflowInstanceListPaging(
                 page,
                 projectCode,
                 workflowDefinitionCode,
@@ -261,10 +267,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 start,
                 end);
 
-        List<WorkflowInstance> workflowInstances = workflowInstanceList.getRecords();
+        List<WorkflowInstanceSummaryDto> workflowInstances = workflowInstanceList.getRecords();
         List<Integer> userIds = Collections.emptyList();
         if (CollectionUtils.isNotEmpty(workflowInstances)) {
-            userIds = workflowInstances.stream().map(WorkflowInstance::getExecutorId).collect(Collectors.toList());
+            userIds = workflowInstances.stream().map(WorkflowInstanceSummaryDto::getExecutorId)
+                    .collect(Collectors.toList());
         }
         List<User> users = usersService.queryUser(userIds);
         Map<Integer, User> idToUserMap = Collections.emptyMap();
@@ -272,7 +279,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             idToUserMap = users.stream().collect(Collectors.toMap(User::getId, Function.identity()));
         }
 
-        for (WorkflowInstance workflowInstance : workflowInstances) {
+        for (WorkflowInstanceSummaryDto workflowInstance : workflowInstances) {
             workflowInstance.setDuration(WorkflowUtils.getWorkflowInstanceDuration(workflowInstance));
             User executor = idToUserMap.get(workflowInstance.getExecutorId());
             if (null != executor) {
@@ -281,7 +288,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         }
 
         pageInfo.setTotal((int) workflowInstanceList.getTotal());
-        pageInfo.setTotalList(workflowInstances);
+        pageInfo.setTotalList(workflowInstances.stream()
+                .map(WorkflowInstanceSummaryVO::fromSummaryDto)
+                .collect(Collectors.toList()));
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -308,7 +317,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskInstanceDependentDetailsList =
                 setTaskInstanceDependentResult(taskInstanceList);
         return new WorkflowInstanceTaskListDTO(workflowInstance.getState().toString(),
-                taskInstanceDependentDetailsList);
+                new ArrayList<>(taskInstanceDependentDetailsList));
     }
 
     private List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> setTaskInstanceDependentResult(List<TaskInstance> taskInstanceList) {
@@ -334,57 +343,6 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             }
         }
         return taskInstanceDependentDetailsList;
-    }
-
-    @Override
-    public List<DynamicSubWorkflowDto> queryDynamicSubWorkflowInstances(User loginUser, Integer taskId) {
-        TaskInstance taskInstance = taskInstanceDao.queryById(taskId);
-        if (taskInstance == null) {
-            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
-        }
-
-        TaskDefinition taskDefinition = taskDefinitionDao.queryByCode(taskInstance.getTaskCode());
-        if (taskDefinition == null) {
-            throw new ServiceException(Status.TASK_INSTANCE_NOT_EXISTS, taskId);
-        }
-
-        List<RelationSubWorkflow> relationSubWorkflows = relationSubWorkflowMapper
-                .queryAllSubWorkflowInstance((long) taskInstance.getWorkflowInstanceId(),
-                        taskInstance.getTaskCode());
-        List<Long> allSubWorkflowInstanceId = relationSubWorkflows.stream()
-                .map(RelationSubWorkflow::getSubWorkflowInstanceId).collect(Collectors.toList());
-        List<WorkflowInstance> allSubWorkflows = workflowInstanceDao.queryByIds(allSubWorkflowInstanceId);
-
-        if (allSubWorkflows == null || allSubWorkflows.isEmpty()) {
-            throw new ServiceException(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST, taskId);
-        }
-        Long subWorkflowCode = allSubWorkflows.get(0).getWorkflowDefinitionCode();
-        int subWorkflowVersion = allSubWorkflows.get(0).getWorkflowDefinitionVersion();
-        WorkflowDefinition subWorkflowDefinition =
-                processService.findWorkflowDefinition(subWorkflowCode, subWorkflowVersion);
-        if (subWorkflowDefinition == null) {
-            throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, subWorkflowCode);
-        }
-
-        allSubWorkflows.sort(Comparator.comparing(WorkflowInstance::getId));
-
-        List<DynamicSubWorkflowDto> allDynamicSubWorkflowDtos = new ArrayList<>();
-        int index = 1;
-        for (WorkflowInstance workflowInstance : allSubWorkflows) {
-            DynamicSubWorkflowDto dynamicSubWorkflowDto = new DynamicSubWorkflowDto();
-            dynamicSubWorkflowDto.setWorkflowInstanceId(workflowInstance.getId());
-            dynamicSubWorkflowDto.setIndex(index);
-            dynamicSubWorkflowDto.setState(workflowInstance.getState());
-            dynamicSubWorkflowDto.setName(subWorkflowDefinition.getName());
-            Map<String, String> commandParamMap = JSONUtils.toMap(workflowInstance.getCommandParam());
-            String parameter = commandParamMap.get(CommandKeyConstants.CMD_DYNAMIC_START_PARAMS);
-            dynamicSubWorkflowDto.setParameters(JSONUtils.toMap(parameter));
-            allDynamicSubWorkflowDtos.add(dynamicSubWorkflowDto);
-            index++;
-
-        }
-
-        return allDynamicSubWorkflowDtos;
     }
 
     @Override
@@ -428,18 +386,14 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                                                      Boolean syncDefine,
                                                      String globalParams,
                                                      String locations, int timeout) {
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode,
-                ApiFuncIdentificationConstant.INSTANCE_UPDATE);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
         // check workflow instance exists
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
         // check workflow instance exists in project
-        WorkflowDefinition workflowDefinition0 =
-                workflowDefinitionDao.queryByCode(workflowInstance.getWorkflowDefinitionCode()).orElse(null);
-        if (workflowDefinition0 != null && projectCode != workflowDefinition0.getProjectCode()) {
-            log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
-                    workflowInstance.getWorkflowDefinitionCode());
+        if (workflowInstance.getProjectCode() != projectCode) {
+            log.error("workflow instance does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
+                    workflowInstanceId);
             throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
         // check workflow instance status
@@ -458,6 +412,12 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             timezoneId = commandParam.getTimeZone();
         }
 
+        List<Property> submittedGlobalParams = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
+        if (CollectionUtils.isNotEmpty(submittedGlobalParams)) {
+            globalParams = GlobalParameterUtils.serializeGlobalParameter(
+                    SensitivePropertyUtils.merge(submittedGlobalParams,
+                            GlobalParameterUtils.deserializeGlobalParameter(workflowInstance.getGlobalParams())));
+        }
         setWorkflowInstance(workflowInstance, scheduleTime, globalParams, timeout, timezoneId);
         List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
         if (taskDefinitionLogs.isEmpty()) {
@@ -470,6 +430,29 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
             }
         }
+        List<TaskDefinition> versionKeys = new ArrayList<>();
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
+            if (taskDefinitionLog.getCode() > 0 && taskDefinitionLog.getVersion() > 0) {
+                versionKeys.add(new TaskDefinition(taskDefinitionLog.getCode(), taskDefinitionLog.getVersion()));
+            }
+        }
+        List<TaskDefinitionLog> existingTaskLogs = CollectionUtils.isEmpty(versionKeys)
+                ? Collections.emptyList()
+                : taskDefinitionLogMapper.queryByTaskDefinitions(versionKeys);
+        Map<String, String> existingTaskParamsMap = existingTaskLogs.stream()
+                .collect(Collectors.toMap(
+                        log -> log.getCode() + "_" + log.getVersion(),
+                        TaskDefinitionLog::getTaskParams,
+                        (left, right) -> left));
+        for (TaskDefinitionLog submitted : taskDefinitionLogs) {
+            String existingTaskParams = submitted.getCode() <= 0 || submitted.getVersion() <= 0
+                    ? null
+                    : existingTaskParamsMap.get(submitted.getCode() + "_" + submitted.getVersion());
+            submitted.setTaskParams(SensitivePropertyUtils.mergeLocalParams(
+                    submitted.getTaskParams(), existingTaskParams));
+        }
+        taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
+        taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         int saveTaskResult = processService.saveTaskDefine(loginUser, projectCode, taskDefinitionLogs, syncDefine);
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             log.error("Update task definition error, projectCode:{}, workflowInstanceId:{}", projectCode,
@@ -578,9 +561,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
 
         Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
-        // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, project,
-                ApiFuncIdentificationConstant.INSTANCE_DELETE);
+        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
         // check workflow instance status
         if (!workflowInstance.getState().isFinalState()) {
             log.warn("workflow Instance state is {} so can not delete workflow instance, workflowInstanceId:{}.",
@@ -758,24 +739,26 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     }
 
     @Override
-    public List<WorkflowInstance> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode, int[] states) {
+    public List<WorkflowInstanceSummaryDto> queryByWorkflowDefinitionCodeAndStatus(Long workflowDefinitionCode,
+                                                                                   int[] states) {
         return workflowInstanceDao.queryByWorkflowDefinitionCodeAndStatus(workflowDefinitionCode, states);
     }
 
     @Override
-    public List<WorkflowInstance> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
-                                                                   int workflowDefinitionVersion, int[] states) {
+    public List<WorkflowInstanceSummaryDto> queryByWorkflowCodeVersionStatus(Long workflowDefinitionCode,
+                                                                             int workflowDefinitionVersion,
+                                                                             int[] states) {
         return workflowInstanceDao.queryByWorkflowCodeVersionStatus(workflowDefinitionCode, workflowDefinitionVersion,
                 states);
     }
 
     @Override
-    public List<WorkflowInstance> queryByWorkflowDefinitionCode(Long workflowDefinitionCode, int size) {
+    public List<WorkflowInstanceSummaryDto> queryByWorkflowDefinitionCode(Long workflowDefinitionCode, int size) {
         return workflowInstanceDao.queryByWorkflowDefinitionCode(workflowDefinitionCode, size);
     }
 
     @Override
-    public List<WorkflowInstance> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode) {
+    public List<WorkflowInstanceSummaryVO> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode) {
 
         Project project = projectDao.queryByCode(projectCode);
         // check user access for project
@@ -784,19 +767,22 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (triggerCode == null) {
             return Collections.emptyList();
         }
-        return workflowInstanceDao.queryByTriggerCode(triggerCode);
+        return workflowInstanceDao.queryByTriggerCode(triggerCode)
+                .stream()
+                .map(WorkflowInstanceSummaryVO::fromSummaryDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     public void deleteWorkflowInstanceByWorkflowDefinitionCode(long workflowDefinitionCode) {
         while (true) {
-            List<WorkflowInstance> workflowInstances =
+            List<WorkflowInstanceSummaryDto> workflowInstances =
                     workflowInstanceDao.queryByWorkflowDefinitionCode(workflowDefinitionCode, 100);
             if (CollectionUtils.isEmpty(workflowInstances)) {
                 break;
             }
             log.info("Begin to delete workflow instance, workflow definition code: {}", workflowDefinitionCode);
-            for (WorkflowInstance workflowInstance : workflowInstances) {
+            for (WorkflowInstanceSummaryDto workflowInstance : workflowInstances) {
                 if (!workflowInstance.getState().isFinalState()) {
                     log.warn("Workflow instance is not finished cannot delete, workflow instance id:{}",
                             workflowInstance.getId());

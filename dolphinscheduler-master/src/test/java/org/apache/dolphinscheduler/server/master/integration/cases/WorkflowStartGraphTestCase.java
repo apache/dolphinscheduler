@@ -210,6 +210,46 @@ public class WorkflowStartGraphTestCase extends AbstractMasterIntegrationTestCas
     }
 
     @Test
+    @DisplayName("Test continue failure strategy with a blocked intermediate predecessor")
+    void testStartWorkflow_with_blockedIntermediatePredecessor_usingFailureStrategyContinue() {
+        final String yaml =
+                "/it/start/workflow_with_blocked_intermediate_predecessor_using_failure_strategy_continue.yaml";
+        final WorkflowTestCaseContext context = workflowTestCaseContextFactory.initializeContextFromYaml(yaml);
+        final WorkflowDefinition workflow = context.getOneWorkflow();
+
+        final WorkflowOperator.WorkflowTriggerDTO workflowTriggerDTO = WorkflowOperator.WorkflowTriggerDTO.builder()
+                .workflowDefinition(workflow)
+                .runWorkflowCommandParam(new RunWorkflowCommandParam())
+                .failureStrategy(FailureStrategy.CONTINUE)
+                .build();
+        final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(workflowTriggerDTO);
+
+        await()
+                .atMost(Duration.ofMinutes(1))
+                .untilAsserted(() -> {
+                    Assertions.assertThat(repository.queryWorkflowInstance(workflowInstanceId))
+                            .matches(workflowInstance -> workflowInstance.getState() == WorkflowExecutionStatus.FAILURE)
+                            .matches(workflowInstance -> workflowInstance.getEndTime() != null);
+
+                    Assertions.assertThat(repository.queryTaskInstance(workflowInstanceId))
+                            .hasSize(3)
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("A");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("B");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.SUCCESS);
+                            })
+                            .anySatisfy(taskInstance -> {
+                                assertThat(taskInstance.getName()).isEqualTo("C");
+                                assertThat(taskInstance.getState()).isEqualTo(TaskExecutionStatus.FAILURE);
+                            });
+                });
+        masterContainer.assertAllResourceReleased();
+    }
+
+    @Test
     @DisplayName("Test start a workflow with two parallel fake tasks(A, B) success")
     public void testStartWorkflow_with_twoParallelSuccessTask() {
         final String yaml = "/it/start/workflow_with_two_parallel_fake_task_success.yaml";

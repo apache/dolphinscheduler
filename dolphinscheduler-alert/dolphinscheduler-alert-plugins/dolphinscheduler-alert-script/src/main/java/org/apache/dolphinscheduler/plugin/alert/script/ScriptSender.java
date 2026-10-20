@@ -30,9 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public final class ScriptSender {
 
-    private static final String ALERT_TITLE_OPTION = " -t ";
-    private static final String ALERT_CONTENT_OPTION = " -c ";
-    private static final String ALERT_USER_PARAMS_OPTION = " -p ";
+    private static final String ALERT_TITLE_OPTION = "-t";
+    private static final String ALERT_CONTENT_OPTION = "-c";
+    private static final String ALERT_USER_PARAMS_OPTION = "-p";
     private final String scriptPath;
     private final String scriptType;
     private final String userParams;
@@ -74,7 +74,7 @@ public final class ScriptSender {
             return alertResult;
         }
 
-        // validate script path in case of injections
+        // validate script path
         File shellScriptFile = new File(scriptPath);
         // validate existence
         if (!shellScriptFile.exists()) {
@@ -89,25 +89,8 @@ public final class ScriptSender {
             return alertResult;
         }
 
-        // avoid command injection (RCE vulnerability)
-        if (userParams.contains("'")) {
-            log.error("shell script illegal user params : {}", userParams);
-            alertResult.setMessage("shell script illegal user params : " + userParams);
-            return alertResult;
-        }
-        if (title.contains("'")) {
-            log.error("shell script illegal title : {}", title);
-            alertResult.setMessage("shell script illegal title : " + title);
-            return alertResult;
-        }
-        if (content.contains("'")) {
-            log.error("shell script illegal content : {}", content);
-            alertResult.setMessage("shell script illegal content : " + content);
-            return alertResult;
-        }
-
-        String[] cmd = {"/bin/sh", "-c", scriptPath + ALERT_TITLE_OPTION + "'" + title + "'" + ALERT_CONTENT_OPTION
-                + "'" + content + "'" + ALERT_USER_PARAMS_OPTION + "'" + userParams + "'"};
+        String[] cmd = {scriptPath, ALERT_TITLE_OPTION, title, ALERT_CONTENT_OPTION, content, ALERT_USER_PARAMS_OPTION,
+                userParams};
         int exitCode = ProcessUtils.executeScript(cmd);
 
         if (exitCode == 0) {

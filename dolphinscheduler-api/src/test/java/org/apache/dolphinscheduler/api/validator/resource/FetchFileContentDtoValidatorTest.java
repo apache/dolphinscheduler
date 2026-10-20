@@ -81,6 +81,19 @@ class FetchFileContentDtoValidatorTest {
     }
 
     @Test
+    void testValidate_limitInvalid() {
+        FetchFileContentDto fetchFileContentDto = FetchFileContentDto.builder()
+                .loginUser(loginUser)
+                .resourceFileAbsolutePath("/tmp")
+                .skipLineNum(0)
+                .limit(0)
+                .build();
+        assertThrowServiceException(
+                "Internal Server Error: limit must be -1 or greater than 0",
+                () -> fetchFileContentDtoValidator.validate(fetchFileContentDto));
+    }
+
+    @Test
     void testValidate_notUnderBaseDirectory() {
         FetchFileContentDto fetchFileContentDto = FetchFileContentDto.builder()
                 .loginUser(loginUser)

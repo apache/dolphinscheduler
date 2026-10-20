@@ -193,7 +193,9 @@ public class CommandEngine extends BaseDaemonThread implements AutoCloseable {
     }
 
     private Void bootstrapError(Command command, Throwable throwable) {
-        if (throwable instanceof CommandDuplicateHandleException) {
+        // The exception is raised inside a CompletableFuture chain, so it arrives here wrapped in
+        // CompletionException, which a direct instanceof check cannot see through. See #18570.
+        if (ExceptionUtils.throwableOfType(throwable, CommandDuplicateHandleException.class) != null) {
             log.warn("Handle command failed, the command: {} has been handled by other master",
                     command,
                     throwable);

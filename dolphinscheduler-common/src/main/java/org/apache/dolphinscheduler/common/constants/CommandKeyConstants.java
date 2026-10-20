@@ -31,8 +31,6 @@ public class CommandKeyConstants {
 
     public static final String CMD_PARAM_START_NODES = "StartNodeList";
 
-    public static final String CMD_DYNAMIC_START_PARAMS = "dynamicParams";
-
     /**
      * complement data Schedule date
      */

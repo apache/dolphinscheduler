@@ -17,9 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.repository;
 
+import org.apache.dolphinscheduler.common.enums.TaskGroupQueueStatus;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 
+import java.util.Date;
 import java.util.List;
 
 public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
@@ -64,6 +66,24 @@ public interface TaskGroupQueueDao extends IDao<TaskGroupQueue> {
      * @return TaskGroupQueue ordered by priority desc
      */
     List<TaskGroupQueue> queryByTaskInstanceId(Integer taskInstanceId);
+
+    /**
+     * Atomically change a waiting TaskGroupQueue to acquired.
+     *
+     * @param id taskGroupQueue id
+     * @param updateTime update time
+     * @return true if the waiting TaskGroupQueue was acquired
+     */
+    boolean acquireTaskGroupQueue(Integer id, Date updateTime);
+
+    /**
+     * Delete the TaskGroupQueue only when its current status matches the expected status.
+     *
+     * @param taskInstanceId taskInstance id
+     * @param status expected status
+     * @return true if a TaskGroupQueue was deleted
+     */
+    boolean deleteByTaskInstanceIdAndStatus(Integer taskInstanceId, TaskGroupQueueStatus status);
 
     /**
      * Query all {@link TaskGroupQueue} which status is TaskGroupQueueStatus.ACQUIRE_SUCCESS and forceStart is {@link org.apache.dolphinscheduler.common.enums.Flag#NO}.

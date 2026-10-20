@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.api.dto.workflowInstance;
 
-import org.apache.dolphinscheduler.dao.entity.AbstractTaskInstanceContext;
-import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentDetails;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 
 import java.util.List;
 
@@ -33,5 +32,5 @@ public class WorkflowInstanceTaskListDTO {
 
     private String workflowInstanceState;
 
-    private List<TaskInstanceDependentDetails<AbstractTaskInstanceContext>> taskList;
+    private List<TaskInstance> taskList;
 }

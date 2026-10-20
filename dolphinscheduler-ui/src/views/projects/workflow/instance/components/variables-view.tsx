@@ -66,17 +66,23 @@ export default defineComponent({
       ctx.emit('copy', text)
     }
 
+    const shouldDisplayParamField = (key: string, taskType: string) => {
+      if (key === 'sensitive') {
+        return false
+      }
+      return (
+        !(taskType === 'SQL' || taskType === 'PROCEDURE') ||
+        (key !== 'direct' && key !== 'type')
+      )
+    }
+
     /**
      * Copyed text processing
      */
     const rtClipboard = (el: any, taskType: string) => {
       const arr: Array<string> = []
       Object.keys(el).forEach((key) => {
-        if (taskType === 'SQL' || taskType === 'PROCEDURE') {
-          if (key !== 'direct' && key !== 'type') {
-            arr.push(`${key}=${el[key]}`)
-          }
-        } else {
+        if (shouldDisplayParamField(key, taskType)) {
           arr.push(`${key}=${el[key]}`)
         }
       })
@@ -92,21 +98,14 @@ export default defineComponent({
           onClick={() => handleCopy(rtClipboard(el, taskType))}
         >
           {Object.keys(el).map((key: string) => {
-            if (taskType === 'SQL' || taskType === 'PROCEDURE') {
-              return key !== 'direct' && key !== 'type' ? (
-                <span style={'margin-right: 5px'}>
-                  <strong style='color: #2A455B;'>{key}</strong> = {el[key]}
-                </span>
-              ) : (
-                ''
-              )
-            } else {
+            if (shouldDisplayParamField(key, taskType)) {
               return (
                 <span style={'margin-right: 5px'}>
                   <strong style='color: #2A455B;'>{key}</strong> = {el[key]}
                 </span>
               )
             }
+            return ''
           })}
         </NButton>
       )
@@ -120,7 +119,8 @@ export default defineComponent({
       globalParams,
       localParams,
       localButton,
-      handleCopy
+      handleCopy,
+      shouldDisplayParamField
     }
   },
   render() {

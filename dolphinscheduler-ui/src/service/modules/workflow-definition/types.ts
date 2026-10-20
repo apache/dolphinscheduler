@@ -51,6 +51,8 @@ interface PageReq {
 interface ListReq extends PageReq {
   searchVal?: string
   userId?: number
+  sortField?: string
+  sortOrder?: string
 }
 
 interface WorkflowDefinitionReq {

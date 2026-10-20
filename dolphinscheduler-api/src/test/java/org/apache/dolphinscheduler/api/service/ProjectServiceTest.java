@@ -31,9 +31,11 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
+import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
@@ -169,6 +171,19 @@ public class ProjectServiceTest {
         ServiceException noWriteEx = Assertions.assertThrows(ServiceException.class,
                 () -> projectService.checkHasProjectWritePermissionThrowException(loginUser, project));
         Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), noWriteEx.getCode());
+
+        // USER_NO_WRITE_PROJECT_PERM: read-only project member
+        ProjectUser projectUser = new ProjectUser();
+        projectUser.setPerm(Constants.READ_PERMISSION);
+        Mockito.when(projectUserDao.queryProjectRelation(project.getId(), loginUser.getId())).thenReturn(projectUser);
+        ServiceException readOnlyEx = Assertions.assertThrows(ServiceException.class,
+                () -> projectService.checkHasProjectWritePermissionThrowException(loginUser, project));
+        Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), readOnlyEx.getCode());
+
+        // success: project member with write permission
+        projectUser.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
+        Assertions.assertDoesNotThrow(
+                () -> projectService.checkHasProjectWritePermissionThrowException(loginUser, project));
 
         // success: admin
         loginUser.setUserType(UserType.ADMIN_USER);

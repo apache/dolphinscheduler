@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_FAILURE;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_HARD_KILL;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_KILL;
+import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_CODE_SIGINT_KILL;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
@@ -151,8 +152,9 @@ public abstract class AbstractCommandExecutor {
             result.setExitStatusCode(EXIT_CODE_FAILURE);
         }
         int exitCode = this.process.exitValue();
-        String exitLogMessage = (EXIT_CODE_KILL == exitCode || EXIT_CODE_HARD_KILL == exitCode) ? "process has killed."
-                : "process has exited.";
+        boolean isCancelled =
+                EXIT_CODE_KILL == exitCode || EXIT_CODE_HARD_KILL == exitCode || EXIT_CODE_SIGINT_KILL == exitCode;
+        String exitLogMessage = isCancelled ? "process has killed." : "process has exited.";
         log.info("{} execute path:{}, processId:{} ,exitStatusCode:{} ,processWaitForStatus:{} ,processExitValue:{}",
                 exitLogMessage, taskRequest.getExecutePath(), processId, result.getExitStatusCode(), status, exitCode);
         return result;

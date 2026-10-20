@@ -13,29 +13,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
+*/
 
-package org.apache.dolphinscheduler.api.dto;
-
-import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-
-import java.util.Map;
-
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Data
-@NoArgsConstructor
-public class DynamicSubWorkflowDto {
-
-    private long workflowInstanceId;
-
-    private String name;
-
-    private long index;
-
-    private Map<String, String> parameters;
-
-    private WorkflowExecutionStatus state;
-
-}
+CREATE INDEX idx_project_submit_time ON t_ds_task_instance (project_code ASC, submit_time DESC);
+CREATE INDEX idx_project_start_time ON t_ds_workflow_instance (project_code ASC, start_time DESC);
+ALTER TABLE t_ds_schedules
+    ADD COLUMN missed_fire_policy smallint NOT NULL DEFAULT 2;

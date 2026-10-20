@@ -64,12 +64,16 @@ public class NetUtilsTest {
             address = mock(InetAddress.class);
             when(address.getCanonicalHostName()).thenReturn("dolphinscheduler.cluster-domain.example");
             when(address.getHostName()).thenReturn("dolphinscheduler");
-            Assertions.assertEquals("dolphinscheduler.cluster-domain.example", NetUtils.getHost(address));
+            when(address.getHostAddress()).thenReturn("10.0.0.1");
+            Assertions.assertEquals("10.0.0.1", NetUtils.getHost(address));
 
+            // Regression test for Kubernetes Deployment pod: short hostname without svc suffix
+            // should fall back to getHostAddress() to return the IP address
             address = mock(InetAddress.class);
             when(address.getCanonicalHostName()).thenReturn("dolphinscheduler-worker-0");
             when(address.getHostName()).thenReturn("dolphinscheduler-worker-0");
-            Assertions.assertEquals("dolphinscheduler-worker-0", NetUtils.getHost(address));
+            when(address.getHostAddress()).thenReturn("10.0.0.2");
+            Assertions.assertEquals("10.0.0.2", NetUtils.getHost(address));
         }
     }
 

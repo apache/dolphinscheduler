@@ -298,7 +298,11 @@ public class AlertPluginInstanceServiceImpl extends BaseServiceImpl implements A
     }
 
     @Override
-    public void testSend(int pluginDefineId, String pluginInstanceParams) {
+    public void testSend(User loginUser, int pluginDefineId, String pluginInstanceParams) {
+        if (!canOperatorPermissions(loginUser, null, AuthorizationType.ALERT_PLUGIN_INSTANCE, ALERT_INSTANCE_CREATE)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+
         Optional<Host> alertServerAddressOptional = getAlertServerAddress();
         if (!alertServerAddressOptional.isPresent()) {
             throw new ServiceException(Status.ALERT_SERVER_NOT_EXIST);

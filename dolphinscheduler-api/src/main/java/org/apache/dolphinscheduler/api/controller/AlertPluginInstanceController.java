@@ -106,9 +106,10 @@ public class AlertPluginInstanceController extends BaseController {
     @PostMapping(value = "/test-send")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(SEND_TEST_ALERT_PLUGIN_INSTANCE_ERROR)
-    public Result<Boolean> testSendAlertPluginInstance(@RequestParam(value = "pluginDefineId") int pluginDefineId,
+    public Result<Boolean> testSendAlertPluginInstance(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                       @RequestParam(value = "pluginDefineId") int pluginDefineId,
                                                        @RequestParam(value = "pluginInstanceParams") String pluginInstanceParams) {
-        alertPluginInstanceService.testSend(pluginDefineId, pluginInstanceParams);
+        alertPluginInstanceService.testSend(loginUser, pluginDefineId, pluginInstanceParams);
         return Result.success(true);
     }
 

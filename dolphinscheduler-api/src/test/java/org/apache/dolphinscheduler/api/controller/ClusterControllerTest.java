@@ -107,24 +107,14 @@ public class ClusterControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    public void testQueryClusterByCode() throws Exception {
+    public void testQueryClusterByCodeIsNotExposed() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("clusterCode", clusterCode);
 
-        MvcResult mvcResult = mockMvc.perform(get("/cluster/query-by-code")
+        mockMvc.perform(get("/cluster/query-by-code")
                 .header(SESSION_ID, sessionId)
                 .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        logger.info(result.toString());
-        Assertions.assertTrue(result != null && result.isSuccess());
-        logger.info(mvcResult.getResponse().getContentAsString());
-        logger.info("query cluster by id :{}, return result:{}", clusterCode,
-                mvcResult.getResponse().getContentAsString());
-
+                .andExpect(status().isNotFound());
     }
 
     @Test

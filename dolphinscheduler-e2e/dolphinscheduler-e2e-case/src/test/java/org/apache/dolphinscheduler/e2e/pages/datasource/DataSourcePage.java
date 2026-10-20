@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.e2e.pages.datasource;
 
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
 import java.util.List;
+import java.util.Locale;
 
 import lombok.Getter;
 
@@ -63,16 +65,16 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     public DataSourcePage createDataSource(String dataSourceType, String dataSourceName, String dataSourceDescription,
                                            String ip, String port, String userName, String password, String database,
                                            String jdbcParams) {
-        buttonCreateDataSource().click();
+        UiInteraction.click(driver, ".btn-create-data-source");
 
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOf(dataSourceModal));
-        WebElement dataSourceTypeButton = By.className(dataSourceType.toUpperCase() + "-box").findElement(driver);
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(dataSourceTypeButton));
-        dataSourceTypeButton.click();
+        String typeLabel = dataSourceType.toUpperCase(Locale.ROOT);
+        // Labels such as HIVE/IMPALA are class tokens, but not valid unescaped CSS identifiers.
+        String typeClass = typeLabel.replace("\\", "\\\\").replace("'", "\\'") + "-box";
+        UiInteraction.click(driver, ".dialog-source-modal [class~='" + typeClass + "']");
 
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.textToBePresentInElement(
-                driver.findElement(By.className("dialog-create-data-source")), dataSourceType.toUpperCase()));
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.textToBePresentInElementLocated(
+                By.className("dialog-create-data-source"), typeLabel));
 
         createDataSourceForm().inputDataSourceName().sendKeys(dataSourceName);
         createDataSourceForm().inputDataSourceDescription().sendKeys(dataSourceDescription);
@@ -90,7 +92,9 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
             createDataSourceForm().inputJdbcParams().sendKeys(jdbcParams);
         }
 
-        createDataSourceForm().buttonSubmit().click();
+        UiInteraction.click(driver, ".dialog-create-data-source .btn-submit");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.invisibilityOfElementLocated(
+                By.cssSelector(".dialog-create-data-source")));
 
         return this;
     }

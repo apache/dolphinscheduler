@@ -1,5 +1,5 @@
 # PyDolphinScheduler
 
-PyDolphinScheduler is python API for Apache DolphinScheduler, which allow you definition your workflow by python code, aka workflow-as-codes.
+PyDolphinScheduler is the Python API for Apache DolphinScheduler, which allows you to define your workflow using Python code, aka workflow-as-code.
 
-For more information, please refer to [PyDolphinScheduler](https://dolphinscheduler.apache.org/python/main/)
+For more information, please refer to [PyDolphinScheduler](https://dolphinscheduler.apache.org/python/)

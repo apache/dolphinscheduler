@@ -17,6 +17,11 @@
 
 package org.apache.dolphinscheduler.plugin.task.api;
 
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.model.TaskAlertInfo;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +41,99 @@ public class AbstractTaskTest {
         }
         Assertions.assertNotNull(str);
         Assertions.assertEquals(jobId, str.substring(6));
+    }
+
+    @Test
+    public void testGetExitStatus() {
+        AbstractTask task = new TestTask();
+
+        task.setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
+        Assertions.assertEquals(TaskExecutionStatus.SUCCESS, task.getExitStatus());
+
+        task.setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
+        Assertions.assertEquals(TaskExecutionStatus.KILL, task.getExitStatus());
+
+        task.setExitStatusCode(TaskConstants.EXIT_CODE_HARD_KILL);
+        Assertions.assertEquals(TaskExecutionStatus.KILL, task.getExitStatus());
+
+        task.setExitStatusCode(TaskConstants.EXIT_CODE_SIGINT_KILL);
+        Assertions.assertEquals(TaskExecutionStatus.KILL, task.getExitStatus());
+
+        task.setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
+        Assertions.assertEquals(TaskExecutionStatus.FAILURE, task.getExitStatus());
+    }
+
+    @Test
+    public void testDirectFieldAssignmentIsExposedByGetters() {
+        AbstractTask task = new TestTask();
+        // legacy plugins may assign the protected fields directly
+        task.needAlert = true;
+        TaskAlertInfo alertInfo = new TaskAlertInfo();
+        alertInfo.setTitle("legacy alert");
+        task.taskAlertInfo = alertInfo;
+
+        Assertions.assertTrue(task.getNeedAlert());
+        Assertions.assertSame(alertInfo, task.getTaskAlertInfo());
+    }
+
+    @Test
+    public void testSettersWriteBothFieldAndContext() {
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        AbstractTask task = new TestTask(ctx);
+        task.setNeedAlert(true);
+        TaskAlertInfo alertInfo = new TaskAlertInfo();
+        alertInfo.setTitle("setter alert");
+        task.setTaskAlertInfo(alertInfo);
+
+        Assertions.assertTrue(ctx.isNeedAlert());
+        Assertions.assertSame(alertInfo, ctx.getTaskAlertInfo());
+        Assertions.assertTrue(task.getNeedAlert());
+        Assertions.assertSame(alertInfo, task.getTaskAlertInfo());
+    }
+
+    @Test
+    public void testGettersFallBackToContextWhenFieldNotSet() {
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        AbstractTask task = new TestTask(ctx);
+        ctx.setNeedAlert(true);
+        TaskAlertInfo alertInfo = new TaskAlertInfo();
+        alertInfo.setTitle("context alert");
+        ctx.setTaskAlertInfo(alertInfo);
+
+        Assertions.assertTrue(task.getNeedAlert());
+        Assertions.assertSame(alertInfo, task.getTaskAlertInfo());
+    }
+
+    @Test
+    public void testGettersReturnDefaultsWhenNothingSet() {
+        AbstractTask task = new TestTask();
+
+        Assertions.assertFalse(task.getNeedAlert());
+        Assertions.assertNull(task.getTaskAlertInfo());
+    }
+
+    private static final class TestTask extends AbstractTask {
+
+        private TestTask() {
+            super(new TaskExecutionContext());
+        }
+
+        private TestTask(TaskExecutionContext taskExecutionContext) {
+            super(taskExecutionContext);
+        }
+
+        @Override
+        public void handle(TaskCallBack taskCallBack) {
+        }
+
+        @Override
+        public void cancel() {
+        }
+
+        @Override
+        public AbstractParameters getParameters() {
+            return new SubWorkflowParameters();
+        }
     }
 
 }

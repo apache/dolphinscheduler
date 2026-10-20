@@ -13,7 +13,7 @@
 DolphinScheduler 的主要特性如下：
 
 - 易于部署，提供四种部署方式，包括 Standalone、Cluster、Docker 和 Kubernetes
-- 易于使用，可以通过多种方式创建和管理工作流，包括 Web UI、[Python SDK](https://dolphinscheduler.apache.org/python/main/index.html) 和 Open API
+- 易于使用，可以通过多种方式创建和管理工作流，包括 Web UI、[Python SDK](https://dolphinscheduler.apache.org/python/) 和 Open API
 - 高可靠高可用，多主多从的去中心化架构，原生支持横向扩展
 - 高性能，性能比其他编排平台快N倍，每天可支持千万级任务
 - Cloud Native，DolphinScheduler支持编排多云/数据中心工作流，支持自定义任务类型

@@ -36,7 +36,7 @@ permissions:
 jobs:
   paths-filter:
     name: E2E-Path-Filter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
@@ -53,12 +53,17 @@ jobs:
     name: E2E-Build
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
         with:
           submodules: true
+      - name: Cache Maven Wrapper
+        uses: actions/cache@v5
+        with:
+          path: ~/.m2/wrapper
+          key: ${{ runner.os }}-mvnw-${{ hashFiles('.mvn/wrapper/maven-wrapper.properties') }}
       - name: Sanity Check
         uses: ./.github/actions/sanity-check
         with:
@@ -90,7 +95,7 @@ jobs:
   e2e:
     name: ${{ matrix.case.name }}
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     strategy:
       matrix:
@@ -150,11 +155,16 @@ jobs:
       - uses: actions/checkout@v6
         with:
           submodules: true
+      - name: Cache Maven Wrapper
+        uses: actions/cache@v5
+        with:
+          path: ~/.m2/wrapper
+          key: ${{ runner.os }}-mvnw-${{ hashFiles('.mvn/wrapper/maven-wrapper.properties') }}
       - name: Set up JDK 11
         uses: actions/setup-java@v5
         with:
           java-version: 11
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Collect Workflow Metrics
         uses: ./.github/actions/actions-workflow-metrics
       - name: Cache local Maven repository
@@ -186,7 +196,7 @@ jobs:
           retention-days: 1
   result:
     name: E2E
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: [ e2e, paths-filter ]
     if: always()

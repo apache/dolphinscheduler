@@ -636,7 +636,8 @@ CREATE TABLE t_ds_workflow_instance
     var_pool                   longtext,
     dry_run                    int NULL DEFAULT 0,
     restart_time               datetime     DEFAULT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    INDEX idx_project_start_time (project_code ASC, start_time DESC)
 );
 
 -- ----------------------------
@@ -857,6 +858,7 @@ CREATE TABLE t_ds_schedules
     end_time                  datetime     NOT NULL,
     timezone_id               varchar(40) DEFAULT NULL,
     crontab                   varchar(255) NOT NULL,
+    missed_fire_policy        tinyint NOT NULL DEFAULT 2,
     failure_strategy          tinyint(4) NOT NULL,
     user_id                   int(11) NOT NULL,
     release_state             tinyint(4) NOT NULL,
@@ -936,7 +938,8 @@ CREATE TABLE t_ds_task_instance
     dry_run                 int NULL DEFAULT 0,
     cpu_quota               int(11) DEFAULT '-1' NOT NULL,
     memory_max              int(11) DEFAULT '-1' NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    INDEX idx_project_submit_time (project_code ASC, submit_time DESC)
 );
 
 -- ----------------------------

@@ -37,6 +37,9 @@ public class FetchFileContentDtoValidator extends AbstractResourceValidator<Fetc
         if (fetchFileContentDto.getSkipLineNum() < 0) {
             throw new ServiceException("skipLineNum must be greater than or equal to 0");
         }
+        if (fetchFileContentDto.getLimit() != -1 && fetchFileContentDto.getLimit() <= 0) {
+            throw new ServiceException("limit must be -1 or greater than 0");
+        }
         String resourceFileAbsolutePath = fetchFileContentDto.getResourceFileAbsolutePath();
         User loginUser = fetchFileContentDto.getLoginUser();
 

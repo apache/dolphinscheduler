@@ -646,7 +646,8 @@ CREATE TABLE `t_ds_workflow_instance` (
   `restart_time` datetime DEFAULT NULL COMMENT 'workflow instance restart time',
   PRIMARY KEY (`id`),
   KEY `workflow_instance_index` (`workflow_definition_code`,`id`) USING BTREE,
-  KEY `start_time_index` (`start_time`,`end_time`) USING BTREE
+  KEY `start_time_index` (`start_time`,`end_time`) USING BTREE,
+  KEY `idx_project_start_time` (`project_code` ASC, `start_time` DESC) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------
@@ -858,6 +859,7 @@ CREATE TABLE `t_ds_schedules` (
   `end_time` datetime NOT NULL COMMENT 'end time',
   `timezone_id` varchar(40) DEFAULT NULL COMMENT 'schedule timezone id',
   `crontab` varchar(255) NOT NULL COMMENT 'crontab description',
+  `missed_fire_policy` tinyint NOT NULL DEFAULT '2' COMMENT 'missed fire policy: 0 skip missed, 1 fire once now, 2 fire all missed',
   `failure_strategy` tinyint(4) NOT NULL COMMENT 'failure strategy. 0:end,1:continue',
   `user_id` int(11) NOT NULL COMMENT 'user id',
   `release_state` tinyint(4) NOT NULL COMMENT 'release state. 0:offline,1:online ',
@@ -937,7 +939,8 @@ CREATE TABLE `t_ds_task_instance` (
   `memory_max` int(11) DEFAULT '-1' NOT NULL COMMENT 'MemoryMax(MB): -1:Infinity',
   PRIMARY KEY (`id`),
   KEY `workflow_instance_id` (`workflow_instance_id`) USING BTREE,
-  KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE
+  KEY `idx_code_version` (`task_code`, `task_definition_version`) USING BTREE,
+  KEY `idx_project_submit_time` (`project_code` ASC, `submit_time` DESC) USING BTREE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;
 
 -- ----------------------------

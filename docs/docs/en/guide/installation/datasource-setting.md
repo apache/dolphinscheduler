@@ -131,7 +131,7 @@ restarting `api-server` and `worker-server`. Mount to container volume in the sa
 like Docker.
 
 > Note: If you only want to use MySQL in the datasource center, there is no requirement for the version of MySQL JDBC driver.
-> But if you want to use MySQL as the metabase of DolphinScheduler, it only supports [8.0.16 and above](https:/ /repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar) version.
+> But if you want to use MySQL as the metabase of DolphinScheduler, it only supports [8.0.16 and above](https://repo1.maven.org/maven2/mysql/mysql-connector-java/8.0.16/mysql-connector-java-8.0.16.jar) version.
 
 [mysql]: https://downloads.MySQL.com/archives/c-j/
 

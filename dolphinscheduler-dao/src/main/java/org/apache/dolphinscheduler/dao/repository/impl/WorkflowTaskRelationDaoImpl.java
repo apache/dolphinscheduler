@@ -70,19 +70,8 @@ public class WorkflowTaskRelationDaoImpl extends BaseDao<WorkflowTaskRelation, W
     }
 
     @Override
-    public boolean updateWorkflowTaskRelationTaskVersion(WorkflowTaskRelation workflowTaskRelation) {
-        return mybatisMapper.updateWorkflowTaskRelationTaskVersion(workflowTaskRelation) > 0;
-    }
-
-    @Override
     public void deleteByWorkflowDefinitionCodeAndVersion(long workflowDefinitionCode, int workflowDefinitionVersion) {
         mybatisMapper.deleteByWorkflowDefinitionCodeAndVersion(workflowDefinitionCode, workflowDefinitionVersion);
-    }
-
-    @Override
-    public List<WorkflowTaskRelation> queryWorkflowTaskRelationByTaskCodeAndTaskVersion(long taskCode,
-                                                                                        long postTaskVersion) {
-        return mybatisMapper.queryWorkflowTaskRelationByTaskCodeAndTaskVersion(taskCode, postTaskVersion);
     }
 
     @Override

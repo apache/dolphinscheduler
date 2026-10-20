@@ -26,12 +26,17 @@ import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskInstanceService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -94,25 +99,25 @@ public class TaskInstanceController extends BaseController {
     @GetMapping()
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_LIST_PAGING_ERROR)
-    public Result queryTaskListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                      @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                      @RequestParam(value = "workflowInstanceId", required = false, defaultValue = "0") Integer workflowInstanceId,
-                                      @RequestParam(value = "workflowInstanceName", required = false) String workflowInstanceName,
-                                      @RequestParam(value = "workflowDefinitionName", required = false) String workflowDefinitionName,
-                                      @RequestParam(value = "searchVal", required = false) String searchVal,
-                                      @RequestParam(value = "taskName", required = false) String taskName,
-                                      @RequestParam(value = "taskCode", required = false) Long taskCode,
-                                      @RequestParam(value = "executorName", required = false) String executorName,
-                                      @RequestParam(value = "stateType", required = false) TaskExecutionStatus stateType,
-                                      @RequestParam(value = "host", required = false) String host,
-                                      @RequestParam(value = "startDate", required = false) String startTime,
-                                      @RequestParam(value = "endDate", required = false) String endTime,
-                                      @RequestParam(value = "taskExecuteType", required = false, defaultValue = "BATCH") TaskExecuteType taskExecuteType,
-                                      @RequestParam("pageNo") Integer pageNo,
-                                      @RequestParam("pageSize") Integer pageSize) {
+    public Result<PageInfo<TaskInstance>> queryTaskListPaging(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                              @RequestParam(value = "workflowInstanceId", required = false, defaultValue = "0") Integer workflowInstanceId,
+                                                              @RequestParam(value = "workflowInstanceName", required = false) String workflowInstanceName,
+                                                              @RequestParam(value = "workflowDefinitionName", required = false) String workflowDefinitionName,
+                                                              @RequestParam(value = "searchVal", required = false) String searchVal,
+                                                              @RequestParam(value = "taskName", required = false) String taskName,
+                                                              @RequestParam(value = "taskCode", required = false) Long taskCode,
+                                                              @RequestParam(value = "executorName", required = false) String executorName,
+                                                              @RequestParam(value = "stateType", required = false) TaskExecutionStatus stateType,
+                                                              @RequestParam(value = "host", required = false) String host,
+                                                              @RequestParam(value = "startDate", required = false) String startTime,
+                                                              @RequestParam(value = "endDate", required = false) String endTime,
+                                                              @RequestParam(value = "taskExecuteType", required = false, defaultValue = "BATCH") TaskExecuteType taskExecuteType,
+                                                              @RequestParam("pageNo") Integer pageNo,
+                                                              @RequestParam("pageSize") Integer pageSize) {
         checkPageParams(pageNo, pageSize);
         searchVal = ParameterUtils.handleEscapes(searchVal);
-        return taskInstanceService.queryTaskListPaging(
+        Result<PageInfo<TaskInstance>> result = taskInstanceService.queryTaskListPaging(
                 loginUser,
                 projectCode,
                 workflowInstanceId,
@@ -129,6 +134,13 @@ public class TaskInstanceController extends BaseController {
                 taskExecuteType,
                 pageNo,
                 pageSize);
+        PageInfo<TaskInstance> pageInfo = result.getData();
+        if (pageInfo != null && pageInfo.getTotalList() != null) {
+            pageInfo.setTotalList(pageInfo.getTotalList().stream()
+                    .map(SensitivePropertyUtils::mask)
+                    .collect(Collectors.toList()));
+        }
+        return result;
     }
 
     /**

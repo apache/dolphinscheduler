@@ -26,6 +26,7 @@ import lombok.Data;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -37,7 +38,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
  * Security configuration for Actuator endpoints.
@@ -57,8 +57,6 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Slf4j
 public class ActuatorAuthenticationAutoConfiguration {
 
-    private static final String ACTUATOR_PATH_PATTERN_1 = "/dolphinscheduler/actuator/";
-    private static final String ACTUATOR_PATH_PATTERN_2 = "/actuator/";
     private static final String ROLE_ACTUATOR = "ACTUATOR";
 
     @Bean
@@ -68,9 +66,8 @@ public class ActuatorAuthenticationAutoConfiguration {
         log.info(
                 "Initialize ActuatorSecurityConfiguration, management.security.enabled: {}, management.security.exclude: {}",
                 properties.isEnabled(), properties.getExclude());
-        // Restrict this security configuration to requests starting with actuator paths
-        http.requestMatcher(request -> request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_1) ||
-                request.getRequestURI().startsWith(ACTUATOR_PATH_PATTERN_2));
+        // Restrict this security configuration to registered actuator endpoints
+        http.requestMatcher(EndpointRequest.toAnyEndpoint());
 
         if (properties.isEnabled()) {
             http.authorizeHttpRequests(authz -> {
@@ -78,11 +75,7 @@ public class ActuatorAuthenticationAutoConfiguration {
                 for (String endpoint : properties.getExclude()) {
                     if (StringUtils.isNotBlank(endpoint)) {
                         String cleanEndpoint = endpoint.trim();
-                        // Match both standard and prefixed actuator paths
-                        authz.requestMatchers(
-                                new AntPathRequestMatcher(ACTUATOR_PATH_PATTERN_2 + cleanEndpoint)).permitAll();
-                        authz.requestMatchers(
-                                new AntPathRequestMatcher(ACTUATOR_PATH_PATTERN_1 + cleanEndpoint)).permitAll();
+                        authz.requestMatchers(EndpointRequest.to(cleanEndpoint)).permitAll();
                     }
                 }
                 // All other actuator requests require the ACTUATOR role

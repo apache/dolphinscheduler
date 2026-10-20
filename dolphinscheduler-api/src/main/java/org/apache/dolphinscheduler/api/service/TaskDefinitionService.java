@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service;
 
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
@@ -52,22 +54,6 @@ public interface TaskDefinitionService {
                                      long taskCode);
 
     /**
-     * update task definition and upstream
-     *
-     * @param loginUser             login user
-     * @param projectCode           project code
-     * @param taskCode              task definition code
-     * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes         upstream task codes, sep comma
-     * @return updated task code
-     */
-    Long updateTaskWithUpstream(User loginUser,
-                                long projectCode,
-                                long taskCode,
-                                String taskDefinitionJsonObj,
-                                String upstreamCodes);
-
-    /**
      * update task definition
      *
      * @param loginUser login user
@@ -90,11 +76,11 @@ public interface TaskDefinitionService {
      * @param pageSize page size
      * @return the pagination task definition versions info of the certain task definition
      */
-    Result queryTaskDefinitionVersions(User loginUser,
-                                       long projectCode,
-                                       long taskCode,
-                                       int pageNo,
-                                       int pageSize);
+    Result<PageInfo<TaskDefinitionLog>> queryTaskDefinitionVersions(User loginUser,
+                                                                    long projectCode,
+                                                                    long taskCode,
+                                                                    int pageNo,
+                                                                    int pageSize);
 
     /**
      * delete the certain task definition version by version and code

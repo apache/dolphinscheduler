@@ -37,7 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -289,9 +289,9 @@ public class TenantServiceTest {
         return userList;
     }
 
-    private List<WorkflowInstance> getInstanceList() {
-        List<WorkflowInstance> workflowInstances = new ArrayList<>();
-        WorkflowInstance workflowInstance = new WorkflowInstance();
+    private List<WorkflowInstanceSummaryDto> getInstanceList() {
+        List<WorkflowInstanceSummaryDto> workflowInstances = new ArrayList<>();
+        WorkflowInstanceSummaryDto workflowInstance = new WorkflowInstanceSummaryDto();
         workflowInstances.add(workflowInstance);
         return workflowInstances;
     }

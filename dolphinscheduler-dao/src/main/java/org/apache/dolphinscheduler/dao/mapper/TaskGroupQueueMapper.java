@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -117,6 +118,16 @@ public interface TaskGroupQueueMapper extends BaseMapper<TaskGroupQueue> {
     List<TaskGroupQueue> queryAllTaskGroupQueueByInQueue(@Param("inQueue") int inQueue);
 
     List<TaskGroupQueue> queryByTaskInstanceId(@Param("taskInstanceId") Integer taskInstanceId);
+
+    int acquireTaskGroupQueue(@Param("id") Integer id,
+                              @Param("waitingStatus") int waitingStatus,
+                              @Param("acquiredStatus") int acquiredStatus,
+                              @Param("inQueue") int inQueue,
+                              @Param("forceStart") int forceStart,
+                              @Param("updateTime") Date updateTime);
+
+    int deleteByTaskInstanceIdAndStatus(@Param("taskInstanceId") Integer taskInstanceId,
+                                        @Param("status") int status);
 
     List<TaskGroupQueue> queryUsingTaskGroupQueueByGroupId(@Param("taskGroupId") Integer taskGroupId,
                                                            @Param("status") int status,

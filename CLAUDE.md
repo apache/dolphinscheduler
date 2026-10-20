@@ -157,5 +157,5 @@ A **user** hits the UI, which calls the API server. The API server writes to the
 
 - Release docs (version-specific): https://dolphinscheduler.apache.org/en-us/docs
 - GitHub issues: https://github.com/apache/dolphinscheduler/issues
-- Python SDK: https://dolphinscheduler.apache.org/python/main/index.html
+- Python SDK: https://dolphinscheduler.apache.org/python/
 - Contribution guide: [`docs/docs/en/contribute/join/contribute.md`](docs/docs/en/contribute/join/contribute.md)

@@ -178,6 +178,9 @@ spec:
             {{- include "dolphinscheduler.fsFileResource.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.ldap.ssl.volumeMount" . | nindent 12 }}
             {{- include "dolphinscheduler.etcd.ssl.volumeMount" . | nindent 12 }}
+            {{- if .Values.api.extraVolumeMounts }}
+            {{- toYaml .Values.api.extraVolumeMounts | nindent 12 }}
+            {{- end }}
       volumes:
         - name: {{ include "dolphinscheduler.fullname" . }}-api
           {{- if .Values.api.persistentVolumeClaim.enabled }}
@@ -198,4 +201,7 @@ spec:
         {{- include "dolphinscheduler.fsFileResource.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.ldap.ssl.volume" . | nindent 8 }}
         {{- include "dolphinscheduler.etcd.ssl.volume" . | nindent 8 }}
+        {{- if .Values.api.extraVolumes }}
+        {{- toYaml .Values.api.extraVolumes | nindent 8 }}
+        {{- end }}
 {{- end }}

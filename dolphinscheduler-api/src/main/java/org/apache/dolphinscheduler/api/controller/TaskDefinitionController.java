@@ -23,19 +23,22 @@ import static org.apache.dolphinscheduler.api.enums.Status.QUERY_DETAIL_OF_TASK_
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_TASK_DEFINITION_VERSIONS_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.RELEASE_TASK_DEFINITION_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.SWITCH_TASK_DEFINITION_VERSION_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.UPDATE_TASK_DEFINITION_ERROR;
 
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
 import org.apache.dolphinscheduler.api.audit.enums.AuditType;
 import org.apache.dolphinscheduler.api.exceptions.ApiException;
 import org.apache.dolphinscheduler.api.service.TaskDefinitionService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.vo.TaskDefinitionVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,7 +46,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -65,37 +67,6 @@ public class TaskDefinitionController extends BaseController {
     private TaskDefinitionService taskDefinitionService;
 
     /**
-     * update task definition
-     *
-     * @param loginUser             login user
-     * @param projectCode           project code
-     * @param code                  task definition code
-     * @param taskDefinitionJsonObj task definition json object
-     * @param upstreamCodes         upstream task codes, sep comma
-     * @return update result code
-     */
-    @Operation(summary = "updateWithUpstream", description = "UPDATE_TASK_DEFINITION_NOTES")
-    @Parameters({
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true, schema = @Schema(implementation = long.class)),
-            @Parameter(name = "code", description = "TASK_DEFINITION_CODE", required = true, schema = @Schema(implementation = long.class, example = "1")),
-            @Parameter(name = "taskDefinitionJsonObj", description = "TASK_DEFINITION_JSON", required = true, schema = @Schema(implementation = String.class)),
-            @Parameter(name = "upstreamCodes", description = "UPSTREAM_CODES", required = false, schema = @Schema(implementation = String.class))
-    })
-    @PutMapping(value = "/{code}/with-upstream")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(UPDATE_TASK_DEFINITION_ERROR)
-    @OperatorLog(auditType = AuditType.TASK_UPDATE)
-    public Result<Long> updateTaskWithUpstream(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                               @PathVariable(value = "code") long code,
-                                               @RequestParam(value = "taskDefinitionJsonObj", required = true) String taskDefinitionJsonObj,
-                                               @RequestParam(value = "upstreamCodes", required = false) String upstreamCodes) {
-        Long updatedTaskCode = taskDefinitionService.updateTaskWithUpstream(loginUser, projectCode, code,
-                taskDefinitionJsonObj, upstreamCodes);
-        return Result.success(updatedTaskCode);
-    }
-
-    /**
      * query task definition version paging list info
      *
      * @param loginUser login user info
@@ -115,13 +86,21 @@ public class TaskDefinitionController extends BaseController {
     @GetMapping(value = "/{code}/versions")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TASK_DEFINITION_VERSIONS_ERROR)
-    public Result queryTaskDefinitionVersions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                              @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                              @PathVariable(value = "code") long code,
-                                              @RequestParam(value = "pageNo") int pageNo,
-                                              @RequestParam(value = "pageSize") int pageSize) {
+    public Result<PageInfo<TaskDefinitionLog>> queryTaskDefinitionVersions(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                           @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                           @PathVariable(value = "code") long code,
+                                                                           @RequestParam(value = "pageNo") int pageNo,
+                                                                           @RequestParam(value = "pageSize") int pageSize) {
         checkPageParams(pageNo, pageSize);
-        return taskDefinitionService.queryTaskDefinitionVersions(loginUser, projectCode, code, pageNo, pageSize);
+        Result<PageInfo<TaskDefinitionLog>> result = taskDefinitionService.queryTaskDefinitionVersions(loginUser,
+                projectCode, code, pageNo, pageSize);
+        PageInfo<TaskDefinitionLog> pageInfo = result.getData();
+        if (pageInfo != null && pageInfo.getTotalList() != null) {
+            pageInfo.setTotalList(pageInfo.getTotalList().stream()
+                    .map(log -> (TaskDefinitionLog) SensitivePropertyUtils.mask(log))
+                    .collect(Collectors.toList()));
+        }
+        return result;
     }
 
     /**
@@ -196,7 +175,7 @@ public class TaskDefinitionController extends BaseController {
                                                               @PathVariable(value = "code") long code) {
         TaskDefinitionVO taskDefinitionVO =
                 taskDefinitionService.queryTaskDefinitionDetail(loginUser, projectCode, code);
-        return Result.success(taskDefinitionVO);
+        return Result.success((TaskDefinitionVO) SensitivePropertyUtils.mask(taskDefinitionVO));
     }
 
     /**

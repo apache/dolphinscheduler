@@ -145,7 +145,7 @@ RUN apt update ; \
 DolphinScheduler 开发环境配置有两个方式，分别是standalone模式，以及普通模式
 
 * [standalone模式](#dolphinscheduler-standalone快速开发模式)：**推荐使用，但仅支持 1.3.9 及以后的版本**，方便快速的开发环境搭建，能解决大部分场景的开发
-* [普通模式](#dolphinscheduler-普通开发模式)：master、worker、api等单独启动，能更好的的模拟真实生产环境，可以覆盖的测试环境更多
+* [普通模式](#dolphinscheduler-普通开发模式)：master、worker、api等单独启动，能更好的模拟真实生产环境，可以覆盖的测试环境更多
 
 ## DolphinScheduler Standalone快速开发模式
 

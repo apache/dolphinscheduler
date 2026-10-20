@@ -24,18 +24,33 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
+import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.DagData;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskInstanceDependentDetails;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
+import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
+import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
+import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -51,10 +66,33 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
     @MockBean
     private WorkflowInstanceService workflowInstanceService;
 
+    /**
+     * All properties that were present on {@link WorkflowInstance} but are
+     * intentionally removed from {@link WorkflowInstanceSummaryVO} and thus from
+     * the list/topN/trigger API response. This list must stay in sync with the
+     * incompatible-change documentation in incompatible.md (version 3.4.3).
+     */
+    private static final List<String> REMOVED_RESPONSE_PROPERTIES = java.util.Arrays.asList(
+            // Heavy DB-backed fields removed from the SQL projection
+            "commandParam", "globalParams", "historyCmd", "varPool", "stateHistory",
+            // Transient (non-DB) fields that were always null in list responses
+            "stateDescList", "workflowDefinition", "dagData", "queue",
+            "locations", "dependenceScheduleTimes",
+            // Derived getter properties
+            "cmdTypeIfComplement", "complementData");
+
     @Test
     public void testQueryWorkflowInstanceList() throws Exception {
-        Result mockResult = new Result<>();
+        WorkflowInstanceSummaryVO dto = new WorkflowInstanceSummaryVO();
+        dto.setId(1);
+        dto.setName("test-workflow");
+        PageInfo<WorkflowInstanceSummaryVO> pageInfo = new PageInfo<>(1, 10);
+        pageInfo.setTotalList(java.util.Collections.singletonList(dto));
+        pageInfo.setTotal(1);
+
+        Result<PageInfo<WorkflowInstanceSummaryVO>> mockResult = new Result<>();
         mockResult.setCode(Status.SUCCESS.getCode());
+        mockResult.setData(pageInfo);
         Mockito.when(workflowInstanceService
                 .queryWorkflowInstanceList(Mockito.any(), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(),
                         Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
@@ -77,9 +115,44 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        Result result = JSONUtils.parseObject(responseBody, Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+
+        // Parse the JSON tree and navigate to the DTO object in the response
+        com.fasterxml.jackson.databind.node.ObjectNode root = JSONUtils.parseObject(responseBody);
+        com.fasterxml.jackson.databind.JsonNode dtoNode =
+                root.path("data").path("totalList").path(0);
+        Assertions.assertTrue(dtoNode.isObject(),
+                "Response data.totalList[0] should be a JSON object (the DTO)");
+        java.util.Set<String> jsonKeys = new java.util.HashSet<>();
+        dtoNode.fieldNames().forEachRemaining(jsonKeys::add);
+
+        // Verify that none of the removed properties appear in the serialized response
+        for (String removed : REMOVED_RESPONSE_PROPERTIES) {
+            Assertions.assertFalse(jsonKeys.contains(removed),
+                    "List endpoint response JSON should not contain key '" + removed
+                            + "' — it is removed from WorkflowInstanceSummaryVO");
+        }
+
+        // Positive assertion: verify all expected DTO fields are present in the response.
+        // This catches accidental omission of fields that should be retained.
+        java.util.Set<String> expectedKeys = new java.util.HashSet<>(java.util.Arrays.asList(
+                "id", "name", "workflowDefinitionCode", "workflowDefinitionVersion",
+                "projectCode", "state", "recovery", "startTime", "endTime",
+                "runTimes", "host", "commandType", "taskDependType",
+                "maxTryTimes", "failureStrategy", "warningType", "warningGroupId",
+                "scheduleTime", "commandStartTime",
+                "isSubWorkflow", "executorId", "workflowInstancePriority",
+                "workerGroup", "environmentCode", "timeout", "tenantCode",
+                "dryRun", "nextWorkflowInstanceId", "restartTime", "duration",
+                "executorName"));
+        for (String expected : expectedKeys) {
+            Assertions.assertTrue(jsonKeys.contains(expected),
+                    "List endpoint response JSON should contain key '" + expected
+                            + "' — it is a required DTO field");
+        }
     }
 
     @Test
@@ -102,8 +175,36 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    public void testQueryTaskListByWorkflowInstanceIdMasksSensitiveTaskParams() throws Exception {
+        TaskInstanceDependentDetails taskInstance = new TaskInstanceDependentDetails();
+        taskInstance.setTaskParams(sensitiveTaskParams());
+        WorkflowInstanceTaskListDTO dto = new WorkflowInstanceTaskListDTO("SUCCESS",
+                Collections.singletonList(taskInstance));
+        Mockito.when(workflowInstanceService.queryTaskListByWorkflowInstanceId(Mockito.any(), Mockito.anyLong(),
+                Mockito.any()))
+                .thenReturn(dto);
+
+        MvcResult mvcResult = mockMvc
+                .perform(get("/projects/{projectCode}/workflow-instances/{id}/tasks", "1113", "123")
+                        .header(SESSION_ID, sessionId))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andReturn();
+
+        String responseBody = mvcResult.getResponse().getContentAsString();
+        Result result = JSONUtils.parseObject(responseBody, Result.class);
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        com.fasterxml.jackson.databind.node.ObjectNode root = JSONUtils.parseObject(responseBody);
+        String taskParams = root.path("data").path("taskList").path(0).path("taskParams").toString();
+        Assertions.assertTrue(taskParams.contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(taskParams.contains("abc"));
+        Assertions.assertTrue(taskInstance.getTaskParams().contains("abc"));
+    }
+
+    @Test
     public void testUpdateWorkflowInstance() throws Exception {
         WorkflowDefinition mockResult = new WorkflowDefinition();
+        mockResult.setGlobalParams(sensitiveGlobalParams());
         Mockito.when(workflowInstanceService
                 .updateWorkflowInstance(Mockito.any(), Mockito.anyLong(), Mockito.anyInt(), Mockito.anyString(),
                         Mockito.anyString(), Mockito.anyString(), Mockito.anyBoolean(), Mockito.anyString(),
@@ -135,13 +236,25 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        com.fasterxml.jackson.databind.node.ObjectNode updateRoot =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
+        String maskedGlobalParams = updateRoot.path("data").path("globalParams").asText();
+        Assertions.assertTrue(maskedGlobalParams.contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(maskedGlobalParams.contains("Secret123"));
+        Assertions.assertTrue(mockResult.getGlobalParams().contains("Secret123"));
     }
 
     @Test
     public void testQueryWorkflowInstanceById() throws Exception {
+        WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setGlobalParams(sensitiveGlobalParams());
+        TaskDefinition taskDefinition = new TaskDefinition();
+        taskDefinition.setTaskParams(sensitiveTaskParams());
+        workflowInstance.setDagData(new DagData(new WorkflowDefinition(), Collections.emptyList(),
+                Collections.singletonList(taskDefinition)));
         Mockito.when(
                 workflowInstanceService.queryWorkflowInstanceById(Mockito.any(), Mockito.anyLong(), Mockito.anyInt()))
-                .thenReturn(new WorkflowInstance());
+                .thenReturn(workflowInstance);
         MvcResult mvcResult = mockMvc.perform(get("/projects/{projectCode}/workflow-instances/{id}", "1113", "123")
                 .header(SESSION_ID, sessionId))
                 .andExpect(status().isOk())
@@ -151,6 +264,14 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        com.fasterxml.jackson.databind.node.ObjectNode instanceRoot =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
+        String maskedPayload = instanceRoot.path("data").toString();
+        Assertions.assertTrue(maskedPayload.contains(TaskConstants.SENSITIVE_DATA_MASK));
+        Assertions.assertFalse(maskedPayload.contains("Secret123"));
+        Assertions.assertFalse(maskedPayload.contains("\"abc\""));
+        Assertions.assertTrue(workflowInstance.getGlobalParams().contains("Secret123"));
+        Assertions.assertTrue(taskDefinition.getTaskParams().contains("abc"));
     }
 
     @Test
@@ -193,8 +314,11 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testViewVariables() throws Exception {
+        Map<String, Object> localParam = new LinkedHashMap<>();
+        localParam.put(TaskConstants.LOCAL_PARAMS_LIST, Collections.singletonList(sensitive("token", "abc")));
         WorkflowInstanceVariablesDTO mockResult =
-                new WorkflowInstanceVariablesDTO(Collections.emptyList(), Collections.emptyMap());
+                new WorkflowInstanceVariablesDTO(Collections.singletonList(sensitive("pwd", "Secret123")),
+                        Collections.singletonMap("shell-1", localParam));
         Mockito.when(workflowInstanceService.viewVariables(Mockito.any(), Mockito.eq(1113L), Mockito.eq(123)))
                 .thenReturn(mockResult);
         MvcResult mvcResult = mockMvc
@@ -206,6 +330,14 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        com.fasterxml.jackson.databind.node.ObjectNode variablesRoot =
+                JSONUtils.parseObject(mvcResult.getResponse().getContentAsString());
+        Assertions.assertEquals(TaskConstants.SENSITIVE_DATA_MASK,
+                variablesRoot.path("data").path("globalParams").path(0).path("value").asText());
+        Assertions.assertEquals("Secret123", mockResult.getGlobalParams().get(0).getValue());
+        Assertions.assertEquals(TaskConstants.SENSITIVE_DATA_MASK,
+                variablesRoot.path("data").path("localParams").path("shell-1")
+                        .path(TaskConstants.LOCAL_PARAMS_LIST).path(0).path("value").asText());
     }
 
     @Test
@@ -253,5 +385,80 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
         Assertions.assertNotNull(result);
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+    }
+
+    @Test
+    public void testWorkflowInstanceSummaryVO_omitsRemovedProperties() {
+        // Verify via reflection that WorkflowInstanceSummaryVO does NOT declare
+        // the 5 heavy DB-backed fields removed from the list API response contract.
+        List<String> heavyFields = java.util.Arrays.asList(
+                "commandParam", "globalParams", "historyCmd", "varPool", "stateHistory");
+        for (String field : heavyFields) {
+            Assertions.assertThrows(NoSuchFieldException.class,
+                    () -> WorkflowInstanceSummaryVO.class.getDeclaredField(field),
+                    "WorkflowInstanceSummaryVO should NOT declare field '" + field
+                            + "' — it was intentionally removed from the list API response contract");
+        }
+    }
+
+    @Test
+    public void testWorkflowInstanceSummaryVO_includesRequiredFields() {
+        // Verify that all fields present in listSql are also declared in the DTO.
+        List<String> requiredFields = java.util.Arrays.asList(
+                "id", "name", "workflowDefinitionCode", "workflowDefinitionVersion",
+                "projectCode", "state", "recovery", "startTime", "endTime",
+                "runTimes", "host", "commandType", "taskDependType",
+                "maxTryTimes", "failureStrategy", "warningType", "warningGroupId",
+                "scheduleTime", "commandStartTime",
+                "isSubWorkflow", "executorId", "workflowInstancePriority",
+                "workerGroup", "environmentCode", "timeout", "tenantCode",
+                "dryRun", "nextWorkflowInstanceId", "restartTime", "duration",
+                "executorName");
+        for (String field : requiredFields) {
+            Assertions.assertDoesNotThrow(() -> WorkflowInstanceSummaryVO.class.getDeclaredField(field),
+                    "WorkflowInstanceSummaryVO should declare field '" + field
+                            + "' — it must be present in the list API response contract");
+        }
+    }
+
+    @Test
+    public void testFromSummaryDto_MapsAllFields() {
+        WorkflowInstanceSummaryDto dto = new WorkflowInstanceSummaryDto();
+        dto.setId(1);
+        dto.setName("test-workflow");
+        dto.setWorkflowDefinitionCode(123456L);
+        dto.setWorkflowDefinitionVersion(1);
+        dto.setProjectCode(789L);
+        dto.setState(WorkflowExecutionStatus.SUCCESS);
+        dto.setExecutorName("admin");
+        dto.setDuration("1h 2m");
+
+        WorkflowInstanceSummaryVO result = WorkflowInstanceSummaryVO.fromSummaryDto(dto);
+
+        Assertions.assertEquals(1, result.getId());
+        Assertions.assertEquals("test-workflow", result.getName());
+        Assertions.assertEquals(123456L, result.getWorkflowDefinitionCode());
+        Assertions.assertEquals(WorkflowExecutionStatus.SUCCESS, result.getState());
+        Assertions.assertEquals("admin", result.getExecutorName());
+        Assertions.assertEquals("1h 2m", result.getDuration());
+    }
+
+    private static String sensitiveGlobalParams() {
+        return GlobalParameterUtils.serializeGlobalParameter(Collections.singletonList(sensitive("pwd", "Secret123")));
+    }
+
+    private static String sensitiveTaskParams() {
+        return "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
+                + "\"value\":\"abc\",\"sensitive\":true}]}";
+    }
+
+    private static Property sensitive(String prop, String value) {
+        return Property.builder()
+                .prop(prop)
+                .direct(Direct.IN)
+                .type(DataType.VARCHAR)
+                .value(value)
+                .sensitive(true)
+                .build();
     }
 }
