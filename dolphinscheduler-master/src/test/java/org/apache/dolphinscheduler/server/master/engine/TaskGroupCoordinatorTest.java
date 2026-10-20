@@ -50,7 +50,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import com.google.common.collect.Lists;
 
@@ -177,89 +176,143 @@ class TaskGroupCoordinatorTest {
 
     }
     @Test
-    void restartShouldWaitForPreviousFetchToReturn() throws Exception {
-        verifyRestartDuringFetch(false);
+    void closeShouldWaitForPreviousFetchBeforeRestart() throws Exception {
+        verifyCloseDuringFetch(false);
     }
 
     @Test
-    void closeShouldCancelPendingRestart() throws Exception {
-        verifyRestartDuringFetch(true);
+    void interruptedCloseShouldFinishWaitingAndRestoreInterrupt() throws Exception {
+        verifyCloseDuringFetch(true);
     }
 
-    private void verifyRestartDuringFetch(boolean cancelRestart) throws Exception {
-        taskGroupCoordinator = Mockito.spy(taskGroupCoordinator);
-        Mockito.doNothing().when(taskGroupCoordinator).pauseBeforeStart();
+    private void verifyCloseDuringFetch(boolean interruptCloser) throws Exception {
         CountDownLatch fetching = new CountDownLatch(1);
+        CountDownLatch canceled = new CountDownLatch(1);
         CountDownLatch releaseFetch = new CountDownLatch(1);
         CountDownLatch restarted = new CountDownLatch(1);
-        AtomicReference<Throwable> workerFailure = new AtomicReference<>();
+        CountDownLatch closed = new CountDownLatch(1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
         AtomicReference<Thread> firstThread = new AtomicReference<>();
         Mockito.when(taskGroupDao.queryAllTaskGroups()).thenAnswer(invocation -> {
             if (firstThread.compareAndSet(null, Thread.currentThread())) {
                 fetching.countDown();
-                // JDBC calls can finish after interrupt. Keep the previous run inside its DAO call.
-                boolean released = false;
-                while (!released) {
+                // Model a JDBC request that returns only after the server responds, despite interruption.
+                long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+                while (releaseFetch.getCount() != 0) {
                     try {
-                        released = releaseFetch.await(5, TimeUnit.SECONDS);
-                        if (!released) {
-                            workerFailure.set(new AssertionError("Test did not release the blocked DAO"));
+                        long remaining = deadline - System.nanoTime();
+                        if (remaining <= 0 || !releaseFetch.await(remaining, TimeUnit.NANOSECONDS)) {
+                            failure.compareAndSet(null, new AssertionError("Blocked DAO was not released"));
                             return Collections.emptyList();
                         }
                     } catch (InterruptedException ignored) {
-                        // Model a driver that does not cancel its request on interrupt.
+                        canceled.countDown();
                     }
                 }
                 TaskGroup staleGroup = new TaskGroup();
                 staleGroup.setId(1);
                 staleGroup.setUseSize(1);
                 return Collections.singletonList(staleGroup);
-            } else {
-                if (firstThread.get() == Thread.currentThread()) {
-                    workerFailure.set(new AssertionError("Old polling loop resumed"));
-                }
-                restarted.countDown();
+            }
+            if (Thread.currentThread() == firstThread.get()) {
+                failure.compareAndSet(null, new AssertionError("Canceled worker resumed polling"));
+            }
+            restarted.countDown();
+            return Collections.emptyList();
+        });
+        Thread closer = new Thread(() -> {
+            try {
+                taskGroupCoordinator.close();
+                Assertions.assertFalse(firstThread.get().isAlive(), "close must finish the old worker");
+                Assertions.assertEquals(interruptCloser, Thread.currentThread().isInterrupted());
+            } catch (Throwable ex) {
+                failure.compareAndSet(null, ex);
+            } finally {
+                closed.countDown();
+            }
+        });
+        Thread starter = new Thread(() -> {
+            try {
+                taskGroupCoordinator.start();
+            } catch (Throwable ex) {
+                failure.compareAndSet(null, ex);
+            }
+        });
+        closer.setDaemon(true);
+        starter.setDaemon(true);
+        try {
+            taskGroupCoordinator.start();
+            // Allow the coordinator's normal one-minute startup delay before observing the DAO call.
+            Assertions.assertTrue(fetching.await(90, TimeUnit.SECONDS));
+            closer.start();
+            Assertions.assertTrue(canceled.await(5, TimeUnit.SECONDS));
+            if (interruptCloser) {
+                closer.interrupt();
+            }
+            starter.start();
+            // The start call must wait on the lifecycle monitor while close drains the old request.
+            awaitBlocked(starter);
+            Assertions.assertEquals(1L, closed.getCount());
+            Assertions.assertEquals(1L, restarted.getCount());
+            releaseFetch.countDown();
+            Assertions.assertTrue(closed.await(5, TimeUnit.SECONDS));
+            // A new worker also observes the normal startup delay.
+            Assertions.assertTrue(restarted.await(90, TimeUnit.SECONDS));
+            closer.join(5000);
+            starter.join(5000);
+            Assertions.assertFalse(closer.isAlive());
+            Assertions.assertFalse(starter.isAlive());
+            Assertions.assertNull(failure.get());
+            // A nonempty batch fetched before cancellation must not be processed after it returns.
+            Mockito.verify(taskGroupQueueDao, Mockito.never()).countUsingTaskGroupQueueByGroupId(Mockito.anyInt());
+            taskGroupCoordinator.close();
+            taskGroupCoordinator.close();
+            taskGroupCoordinator.start();
+            taskGroupCoordinator.close();
+        } finally {
+            // Release external work before waiting for close; otherwise cleanup itself would deadlock.
+            releaseFetch.countDown();
+            closer.join(5000);
+            starter.join(5000);
+            Assertions.assertFalse(closer.isAlive());
+            Assertions.assertFalse(starter.isAlive());
+            taskGroupCoordinator.close();
+        }
+    }
+
+    @Test
+    void workerShouldNotCloseItself() throws Exception {
+        CountDownLatch checked = new CountDownLatch(1);
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        Mockito.when(taskGroupDao.queryAllTaskGroups()).thenAnswer(invocation -> {
+            try {
+                Assertions.assertThrows(IllegalStateException.class, () -> taskGroupCoordinator.close());
+            } catch (Throwable ex) {
+                failure.compareAndSet(null, ex);
+            } finally {
+                checked.countDown();
             }
             return Collections.emptyList();
         });
         try {
             taskGroupCoordinator.start();
-            Assertions.assertTrue(fetching.await(5, TimeUnit.SECONDS));
-            taskGroupCoordinator.close();
-            taskGroupCoordinator.start();
-            Assertions.assertSame(firstThread.get(), ReflectionTestUtils.getField(taskGroupCoordinator,
-                    "internalThread"), "Keep the old run until its DAO call returns");
-            if (cancelRestart) {
-                taskGroupCoordinator.close();
-            }
-            releaseFetch.countDown();
-            firstThread.get().join(5000);
-            Assertions.assertFalse(firstThread.get().isAlive());
-            if (cancelRestart) {
-                Assertions.assertEquals(1L, restarted.getCount());
-                Assertions.assertNull(ReflectionTestUtils.getField(taskGroupCoordinator, "internalThread"));
-            } else {
-                Assertions.assertTrue(restarted.await(5, TimeUnit.SECONDS));
-            }
-            Assertions.assertNull(workerFailure.get());
-            // The old fetch returned a nonempty batch, but cancellation must discard it.
-            Mockito.verify(taskGroupQueueDao, Mockito.never()).countUsingTaskGroupQueueByGroupId(Mockito.anyInt());
+            // Exercise the actual worker after its normal one-minute startup delay.
+            Assertions.assertTrue(checked.await(90, TimeUnit.SECONDS));
+            Assertions.assertNull(failure.get());
+            // Rejection must leave lifecycle state unchanged so the owner can still close the worker.
+            Assertions.assertThrows(IllegalStateException.class, () -> taskGroupCoordinator.start());
         } finally {
-            Thread latestThread;
-            synchronized (taskGroupCoordinator) {
-                latestThread = (Thread) ReflectionTestUtils.getField(taskGroupCoordinator, "internalThread");
-                taskGroupCoordinator.close();
-            }
-            releaseFetch.countDown();
-            if (latestThread != null) {
-                latestThread.join(5000);
-                Assertions.assertFalse(latestThread.isAlive());
-            }
-            if (firstThread.get() != null) {
-                firstThread.get().join(5000);
-                Assertions.assertFalse(firstThread.get().isAlive());
-            }
+            taskGroupCoordinator.close();
         }
+    }
+
+    private static void awaitBlocked(Thread thread) {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+        while (thread.isAlive() && thread.getState() != Thread.State.BLOCKED
+                && System.nanoTime() < deadline) {
+            Thread.yield();
+        }
+        Assertions.assertEquals(Thread.State.BLOCKED, thread.getState());
     }
 
 }
