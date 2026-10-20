@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
@@ -91,6 +92,13 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     protected TaskExecutorState doTrackTaskPluginStatus() {
+        if (physicalTask.getExitStatus() == TaskExecutionStatus.SUCCESS) {
+            // Synchronize the legacy needAlert/taskAlertInfo fields written directly
+            // by AbstractTask subclasses into the context, so that the success
+            // lifecycle event carries the alert info of third-party plugins.
+            taskExecutionContext.setNeedAlert(physicalTask.getNeedAlert());
+            taskExecutionContext.setTaskAlertInfo(physicalTask.getTaskAlertInfo());
+        }
         return TaskExecutorStateMappings.mapState(physicalTask.getExitStatus());
     }
 

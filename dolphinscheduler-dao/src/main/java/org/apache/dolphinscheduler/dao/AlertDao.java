@@ -109,6 +109,24 @@ public class AlertDao {
     }
 
     /**
+     * Insert a task-result alert.
+     *
+     * @return insert count
+     */
+    public int addTaskResultAlert(Alert alert) {
+        if (null == alert.getAlertGroupId() || NumberUtils.INTEGER_ZERO.equals(alert.getAlertGroupId())) {
+            log.warn("the value of alertGroupId is null or 0 ");
+            return 0;
+        }
+
+        String sign = generateSign(alert);
+        alert.setSign(sign);
+        int count = alertMapper.insert(alert);
+        log.info("add task result alert to db , alert: {}", alert);
+        return count;
+    }
+
+    /**
      * update alert sending(execution) status
      *
      * @param alertStatus alertStatus
@@ -132,6 +150,13 @@ public class AlertDao {
      * @return sign's str
      */
     private String generateSign(Alert alert) {
+        // Task-result alerts include the task instance ID in the sign so that different
+        // tasks returning identical results get different signs, and repeated success
+        // events of the same task yield the same sign. For other alert types
+        // taskInstanceId is null and the sign falls back to content-only.
+        if (alert.getTaskInstanceId() != null) {
+            return DigestUtils.sha1Hex(alert.getTaskInstanceId() + "|" + alert.getContent()).toLowerCase();
+        }
         return Optional.of(alert)
                 .map(Alert::getContent)
                 .map(DigestUtils::sha1Hex)
