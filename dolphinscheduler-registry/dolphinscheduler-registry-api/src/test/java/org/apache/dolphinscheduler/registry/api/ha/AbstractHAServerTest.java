@@ -120,22 +120,21 @@ class AbstractHAServerTest {
     }
 
     @Test
-    void testSameAddressInstancesHaveDifferentOwnership() {
+    void testDoesNotAdoptPredecessorWithEarlierTimestamp() {
+        // Seed an earlier incarnation explicitly. Millisecond timestamps do not guarantee
+        // different identities for two same-address instances created in the same millisecond.
+        String previousOwner = ADDRESS + "#1";
+        owner.set(previousOwner);
         server.start();
-        String previousOwner = owner.get();
-        AbstractHAServer replacement = newServer();
-        AbstractServerStatusChangeListener replacementListener =
-                mock(AbstractServerStatusChangeListener.class, CALLS_REAL_METHODS);
-        replacement.addServerStatusChangeListener(replacementListener);
-        replacement.start();
-        assertFalse(replacement.isActive());
-        verify(replacementListener, never()).changeToActive();
+        assertFalse(server.isActive());
+        verify(statusListener, never()).changeToActive();
+        verify(registry, never()).put(eq(SELECTOR_PATH), anyString(), eq(true));
 
         owner.set(null);
         remove(previousOwner);
-        assertTrue(replacement.isActive());
+        assertTrue(server.isActive());
         assertNotEquals(previousOwner, owner.get());
-        verify(replacementListener).changeToActive();
+        verify(statusListener).changeToActive();
     }
 
     @Test

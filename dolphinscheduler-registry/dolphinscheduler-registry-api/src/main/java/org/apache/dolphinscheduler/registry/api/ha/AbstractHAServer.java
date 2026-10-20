@@ -25,7 +25,6 @@ import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.util.List;
-import java.util.UUID;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,8 +39,6 @@ public abstract class AbstractHAServer implements HAServer {
 
     private final String serverIdentify;
 
-    private final String electionIdentity;
-
     private volatile ServerStatus serverStatus;
 
     private volatile boolean closed;
@@ -55,9 +52,8 @@ public abstract class AbstractHAServer implements HAServer {
     public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
         this.registry = registry;
         this.selectorPath = checkNotNull(selectorPath);
-        this.serverIdentify = checkNotNull(serverIdentify);
-        // An address can be reused while the previous process still owns an ephemeral node.
-        this.electionIdentity = serverIdentify + "#" + UUID.randomUUID();
+        // Include the creation time to distinguish restarts at the same address.
+        this.serverIdentify = checkNotNull(serverIdentify) + "#" + System.currentTimeMillis();
         this.serverStatus = ServerStatus.STAND_BY;
         this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());
     }
@@ -130,10 +126,10 @@ public abstract class AbstractHAServer implements HAServer {
                             if (closed) {
                                 return false;
                             }
-                            registry.put(selectorPath, electionIdentity, true);
+                            registry.put(selectorPath, serverIdentify, true);
                             return true;
                         }
-                        return electionIdentity.equals(registry.get(selectorPath));
+                        return serverIdentify.equals(registry.get(selectorPath));
                     }
                     return false;
                 } finally {
