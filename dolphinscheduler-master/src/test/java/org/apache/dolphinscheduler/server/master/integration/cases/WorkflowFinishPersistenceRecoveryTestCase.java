@@ -77,13 +77,11 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Metrics;
@@ -102,8 +100,6 @@ public class WorkflowFinishPersistenceRecoveryTestCase extends AbstractMasterInt
     private WorkflowFinalizeLifecycleEventHandler finalizeHandler;
     @Autowired
     private IWorkflowRepository workflowRepository;
-    @Autowired
-    private TransactionTemplate transactionTemplate;
     @Autowired
     private WorkflowSerialCoordinator serialCoordinator;
     @Autowired
@@ -278,36 +274,32 @@ public class WorkflowFinishPersistenceRecoveryTestCase extends AbstractMasterInt
     @EnumSource(value = WorkflowExecutionStatus.class, names = {"SUCCESS", "FAILURE", "STOP", "PAUSE"})
     void shouldPublishCompletionOnlyAfterCommit(final WorkflowExecutionStatus target) {
         final Fixture fixture = new Fixture(target, true);
-        transactionTemplate.execute(status -> {
-            fixture.deliver();
-            // SQL has executed, but the enclosing transaction has not committed.
-            assertThat(workflowDao.queryById(fixture.shared.getId()).getState()).isEqualTo(target);
-            assertThat(serialDao.queryById(fixture.commandId)).isNull();
-            fixture.assertSharedUnchanged();
-            return null;
-        });
-        fixture.assertFinished();
-    }
+        final AtomicInteger commitChecks = new AtomicInteger();
+        doAnswer(call -> {
+            final Object result = call.callRealMethod();
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    void shouldRemainRetryableAfterEnclosingTransactionRollsBack(final boolean failBeforeCommit) {
-        final Fixture fixture = new Fixture(WorkflowExecutionStatus.SUCCESS, true);
-        if (failBeforeCommit) {
-            assertThatThrownBy(() -> transactionTemplate.execute(status -> {
-                fixture.deliver();
-                registerCommitFailure();
-                return null;
-            })).isInstanceOf(DataAccessResourceFailureException.class);
-        } else {
-            transactionTemplate.execute(status -> {
-                fixture.deliver();
-                status.setRollbackOnly();
-                return null;
+                @Override
+                public void beforeCommit(final boolean readOnly) {
+                    // SQL has executed, but shared state and completion actions must wait for commit.
+                    assertThat(workflowDao.queryById(fixture.shared.getId()).getState()).isEqualTo(target);
+                    assertThat(serialDao.queryById(fixture.commandId)).isNull();
+                    fixture.assertSharedUnchanged();
+                    commitChecks.incrementAndGet();
+                }
             });
-        }
-        fixture.assertNotFinished();
+            return result;
+        }).when(workflowDao).updateById(any(WorkflowInstance.class));
+        doAnswer(call -> {
+            assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
+            assertThat(workflowDao.queryById(fixture.shared.getId()).getState()).isEqualTo(target);
+            assertThat(fixture.shared.getState()).isEqualTo(target);
+            assertThat(serialDao.queryById(fixture.commandId)).isNull();
+            return null;
+        }).when(fixture.bus).publish(any(WorkflowFinalizeLifecycleEvent.class));
+
         fixture.deliver();
+        assertThat(commitChecks).hasValue(1);
         fixture.assertFinished();
     }
 
@@ -373,78 +365,6 @@ public class WorkflowFinishPersistenceRecoveryTestCase extends AbstractMasterInt
         });
         assertThat(finishAttempts).hasValue(2);
         masterContainer.assertAllResourceReleased();
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = WorkflowExecutionStatus.class, names = {"SUCCESS", "FAILURE", "STOP", "PAUSE"})
-    void shouldFinishOnlyOnceWithinEnclosingTransaction(final WorkflowExecutionStatus target) {
-        final Fixture fixture = new Fixture(target, true);
-        transactionTemplate.execute(status -> {
-            fixture.deliver();
-            fixture.deliver();
-            return null;
-        });
-        fixture.assertFinished();
-        verify(workflowDao, times(1)).updateById(any(WorkflowInstance.class));
-    }
-
-    @Test
-    void shouldKeepFirstFinishWhenConflictingEventArrivesBeforeCommit() {
-        final Fixture fixture = new Fixture(WorkflowExecutionStatus.SUCCESS, true);
-        transactionTemplate.execute(status -> {
-            fixture.deliver();
-            failedHandler.handle(fixture.workflow, WorkflowFailedLifecycleEvent.of(fixture.workflow));
-            fixture.assertSharedUnchanged();
-            return null;
-        });
-        fixture.assertFinished();
-        verify(workflowDao, times(1)).updateById(any(WorkflowInstance.class));
-    }
-
-    @Test
-    void shouldFinishDifferentWorkflowsInTheSameTransaction() {
-        final Fixture fixture = new Fixture(WorkflowExecutionStatus.SUCCESS, false);
-        final WorkflowInstance secondInstance = new WorkflowInstance();
-        BeanUtils.copyProperties(fixture.shared, secondInstance);
-        secondInstance.setId(null);
-        workflowDao.insert(secondInstance);
-        final IWorkflowExecution secondWorkflow = mock(IWorkflowExecution.class);
-        final WorkflowEventBus secondBus = mock(WorkflowEventBus.class);
-        when(secondWorkflow.getWorkflowInstance()).thenReturn(secondInstance);
-        when(secondWorkflow.getState()).thenAnswer(call -> secondInstance.getState());
-        final IWorkflowExecuteContext secondContext = fixture.workflow.getWorkflowExecuteContext();
-        final IWorkflowExecutionGraph secondGraph = fixture.workflow.getWorkflowExecutionGraph();
-        when(secondWorkflow.getWorkflowExecuteContext()).thenReturn(secondContext);
-        when(secondWorkflow.getWorkflowExecutionGraph()).thenReturn(secondGraph);
-        when(secondWorkflow.getWorkflowEventBus()).thenReturn(secondBus);
-        transactionTemplate.execute(status -> {
-            fixture.deliver();
-            succeedHandler.handle(secondWorkflow, WorkflowSucceedLifecycleEvent.of(secondWorkflow));
-            fixture.assertSharedUnchanged();
-            assertThat(secondInstance.getState()).isEqualTo(WorkflowExecutionStatus.RUNNING_EXECUTION);
-            return null;
-        });
-        assertThat(workflowDao.queryById(fixture.shared.getId()).getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-        assertThat(workflowDao.queryById(secondInstance.getId()).getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-        assertThat(fixture.shared.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-        assertThat(secondInstance.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-        verify(fixture.bus, times(1)).publish(any(WorkflowFinalizeLifecycleEvent.class));
-        verify(secondBus, times(1)).publish(any(WorkflowFinalizeLifecycleEvent.class));
-        assertThat(fixture.metric()).isEqualTo(fixture.originalMetric + 2);
-    }
-
-    @Test
-    void shouldRetryRepeatedFinishAfterEnclosingRollback() {
-        final Fixture fixture = new Fixture(WorkflowExecutionStatus.SUCCESS, true);
-        transactionTemplate.execute(status -> {
-            fixture.deliver();
-            fixture.deliver();
-            status.setRollbackOnly();
-            return null;
-        });
-        fixture.assertNotFinished();
-        fixture.deliver();
-        fixture.assertFinished();
     }
 
     @Test
@@ -530,113 +450,6 @@ public class WorkflowFinishPersistenceRecoveryTestCase extends AbstractMasterInt
             releaseFinalize.countDown();
         }
         masterContainer.assertAllResourceReleased();
-    }
-
-    @ParameterizedTest
-    @EnumSource(value = WorkflowExecutionStatus.class, names = {"SUCCESS", "FAILURE", "STOP", "PAUSE"})
-    void shouldFinishAfterEarlierAfterCommitThrows(final WorkflowExecutionStatus target) {
-        final Fixture fixture = new Fixture(target, true);
-        final IllegalStateException failure = new IllegalStateException("synthetic earlier callback failure");
-        assertThatThrownBy(() -> transactionTemplate.execute(status -> {
-            registerAfterCommitFailure(failure);
-            fixture.deliver();
-            fixture.assertSharedUnchanged();
-            return null;
-        })).isSameAs(failure);
-        fixture.assertFinished();
-        fixture.deliver();
-        fixture.assertFinished();
-        verify(workflowDao, times(1)).updateById(any(WorkflowInstance.class));
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    void shouldFinishOtherWorkflowWhenEarlierFinalizeThrows(final boolean enqueueBeforeThrowing) {
-        final Fixture fixture = new Fixture(WorkflowExecutionStatus.SUCCESS, false);
-        final WorkflowEventBus firstBus = spy(new WorkflowEventBus());
-        when(fixture.workflow.getWorkflowEventBus()).thenReturn(firstBus);
-        final IllegalStateException failure = new IllegalStateException("synthetic earlier finalize failure");
-        doAnswer(call -> {
-            if (enqueueBeforeThrowing) {
-                call.callRealMethod();
-            }
-            throw failure;
-        }).when(firstBus).publish(any(WorkflowFinalizeLifecycleEvent.class));
-
-        final WorkflowInstance secondInstance = new WorkflowInstance();
-        BeanUtils.copyProperties(fixture.shared, secondInstance);
-        secondInstance.setId(null);
-        workflowDao.insert(secondInstance);
-        final IWorkflowExecution secondWorkflow = mock(IWorkflowExecution.class);
-        final WorkflowEventBus secondBus = mock(WorkflowEventBus.class);
-        final IWorkflowExecuteContext secondContext = fixture.workflow.getWorkflowExecuteContext();
-        final IWorkflowExecutionGraph secondGraph = fixture.workflow.getWorkflowExecutionGraph();
-        when(secondWorkflow.getWorkflowInstance()).thenReturn(secondInstance);
-        when(secondWorkflow.getState()).thenAnswer(call -> secondInstance.getState());
-        when(secondWorkflow.getWorkflowExecuteContext()).thenReturn(secondContext);
-        when(secondWorkflow.getWorkflowExecutionGraph()).thenReturn(secondGraph);
-        when(secondWorkflow.getWorkflowEventBus()).thenReturn(secondBus);
-
-        assertThatThrownBy(() -> transactionTemplate.execute(status -> {
-            fixture.deliver();
-            succeedHandler.handle(secondWorkflow, WorkflowSucceedLifecycleEvent.of(secondWorkflow));
-            return null;
-        })).isSameAs(failure);
-        for (WorkflowInstance instance : new WorkflowInstance[]{fixture.shared, secondInstance}) {
-            final WorkflowInstance persisted = workflowDao.queryById(instance.getId());
-            assertThat(persisted.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-            assertThat(instance.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-            assertThat(persisted.getEndTime()).isNotNull().isEqualTo(instance.getEndTime());
-        }
-        fixture.deliver();
-        succeedHandler.handle(secondWorkflow, WorkflowSucceedLifecycleEvent.of(secondWorkflow));
-        verify(workflowDao, times(2)).updateById(any(WorkflowInstance.class));
-        verify(firstBus, times(1)).publish(any(WorkflowFinalizeLifecycleEvent.class));
-        verify(secondBus, times(1)).publish(any(WorkflowFinalizeLifecycleEvent.class));
-        assertThat(firstBus.poll().isPresent()).isEqualTo(enqueueBeforeThrowing);
-        assertThat(firstBus.isEmpty()).isTrue();
-        assertThat(fixture.metric()).isEqualTo(fixture.originalMetric + 2);
-    }
-
-    @ParameterizedTest
-    @ValueSource(booleans = {false, true})
-    void shouldNotRepeatPublicationWhenCompletionFallbackThrows(final boolean enqueueBeforeThrowing) {
-        final Fixture fixture = new Fixture(WorkflowExecutionStatus.SUCCESS, true);
-        final WorkflowEventBus bus = spy(new WorkflowEventBus());
-        when(fixture.workflow.getWorkflowEventBus()).thenReturn(bus);
-        final IllegalStateException earlierFailure = new IllegalStateException("synthetic earlier callback failure");
-        doAnswer(call -> {
-            if (enqueueBeforeThrowing) {
-                call.callRealMethod();
-            }
-            throw new IllegalStateException("synthetic fallback publication failure");
-        }).when(bus).publish(any(WorkflowFinalizeLifecycleEvent.class));
-        // Spring logs an afterCompletion failure; it does not replace the earlier afterCommit exception.
-        assertThatThrownBy(() -> transactionTemplate.execute(status -> {
-            registerAfterCommitFailure(earlierFailure);
-            fixture.deliver();
-            return null;
-        })).isSameAs(earlierFailure);
-        assertThat(workflowDao.queryById(fixture.shared.getId()).getState())
-                .isEqualTo(WorkflowExecutionStatus.SUCCESS);
-        assertThat(fixture.shared.getState()).isEqualTo(WorkflowExecutionStatus.SUCCESS);
-        assertThat(serialDao.queryById(fixture.commandId)).isNull();
-        fixture.deliver();
-        verify(workflowDao, times(1)).updateById(any(WorkflowInstance.class));
-        verify(bus, times(1)).publish(any(WorkflowFinalizeLifecycleEvent.class));
-        assertThat(bus.poll().isPresent()).isEqualTo(enqueueBeforeThrowing);
-        assertThat(bus.isEmpty()).isTrue();
-        assertThat(fixture.metric()).isEqualTo(fixture.originalMetric + 1);
-    }
-
-    private static void registerAfterCommitFailure(final RuntimeException failure) {
-        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-
-            @Override
-            public void afterCommit() {
-                throw failure;
-            }
-        });
     }
 
     private static void registerCommitFailure() {
@@ -731,6 +544,7 @@ public class WorkflowFinishPersistenceRecoveryTestCase extends AbstractMasterInt
         }
 
         private void deliver() {
+            assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
             switch (target) {
                 case SUCCESS:
                     succeedHandler.handle(workflow, WorkflowSucceedLifecycleEvent.of(workflow));

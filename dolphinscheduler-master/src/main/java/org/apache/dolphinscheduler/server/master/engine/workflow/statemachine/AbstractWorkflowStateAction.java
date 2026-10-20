@@ -51,8 +51,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Slf4j
@@ -157,82 +155,33 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
     protected void workflowFinish(final IWorkflowExecution workflowExecution,
                                   final WorkflowExecutionStatus workflowExecutionStatus) {
         final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
+        final WorkflowInstance workflowInstanceToUpdate = new WorkflowInstance();
+        BeanUtils.copyProperties(workflowInstance, workflowInstanceToUpdate);
+        // Lifecycle events are dispatched without an enclosing transaction, so execute commits before returning.
         transactionTemplate.execute(status -> {
-            // An enclosing transaction can deliver another finish event before the first one commits.
-            final boolean finishPending = TransactionSynchronizationManager.getSynchronizations().stream()
-                    .filter(WorkflowFinishTransactionSynchronization.class::isInstance)
-                    .map(WorkflowFinishTransactionSynchronization.class::cast)
-                    .anyMatch(synchronization -> synchronization.workflowInstance == workflowInstance);
-            if (finishPending) {
-                return null;
-            }
-            final WorkflowInstance workflowInstanceToUpdate = new WorkflowInstance();
-            BeanUtils.copyProperties(workflowInstance, workflowInstanceToUpdate);
             workflowInstanceToUpdate.setState(workflowExecutionStatus);
             workflowInstanceToUpdate.setEndTime(new Date());
             workflowInstanceDao.updateById(workflowInstanceToUpdate);
-            final boolean serialCommandDeleted = workflowExecution.getWorkflowExecuteContext().getWorkflowDefinition()
-                    .getExecutionType().isSerial()
-                    && serialCommandDao.deleteByWorkflowInstanceId(workflowInstance.getId()) > 0;
-            // The template may join an enclosing transaction. Keep the shared instance retryable until it commits.
-            TransactionSynchronizationManager.registerSynchronization(new WorkflowFinishTransactionSynchronization(
-                    workflowExecution, workflowInstance, workflowInstanceToUpdate, serialCommandDeleted));
+            if (workflowExecution.getWorkflowExecuteContext().getWorkflowDefinition().getExecutionType().isSerial()
+                    && serialCommandDao.deleteByWorkflowInstanceId(workflowInstance.getId()) > 0) {
+                log.info("Deleted SerialCommand within workflow finish transaction for WorkflowExecuteRunnable: {}",
+                        workflowExecution.getName());
+            }
             return null;
         });
-    }
-
-    private static final class WorkflowFinishTransactionSynchronization implements TransactionSynchronization {
-
-        private final IWorkflowExecution workflowExecution;
-        private final WorkflowInstance workflowInstance;
-        private final WorkflowInstance workflowInstanceToUpdate;
-        private final boolean serialCommandDeleted;
-        private boolean completionAttempted;
-
-        private WorkflowFinishTransactionSynchronization(final IWorkflowExecution workflowExecution,
-                                                         final WorkflowInstance workflowInstance,
-                                                         final WorkflowInstance workflowInstanceToUpdate,
-                                                         final boolean serialCommandDeleted) {
-            this.workflowExecution = workflowExecution;
-            this.workflowInstance = workflowInstance;
-            this.workflowInstanceToUpdate = workflowInstanceToUpdate;
-            this.serialCommandDeleted = serialCommandDeleted;
+        final WorkflowExecutionStatus originState = workflowInstance.getState();
+        workflowInstance.setState(workflowInstanceToUpdate.getState());
+        workflowInstance.setEndTime(workflowInstanceToUpdate.getEndTime());
+        log.info("Success set WorkflowExecuteRunnable: {} state from: {} to {}",
+                workflowInstance.getName(), originState.name(), workflowInstance.getState().name());
+        try {
+            WorkflowInstanceMetrics.recordWorkflowInstanceFinish(workflowInstance.getState(),
+                    workflowInstance.getWorkflowDefinitionCode());
+        } catch (Exception ex) {
+            // Metrics must not prevent releasing a workflow whose transaction has already committed.
+            log.warn("Record completion metric failed for workflow: {}", workflowExecution.getName(), ex);
         }
-
-        @Override
-        public void afterCommit() {
-            completeWorkflow();
-        }
-
-        @Override
-        public void afterCompletion(final int status) {
-            // A preceding afterCommit callback may throw before ours is invoked.
-            if (status == STATUS_COMMITTED && !completionAttempted) {
-                completeWorkflow();
-            }
-        }
-
-        private void completeWorkflow() {
-            // Publication may throw after enqueueing; do not repeat an attempted completion.
-            completionAttempted = true;
-            final WorkflowExecutionStatus originState = workflowInstance.getState();
-            final WorkflowExecutionStatus targetState = workflowInstanceToUpdate.getState();
-            workflowInstance.setState(targetState);
-            workflowInstance.setEndTime(workflowInstanceToUpdate.getEndTime());
-            log.info("Success set WorkflowExecuteRunnable: {} state from: {} to {}",
-                    workflowInstance.getName(), originState.name(), targetState.name());
-            if (serialCommandDeleted) {
-                log.info("Success clear SerialCommand for WorkflowExecuteRunnable: {}", workflowExecution.getName());
-            }
-            try {
-                WorkflowInstanceMetrics.recordWorkflowInstanceFinish(targetState,
-                        workflowInstance.getWorkflowDefinitionCode());
-            } catch (Exception ex) {
-                // Metrics must not prevent releasing a workflow whose transaction has already committed.
-                log.warn("Record completion metric failed for workflow: {}", workflowExecution.getName(), ex);
-            }
-            workflowExecution.getWorkflowEventBus().publish(WorkflowFinalizeLifecycleEvent.of(workflowExecution));
-        }
+        workflowExecution.getWorkflowEventBus().publish(WorkflowFinalizeLifecycleEvent.of(workflowExecution));
     }
 
     /**
