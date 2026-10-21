@@ -69,13 +69,19 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @UtilityClass
 public class SensitivePropertyUtils {
 
-    /** Create: {@code ******} is never a real value. */
+    /** Create: {@code ******} is never a real value; sensitive values must satisfy the rule. */
     public void requireNoPlaceholder(List<Property> properties) {
         String invalidProp = PropertySensitiveUtils.findPlaceholderProp(properties);
         if (invalidProp != null) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
                     "parameter '" + invalidProp
                             + "' cannot use ****** when creating; please re-enter the value");
+        }
+        String invalidSensitive = PropertySensitiveUtils.findInvalidSensitiveField(properties);
+        if (invalidSensitive != null) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                    "parameter '" + invalidSensitive
+                            + "' value length must be at least 6 characters");
         }
     }
 
@@ -94,6 +100,12 @@ public class SensitivePropertyUtils {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
                     "parameter '" + invalidProp
                             + "' cannot use ****** when creating, enabling, or disabling sensitive; please re-enter the value");
+        }
+        String invalidSensitive = PropertySensitiveUtils.findInvalidSensitiveField(submittedProperties);
+        if (invalidSensitive != null) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                    "parameter '" + invalidSensitive
+                            + "' value length must be at least 6 characters");
         }
         return PropertySensitiveUtils.mergeSensitiveValuePlaceholders(submittedProperties, existingProperties);
     }

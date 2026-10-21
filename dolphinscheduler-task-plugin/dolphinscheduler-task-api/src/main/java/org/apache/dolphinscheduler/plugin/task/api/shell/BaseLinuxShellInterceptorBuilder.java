@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,7 +62,10 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
-        log.info("Final Script Content:\n====================\n{}\n====================", finalScript);
+        // The shell file keeps the real values so the task can run,
+        // only the logged script content is masked
+        log.info("Final Script Content:\n====================\n{}\n====================",
+                PropertySensitiveUtils.maskSensitiveValues(finalScript, sensitiveValues));
 
     }
 

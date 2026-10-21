@@ -21,12 +21,18 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
@@ -37,6 +43,21 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class PropertySensitiveUtils {
+
+    /**
+     * TODO: Optimize the sensitive-value identification so sensitive values can be recognized
+     * accurately instead of relying on a regex / length heuristic; once that lands, this rule
+     * restriction can be removed.
+     * <p>
+     * Regex rule for a valid sensitive property value. Kept as a regex so the rule can be
+     * extended later. It is matched with {@link Pattern#DOTALL} so the whole value must match.
+     * <p>
+     * Currently it requires at least 6 characters ({@code .{6,}}).
+     */
+    public static final String SENSITIVE_FIELD_RULE = ".{6,}";
+
+    private static final Pattern SENSITIVE_FIELD_RULE_PATTERN =
+            Pattern.compile(SENSITIVE_FIELD_RULE, Pattern.DOTALL);
 
     public boolean isSensitive(Property property) {
         return property != null && property.isSensitive();
@@ -83,6 +104,56 @@ public class PropertySensitiveUtils {
         return properties.stream()
                 .map(PropertySensitiveUtils::maskSensitiveValue)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Extract the plaintext values of sensitive properties from the given params map.
+     * <p>
+     * Null / empty / {@code ******} placeholder values are skipped, since they never
+     * contain plaintext which could leak into logs.
+     *
+     * @return an empty set when the map is empty or no sensitive plaintext exists.
+     */
+    public Set<String> extractSensitiveValues(final Map<String, Property> paramsMap) {
+        if (MapUtils.isEmpty(paramsMap)) {
+            return Collections.emptySet();
+        }
+        return paramsMap.values()
+                .stream()
+                .filter(PropertySensitiveUtils::isSensitive)
+                .map(Property::getValue)
+                .filter(StringUtils::isNotEmpty)
+                .filter(value -> !isSensitiveValuePlaceholder(value))
+                .collect(Collectors.toSet());
+    }
+
+    /**
+     * Mask the given sensitive plaintext values in a message which is known to contain
+     * them (e.g. the task context dump or the final shell script content) before it is
+     * logged by the worker server itself.
+     * <p>
+     * This is plain literal replacement: no regex patterns and no minimum length
+     * threshold. Longer values are masked before shorter ones so a value containing
+     * another one is not partially left over after replacement. It is only meant to be
+     * called at log statements which are known to print sensitive plaintext, never as a
+     * blanket filter over arbitrary log lines.
+     *
+     * @return the masked message, or the original message when there is nothing to mask.
+     */
+    public String maskSensitiveValues(final String message, final Collection<String> sensitiveValues) {
+        if (StringUtils.isEmpty(message) || CollectionUtils.isEmpty(sensitiveValues)) {
+            return message;
+        }
+        final List<String> orderedSensitiveValues = sensitiveValues.stream()
+                .filter(StringUtils::isNotEmpty)
+                .distinct()
+                .sorted(Comparator.comparingInt(String::length).reversed())
+                .collect(Collectors.toList());
+        String maskedMessage = message;
+        for (final String sensitiveValue : orderedSensitiveValues) {
+            maskedMessage = maskedMessage.replace(sensitiveValue, TaskConstants.SENSITIVE_DATA_MASK);
+        }
+        return maskedMessage;
     }
 
     public List<Property> mergeSensitiveValuePlaceholders(List<Property> submittedProperties,
@@ -134,6 +205,34 @@ public class PropertySensitiveUtils {
             }
             if (existing == null) {
                 return submitted.getProp();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Check that every sensitive property has a value which satisfies {@link #SENSITIVE_FIELD_RULE}.
+     * <p>
+     * Empty / null values and the {@code ******} keep-original placeholder are skipped, since
+     * they are not real plaintext inputs and are handled separately by the create / update logic.
+     *
+     * @return the prop name of the first sensitive property whose value violates the rule,
+     *         or {@code null} when every sensitive value is valid.
+     */
+    public String findInvalidSensitiveField(List<Property> properties) {
+        if (CollectionUtils.isEmpty(properties)) {
+            return null;
+        }
+        for (Property property : properties) {
+            if (property == null || !property.isSensitive()) {
+                continue;
+            }
+            String value = property.getValue();
+            if (StringUtils.isEmpty(value) || isSensitiveValuePlaceholder(value)) {
+                continue;
+            }
+            if (!SENSITIVE_FIELD_RULE_PATTERN.matcher(value).matches()) {
+                return property.getProp();
             }
         }
         return null;

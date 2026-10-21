@@ -17,6 +17,32 @@
 
 export const SENSITIVE_VALUE_MASK = '******'
 
+/** TODO: Optimize sensitive-value identification so it can be recognized accurately instead
+ *  of relying on a regex / length heuristic; this will allow removing this rule restriction.
+ *  Regex rule for a valid sensitive value. Mirrors the backend {@code SENSITIVE_FIELD_RULE}.
+ *  Kept as a regex so the rule can be extended later. Currently requires at least 6
+ *  characters ({@code .{6,}}). */
+export const SENSITIVE_FIELD_RULE = '.{6,}'
+
+const SENSITIVE_FIELD_RULE_REGEXP = new RegExp(`^${SENSITIVE_FIELD_RULE}$`, 's')
+
+/**
+ * A sensitive value is valid when it is empty / keep-original placeholder
+ * (handled separately by the create/update logic) or satisfies
+ * {@link SENSITIVE_FIELD_RULE}.
+ */
+export function isValidSensitiveValue(value?: string): boolean {
+  if (
+    value === undefined ||
+    value === null ||
+    value === '' ||
+    value === SENSITIVE_VALUE_MASK
+  ) {
+    return true
+  }
+  return SENSITIVE_FIELD_RULE_REGEXP.test(value)
+}
+
 /** Unchecking does not clear value; empty + re-check restores ****** (keep-original). */
 export function applySensitiveToggle(
   param: { value?: string; sensitive?: boolean },

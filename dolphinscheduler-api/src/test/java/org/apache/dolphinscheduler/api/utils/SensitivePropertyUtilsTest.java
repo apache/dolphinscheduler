@@ -50,6 +50,27 @@ class SensitivePropertyUtilsTest {
     }
 
     @Test
+    void requireNoPlaceholderRejectsShortSensitiveValueOnCreate() {
+        Assertions.assertThrows(ServiceException.class,
+                () -> SensitivePropertyUtils.requireNoPlaceholder(
+                        Collections.singletonList(sensitive("pwd", "abc"))));
+    }
+
+    @Test
+    void requireNoPlaceholderAcceptsSensitiveValueOfMinLengthOnCreate() {
+        Assertions.assertDoesNotThrow(
+                () -> SensitivePropertyUtils.requireNoPlaceholder(
+                        Collections.singletonList(sensitive("pwd", "123456"))));
+    }
+
+    @Test
+    void requireNoPlaceholderAcceptsSensitiveValueOnCreate() {
+        Assertions.assertDoesNotThrow(
+                () -> SensitivePropertyUtils.requireNoPlaceholder(
+                        Collections.singletonList(sensitive("pwd", "Secret123"))));
+    }
+
+    @Test
     void mergeKeepsOriginalOnPlaceholder() {
         List<Property> merged = SensitivePropertyUtils.merge(
                 Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
@@ -74,6 +95,30 @@ class SensitivePropertyUtilsTest {
         Assertions.assertThrows(ServiceException.class,
                 () -> SensitivePropertyUtils.merge(
                         Collections.singletonList(nonSensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
+                        Collections.singletonList(sensitive("pwd", "Secret123"))));
+    }
+
+    @Test
+    void mergeRejectsShortSensitiveValueOnUpdate() {
+        Assertions.assertThrows(ServiceException.class,
+                () -> SensitivePropertyUtils.merge(
+                        Collections.singletonList(sensitive("pwd", "abc")),
+                        Collections.singletonList(sensitive("pwd", "Secret123"))));
+    }
+
+    @Test
+    void mergeAcceptsSensitiveValueOfMinLengthOnUpdate() {
+        Assertions.assertDoesNotThrow(
+                () -> SensitivePropertyUtils.merge(
+                        Collections.singletonList(sensitive("pwd", "123456")),
+                        Collections.singletonList(sensitive("pwd", "Secret123"))));
+    }
+
+    @Test
+    void mergeAcceptsLongSensitiveValueOnUpdate() {
+        Assertions.assertDoesNotThrow(
+                () -> SensitivePropertyUtils.merge(
+                        Collections.singletonList(sensitive("pwd", "new-secret-value")),
                         Collections.singletonList(sensitive("pwd", "Secret123"))));
     }
 
