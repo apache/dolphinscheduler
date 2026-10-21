@@ -24,10 +24,10 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
-import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.utils.TaskExecutionContextUtils;
 import org.apache.dolphinscheduler.server.worker.utils.TenantUtils;
@@ -117,7 +117,12 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     public void finalizeTask() {
-        clearTaskInstanceWorkingDirectoryIfNeeded();
+        try {
+            clearTaskInstanceWorkingDirectoryIfNeeded();
+        } finally {
+            // Must clear on success / failure / kill so later tasks are not polluted.
+            SensitiveDataConverter.clearTaskSensitiveValues(taskExecutionContext.getTaskInstanceId());
+        }
     }
 
     private void clearTaskInstanceWorkingDirectoryIfNeeded() {
@@ -129,6 +134,11 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     protected void initializeTaskContext() {
+        // Register before any context logging (including super) so worker logs are masked too.
+        SensitiveDataConverter.registerTaskSensitiveValues(
+                taskExecutionContext.getTaskInstanceId(),
+                taskExecutionContext.getPrepareParamsMap());
+
         super.initializeTaskContext();
 
         taskExecutionContext.setTaskAppId(String.valueOf(taskExecutionContext.getTaskInstanceId()));
@@ -146,22 +156,9 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
         taskExecutionContext.setResourceContext(resourceContext);
         log.info("Download resources successfully: {}", taskExecutionContext.getResourceContext());
 
-        // The task context dump contains the prepareParams plaintext, mask the sensitive
-        // values before printing it to the worker server log
         log.info(TaskLogMarkers.excludeInTaskLog(), "Initialized Task Context{}",
-                buildMaskedTaskContextJsonString());
+                JSONUtils.toPrettyJsonString(taskExecutionContext));
 
-    }
-
-    /**
-     * Serialize the task context with the sensitive prepareParams plaintext values masked,
-     * so the worker server log does not contain sensitive information.
-     */
-    private String buildMaskedTaskContextJsonString() {
-        return PropertySensitiveUtils.maskSensitiveValues(
-                JSONUtils.toPrettyJsonString(taskExecutionContext),
-                PropertySensitiveUtils.extractSensitiveValues(
-                        taskExecutionContext.getPrepareParamsMap()));
     }
 
     @Override
