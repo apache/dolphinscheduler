@@ -101,12 +101,24 @@ public class FlinkArgsUtils {
             "execution.target"));
 
     /**
-     * The prefixes of the configuration keys which identify the cluster. Each
-     * {@code security.ssl.rest.} key is needed as well, otherwise a submission to a REST endpoint
-     * over TLS can connect, while the cancel / savepoint command falls back to a plain connection.
+     * The prefixes of the configuration keys which identify the cluster. The whole
+     * {@code security.ssl.} group is needed, not only the {@code security.ssl.rest.} keys: the REST
+     * client also consumes the shared TLS settings. It reads {@code security.ssl.protocol} and
+     * {@code security.ssl.provider} for every endpoint, and the keystore / truststore of the REST
+     * endpoints fall back to the shared {@code security.ssl.keystore} and
+     * {@code security.ssl.truststore} when the REST specific key is not set. Dropping any of them
+     * makes the cancel / savepoint command negotiate a different TLS connection than the submission.
      */
     private static final List<String> CLUSTER_CONNECTION_CONFIG_PREFIXES =
-            Collections.singletonList("security.ssl.rest.");
+            Collections.singletonList("security.ssl.");
+
+    /**
+     * The SQL Client configuration key which makes the client execute an update statement
+     * synchronously instead of printing its JobID. A statement which is executed that way never
+     * reaches the task log with a JobID, so it is not a submission which the control commands can
+     * target, and it must not take a place in the per-job connection snapshots.
+     */
+    private static final String SQL_DML_SYNC_CONFIG_KEY = "table.dml-sync";
 
     /**
      * The {@code SET} statement of the Flink SQL Client, in the quoted form
@@ -325,6 +337,9 @@ public class FlinkArgsUtils {
     private static void applySqlStatement(SqlClusterConnectionTracker tracker, String statement) {
         Matcher setMatcher = SQL_SET_STATEMENT_REGEX.matcher(statement);
         if (setMatcher.find()) {
+            if (SQL_DML_SYNC_CONFIG_KEY.equals(sqlSetKeyOf(setMatcher))) {
+                tracker.setDmlSync(Boolean.parseBoolean(sqlSetValueOf(setMatcher)));
+            }
             String option = clusterConnectionOptionOfSqlSet(setMatcher);
             if (option != null) {
                 tracker.set(option);
@@ -437,12 +452,16 @@ public class FlinkArgsUtils {
         private final Map<String, List<String>> baseline;
         private Map<String, List<String>> current;
         private final List<List<String>> optionsPerJob = new ArrayList<>();
+        private final boolean baselineDmlSync;
+        private boolean dmlSync;
         private boolean inStatementSet;
         private boolean statementSetRecorded;
 
         private SqlClusterConnectionTracker(String others) {
             baseline = clusterConnectionOptionsByKey(extractClusterConnectionOptions(others));
             current = new LinkedHashMap<>(baseline);
+            baselineDmlSync = dmlSyncOfOptions(others);
+            dmlSync = baselineDmlSync;
         }
 
         private void set(String option) {
@@ -450,6 +469,9 @@ public class FlinkArgsUtils {
         }
 
         private void reset(String key) {
+            if (SQL_DML_SYNC_CONFIG_KEY.equals(key)) {
+                dmlSync = baselineDmlSync;
+            }
             if (baseline.containsKey(key)) {
                 current.put(key, baseline.get(key));
             } else {
@@ -459,6 +481,11 @@ public class FlinkArgsUtils {
 
         private void resetAll() {
             current = new LinkedHashMap<>(baseline);
+            dmlSync = baselineDmlSync;
+        }
+
+        private void setDmlSync(boolean value) {
+            dmlSync = value;
         }
 
         private void beginStatementSet() {
@@ -472,6 +499,11 @@ public class FlinkArgsUtils {
         }
 
         private void submit() {
+            if (dmlSync) {
+                // the client executes the statement synchronously and prints no JobID, so the job has
+                // no submission in the task log to associate this configuration with
+                return;
+            }
             if (inStatementSet && statementSetRecorded) {
                 // the update statements of a statement set are submitted as a single job
                 return;
@@ -497,17 +529,31 @@ public class FlinkArgsUtils {
      * quoted for the shell when the generated command needs it.
      */
     private static String clusterConnectionOptionOfSqlSet(Matcher matcher) {
-        String key = matcher.group(SET_QUOTED_KEY_GROUP) != null
-                ? matcher.group(SET_QUOTED_KEY_GROUP)
-                : matcher.group(SET_KEY_GROUP);
-        // a doubled single quote inside a SQL string is an escaped quote, the effective value uses one
-        String value = matcher.group(SET_QUOTED_VALUE_GROUP) != null
-                ? matcher.group(SET_QUOTED_VALUE_GROUP).replace("''", "'")
-                : matcher.group(SET_VALUE_GROUP);
+        String key = sqlSetKeyOf(matcher);
+        String value = sqlSetValueOf(matcher);
         if (key == null || value == null || !isClusterConnectionConfig(DYNAMIC_PROPERTY_OPTION + key + "=" + value)) {
             return null;
         }
         return DYNAMIC_PROPERTY_OPTION + key + "=" + quoteForShell(value);
+    }
+
+    /**
+     * The quoted or unquoted key of a matched {@code SET} statement.
+     */
+    private static String sqlSetKeyOf(Matcher matcher) {
+        return matcher.group(SET_QUOTED_KEY_GROUP) != null
+                ? matcher.group(SET_QUOTED_KEY_GROUP)
+                : matcher.group(SET_KEY_GROUP);
+    }
+
+    /**
+     * The effective value of a matched {@code SET} statement. A doubled single quote inside a SQL
+     * string is an escaped quote, the effective value uses one.
+     */
+    private static String sqlSetValueOf(Matcher matcher) {
+        return matcher.group(SET_QUOTED_VALUE_GROUP) != null
+                ? matcher.group(SET_QUOTED_VALUE_GROUP).replace("''", "'")
+                : matcher.group(SET_VALUE_GROUP);
     }
 
     /**
@@ -662,6 +708,29 @@ public class FlinkArgsUtils {
             return true;
         }
         return CLUSTER_CONNECTION_CONFIG_PREFIXES.stream().anyMatch(key::startsWith);
+    }
+
+    /**
+     * The {@code table.dml-sync} setting of the submission options, which decides whether the client
+     * prints a JobID for an update statement. It may be given as {@code -Dtable.dml-sync=true} or as
+     * two arguments.
+     */
+    private static boolean dmlSyncOfOptions(String others) {
+        if (StringUtils.isBlank(others)) {
+            return false;
+        }
+        List<String> tokens = tokenizeOptions(others);
+        for (int i = 0; i < tokens.size(); i++) {
+            String option = unquoteToken(tokens.get(i));
+            if (DYNAMIC_PROPERTY_OPTION.equals(option) && i + 1 < tokens.size()) {
+                option = DYNAMIC_PROPERTY_OPTION + unquoteToken(tokens.get(++i));
+            }
+            if (option.startsWith(DYNAMIC_PROPERTY_OPTION + SQL_DML_SYNC_CONFIG_KEY + "=")) {
+                return Boolean.parseBoolean(option.substring(
+                        (DYNAMIC_PROPERTY_OPTION + SQL_DML_SYNC_CONFIG_KEY + "=").length()));
+            }
+        }
+        return false;
     }
 
     /**

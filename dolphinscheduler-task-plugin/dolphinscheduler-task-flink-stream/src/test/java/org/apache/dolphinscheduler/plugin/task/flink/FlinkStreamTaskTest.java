@@ -29,6 +29,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,6 +170,60 @@ public class FlinkStreamTaskTest {
         Assertions.assertEquals(1, executedCommands.size());
         Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef",
                 String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
+    public void testSavePointUsesTheApplicationIdCollectedFromTheConfiguredSource() throws Exception {
+        // the task log only contains the JobID: with the aop collection way the application id is
+        // available in appInfo.log only, and the savepoint has to target the cluster which runs the
+        // job anyway
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Job has been submitted with JobID 1234567890abcdef1234567890abcdef");
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
+        Mockito.doReturn(Collections.singletonList("application_1700000000000_0001"))
+                .when(task).getApplicationIds();
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
+
+        task.savePoint();
+
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef "
+                        + "-yid application_1700000000000_0001",
+                String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
+    public void testSavePointDoesNotGuessTheApplicationOfAMultiApplicationTask() throws Exception {
+        // two jobs and two applications which the collection source cannot associate with a job: no
+        // -yid is guessed, the jobs are triggered without it
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Job has been submitted with JobID 11111111111111111111111111111111\n"
+                        + "Job has been submitted with JobID 22222222222222222222222222222222");
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
+        Mockito.doReturn(Arrays.asList("application_1700000000000_0001",
+                "application_1700000000000_0002")).when(task).getApplicationIds();
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
+
+        task.savePoint();
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 11111111111111111111111111111111",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 22222222222222222222222222222222",
+                String.join(" ", executedCommands.get(1)));
     }
 
     @Test

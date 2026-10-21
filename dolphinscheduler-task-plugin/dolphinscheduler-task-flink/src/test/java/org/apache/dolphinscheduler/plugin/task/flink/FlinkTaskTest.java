@@ -428,6 +428,36 @@ public class FlinkTaskTest {
     }
 
     @Test
+    public void testCancelApplicationIgnoresTheSynchronousJobOfAnotherEndpoint() throws Exception {
+        // a synchronous update statement is completed by the client and prints no JobID, so it is not
+        // cancelled: the asynchronous job which follows is the only one and keeps its own endpoint
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job ID: 22222222222222222222222222222222");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'table.dml-sync' = 'true';\n"
+                + "SET 'rest.address' = 'cluster-a';\n"
+                + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                + "SET 'table.dml-sync' = 'false';\n"
+                + "SET 'rest.address' = 'cluster-b';\n"
+                + "INSERT INTO second_sink SELECT * FROM streaming_source;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
+        task.cancelApplication();
+
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222 -Drest.address=cluster-b",
+                String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
     public void testCancelApplicationCollectsJobIdSubmittedWhileTheClientIsStopped() throws Exception {
         // a multi statement SQL script can submit another job while the client is being stopped, the
         // final snapshot has to contain it

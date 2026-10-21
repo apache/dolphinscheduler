@@ -493,6 +493,88 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsKeepsTheSharedRestTlsSettings() {
+        // the REST client consumes the shared TLS settings, not only the security.ssl.rest.* ones: the
+        // protocol and the provider apply to every endpoint, and the REST keystore / truststore fall
+        // back to the shared keys
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-Dsecurity.ssl.protocol=TLSv1.3 -Dsecurity.ssl.provider=OPENSSL "
+                        + "-Dsecurity.ssl.truststore=/opt/shared.jks "
+                        + "-Dsecurity.ssl.truststore-password=secret "
+                        + "-Dparallelism.default=4");
+
+        Assertions.assertEquals(Arrays.asList(
+                "-Dsecurity.ssl.protocol=TLSv1.3",
+                "-Dsecurity.ssl.provider=OPENSSL",
+                "-Dsecurity.ssl.truststore=/opt/shared.jks",
+                "-Dsecurity.ssl.truststore-password=secret"), options);
+        Assertions.assertTrue(
+                joinStringListWithSpace(FlinkArgsUtils.buildCancelCommandLine("job-id", options))
+                        .contains("-Dsecurity.ssl.protocol=TLSv1.3"));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsFromSqlKeepsTheSharedRestTlsSettings() {
+        // a SQL task configures the shared TLS settings with SET statements as well
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'security.ssl.protocol' = 'TLSv1.3';\n"
+                        + "SET 'security.ssl.truststore' = '/opt/shared.jks';\n"
+                        + "INSERT INTO t SELECT * FROM s;");
+
+        Assertions.assertEquals(Arrays.asList(
+                "-Dsecurity.ssl.protocol=TLSv1.3",
+                "-Dsecurity.ssl.truststore=/opt/shared.jks"), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobSkipsSynchronousSubmission() {
+        // a synchronous update statement is completed by the client, which prints no JobID, so it does
+        // not take a place in the snapshots: the asynchronous job which follows keeps its own endpoint
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'table.dml-sync' = 'true';\n"
+                        + "SET 'rest.address'='cluster-a';\n"
+                        + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                        + "SET 'table.dml-sync' = 'false';\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO second_sink SELECT * FROM streaming_source;");
+
+        Assertions.assertEquals(1, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(0));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobSkipsSubmissionWhenDmlSyncIsASubmissionOption() {
+        // table.dml-sync can also be given as a submission option, the statements which follow are
+        // synchronized as well
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(
+                "-Dtable.dml-sync=true",
+                "SET 'rest.address'='cluster-a';\n"
+                        + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                        + "INSERT INTO second_sink SELECT * FROM streaming_source;");
+
+        Assertions.assertTrue(optionsPerJob.isEmpty());
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobFollowsTheDmlSyncTransitions() {
+        // the submission enables the synchronous mode, a SET disables it for the second job and a
+        // RESET restores the submission value again
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(
+                "-Dtable.dml-sync=true",
+                "SET 'rest.address'='cluster-a';\n"
+                        + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                        + "SET 'table.dml-sync' = 'false';\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO second_sink SELECT * FROM streaming_source;\n"
+                        + "RESET 'table.dml-sync';\n"
+                        + "SET 'rest.address'='cluster-c';\n"
+                        + "INSERT INTO third_sink SELECT * FROM bounded_source;");
+
+        Assertions.assertEquals(1, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(0));
+    }
+
+    @Test
     public void testExtractClusterConnectionOptionsPerJobIgnoresComments() {
         // a comment which precedes an INSERT must not hide the statement, otherwise the snapshots are
         // associated with the wrong JobID

@@ -330,15 +330,58 @@ public class FlinkTask extends AbstractYarnTask {
             log.error("Read task log failed, logPath: {}", logPath, e);
             return Collections.emptyList();
         }
+        associateApplications(submissions, applicationIds);
+        return submissions;
+    }
+
+    /**
+     * Associate the jobs whose application id is not in the task log with the application of the
+     * task.
+     *
+     * <p>The application id is printed in the task log by a submission which targets YARN directly.
+     * When it is missing there, for example because the task log only contains the JobIDs, the
+     * application-id collection source of the task is used as well, which also covers
+     * {@code appId.collect=aop} and its {@code appInfo.log}.
+     *
+     * <p>That source cannot tell which job of a multi-job task belongs to which application, so it is
+     * only used when it names a single application. A task with several applications which cannot be
+     * associated is reported explicitly instead of targeting a guessed cluster.
+     */
+    private void associateApplications(List<FlinkJobSubmission> submissions, List<String> logApplicationIds) {
+        boolean applicationIdMissing =
+                submissions.stream().anyMatch(submission -> submission.getYarnApplicationId() == null);
+        if (!applicationIdMissing) {
+            return;
+        }
+        List<String> applicationIds = new ArrayList<>(logApplicationIds);
+        try {
+            List<String> collectedApplicationIds = getApplicationIds();
+            if (CollectionUtils.isNotEmpty(collectedApplicationIds)) {
+                for (String applicationId : collectedApplicationIds) {
+                    if (!applicationIds.contains(applicationId)) {
+                        applicationIds.add(applicationId);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Get application ids failed, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
+        }
         if (applicationIds.size() == 1) {
-            // a log which contains a single application and prints it after the job: every job of the
-            // task belongs to that application
+            // a task which belongs to a single application: every job of the log runs in it
             String onlyApplicationId = applicationIds.get(0);
             submissions.replaceAll(submission -> submission.getYarnApplicationId() == null
                     ? new FlinkJobSubmission(submission.getJobId(), onlyApplicationId)
                     : submission);
+            return;
         }
-        return submissions;
+        if (applicationIds.size() > 1) {
+            log.error("Cannot associate the jobs {} with the applications {} of taskInstanceId: {}, "
+                    + "they are triggered without a -yid",
+                    submissions.stream()
+                            .map(FlinkJobSubmission::getJobId)
+                            .collect(Collectors.toList()),
+                    applicationIds, taskExecutionContext.getTaskInstanceId());
+        }
     }
 
     /**
