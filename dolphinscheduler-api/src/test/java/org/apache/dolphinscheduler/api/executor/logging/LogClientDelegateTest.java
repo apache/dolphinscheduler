@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
@@ -139,7 +140,7 @@ public class LogClientDelegateTest {
         byte[] full = "0123456789ABCDEFGHIJ".getBytes(StandardCharsets.UTF_8);
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenReturn(chunk(full, 0, 10, false))
                 .thenReturn(chunk(full, 10, 10, true));
 
@@ -160,7 +161,7 @@ public class LogClientDelegateTest {
         byte[] remoteData = "REMOTE_ARCHIVE".getBytes(StandardCharsets.UTF_8);
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenReturn(new TaskInstanceLogFileDownloadResponse(null, LogResponseStatus.ERROR, "down", true));
         mockRemoteStream(ti, remoteData);
 
@@ -182,7 +183,7 @@ public class LogClientDelegateTest {
         byte[] remoteData = "REMOTE_ARCHIVE".getBytes(StandardCharsets.UTF_8);
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenThrow(new RuntimeException("Cannot find ServerMethodInvoker"));
         mockRemoteStream(ti, remoteData);
 
@@ -205,7 +206,7 @@ public class LogClientDelegateTest {
         TaskInstance ti = newTaskInstance();
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenThrow(new MethodNotFoundException(
                         "Cannot find the ServerMethodInvoker of getTaskInstanceLogFileChunk"));
         doThrow(new IOException("Remote log file not found after download (remote log archiving may not be enabled "
@@ -232,7 +233,7 @@ public class LogClientDelegateTest {
         TaskInstance ti = newTaskInstance();
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenThrow(new RuntimeException("connection refused: /10.0.0.5:1235"));
         doThrow(new IOException("Remote log file not found after download (remote log archiving may not be enabled "
                 + "or the archive is missing): /tmp/x.log"))
@@ -259,7 +260,7 @@ public class LogClientDelegateTest {
         TaskInstance ti = newTaskInstance();
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenReturn(new TaskInstanceLogFileDownloadResponse(null, LogResponseStatus.ERROR, "down", true));
         doThrow(new IOException("Remote log file not found after download (remote log archiving may not be enabled "
                 + "or the archive is missing): /tmp/x.log"))
@@ -287,7 +288,7 @@ public class LogClientDelegateTest {
         TaskInstance ti = newTaskInstance();
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenThrow(new MethodInvocationException("NettyRemotingServer's thread pool is full"));
         doThrow(new IOException("Remote log file not found after download (remote log archiving may not be enabled "
                 + "or the archive is missing): /tmp/x.log"))
@@ -314,7 +315,7 @@ public class LogClientDelegateTest {
         TaskInstance ti = newTaskInstance();
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenReturn(new TaskInstanceLogFileDownloadResponse(new byte[0], LogResponseStatus.SUCCESS, null,
                         true));
 
@@ -337,7 +338,7 @@ public class LogClientDelegateTest {
         logClientDelegate.streamWholeLog(ti, out);
 
         assertArrayEquals(remoteData, out.toByteArray());
-        verify(localLogClient, never()).getLogChunk(any(), anyLong(), anyInt());
+        verify(localLogClient, never()).getLogChunk(any(), anyLong(), anyInt(), anyLong(), anyLong(), any());
         verify(remoteLogClient, times(1)).streamWholeLog(eq(ti), any(OutputStream.class));
     }
 
@@ -347,7 +348,7 @@ public class LogClientDelegateTest {
         byte[] full = "0123456789ABCDEFGHIJ".getBytes(StandardCharsets.UTF_8);
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenReturn(chunk(full, 0, 10, false))
                 .thenReturn(new TaskInstanceLogFileDownloadResponse(null, LogResponseStatus.ERROR, "down", true));
 
@@ -371,6 +372,68 @@ public class LogClientDelegateTest {
     }
 
     /**
+     * The identity pinned from the first chunk (mtime / fileKey) must be echoed back to the
+     * worker on every subsequent chunk request — this is what lets the worker detect a file
+     * replaced mid-download (rotation to an equal-or-greater-length file), which the
+     * length-only checks cannot see.
+     */
+    @Test
+    public void testStreamWholeLogPinsIdentityFromFirstChunkAndEchoesIt() throws Exception {
+        TaskInstance ti = newTaskInstance();
+        byte[] full = "0123456789ABCDEFGHIJ".getBytes(StandardCharsets.UTF_8);
+
+        when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
+        final TaskInstanceLogFileDownloadResponse first = chunkWithLength(full, 0, 10, false, 20, 1111L, "ino:1");
+        final TaskInstanceLogFileDownloadResponse second = chunkWithLength(full, 10, 10, true, 20, 1111L, "ino:1");
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), anyInt(), eq(0L), eq(0L), isNull()))
+                .thenReturn(first);
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), eq(20L), eq(1111L), eq("ino:1")))
+                .thenReturn(second);
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        logClientDelegate.streamWholeLog(ti, out);
+
+        assertArrayEquals(full, out.toByteArray());
+    }
+
+    /**
+     * The worker reports LOG_FILE_REPLACED on a later chunk (the file at the log path no longer
+     * matches the pinned identity): the download must fail explicitly — mid-stream bytes already
+     * written cannot be retracted, and falling back to remote storage would splice two
+     * different files together.
+     */
+    @Test
+    public void testStreamWholeLogReplacedFileMidStreamFailsExplicitly() throws Exception {
+        TaskInstance ti = newTaskInstance();
+        byte[] full = "0123456789ABCDEFGHIJ".getBytes(StandardCharsets.UTF_8);
+
+        when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
+                .thenReturn(chunkWithLength(full, 0, 10, false, 20, 1111L, "ino:1"))
+                .thenReturn(new TaskInstanceLogFileDownloadResponse(null, LogResponseStatus.LOG_FILE_REPLACED,
+                        "fileKey changed", true));
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        assertThrows(IOException.class, () -> logClientDelegate.streamWholeLog(ti, out));
+        // First chunk's bytes were already written; the failure must not silently succeed.
+        assertEquals(10, out.toByteArray().length);
+        verify(remoteLogClient, never()).streamWholeLog(any(), any(OutputStream.class));
+    }
+
+    private static TaskInstanceLogFileDownloadResponse chunkWithLength(byte[] data, int off, int len, boolean eof,
+                                                                       long observedLength,
+                                                                       long observedMtime, String observedFileKey) {
+        byte[] b = new byte[len];
+        System.arraycopy(data, off, b, 0, len);
+        final TaskInstanceLogFileDownloadResponse response =
+                new TaskInstanceLogFileDownloadResponse(b, LogResponseStatus.SUCCESS, null, eof);
+        response.setObservedLength(observedLength);
+        response.setObservedLastModifiedMillis(observedMtime);
+        response.setObservedFileKey(observedFileKey);
+        return response;
+    }
+
+    /**
      * A live task keeps writing while its log is downloaded: the download must be a SNAPSHOT of
      * the length observed on the FIRST chunk, not an unbounded tail that never reaches eof. The
      * follow-up chunks are requested clamped to the snapshot boundary, so output written after
@@ -383,10 +446,10 @@ public class LogClientDelegateTest {
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
         // The first chunk pins the snapshot: 6 of 10 bytes delivered, the log already grew to 30.
-        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize)))
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize), anyLong(), anyLong(), any()))
                 .thenReturn(chunkWithLength("ABCDEF".getBytes(StandardCharsets.UTF_8), false, 10));
         // The second request is clamped to the 4 bytes left of the snapshot.
-        when(localLogClient.getLogChunk(eq(ti), eq(6L), eq(4)))
+        when(localLogClient.getLogChunk(eq(ti), eq(6L), eq(4), anyLong(), anyLong(), any()))
                 .thenReturn(chunkWithLength("GHIJ".getBytes(StandardCharsets.UTF_8), false, 30));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -394,7 +457,7 @@ public class LogClientDelegateTest {
 
         assertEquals("ABCDEFGHIJ", new String(out.toByteArray(), StandardCharsets.UTF_8));
         // Exactly the snapshot was fetched — no third request follows the growing tail.
-        verify(localLogClient, times(2)).getLogChunk(eq(ti), anyLong(), anyInt());
+        verify(localLogClient, times(2)).getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any());
     }
 
     /**
@@ -407,16 +470,16 @@ public class LogClientDelegateTest {
         final int chunkSize = 8 * 1024 * 1024;
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize)))
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize), anyLong(), anyLong(), any()))
                 .thenReturn(chunkWithLength("ABCDEF".getBytes(StandardCharsets.UTF_8), false, 0));
-        when(localLogClient.getLogChunk(eq(ti), eq(6L), eq(chunkSize)))
+        when(localLogClient.getLogChunk(eq(ti), eq(6L), eq(chunkSize), anyLong(), anyLong(), any()))
                 .thenReturn(chunkWithLength("GHIJ".getBytes(StandardCharsets.UTF_8), true, 0));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         logClientDelegate.streamWholeLog(ti, out);
 
         assertEquals("ABCDEFGHIJ", new String(out.toByteArray(), StandardCharsets.UTF_8));
-        verify(localLogClient, times(2)).getLogChunk(eq(ti), anyLong(), anyInt());
+        verify(localLogClient, times(2)).getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any());
     }
 
     /**
@@ -430,7 +493,7 @@ public class LogClientDelegateTest {
         byte[] remoteData = "REMOTE_ARCHIVE".getBytes(StandardCharsets.UTF_8);
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenReturn(new TaskInstanceLogFileDownloadResponse(null, LogResponseStatus.LOG_FILE_NOT_FOUND,
                         "missing", true));
         mockRemoteStream(ti, remoteData);
@@ -457,7 +520,7 @@ public class LogClientDelegateTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         assertThrows(IOException.class, () -> logClientDelegate.streamWholeLog(ti, out));
         assertEquals(0, out.toByteArray().length);
-        verify(localLogClient, never()).getLogChunk(any(), anyLong(), anyInt());
+        verify(localLogClient, never()).getLogChunk(any(), anyLong(), anyInt(), anyLong(), anyLong(), any());
     }
 
     /**
@@ -470,7 +533,7 @@ public class LogClientDelegateTest {
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
         // First chunk succeeds, second RPC throws
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenReturn(chunk(full, 0, 10, false))
                 .thenThrow(new RuntimeException("Connection reset"));
 
@@ -492,7 +555,7 @@ public class LogClientDelegateTest {
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
         // First chunk succeeds, then the file is rotated underneath the reader.
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenReturn(chunk(full, 0, 10, false))
                 .thenReturn(new TaskInstanceLogFileDownloadResponse(null, LogResponseStatus.LOG_TRUNCATED,
                         "Log file was truncated/rotated: size 0 < requested offset 10", true));
@@ -517,12 +580,12 @@ public class LogClientDelegateTest {
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
         // The first chunk pins a 20-byte snapshot after delivering 8 bytes.
-        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize)))
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize), anyLong(), anyLong(), any()))
                 .thenReturn(chunkWithLength("ABCDEFGH".getBytes(StandardCharsets.UTF_8), false, 20));
         // The file then shrank to 10 bytes - still >= the 8 bytes already delivered, so the
         // worker's offset > fileLength check does NOT fire: it reports the two remaining bytes
         // with SUCCESS + eof. Only the pinned length (10 < 20) reveals the truncation.
-        when(localLogClient.getLogChunk(eq(ti), eq(8L), eq(12)))
+        when(localLogClient.getLogChunk(eq(ti), eq(8L), eq(12), anyLong(), anyLong(), any()))
                 .thenReturn(chunkWithLength("IJ".getBytes(StandardCharsets.UTF_8), true, 10));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -546,9 +609,9 @@ public class LogClientDelegateTest {
         final int chunkSize = 8 * 1024 * 1024;
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize)))
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize), anyLong(), anyLong(), any()))
                 .thenReturn(chunkWithLength("ABCDEFGH".getBytes(StandardCharsets.UTF_8), false, 20));
-        when(localLogClient.getLogChunk(eq(ti), eq(8L), eq(12)))
+        when(localLogClient.getLogChunk(eq(ti), eq(8L), eq(12), anyLong(), anyLong(), any()))
                 .thenReturn(chunkWithLength(new byte[0], true, 8));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -572,9 +635,9 @@ public class LogClientDelegateTest {
         final int chunkSize = 8 * 1024 * 1024;
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize)))
+        when(localLogClient.getLogChunk(eq(ti), eq(0L), eq(chunkSize), anyLong(), anyLong(), any()))
                 .thenReturn(chunkWithLength("ABCDEFGH".getBytes(StandardCharsets.UTF_8), false, 20));
-        when(localLogClient.getLogChunk(eq(ti), eq(8L), eq(12)))
+        when(localLogClient.getLogChunk(eq(ti), eq(8L), eq(12), anyLong(), anyLong(), any()))
                 .thenReturn(chunkWithLength("IJ".getBytes(StandardCharsets.UTF_8), true, 0));
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -598,7 +661,7 @@ public class LogClientDelegateTest {
         TaskInstance ti = newTaskInstance();
 
         when(registryClient.checkNodeExists(eq(ti.getHost()), any())).thenReturn(true);
-        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt()))
+        when(localLogClient.getLogChunk(eq(ti), anyLong(), anyInt(), anyLong(), anyLong(), any()))
                 .thenReturn(new TaskInstanceLogFileDownloadResponse(null, LogResponseStatus.ERROR, "down", true));
 
         final OutputStream[] streamHandedToRemote = new OutputStream[1];

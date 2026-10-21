@@ -50,6 +50,8 @@ worker:
   host-weight: 100
   # worker group name
   group: default
+  # Maximum number of log lines that can be queried in a single RPC request
+  max-log-query-limit: 10000
   server-load-protection:
     # If set true, will open worker overload protection
     enabled: true

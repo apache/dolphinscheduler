@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -55,6 +56,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -146,7 +148,7 @@ class LogStreamingIntegrationTest {
 
         // The file is 9 MB and the chunk size is 8 MB, so at least two chunk RPCs should have been
         // issued against the real embedded worker.
-        verify(localLogClient, atLeast(2)).getLogChunk(eq(taskInstance), any(Long.class), any(Integer.class));
+        verify(localLogClient, atLeast(2)).getLogChunk(eq(taskInstance), any(Long.class), any(Integer.class), any(Long.class), any(Long.class), ArgumentMatchers.<String>any());
     }
 
     /**
@@ -324,6 +326,101 @@ class LogStreamingIntegrationTest {
                 "Error chain must identify the pinned-length shrink, got: " + thrown);
         // Exactly the first 8 MB chunk was delivered; the replacement file's bytes never were.
         assertEquals(8 * 1024 * 1024, written.get());
+    }
+
+    /**
+     * End-to-end regression for SAME-SIZE file REPLACEMENT during a download — the exact shape
+     * the reviewer flagged: rotation swaps in a DIFFERENT file of equal length mid-download, so
+     * every length-only check passes. Only the request-pinned identity (mtime/inode key echoed
+     * back in the chunk request, real over the wire) can catch it. Proves the pin fields
+     * actually survive JSON serialization both directions: if they were dropped, the worker
+     * would see 0/0/null, skip the identity block, and this download would "succeed" with an
+     * A-prefix + B-suffix splice.
+     *
+     * <p>Deterministic timing via the same output gate as the rotation test: the streaming
+     * thread blocks inside the first 8 MB write until the test thread has replaced the file.
+     */
+    @Test
+    void streamWholeLog_sameSizeFileReplacedMidDownload_failsExplicitly() throws Exception {
+        final Path logFile = tempLogFile.toPath();
+        final Path replacedAside = logFile.resolveSibling(tempLogFile.getName() + ".replaced");
+
+        final CountDownLatch firstChunkArrived = new CountDownLatch(1);
+        final CountDownLatch replacementDone = new CountDownLatch(1);
+        final AtomicLong written = new AtomicLong();
+
+        final OutputStream gatedOutput = new OutputStream() {
+
+            private final AtomicBoolean firstWrite = new AtomicBoolean(true);
+
+            @Override
+            public void write(final int b) {
+                written.incrementAndGet();
+            }
+
+            @Override
+            public void write(final byte[] b, final int off, final int len) throws IOException {
+                written.addAndGet(len);
+                if (firstWrite.compareAndSet(true, false)) {
+                    // First chunk (8 MB) has arrived — hold the stream while the file is replaced.
+                    firstChunkArrived.countDown();
+                    try {
+                        if (!replacementDone.await(15, TimeUnit.SECONDS)) {
+                            throw new IOException("Test gate timed out waiting for replacement");
+                        }
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new IOException("Test gate interrupted", e);
+                    }
+                }
+            }
+        };
+
+        TaskInstance taskInstance = new TaskInstance();
+        taskInstance.setId(4);
+        taskInstance.setHost("127.0.0.1:" + nettyServerPort);
+        taskInstance.setLogPath(tempLogFile.getAbsolutePath());
+        taskInstance.setTaskType("SHELL");
+        when(registryClient.checkNodeExists(eq(taskInstance.getHost()), any(RegistryNodeType.class))).thenReturn(true);
+
+        final ExecutorService pool = Executors.newSingleThreadExecutor();
+        final Future<Throwable> download;
+        try {
+            download = pool.submit(() -> {
+                try {
+                    logClientDelegate.streamWholeLog(taskInstance, gatedOutput);
+                    return null;
+                } catch (Throwable t) {
+                    return t;
+                }
+            });
+
+            // Wait until the first 8 MB chunk was written, then replace the file with a
+            // DIFFERENT file of the SAME length (new inode, new mtime): length stays 9 MiB, so
+            // the shrink check passes — only the pinned identity can reject this.
+            assertTrue(firstChunkArrived.await(15, TimeUnit.SECONDS),
+                    "First chunk never arrived — streaming did not start");
+            Files.move(logFile, replacedAside, StandardCopyOption.REPLACE_EXISTING);
+            final byte[] sameLength = new byte[FILE_SIZE];
+            for (int i = 0; i < FILE_SIZE; i++) {
+                sameLength[i] = (byte) (255 - (i % 256)); // different content, same size
+            }
+            Files.write(logFile, sameLength);
+            replacementDone.countDown();
+        } finally {
+            pool.shutdown();
+        }
+
+        final Throwable thrown = download.get(30, TimeUnit.SECONDS);
+        assertNotNull(thrown, "Download must fail after a same-size replacement — not splice two files");
+        assertTrue(thrown instanceof IOException, "Expected IOException but got: " + thrown);
+        assertTrue(causeChainContains(thrown, "identity")
+                        || causeChainContains(thrown, "LOG_FILE_REPLACED"),
+                "Error chain must identify the identity mismatch, got: " + thrown);
+        // Exactly the first 8 MB chunk was delivered; the replacement file's bytes never were.
+        assertEquals(8 * 1024 * 1024, written.get());
+
+        Files.deleteIfExists(replacedAside);
     }
 
     private static boolean causeChainContains(final Throwable throwable, final String needle) {

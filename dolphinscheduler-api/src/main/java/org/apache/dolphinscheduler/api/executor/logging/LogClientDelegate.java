@@ -106,6 +106,12 @@ public class LogClientDelegate {
      *       download starts: the target length is pinned to the length the worker reports on the
      *       first chunk, so a live task's growing log ends cleanly at that boundary instead of
      *       tailing the file until the writer stops (or the request times out).</li>
+     *   <li>The identity (length + mtime + inode key, as available) observed on the FIRST chunk
+     *       is pinned and echoed on every subsequent chunk request; the worker stats before each
+     *       read and rejects the chunk when the file at the log path no longer matches — catching
+     *       a replacement the length check cannot see (a rotation that swaps in a different file
+     *       of coincidentally equal or greater length would otherwise yield an A-prefix + B-suffix
+     *       "successful" download).</li>
      *   <li>If the FIRST chunk fails — e.g. an old worker during a rolling upgrade does not
      *       implement {@code getTaskInstanceLogFileChunk} — fall back to remote log storage; if
      *       that also fails, throw an explicit error asking for a worker upgrade.</li>
@@ -135,6 +141,13 @@ public class LogClientDelegate {
         // reports it; 0 means the worker does not report it (e.g. an old worker during a rolling
         // upgrade) and the stream then ends on eof only.
         long snapshotLength = -1;
+        // The file identity pinned from the first chunk and echoed on every subsequent request:
+        // the worker stats before each read and rejects the chunk when the file at the log path
+        // no longer matches (a rotation that swaps in a different file of coincidentally equal
+        // or greater length would otherwise pass the length check and yield an A-prefix +
+        // B-suffix "successful" download).
+        long pinnedLastModified = 0;
+        String pinnedFileKey = null;
         while (true) {
             if (snapshotLength > 0 && offset >= snapshotLength) {
                 // The last byte of the request-time snapshot has been delivered. A live task may
@@ -149,7 +162,8 @@ public class LogClientDelegate {
                     : LOG_CHUNK_SIZE;
             final TaskInstanceLogFileDownloadResponse chunk;
             try {
-                chunk = localLogClient.getLogChunk(taskInstance, offset, chunkLength);
+                chunk = localLogClient.getLogChunk(taskInstance, offset, chunkLength,
+                        snapshotLength > 0 ? snapshotLength : 0, pinnedLastModified, pinnedFileKey);
             } catch (Exception e) {
                 if (offset > 0) {
                     throw new IOException("Log streaming failed at offset " + offset, e);
@@ -185,6 +199,19 @@ public class LogClientDelegate {
                         ? "worker returned no response"
                         : chunk.getCode() + ": " + chunk.getMessage();
                 if (offset > 0) {
+                    if (chunk != null && chunk.getCode() == LogResponseStatus.LOG_TRUNCATED) {
+                        // Same semantic as the API-side shrink guard below: the pinned snapshot
+                        // can no longer be delivered. Worded identically so callers/ops match
+                        // the two failure shapes.
+                        throw new IOException("Log file shrank below the pinned snapshot length (truncated/rotated)"
+                                + " for task instance " + taskInstance.getId() + " on " + taskInstance.getHost()
+                                + " at offset " + offset + ": " + failure);
+                    }
+                    if (chunk != null && chunk.getCode() == LogResponseStatus.LOG_FILE_REPLACED) {
+                        throw new IOException("Log file was replaced mid-download (identity no longer matches the"
+                                + " first chunk's pin) for task instance " + taskInstance.getId() + " on "
+                                + taskInstance.getHost() + " at offset " + offset + ": " + failure);
+                    }
                     throw new IOException("Worker chunk failed at offset " + offset + ": " + failure);
                 }
                 log.warn("First chunk failed for task instance {} ({}), falling back to remote log storage",
@@ -197,8 +224,11 @@ public class LogClientDelegate {
                 return;
             }
             if (snapshotLength < 0) {
-                // Pin the snapshot from the worker's first stat; 0 keeps the eof-only behavior.
+                // Pin the snapshot AND the identity from the worker's first stat; a 0 length
+                // keeps the eof-only behavior, absent mtime/key simply skip that check.
                 snapshotLength = chunk.getObservedLength();
+                pinnedLastModified = chunk.getObservedLastModifiedMillis();
+                pinnedFileKey = chunk.getObservedFileKey();
             } else if (snapshotLength > 0 && chunk.getObservedLength() > 0
                     && chunk.getObservedLength() < snapshotLength) {
                 // The file at the log path is now shorter than the pinned snapshot: the remaining

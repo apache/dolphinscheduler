@@ -51,6 +51,12 @@ public class MasterConfig implements Validator {
     private LogicTaskConfig logicTaskConfig = new LogicTaskConfig();
 
     /**
+     * Maximum number of log lines that can be queried in a single RPC request.
+     * Used by MasterLogServiceImpl to clamp the limit parameter on the master side.
+     */
+    private int maxLogQueryLimit = 10000;
+
+    /**
      * Master heart beat task execute interval.
      */
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
@@ -138,6 +144,7 @@ public class MasterConfig implements Validator {
                         "\n  listen-port -> " + listenPort +
                         "\n  workflow-event-bus-fire-thread-count -> " + workflowEventBusFireThreadCount +
                         "\n  logic-task-config -> " + logicTaskConfig +
+                        "\n  max-log-query-limit -> " + maxLogQueryLimit +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
                         "\n  kill-application-when-task-failover -> " + isKillApplicationWhenTaskFailover() +
                         "\n  server-load-protection -> " + serverLoadProtection +

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DOWNLOAD_LOG;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.VIEW_LOG;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.logging.LogClientDelegate;
@@ -68,6 +69,9 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
 
     @Autowired
     private LogClientDelegate logClientDelegate;
+
+    @Autowired
+    private ApiConfig apiConfig;
 
     /**
      * view log
@@ -137,6 +141,11 @@ public class LoggerServiceImpl extends BaseServiceImpl implements LoggerService 
      * @return log string data
      */
     private String queryLog(TaskInstance taskInstance, int skipLineNum, int limit) {
+        // Defensive clamp: the RPC path already clamps (LogServiceImpl), but the returned
+        // content is assembled in this JVM, and a controller/scheduler caller could bypass
+        // the REST-layer validation. Bound both parameters before they reach the worker.
+        skipLineNum = Math.max(skipLineNum, 0);
+        limit = Math.min(Math.max(limit, 1), apiConfig.getMaxLogQueryLimit());
         final String logPath = taskInstance.getLogPath();
         log.info("Query task instance log, taskInstanceId:{}, taskInstanceName:{}, host: {}, logPath:{}",
                 taskInstance.getId(), taskInstance.getName(), taskInstance.getHost(), logPath);

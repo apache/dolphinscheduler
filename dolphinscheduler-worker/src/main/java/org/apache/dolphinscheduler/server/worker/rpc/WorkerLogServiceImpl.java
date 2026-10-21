@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.extract.common.ILogService;
 import org.apache.dolphinscheduler.extract.common.service.impl.LogServiceImpl;
+import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,5 +28,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 public class WorkerLogServiceImpl extends LogServiceImpl implements ILogService {
+
+    public WorkerLogServiceImpl(WorkerConfig workerConfig) {
+        setMaxLogQueryLimit(workerConfig.getMaxLogQueryLimit());
+    }
 
 }

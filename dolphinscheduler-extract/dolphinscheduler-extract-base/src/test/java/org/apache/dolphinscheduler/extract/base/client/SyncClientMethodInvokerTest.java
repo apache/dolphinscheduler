@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.extract.base.client;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -32,6 +33,7 @@ import org.apache.dolphinscheduler.extract.base.serialize.JsonSerializer;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -88,6 +90,29 @@ class SyncClientMethodInvokerTest {
         assertEquals("NettyRemotingServer's thread pool is full", thrown.getMessage());
     }
 
+    /**
+     * LEGACY peer regression: an OLD server (pre typed-signal build) answers a missing method
+     * with a plain {@code fail("Cannot find the ServerMethodInvoker of ...")} — its wire JSON has
+     * no {@code methodNotFound} field, so the deserialized flag is false. The client must still
+     * recognize this exact legacy message as "the server does not have the method" and throw the
+     * typed exception; otherwise a rolling upgrade misclassifies the old worker as a broken
+     * current one and gives the wrong upgrade guidance (and the log-download fallback decision
+     * degrades).
+     */
+    @Test
+    void invoke_legacyServerWithoutTheMethod_throwsTypedMethodNotFoundException() throws Throwable {
+        final SyncClientMethodInvoker invoker =
+                invokerReturning(StandardRpcResponse.fail(
+                        "Cannot find the ServerMethodInvoker of "
+                                + "org.apache.dolphinscheduler.extract.common.ILogService:getTaskInstanceLogFileChunk"));
+
+        final MethodNotFoundException thrown = assertThrows(MethodNotFoundException.class,
+                () -> invoke(invoker));
+
+        assertTrue(thrown.getMessage().startsWith("Cannot find the ServerMethodInvoker of"),
+                "the legacy message must survive into the typed exception");
+    }
+
     /** The happy path is untouched: a success response still deserializes to the return value. */
     @Test
     void invoke_successResponse_returnsTheDeserializedBody() throws Throwable {
@@ -95,6 +120,26 @@ class SyncClientMethodInvokerTest {
                 StandardRpcResponse.success(JsonSerializer.serialize("result-body"), String.class));
 
         assertEquals("result-body", invoke(invoker));
+    }
+
+    /**
+     * The exact wire shape an OLD server produces: its JSON has NO {@code methodNotFound} field
+     * (the field postdates it), so round-tripping it must NOT lose the not-found signal — the
+     * legacy message prefix carries it instead.
+     */
+    @Test
+    void legacyWireResponseWithoutFlagField_isStillRecognizedAsMethodNotFound() {
+        final String legacyJson =
+                "{\"success\":false,\"message\":\"Cannot find the ServerMethodInvoker of "
+                        + "org.apache.dolphinscheduler.extract.common.ILogService:getTaskInstanceLogFileChunk\"}";
+
+        final StandardRpcResponse deserialized =
+                JsonSerializer.deserialize(legacyJson.getBytes(StandardCharsets.UTF_8), StandardRpcResponse.class);
+
+        // The raw flag field is absent on the old wire (it deserializes to false); only the
+        // message prefix can carry the signal.
+        assertTrue(deserialized.isMethodNotFound(),
+                "the legacy message must carry the not-found signal");
     }
 
     private static Object invoke(final SyncClientMethodInvoker invoker) throws Throwable {

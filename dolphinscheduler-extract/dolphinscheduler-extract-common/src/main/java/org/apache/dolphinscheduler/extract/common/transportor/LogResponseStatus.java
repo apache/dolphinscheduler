@@ -39,4 +39,13 @@ public enum LogResponseStatus {
      * assembling is truncated and must fail explicitly instead of silently ending.
      */
     LOG_TRUNCATED,
+
+    /**
+     * The file at the log path is no longer the file this download pinned on its first chunk:
+     * the identity the request carried (mtime and/or inode key) no longer matches. This catches
+     * a replacement that per-chunk length checks cannot see — a rotation that swaps in a
+     * different file of coincidentally equal or greater length would otherwise yield an
+     * A-prefix + B-suffix "successful" download. The caller must fail the download explicitly.
+     */
+    LOG_FILE_REPLACED,
 }

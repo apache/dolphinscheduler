@@ -32,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.request;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.exceptions.ApiExceptionHandler;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.LoggerService;
@@ -50,6 +51,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -79,6 +81,9 @@ public class LoggerControllerStreamingTest {
 
     @BeforeEach
     public void setUp() {
+        // The controller clamps queryLog params against apiConfig; inject the real default
+        // config so the standalone MockMvc setup has it available.
+        ReflectionTestUtils.setField(loggerController, "apiConfig", new ApiConfig());
         mockMvc = MockMvcBuilders.standaloneSetup(loggerController)
                 .setControllerAdvice(new ApiExceptionHandler())
                 .build();

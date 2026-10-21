@@ -30,6 +30,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.AssertionsHelper;
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.logging.LogClientDelegate;
@@ -49,6 +50,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -58,6 +60,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -82,6 +85,15 @@ public class LoggerServiceTest {
 
     @Mock
     private LogClientDelegate logClientDelegate;
+
+    private final ApiConfig apiConfig = new ApiConfig();
+
+    @BeforeEach
+    public void setUpApiConfig() {
+        // queryLog clamps against apiConfig.maxLogQueryLimit; Mockito can't inject a plain
+        // field, so set it directly on the @InjectMocks instance.
+        ReflectionTestUtils.setField(loggerService, "apiConfig", apiConfig);
+    }
 
     private final int nettyServerPort = 18080;
 

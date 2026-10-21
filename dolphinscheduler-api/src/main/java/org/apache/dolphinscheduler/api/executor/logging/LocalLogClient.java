@@ -49,11 +49,21 @@ public class LocalLogClient {
 
     /**
      * Fetch a single bounded chunk of the task instance log from the worker via chunked RPC.
+     *
+     * @param pinnedFileLength  the snapshot length pinned from the first chunk (0 = not pinned)
+     * @param pinnedLastModifiedMillis the mtime pinned from the first chunk (0 = not pinned)
+     * @param pinnedFileKey     the inode key pinned from the first chunk (null = not pinned)
      */
     public TaskInstanceLogFileDownloadResponse getLogChunk(final TaskInstance taskInstance,
-                                                           final long offset, final int length) {
+                                                           final long offset, final int length,
+                                                           final long pinnedFileLength,
+                                                           final long pinnedLastModifiedMillis,
+                                                           final String pinnedFileKey) {
         final TaskInstanceLogFileDownloadRequest request = new TaskInstanceLogFileDownloadRequest(
                 taskInstance.getId(), taskInstance.getLogPath(), offset, length);
+        request.setExpectedFileLength(pinnedFileLength);
+        request.setExpectedLastModifiedMillis(pinnedLastModifiedMillis);
+        request.setExpectedFileKey(pinnedFileKey);
         return getProxyLogService(taskInstance).getTaskInstanceLogFileChunk(request);
     }
 

@@ -43,6 +43,13 @@ public class WorkerConfig implements Validator {
     private int listenPort = 1234;
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
     private int hostWeight = 100;
+
+    /**
+     * Maximum number of log lines that can be queried in a single RPC request.
+     * Used by WorkerLogServiceImpl to clamp the limit parameter on the worker side.
+     */
+    private int maxLogQueryLimit = 10000;
+
     private WorkerServerLoadProtectionConfig serverLoadProtection = new WorkerServerLoadProtectionConfig();
     private String group;
 
@@ -87,6 +94,7 @@ public class WorkerConfig implements Validator {
                         "\n  listen-port -> " + listenPort +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
                         "\n  host-weight -> " + hostWeight +
+                        "\n  max-log-query-limit -> " + maxLogQueryLimit +
                         "\n  tenantConfig -> " + tenantConfig +
                         "\n  server-load-protection -> " + serverLoadProtection +
                         "\n  address -> " + workerAddress +

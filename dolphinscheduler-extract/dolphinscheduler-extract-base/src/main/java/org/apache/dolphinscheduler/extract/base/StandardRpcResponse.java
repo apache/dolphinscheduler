@@ -24,6 +24,15 @@ import lombok.Data;
 @Data
 public class StandardRpcResponse implements IRpcResponse {
 
+    /**
+     * The message both OLD and CURRENT servers attach when the requested method does not exist
+     * on the receiving side (see {@code JdkDynamicServerHandler}). A current server also sets
+     * {@link #methodNotFound}; an old one sends the bare failure, so this prefix is the legacy
+     * discriminator. Shared between the server (which produces the message) and the client
+     * (which recognizes it) — change both sides together or not at all.
+     */
+    public static final String METHOD_NOT_FOUND_MESSAGE_PREFIX = "Cannot find the ServerMethodInvoker of ";
+
     private boolean success;
 
     private String message;
@@ -62,6 +71,19 @@ public class StandardRpcResponse implements IRpcResponse {
         StandardRpcResponse rpcResponse = fail(message);
         rpcResponse.setMethodNotFound(true);
         return rpcResponse;
+    }
+
+    /**
+     * The typed flag from a CURRENT peer, or — for an OLD peer whose wire JSON predates the
+     * flag — the exact legacy failure message both server generations have always used for a
+     * missing method. Other failures keep false: their messages never start with this prefix.
+     */
+    @Override
+    public boolean isMethodNotFound() {
+        if (methodNotFound) {
+            return true;
+        }
+        return message != null && message.startsWith(METHOD_NOT_FOUND_MESSAGE_PREFIX);
     }
 
     @Override

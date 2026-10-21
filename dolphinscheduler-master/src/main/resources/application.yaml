@@ -101,6 +101,8 @@ master:
   max-heartbeat-interval: 10s
   # Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.
   kill-application-when-task-failover: true
+  # Maximum number of log lines that can be queried in a single RPC request
+  max-log-query-limit: 10000
   server-load-protection:
     # If set true, will open master overload protection
     enabled: true

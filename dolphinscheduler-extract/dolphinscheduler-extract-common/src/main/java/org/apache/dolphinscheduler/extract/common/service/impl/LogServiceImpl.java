@@ -30,11 +30,25 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.List;
 
 public class LogServiceImpl implements ILogService {
 
     private static final int MAX_CHUNK_SIZE = 8 * 1024 * 1024; // 8 MB
+
+    /**
+     * Maximum number of log lines returned by a single {@link #pageQueryTaskInstanceLog} call.
+     * The request parameters are user-controlled all the way down from the REST layer; without
+     * this clamp, {@code limit=Integer.MAX_VALUE} materializes the whole log as a
+     * {@code List<String>} and re-introduces the OOM this streaming work exists to prevent.
+     */
+    protected int maxLogQueryLimit = 10000;
+
+    public void setMaxLogQueryLimit(int maxLogQueryLimit) {
+        this.maxLogQueryLimit = maxLogQueryLimit;
+    }
 
     /**
      * Downloads the entire log file for a task instance.
@@ -81,10 +95,14 @@ public class LogServiceImpl implements ILogService {
                 new TaskInstanceLogPageQueryResponse();
         List<String> lines;
         try {
+            // Clamp both parameters: the request comes from the REST layer with no safe upper
+            // bound, and a negative skip/limit makes Files.lines().skip()/limit() throw.
+            final int skipLineNum = Math.max(taskInstanceLogPageQueryRequest.getSkipLineNum(), 0);
+            final int limit = Math.min(Math.max(taskInstanceLogPageQueryRequest.getLimit(), 1), maxLogQueryLimit);
             lines = LogUtils.readPartFileContentFromLocal(
                     taskInstanceLogPageQueryRequest.getTaskInstanceLogAbsolutePath(),
-                    taskInstanceLogPageQueryRequest.getSkipLineNum(),
-                    taskInstanceLogPageQueryRequest.getLimit());
+                    skipLineNum,
+                    limit);
             taskInstanceLogPageQueryResponse.setLogContent(LogUtils.rollViewLogLines(lines));
         } catch (Exception e) {
             taskInstanceLogPageQueryResponse.setCode(LogResponseStatus.ERROR);
@@ -115,11 +133,60 @@ public class LogServiceImpl implements ILogService {
                 response.setEof(true);
                 return response;
             }
-            // Single stat drives ALL decisions below (missing / truncated / EOF / read clamp):
-            // re-statting after the read would race against rotation between the two
-            // observations and could misclassify the result.
-            final long observedFileLength = logFile.length();
+            // ONE atomic stat drives ALL decisions below (identity / missing / truncated / EOF /
+            // read clamp): File.length()/lastModified() are SEPARATE syscalls — a rotation
+            // landing between them would report the OLD file's length with the NEW file's
+            // mtime/inode, pinning a hybrid identity that defeats the replacement guard below.
+            // Files.readAttributes snapshots all attributes from a single kernel call; its
+            // fileKey is the strongest identity signal available (null when unsupported).
+            final BasicFileAttributes attrs = Files.readAttributes(logFile.toPath(), BasicFileAttributes.class);
+            final long observedFileLength = attrs.size();
+            final long observedLastModified = attrs.lastModifiedTime().toMillis();
+            final String observedFileKey = attrs.fileKey() == null ? null : String.valueOf(attrs.fileKey());
             response.setObservedLength(observedFileLength);
+            response.setObservedLastModifiedMillis(observedLastModified);
+            response.setObservedFileKey(observedFileKey);
+            // --- request-pinned identity check (file replacement across chunks) ---
+            // The caller pins identity from the first chunk and echoes it on every subsequent
+            // one. A replacement the length check cannot see — a rotation that swaps in a
+            // different file of equal-or-greater length — would otherwise produce an A-prefix +
+            // B-suffix "successful" download. Checks, most to least reliable:
+            //   1. inode key: present on BOTH sides -> must be identical.
+            //   2. mtime: a replaced file's mtime is always EARLIER than the pin (the pin was
+            //      taken from the previous live file; a fresh file is born "now"). Appends move
+            //      mtime FORWARD and stay accepted; same-mtime keeps passing (granularity).
+            // There remains a stat->read window inside which a replacement can still slip
+            // through (a true fix needs an inode-pinned open handle, a larger change); with the
+            // single atomic stat above the window is micro- rather than chunk-sized.
+            if (request.getExpectedFileLength() > 0 || request.getExpectedLastModifiedMillis() > 0
+                    || request.getExpectedFileKey() != null) {
+                if (request.getExpectedFileLength() > 0 && observedFileLength < request.getExpectedFileLength()) {
+                    // Shrink: rotation renamed the active file — the existing truncation
+                    // semantics (kept distinct from replacement so operators can tell them
+                    // apart; the API rejects a shrink against its pin too).
+                    response.setCode(LogResponseStatus.LOG_TRUNCATED);
+                    response.setMessage("Log file was truncated/rotated: size "
+                            + observedFileLength + " < pinned " + request.getExpectedFileLength());
+                    response.setEof(true);
+                    return response;
+                }
+                if (request.getExpectedFileKey() != null && observedFileKey != null
+                        && !request.getExpectedFileKey().equals(observedFileKey)) {
+                    response.setCode(LogResponseStatus.LOG_FILE_REPLACED);
+                    response.setMessage("Log file identity changed: pinned fileKey "
+                            + request.getExpectedFileKey() + " but observed " + observedFileKey);
+                    response.setEof(true);
+                    return response;
+                }
+                if (request.getExpectedLastModifiedMillis() > 0 && observedLastModified > 0
+                        && observedLastModified < request.getExpectedLastModifiedMillis()) {
+                    response.setCode(LogResponseStatus.LOG_FILE_REPLACED);
+                    response.setMessage("Log file identity changed: mtime went backwards, pinned "
+                            + request.getExpectedLastModifiedMillis() + " but observed " + observedLastModified);
+                    response.setEof(true);
+                    return response;
+                }
+            }
             if (offset > observedFileLength) {
                 // offset is PAST the observed file size: the file shrank underneath the reader
                 // (log rotation renamed it, a fresh one started from 0). offset == fileLength

@@ -42,9 +42,42 @@ public class TaskInstanceLogFileDownloadRequest {
      */
     private int length = 0;
 
+    /**
+     * The file length the caller pinned (from the first chunk's {@code observedLength}) for this
+     * download; 0 = not pinned. The worker stats before every read: a file SHORTER than this
+     * means rotation/truncation (LOG_TRUNCATED); the API additionally rejects a shrink on its
+     * side. Only read by the chunk RPC.
+     */
+    private long expectedFileLength = 0;
+
+    /**
+     * The mtime the caller pinned (from the first chunk's {@code observedLastModifiedMillis});
+     * 0 = not pinned. The worker rejects the chunk when the file's current mtime is EARLIER than
+     * the pin: that means the file was replaced (a fresh file starts mtime "now", never in the
+     * past) rather than appended to. Appends (mtime moving FORWARD) are accepted — a live task
+     * legitimately grows the log mid-download. Only read by the chunk RPC.
+     */
+    private long expectedLastModifiedMillis = 0;
+
+    /**
+     * The inode identity the caller pinned (from the first chunk's {@code observedFileKey});
+     * null = not pinned or the worker's filesystem does not expose inodes. When present on both
+     * sides it is the strongest check: the worker rejects the chunk when the file at the path is
+     * now a different INODE — catching a same-size, back-dated-mtime replacement that mtime
+     * alone would miss. Only read by the chunk RPC.
+     */
+    private String expectedFileKey;
+
     public TaskInstanceLogFileDownloadRequest(long taskInstanceId, String taskInstanceLogAbsolutePath) {
         this.taskInstanceId = taskInstanceId;
         this.taskInstanceLogAbsolutePath = taskInstanceLogAbsolutePath;
+    }
+
+    public TaskInstanceLogFileDownloadRequest(long taskInstanceId, String taskInstanceLogAbsolutePath,
+                                              long offset, int length) {
+        this(taskInstanceId, taskInstanceLogAbsolutePath);
+        this.offset = offset;
+        this.length = length;
     }
 
 }

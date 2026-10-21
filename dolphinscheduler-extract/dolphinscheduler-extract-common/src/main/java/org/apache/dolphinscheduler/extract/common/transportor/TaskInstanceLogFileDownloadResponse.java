@@ -46,8 +46,24 @@ public class TaskInstanceLogFileDownloadResponse {
     private long observedLength;
 
     /**
-     * Convenience constructor for callers that do not report {@link #observedLength} — it stays
-     * 0, i.e. unknown.
+     * The mtime the worker observed on this chunk's single stat; 0 when unknown (an old worker).
+     * The API pins identity from the FIRST chunk's value and sends it back as
+     * {@code expectedLastModifiedMillis} on every subsequent chunk, letting the worker detect a
+     * replaced file (mtime reset to the past) that a length-only check would miss.
+     */
+    private long observedLastModifiedMillis;
+
+    /**
+     * The inode identity (dev:ino or equivalent) the worker observed on this chunk's stat; null
+     * when unknown (an old worker, or a filesystem that does not expose inodes — e.g. some
+     * Windows/container setups). Sent back as {@code expectedFileKey}; the strongest replacement
+     * signal available because it survives any mtime coincidence.
+     */
+    private String observedFileKey;
+
+    /**
+     * Convenience constructor for callers that do not report the observed identity — lengths
+     * stay 0 and the file key null, i.e. unknown.
      */
     public TaskInstanceLogFileDownloadResponse(final byte[] logBytes, final LogResponseStatus code,
                                                final String message, final boolean eof) {

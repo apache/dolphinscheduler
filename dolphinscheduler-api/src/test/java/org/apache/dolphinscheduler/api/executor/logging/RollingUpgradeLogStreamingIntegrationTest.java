@@ -245,9 +245,11 @@ class RollingUpgradeLogStreamingIntegrationTest {
 
     /**
      * The genuine missing-method signal over the real wire: the worker's ILogService does not
-     * have the chunk method at all (a REAL old worker), the server answers "Cannot find the
-     * ServerMethodInvoker" with the typed not-found flag, and with remote storage unavailable
-     * the download fails with the explicit "worker upgrade required" guidance.
+     * have the chunk method at all (a REAL old worker — this build's server answers with the
+     * typed not-found flag; an actual old build sends the same "Cannot find the
+     * ServerMethodInvoker" message WITHOUT the flag, and the client recognizes both shapes),
+     * and with remote storage unavailable the download fails with the explicit "worker upgrade
+     * required" guidance.
      */
     @Test
     void missingChunkMethodWorkerWithoutRemoteArchiveFailsWithExplicitUpgradeError() throws Exception {
