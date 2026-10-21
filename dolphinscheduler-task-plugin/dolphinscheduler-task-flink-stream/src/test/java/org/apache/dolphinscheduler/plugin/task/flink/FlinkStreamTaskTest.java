@@ -199,15 +199,42 @@ public class FlinkStreamTaskTest {
     }
 
     @Test
-    public void testSavePointDoesNotGuessTheApplicationOfAMultiApplicationTask() throws Exception {
-        // two jobs and two applications which the collection source cannot associate with a job: no
-        // -yid is guessed, the jobs are triggered without it
+    public void testSavePointFailsWhenTheApplicationOfAMultiApplicationJobIsUnknown() throws Exception {
+        // two jobs and two applications which the collection source cannot associate with a job: the
+        // savepoint cannot target one of them, so it must fail instead of triggering against an
+        // arbitrary cluster
         TaskExecutionContext context = buildSavepointTaskExecutionContext(
                 "Job has been submitted with JobID 11111111111111111111111111111111\n"
                         + "Job has been submitted with JobID 22222222222222222222222222222222");
         FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
         Mockito.doReturn(Arrays.asList("application_1700000000000_0001",
                 "application_1700000000000_0002")).when(task).getApplicationIds();
+
+        Assertions.assertThrows(TaskException.class, task::savePoint);
+        Mockito.verify(task, Mockito.never()).executeFlinkSavepointCommand(Mockito.anyList());
+    }
+
+    @Test
+    public void testSavePointFailsWhenASynchronousSubmissionIsStillRunning() throws Exception {
+        // the synchronous statement of another endpoint is still running: the client prints no JobID
+        // for it, so the savepoint of the task cannot cover every submitted job
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Job ID: 22222222222222222222222222222222\n"
+                        + "Execute statement in sync mode. Please wait for the execution finish...");
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
+
+        Assertions.assertThrows(TaskException.class, task::savePoint);
+        Mockito.verify(task, Mockito.never()).executeFlinkSavepointCommand(Mockito.anyList());
+    }
+
+    @Test
+    public void testSavePointSucceedsAfterACompletedSynchronousSubmission() throws Exception {
+        // the synchronous statement has finished, only the asynchronous job is checkpointed
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Execute statement in sync mode. Please wait for the execution finish...\n"
+                        + "Complete execution of the SQL update statement.\n"
+                        + "Job ID: 22222222222222222222222222222222");
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
 
         List<List<String>> executedCommands = new ArrayList<>();
         Mockito.doAnswer(invocation -> {
@@ -217,13 +244,10 @@ public class FlinkStreamTaskTest {
 
         task.savePoint();
 
-        Assertions.assertEquals(2, executedCommands.size());
-        Assertions.assertEquals(
-                "${FLINK_HOME}/bin/flink savepoint 11111111111111111111111111111111",
-                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals(1, executedCommands.size());
         Assertions.assertEquals(
                 "${FLINK_HOME}/bin/flink savepoint 22222222222222222222222222222222",
-                String.join(" ", executedCommands.get(1)));
+                String.join(" ", executedCommands.get(0)));
     }
 
     @Test

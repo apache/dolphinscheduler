@@ -73,6 +73,18 @@ public class FlinkTask extends AbstractYarnTask {
     private static final String JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE = "already reached another terminal state";
 
     /**
+     * The message the SQL Client prints when it waits for a synchronous submission to finish. The
+     * JobID of such a submission is never printed, so it is only reachable through the task log.
+     */
+    private static final String SYNCHRONOUS_SUBMISSION_STARTED_MESSAGE = "Execute statement in sync mode";
+
+    /**
+     * The message the SQL Client prints when a synchronous submission has finished.
+     */
+    private static final String SYNCHRONOUS_SUBMISSION_FINISHED_MESSAGE =
+            "Complete execution of the SQL update statement";
+
+    /**
      * The maximum time to wait for the submission output which is still buffered when the client is
      * stopped to be written to the task log.
      */
@@ -237,7 +249,10 @@ public class FlinkTask extends AbstractYarnTask {
             log.warn("Get application ids failed, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
         }
         List<String> jobIds = getFlinkJobIds();
-        if (CollectionUtils.isEmpty(jobIds)) {
+        // a synchronous submission which is still running prints no JobID, so it cannot be cancelled
+        // through the flink CLI: it must not be reported as cancelled either
+        int pendingSynchronousSubmissions = countPendingSynchronousSubmissions();
+        if (CollectionUtils.isEmpty(jobIds) && pendingSynchronousSubmissions == 0) {
             log.info("Cannot find flink JobID from the task log, taskInstanceId: {}",
                     taskExecutionContext.getTaskInstanceId());
             return;
@@ -265,12 +280,55 @@ public class FlinkTask extends AbstractYarnTask {
             log.error("Cancel flink job {} failed, the job may still be running", jobId);
             failedJobIds.add(jobId);
         }
+        List<String> failures = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(failedJobIds)) {
-            throw new TaskException(
-                    String.format("Cancel flink jobs %s failed, they may still be running, taskInstanceId: %s",
-                            failedJobIds, taskExecutionContext.getTaskInstanceId()));
+            failures.add(String.format("the jobs %s could not be cancelled, they may still be running", failedJobIds));
+        }
+        if (pendingSynchronousSubmissions > 0) {
+            failures.add(String.format(
+                    "%d synchronous SQL submission(s) were still running, the SQL Client prints no JobID for them "
+                            + "so they cannot be cancelled through the flink CLI",
+                    pendingSynchronousSubmissions));
+        }
+        if (CollectionUtils.isNotEmpty(failures)) {
+            throw new TaskException(String.format("Cancel the flink jobs of the task failed, %s, taskInstanceId: %s",
+                    String.join("; ", failures), taskExecutionContext.getTaskInstanceId()));
         }
         log.info("Successfully cancelled flink jobs: {}", jobIds);
+    }
+
+    /**
+     * The number of synchronous submissions which the SQL Client started but did not finish.
+     *
+     * <p>With {@code table.dml-sync} the client waits for the job instead of printing its JobID, so a
+     * submission which is still running when the client is stopped has no id in the task log and
+     * cannot be addressed by the flink CLI. The messages which the client prints around such a
+     * submission tell it apart from one which has finished.
+     */
+    protected int countPendingSynchronousSubmissions() {
+        String logPath = taskExecutionContext.getLogPath();
+        File logFile = StringUtils.isEmpty(logPath) ? null : new File(logPath);
+        if (logFile == null || !logFile.isFile()) {
+            return 0;
+        }
+        int started = 0;
+        int finished = 0;
+        try (Stream<String> lines = Files.lines(logFile.toPath())) {
+            Iterator<String> iterator = lines.iterator();
+            while (iterator.hasNext()) {
+                String line = iterator.next();
+                if (StringUtils.contains(line, SYNCHRONOUS_SUBMISSION_STARTED_MESSAGE)) {
+                    started++;
+                }
+                if (StringUtils.contains(line, SYNCHRONOUS_SUBMISSION_FINISHED_MESSAGE)) {
+                    finished++;
+                }
+            }
+        } catch (Exception e) {
+            log.error("Read task log failed, logPath: {}", logPath, e);
+            return 0;
+        }
+        return Math.max(0, started - finished);
     }
 
     /**
@@ -376,11 +434,14 @@ public class FlinkTask extends AbstractYarnTask {
         }
         if (applicationIds.size() > 1) {
             log.error("Cannot associate the jobs {} with the applications {} of taskInstanceId: {}, "
-                    + "they are triggered without a -yid",
+                    + "they are not triggered with a -yid",
                     submissions.stream()
                             .map(FlinkJobSubmission::getJobId)
                             .collect(Collectors.toList()),
                     applicationIds, taskExecutionContext.getTaskInstanceId());
+            submissions.replaceAll(submission -> submission.getYarnApplicationId() == null
+                    ? new FlinkJobSubmission(submission.getJobId(), null, true)
+                    : submission);
         }
     }
 
@@ -455,7 +516,8 @@ public class FlinkTask extends AbstractYarnTask {
     /**
      * A job submitted by the task: its Flink JobID, which identifies the job, and the YARN
      * application which runs it, which is only used to target the cluster. The application is null
-     * when the job was not submitted to YARN.
+     * when the job was not submitted to YARN, or when the task runs in several applications and the
+     * log does not tell which one runs this job.
      */
     @Getter
     protected static class FlinkJobSubmission {
@@ -464,9 +526,20 @@ public class FlinkTask extends AbstractYarnTask {
 
         private final String yarnApplicationId;
 
+        /**
+         * true when the task runs in several YARN applications and this job could not be associated
+         * with the application which runs it.
+         */
+        private final boolean yarnApplicationUnresolved;
+
         FlinkJobSubmission(String jobId, String yarnApplicationId) {
+            this(jobId, yarnApplicationId, false);
+        }
+
+        FlinkJobSubmission(String jobId, String yarnApplicationId, boolean yarnApplicationUnresolved) {
             this.jobId = jobId;
             this.yarnApplicationId = yarnApplicationId;
+            this.yarnApplicationUnresolved = yarnApplicationUnresolved;
         }
     }
 }

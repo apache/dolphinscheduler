@@ -69,6 +69,7 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         // job, and is passed as the `-yid` option. It is kept per job, because the SQL Client with
         // `yarn-per-job` submits every job into its own application.
         List<FlinkJobSubmission> submissions = getFlinkJobSubmissions();
+        failOnPendingSynchronousSubmissions();
         if (CollectionUtils.isEmpty(submissions)) {
             throw new TaskException(
                     "Cannot find the flink JobID of the task, taskInstanceId: "
@@ -82,6 +83,14 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
             List<String> clusterConnectionOptions = i < clusterConnectionOptionsPerJob.size()
                     ? clusterConnectionOptionsPerJob.get(i)
                     : lastClusterConnectionOptions;
+            if (submission.isYarnApplicationUnresolved() && CollectionUtils.isEmpty(clusterConnectionOptions)) {
+                // the job runs in one of several applications and nothing else selects the cluster it
+                // runs in, so a savepoint would be triggered against an arbitrary one
+                throw new TaskException("Cannot determine the YARN application which runs flink job "
+                        + submission.getJobId() + ", the task submitted it to one of several applications and the "
+                        + "task log does not say which one, taskInstanceId: "
+                        + taskExecutionContext.getTaskInstanceId());
+            }
             List<String> args = FlinkArgsUtils.buildSavePointCommandLine(submission.getJobId(),
                     submission.getYarnApplicationId(), clusterConnectionOptions);
 
@@ -89,6 +98,20 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
                 throw new TaskException("Trigger savepoint for flink job " + submission.getJobId()
                         + " failed, taskInstanceId: " + taskExecutionContext.getTaskInstanceId());
             }
+        }
+    }
+
+    /**
+     * A synchronous submission which the SQL Client is still running prints no JobID and cannot be
+     * checkpointed, so the savepoint of the task must not be reported as successful.
+     */
+    private void failOnPendingSynchronousSubmissions() throws TaskException {
+        int pendingSynchronousSubmissions = countPendingSynchronousSubmissions();
+        if (pendingSynchronousSubmissions > 0) {
+            throw new TaskException(String.format(
+                    "%d synchronous SQL submission(s) of the task were still running, the SQL Client prints no JobID "
+                            + "for them so no savepoint can be triggered, taskInstanceId: %s",
+                    pendingSynchronousSubmissions, taskExecutionContext.getTaskInstanceId()));
         }
     }
 }

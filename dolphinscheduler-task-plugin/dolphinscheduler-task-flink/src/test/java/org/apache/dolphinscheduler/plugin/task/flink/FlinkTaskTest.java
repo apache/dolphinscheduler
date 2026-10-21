@@ -458,6 +458,39 @@ public class FlinkTaskTest {
     }
 
     @Test
+    public void testCancelApplicationFailsWhenASynchronousSubmissionIsStillRunning() throws Exception {
+        // the client waits for the synchronous statement instead of printing its JobID, so stopping
+        // the client is not proof that the remote job is cancelled: the cancellation must fail
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Execute statement in sync mode. Please wait for the execution finish...");
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        Assertions.assertThrows(TaskException.class, task::cancelApplication);
+        Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
+    }
+
+    @Test
+    public void testCancelApplicationAfterACompletedSynchronousSubmission() throws Exception {
+        // a synchronous statement which has finished has nothing left to cancel, only the
+        // asynchronous job is cancelled
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Execute statement in sync mode. Please wait for the execution finish...\n"
+                        + "Complete execution of the SQL update statement.\n"
+                        + "Job ID: 22222222222222222222222222222222");
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
+        task.cancelApplication();
+
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222",
+                String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
     public void testCancelApplicationCollectsJobIdSubmittedWhileTheClientIsStopped() throws Exception {
         // a multi statement SQL script can submit another job while the client is being stopped, the
         // final snapshot has to contain it
