@@ -471,6 +471,41 @@ public class FlinkTaskTest {
     }
 
     @Test
+    public void testCancelApplicationIgnoresAFailedSynchronousSubmission() throws Exception {
+        // the client prints the failure message instead of the completion message when the synchronous
+        // statement fails, so it does not wait for that submission any more: a stop which races with
+        // the failure must not report a submission which cannot be cancelled
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Execute statement in sync mode. Please wait for the execution finish...\n"
+                        + "Could not execute SQL statement.\n"
+                        + "org.apache.flink.table.client.gui.shell.SqlClientException: the source table "
+                        + "does not exist");
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        task.cancelApplication();
+
+        Assertions.assertEquals(0, task.countPendingSynchronousSubmissions());
+        Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
+    }
+
+    @Test
+    public void testCancelApplicationFailsWhenTheSubmissionAfterAFailureIsStillRunning() throws Exception {
+        // a failed submission ends the previous synchronous execution, but the following one is still
+        // running, so the task must still report the submission which cannot be cancelled
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Execute statement in sync mode. Please wait for the execution finish...\n"
+                        + "Could not execute SQL statement.\n"
+                        + "Execute statement in sync mode. Please wait for the execution finish...");
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+
+        Assertions.assertThrows(TaskException.class, task::cancelApplication);
+        Assertions.assertEquals(1, task.countPendingSynchronousSubmissions());
+        Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
+    }
+
+    @Test
     public void testCancelApplicationAfterACompletedSynchronousSubmission() throws Exception {
         // a synchronous statement which has finished has nothing left to cancel, only the
         // asynchronous job is cancelled

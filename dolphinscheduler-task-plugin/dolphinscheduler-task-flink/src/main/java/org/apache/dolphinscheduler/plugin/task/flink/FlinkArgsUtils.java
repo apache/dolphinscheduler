@@ -930,7 +930,11 @@ public class FlinkArgsUtils {
     private static void destroyProcessTree(Process process, TaskExecutionContext taskExecutionContext) {
         int processId = ProcessUtils.getProcessId(process);
         if (processId > 0) {
-            ProcessUtils.kill(processId, taskExecutionContext.getTenantCode());
+            if (!ProcessUtils.kill(processId, taskExecutionContext.getTenantCode())) {
+                // the descendant processes may outlive the command, for example when neither pstree nor
+                // ps is available, or when a background process ignores SIGINT
+                log.warn("The process tree of the flink command could not be terminated, processId: {}", processId);
+            }
         }
         if (process.isAlive()) {
             process.destroyForcibly();

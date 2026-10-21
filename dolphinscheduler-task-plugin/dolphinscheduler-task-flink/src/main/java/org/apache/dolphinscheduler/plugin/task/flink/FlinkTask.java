@@ -85,6 +85,13 @@ public class FlinkTask extends AbstractYarnTask {
             "Complete execution of the SQL update statement";
 
     /**
+     * The message the SQL Client prints when a statement failed. It is printed instead of the
+     * completion message, so a failed submission is not a submission which the client still waits
+     * for, even though the submission never printed a JobID.
+     */
+    private static final String SYNCHRONOUS_SUBMISSION_FAILED_MESSAGE = "Could not execute SQL statement";
+
+    /**
      * The maximum time to wait for the submission output which is still buffered when the client is
      * stopped to be written to the task log.
      */
@@ -291,8 +298,12 @@ public class FlinkTask extends AbstractYarnTask {
                     pendingSynchronousSubmissions));
         }
         if (CollectionUtils.isNotEmpty(failures)) {
-            throw new TaskException(String.format("Cancel the flink jobs of the task failed, %s, taskInstanceId: %s",
-                    String.join("; ", failures), taskExecutionContext.getTaskInstanceId()));
+            String message = String.format("Cancel the flink jobs of the task failed, %s, taskInstanceId: %s",
+                    String.join("; ", failures), taskExecutionContext.getTaskInstanceId());
+            // the failure is written to the task log explicitly instead of relying on the thrown
+            // exception only: the task is stopped anyway, so the task log is what the user sees
+            log.error(message);
+            throw new TaskException(message);
         }
         log.info("Successfully cancelled flink jobs: {}", jobIds);
     }
@@ -304,6 +315,12 @@ public class FlinkTask extends AbstractYarnTask {
      * submission which is still running when the client is stopped has no id in the task log and
      * cannot be addressed by the flink CLI. The messages which the client prints around such a
      * submission tell it apart from one which has finished.
+     *
+     * <p>A submission ends either with the completion message or with the failure message: the client
+     * executes the statements one by one, so the two can be paired in order. A failed submission is
+     * not pending, it is over and the client waits for nothing. In file mode the client exits on a
+     * failed statement, so a stop usually does not reach that state, but a stop which races with the
+     * failure must still not report a submission which cannot be cancelled.
      */
     protected int countPendingSynchronousSubmissions() {
         String logPath = taskExecutionContext.getLogPath();
@@ -311,24 +328,25 @@ public class FlinkTask extends AbstractYarnTask {
         if (logFile == null || !logFile.isFile()) {
             return 0;
         }
-        int started = 0;
-        int finished = 0;
+        int pending = 0;
         try (Stream<String> lines = Files.lines(logFile.toPath())) {
             Iterator<String> iterator = lines.iterator();
             while (iterator.hasNext()) {
                 String line = iterator.next();
                 if (StringUtils.contains(line, SYNCHRONOUS_SUBMISSION_STARTED_MESSAGE)) {
-                    started++;
-                }
-                if (StringUtils.contains(line, SYNCHRONOUS_SUBMISSION_FINISHED_MESSAGE)) {
-                    finished++;
+                    pending++;
+                } else if (StringUtils.contains(line, SYNCHRONOUS_SUBMISSION_FINISHED_MESSAGE)
+                        || StringUtils.contains(line, SYNCHRONOUS_SUBMISSION_FAILED_MESSAGE)) {
+                    // the failure message can also belong to a statement which was not submitted
+                    // synchronously, so it only ends a submission which is pending
+                    pending = Math.max(0, pending - 1);
                 }
             }
         } catch (Exception e) {
             log.error("Read task log failed, logPath: {}", logPath, e);
             return 0;
         }
-        return Math.max(0, started - finished);
+        return pending;
     }
 
     /**
