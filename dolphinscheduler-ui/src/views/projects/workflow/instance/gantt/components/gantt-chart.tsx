@@ -141,7 +141,7 @@ export default defineComponent({
             : date(row.end)}
         </div>
         <div>
-          {t('project.workflow.gantt_duration')}: {formatDuration(row.duration)}
+          {t('project.workflow.duration')}: {formatDuration(row.duration)}
         </div>
         <div>
           {t(shareLabel())}: {row.percent.toFixed(2)}%

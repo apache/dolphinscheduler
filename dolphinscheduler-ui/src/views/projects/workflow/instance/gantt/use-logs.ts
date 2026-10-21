@@ -16,7 +16,7 @@
  */
 
 import { onBeforeUnmount, ref } from 'vue'
-import { queryLog } from '@/service/modules/log'
+import { loadLogPages } from '@/service/modules/log/load-pages'
 import { downloadLog } from '@/service/modules/task-instances'
 import type { GanttRow } from './type'
 
@@ -37,21 +37,17 @@ export function useGanttLogs(t: (key: string) => string) {
     const request = ++generation
     text.value = ''
     loading.value = true
-    let skipLineNum = 0
     try {
       // Bound the live preview; the existing download action returns the complete log.
-      while (skipLineNum < 20000) {
-        const result = await queryLog({
-          taskInstanceId: id,
-          limit: 1000,
-          skipLineNum
-        })
-        if (request !== generation) return
-        text.value += result.message || ''
-        if (!result.message || !result.lineNum) break
-        skipLineNum += result.lineNum
-      }
-      if (skipLineNum >= 20000)
+      const result = await loadLogPages(
+        id,
+        (message) => {
+          text.value += message
+        },
+        { maxLines: 20000, isCurrent: () => request === generation }
+      )
+      if (result.cancelled) return
+      if (result.limited)
         text.value += `\n${t('project.workflow.gantt_log_limit')}`
       if (!text.value) text.value = t('project.workflow.gantt_no_log')
     } catch {
