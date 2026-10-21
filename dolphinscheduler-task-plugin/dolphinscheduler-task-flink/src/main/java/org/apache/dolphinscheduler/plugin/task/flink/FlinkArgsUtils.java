@@ -134,6 +134,17 @@ public class FlinkArgsUtils {
             Pattern.compile("(?is)^\\s*(?:INSERT|UPDATE|DELETE)\\b");
 
     /**
+     * The {@code CREATE TABLE ... AS <query>} statement, which is the other Flink SQL Client
+     * statement which submits a job and makes the client print its JobID. A plain
+     * {@code CREATE TABLE} without a query only registers a table and submits nothing. The query
+     * keyword is matched outside of a quoted string, so a quoted {@code AS SELECT} is not a
+     * submission.
+     */
+    private static final Pattern SQL_CREATE_TABLE_AS_SELECT_REGEX = Pattern.compile(
+            "(?is)^\\s*CREATE\\s+(?:TEMPORARY\\s+(?:SYSTEM\\s+)?)?TABLE\\b"
+                    + "(?:[^;'\"]|'[^']*'|\"[^\"]*\")*?\\bAS\\s+(?:SELECT|WITH|VALUES|TABLE)\\b");
+
+    /**
      * The beginning of a statement set, whose update statements are submitted as a single job. The
      * {@code BEGIN} keyword which follows the {@code EXECUTE STATEMENT SET} form belongs to the
      * boundary as well, so it does not hide an update statement which shares the fragment.
@@ -342,7 +353,8 @@ public class FlinkArgsUtils {
             tracker.endStatementSet();
             return;
         }
-        if (SQL_JOB_STATEMENT_REGEX.matcher(statement).find()) {
+        if (SQL_JOB_STATEMENT_REGEX.matcher(statement).find()
+                || SQL_CREATE_TABLE_AS_SELECT_REGEX.matcher(statement).find()) {
             tracker.submit();
         }
     }
@@ -364,6 +376,11 @@ public class FlinkArgsUtils {
             } else if (current == '/' && i + 1 < script.length() && script.charAt(i + 1) == '*') {
                 int end = script.indexOf("*/", i + 2);
                 i = end < 0 ? script.length() : end + 2;
+                // a comment separates the tokens which surround it, otherwise INSERT/* c */INTO would
+                // become INSERTINTO and stop being recognized as an update statement
+                if (statement.length() > 0 && !Character.isWhitespace(statement.charAt(statement.length() - 1))) {
+                    statement.append(' ');
+                }
             } else if (current == '\'' || current == '"') {
                 i = appendQuotedSql(script, i, statement);
             } else if (current == ';') {

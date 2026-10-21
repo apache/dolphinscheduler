@@ -66,45 +66,29 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void savePoint() throws Exception {
         // `flink savepoint` takes the Flink JobID. The YARN/K8s application id is a different
         // identifier: it is not the savepoint target, it only targets the cluster which runs the
-        // job, and is passed as the `-yid` option.
-        List<String> jobIds = getFlinkJobIds();
-        if (CollectionUtils.isEmpty(jobIds)) {
+        // job, and is passed as the `-yid` option. It is kept per job, because the SQL Client with
+        // `yarn-per-job` submits every job into its own application.
+        List<FlinkJobSubmission> submissions = getFlinkJobSubmissions();
+        if (CollectionUtils.isEmpty(submissions)) {
             throw new TaskException(
                     "Cannot find the flink JobID of the task, taskInstanceId: "
                             + taskExecutionContext.getTaskInstanceId());
         }
-        String yarnApplicationId = getYarnApplicationId();
         List<List<String>> clusterConnectionOptionsPerJob = getClusterConnectionOptionsPerJob();
         // a job which the scripts do not describe uses the last configuration of the submission
         List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
-        for (int i = 0; i < jobIds.size(); i++) {
-            String jobId = jobIds.get(i);
+        for (int i = 0; i < submissions.size(); i++) {
+            FlinkJobSubmission submission = submissions.get(i);
             List<String> clusterConnectionOptions = i < clusterConnectionOptionsPerJob.size()
                     ? clusterConnectionOptionsPerJob.get(i)
                     : lastClusterConnectionOptions;
-            List<String> args = FlinkArgsUtils.buildSavePointCommandLine(jobId, yarnApplicationId,
-                    clusterConnectionOptions);
+            List<String> args = FlinkArgsUtils.buildSavePointCommandLine(submission.getJobId(),
+                    submission.getYarnApplicationId(), clusterConnectionOptions);
 
             if (!executeFlinkSavepointCommand(args)) {
-                throw new TaskException("Trigger savepoint for flink job " + jobId + " failed, taskInstanceId: "
-                        + taskExecutionContext.getTaskInstanceId());
+                throw new TaskException("Trigger savepoint for flink job " + submission.getJobId()
+                        + " failed, taskInstanceId: " + taskExecutionContext.getTaskInstanceId());
             }
-        }
-    }
-
-    /**
-     * The YARN application id is kept separate from the Flink JobID, it is only used to target the
-     * cluster which runs the job.
-     *
-     * @return the YARN application id, or null when the task was not submitted to YARN
-     */
-    private String getYarnApplicationId() {
-        try {
-            List<String> appIds = getApplicationIds();
-            return CollectionUtils.isEmpty(appIds) ? null : appIds.get(0);
-        } catch (Exception e) {
-            log.warn("Get application ids failed, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
-            return null;
         }
     }
 }

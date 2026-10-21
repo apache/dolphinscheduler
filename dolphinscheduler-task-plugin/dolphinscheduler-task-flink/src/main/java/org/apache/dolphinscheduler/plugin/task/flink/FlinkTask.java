@@ -33,14 +33,17 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -55,6 +58,13 @@ public class FlinkTask extends AbstractYarnTask {
      * id.
      */
     protected static final Pattern FLINK_JOB_ID_REGEX = Pattern.compile(TaskConstants.FLINK_JOB_ID_REGEX);
+
+    /**
+     * The pattern of the YARN application id printed by the submission, it identifies the cluster
+     * which runs a job and is not the Flink JobID.
+     */
+    protected static final Pattern YARN_APPLICATION_ID_REGEX =
+            Pattern.compile(TaskConstants.YARN_APPLICATION_REGEX);
 
     /**
      * The message the flink CLI reports when the job is already in another terminal state, so it does
@@ -272,23 +282,73 @@ public class FlinkTask extends AbstractYarnTask {
     }
 
     /**
-     * The flink JobID is printed by `flink run` and is the id which `flink cancel` accepts.
+     * The YARN application id of the log line, it identifies the cluster which runs a job and is not
+     * the Flink JobID.
      */
-    protected List<String> getFlinkJobIds() {
+    protected String findYarnApplicationId(String line) {
+        Matcher matcher = YARN_APPLICATION_ID_REGEX.matcher(line);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
+    }
+
+    /**
+     * The jobs the task submitted, in the order they appear in the task log. Each job keeps its Flink
+     * JobID and the YARN application which runs it, because the SQL Client with {@code yarn-per-job}
+     * submits every job into its own application, so a savepoint has to target the application of
+     * its own job.
+     */
+    protected List<FlinkJobSubmission> getFlinkJobSubmissions() {
         String logPath = taskExecutionContext.getLogPath();
         File logFile = StringUtils.isEmpty(logPath) ? null : new File(logPath);
         if (logFile == null || !logFile.isFile()) {
             return Collections.emptyList();
         }
+        List<FlinkJobSubmission> submissions = new ArrayList<>();
+        List<String> applicationIds = new ArrayList<>();
+        Set<String> jobIds = new HashSet<>();
         try (Stream<String> lines = Files.lines(logFile.toPath())) {
-            return lines.map(this::findFlinkJobId)
-                    .filter(Objects::nonNull)
-                    .distinct()
-                    .collect(Collectors.toList());
+            Iterator<String> iterator = lines.iterator();
+            String yarnApplicationId = null;
+            while (iterator.hasNext()) {
+                String line = iterator.next();
+                String applicationId = findYarnApplicationId(line);
+                if (applicationId != null) {
+                    // the client prints the application before it submits the job into it
+                    yarnApplicationId = applicationId;
+                    if (!applicationIds.contains(applicationId)) {
+                        applicationIds.add(applicationId);
+                    }
+                }
+                String jobId = findFlinkJobId(line);
+                if (jobId != null && jobIds.add(jobId)) {
+                    submissions.add(new FlinkJobSubmission(jobId, yarnApplicationId));
+                }
+            }
         } catch (Exception e) {
             log.error("Read task log failed, logPath: {}", logPath, e);
             return Collections.emptyList();
         }
+        if (applicationIds.size() == 1) {
+            // a log which contains a single application and prints it after the job: every job of the
+            // task belongs to that application
+            String onlyApplicationId = applicationIds.get(0);
+            submissions.replaceAll(submission -> submission.getYarnApplicationId() == null
+                    ? new FlinkJobSubmission(submission.getJobId(), onlyApplicationId)
+                    : submission);
+        }
+        return submissions;
+    }
+
+    /**
+     * The Flink JobIDs of the submitted jobs, in the order they appear in the task log. It is the id
+     * which `flink cancel` accepts, it is not the YARN/K8s application id.
+     */
+    protected List<String> getFlinkJobIds() {
+        return getFlinkJobSubmissions().stream()
+                .map(FlinkJobSubmission::getJobId)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -347,5 +407,23 @@ public class FlinkTask extends AbstractYarnTask {
     protected boolean executeFlinkSavepointCommand(List<String> args) {
         return FlinkArgsUtils.executeCommand(taskExecutionContext, args,
                 FlinkConstants.FLINK_SAVEPOINT_TIMEOUT_SECONDS);
+    }
+
+    /**
+     * A job submitted by the task: its Flink JobID, which identifies the job, and the YARN
+     * application which runs it, which is only used to target the cluster. The application is null
+     * when the job was not submitted to YARN.
+     */
+    @Getter
+    protected static class FlinkJobSubmission {
+
+        private final String jobId;
+
+        private final String yarnApplicationId;
+
+        FlinkJobSubmission(String jobId, String yarnApplicationId) {
+            this.jobId = jobId;
+            this.yarnApplicationId = yarnApplicationId;
+        }
     }
 }

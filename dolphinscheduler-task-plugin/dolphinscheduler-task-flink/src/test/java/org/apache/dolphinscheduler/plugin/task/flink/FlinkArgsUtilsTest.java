@@ -442,6 +442,47 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsPerJobCountsCreateTableAsSelectAsAJob() {
+        // a CREATE TABLE ... AS SELECT statement submits a job as well, so it must record a snapshot
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "CREATE TABLE t AS SELECT * FROM s;\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobIgnoresCreateTableWithoutQuery() {
+        // registering a table without a query does not submit a job
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "CREATE TABLE t (x INT) WITH ('connector' = 'datagen');\n"
+                        + "INSERT INTO t SELECT * FROM s;");
+
+        Assertions.assertEquals(1, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobKeepsCommentsAsTokenSeparators() {
+        // a block comment between two tokens must not join them, otherwise the statement is not
+        // recognized and the snapshots are shifted
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET/* endpoint */ 'rest.address'='cluster-a';\n"
+                        + "INSERT/* first job */INTO t SELECT * FROM s;\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
     public void testMergeClusterConnectionOptionsDropsSubmissionOnlyConfigs() {
         // a two argument -D option which does not configure the cluster is not a connection option
         List<String> options = FlinkArgsUtils.mergeClusterConnectionOptions(

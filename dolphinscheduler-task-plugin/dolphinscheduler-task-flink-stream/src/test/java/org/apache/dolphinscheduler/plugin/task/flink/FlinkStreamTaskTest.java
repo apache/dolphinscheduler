@@ -171,6 +171,47 @@ public class FlinkStreamTaskTest {
     }
 
     @Test
+    public void testSavePointTargetsTheApplicationOfEachJob() throws Exception {
+        // `yarn-per-job` submits every job into its own application, so each savepoint has to target
+        // the application of its own job instead of the first one which appears in the log
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Submitted application application_1700000000000_0001\n"
+                        + "Job ID: 11111111111111111111111111111111\n"
+                        + "Submitted application application_1700000000000_0002\n"
+                        + "Job ID: 22222222222222222222222222222222");
+
+        FlinkStreamParameters parameters = new FlinkStreamParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'rest.address'='cluster-a';\n"
+                + "INSERT INTO t SELECT * FROM s;\n"
+                + "SET 'rest.address'='cluster-b';\n"
+                + "INSERT INTO u SELECT * FROM v;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
+
+        task.savePoint();
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 11111111111111111111111111111111 "
+                        + "-yid application_1700000000000_0001 -Drest.address=cluster-a",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 22222222222222222222222222222222 "
+                        + "-yid application_1700000000000_0002 -Drest.address=cluster-b",
+                String.join(" ", executedCommands.get(1)));
+    }
+
+    @Test
     public void testSavePointCommandParsesSqlClientJobId() throws Exception {
         // the Flink SQL Client prints "Job ID: <id>"
         TaskExecutionContext context = buildSavepointTaskExecutionContext(
