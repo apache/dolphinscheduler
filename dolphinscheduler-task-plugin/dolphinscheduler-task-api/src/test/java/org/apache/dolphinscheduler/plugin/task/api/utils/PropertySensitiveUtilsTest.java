@@ -24,7 +24,11 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -136,6 +140,54 @@ class PropertySensitiveUtilsTest {
     }
 
     @Test
+    void findInvalidSensitiveFieldIsNullWhenAllValuesMatch() {
+        List<Property> properties = Arrays.asList(
+                sensitive("pwd", "Secret123"),
+                sensitive("token", "long-token-value"),
+                nonSensitive("name", "a"));
+
+        Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(properties));
+    }
+
+    @Test
+    void findInvalidSensitiveFieldReportsPropWhenTooShort() {
+        Assertions.assertEquals("pwd",
+                PropertySensitiveUtils.findInvalidSensitiveField(
+                        Collections.singletonList(sensitive("pwd", "abc"))));
+        Assertions.assertEquals("pwd",
+                PropertySensitiveUtils.findInvalidSensitiveField(
+                        Collections.singletonList(sensitive("pwd", "12345"))));
+    }
+
+    @Test
+    void findInvalidSensitiveFieldAcceptsLengthGreaterThanOrEqualToSix() {
+        // Boundary: exactly 6 characters is the minimum and passes.
+        Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(
+                Collections.singletonList(sensitive("pwd", "123456"))));
+        Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(
+                Collections.singletonList(sensitive("pwd", "1234567"))));
+    }
+
+    @Test
+    void findInvalidSensitiveFieldSkipsPlaceholderAndEmpty() {
+        List<Property> properties = Arrays.asList(
+                sensitive("mask", TaskConstants.SENSITIVE_DATA_MASK),
+                sensitive("empty", ""),
+                sensitive("null", null));
+
+        Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(properties));
+    }
+
+    @Test
+    void findInvalidSensitiveFieldIgnoresNonSensitiveShortValue() {
+        List<Property> properties = Arrays.asList(
+                nonSensitive("short", "a"),
+                sensitive("pwd", "Secret123"));
+
+        Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(properties));
+    }
+
+    @Test
     void serializationRoundTripKeepsSensitiveFlag() {
         Property property = sensitive("token", "abc");
         String json = org.apache.dolphinscheduler.common.utils.JSONUtils.toJsonString(
@@ -143,6 +195,62 @@ class PropertySensitiveUtilsTest {
         List<Property> parsed = org.apache.dolphinscheduler.common.utils.JSONUtils.toList(json, Property.class);
         Assertions.assertTrue(parsed.get(0).isSensitive());
         Assertions.assertEquals("abc", parsed.get(0).getValue());
+    }
+
+    @Test
+    void extractSensitiveValuesReturnsOnlySensitivePlaintext() {
+        Map<String, Property> paramsMap = new HashMap<>();
+        paramsMap.put("pwd", sensitive("pwd", "Secret123"));
+        paramsMap.put("name", nonSensitive("name", "alice"));
+        paramsMap.put("empty", sensitive("empty", ""));
+        paramsMap.put("placeholder", sensitive("placeholder", TaskConstants.SENSITIVE_DATA_MASK));
+
+        Set<String> sensitiveValues = PropertySensitiveUtils.extractSensitiveValues(paramsMap);
+
+        Assertions.assertEquals(Collections.singleton("Secret123"), sensitiveValues);
+    }
+
+    @Test
+    void extractSensitiveValuesReturnsEmptyWhenMapIsNullOrEmpty() {
+        Assertions.assertTrue(PropertySensitiveUtils.extractSensitiveValues(null).isEmpty());
+        Assertions.assertTrue(PropertySensitiveUtils.extractSensitiveValues(new HashMap<>()).isEmpty());
+    }
+
+    @Test
+    void maskSensitiveValuesReplacesEveryOccurrenceOfKnownValues() {
+        String masked = PropertySensitiveUtils.maskSensitiveValues(
+                "cmd SuperSecret123; echo SuperSecret123; normal",
+                Collections.singleton("SuperSecret123"));
+
+        Assertions.assertEquals("cmd ******; echo ******; normal", masked);
+    }
+
+    @Test
+    void maskSensitiveValuesMasksLongerValueBeforeContainedOne() {
+        // "secret" must not be masked first, otherwise "secret-token" would
+        // partially survive as "******-token"
+        String masked = PropertySensitiveUtils.maskSensitiveValues(
+                "v=secret-token", new HashSet<>(Arrays.asList("secret", "secret-token")));
+
+        Assertions.assertEquals("v=******", masked);
+    }
+
+    @Test
+    void maskSensitiveValuesHasNoMinimumLengthThreshold() {
+        // The values come from the caller's own sensitive params, no heuristic
+        // length restriction is applied to them
+        String masked = PropertySensitiveUtils.maskSensitiveValues(
+                "v=abc", Collections.singleton("abc"));
+
+        Assertions.assertEquals("v=******", masked);
+    }
+
+    @Test
+    void maskSensitiveValuesKeepsMessageWhenNothingToMask() {
+        Assertions.assertEquals("plain message",
+                PropertySensitiveUtils.maskSensitiveValues("plain message", Collections.emptySet()));
+        Assertions.assertNull(
+                PropertySensitiveUtils.maskSensitiveValues(null, Collections.singleton("x")));
     }
 
     private static Property sensitive(String prop, String value) {

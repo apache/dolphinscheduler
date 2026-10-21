@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptor;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ShellUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -96,6 +97,10 @@ public abstract class AbstractCommandExecutor {
         if (taskRequest.getMemoryMax() != null) {
             iShellInterceptorBuilder.memoryQuota(taskRequest.getMemoryMax());
         }
+        // Set sensitive param values, so the builder masks them when logging the final
+        // shell script content (the shell file itself keeps the real values)
+        iShellInterceptorBuilder.sensitiveValues(
+                PropertySensitiveUtils.extractSensitiveValues(taskRequest.getPrepareParamsMap()));
 
         IShellInterceptor iShellInterceptor = iShellInterceptorBuilder.build();
         process = iShellInterceptor.execute();
