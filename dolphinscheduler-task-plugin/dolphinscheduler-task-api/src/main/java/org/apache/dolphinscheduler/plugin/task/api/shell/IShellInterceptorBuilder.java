@@ -20,7 +20,6 @@ package org.apache.dolphinscheduler.plugin.task.api.shell;
 import org.apache.dolphinscheduler.common.exception.FileOperateException;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 
 public interface IShellInterceptorBuilder<T extends IShellInterceptorBuilder<T, Y>, Y extends IShellInterceptor> {
@@ -46,13 +45,6 @@ public interface IShellInterceptorBuilder<T extends IShellInterceptorBuilder<T, 
     T k8sConfigYaml(String k8sConfigYaml);
 
     T properties(Map<String, String> propertyMap);
-
-    /**
-     * The sensitive plaintext values among {@link #properties(Map)}, used to mask the
-     * final shell script content before it is logged. The shell file written to disk is
-     * not affected: it must keep the real values to stay executable.
-     */
-    T sensitiveValues(Collection<String> sensitiveValues);
 
     T sudoMode(boolean sudoEnable);
 

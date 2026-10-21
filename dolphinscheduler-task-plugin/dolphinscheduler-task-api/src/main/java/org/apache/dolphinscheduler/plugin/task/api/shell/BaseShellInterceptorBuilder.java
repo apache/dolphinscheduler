@@ -17,16 +17,12 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptorBuilder<T, Y>, Y extends BaseShellInterceptor>
         implements
@@ -50,13 +46,6 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
 
     protected Map<String, String> propertyMap = new HashMap<>();
 
-    /**
-     * The sensitive plaintext values among {@link #propertyMap}. They are only used to
-     * mask the final shell script content before it is logged, never used when writing
-     * the shell file itself.
-     */
-    protected Set<String> sensitiveValues = new HashSet<>();
-
     protected boolean sudoEnable;
 
     protected List<String> scripts = new ArrayList<>();
@@ -76,7 +65,6 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
         newBuilder.customEnvScripts = builder.customEnvScripts;
         newBuilder.k8sConfigYaml = builder.k8sConfigYaml;
         newBuilder.propertyMap = builder.propertyMap;
-        newBuilder.sensitiveValues = builder.sensitiveValues;
         newBuilder.sudoEnable = builder.sudoEnable;
         newBuilder.scripts = builder.scripts;
         return newBuilder;
@@ -134,14 +122,6 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
     public T properties(Map<String, String> propertyMap) {
         if (MapUtils.isNotEmpty(propertyMap)) {
             this.propertyMap.putAll(propertyMap);
-        }
-        return (T) this;
-    }
-
-    @Override
-    public T sensitiveValues(Collection<String> sensitiveValues) {
-        if (CollectionUtils.isNotEmpty(sensitiveValues)) {
-            this.sensitiveValues.addAll(sensitiveValues);
         }
         return (T) this;
     }

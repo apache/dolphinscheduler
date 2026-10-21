@@ -18,27 +18,16 @@
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
 
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.shell.bash.BashShellInterceptorBuilder;
 import org.apache.dolphinscheduler.plugin.task.api.utils.AbstractCommandExecutorConstants;
 
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 
 class BaseLinuxShellInterceptorBuilderTest {
 
@@ -68,36 +57,6 @@ class BaseLinuxShellInterceptorBuilderTest {
             List<String> limitModeCommands = builder.generateBootstrapCommand();
             assertEquals("sudo systemd-run -q --scope -p CPUQuota=10% -p MemoryLimit=1024M --uid=root /tmp/test.sh",
                     String.join(" ", limitModeCommands));
-        }
-    }
-
-    @Test
-    void generateShellScriptMasksSensitiveValuesInLogButKeepsFilePlaintext(@TempDir Path tempDir) throws Exception {
-        ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
-        listAppender.start();
-        Logger builderLogger = (Logger) LoggerFactory.getLogger(BaseLinuxShellInterceptorBuilder.class);
-        builderLogger.addAppender(listAppender);
-        try {
-            BashShellInterceptorBuilder builder = new BashShellInterceptorBuilder()
-                    .shellDirectory(tempDir.toString())
-                    .shellName("mask_test")
-                    .properties(Collections.singletonMap("secret_token", "SuperSecret123"))
-                    .sensitiveValues(Collections.singleton("SuperSecret123"))
-                    .appendScript("echo ${secret_token}");
-            builder.generateShellScript();
-
-            // The shell file keeps the real values so the task can run
-            String shellFileContent = new String(
-                    Files.readAllBytes(tempDir.resolve("mask_test.sh")), StandardCharsets.UTF_8);
-            assertTrue(shellFileContent.contains("SuperSecret123"));
-
-            // Only the logged final script content is masked
-            assertTrue(listAppender.list.stream()
-                    .anyMatch(event -> event.getFormattedMessage().contains("Final Script Content")
-                            && event.getFormattedMessage().contains("******")
-                            && !event.getFormattedMessage().contains("SuperSecret123")));
-        } finally {
-            builderLogger.detachAppender(listAppender);
         }
     }
 }

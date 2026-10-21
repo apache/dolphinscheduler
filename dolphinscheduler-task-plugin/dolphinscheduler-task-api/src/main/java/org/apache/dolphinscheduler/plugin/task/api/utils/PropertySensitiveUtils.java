@@ -21,16 +21,12 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -104,56 +100,6 @@ public class PropertySensitiveUtils {
         return properties.stream()
                 .map(PropertySensitiveUtils::maskSensitiveValue)
                 .collect(Collectors.toList());
-    }
-
-    /**
-     * Extract the plaintext values of sensitive properties from the given params map.
-     * <p>
-     * Null / empty / {@code ******} placeholder values are skipped, since they never
-     * contain plaintext which could leak into logs.
-     *
-     * @return an empty set when the map is empty or no sensitive plaintext exists.
-     */
-    public Set<String> extractSensitiveValues(final Map<String, Property> paramsMap) {
-        if (MapUtils.isEmpty(paramsMap)) {
-            return Collections.emptySet();
-        }
-        return paramsMap.values()
-                .stream()
-                .filter(PropertySensitiveUtils::isSensitive)
-                .map(Property::getValue)
-                .filter(StringUtils::isNotEmpty)
-                .filter(value -> !isSensitiveValuePlaceholder(value))
-                .collect(Collectors.toSet());
-    }
-
-    /**
-     * Mask the given sensitive plaintext values in a message which is known to contain
-     * them (e.g. the task context dump or the final shell script content) before it is
-     * logged by the worker server itself.
-     * <p>
-     * This is plain literal replacement: no regex patterns and no minimum length
-     * threshold. Longer values are masked before shorter ones so a value containing
-     * another one is not partially left over after replacement. It is only meant to be
-     * called at log statements which are known to print sensitive plaintext, never as a
-     * blanket filter over arbitrary log lines.
-     *
-     * @return the masked message, or the original message when there is nothing to mask.
-     */
-    public String maskSensitiveValues(final String message, final Collection<String> sensitiveValues) {
-        if (StringUtils.isEmpty(message) || CollectionUtils.isEmpty(sensitiveValues)) {
-            return message;
-        }
-        final List<String> orderedSensitiveValues = sensitiveValues.stream()
-                .filter(StringUtils::isNotEmpty)
-                .distinct()
-                .sorted(Comparator.comparingInt(String::length).reversed())
-                .collect(Collectors.toList());
-        String maskedMessage = message;
-        for (final String sensitiveValue : orderedSensitiveValues) {
-            maskedMessage = maskedMessage.replace(sensitiveValue, TaskConstants.SENSITIVE_DATA_MASK);
-        }
-        return maskedMessage;
     }
 
     public List<Property> mergeSensitiveValuePlaceholders(List<Property> submittedProperties,
