@@ -557,8 +557,10 @@ public class FlinkArgsUtils {
             } else if (DYNAMIC_PROPERTY_OPTION.equals(option) && i + 1 < tokens.size()) {
                 // the configuration may also be given as two arguments, "-D <key>=<value>"
                 String value = tokens.get(++i);
-                optionsByKey.put(configurationKeyOf(DYNAMIC_PROPERTY_OPTION + unquoteToken(value)),
-                        Arrays.asList(token, value));
+                if (isClusterConnectionConfig(DYNAMIC_PROPERTY_OPTION + unquoteToken(value))) {
+                    optionsByKey.put(configurationKeyOf(DYNAMIC_PROPERTY_OPTION + unquoteToken(value)),
+                            Arrays.asList(token, value));
+                }
             } else if (isClusterConnectionConfig(option)) {
                 optionsByKey.put(configurationKeyOf(option), Collections.singletonList(token));
             }

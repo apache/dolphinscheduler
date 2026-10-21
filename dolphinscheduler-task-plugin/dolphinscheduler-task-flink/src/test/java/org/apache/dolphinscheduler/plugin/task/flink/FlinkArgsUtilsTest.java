@@ -424,6 +424,34 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsPerJobWithBeginStatementSet() {
+        // the `BEGIN STATEMENT SET;` form is a statement set as well, its update statements are
+        // submitted as a single job
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "BEGIN STATEMENT SET;\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "INSERT INTO u SELECT * FROM v;\n"
+                        + "END;\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO w SELECT * FROM x;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testMergeClusterConnectionOptionsDropsSubmissionOnlyConfigs() {
+        // a two argument -D option which does not configure the cluster is not a connection option
+        List<String> options = FlinkArgsUtils.mergeClusterConnectionOptions(
+                Arrays.asList("-D", "parallelism.default=4"),
+                Collections.singletonList("-Drest.address=remote-jm"));
+
+        Assertions.assertEquals(Arrays.asList("-Drest.address=remote-jm"), options);
+    }
+
+    @Test
     public void testExtractClusterConnectionOptionsPerJobIgnoresComments() {
         // a comment which precedes an INSERT must not hide the statement, otherwise the snapshots are
         // associated with the wrong JobID
