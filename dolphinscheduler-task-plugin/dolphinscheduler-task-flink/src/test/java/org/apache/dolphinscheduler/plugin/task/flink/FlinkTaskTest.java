@@ -303,6 +303,67 @@ public class FlinkTaskTest {
     }
 
     @Test
+    public void testCancelApplicationKeepsTheEndpointOfASingleInsertStatementSet() throws Exception {
+        // a statement set with one INSERT is submitted as a single job, the snapshot of that job must
+        // not be lost, otherwise the first job is cancelled against the second endpoint
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 11111111111111111111111111111111\n"
+                        + "Job has been submitted with JobID 22222222222222222222222222222222");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'rest.address' = 'cluster-a';\n"
+                + "EXECUTE STATEMENT SET\n"
+                + "BEGIN\n"
+                + "INSERT INTO t SELECT * FROM s;\n"
+                + "END;\n"
+                + "SET 'rest.address' = 'cluster-b';\n"
+                + "INSERT INTO u SELECT * FROM v;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded(), cancelSucceeded());
+        task.cancelApplication();
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 11111111111111111111111111111111 -Drest.address=cluster-a",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222 -Drest.address=cluster-b",
+                String.join(" ", executedCommands.get(1)));
+    }
+
+    @Test
+    public void testCancelApplicationKeepsEscapedQuotesInConnectionOptions() throws Exception {
+        // a doubled quote in a SQL string is an escaped quote, the effective value must reach the CLI
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job ID: 1234567890abcdef1234567890abcdef");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'security.ssl.rest.truststore-password' = 'pa''ss';\n"
+                + "INSERT INTO t SELECT * FROM s;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
+        task.cancelApplication();
+
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef "
+                        + "-Dsecurity.ssl.rest.truststore-password='pa'\\''ss'",
+                String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
     public void testCancelApplicationCollectsJobIdSubmittedWhileTheClientIsStopped() throws Exception {
         // a multi statement SQL script can submit another job while the client is being stopped, the
         // final snapshot has to contain it

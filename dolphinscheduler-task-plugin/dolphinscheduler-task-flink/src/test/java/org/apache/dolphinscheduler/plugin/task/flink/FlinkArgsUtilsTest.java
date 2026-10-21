@@ -332,6 +332,16 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsFromSqlScriptsDecodesEscapedQuotes() {
+        // a doubled single quote is an escaped quote; the effective value must be preserved
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'security.ssl.rest.truststore-password' = 'pa''ss';");
+
+        Assertions.assertEquals(
+                Arrays.asList("-Dsecurity.ssl.rest.truststore-password='pa'\\''ss'"), options);
+    }
+
+    @Test
     public void testExtractClusterConnectionOptionsPerJob() {
         // the SQL Client executes the statements in order, so a script which changes the connection
         // between two jobs keeps the settings which were effective for each of them
@@ -389,6 +399,24 @@ public class FlinkArgsUtilsTest {
                         + "END;\n"
                         + "SET 'rest.address'='cluster-b';\n"
                         + "INSERT INTO w SELECT * FROM x;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobCountsASingleInsertStatementSetAsOneJob() {
+        // the statement set keyword, its BEGIN and the first INSERT share one semicolon-delimited
+        // fragment, so the INSERT must still record the snapshot of the statement set
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "EXECUTE STATEMENT SET\n"
+                        + "BEGIN\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "END;\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
 
         Assertions.assertEquals(2, optionsPerJob.size());
         Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));

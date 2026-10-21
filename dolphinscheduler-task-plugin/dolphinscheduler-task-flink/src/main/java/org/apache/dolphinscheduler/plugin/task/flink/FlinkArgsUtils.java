@@ -116,7 +116,7 @@ public class FlinkArgsUtils {
      * {@code SELECT 'SET rest.address=x'}, is not a statement.
      */
     private static final Pattern SQL_SET_STATEMENT_REGEX = Pattern.compile(
-            "(?is)^\\s*SET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'([^']*)'|([^;'\\s]+))");
+            "(?is)^\\s*SET\\s+(?:'([^']+)'|([\\w.-]+))\\s*=\\s*(?:'((?:[^']|'')*)'|([^;'\\s]+))");
 
     /**
      * The {@code RESET} statement of the Flink SQL Client: the keyed form {@code RESET 'rest.address'},
@@ -134,10 +134,12 @@ public class FlinkArgsUtils {
             Pattern.compile("(?is)^\\s*(?:INSERT|UPDATE|DELETE)\\b");
 
     /**
-     * The beginning of a statement set, whose update statements are submitted as a single job.
+     * The beginning of a statement set, whose update statements are submitted as a single job. The
+     * {@code BEGIN} keyword which follows the {@code EXECUTE STATEMENT SET} form belongs to the
+     * boundary as well, so it does not hide an update statement which shares the fragment.
      */
     private static final Pattern SQL_STATEMENT_SET_START_REGEX =
-            Pattern.compile("(?is)^\\s*(?:BEGIN\\s+STATEMENT\\s+SET|EXECUTE\\s+STATEMENT\\s+SET)\\b");
+            Pattern.compile("(?is)^\\s*(?:BEGIN\\s+STATEMENT\\s+SET|EXECUTE\\s+STATEMENT\\s+SET)(?:\\s+BEGIN)?\\b");
 
     /**
      * The end of a statement set.
@@ -298,38 +300,50 @@ public class FlinkArgsUtils {
                 continue;
             }
             for (String statement : splitSqlStatements(script)) {
-                Matcher setMatcher = SQL_SET_STATEMENT_REGEX.matcher(statement);
-                if (setMatcher.find()) {
-                    String option = clusterConnectionOptionOfSqlSet(setMatcher);
-                    if (option != null) {
-                        tracker.set(option);
-                    }
-                    continue;
-                }
-                Matcher resetMatcher = SQL_RESET_STATEMENT_REGEX.matcher(statement);
-                if (resetMatcher.find()) {
-                    String key = resetMatcher.group(RESET_QUOTED_KEY_GROUP) != null
-                            ? resetMatcher.group(RESET_QUOTED_KEY_GROUP)
-                            : resetMatcher.group(RESET_KEY_GROUP);
-                    if (key == null) {
-                        tracker.resetAll();
-                    } else {
-                        tracker.reset(key);
-                    }
-                    continue;
-                }
-                if (SQL_STATEMENT_SET_START_REGEX.matcher(statement).find()) {
-                    tracker.beginStatementSet();
-                    continue;
-                }
-                if (SQL_STATEMENT_SET_END_REGEX.matcher(statement).find()) {
-                    tracker.endStatementSet();
-                    continue;
-                }
-                if (SQL_JOB_STATEMENT_REGEX.matcher(statement).find()) {
-                    tracker.submit();
-                }
+                applySqlStatement(tracker, statement);
             }
+        }
+    }
+
+    /**
+     * Apply one semicolon-delimited statement to the tracker. The fragment which begins a statement
+     * set can also contain the {@code BEGIN} keyword and the first update statement before the next
+     * semicolon, so the remainder of that fragment is scanned as well, otherwise the job of a
+     * statement set with a single update statement would not be represented.
+     */
+    private static void applySqlStatement(SqlClusterConnectionTracker tracker, String statement) {
+        Matcher setMatcher = SQL_SET_STATEMENT_REGEX.matcher(statement);
+        if (setMatcher.find()) {
+            String option = clusterConnectionOptionOfSqlSet(setMatcher);
+            if (option != null) {
+                tracker.set(option);
+            }
+            return;
+        }
+        Matcher resetMatcher = SQL_RESET_STATEMENT_REGEX.matcher(statement);
+        if (resetMatcher.find()) {
+            String key = resetMatcher.group(RESET_QUOTED_KEY_GROUP) != null
+                    ? resetMatcher.group(RESET_QUOTED_KEY_GROUP)
+                    : resetMatcher.group(RESET_KEY_GROUP);
+            if (key == null) {
+                tracker.resetAll();
+            } else {
+                tracker.reset(key);
+            }
+            return;
+        }
+        Matcher statementSetStartMatcher = SQL_STATEMENT_SET_START_REGEX.matcher(statement);
+        if (statementSetStartMatcher.find()) {
+            tracker.beginStatementSet();
+            applySqlStatement(tracker, statement.substring(statementSetStartMatcher.end()));
+            return;
+        }
+        if (SQL_STATEMENT_SET_END_REGEX.matcher(statement).find()) {
+            tracker.endStatementSet();
+            return;
+        }
+        if (SQL_JOB_STATEMENT_REGEX.matcher(statement).find()) {
+            tracker.submit();
         }
     }
 
@@ -469,8 +483,9 @@ public class FlinkArgsUtils {
         String key = matcher.group(SET_QUOTED_KEY_GROUP) != null
                 ? matcher.group(SET_QUOTED_KEY_GROUP)
                 : matcher.group(SET_KEY_GROUP);
+        // a doubled single quote inside a SQL string is an escaped quote, the effective value uses one
         String value = matcher.group(SET_QUOTED_VALUE_GROUP) != null
-                ? matcher.group(SET_QUOTED_VALUE_GROUP)
+                ? matcher.group(SET_QUOTED_VALUE_GROUP).replace("''", "'")
                 : matcher.group(SET_VALUE_GROUP);
         if (key == null || value == null || !isClusterConnectionConfig(DYNAMIC_PROPERTY_OPTION + key + "=" + value)) {
             return null;
