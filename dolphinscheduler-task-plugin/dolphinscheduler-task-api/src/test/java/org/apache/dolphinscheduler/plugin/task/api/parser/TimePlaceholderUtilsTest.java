@@ -272,4 +272,56 @@ public class TimePlaceholderUtilsTest {
                 ParameterUtils.convertParameterPlaceholders(
                         "$[month_first_day(yyyy-MM-dd'T'HH:mm:ss+08:00' (CST)')]", timeParams));
     }
+
+    @Test
+    public void timePlaceHolderWithBoundaryOffsetAfterTimezoneLiteral() {
+        // The offset boundary is the complete trailing arithmetic operand: a timezone literal
+        // followed by an offset keeps both
+        Date septFirst = DateUtils.parse("2022-09-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Map<String, String> septFirstParams =
+                BusinessTimeUtils.getBusinessTime(CommandType.COMPLEMENT_DATA, septFirst, null);
+        // colon timezone + negative offset
+        assertEquals("2022-08-01T00:00:00+08:00",
+                ParameterUtils.convertParameterPlaceholders(
+                        "$[month_first_day(yyyy-MM-dd'T'HH:mm:ss+08:00-1)]", septFirstParams));
+        // colon timezone + positive offset
+        assertEquals("2022-09-01T00:00:00+08:00",
+                ParameterUtils.convertParameterPlaceholders(
+                        "$[month_first_day(yyyy-MM-dd'T'HH:mm:ss+08:00+1)]", septFirstParams));
+        // compact timezone + offset: the 0800 prefix is a timezone literal, not the start of the
+        // arithmetic operand
+        assertEquals("20220801+0800",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyyMMdd+0800-1)]",
+                        septFirstParams));
+        // quoted zone-name suffix + offset
+        assertEquals("2022-08-01+08:00 (CST)",
+                ParameterUtils.convertParameterPlaceholders(
+                        "$[month_first_day(yyyy-MM-dd+08:00' (CST)'-1)]", septFirstParams));
+    }
+
+    @Test
+    public void timePlaceHolderWithUnaryMinusInBoundaryOffset() {
+        // Unary signs and parenthesized arithmetic inside a boundary-function offset stay part
+        // of the operand
+        Date septFirst = DateUtils.parse("2022-09-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Map<String, String> septFirstParams =
+                BusinessTimeUtils.getBusinessTime(CommandType.COMPLEMENT_DATA, septFirst, null);
+        assertEquals("2022-09-01",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd-7*-1)]",
+                        septFirstParams));
+        assertEquals("20220801",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyyMMdd+7*-1)]", timeParams));
+        assertEquals("20220821",
+                ParameterUtils.convertParameterPlaceholders("$[week_last_day(yyyyMMdd+7*(-1))]", timeParams));
+    }
+
+    @Test
+    public void timePlaceHolderWithBoundaryArithmeticFailure() {
+        // Arithmetic failures in boundary-function offsets propagate to formatTimeExpression:
+        // ignore-invalid mode preserves the placeholder, strict mode rejects the expression
+        assertEquals("$[month_first_day(yyyy-MM-dd+1/0)]",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd+1/0)]", timeParams));
+        assertThrows(IllegalArgumentException.class, () -> TimePlaceholderUtils
+                .formatTimeExpression("month_first_day(yyyy-MM-dd+1/0)", date, false));
+    }
 }

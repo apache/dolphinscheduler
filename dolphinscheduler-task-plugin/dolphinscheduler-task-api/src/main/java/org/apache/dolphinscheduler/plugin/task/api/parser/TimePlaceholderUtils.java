@@ -756,9 +756,10 @@ public class TimePlaceholderUtils {
 
     /**
      * Finds the index of the arithmetic operator ('+' or '-') that separates the date format from a
-     * trailing offset expression, ignoring operators inside single-quoted literals. An offset
-     * starting with '+' wins over one starting with '-', so unary signs inside the offset expression
-     * stay part of the operand.
+     * complete trailing offset expression, ignoring operators inside single-quoted literals. The
+     * boundary is the first sign whose entire remainder is an arithmetic expression: timezone
+     * literals such as +08:00 or +0800 fail the arithmetic check and stay part of the format, while
+     * unary signs inside the offset (e.g. the '-' in yyyy-MM-dd-7*-1) remain part of the operand.
      *
      * @param format date format, possibly with a trailing offset
      * @return index of operator, or -1 when the format has no trailing offset
@@ -768,10 +769,7 @@ public class TimePlaceholderUtils {
             return -1;
         }
 
-        int lastAddIndex = -1;
-        int lastSubIndex = -1;
         boolean inQuote = false;
-
         for (int i = 0; i < format.length(); i++) {
             char c = format.charAt(i);
             if (c == '\'') {
@@ -781,31 +779,20 @@ public class TimePlaceholderUtils {
                 } else {
                     inQuote = !inQuote;
                 }
-            } else if (!inQuote && c == '+') {
-                lastAddIndex = i;
-            } else if (!inQuote && c == '-') {
-                lastSubIndex = i;
+            } else if (!inQuote && (c == '+' || c == '-') && i + 1 < format.length()
+                    && Character.isDigit(format.charAt(i + 1))) {
+                String operand = format.substring(i + 1).trim();
+                // a tail that cannot be arithmetic (e.g. +08:00' (CST)'), a timezone offset literal
+                // (e.g. +0800), or an arithmetic tail starting with a timezone literal (e.g. 0800-1)
+                // belongs to the date format rather than to an offset
+                if (isArithmeticExpression(operand) && !isTimezoneOffsetLiteral(operand)
+                        && !startsWithTimezoneOffsetLiteral(operand)) {
+                    return i;
+                }
             }
         }
 
-        int opIndex = lastAddIndex >= 0 ? lastAddIndex : lastSubIndex;
-        if (opIndex == -1) {
-            return -1;
-        }
-
-        // the offset expression must start with a digit, otherwise the sign belongs to the date format
-        if (opIndex + 1 >= format.length() || !Character.isDigit(format.charAt(opIndex + 1))) {
-            return -1;
-        }
-
-        String operand = format.substring(opIndex + 1).trim();
-        // a tail that cannot be arithmetic (e.g. +08:00' (CST)') or a timezone offset literal
-        // (e.g. +0800) belongs to the date format rather than to an offset
-        if (!isArithmeticExpression(operand) || isTimezoneOffsetLiteral(operand)) {
-            return -1;
-        }
-
-        return opIndex;
+        return -1;
     }
 
     /**
@@ -829,6 +816,15 @@ public class TimePlaceholderUtils {
             return false;
         }
         return TIMEZONE_PATTERN.matcher(operand).matches();
+    }
+
+    /**
+     * @param operand candidate offset expression
+     * @return whether the operand starts with a four-digit timezone offset literal (e.g. the 0800 in
+     *         0800-1), so the sign belongs to the date format rather than to an arithmetic offset
+     */
+    private static boolean startsWithTimezoneOffsetLiteral(String operand) {
+        return operand.length() > 4 && TIMEZONE_PATTERN.matcher(operand.substring(0, 4)).matches();
     }
 
     /**
