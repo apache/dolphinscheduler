@@ -188,6 +188,39 @@ public class TimePlaceholderUtilsTest {
         // add_months with date offset:
         assertEquals("2022-09-25",
                 ParameterUtils.convertParameterPlaceholders("$[add_months(yyyy-MM-dd-1,1)]", timeParams));
+
+        // Preserve date-format literals and quoted literals:
+        assertEquals("2022-08-01+0800",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd+0800)]", timeParams));
+        assertEquals("2022-08-01+0800",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd'+0800')]", timeParams));
+        assertEquals("2022-08-01+08:00",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd+08:00)]", timeParams));
+        assertEquals("2022-08-01+08:00",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd'+08:00')]", timeParams));
+        assertEquals("2022-08-01-0500",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd-0500)]", timeParams));
+        assertEquals("2022-08-01-0500",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd'-0500')]", timeParams));
+        assertEquals("2022-08-01T00:00:00",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd'T'HH:mm:ss)]", timeParams));
+
+        assertEquals("2022-08-01+0800",
+                ParameterUtils.convertParameterPlaceholders("$[month_begin(yyyy-MM-dd'+0800',0)]", timeParams));
+        assertEquals("2022-08-22+0800",
+                ParameterUtils.convertParameterPlaceholders("$[week_first_day(yyyy-MM-dd'+0800')]", timeParams));
+        assertEquals("2022-09-26+0800",
+                ParameterUtils.convertParameterPlaceholders("$[add_months(yyyy-MM-dd'+0800',1)]", timeParams));
+
+        // Standard placeholders with literals:
+        assertEquals("2022-08-26+0800",
+                ParameterUtils.convertParameterPlaceholders("$[yyyy-MM-dd+0800]", timeParams));
+        assertEquals("2022-08-26+0800",
+                ParameterUtils.convertParameterPlaceholders("$[yyyy-MM-dd'+0800']", timeParams));
+        assertEquals("2022-08-26-0500",
+                ParameterUtils.convertParameterPlaceholders("$[yyyy-MM-dd-0500]", timeParams));
+        assertEquals("2022-08-26-0500",
+                ParameterUtils.convertParameterPlaceholders("$[yyyy-MM-dd'-0500']", timeParams));
     }
 
     @Test

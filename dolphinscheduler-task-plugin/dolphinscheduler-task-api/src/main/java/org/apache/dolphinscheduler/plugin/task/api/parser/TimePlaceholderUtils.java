@@ -62,6 +62,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -678,6 +679,8 @@ public class TimePlaceholderUtils {
         throw new RuntimeException("expression not valid");
     }
 
+    private static final Pattern TIMEZONE_PATTERN = Pattern.compile("^(\\d{4}|\\d{2}:\\d{2})$");
+
     /**
      * calculate time expression
      *
@@ -686,33 +689,71 @@ public class TimePlaceholderUtils {
      * @return calculate time expression with date,format
      */
     public static Map.Entry<Date, String> calcMinutes(String expression, Date date) {
-        if (expression.contains("+")) {
-            int index = expression.lastIndexOf('+');
-
-            if (Character.isDigit(expression.charAt(index + 1))) {
-                String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = addMinutes(date, calcMinutes(addMinuteExpr));
-                String dateFormat = expression.substring(0, index);
-
-                return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
-            }
-        } else if (expression.contains("-")) {
-            int index = expression.lastIndexOf('-');
-
-            if (Character.isDigit(expression.charAt(index + 1))) {
-                String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = addMinutes(date, 0 - calcMinutes(addMinuteExpr));
-                String dateFormat = expression.substring(0, index);
-
-                return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
-            }
-
-            // yyyy-MM-dd/HH:mm:ss
+        int opIndex = findLastUnquotedOffsetOperator(expression);
+        if (opIndex == -1) {
             return new AbstractMap.SimpleImmutableEntry<>(date, expression);
         }
 
-        // $[HHmmss]
-        return new AbstractMap.SimpleImmutableEntry<>(date, expression);
+        char op = expression.charAt(opIndex);
+        String addMinuteExpr = expression.substring(opIndex + 1);
+        String dateFormat = expression.substring(0, opIndex);
+
+        try {
+            int minutes = calcMinutes(addMinuteExpr);
+            Date targetDate = (op == '+') ? addMinutes(date, minutes) : addMinutes(date, -minutes);
+            return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
+        } catch (Exception e) {
+            return new AbstractMap.SimpleImmutableEntry<>(date, expression);
+        }
+    }
+
+    /**
+     * Finds the index of the last arithmetic operator ('+' or '-') that is outside single quotes
+     * and is followed by a valid offset expression (not a timezone offset literal like +0800 or +08:00).
+     *
+     * @param expression expression
+     * @return index of operator, or -1 if no offset operator found
+     */
+    private static int findLastUnquotedOffsetOperator(String expression) {
+        if (StringUtils.isEmpty(expression)) {
+            return -1;
+        }
+
+        boolean inQuote = false;
+        int lastOpIndex = -1;
+
+        for (int i = 0; i < expression.length(); i++) {
+            char c = expression.charAt(i);
+            if (c == '\'') {
+                if (i + 1 < expression.length() && expression.charAt(i + 1) == '\'') {
+                    i++;
+                } else {
+                    inQuote = !inQuote;
+                }
+            } else if (!inQuote && (c == '+' || c == '-')) {
+                if (i + 1 < expression.length() && Character.isDigit(expression.charAt(i + 1))) {
+                    lastOpIndex = i;
+                }
+            }
+        }
+
+        if (lastOpIndex == -1) {
+            return -1;
+        }
+
+        String operand = expression.substring(lastOpIndex + 1).trim();
+        if (isTimezoneOffsetLiteral(operand)) {
+            return -1;
+        }
+
+        return lastOpIndex;
+    }
+
+    private static boolean isTimezoneOffsetLiteral(String operand) {
+        if (StringUtils.isEmpty(operand)) {
+            return false;
+        }
+        return TIMEZONE_PATTERN.matcher(operand).matches() || operand.contains(":");
     }
 
     /**
