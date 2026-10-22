@@ -324,4 +324,31 @@ public class TimePlaceholderUtilsTest {
         assertThrows(IllegalArgumentException.class, () -> TimePlaceholderUtils
                 .formatTimeExpression("month_first_day(yyyy-MM-dd+1/0)", date, false));
     }
+
+    @Test
+    public void timePlaceHolderWithTzShapedArithmeticOperand() {
+        // Operands that merely start with a timezone-shaped number are complete arithmetic
+        // expressions: division, multiplication and longer numbers are evaluated as offsets,
+        // not treated as timezone literals followed by another offset
+        Date septFirst = DateUtils.parse("2022-09-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Map<String, String> septFirstParams =
+                BusinessTimeUtils.getBusinessTime(CommandType.COMPLEMENT_DATA, septFirst, null);
+        // division operand: 1000/24/60 is 1000 minutes
+        assertEquals("20220801",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyyMMdd-1000/24/60)]",
+                        septFirstParams));
+        // multiplication operand: 2*3 is 6 days
+        assertEquals("20220820",
+                ParameterUtils.convertParameterPlaceholders("$[this_day(yyyyMMdd-2*3)]", timeParams));
+        // five-digit numeric operand
+        assertEquals("19950401",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyyMMdd-10000)]",
+                        septFirstParams));
+        // arithmetic failures with a timezone-shaped prefix still reach formatTimeExpression
+        assertEquals("$[month_first_day(yyyyMMdd+1000/0)]",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyyMMdd+1000/0)]",
+                        septFirstParams));
+        assertThrows(IllegalArgumentException.class, () -> TimePlaceholderUtils
+                .formatTimeExpression("month_first_day(yyyyMMdd+1000/0)", date, false));
+    }
 }

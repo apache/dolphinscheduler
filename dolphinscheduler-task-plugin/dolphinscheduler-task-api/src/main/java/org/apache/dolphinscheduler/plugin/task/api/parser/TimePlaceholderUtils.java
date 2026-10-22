@@ -820,11 +820,14 @@ public class TimePlaceholderUtils {
 
     /**
      * @param operand candidate offset expression
-     * @return whether the operand starts with a four-digit timezone offset literal (e.g. the 0800 in
-     *         0800-1), so the sign belongs to the date format rather than to an arithmetic offset
+     * @return whether the operand is a timezone offset literal immediately followed by another sign,
+     *         e.g. the 0800-1 in +0800-1, so the sign belongs to the date format rather than to an
+     *         arithmetic offset. Continuations of the same arithmetic expression, such as the /
+     *         in 1000/24/60 or the digits of 10000, are complete operands and are not affected.
      */
     private static boolean startsWithTimezoneOffsetLiteral(String operand) {
-        return operand.length() > 4 && TIMEZONE_PATTERN.matcher(operand.substring(0, 4)).matches();
+        return operand.length() > 4 && TIMEZONE_PATTERN.matcher(operand.substring(0, 4)).matches()
+                && (operand.charAt(4) == '+' || operand.charAt(4) == '-');
     }
 
     /**
