@@ -312,10 +312,10 @@ public class TimePlaceholderUtils {
                 String param2 = dataFormat.split(COMMA)[1];
                 dataFormat = param1;
 
-                Map.Entry<Date, String> baseEntry = calcMinutes(dataFormat, date);
+                Map.Entry<Date, String> baseEntry = calcFormatOffset(dataFormat, date);
                 targetDate = transformYearWeek(baseEntry.getKey(), baseEntry.getValue(), calculate(param2));
             } else {
-                Map.Entry<Date, String> baseEntry = calcMinutes(dataFormat, date);
+                Map.Entry<Date, String> baseEntry = calcFormatOffset(dataFormat, date);
                 targetDate = transformYearWeek(baseEntry.getKey(), baseEntry.getValue(), 1);
             }
         } catch (Exception e) {
@@ -448,7 +448,7 @@ public class TimePlaceholderUtils {
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
-            Map.Entry<Date, String> baseEntry = calcMinutes(dateFormat, date);
+            Map.Entry<Date, String> baseEntry = calcFormatOffset(dateFormat, date);
             Date baseDate = baseEntry.getKey();
             String cleanFormat = baseEntry.getValue();
 
@@ -476,7 +476,7 @@ public class TimePlaceholderUtils {
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
-            Map.Entry<Date, String> baseEntry = calcMinutes(dateFormat, date);
+            Map.Entry<Date, String> baseEntry = calcFormatOffset(dateFormat, date);
             Date baseDate = baseEntry.getKey();
             String cleanFormat = baseEntry.getValue();
 
@@ -510,7 +510,7 @@ public class TimePlaceholderUtils {
                     dataFormat = parts[0];
                     monthFirstOffset = parts[1];
                 }
-                Map.Entry<Date, String> monthFirstBaseEntry = calcMinutes(dataFormat, date);
+                Map.Entry<Date, String> monthFirstBaseEntry = calcFormatOffset(dataFormat, date);
                 Date monthFirstBaseDate = monthFirstBaseEntry.getKey();
                 dataFormat = monthFirstBaseEntry.getValue();
 
@@ -530,7 +530,7 @@ public class TimePlaceholderUtils {
                     dataFormat = parts[0];
                     monthLastOffset = parts[1];
                 }
-                Map.Entry<Date, String> monthLastBaseEntry = calcMinutes(dataFormat, date);
+                Map.Entry<Date, String> monthLastBaseEntry = calcFormatOffset(dataFormat, date);
                 Date monthLastBaseDate = monthLastBaseEntry.getKey();
                 dataFormat = monthLastBaseEntry.getValue();
 
@@ -543,13 +543,13 @@ public class TimePlaceholderUtils {
                 break;
             case THIS_DAY:
                 dataFormat = expression.substring(THIS_DAY.length() + 1, expression.length() - 1);
-                Map.Entry<Date, String> thisDayBaseEntry = calcMinutes(dataFormat, date);
+                Map.Entry<Date, String> thisDayBaseEntry = calcFormatOffset(dataFormat, date);
                 targetDate = addDays(thisDayBaseEntry.getKey(), 0);
                 dataFormat = thisDayBaseEntry.getValue();
                 break;
             case LAST_DAY:
                 dataFormat = expression.substring(LAST_DAY.length() + 1, expression.length() - 1);
-                Map.Entry<Date, String> lastDayBaseEntry = calcMinutes(dataFormat, date);
+                Map.Entry<Date, String> lastDayBaseEntry = calcFormatOffset(dataFormat, date);
                 targetDate = addDays(lastDayBaseEntry.getKey(), -1);
                 dataFormat = lastDayBaseEntry.getValue();
                 break;
@@ -561,7 +561,7 @@ public class TimePlaceholderUtils {
                     dataFormat = parts[0];
                     weekFirstOffset = parts[1];
                 }
-                Map.Entry<Date, String> weekFirstBaseEntry = calcMinutes(dataFormat, date);
+                Map.Entry<Date, String> weekFirstBaseEntry = calcFormatOffset(dataFormat, date);
                 Date weekFirstBaseDate = weekFirstBaseEntry.getKey();
                 dataFormat = weekFirstBaseEntry.getValue();
 
@@ -579,7 +579,7 @@ public class TimePlaceholderUtils {
                     dataFormat = parts[0];
                     weekLastOffset = parts[1];
                 }
-                Map.Entry<Date, String> weekLastBaseEntry = calcMinutes(dataFormat, date);
+                Map.Entry<Date, String> weekLastBaseEntry = calcFormatOffset(dataFormat, date);
                 Date weekLastBaseDate = weekLastBaseEntry.getKey();
                 dataFormat = weekLastBaseEntry.getValue();
 
@@ -611,7 +611,7 @@ public class TimePlaceholderUtils {
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
-            Map.Entry<Date, String> baseEntry = calcMinutes(dateFormat, date);
+            Map.Entry<Date, String> baseEntry = calcFormatOffset(dateFormat, date);
             Date baseDate = baseEntry.getKey();
             String cleanFormat = baseEntry.getValue();
 
@@ -638,7 +638,7 @@ public class TimePlaceholderUtils {
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
-            Map.Entry<Date, String> baseEntry = calcMinutes(dateFormat, date);
+            Map.Entry<Date, String> baseEntry = calcFormatOffset(dateFormat, date);
             Date baseDate = baseEntry.getKey();
             String cleanFormat = baseEntry.getValue();
 
@@ -666,7 +666,7 @@ public class TimePlaceholderUtils {
         if (params.length == 2) {
             String dateFormat = params[0];
             String monthExpr = params[1];
-            Map.Entry<Date, String> baseEntry = calcMinutes(dateFormat, date);
+            Map.Entry<Date, String> baseEntry = calcFormatOffset(dateFormat, date);
             Date baseDate = baseEntry.getKey();
             String cleanFormat = baseEntry.getValue();
 
@@ -680,31 +680,73 @@ public class TimePlaceholderUtils {
     }
 
     /**
-     * Matches a timezone offset literal appended to a date format, such as 0800 in
-     * yyyy-MM-dd+0800 or 08:00 in yyyy-MM-dd+08:00. Timezone offsets range from UTC-12:00 to
-     * UTC+14:00, so only hours up to 14 with minutes up to 59 are accepted: larger four-digit
-     * operands such as 3650 cannot be a timezone and keep the legacy numeric day-offset semantics.
+     * Matches a timezone offset literal appended to the date format argument of a boundary function,
+     * such as 0800 in month_first_day(yyyy-MM-dd+0800) or 08:00 in month_first_day(yyyy-MM-dd+08:00).
+     * Timezone offsets range from UTC-12:00 to UTC+14:00, so only hours up to 14 with minutes up to
+     * 59 are accepted. Standard placeholders are not affected by this pattern: their operands always
+     * keep the legacy numeric day-offset semantics.
      */
     private static final Pattern TIMEZONE_PATTERN =
             Pattern.compile("^((?:0\\d|1[0-4])[0-5]\\d|(?:0\\d|1[0-4]):[0-5]\\d)$");
 
     /**
      * calculate time expression
+     * <p> Keeps the legacy semantics of standard placeholders such as $[yyyyMMdd+1400]: the operand
+     * after the last '+'/'-' sign is always evaluated as a numeric offset expression.
      *
      * @param expression expresstion
      * @param date       date
      * @return calculate time expression with date,format
      */
     public static Map.Entry<Date, String> calcMinutes(String expression, Date date) {
-        int opIndex = findOffsetOperatorIndex(expression);
-        if (opIndex == -1) {
-            // $[HHmmss] or a pure date format such as yyyy-MM-dd: no offset to apply
+        if (expression.contains("+")) {
+            int index = expression.lastIndexOf('+');
+
+            if (Character.isDigit(expression.charAt(index + 1))) {
+                String addMinuteExpr = expression.substring(index + 1);
+                Date targetDate = addMinutes(date, calcMinutes(addMinuteExpr));
+                String dateFormat = expression.substring(0, index);
+
+                return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
+            }
+        } else if (expression.contains("-")) {
+            int index = expression.lastIndexOf('-');
+
+            if (Character.isDigit(expression.charAt(index + 1))) {
+                String addMinuteExpr = expression.substring(index + 1);
+                Date targetDate = addMinutes(date, 0 - calcMinutes(addMinuteExpr));
+                String dateFormat = expression.substring(0, index);
+
+                return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
+            }
+
+            // yyyy-MM-dd
             return new AbstractMap.SimpleImmutableEntry<>(date, expression);
         }
 
-        char op = expression.charAt(opIndex);
-        String addMinuteExpr = expression.substring(opIndex + 1);
-        String dateFormat = expression.substring(0, opIndex);
+        // $[HHmmss]
+        return new AbstractMap.SimpleImmutableEntry<>(date, expression);
+    }
+
+    /**
+     * Resolves the date format argument of a boundary function, e.g. month_first_day(yyyy-MM-dd-1):
+     * when the format carries a trailing offset expression the base date is shifted and the offset is
+     * stripped from the returned format. Tails that are not arithmetic offsets - timezone literals
+     * such as +0800 or +08:00, or quoted literal suffixes such as +08:00' (CST)' - stay in the format.
+     *
+     * @param format date format, possibly with a trailing offset
+     * @param date   date
+     * @return base date after applying the offset, and the date format without the offset
+     */
+    private static Map.Entry<Date, String> calcFormatOffset(String format, Date date) {
+        int opIndex = findFormatOffsetIndex(format);
+        if (opIndex == -1) {
+            return new AbstractMap.SimpleImmutableEntry<>(date, format);
+        }
+
+        char op = format.charAt(opIndex);
+        String addMinuteExpr = format.substring(opIndex + 1);
+        String dateFormat = format.substring(0, opIndex);
 
         // arithmetic failures are propagated, formatTimeExpression decides how to handle them
         int minutes = calcMinutes(addMinuteExpr);
@@ -713,16 +755,16 @@ public class TimePlaceholderUtils {
     }
 
     /**
-     * Finds the index of the arithmetic operator ('+' or '-') that separates the date format from
-     * the offset expression, ignoring operators inside single-quoted literals. An offset starting
-     * with '+' wins over one starting with '-', mirroring the legacy semantics, so signs inside the
-     * offset expression (e.g. the unary '-' in $[yyyyMMdd+7*-1]) stay part of the operand.
+     * Finds the index of the arithmetic operator ('+' or '-') that separates the date format from a
+     * trailing offset expression, ignoring operators inside single-quoted literals. An offset
+     * starting with '+' wins over one starting with '-', so unary signs inside the offset expression
+     * stay part of the operand.
      *
-     * @param expression expression
-     * @return index of operator, or -1 if no offset operator found
+     * @param format date format, possibly with a trailing offset
+     * @return index of operator, or -1 when the format has no trailing offset
      */
-    private static int findOffsetOperatorIndex(String expression) {
-        if (StringUtils.isEmpty(expression)) {
+    private static int findFormatOffsetIndex(String format) {
+        if (StringUtils.isEmpty(format)) {
             return -1;
         }
 
@@ -730,10 +772,10 @@ public class TimePlaceholderUtils {
         int lastSubIndex = -1;
         boolean inQuote = false;
 
-        for (int i = 0; i < expression.length(); i++) {
-            char c = expression.charAt(i);
+        for (int i = 0; i < format.length(); i++) {
+            char c = format.charAt(i);
             if (c == '\'') {
-                if (i + 1 < expression.length() && expression.charAt(i + 1) == '\'') {
+                if (i + 1 < format.length() && format.charAt(i + 1) == '\'') {
                     // escaped quote ('') inside a literal
                     i++;
                 } else {
@@ -752,16 +794,34 @@ public class TimePlaceholderUtils {
         }
 
         // the offset expression must start with a digit, otherwise the sign belongs to the date format
-        if (opIndex + 1 >= expression.length() || !Character.isDigit(expression.charAt(opIndex + 1))) {
+        if (opIndex + 1 >= format.length() || !Character.isDigit(format.charAt(opIndex + 1))) {
             return -1;
         }
 
-        // a trailing timezone offset literal (e.g. +0800) stays part of the date format
-        if (isTimezoneOffsetLiteral(expression.substring(opIndex + 1).trim())) {
+        String operand = format.substring(opIndex + 1).trim();
+        // a tail that cannot be arithmetic (e.g. +08:00' (CST)') or a timezone offset literal
+        // (e.g. +0800) belongs to the date format rather than to an offset
+        if (!isArithmeticExpression(operand) || isTimezoneOffsetLiteral(operand)) {
             return -1;
         }
 
         return opIndex;
+    }
+
+    /**
+     * @param operand candidate offset expression
+     * @return whether the operand consists only of arithmetic characters (digits, operators,
+     *         parentheses and whitespace)
+     */
+    private static boolean isArithmeticExpression(String operand) {
+        for (int i = 0; i < operand.length(); i++) {
+            char c = operand.charAt(i);
+            if (!Character.isDigit(c) && c != '+' && c != '-' && c != '*' && c != '/' && c != '(' && c != ')'
+                    && !Character.isWhitespace(c)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private static boolean isTimezoneOffsetLiteral(String operand) {

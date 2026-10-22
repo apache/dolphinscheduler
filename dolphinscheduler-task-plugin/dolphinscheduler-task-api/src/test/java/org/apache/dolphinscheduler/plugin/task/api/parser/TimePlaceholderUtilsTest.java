@@ -213,14 +213,16 @@ public class TimePlaceholderUtilsTest {
         assertEquals("2022-09-26+0800",
                 ParameterUtils.convertParameterPlaceholders("$[add_months(yyyy-MM-dd'+0800',1)]", timeParams));
 
-        // Standard placeholders with literals:
-        assertEquals("2022-08-26+0800",
+        // Standard placeholders keep the legacy numeric offset semantics: timezone-shaped operands
+        // are evaluated as day offsets, and quoted literals that fail arithmetic parsing or date
+        // formatting leave the placeholder unresolved
+        assertEquals("2024-11-03",
                 ParameterUtils.convertParameterPlaceholders("$[yyyy-MM-dd+0800]", timeParams));
-        assertEquals("2022-08-26+0800",
+        assertEquals("$[yyyy-MM-dd'+0800']",
                 ParameterUtils.convertParameterPlaceholders("$[yyyy-MM-dd'+0800']", timeParams));
-        assertEquals("2022-08-26-0500",
+        assertEquals("2021-04-13",
                 ParameterUtils.convertParameterPlaceholders("$[yyyy-MM-dd-0500]", timeParams));
-        assertEquals("2022-08-26-0500",
+        assertEquals("$[yyyy-MM-dd'-0500']",
                 ParameterUtils.convertParameterPlaceholders("$[yyyy-MM-dd'-0500']", timeParams));
     }
 
@@ -232,12 +234,11 @@ public class TimePlaceholderUtilsTest {
 
     @Test
     public void timePlaceHolderWithFourDigitDayOffset() {
-        // Four-digit operands that cannot be a timezone offset (timezone offsets are limited
-        // to UTC-12:00..UTC+14:00) keep the legacy numeric day-offset semantics
+        // Standard placeholders keep the legacy numeric day-offset semantics for any operand,
+        // including timezone-shaped four-digit values such as +1400
         assertEquals("20120828", ParameterUtils.convertParameterPlaceholders("$[yyyyMMdd-3650]", timeParams));
         assertEquals("20320823", ParameterUtils.convertParameterPlaceholders("$[yyyyMMdd+3650]", timeParams));
-        // Operands that do form a valid timezone offset stay part of the date format
-        assertEquals("20220826+1400", ParameterUtils.convertParameterPlaceholders("$[yyyyMMdd+1400]", timeParams));
+        assertEquals("20260626", ParameterUtils.convertParameterPlaceholders("$[yyyyMMdd+1400]", timeParams));
     }
 
     @Test
@@ -258,5 +259,17 @@ public class TimePlaceholderUtilsTest {
         // strict mode rejects the expression
         assertThrows(IllegalArgumentException.class,
                 () -> TimePlaceholderUtils.formatTimeExpression("yyyyMMdd+1/0", date, false));
+    }
+
+    @Test
+    public void timePlaceHolderWithTrailingFormatLiteralSuffix() {
+        // Boundary-function format arguments keep tails that are not arithmetic offsets, such as
+        // a timezone suffix followed by a quoted zone name
+        assertEquals("2022-08-26T00:00:00+08:00 (CST)",
+                ParameterUtils.convertParameterPlaceholders(
+                        "$[this_day(yyyy-MM-dd'T'HH:mm:ss+08:00' (CST)')]", timeParams));
+        assertEquals("2022-08-01T00:00:00+08:00 (CST)",
+                ParameterUtils.convertParameterPlaceholders(
+                        "$[month_first_day(yyyy-MM-dd'T'HH:mm:ss+08:00' (CST)')]", timeParams));
     }
 }
