@@ -410,6 +410,26 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                             JSONUtils.toJsonString(workflowTaskRelationLog),
                             WorkflowTaskRelation.class))
                     .collect(Collectors.toList());
+            // Check that both the pre and post taskCodes in taskRelation exist in taskDefinition,
+            // otherwise transformTask will be broken by missing task definitions
+            Set<Long> taskDefinitionCodes =
+                    taskDefinitionLogs.stream().map(TaskDefinitionLog::getCode).collect(Collectors.toSet());
+            Set<Long> missedTaskCodes = new HashSet<>();
+            for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
+                if (!taskDefinitionCodes.contains(workflowTaskRelationLog.getPostTaskCode())) {
+                    missedTaskCodes.add(workflowTaskRelationLog.getPostTaskCode());
+                }
+                if (workflowTaskRelationLog.getPreTaskCode() != 0L
+                        && !taskDefinitionCodes.contains(workflowTaskRelationLog.getPreTaskCode())) {
+                    missedTaskCodes.add(workflowTaskRelationLog.getPreTaskCode());
+                }
+            }
+            if (CollectionUtils.isNotEmpty(missedTaskCodes)) {
+                String taskCodes = StringUtils.join(missedTaskCodes, Constants.COMMA);
+                log.error("Task definitions do not exist, taskCodes:{}.", taskCodes);
+                throw new ServiceException(Status.WORKFLOW_DAG_IS_INVALID,
+                        "the task definitions of taskCodes: [" + taskCodes + "] do not exist");
+            }
             List<TaskNode> taskNodeList = processService.transformTask(workflowTaskRelations, taskDefinitionLogs);
             if (taskNodeList.size() != taskRelationList.size()) {
                 Set<Long> postTaskCodes = taskRelationList.stream().map(WorkflowTaskRelationLog::getPostTaskCode)
@@ -419,7 +439,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 if (CollectionUtils.isNotEmpty(codes)) {
                     String taskCodes = StringUtils.join(codes, Constants.COMMA);
                     log.error("Task definitions do not exist, taskCodes:{}.", taskCodes);
-                    throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, taskCodes);
+                    throw new ServiceException(Status.WORKFLOW_DAG_IS_INVALID,
+                            "the task definitions of taskCodes: [" + taskCodes + "] do not exist");
                 }
             }
             if (graphHasCycle(taskNodeList)) {
@@ -979,7 +1000,15 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             List<WorkflowTaskRelation> taskRelationList =
                     JSONUtils.toList(workflowTaskRelationJson, WorkflowTaskRelation.class);
             // Check whether the task node is normal
-            List<TaskNode> taskNodes = processService.transformTask(taskRelationList, taskDefinitionLogsList);
+            List<TaskNode> taskNodes;
+            try {
+                taskNodes = processService.transformTask(taskRelationList, taskDefinitionLogsList);
+            } catch (org.apache.dolphinscheduler.service.exceptions.ServiceException e) {
+                // transformTask reports exactly what makes the dag inconsistent, e.g.
+                // task codes referenced by relations but missing in task definitions
+                log.error("Failed to build the workflow dag from the given workflowTaskRelationJson", e);
+                throw new ServiceException(Status.WORKFLOW_DAG_IS_INVALID, e.getMessage());
+            }
 
             if (CollectionUtils.isEmpty(taskNodes)) {
                 log.error("Task node data is empty.");
