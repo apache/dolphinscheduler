@@ -49,4 +49,6 @@
      - Before(-)/After(+) The last day of Month(The unit of N is month): `$[month_last_day(yyyy-MM-dd,-N)]`,Such as when N=1, 2022-08-28 => 2022-07-31
      - Before(-)/After(+) The first day of Week(The unit of N is week): `$[week_first_day(yyyy-MM-dd,-N)]`,Such as when N=1, 2022-08-26 => 2022-08-15
      - Before(-)/After(+) The last day of Week(The unit of N is week): `$[week_last_day(yyyy-MM-dd,-N)]`, Such as when N=1, 2022-08-26 => 2022-08-21
+     - The date format parameter also supports date offsets (e.g. `yyyy-MM-dd-1` to calculate month/week boundaries based on yesterday), such as `$[month_first_day(yyyy-MM-dd-1)]` or `$[month_first_day(yyyy-MM-dd-1, 0)]`.
+
 

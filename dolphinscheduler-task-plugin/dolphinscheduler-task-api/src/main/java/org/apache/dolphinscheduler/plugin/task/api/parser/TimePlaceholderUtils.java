@@ -306,16 +306,16 @@ public class TimePlaceholderUtils {
 
         String targetDate = "";
         try {
-
             if (dataFormat.contains(COMMA)) {
                 String param1 = dataFormat.split(COMMA)[0];
                 String param2 = dataFormat.split(COMMA)[1];
                 dataFormat = param1;
 
-                targetDate = transformYearWeek(date, dataFormat, calculate(param2));
-
+                Map.Entry<Date, String> baseEntry = calcMinutes(dataFormat, date);
+                targetDate = transformYearWeek(baseEntry.getKey(), baseEntry.getValue(), calculate(param2));
             } else {
-                targetDate = transformYearWeek(date, dataFormat, 1);
+                Map.Entry<Date, String> baseEntry = calcMinutes(dataFormat, date);
+                targetDate = transformYearWeek(baseEntry.getKey(), baseEntry.getValue(), 1);
             }
         } catch (Exception e) {
             throw new RuntimeException("expression not valid");
@@ -447,11 +447,15 @@ public class TimePlaceholderUtils {
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
+            Map.Entry<Date, String> baseEntry = calcMinutes(dateFormat, date);
+            Date baseDate = baseEntry.getKey();
+            String cleanFormat = baseEntry.getValue();
+
             Integer day = calculate(dayExpr);
-            Date targetDate = DateUtils.getFirstDayOfMonth(date);
+            Date targetDate = DateUtils.getFirstDayOfMonth(baseDate);
             targetDate = addDays(targetDate, day);
 
-            return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
+            return new AbstractMap.SimpleImmutableEntry<>(targetDate, cleanFormat);
         }
 
         throw new RuntimeException("expression not valid");
@@ -471,11 +475,15 @@ public class TimePlaceholderUtils {
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
+            Map.Entry<Date, String> baseEntry = calcMinutes(dateFormat, date);
+            Date baseDate = baseEntry.getKey();
+            String cleanFormat = baseEntry.getValue();
+
             Integer day = calculate(dayExpr);
-            Date targetDate = DateUtils.getLastDayOfMonth(date);
+            Date targetDate = DateUtils.getLastDayOfMonth(baseDate);
             targetDate = addDays(targetDate, day);
 
-            return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
+            return new AbstractMap.SimpleImmutableEntry<>(targetDate, cleanFormat);
         }
 
         throw new RuntimeException("expression not valid");
@@ -495,66 +503,89 @@ public class TimePlaceholderUtils {
         switch (keyDate) {
             case MONTH_FIRST_DAY:
                 dataFormat = expression.substring(MONTH_FIRST_DAY.length() + 1, expression.length() - 1);
-
+                String monthFirstOffset = null;
                 if (dataFormat.contains(COMMA)) {
-                    String param1 = dataFormat.split(COMMA)[0];
-                    String param2 = dataFormat.split(COMMA)[1];
-                    dataFormat = param1;
+                    String[] parts = dataFormat.split(COMMA);
+                    dataFormat = parts[0];
+                    monthFirstOffset = parts[1];
+                }
+                Map.Entry<Date, String> monthFirstBaseEntry = calcMinutes(dataFormat, date);
+                Date monthFirstBaseDate = monthFirstBaseEntry.getKey();
+                dataFormat = monthFirstBaseEntry.getValue();
 
-                    targetDate = addMonths(DateUtils.getFirstDayOfMonth(date), calculate(param2));
+                if (monthFirstOffset != null) {
+                    targetDate =
+                            addMonths(DateUtils.getFirstDayOfMonth(monthFirstBaseDate), calculate(monthFirstOffset));
                 } else {
-                    targetDate = DateUtils.getFirstDayOfMonth(date);
+                    targetDate = DateUtils.getFirstDayOfMonth(monthFirstBaseDate);
                 }
 
                 break;
             case MONTH_LAST_DAY:
                 dataFormat = expression.substring(MONTH_LAST_DAY.length() + 1, expression.length() - 1);
-
+                String monthLastOffset = null;
                 if (dataFormat.contains(COMMA)) {
-                    String param1 = dataFormat.split(COMMA)[0];
-                    String param2 = dataFormat.split(COMMA)[1];
-                    dataFormat = param1;
+                    String[] parts = dataFormat.split(COMMA);
+                    dataFormat = parts[0];
+                    monthLastOffset = parts[1];
+                }
+                Map.Entry<Date, String> monthLastBaseEntry = calcMinutes(dataFormat, date);
+                Date monthLastBaseDate = monthLastBaseEntry.getKey();
+                dataFormat = monthLastBaseEntry.getValue();
 
-                    Date lastMonthDay = addMonths(date, calculate(param2));
-
+                if (monthLastOffset != null) {
+                    Date lastMonthDay = addMonths(monthLastBaseDate, calculate(monthLastOffset));
                     targetDate = DateUtils.getLastDayOfMonth(lastMonthDay);
-
                 } else {
-                    targetDate = DateUtils.getLastDayOfMonth(date);
+                    targetDate = DateUtils.getLastDayOfMonth(monthLastBaseDate);
                 }
                 break;
             case THIS_DAY:
                 dataFormat = expression.substring(THIS_DAY.length() + 1, expression.length() - 1);
-                targetDate = addDays(date, 0);
+                Map.Entry<Date, String> thisDayBaseEntry = calcMinutes(dataFormat, date);
+                targetDate = addDays(thisDayBaseEntry.getKey(), 0);
+                dataFormat = thisDayBaseEntry.getValue();
                 break;
             case LAST_DAY:
                 dataFormat = expression.substring(LAST_DAY.length() + 1, expression.length() - 1);
-                targetDate = addDays(date, -1);
+                Map.Entry<Date, String> lastDayBaseEntry = calcMinutes(dataFormat, date);
+                targetDate = addDays(lastDayBaseEntry.getKey(), -1);
+                dataFormat = lastDayBaseEntry.getValue();
                 break;
             case WEEK_FIRST_DAY:
                 dataFormat = expression.substring(WEEK_FIRST_DAY.length() + 1, expression.length() - 1);
-
+                String weekFirstOffset = null;
                 if (dataFormat.contains(COMMA)) {
-                    String param1 = dataFormat.split(COMMA)[0];
-                    String param2 = dataFormat.split(COMMA)[1];
-                    dataFormat = param1;
+                    String[] parts = dataFormat.split(COMMA);
+                    dataFormat = parts[0];
+                    weekFirstOffset = parts[1];
+                }
+                Map.Entry<Date, String> weekFirstBaseEntry = calcMinutes(dataFormat, date);
+                Date weekFirstBaseDate = weekFirstBaseEntry.getKey();
+                dataFormat = weekFirstBaseEntry.getValue();
 
-                    targetDate = addWeeks(DateUtils.getMonday(date), calculate(param2));
+                if (weekFirstOffset != null) {
+                    targetDate = addWeeks(DateUtils.getMonday(weekFirstBaseDate), calculate(weekFirstOffset));
                 } else {
-                    targetDate = addWeeks(DateUtils.getMonday(date), 0);
+                    targetDate = addWeeks(DateUtils.getMonday(weekFirstBaseDate), 0);
                 }
                 break;
             case WEEK_LAST_DAY:
                 dataFormat = expression.substring(WEEK_LAST_DAY.length() + 1, expression.length() - 1);
-
+                String weekLastOffset = null;
                 if (dataFormat.contains(COMMA)) {
-                    String param1 = dataFormat.split(COMMA)[0];
-                    String param2 = dataFormat.split(COMMA)[1];
-                    dataFormat = param1;
+                    String[] parts = dataFormat.split(COMMA);
+                    dataFormat = parts[0];
+                    weekLastOffset = parts[1];
+                }
+                Map.Entry<Date, String> weekLastBaseEntry = calcMinutes(dataFormat, date);
+                Date weekLastBaseDate = weekLastBaseEntry.getKey();
+                dataFormat = weekLastBaseEntry.getValue();
 
-                    targetDate = addWeeks(DateUtils.getSunday(date), calculate(param2));
+                if (weekLastOffset != null) {
+                    targetDate = addWeeks(DateUtils.getSunday(weekLastBaseDate), calculate(weekLastOffset));
                 } else {
-                    targetDate = addWeeks(DateUtils.getSunday(date), 0);
+                    targetDate = addWeeks(DateUtils.getSunday(weekLastBaseDate), 0);
                 }
                 break;
             default:
@@ -579,10 +610,14 @@ public class TimePlaceholderUtils {
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
+            Map.Entry<Date, String> baseEntry = calcMinutes(dateFormat, date);
+            Date baseDate = baseEntry.getKey();
+            String cleanFormat = baseEntry.getValue();
+
             Integer day = calculate(dayExpr);
-            Date targetDate = DateUtils.getMonday(date);
+            Date targetDate = DateUtils.getMonday(baseDate);
             targetDate = addDays(targetDate, day);
-            return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
+            return new AbstractMap.SimpleImmutableEntry<>(targetDate, cleanFormat);
         }
 
         throw new RuntimeException("expression not valid");
@@ -602,11 +637,15 @@ public class TimePlaceholderUtils {
         if (params.length == 2) {
             String dateFormat = params[0];
             String dayExpr = params[1];
+            Map.Entry<Date, String> baseEntry = calcMinutes(dateFormat, date);
+            Date baseDate = baseEntry.getKey();
+            String cleanFormat = baseEntry.getValue();
+
             Integer day = calculate(dayExpr);
-            Date targetDate = DateUtils.getSunday(date);
+            Date targetDate = DateUtils.getSunday(baseDate);
             targetDate = addDays(targetDate, day);
 
-            return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
+            return new AbstractMap.SimpleImmutableEntry<>(targetDate, cleanFormat);
         }
 
         throw new RuntimeException("Expression not valid");
@@ -626,10 +665,14 @@ public class TimePlaceholderUtils {
         if (params.length == 2) {
             String dateFormat = params[0];
             String monthExpr = params[1];
-            Integer addMonth = calculate(monthExpr);
-            Date targetDate = addMonths(date, addMonth);
+            Map.Entry<Date, String> baseEntry = calcMinutes(dateFormat, date);
+            Date baseDate = baseEntry.getKey();
+            String cleanFormat = baseEntry.getValue();
 
-            return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
+            Integer addMonth = calculate(monthExpr);
+            Date targetDate = addMonths(baseDate, addMonth);
+
+            return new AbstractMap.SimpleImmutableEntry<>(targetDate, cleanFormat);
         }
 
         throw new RuntimeException("expression not valid");

@@ -130,6 +130,67 @@ public class TimePlaceholderUtilsTest {
     }
 
     @Test
+    public void timePlaceHolderForMonthFirstDayWithDateOffset() {
+        // Business date: 2022-08-26 (Friday)
+        // Yesterday is 2022-08-25, which is in August 2022. First day of yesterday's month is 2022-08-01
+        String monthFirstDate = "$[month_first_day(yyyy-MM-dd-1)]";
+        String monthFirstDay = "$[month_first_day(yyyyMMdd-1)]";
+        assertEquals("2022-08-01", ParameterUtils.convertParameterPlaceholders(monthFirstDate, timeParams));
+        assertEquals("20220801", ParameterUtils.convertParameterPlaceholders(monthFirstDay, timeParams));
+
+        String monthFirstDateWithMonthOffset = "$[month_first_day(yyyy-MM-dd-1,0)]";
+        assertEquals("2022-08-01",
+                ParameterUtils.convertParameterPlaceholders(monthFirstDateWithMonthOffset, timeParams));
+
+        String monthFirstDateLastMonth = "$[month_first_day(yyyy-MM-dd-1,-1)]";
+        assertEquals("2022-07-01", ParameterUtils.convertParameterPlaceholders(monthFirstDateLastMonth, timeParams));
+
+        // Test across month boundary: on 2022-09-01, yesterday is 2022-08-31
+        Date septFirst = DateUtils.parse("2022-09-01 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Map<String, String> septParams =
+                BusinessTimeUtils.getBusinessTime(CommandType.COMPLEMENT_DATA, septFirst, null);
+        assertEquals("2022-08-01",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd-1)]", septParams));
+        assertEquals("2022-08-01",
+                ParameterUtils.convertParameterPlaceholders("$[month_begin(yyyy-MM-dd-1,0)]", septParams));
+        assertEquals("2022-08-31",
+                ParameterUtils.convertParameterPlaceholders("$[month_last_day(yyyy-MM-dd-1)]", septParams));
+        assertEquals("2022-08-31",
+                ParameterUtils.convertParameterPlaceholders("$[month_end(yyyy-MM-dd-1,0)]", septParams));
+
+        // On 2022-09-02, yesterday is 2022-09-01
+        Date septSecond = DateUtils.parse("2022-09-02 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Map<String, String> septSecondParams =
+                BusinessTimeUtils.getBusinessTime(CommandType.COMPLEMENT_DATA, septSecond, null);
+        assertEquals("2022-09-01",
+                ParameterUtils.convertParameterPlaceholders("$[month_first_day(yyyy-MM-dd-1)]", septSecondParams));
+        assertEquals("2022-09-01",
+                ParameterUtils.convertParameterPlaceholders("$[month_begin(yyyy-MM-dd-1,0)]", septSecondParams));
+        assertEquals("2022-09-30",
+                ParameterUtils.convertParameterPlaceholders("$[month_last_day(yyyy-MM-dd-1)]", septSecondParams));
+        assertEquals("2022-09-30",
+                ParameterUtils.convertParameterPlaceholders("$[month_end(yyyy-MM-dd-1,0)]", septSecondParams));
+
+        // Week tests with date offset:
+        // On 2022-08-29 (Monday), yesterday is 2022-08-28 (Sunday of previous week)
+        Date aug29 = DateUtils.parse("2022-08-29 00:00:00", "yyyy-MM-dd HH:mm:ss");
+        Map<String, String> aug29Params =
+                BusinessTimeUtils.getBusinessTime(CommandType.COMPLEMENT_DATA, aug29, null);
+        assertEquals("2022-08-22",
+                ParameterUtils.convertParameterPlaceholders("$[week_first_day(yyyy-MM-dd-1,0)]", aug29Params));
+        assertEquals("2022-08-28",
+                ParameterUtils.convertParameterPlaceholders("$[week_last_day(yyyy-MM-dd-1,0)]", aug29Params));
+        assertEquals("2022-08-22",
+                ParameterUtils.convertParameterPlaceholders("$[week_begin(yyyy-MM-dd-1,0)]", aug29Params));
+        assertEquals("2022-08-28",
+                ParameterUtils.convertParameterPlaceholders("$[week_end(yyyy-MM-dd-1,0)]", aug29Params));
+
+        // add_months with date offset:
+        assertEquals("2022-09-25",
+                ParameterUtils.convertParameterPlaceholders("$[add_months(yyyy-MM-dd-1,1)]", timeParams));
+    }
+
+    @Test
     void formatTimeExpressionWithInvalidExpression() {
         assertEquals("$[week_last_day(yyyy-MM-dd,0) - 1]",
                 TimePlaceholderUtils.formatTimeExpression("$[week_last_day(yyyy-MM-dd,0) - 1]", new Date(), true));
