@@ -55,5 +55,5 @@
   * 前(-)/后(+) N 月最后一天：$[month_last_day(yyyy-MM-dd,-N)]，如：N=1时 2022-08-28 => 2022-07-31
   * 前(-)/后(+) N 周的周一：$[week_first_day(yyyy-MM-dd,-N)]，如：N=1 2022-08-26 => 2022-08-15
   * 前(-)/后(+) N 周的周日：$[week_last_day(yyyy-MM-dd,-N)]，如：N=1 2022-08-26 => 2022-08-21
-  * 日期格式参数同样支持日期偏移（例如使用 `yyyy-MM-dd-1` 基于昨天计算月/周边界），如：`$[month_first_day(yyyy-MM-dd-1)]` 或 `$[month_first_day(yyyy-MM-dd-1, 0)]`。
+  * 前一天所在月的第一天：$[month_first_day(yyyy-MM-dd-1)]，如：2022-09-01 => 2022-08-01
 

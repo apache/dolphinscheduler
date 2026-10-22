@@ -177,9 +177,9 @@ public class TimePlaceholderUtilsTest {
         Map<String, String> aug29Params =
                 BusinessTimeUtils.getBusinessTime(CommandType.COMPLEMENT_DATA, aug29, null);
         assertEquals("2022-08-22",
-                ParameterUtils.convertParameterPlaceholders("$[week_first_day(yyyy-MM-dd-1,0)]", aug29Params));
+                ParameterUtils.convertParameterPlaceholders("$[week_first_day(yyyy-MM-dd-1)]", aug29Params));
         assertEquals("2022-08-28",
-                ParameterUtils.convertParameterPlaceholders("$[week_last_day(yyyy-MM-dd-1,0)]", aug29Params));
+                ParameterUtils.convertParameterPlaceholders("$[week_last_day(yyyy-MM-dd-1)]", aug29Params));
         assertEquals("2022-08-22",
                 ParameterUtils.convertParameterPlaceholders("$[week_begin(yyyy-MM-dd-1,0)]", aug29Params));
         assertEquals("2022-08-28",
