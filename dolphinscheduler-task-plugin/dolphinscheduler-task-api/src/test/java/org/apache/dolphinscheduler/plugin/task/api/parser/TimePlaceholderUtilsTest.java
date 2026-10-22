@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.parser;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
@@ -227,5 +228,35 @@ public class TimePlaceholderUtilsTest {
     void formatTimeExpressionWithInvalidExpression() {
         assertEquals("$[week_last_day(yyyy-MM-dd,0) - 1]",
                 TimePlaceholderUtils.formatTimeExpression("$[week_last_day(yyyy-MM-dd,0) - 1]", new Date(), true));
+    }
+
+    @Test
+    public void timePlaceHolderWithFourDigitDayOffset() {
+        // Four-digit operands that cannot be a timezone offset (timezone offsets are limited
+        // to UTC-12:00..UTC+14:00) keep the legacy numeric day-offset semantics
+        assertEquals("20120828", ParameterUtils.convertParameterPlaceholders("$[yyyyMMdd-3650]", timeParams));
+        assertEquals("20320823", ParameterUtils.convertParameterPlaceholders("$[yyyyMMdd+3650]", timeParams));
+        // Operands that do form a valid timezone offset stay part of the date format
+        assertEquals("20220826+1400", ParameterUtils.convertParameterPlaceholders("$[yyyyMMdd+1400]", timeParams));
+    }
+
+    @Test
+    public void timePlaceHolderWithUnaryMinusInOffsetExpression() {
+        // The boundary sign only starts the offset expression: unary signs and parenthesized
+        // arithmetic inside the operand stay part of the arithmetic expression
+        assertEquals("20220819", ParameterUtils.convertParameterPlaceholders("$[yyyyMMdd+7*-1]", timeParams));
+        assertEquals("20220819", ParameterUtils.convertParameterPlaceholders("$[yyyyMMdd+7*(-1)]", timeParams));
+    }
+
+    @Test
+    public void timePlaceHolderWithArithmeticFailure() {
+        // ignore-invalid mode preserves the original placeholder
+        assertEquals("$[yyyyMMdd+1/0]",
+                ParameterUtils.convertParameterPlaceholders("$[yyyyMMdd+1/0]", timeParams));
+        assertEquals("yyyyMMdd+1/0",
+                TimePlaceholderUtils.formatTimeExpression("yyyyMMdd+1/0", date, true));
+        // strict mode rejects the expression
+        assertThrows(IllegalArgumentException.class,
+                () -> TimePlaceholderUtils.formatTimeExpression("yyyyMMdd+1/0", date, false));
     }
 }

@@ -679,7 +679,14 @@ public class TimePlaceholderUtils {
         throw new RuntimeException("expression not valid");
     }
 
-    private static final Pattern TIMEZONE_PATTERN = Pattern.compile("^(\\d{4}|\\d{2}:\\d{2})$");
+    /**
+     * Matches a timezone offset literal appended to a date format, such as 0800 in
+     * yyyy-MM-dd+0800 or 08:00 in yyyy-MM-dd+08:00. Timezone offsets range from UTC-12:00 to
+     * UTC+14:00, so only hours up to 14 with minutes up to 59 are accepted: larger four-digit
+     * operands such as 3650 cannot be a timezone and keep the legacy numeric day-offset semantics.
+     */
+    private static final Pattern TIMEZONE_PATTERN =
+            Pattern.compile("^((?:0\\d|1[0-4])[0-5]\\d|(?:0\\d|1[0-4]):[0-5]\\d)$");
 
     /**
      * calculate time expression
@@ -689,8 +696,9 @@ public class TimePlaceholderUtils {
      * @return calculate time expression with date,format
      */
     public static Map.Entry<Date, String> calcMinutes(String expression, Date date) {
-        int opIndex = findLastUnquotedOffsetOperator(expression);
+        int opIndex = findOffsetOperatorIndex(expression);
         if (opIndex == -1) {
+            // $[HHmmss] or a pure date format such as yyyy-MM-dd: no offset to apply
             return new AbstractMap.SimpleImmutableEntry<>(date, expression);
         }
 
@@ -698,62 +706,69 @@ public class TimePlaceholderUtils {
         String addMinuteExpr = expression.substring(opIndex + 1);
         String dateFormat = expression.substring(0, opIndex);
 
-        try {
-            int minutes = calcMinutes(addMinuteExpr);
-            Date targetDate = (op == '+') ? addMinutes(date, minutes) : addMinutes(date, -minutes);
-            return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
-        } catch (Exception e) {
-            return new AbstractMap.SimpleImmutableEntry<>(date, expression);
-        }
+        // arithmetic failures are propagated, formatTimeExpression decides how to handle them
+        int minutes = calcMinutes(addMinuteExpr);
+        Date targetDate = (op == '+') ? addMinutes(date, minutes) : addMinutes(date, -minutes);
+        return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
     }
 
     /**
-     * Finds the index of the last arithmetic operator ('+' or '-') that is outside single quotes
-     * and is followed by a valid offset expression (not a timezone offset literal like +0800 or +08:00).
+     * Finds the index of the arithmetic operator ('+' or '-') that separates the date format from
+     * the offset expression, ignoring operators inside single-quoted literals. An offset starting
+     * with '+' wins over one starting with '-', mirroring the legacy semantics, so signs inside the
+     * offset expression (e.g. the unary '-' in $[yyyyMMdd+7*-1]) stay part of the operand.
      *
      * @param expression expression
      * @return index of operator, or -1 if no offset operator found
      */
-    private static int findLastUnquotedOffsetOperator(String expression) {
+    private static int findOffsetOperatorIndex(String expression) {
         if (StringUtils.isEmpty(expression)) {
             return -1;
         }
 
+        int lastAddIndex = -1;
+        int lastSubIndex = -1;
         boolean inQuote = false;
-        int lastOpIndex = -1;
 
         for (int i = 0; i < expression.length(); i++) {
             char c = expression.charAt(i);
             if (c == '\'') {
                 if (i + 1 < expression.length() && expression.charAt(i + 1) == '\'') {
+                    // escaped quote ('') inside a literal
                     i++;
                 } else {
                     inQuote = !inQuote;
                 }
-            } else if (!inQuote && (c == '+' || c == '-')) {
-                if (i + 1 < expression.length() && Character.isDigit(expression.charAt(i + 1))) {
-                    lastOpIndex = i;
-                }
+            } else if (!inQuote && c == '+') {
+                lastAddIndex = i;
+            } else if (!inQuote && c == '-') {
+                lastSubIndex = i;
             }
         }
 
-        if (lastOpIndex == -1) {
+        int opIndex = lastAddIndex >= 0 ? lastAddIndex : lastSubIndex;
+        if (opIndex == -1) {
             return -1;
         }
 
-        String operand = expression.substring(lastOpIndex + 1).trim();
-        if (isTimezoneOffsetLiteral(operand)) {
+        // the offset expression must start with a digit, otherwise the sign belongs to the date format
+        if (opIndex + 1 >= expression.length() || !Character.isDigit(expression.charAt(opIndex + 1))) {
             return -1;
         }
 
-        return lastOpIndex;
+        // a trailing timezone offset literal (e.g. +0800) stays part of the date format
+        if (isTimezoneOffsetLiteral(expression.substring(opIndex + 1).trim())) {
+            return -1;
+        }
+
+        return opIndex;
     }
 
     private static boolean isTimezoneOffsetLiteral(String operand) {
         if (StringUtils.isEmpty(operand)) {
             return false;
         }
-        return TIMEZONE_PATTERN.matcher(operand).matches() || operand.contains(":");
+        return TIMEZONE_PATTERN.matcher(operand).matches();
     }
 
     /**
