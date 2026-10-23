@@ -1085,7 +1085,7 @@ CREATE TABLE t_ds_version
 -- Records of t_ds_version
 -- ----------------------------
 INSERT INTO t_ds_version
-VALUES ('1', '3.3.0');
+VALUES ('1', '3.5.0');
 
 
 -- ----------------------------
@@ -1423,3 +1423,30 @@ CREATE TABLE `t_ds_jdbc_registry_data_change_event`
 -- ----------------------------
 -- Table structure for jdbc registry
 -- ----------------------------
+
+
+-- Project-scoped operation permissions. Legacy authorization tables are retained.
+DROP TABLE IF EXISTS t_ds_project_user_permission;
+CREATE TABLE t_ds_project_user_permission (
+    id INT AUTO_INCREMENT NOT NULL,
+    project_code BIGINT NOT NULL,
+    user_id INT NOT NULL,
+    permission VARCHAR(32) NOT NULL,
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT uk_project_user_permission UNIQUE (project_code, user_id, permission)
+);
+CREATE INDEX idx_user_permission_project ON t_ds_project_user_permission (user_id, permission, project_code);
+
+-- Presence of a row grants the project use of the resource.
+DROP TABLE IF EXISTS t_ds_project_resource_authorization;
+CREATE TABLE t_ds_project_resource_authorization (
+    id INT AUTO_INCREMENT NOT NULL,
+    project_code BIGINT NOT NULL,
+    resource_type VARCHAR(32) NOT NULL,
+    resource_key VARCHAR(255) NOT NULL,
+    create_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    CONSTRAINT uk_project_resource_authorization UNIQUE (project_code, resource_type, resource_key)
+);
+CREATE INDEX idx_resource_authorization_project ON t_ds_project_resource_authorization (resource_type, resource_key, project_code);

@@ -24,6 +24,7 @@ import type { TypeReq } from '@/service/modules/data-source/types'
 
 export function useDatasource(
   model: { [field: string]: any },
+  projectCode: number,
   params: {
     supportedDatasourceType?: string[]
     typeField?: string
@@ -185,6 +186,7 @@ export function useDatasource(
 
   const refreshOptions = async () => {
     const parameters = {
+      projectCode,
       type: model[params.typeField || 'type']
     } as TypeReq
     const res = await queryDataSourceList(parameters)

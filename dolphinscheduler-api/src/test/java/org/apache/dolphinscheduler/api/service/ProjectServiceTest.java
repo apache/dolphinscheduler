@@ -17,15 +17,14 @@
 
 package org.apache.dolphinscheduler.api.service;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_UPDATE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -33,22 +32,25 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.ProjectUserPermission;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserPermissionDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -84,6 +86,15 @@ public class ProjectServiceTest {
 
     @Mock
     private ProjectUserDao projectUserDao;
+
+    @Mock
+    private ProjectResourceAuthorizationDao projectResourceAuthorizationDao;
+
+    @Mock
+    private ProjectUserPermissionDao projectUserPermissionDao;
+
+    @Mock
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Mock
     private TaskGroupService taskGroupService;
@@ -125,143 +136,168 @@ public class ProjectServiceTest {
         result = projectService.createProject(loginUser, "test", "test");
         logger.info(result.toString());
         Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Mockito.verify(projectUserPermissionDao, Mockito.times(ProjectPermission.values().length))
+                .insert(Mockito.any(ProjectUserPermission.class));
+        Mockito.verifyNoInteractions(projectUserDao);
+    }
+
+    @Test
+    public void testCheckProjectPermissionRejectsMissingProjectAndPropagatesDenial() {
+        User loginUser = getLoginUser();
+        Assertions.assertThrows(ServiceException.class,
+                () -> projectService.checkProjectPermission(loginUser, (Project) null, ProjectPermission.VIEW));
+        Project project = getProject();
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectAuthorizationService)
+                .requirePermission(loginUser, project.getCode(), ProjectPermission.VIEW);
+        Assertions.assertThrows(ServiceException.class,
+                () -> projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW));
+        Mockito.verifyNoInteractions(projectUserDao, resourcePermissionCheckService);
 
     }
 
     @Test
-    public void testCheckProjectAndAuth() {
+    public void testCheckProjectPermissionDelegatesDevelop() {
         User loginUser = getLoginUser();
-
-        // PROJECT_NOT_EXIST
-        ServiceException notExistEx = Assertions.assertThrows(ServiceException.class,
-                () -> projectService.checkProjectAndAuthThrowException(loginUser, (Project) null, PROJECT));
-        Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), notExistEx.getCode());
-
-        // USER_NO_OPERATION_PROJECT_PERM
         Project project = getProject();
-        project.setUserId(2);
-        ServiceException noPermEx = Assertions.assertThrows(ServiceException.class,
-                () -> projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), noPermEx.getCode());
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
+        Mockito.verify(projectAuthorizationService).requirePermission(loginUser, project.getCode(),
+                ProjectPermission.DEVELOP);
+        Mockito.verifyNoInteractions(projectUserDao, resourcePermissionCheckService);
 
-        // success
-        project.setUserId(1);
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                project.getUserId(), PROJECT, baseServiceLogger)).thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
-                new Object[]{project.getId()},
-                0, baseServiceLogger)).thenReturn(true);
-        Assertions.assertDoesNotThrow(
-                () -> projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT));
     }
 
     @Test
-    public void testCheckHasProjectWritePermissionThrowException() {
-        User loginUser = getLoginUser();
+    public void testProjectPagingPreservesReadOnlyPermission() {
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
         Project project = getProject();
-
-        // PROJECT_NOT_FOUND
-        ServiceException notFoundEx = Assertions.assertThrows(ServiceException.class,
-                () -> projectService.checkHasProjectWritePermissionThrowException(loginUser, (Project) null));
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), notFoundEx.getCode());
-
-        // USER_NO_WRITE_PROJECT_PERM
         project.setUserId(2);
-        ServiceException noWriteEx = Assertions.assertThrows(ServiceException.class,
-                () -> projectService.checkHasProjectWritePermissionThrowException(loginUser, project));
-        Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), noWriteEx.getCode());
+        project.setPerm(Constants.READ_PERMISSION);
+        Page<Project> page = new Page<>(1, 10);
+        page.setTotal(1);
+        page.setRecords(Collections.singletonList(project));
+        Mockito.when(projectDao.queryVisibleProjectListPaging(any(Page.class), eq(user.getId()), eq(false), eq("test")))
+                .thenReturn(page);
 
-        // USER_NO_WRITE_PROJECT_PERM: read-only project member
-        ProjectUser projectUser = new ProjectUser();
-        projectUser.setPerm(Constants.READ_PERMISSION);
-        Mockito.when(projectUserDao.queryProjectRelation(project.getId(), loginUser.getId())).thenReturn(projectUser);
-        ServiceException readOnlyEx = Assertions.assertThrows(ServiceException.class,
-                () -> projectService.checkHasProjectWritePermissionThrowException(loginUser, project));
-        Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), readOnlyEx.getCode());
+        ProjectUserPermission grant = new ProjectUserPermission();
+        grant.setProjectCode(project.getCode());
+        grant.setPermission(ProjectPermission.VIEW);
+        Mockito.when(projectUserPermissionDao.queryByProjectsAndUser(Collections.singletonList(project.getCode()),
+                user.getId()))
+                .thenReturn(Collections.singletonList(grant));
+        Result result = projectService.queryProjectListPaging(user, 10, 1, "test");
 
-        // success: project member with write permission
-        projectUser.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
-        Assertions.assertDoesNotThrow(
-                () -> projectService.checkHasProjectWritePermissionThrowException(loginUser, project));
+        PageInfo<Project> data = (PageInfo<Project>) result.getData();
+        Assertions.assertEquals(1, data.getTotal());
+        Assertions.assertEquals(Constants.READ_PERMISSION, data.getTotalList().get(0).getPerm());
+        Assertions.assertEquals(EnumSet.of(ProjectPermission.VIEW), data.getTotalList().get(0).getPermissions());
+        Mockito.verify(projectUserPermissionDao).queryByProjectsAndUser(Collections.singletonList(project.getCode()),
+                user.getId());
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
+    }
 
-        // success: admin
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Assertions.assertDoesNotThrow(
-                () -> projectService.checkHasProjectWritePermissionThrowException(loginUser, project));
+    @Test
+    public void testProjectPagingPreservesTotalForEmptyPage() {
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        Page<Project> page = new Page<>(3, 10);
+        page.setTotal(12);
+        Mockito.when(projectDao.queryVisibleProjectListPaging(any(Page.class), eq(user.getId()), eq(false), eq("test")))
+                .thenReturn(page);
 
-        // success: project owner
-        loginUser.setUserType(UserType.GENERAL_USER);
-        project.setUserId(loginUser.getId());
-        Assertions.assertDoesNotThrow(
-                () -> projectService.checkHasProjectWritePermissionThrowException(loginUser, project));
+        Result result = projectService.queryProjectListPaging(user, 10, 3, "test");
+
+        PageInfo<Project> data = (PageInfo<Project>) result.getData();
+        Assertions.assertEquals(12, data.getTotal());
+        Assertions.assertTrue(data.getTotalList().isEmpty());
+        Mockito.verifyNoInteractions(resourcePermissionCheckService, userDao, workflowDefinitionDao);
+    }
+
+    @Test
+    public void testAdminProjectPagingUsesExplicitAdminScope() {
+        User user = getLoginUser();
+        user.setUserType(UserType.ADMIN_USER);
+        Mockito.when(projectDao.queryVisibleProjectListPaging(any(Page.class), eq(user.getId()), eq(true), eq("test")))
+                .thenReturn(new Page<>(1, 10));
+
+        projectService.queryProjectListPaging(user, 10, 1, "test");
+
+        Mockito.verify(projectDao).queryVisibleProjectListPaging(any(Page.class), eq(user.getId()), eq(true),
+                eq("test"));
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
+    }
+
+    @Test
+    public void testProjectDetailsRequireReadPermission() {
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        Project project = getProject();
+        project.setUserId(2);
+        Mockito.when(projectDao.queryByCode(project.getCode())).thenReturn(project);
+        Mockito.when(projectDao.queryByName(project.getName())).thenReturn(project);
+        Mockito.when(projectAuthorizationService.requirePermission(user, project.getCode(), ProjectPermission.VIEW))
+                .thenThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, user.getUserName(),
+                        project.getCode()));
+        Assertions.assertThrows(ServiceException.class, () -> projectService.queryByCode(user, project.getCode()));
+        Assertions.assertThrows(ServiceException.class, () -> projectService.queryByName(user, project.getName()));
+        Mockito.doReturn(project).when(projectAuthorizationService)
+                .requirePermission(user, project.getCode(), ProjectPermission.VIEW);
+        Assertions.assertEquals(project, projectService.queryByCode(user, project.getCode()).getData());
+        Assertions.assertEquals(project, projectService.queryByName(user, project.getName()));
+        Mockito.verifyNoInteractions(projectUserDao);
+    }
+
+    @Test
+    public void testMissingProjectIsRejectedBeforeCheckingPermissions() {
+        User user = getLoginUser();
+        user.setUserType(UserType.ADMIN_USER);
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> projectService.queryByCode(user, 999L));
+        Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), exception.getCode());
+        Mockito.verifyNoInteractions(projectAuthorizationService);
     }
 
     @Test
     public void testQueryProjectWithAuthorizedLevelListPaging() {
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
         IPage<Project> page = new Page<>(1, 10);
-        page.setTotal(1L);
-        page.setRecords(getList());
-
-        User loginUser = getLoginUser();
-        Integer pageSize = 10;
-        Integer pageNo = 1;
-        String searchVal = "testVal";
-        Result result = new Result();
-        Mockito.when(projectDao.queryProjectListPaging(any(Page.class), Mockito.anyList(), eq(searchVal)))
-                .thenReturn(page);
-
-        Set<Integer> allProjectIds = new HashSet();
-        allProjectIds.add(1);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-                loginUser.getId(), projectLogger)).thenReturn(allProjectIds);
-
-        // SUCCESS
-        result = projectService.queryProjectWithAuthorizedLevelListPaging(loginUser.getId(), loginUser, pageSize,
-                pageNo, searchVal);
-        logger.info(result.toString());
-        PageInfo<Project> pageInfo = (PageInfo<Project>) result.getData();
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(pageInfo.getTotalList()));
+        page.setTotal(1);
+        page.setRecords(Collections.singletonList(getProject()));
+        Mockito.when(projectDao.queryProjectAuthorizationLevelsPaging(any(Page.class), eq(user.getId()), eq(false),
+                eq(2), eq("test"))).thenReturn(page);
+        Result result = projectService.queryProjectWithAuthorizedLevelListPaging(2, user, 10, 1, "test");
+        PageInfo<Project> data = (PageInfo<Project>) result.getData();
+        Assertions.assertEquals(1, data.getTotal());
+        Assertions.assertEquals(1, data.getTotalList().size());
+        Mockito.verifyNoInteractions(projectUserDao, resourcePermissionCheckService);
     }
 
     @Test
     public void testDeleteProject() {
         User loginUser = getLoginUser();
-        Mockito.when(projectDao.queryByCode(1L)).thenReturn(getProject());
-
-        // PROJECT_NOT_FOUND
-        ServiceException notFoundEx = Assertions.assertThrows(ServiceException.class,
+        Project project = getProject();
+        Mockito.when(projectDao.queryByCode(1L)).thenReturn(project);
+        ServiceException missing = Assertions.assertThrows(ServiceException.class,
                 () -> projectService.deleteProject(loginUser, 11L));
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), notFoundEx.getCode());
-        loginUser.setId(2);
-
-        // USER_NO_WRITE_PROJECT_PERM
-        ServiceException noWriteEx = Assertions.assertThrows(ServiceException.class,
-                () -> projectService.deleteProject(loginUser, 1L));
-        Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), noWriteEx.getCode());
-
-        // DELETE_PROJECT_ERROR_DEFINES_NOT_NULL
+        Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), missing.getCode());
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectAuthorizationService)
+                .requirePermission(loginUser, project.getCode(), ProjectPermission.DEVELOP);
+        Assertions.assertThrows(ServiceException.class, () -> projectService.deleteProject(loginUser, 1L));
+        Mockito.reset(projectAuthorizationService);
         Mockito.when(workflowDefinitionDao.queryAllDefinitionList(1L)).thenReturn(getProcessDefinitions());
-        loginUser.setUserType(UserType.ADMIN_USER);
-        loginUser.setId(1);
-        Mockito.when(
-                resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1}, 0,
-                        baseServiceLogger))
-                .thenReturn(true);
-        Mockito.when(
-                resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS, loginUser.getId(),
-                        PROJECT_DELETE, baseServiceLogger))
-                .thenReturn(true);
         Result result = projectService.deleteProject(loginUser, 1L);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL.getCode(), result.getCode().intValue());
-
-        // success
+        Assertions.assertEquals(Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL.getCode(), result.getCode());
         Mockito.when(projectDao.deleteById(1)).thenReturn(true);
-        Mockito.when(workflowDefinitionDao.queryAllDefinitionList(1L)).thenReturn(new ArrayList<>());
+        Mockito.when(workflowDefinitionDao.queryAllDefinitionList(1L)).thenReturn(Collections.emptyList());
         result = projectService.deleteProject(loginUser, 1L);
-        logger.info(result.toString());
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        Mockito.verify(projectUserPermissionDao)
+                .deleteByCondition(Mockito.argThat(grant -> grant.getProjectCode() == 1L));
+        Mockito.verify(projectResourceAuthorizationDao)
+                .deleteByCondition(Mockito.argThat(grant -> grant.getProjectCode() == 1L));
+        Mockito.verifyNoInteractions(taskGroupService, projectUserDao);
+
     }
 
     @Test
@@ -273,10 +309,10 @@ public class ProjectServiceTest {
         project.setCode(2L);
         Mockito.when(projectDao.queryByName(projectName)).thenReturn(project);
         Mockito.when(projectDao.queryByCode(2L)).thenReturn(getProject());
-        // PROJECT_NOT_FOUND
+        // PROJECT_NOT_EXIST
         ServiceException notFoundEx = Assertions.assertThrows(ServiceException.class,
                 () -> projectService.update(loginUser, 1L, projectName, "desc"));
-        Assertions.assertEquals(Status.PROJECT_NOT_FOUND.getCode(), notFoundEx.getCode());
+        Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), notFoundEx.getCode());
 
         // PROJECT_ALREADY_EXISTS
         Mockito.when(
@@ -307,62 +343,52 @@ public class ProjectServiceTest {
 
     @Test
     public void testQueryAuthorizedProject() {
-        Mockito.when(projectDao.queryAuthedProjectListByUserId(2)).thenReturn(getList());
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        Project project = getProject();
+        project.setPerm(Constants.READ_PERMISSION);
+        Mockito.when(projectDao.queryProjectAuthorizationLevels(user.getId(), false, 2))
+                .thenReturn(Collections.singletonList(project));
+        Assertions.assertEquals(Collections.singletonList(project),
+                projectService.queryAuthorizedProject(user, 2).getData());
+        Mockito.when(projectDao.queryVisibleProjects(user.getId(), false))
+                .thenReturn(Collections.singletonList(project));
+        Assertions.assertEquals(Collections.singletonList(project),
+                projectService.queryAuthorizedProject(user, user.getId()).getData());
+        Mockito.verifyNoInteractions(projectUserDao, resourcePermissionCheckService);
+    }
 
-        User loginUser = getLoginUser();
+    @Test
+    public void testQueryAuthorizedProjectForSameUserWithDistinctIdObjects() {
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        user.setId(1000);
+        Integer requestedUserId = new Integer(1000);
+        Assertions.assertNotSame(user.getId(), requestedUserId);
+        Project project = getProject();
+        Mockito.when(projectDao.queryVisibleProjects(user.getId(), false))
+                .thenReturn(Collections.singletonList(project));
 
-        // test admin user
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Result result = projectService.queryAuthorizedProject(loginUser, 2);
-        logger.info(result.toString());
-        List<Project> projects = (List<Project>) result.getData();
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
-
-        // test non-admin user
-        loginUser.setUserType(UserType.GENERAL_USER);
-        loginUser.setId(3);
-        result = projectService.queryAuthorizedProject(loginUser, 2);
-        projects = (List<Project>) result.getData();
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
+        Assertions.assertEquals(Collections.singletonList(project),
+                projectService.queryAuthorizedProject(user, requestedUserId).getData());
+        Mockito.verify(projectDao).queryVisibleProjects(user.getId(), false);
+        Mockito.verifyNoMoreInteractions(projectDao);
     }
 
     @Test
     public void testQueryAuthorizedUser() {
-        final User loginUser = this.getLoginUser();
-
-        // Failure 1: PROJECT_NOT_EXIST
-        ServiceException notFoundEx = Assertions.assertThrows(ServiceException.class,
-                () -> this.projectService.queryAuthorizedUser(loginUser, 3682329499136L));
-        Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), notFoundEx.getCode());
-
-        // Failure 2: USER_NO_OPERATION_PROJECT_PERM
-        Mockito.when(this.projectDao.queryByCode(Mockito.anyLong())).thenReturn(this.getProject());
-        ServiceException noPermEx = Assertions.assertThrows(ServiceException.class,
-                () -> this.projectService.queryAuthorizedUser(loginUser, 3682329499136L));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), noPermEx.getCode());
-
-        // SUCCESS
-        loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(
-                resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.PROJECTS,
-                        loginUser.getId(), PROJECT, baseServiceLogger))
-                .thenReturn(true);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
-                0, baseServiceLogger)).thenReturn(true);
-        Mockito.when(this.userDao.queryAuthedUserListByProjectId(1)).thenReturn(this.getUserList());
-        Result result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
-        logger.info("SUCCESS 1: {}", result.toString());
-        List<User> users = (List<User>) result.getData();
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(users));
-
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        Mockito.when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS, new Object[]{1},
-                1, baseServiceLogger)).thenReturn(true);
-        result = this.projectService.queryAuthorizedUser(loginUser, 3682329499136L);
-        logger.info("SUCCESS 2: {}", result.toString());
-        users = (List<User>) result.getData();
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(users));
+        User user = getLoginUser();
+        Assertions.assertThrows(ServiceException.class, () -> projectService.queryAuthorizedUser(user, 100L));
+        Project project = getProject();
+        Mockito.when(projectDao.queryByCode(100L)).thenReturn(project);
+        Mockito.when(projectAuthorizationService.requirePermission(user, project.getCode(), ProjectPermission.VIEW))
+                .thenThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM));
+        Assertions.assertThrows(ServiceException.class, () -> projectService.queryAuthorizedUser(user, 100L));
+        Mockito.verifyNoInteractions(userDao);
+        Mockito.doReturn(project).when(projectAuthorizationService)
+                .requirePermission(user, project.getCode(), ProjectPermission.VIEW);
+        Mockito.when(userDao.queryAuthedUserListByProjectId(project.getId())).thenReturn(getUserList());
+        Assertions.assertEquals(getUserList(), projectService.queryAuthorizedUser(user, 100L).getData());
     }
 
     @Test
@@ -384,32 +410,23 @@ public class ProjectServiceTest {
     public void testQueryProjectCreatedAndAuthorizedByUser() {
         Result result;
         User loginUser = getLoginUser();
-        Set<Integer> set = new HashSet();
-        set.add(1);
-
-        // not admin user
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-                loginUser.getId(), projectLogger)).thenReturn(set);
-        Mockito.when(projectDao.queryByIds(set)).thenReturn(getList());
+        loginUser.setUserType(UserType.GENERAL_USER);
+        Mockito.when(projectDao.queryVisibleProjects(loginUser.getId(), false)).thenReturn(getList());
         result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         List<Project> notAdminUserResult = (List<Project>) result.getData();
         Assertions.assertTrue(CollectionUtils.isNotEmpty(notAdminUserResult));
 
-        // admin user
         loginUser.setUserType(UserType.ADMIN_USER);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-                loginUser.getId(), projectLogger)).thenReturn(set);
-        Mockito.when(projectDao.queryByIds(set)).thenReturn(getList());
+        Mockito.when(projectDao.queryVisibleProjects(loginUser.getId(), true)).thenReturn(getList());
         result = projectService.queryProjectCreatedAndAuthorizedByUser(loginUser);
         List<Project> projects = (List<Project>) result.getData();
-
         Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
-
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
     }
 
     @Test
     public void testQueryAllProjectList() {
-        Mockito.when(projectDao.queryAllProject(0)).thenReturn(getList());
+        Mockito.when(projectDao.queryVisibleProjects(0, false)).thenReturn(getList());
 
         User user = new User();
         user.setId(0);
@@ -421,81 +438,51 @@ public class ProjectServiceTest {
     }
     @Test
     public void queryAllProjectListForDependent() {
-        Mockito.when(projectDao.queryAllProjectForDependent()).thenReturn(getList());
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(projectDao.queryVisibleProjects(user.getId(), false)).thenReturn(getList());
 
-        Result result = projectService.queryAllProjectListForDependent();
+        Result result = projectService.queryAllProjectListForDependent(user);
         logger.info(result.toString());
         List<Project> projects = (List<Project>) result.getData();
         Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
 
+    }
+
+    @Test
+    public void testAuthorizedProjectCodesAreQueriedDirectly() {
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(projectDao.queryVisibleProjectCodes(user.getId(), false))
+                .thenReturn(Collections.singletonList(42L));
+
+        Assertions.assertEquals(Collections.singletonList(42L), projectService.getAuthorizedProjectCodes(user));
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> projectService.getAuthorizedProjectCodes(null));
     }
 
     @Test
     public void testQueryProjectWithAuthorizedLevel() {
-        Set<Integer> set = new HashSet();
-        set.add(1);
-        // test admin user
-        User loginUser = new User();
-        loginUser.setUserType(UserType.ADMIN_USER);
-        loginUser.setId(1);
-        List<Integer> list = new ArrayList<>(1);
-        list.add(1);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-                loginUser.getId(), projectLogger)).thenReturn(set);
-        Mockito.when(projectDao.listAuthorizedProjects(
-                loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), list))
-                .thenReturn(getList());
-        Result result = projectService.queryProjectWithAuthorizedLevel(loginUser, 2);
-        logger.info(result.toString());
-        List<Project> projects = (List<Project>) result.getData();
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
-
-        // test non-admin user
-        loginUser.setId(2);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-                loginUser.getId(), projectLogger)).thenReturn(set);
-        Mockito.when(projectDao.listAuthorizedProjects(
-                loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), list))
-                .thenReturn(getList());
-        result = projectService.queryProjectWithAuthorizedLevel(loginUser, 3);
-        logger.info(result.toString());
-        projects = (List<Project>) result.getData();
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        Mockito.when(projectDao.queryProjectAuthorizationLevels(user.getId(), false, 2)).thenReturn(getList());
+        Assertions.assertEquals(getList(), projectService.queryProjectWithAuthorizedLevel(user, 2).getData());
+        Mockito.verifyNoInteractions(projectUserDao, resourcePermissionCheckService);
     }
 
     @Test
     public void testQueryUnauthorizedProject() {
-        Set<Integer> set = new HashSet();
-        set.add(1);
-        // test admin user
-        User loginUser = new User();
-        loginUser.setUserType(UserType.ADMIN_USER);
-        loginUser.setId(1);
-        List<Integer> list = new ArrayList<>(1);
-        list.add(1);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-                loginUser.getId(), projectLogger)).thenReturn(set);
-        Mockito.when(projectDao.listAuthorizedProjects(
-                loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), list))
-                .thenReturn(getList());
-        Result result = projectService.queryUnauthorizedProject(loginUser, 2);
-        logger.info(result.toString());
-        List<Project> projects = (List<Project>) result.getData();
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
-
-        // test non-admin user
-        loginUser.setId(2);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        Mockito.when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS,
-                loginUser.getId(), projectLogger)).thenReturn(set);
-        Mockito.when(projectDao.listAuthorizedProjects(
-                loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(), list))
-                .thenReturn(getList());
-        result = projectService.queryUnauthorizedProject(loginUser, 3);
-        logger.info(result.toString());
-        projects = (List<Project>) result.getData();
-        Assertions.assertTrue(CollectionUtils.isNotEmpty(projects));
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        Project project = getProject();
+        project.setPerm(0);
+        Mockito.when(projectDao.queryProjectAuthorizationLevels(user.getId(), false, 2))
+                .thenReturn(Collections.singletonList(project));
+        Assertions.assertEquals(Collections.singletonList(project),
+                projectService.queryUnauthorizedProject(user, 2).getData());
+        project.setPerm(Constants.READ_PERMISSION);
+        Assertions.assertTrue(((List<?>) projectService.queryUnauthorizedProject(user, 2).getData()).isEmpty());
+        Mockito.verifyNoInteractions(projectUserDao, resourcePermissionCheckService);
     }
 
     private Project getProject() {

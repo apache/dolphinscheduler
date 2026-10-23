@@ -19,10 +19,8 @@ package org.apache.dolphinscheduler.api.controller;
 
 import static org.apache.dolphinscheduler.api.enums.Status.CREATE_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.DELETE_K8S_NAMESPACE_BY_ID_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_AUTHORIZED_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_CAN_USE_K8S_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.QUERY_K8S_NAMESPACE_LIST_PAGING_ERROR;
-import static org.apache.dolphinscheduler.api.enums.Status.QUERY_UNAUTHORIZED_NAMESPACE_ERROR;
 import static org.apache.dolphinscheduler.api.enums.Status.VERIFY_K8S_NAMESPACE_ERROR;
 
 import org.apache.dolphinscheduler.api.audit.OperatorLog;
@@ -158,46 +156,6 @@ public class K8sNamespaceController extends BaseController {
     }
 
     /**
-     * query unauthorized namespace
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return the namespaces which user have no permission to see
-     */
-    @Operation(summary = "queryUnauthorizedNamespace", description = "QUERY_UNAUTHORIZED_NAMESPACE_NOTES")
-    @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", schema = @Schema(implementation = int.class, example = "100"))
-    })
-    @GetMapping(value = "/unauth-namespace")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_UNAUTHORIZED_NAMESPACE_ERROR)
-    public Result<List<K8sNamespace>> queryUnauthorizedNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                 @RequestParam("userId") Integer userId) {
-        List<K8sNamespace> namespaces = k8sNamespaceService.queryUnauthorizedNamespace(loginUser, userId);
-        return Result.success(namespaces);
-    }
-
-    /**
-     * query unauthorized namespace
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return namespaces which the user have permission to see
-     */
-    @Operation(summary = "queryAuthorizedNamespace", description = "QUERY_AUTHORIZED_NAMESPACE_NOTES")
-    @Parameters({
-            @Parameter(name = "userId", description = "USER_ID", schema = @Schema(implementation = int.class, example = "100"))
-    })
-    @GetMapping(value = "/authed-namespace")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiException(QUERY_AUTHORIZED_NAMESPACE_ERROR)
-    public Result<List<K8sNamespace>> queryAuthorizedNamespace(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                               @RequestParam("userId") Integer userId) {
-        List<K8sNamespace> namespaces = k8sNamespaceService.queryAuthorizedNamespace(loginUser, userId);
-        return Result.success(namespaces);
-    }
-
-    /**
      * query namespace available
      *
      * @param loginUser login user
@@ -207,8 +165,9 @@ public class K8sNamespaceController extends BaseController {
     @GetMapping(value = "/available-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_CAN_USE_K8S_NAMESPACE_ERROR)
-    public Result queryAvailableNamespaceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        List<K8sNamespace> result = k8sNamespaceService.queryNamespaceAvailable(loginUser);
+    public Result queryAvailableNamespaceList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                              @RequestParam("projectCode") long projectCode) {
+        List<K8sNamespace> result = k8sNamespaceService.queryNamespaceAvailable(loginUser, projectCode);
         return success(result);
     }
 }

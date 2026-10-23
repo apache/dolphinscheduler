@@ -29,6 +29,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface EnvironmentMapper extends BaseMapper<Environment> {
 
+    List<Environment> queryByProject(@Param("projectCode") long projectCode);
+
     /**
      * query environment by name
      *

@@ -25,6 +25,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.UsersServiceImpl;
@@ -32,6 +34,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.UserSimpleInfoVO;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
@@ -48,6 +51,8 @@ import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -55,6 +60,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -86,6 +93,9 @@ public class UsersServiceTest {
 
     @Mock
     private ProjectUserDao projectUserDao;
+
+    @Mock
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Mock
     private AlertGroupDao alertGroupDao;
@@ -378,8 +388,22 @@ public class UsersServiceTest {
                 () -> usersService.grantProject(loginUser, userId, projectIds));
 
         // SUCCESS
+        Project first = new Project();
+        first.setCode(10L);
+        Project second = new Project();
+        second.setCode(20L);
+        when(projectDao.queryDetailById(100000)).thenReturn(first);
+        when(projectDao.queryDetailById(120000)).thenReturn(second);
         when(userDao.queryById(userId)).thenReturn(getUser());
         assertDoesNotThrow(() -> usersService.grantProject(loginUser, userId, projectIds));
+
+        Mockito.verify(projectAuthorizationService).replaceMemberPermissions(loginUser, 10L, userId,
+                EnumSet.of(ProjectPermission.VIEW, ProjectPermission.DEVELOP, ProjectPermission.PUBLISH,
+                        ProjectPermission.EXECUTE, ProjectPermission.MANAGE_SCHEDULES));
+        Mockito.verify(projectAuthorizationService).replaceMemberPermissions(loginUser, 20L, userId,
+                EnumSet.of(ProjectPermission.VIEW, ProjectPermission.DEVELOP, ProjectPermission.PUBLISH,
+                        ProjectPermission.EXECUTE, ProjectPermission.MANAGE_SCHEDULES));
+        Mockito.verifyNoInteractions(projectUserDao);
 
         // ERROR: NO_CURRENT_OPERATING_PERMISSION
         loginUser.setId(3);
@@ -403,8 +427,20 @@ public class UsersServiceTest {
                 () -> usersService.grantProjectWithReadPerm(loginUser, userId, projectIds));
 
         // SUCCESS
+        Project first = new Project();
+        first.setCode(10L);
+        Project second = new Project();
+        second.setCode(20L);
+        when(projectDao.queryDetailById(100000)).thenReturn(first);
+        when(projectDao.queryDetailById(120000)).thenReturn(second);
         when(userDao.queryById(userId)).thenReturn(getUser());
         assertDoesNotThrow(() -> usersService.grantProjectWithReadPerm(loginUser, userId, projectIds));
+
+        Mockito.verify(projectAuthorizationService).replaceMemberPermissions(loginUser, 10L, userId,
+                EnumSet.of(ProjectPermission.VIEW));
+        Mockito.verify(projectAuthorizationService).replaceMemberPermissions(loginUser, 20L, userId,
+                EnumSet.of(ProjectPermission.VIEW));
+        Mockito.verifyNoInteractions(projectUserDao);
 
         // ERROR: NO_CURRENT_OPERATING_PERMISSION
         loginUser.setId(3);
@@ -416,122 +452,65 @@ public class UsersServiceTest {
 
     @Test
     public void testGrantProjectByCode() {
-        // Mock Project, User
-        final long projectCode = 1L;
-        final int projectCreator = 1;
-        final int authorizer = 100;
-        Mockito.when(this.userDao.queryById(authorizer)).thenReturn(this.getUser());
-        Mockito.when(this.userDao.queryById(projectCreator)).thenReturn(this.getUser());
-        Mockito.when(this.projectDao.queryByCode(projectCode)).thenReturn(this.getProject());
-
-        // ERROR: USER_NOT_EXIST
-        User loginUser = new User();
-        assertThrowsServiceException(Status.USER_NOT_EXIST,
-                () -> usersService.grantProjectByCode(loginUser, 999, projectCode));
-
-        // ERROR: PROJECT_NOT_FOUNT
-        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
-                () -> usersService.grantProjectByCode(loginUser, authorizer, 999));
-
-        // ERROR: USER_NO_OPERATION_PERM
-        loginUser.setId(999);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> usersService.grantProjectByCode(loginUser, authorizer, projectCode));
-
-        // SUCCESS: USER IS PROJECT OWNER
-        loginUser.setId(projectCreator);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        assertDoesNotThrow(() -> usersService.grantProjectByCode(loginUser, authorizer, projectCode));
-
-        // SUCCESS: USER IS ADMINISTRATOR
-        loginUser.setId(999);
-        loginUser.setUserType(UserType.ADMIN_USER);
-        assertDoesNotThrow(() -> usersService.grantProjectByCode(loginUser, authorizer, projectCode));
+        User user = getUser();
+        when(userDao.queryById(100)).thenReturn(getUser());
+        when(projectDao.queryByCode(10L)).thenReturn(getProject());
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectAuthorizationService).replaceMemberPermissions(Mockito.eq(user), Mockito.eq(10L),
+                        Mockito.eq(100), Mockito.anySet());
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                () -> usersService.grantProjectByCode(user, 100, 10L));
+        Mockito.verifyNoInteractions(projectUserDao);
     }
 
     @Test
     public void testRevokeProject() {
-        Mockito.when(this.userDao.queryById(1)).thenReturn(this.getUser());
-
-        final long projectCode = 3682329499136L;
-
-        // user no permission
-        User loginUser = new User();
-        loginUser.setId(0);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> usersService.revokeProject(loginUser, 1, projectCode));
-
-        // user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        assertThrowsServiceException(Status.USER_NOT_EXIST,
-                () -> usersService.revokeProject(loginUser, 2, projectCode));
-
-        // success
-        Project project = new Project();
-        project.setId(0);
-        Mockito.when(this.projectDao.queryByCode(Mockito.anyLong())).thenReturn(project);
-        assertDoesNotThrow(() -> usersService.revokeProject(loginUser, 1, projectCode));
+        User user = getUser();
+        usersService.revokeProject(user, 100, 10L);
+        Mockito.verify(projectAuthorizationService).replaceMemberPermissions(user, 10L, 100, Collections.emptySet());
+        Mockito.verifyNoInteractions(projectUserDao);
     }
 
     @Test
     public void testRevokeProjectById() {
-        Mockito.when(this.userDao.queryById(1)).thenReturn(this.getUser());
-
-        String projectId = "100000";
-
-        // user no permission
-        User loginUser = new User();
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> usersService.revokeProjectById(loginUser, 1, projectId));
-
-        // user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        assertThrowsServiceException(Status.USER_NOT_EXIST,
-                () -> usersService.revokeProjectById(loginUser, 2, projectId));
-
-        // success
-        Mockito.when(this.projectDao.queryByCode(Mockito.anyLong())).thenReturn(new Project());
-        assertDoesNotThrow(() -> usersService.revokeProjectById(loginUser, 1, projectId));
+        User admin = getUser();
+        admin.setUserType(UserType.ADMIN_USER);
+        when(userDao.queryById(100)).thenReturn(getUser());
+        Project project = new Project();
+        project.setCode(10L);
+        when(projectDao.queryDetailById(5)).thenReturn(project);
+        usersService.revokeProjectById(admin, 100, "5,5");
+        Mockito.verify(projectAuthorizationService).replaceMemberPermissions(admin, 10L, 100, Collections.emptySet());
+        Mockito.verifyNoInteractions(projectUserDao);
     }
 
     @Test
-    public void testGrantNamespaces() {
-        String namespaceIds = "100000,120000";
-        when(userDao.queryById(1)).thenReturn(getUser());
-        User loginUser = new User();
-
-        // user not exist
-        loginUser.setUserType(UserType.ADMIN_USER);
-        assertThrowsServiceException(Status.USER_NOT_EXIST,
-                () -> usersService.grantNamespaces(loginUser, 2, namespaceIds));
-        // success
-        when(k8sNamespaceUserMapper.deleteNamespaceRelation(0, 1)).thenReturn(1);
-        assertDoesNotThrow(() -> usersService.grantNamespaces(loginUser, 1, namespaceIds));
+    public void testBulkProjectGrantRejectsMissingProject() {
+        User admin = getUser();
+        admin.setUserType(UserType.ADMIN_USER);
+        when(userDao.queryById(100)).thenReturn(getUser());
+        assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
+                () -> usersService.grantProject(admin, 100, "5"));
+        Mockito.verifyNoInteractions(projectAuthorizationService, projectUserDao);
     }
 
-    @Test
-    public void testGrantDataSource() {
-        String datasourceIds = "100000,120000";
-        User loginUser = new User();
-        int userId = 3;
+    @ParameterizedTest
+    @ValueSource(strings = {"abc", "2147483648", "5,abc", "5,2147483648", "5,,6", "5,"})
+    public void testBulkProjectPermissionsRejectInvalidIdsBeforeChangingPermissions(String projectIds) {
+        User admin = getUser();
+        admin.setUserType(UserType.ADMIN_USER);
+        when(userDao.queryById(100)).thenReturn(getUser());
+        Project project = new Project();
+        project.setCode(10L);
+        when(projectDao.queryDetailById(5)).thenReturn(project);
 
-        // user not exist
-        loginUser.setId(1);
-        loginUser.setUserType(UserType.ADMIN_USER);
-        when(userDao.queryById(userId)).thenReturn(null);
-        assertThrowsServiceException(Status.USER_NOT_EXIST,
-                () -> usersService.grantDataSource(loginUser, userId, datasourceIds));
-
-        // test admin user
-        when(userDao.queryById(userId)).thenReturn(getUser());
-        assertDoesNotThrow(() -> usersService.grantDataSource(loginUser, userId, datasourceIds));
-
-        // test non-admin user
-        loginUser.setId(2);
-        loginUser.setUserType(UserType.GENERAL_USER);
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> usersService.grantDataSource(loginUser, userId, datasourceIds));
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> usersService.grantProject(admin, 100, projectIds));
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> usersService.grantProjectWithReadPerm(admin, 100, projectIds));
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> usersService.revokeProjectById(admin, 100, projectIds));
+        Mockito.verifyNoInteractions(projectAuthorizationService, projectUserDao);
     }
 
     private User getLoginUser() {

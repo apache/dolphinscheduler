@@ -17,13 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.WORKFLOW_DEFINITION;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.DependentLineageTask;
 import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
@@ -89,7 +88,7 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         return workflowTaskLineageDao.queryWorkFlowLineageByName(projectCode, workflowDefinitionName);
     }
 
@@ -100,7 +99,7 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         List<WorkflowTaskLineage> upstreamWorkflowTaskLineageList =
                 workflowTaskLineageDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         List<WorkflowTaskLineage> downstreamWorkflowTaskLineageList =
@@ -133,7 +132,7 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         List<WorkflowTaskLineage> workflowTaskLineageList = workflowTaskLineageDao.queryByProjectCode(projectCode);
         List<WorkFlowRelation> workFlowRelationList = getWorkFlowRelations(workflowTaskLineageList);
         List<WorkFlowRelationDetail> workFlowRelationDetailList =
@@ -192,7 +191,7 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         long queryTaskCode = 0;
         if (taskCode != 0) {
             queryTaskCode = taskCode;
@@ -310,7 +309,7 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
-        projectService.checkProjectAndAuthThrowException(loginUser, project, WORKFLOW_DEFINITION);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
         List<DependentLineageTask> dependentLineageTaskList = new ArrayList<>();
         List<WorkflowTaskLineage> workflowTaskLineageList =
                 workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode,

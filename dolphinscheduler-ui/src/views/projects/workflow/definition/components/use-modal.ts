@@ -206,7 +206,7 @@ export function useModal(
   }
 
   const getTenantList = () => {
-    queryTenantList().then((res: any) => {
+    queryTenantList(variables.projectCode).then((res: any) => {
       variables.tenantList = res.map((item: any) => ({
         label: item.tenantCode,
         value: item.tenantCode
@@ -215,17 +215,19 @@ export function useModal(
   }
 
   const getEnvironmentList = () => {
-    queryAllEnvironmentList().then((res: Array<EnvironmentItem>) => {
-      variables.environmentList = res.map((item) => ({
-        label: item.name,
-        value: item.code,
-        workerGroups: item.workerGroups
-      }))
-    })
+    queryAllEnvironmentList(variables.projectCode).then(
+      (res: Array<EnvironmentItem>) => {
+        variables.environmentList = res.map((item) => ({
+          label: item.name,
+          value: item.code,
+          workerGroups: item.workerGroups
+        }))
+      }
+    )
   }
 
   const getAlertGroups = () => {
-    listAlertGroupById().then((res: any) => {
+    listAlertGroupById(variables.projectCode).then((res: any) => {
       variables.alertGroups = res.map((item: any) => ({
         label: item.groupName,
         value: item.id

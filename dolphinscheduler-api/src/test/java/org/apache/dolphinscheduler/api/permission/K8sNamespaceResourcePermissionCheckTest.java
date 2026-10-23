@@ -23,11 +23,8 @@ import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -63,16 +60,13 @@ public class K8sNamespaceResourcePermissionCheckTest {
 
     @Test
     public void testListAuthorizedResourceIds() {
-        User user = getLoginUser();
-        K8sNamespace k8sNamespace = new K8sNamespace();
-        Set<Integer> ids = new HashSet<>();
-        ids.add(k8sNamespace.getId());
-        List<K8sNamespace> k8sNamespaces = Arrays.asList(k8sNamespace);
-
-        Mockito.when(k8sNamespaceDao.queryAuthedNamespaceListByUserId(user.getId())).thenReturn(k8sNamespaces);
-
-        Assertions.assertEquals(ids,
-                k8sNamespaceResourcePermissionCheck.listAuthorizedResourceIds(user.getId(), logger));
+        Assertions.assertTrue(k8sNamespaceResourcePermissionCheck.listAuthorizedResourceIds(1, logger).isEmpty());
+        Mockito.verifyNoInteractions(k8sNamespaceDao);
+        K8sNamespace resource = new K8sNamespace();
+        resource.setId(1);
+        Mockito.when(k8sNamespaceDao.queryAll()).thenReturn(Collections.singletonList(resource));
+        Assertions.assertEquals(Collections.singleton(1),
+                k8sNamespaceResourcePermissionCheck.listAuthorizedResourceIds(0, logger));
     }
 
     private User getLoginUser() {

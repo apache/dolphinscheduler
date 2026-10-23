@@ -16,14 +16,7 @@
  */
 
 import { axios } from '@/service/service'
-import {
-  ListReq,
-  IDataSource,
-  UserIdReq,
-  TypeReq,
-  NameReq,
-  IdReq
-} from './types'
+import { ListReq, IDataSource, TypeReq, NameReq, IdReq } from './types'
 
 export function queryDataSourceListPaging(params: ListReq): any {
   return axios({
@@ -42,14 +35,6 @@ export function createDataSource(data: IDataSource): any {
       'Content-Type': 'application/json;charset=UTF-8'
     },
     transformRequest: (params) => JSON.stringify(params)
-  })
-}
-
-export function authedDatasource(params: UserIdReq): any {
-  return axios({
-    url: '/datasources/authed-datasource',
-    method: 'get',
-    params
   })
 }
 
@@ -75,14 +60,6 @@ export function getKerberosStartupState(): any {
 export function queryDataSourceList(params: TypeReq): any {
   return axios({
     url: '/datasources/list',
-    method: 'get',
-    params
-  })
-}
-
-export function unAuthDatasource(params: UserIdReq): any {
-  return axios({
-    url: '/datasources/unauth-datasource',
     method: 'get',
     params
   })
@@ -129,18 +106,23 @@ export function connectionTest(id: IdReq): any {
   })
 }
 
-export function getDatasourceDatabasesById(datasourceId: number): any {
+export function getDatasourceDatabasesById(
+  datasourceId: number,
+  projectCode: number
+): any {
   return axios({
     url: '/datasources/databases',
     method: 'get',
     params: {
-      datasourceId
+      datasourceId,
+      projectCode
     }
   })
 }
 
 export function getDatasourceTablesById(
   datasourceId: number,
+  projectCode: number,
   database: string
 ): any {
   return axios({
@@ -148,12 +130,14 @@ export function getDatasourceTablesById(
     method: 'get',
     params: {
       datasourceId,
+      projectCode,
       database
     }
   })
 }
 export function getDatasourceTableColumnsById(
   datasourceId: number,
+  projectCode: number,
   database: string,
   tableName: string
 ): any {
@@ -162,6 +146,7 @@ export function getDatasourceTableColumnsById(
     method: 'get',
     params: {
       datasourceId,
+      projectCode,
       database,
       tableName
     }

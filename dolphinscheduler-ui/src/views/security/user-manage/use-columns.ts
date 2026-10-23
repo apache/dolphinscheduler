@@ -139,14 +139,6 @@ export function useColumns(onCallback: Function) {
                     {
                       label: t('security.user.project'),
                       key: 'authorize_project'
-                    },
-                    {
-                      label: t('security.user.datasource'),
-                      key: 'authorize_datasource'
-                    },
-                    {
-                      label: t('security.user.namespace'),
-                      key: 'authorize_namespace'
                     }
                   ],
                   onSelect: (key) =>

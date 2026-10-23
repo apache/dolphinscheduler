@@ -26,6 +26,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface AlertGroupDao extends IDao<AlertGroup> {
 
+    List<AlertGroup> queryByProject(long projectCode);
+
     IPage<AlertGroup> queryAlertGroupPage(Page<AlertGroup> page, String groupName);
 
     IPage<AlertGroup> queryAlertGroupPageByIds(Page<AlertGroup> page, List<Integer> ids, String searchVal);

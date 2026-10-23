@@ -318,66 +318,12 @@ public class DataSourceServiceTest {
     }
 
     @Test
-    public void testUnAuthDatasource() {
-        int userId = 3;
-
-        User generalUser = getGeneralUser();
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> dataSourceService.unAuthDatasource(generalUser, userId));
-        Mockito.verifyNoInteractions(dataSourceDao);
-
-        User adminUser = getAdminUser();
-        when(dataSourceDao.queryAuthedDatasource(userId)).thenReturn(getSingleDataSourceList());
-        when(dataSourceDao.queryDatasourceExceptUserId(userId)).thenReturn(getDataSourceList());
-        List<DataSourceSimpleInfoVO> dataSources = dataSourceService.unAuthDatasource(adminUser, userId);
-
-        Assertions.assertEquals(2, dataSources.size());
-        Assertions.assertTrue(dataSources.stream().noneMatch(dataSource -> dataSource.getId() == 3));
-        dataSources.forEach(this::assertDataSourceSimpleInfo);
-    }
-
-    @Test
-    public void testAuthedDatasource() {
-        int userId = 3;
-
-        User generalUser = getGeneralUser();
-        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
-                () -> dataSourceService.authedDatasource(generalUser, userId));
-        Mockito.verifyNoInteractions(dataSourceDao);
-
-        User adminUser = getAdminUser();
-        when(dataSourceDao.queryAuthedDatasource(userId)).thenReturn(getSingleDataSourceList());
-        List<DataSourceSimpleInfoVO> dataSources = dataSourceService.authedDatasource(adminUser, userId);
-
-        Assertions.assertEquals(1, dataSources.size());
-        Assertions.assertEquals(3, dataSources.get(0).getId());
-        assertDataSourceSimpleInfo(dataSources.get(0));
-    }
-
-    @Test
     public void testQueryDataSourceList() {
         User adminUser = getAdminUser();
         assertDoesNotThrow(() -> dataSourceService.queryDataSourceList(adminUser, DbType.MYSQL.ordinal()));
-
-        User generalUser = getGeneralUser();
-
-        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE,
-                generalUser.getId(), dataSourceServiceLogger)).thenReturn(Collections.emptySet());
-        List<DataSource> emptyList = dataSourceService.queryDataSourceList(generalUser, DbType.MYSQL.ordinal());
-        Assertions.assertEquals(emptyList.size(), 0);
-
-        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.DATASOURCE,
-                generalUser.getId(), dataSourceServiceLogger)).thenReturn(Collections.singleton(1));
-
-        DataSource dataSource = new DataSource();
-        dataSource.setId(1);
-        dataSource.setType(DbType.MYSQL);
-        when(dataSourceDao.queryByIds(Collections.singleton(1)))
-                .thenReturn(Collections.singletonList(dataSource));
-
-        List<DataSource> list =
-                dataSourceService.queryDataSourceList(generalUser, DbType.MYSQL.ordinal());
-        Assertions.assertNotNull(list);
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> dataSourceService.queryDataSourceList(getGeneralUser(), DbType.MYSQL.ordinal()));
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
     }
 
     @Test
@@ -591,10 +537,20 @@ public class DataSourceServiceTest {
             when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
 
             assertThrowsServiceException(Status.CONNECTION_TEST_FAILURE,
-                    () -> dataSourceService.checkConnection(dataSourceType, connectionParam));
+                    () -> dataSourceService.checkConnection(getAdminUser(), dataSourceType, connectionParam));
 
             when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
-            assertDoesNotThrow(() -> dataSourceService.checkConnection(dataSourceType, connectionParam));
+            assertDoesNotThrow(
+                    () -> dataSourceService.checkConnection(getAdminUser(), dataSourceType, connectionParam));
+        }
+    }
+
+    @Test
+    public void customConnectionTestRequiresAdministratorBeforeConnecting() {
+        try (MockedStatic<DataSourceUtils> dataSourceUtils = Mockito.mockStatic(DataSourceUtils.class)) {
+            assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                    () -> dataSourceService.checkConnection(getGeneralUser(), DbType.POSTGRESQL, null));
+            dataSourceUtils.verifyNoInteractions();
         }
     }
 
@@ -620,7 +576,6 @@ public class DataSourceServiceTest {
         dataSourceUtils.when(() -> DataSourceUtils.getConnection(Mockito.any(), Mockito.any())).thenReturn(connection);
         dataSourceUtils.when(() -> DataSourceUtils.buildConnectionParams(Mockito.any(), Mockito.any()))
                 .thenReturn(connectionParam);
-        passResourcePermissionCheckService();
 
         try {
             dataSourceService.getDatabases(loginUser, datasourceId);
