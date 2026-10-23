@@ -135,6 +135,7 @@ public class SensitivePropertyUtils {
             if (global != null) {
                 Property inherited = PropertySensitiveUtils.copy(global);
                 if (!PropertySensitiveUtils.isSensitiveValuePlaceholder(startParam.getValue())) {
+                    requireSensitiveFieldRule(global, startParam.getValue());
                     inherited.setValue(startParam.getValue());
                 }
                 restored.add(inherited);
@@ -147,6 +148,27 @@ public class SensitivePropertyUtils {
             }
         }
         return restored;
+    }
+
+    /**
+     * A start param overriding a sensitive workflow global must itself satisfy the sensitive
+     * field rule (same as create/update). Placeholder and empty values are handled by the
+     * keep-original semantics of {@link #restoreStartParams} and are skipped by this check.
+     */
+    private void requireSensitiveFieldRule(Property global, String submittedValue) {
+        if (!global.isSensitive() || StringUtils.isEmpty(submittedValue)
+                || PropertySensitiveUtils.isSensitiveValuePlaceholder(submittedValue)) {
+            return;
+        }
+        Property candidate = PropertySensitiveUtils.copy(global);
+        candidate.setValue(submittedValue);
+        String invalidProp = PropertySensitiveUtils.findInvalidSensitiveField(
+                Collections.singletonList(candidate));
+        if (invalidProp != null) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                    "parameter '" + invalidProp
+                            + "' value length must be at least 6 characters");
+        }
     }
 
     public String mergeLocalParams(String submittedTaskParams, String existingTaskParams) {

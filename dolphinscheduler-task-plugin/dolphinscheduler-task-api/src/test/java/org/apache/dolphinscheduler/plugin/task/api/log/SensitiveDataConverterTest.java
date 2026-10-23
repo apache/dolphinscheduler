@@ -163,16 +163,26 @@ class SensitiveDataConverterTest {
     }
 
     @Test
-    void registerSkipsEmptyPlaceholderAndShortValues() {
+    void registerSkipsEmptyAndPlaceholderValues() {
         Map<String, Property> params = new HashMap<>();
         params.put("empty", sensitive("empty", ""));
         params.put("mask", sensitive("mask", TaskConstants.SENSITIVE_DATA_MASK));
+        SensitiveDataConverter.registerTaskSensitiveValues(101, params);
+
+        assertTrue(SensitiveDataConverter.getTaskSensitiveValues(101).isEmpty());
+    }
+
+    @Test
+    void registerMasksValuesOfAnyLength() {
+        // No length threshold when registering: the minimum length of a sensitive value
+        // is enforced at save time by SENSITIVE_FIELD_RULE, so historical short values
+        // must still be masked in logs.
+        Map<String, Property> params = new HashMap<>();
         params.put("one", sensitive("one", "1"));
         params.put("five", sensitive("five", "abc12"));
         SensitiveDataConverter.registerTaskSensitiveValues(101, params);
 
-        assertTrue(SensitiveDataConverter.getTaskSensitiveValues(101).isEmpty());
-        assertEquals("echo 1 abc12", SensitiveDataConverter.maskSensitiveData("echo 1 abc12", 101));
+        assertEquals("echo ****** ******", SensitiveDataConverter.maskSensitiveData("echo 1 abc12", 101));
     }
 
     @Test

@@ -115,17 +115,31 @@ public class PropertySensitiveUtils {
                 .collect(Collectors.toList());
     }
 
-    /** Create: {@code ******} is never a real value. */
+    /**
+     * Create: {@code ******} is never a real value.
+     *
+     * @return the prop name of the first placeholder property ({@code ""} when the offending
+     *         property has no prop), or {@code null} when there is none.
+     */
     public String findPlaceholderProp(List<Property> properties) {
         if (CollectionUtils.isEmpty(properties)) {
             return null;
         }
         for (Property property : properties) {
             if (property != null && isSensitiveValuePlaceholder(property.getValue())) {
-                return property.getProp();
+                return propOrEmpty(property);
             }
         }
         return null;
+    }
+
+    /**
+     * The offending prop name, or {@code ""} when the offending property has no prop.
+     * Never returns {@code null}, so callers can rely on {@code != null} to detect a
+     * violation: a malformed property with a null prop must not silently pass validation.
+     */
+    private String propOrEmpty(final Property property) {
+        return property.getProp() == null ? "" : property.getProp();
     }
 
     /**
@@ -145,12 +159,12 @@ public class PropertySensitiveUtils {
             Property existing = existingPropertyMap.get(submitted.getProp());
             if (!isSensitive(submitted)) {
                 if (existing != null && existing.isSensitive()) {
-                    return submitted.getProp();
+                    return propOrEmpty(submitted);
                 }
                 continue;
             }
             if (existing == null) {
-                return submitted.getProp();
+                return propOrEmpty(submitted);
             }
         }
         return null;
@@ -162,8 +176,9 @@ public class PropertySensitiveUtils {
      * Empty / null values and the {@code ******} keep-original placeholder are skipped, since
      * they are not real plaintext inputs and are handled separately by the create / update logic.
      *
-     * @return the prop name of the first sensitive property whose value violates the rule,
-     *         or {@code null} when every sensitive value is valid.
+     * @return the prop name of the first sensitive property whose value violates the rule
+     *         ({@code ""} when the offending property has no prop), or {@code null} when every
+     *         sensitive value is valid.
      */
     public String findInvalidSensitiveField(List<Property> properties) {
         if (CollectionUtils.isEmpty(properties)) {
@@ -178,7 +193,7 @@ public class PropertySensitiveUtils {
                 continue;
             }
             if (!SENSITIVE_FIELD_RULE_PATTERN.matcher(value).matches()) {
-                return property.getProp();
+                return propOrEmpty(property);
             }
         }
         return null;

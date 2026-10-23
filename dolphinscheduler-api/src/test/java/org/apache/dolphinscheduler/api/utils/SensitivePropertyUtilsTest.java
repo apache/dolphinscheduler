@@ -188,6 +188,45 @@ class SensitivePropertyUtilsTest {
     }
 
     @Test
+    void restoreStartParamsRejectsTooShortOverrideOfSensitiveGlobal() {
+        Assertions.assertThrows(ServiceException.class,
+                () -> SensitivePropertyUtils.restoreStartParams(
+                        Collections.singletonList(sensitive("pwd", "abc")),
+                        Collections.singletonList(sensitive("pwd", "Secret123"))));
+    }
+
+    @Test
+    void restoreStartParamsAcceptsMinLengthOverrideOfSensitiveGlobal() {
+        List<Property> restored = SensitivePropertyUtils.restoreStartParams(
+                Collections.singletonList(sensitive("pwd", "123456")),
+                Collections.singletonList(sensitive("pwd", "Secret123")));
+
+        Assertions.assertEquals("123456", restored.get(0).getValue());
+        Assertions.assertTrue(restored.get(0).isSensitive());
+    }
+
+    @Test
+    void restoreStartParamsPlaceholderOverrideIsNotLengthChecked() {
+        // Placeholder keeps the stored value (even a legacy short one); the length rule
+        // only applies to a real plaintext submitted value.
+        List<Property> restored = SensitivePropertyUtils.restoreStartParams(
+                Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
+                Collections.singletonList(sensitive("pwd", "abc")));
+
+        Assertions.assertEquals("abc", restored.get(0).getValue());
+    }
+
+    @Test
+    void restoreStartParamsAcceptsShortOverrideOfNonSensitiveGlobal() {
+        List<Property> restored = SensitivePropertyUtils.restoreStartParams(
+                Collections.singletonList(sensitive("plain", "abc")),
+                Collections.singletonList(nonSensitive("plain", "xyz")));
+
+        Assertions.assertEquals("abc", restored.get(0).getValue());
+        Assertions.assertFalse(restored.get(0).isSensitive());
+    }
+
+    @Test
     void emptyStringIsPersistedAsEmpty() {
         List<Property> merged = SensitivePropertyUtils.merge(
                 Collections.singletonList(sensitive("pwd", "")),

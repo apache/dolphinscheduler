@@ -193,6 +193,32 @@ class PropertySensitiveUtilsTest {
         Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(properties));
     }
 
+    @Test
+    void findInvalidSensitiveFieldReturnsEmptyPropWhenViolatingPropertyHasNoProp() {
+        // A malformed property with a null prop must not silently pass validation:
+        // an empty string (not null) is returned so callers can still detect the violation.
+        Property noProp = Property.builder()
+                .direct(Direct.IN)
+                .type(DataType.VARCHAR)
+                .value("abc")
+                .sensitive(true)
+                .build();
+
+        Assertions.assertEquals("", PropertySensitiveUtils.findInvalidSensitiveField(
+                Collections.singletonList(noProp)));
+    }
+
+    @Test
+    void findPlaceholderPropReturnsEmptyPropWhenPlaceholderPropertyHasNoProp() {
+        Property noProp = Property.builder()
+                .value(TaskConstants.SENSITIVE_DATA_MASK)
+                .sensitive(true)
+                .build();
+
+        Assertions.assertEquals("", PropertySensitiveUtils.findPlaceholderProp(
+                Collections.singletonList(noProp)));
+    }
+
     private static Property sensitive(String prop, String value) {
         return Property.builder()
                 .prop(prop)
