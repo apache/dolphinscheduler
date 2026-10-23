@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.engine.task.statemachine;
 
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.WorkerGroupDispatcherCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
@@ -55,9 +54,6 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
 
     @Autowired
     private WorkerGroupDispatcherCoordinator workerGroupDispatcherCoordinator;
-
-    @Autowired
-    private TaskInstanceDao taskInstanceDao;
 
     @Override
     public void onStartEvent(final IWorkflowExecution workflowExecution,
@@ -104,8 +100,7 @@ public class TaskSubmittedStateAction extends AbstractTaskStateAction {
                 taskInstance.getFirstSubmitTime(),
                 taskInstance.getDelayTime() * 60L) * 1_000;
         if (remainTimeMills > 0) {
-            taskInstance.setState(TaskExecutionStatus.DELAY_EXECUTION);
-            taskInstanceDao.updateById(taskInstance);
+            persistTaskInstanceUpdate(taskInstance, instance -> instance.setState(TaskExecutionStatus.DELAY_EXECUTION));
             log.info("Current taskInstance: {} is choose delay execution, delay time: {}/min, remainTime: {}/ms",
                     taskInstance.getName(),
                     taskInstance.getDelayTime(),

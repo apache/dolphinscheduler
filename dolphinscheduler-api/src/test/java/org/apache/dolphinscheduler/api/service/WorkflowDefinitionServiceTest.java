@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -41,6 +42,7 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
+import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCopyVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -83,6 +85,7 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.ConditionsParamete
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SwitchParameters;
 import org.apache.dolphinscheduler.service.model.TaskNode;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.service.process.ProcessServiceImpl;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -505,8 +508,13 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         }
         when(workflowDefinitionDao.queryByCodes(definitionCodes)).thenReturn(workflowDefinitionList);
         when(processService.saveWorkflowDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
-        Assertions.assertDoesNotThrow(() -> workflowDefinitionService.batchCopyWorkflowDefinition(
-                user, projectCodeOther, String.valueOf(processDefinitionCode), projectCode));
+        List<WorkflowDefinitionCopyVO> copyResponses = Assertions.assertDoesNotThrow(
+                () -> workflowDefinitionService.batchCopyWorkflowDefinition(
+                        user, projectCodeOther, String.valueOf(processDefinitionCode), projectCode));
+
+        Assertions.assertEquals(1, copyResponses.size());
+        Assertions.assertEquals(projectCode, copyResponses.get(0).getProjectCode());
+        Assertions.assertEquals(definition.getCode(), copyResponses.get(0).getWorkflowDefinitionCode());
     }
 
     @Test
@@ -804,6 +812,43 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testTransformTaskShouldRejectMissingPreTaskDefinition() {
+        // relation references preTaskCode 123451235 which has no task definition; the shared
+        // transformation must fail explicitly instead of silently dropping the dependency
+        String taskRelationJsonWithUnknownPreTaskCode =
+                "[{\"name\":\"\",\"preTaskCode\":123451235,\"preTaskVersion\":1,\"postTaskCode\":123456789,"
+                        + "\"postTaskVersion\":1,\"conditionType\":\"NONE\",\"conditionParams\":\"{}\"}]";
+        List<WorkflowTaskRelation> taskRelations =
+                JSONUtils.toList(taskRelationJsonWithUnknownPreTaskCode, WorkflowTaskRelation.class);
+        List<TaskDefinitionLog> taskDefinitionLogs =
+                JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+
+        org.apache.dolphinscheduler.service.exceptions.ServiceException exception =
+                Assertions.assertThrows(org.apache.dolphinscheduler.service.exceptions.ServiceException.class,
+                        () -> new ProcessServiceImpl().transformTask(taskRelations, taskDefinitionLogs));
+        Assertions.assertTrue(exception.getMessage().contains("123451235"));
+    }
+
+    @Test
+    public void testCheckWorkflowNodeListShouldReportMissingTaskCode() {
+        // the workflow-instance update path goes through checkWorkflowNodeList -> transformTask,
+        // the missing task code must be reported as an invalid dag naming the missing definitions
+        when(processService.transformTask(anyList(), anyList())).thenThrow(
+                new org.apache.dolphinscheduler.service.exceptions.ServiceException(
+                        "The task definitions of pre taskCodes: [123451235] do not exist"));
+        List<TaskDefinitionLog> taskDefinitionLogs = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+
+        String taskRelationJsonWithUnknownPreTaskCode =
+                "[{\"name\":\"\",\"preTaskCode\":123451235,\"preTaskVersion\":1,\"postTaskCode\":123456789,"
+                        + "\"postTaskVersion\":1,\"conditionType\":\"NONE\",\"conditionParams\":\"{}\"}]";
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.checkWorkflowNodeList(taskRelationJsonWithUnknownPreTaskCode,
+                        taskDefinitionLogs));
+        Assertions.assertEquals(Status.WORKFLOW_DAG_IS_INVALID.getCode(), exception.getCode());
+        Assertions.assertTrue(exception.getMessage().contains("123451235"));
+    }
+
+    @Test
     public void testGetTaskNodeListByDefinitionCode() {
         Project project = getProject(projectCode);
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
@@ -1000,6 +1045,38 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                         taskRelationJson, taskDefinitionJson, null, WorkflowExecutionTypeEnum.PARALLEL));
 
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Mockito.verify(processService, Mockito.never())
+                .saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE));
+    }
+
+    @Test
+    public void testCreateWorkflowDefinitionShouldRejectUnknownPreTaskCode() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
+        when(workflowDefinitionDao.verifyByDefineName(projectCode, name)).thenReturn(null);
+        // mimic the real transformTask: one node for the (existing) post task of the single relation;
+        // lenient since with the fix the validation fails fast before transformTask is even called
+        TaskNode taskNode = new TaskNode();
+        taskNode.setCode(123456789L);
+        taskNode.setPreTasks(JSONUtils.toJsonString(Collections.emptyList()));
+        lenient().when(processService.transformTask(anyList(), anyList()))
+                .thenReturn(Collections.singletonList(taskNode));
+
+        // preTaskCode 123451235 is referenced by the relation but missing in taskDefinitionJson,
+        // this used to end up as a NullPointerException in transformTask and was returned to the client
+        // as a generic REQUEST_PARAMS_NOT_VALID_ERROR
+        String taskRelationJsonWithUnknownPreTaskCode =
+                "[{\"name\":\"\",\"preTaskCode\":123451235,\"preTaskVersion\":1,\"postTaskCode\":123456789,"
+                        + "\"postTaskVersion\":1,\"conditionType\":0,\"conditionParams\":\"{}\"}]";
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.createWorkflowDefinition(
+                        user, projectCode, name, description, "[]", "[]", timeout,
+                        taskRelationJsonWithUnknownPreTaskCode, taskDefinitionJson, null,
+                        WorkflowExecutionTypeEnum.PARALLEL));
+
+        Assertions.assertEquals(Status.WORKFLOW_DAG_IS_INVALID.getCode(), exception.getCode());
         Mockito.verify(processService, Mockito.never())
                 .saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE));
     }
