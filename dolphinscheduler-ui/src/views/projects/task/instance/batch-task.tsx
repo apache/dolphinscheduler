@@ -18,6 +18,7 @@
 import {
   defineComponent,
   getCurrentInstance,
+  onBeforeUnmount,
   onMounted,
   toRefs,
   watch
@@ -35,8 +36,7 @@ import {
 import { SearchOutlined } from '@vicons/antd'
 import { useTable } from './use-table'
 import { useI18n } from 'vue-i18n'
-import { useAsyncState } from '@vueuse/core'
-import { queryLog } from '@/service/modules/log'
+import { loadLogPages } from '@/service/modules/log/load-pages'
 import { stateType } from '@/common/common'
 import Card from '@/components/card'
 import LogModal from '@/components/log-modal'
@@ -111,32 +111,32 @@ const BatchTaskInstance = defineComponent({
       variables.showModalRef = false
     }
 
-    const getLogs = (row: any) => {
-      const { state } = useAsyncState(
-        queryLog({
-          taskInstanceId: Number(row.id),
-          limit: variables.limit,
-          skipLineNum: variables.skipLineNum
-        }).then((res: any) => {
-          variables.logRef += res.message || ''
-          if (res && res.message !== '') {
-            variables.skipLineNum += res.lineNum
-            getLogs(row)
-          } else {
-            variables.logLoadingRef = false
-          }
-        }),
-        {}
-      )
-
-      return state
+    let logGeneration = 0
+    const getLogs = async (row: any) => {
+      const request = ++logGeneration
+      variables.logLoadingRef = true
+      try {
+        await loadLogPages(
+          Number(row.id),
+          (message, nextLine) => {
+            variables.logRef += message
+            variables.skipLineNum = nextLine
+          },
+          { limit: variables.limit, isCurrent: () => request === logGeneration }
+        )
+      } catch {
+        if (request === logGeneration)
+          variables.logRef += `\n${t('project.workflow.gantt_log_error')}`
+      } finally {
+        if (request === logGeneration) variables.logLoadingRef = false
+      }
     }
 
     const refreshLogs = (row: any) => {
       variables.logRef = ''
       variables.limit = 1000
       variables.skipLineNum = 0
-      getLogs(row)
+      void getLogs(row)
     }
 
     const trim = getCurrentInstance()?.appContext.config.globalProperties.trim
@@ -154,8 +154,9 @@ const BatchTaskInstance = defineComponent({
       () => variables.showModalRef,
       () => {
         if (variables.showModalRef) {
-          getLogs(variables.row)
+          void getLogs(variables.row)
         } else {
+          logGeneration++
           variables.row = {}
           variables.logRef = ''
           variables.logLoadingRef = true
@@ -164,6 +165,8 @@ const BatchTaskInstance = defineComponent({
         }
       }
     )
+
+    onBeforeUnmount(() => logGeneration++)
 
     return {
       t,
