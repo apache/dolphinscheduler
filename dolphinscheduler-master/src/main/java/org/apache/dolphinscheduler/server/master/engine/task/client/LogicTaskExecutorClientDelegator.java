@@ -112,9 +112,8 @@ public class LogicTaskExecutorClientDelegator implements ITaskExecutorClientDele
 
     @Override
     public void ackTaskExecutorLifecycleEvent(
-                                              final ITaskExecution taskExecution,
+                                              final TaskInstance taskInstance,
                                               final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
-        final TaskInstance taskInstance = taskExecution.getTaskInstance();
         final String executorHost = taskInstance.getHost();
         checkArgument(StringUtils.isNotEmpty(executorHost), "Executor host is empty");
 

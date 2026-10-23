@@ -174,9 +174,8 @@ public class PhysicalTaskExecutorClientDelegator implements ITaskExecutorClientD
     }
 
     @Override
-    public void ackTaskExecutorLifecycleEvent(final ITaskExecution taskExecution,
+    public void ackTaskExecutorLifecycleEvent(final TaskInstance taskInstance,
                                               final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
-        final TaskInstance taskInstance = taskExecution.getTaskInstance();
         final String executorHost = taskInstance.getHost();
         checkArgument(StringUtils.isNotEmpty(executorHost), "Executor host is empty");
 

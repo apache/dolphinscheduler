@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.client;
 
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskKillException;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskPauseException;
 import org.apache.dolphinscheduler.server.master.engine.exceptions.TaskReassignMasterHostException;
@@ -70,6 +71,14 @@ public interface ITaskExecutorClient {
      */
     void ackTaskExecutorLifecycleEvent(
                                        final ITaskExecution taskExecution,
+                                       final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck);
+
+    /**
+     * Send an acknowledgement using a persisted task instance after its workflow has been released.
+     * <p> Like the execution-based overload, a failed send is retried by the executor engine.
+     */
+    void ackTaskExecutorLifecycleEvent(
+                                       final TaskInstance taskInstance,
                                        final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck);
 
 }
