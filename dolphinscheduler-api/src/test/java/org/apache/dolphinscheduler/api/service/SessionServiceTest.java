@@ -120,10 +120,6 @@ public class SessionServiceTest {
         Assertions.assertTrue(sessionService.isSessionExpire(expired));
     }
 
-    /**
-     * #18699: an unexpired session must be reused on re-login, not deleted and
-     * replaced (the expired/unexpired branches were inverted before the fix)
-     */
     @Test
     public void testCreateSessionIfAbsentReusesUnexpiredSession() {
         User user = new User();
@@ -141,11 +137,6 @@ public class SessionServiceTest {
         Mockito.verify(sessionDao, Mockito.never()).insert(Mockito.any(Session.class));
     }
 
-    /**
-     * #18699: an expired session must be replaced by a new one on re-login,
-     * not refreshed and reused (the expired/unexpired branches were inverted
-     * before the fix)
-     */
     @Test
     public void testCreateSessionIfAbsentReplacesExpiredSession() {
         User user = new User();
