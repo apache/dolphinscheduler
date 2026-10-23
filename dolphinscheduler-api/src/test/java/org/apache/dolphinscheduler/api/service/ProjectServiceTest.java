@@ -359,6 +359,23 @@ public class ProjectServiceTest {
     }
 
     @Test
+    public void testQueryAuthorizedProjectForSameUserWithDistinctIdObjects() {
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        user.setId(1000);
+        Integer requestedUserId = new Integer(1000);
+        Assertions.assertNotSame(user.getId(), requestedUserId);
+        Project project = getProject();
+        Mockito.when(projectDao.queryVisibleProjects(user.getId(), false))
+                .thenReturn(Collections.singletonList(project));
+
+        Assertions.assertEquals(Collections.singletonList(project),
+                projectService.queryAuthorizedProject(user, requestedUserId).getData());
+        Mockito.verify(projectDao).queryVisibleProjects(user.getId(), false);
+        Mockito.verifyNoMoreInteractions(projectDao);
+    }
+
+    @Test
     public void testQueryAuthorizedUser() {
         User user = getLoginUser();
         Assertions.assertThrows(ServiceException.class, () -> projectService.queryAuthorizedUser(user, 100L));

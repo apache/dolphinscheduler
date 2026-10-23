@@ -60,6 +60,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -489,6 +491,25 @@ public class UsersServiceTest {
         when(userDao.queryById(100)).thenReturn(getUser());
         assertThrowsServiceException(Status.PROJECT_NOT_FOUND,
                 () -> usersService.grantProject(admin, 100, "5"));
+        Mockito.verifyNoInteractions(projectAuthorizationService, projectUserDao);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"abc", "2147483648", "5,abc", "5,2147483648", "5,,6", "5,"})
+    public void testBulkProjectPermissionsRejectInvalidIdsBeforeChangingPermissions(String projectIds) {
+        User admin = getUser();
+        admin.setUserType(UserType.ADMIN_USER);
+        when(userDao.queryById(100)).thenReturn(getUser());
+        Project project = new Project();
+        project.setCode(10L);
+        when(projectDao.queryDetailById(5)).thenReturn(project);
+
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> usersService.grantProject(admin, 100, projectIds));
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> usersService.grantProjectWithReadPerm(admin, 100, projectIds));
+        assertThrowsServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR,
+                () -> usersService.revokeProjectById(admin, 100, projectIds));
         Mockito.verifyNoInteractions(projectAuthorizationService, projectUserDao);
     }
 

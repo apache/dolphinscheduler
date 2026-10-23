@@ -677,7 +677,7 @@ public class WorkflowInstanceServiceTest {
         workflowDefinition.setProjectCode(projectCode);
         workflowDefinition.setCode(46L);
 
-        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        doNothing().when(projectService).checkProjectPermission(loginUser, projectCode, ProjectPermission.DEVELOP);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(workflowInstance));
         when(processService.saveTaskDefine(eq(loginUser), eq(projectCode), Mockito.anyList(), eq(Boolean.TRUE)))
                 .thenReturn(1);

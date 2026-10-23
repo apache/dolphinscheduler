@@ -574,8 +574,15 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (StringUtils.isEmpty(projectIds)) {
             return;
         }
-        Arrays.stream(projectIds.split(Constants.COMMA)).distinct().forEach(projectId -> {
-            Project project = projectDao.queryDetailById(Integer.parseInt(projectId));
+        int[] parsedProjectIds;
+        try {
+            parsedProjectIds = Arrays.stream(projectIds.split(Constants.COMMA, -1)).distinct()
+                    .mapToInt(Integer::parseInt).toArray();
+        } catch (NumberFormatException ex) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "projectIds");
+        }
+        Arrays.stream(parsedProjectIds).forEach(projectId -> {
+            Project project = projectDao.queryDetailById(projectId);
             if (project == null) {
                 throw new ServiceException(Status.PROJECT_NOT_FOUND, projectId);
             }

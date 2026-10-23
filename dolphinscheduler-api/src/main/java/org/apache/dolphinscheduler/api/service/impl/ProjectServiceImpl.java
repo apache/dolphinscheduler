@@ -49,6 +49,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -405,7 +406,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     @Override
     public Result queryAuthorizedProject(User loginUser, Integer userId) {
-        if (loginUser.getId() == userId) {
+        if (Objects.equals(loginUser.getId(), userId)) {
             return Result.success(projectDao.queryVisibleProjects(userId, false));
         }
         List<Project> projects = projectDao.queryProjectAuthorizationLevels(loginUser.getId(),

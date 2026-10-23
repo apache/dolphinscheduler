@@ -83,6 +83,25 @@ public class TaskDatasourcePermissionCheckerTest {
         Mockito.verifyNoInteractions(resourceAuthorizationDao);
     }
 
+    @Test
+    public void shouldSkipDatasourceCheckWhenNoTasksAreSubmitted() {
+        checker.checkPermission(100L, null);
+        checker.checkPermission(100L, Collections.emptyList());
+        Mockito.verifyNoInteractions(resourceAuthorizationDao);
+    }
+
+    @Test
+    public void shouldRejectUnauthorizedDatasourceAlongsideTaskWithoutDatasource() {
+        TaskDefinition shellTask = new TaskDefinition();
+        shellTask.setTaskType("SHELL");
+        shellTask.setTaskParams("{\"rawScript\":\"echo test\"}");
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> checker.checkPermission(100L, Arrays.asList(shellTask, remoteShellTask())));
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Mockito.verify(resourceAuthorizationDao).isAuthorized(100L, ProjectResourceType.DATASOURCE, "42");
+    }
+
     private TaskDefinition remoteShellTask() {
         TaskDefinition task = new TaskDefinition();
         task.setTaskType("REMOTESHELL");

@@ -1048,7 +1048,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     public void testCreateWorkflowDefinitionShouldRejectUnknownPreTaskCode() {
         Project project = getProject(projectCode);
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
+        Mockito.doNothing().when(projectService).checkProjectPermission(eq(user), eq(project),
+                eq(ProjectPermission.DEVELOP));
         when(workflowDefinitionDao.verifyByDefineName(projectCode, name)).thenReturn(null);
         // mimic the real transformTask: one node for the (existing) post task of the single relation;
         // lenient since with the fix the validation fails fast before transformTask is even called
