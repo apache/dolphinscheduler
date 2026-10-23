@@ -17,167 +17,231 @@ limitations under the License.
 -->
 <mxfile host="Electron" agent="draw.io" type="device">
   <diagram id="After DSIP-104" name="After DSIP-104">
-    <mxGraphModel dx="1360" dy="1670" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1360" pageHeight="1670" math="0" shadow="0" background="#ffffff">
+    <mxGraphModel dx="1360" dy="950" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1360" pageHeight="950" math="0" shadow="0" background="#ffffff">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="title" value="After DSIP-104: project permissions + project resource grants" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=27;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="40" y="20" width="1280" height="44" />
+        <mxCell id="title" value="After: project P becomes the shared authorization boundary" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=28;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="24" width="1285" height="42" />
         </mxCell>
-        <mxCell id="member-manager" value="Project member manager&#10;MANAGE_MEMBERS in project P" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=22;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="85" y="100" width="540" height="78" />
+        <mxCell id="resources" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;dashed=1;dashPattern=5 4;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="935" y="90" width="390" height="645" />
         </mxCell>
-        <mxCell id="administrator" value="System administrator" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=22;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="735" y="100" width="550" height="78" />
+        <mxCell id="resources-label" value="All 8 types granted to project P" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=22;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="951" y="102" width="358" height="32" />
         </mxCell>
-        <mxCell id="project-scope" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;dashed=1;dashPattern=5 4;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="40" y="250" width="1280" height="605" />
+        <mxCell id="resource-DATASOURCE" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="960" y="150" width="350" height="54" />
         </mxCell>
-        <mxCell id="project-scope-title" value="Project P" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=23;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="58" y="262" width="1244" height="32" />
+        <mxCell id="resource-DATASOURCE-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxlbGxpcHNlIGN4PSIyNCIgY3k9IjEwIiByeD0iMTciIHJ5PSI2Ii8+PHBhdGggZD0iTTcgMTB2MjdjMCA4IDM0IDggMzQgMFYxME03IDIzYzAgOCAzNCA4IDM0IDAiLz48L2c+PC9zdmc+;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="974" y="155.0" width="44" height="44" />
         </mxCell>
-        <mxCell id="permission-set" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#f7f7f7;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="75" y="320" width="565" height="320" />
+        <mxCell id="resource-DATASOURCE-text" value="Datasource" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1030" y="155" width="270" height="44" />
         </mxCell>
-        <mxCell id="permission-heading" value="User → project operation permissions" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=22;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="95" y="334" width="525" height="32" />
+        <mxCell id="resource-K8S_NAMESPACE" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="960" y="218" width="350" height="54" />
         </mxCell>
-        <mxCell id="permission-VIEW" value="VIEW&#10;project content" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="95" y="388" width="255" height="62" />
+        <mxCell id="resource-K8S_NAMESPACE-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yNCAzbDE5IDExdjIxTDI0IDQ2IDUgMzVWMTR6Ii8+PHJlY3QgeD0iMTQiIHk9IjE3IiB3aWR0aD0iMjAiIGhlaWdodD0iMTUiIHJ4PSIxIi8+PHBhdGggZD0iTTE5IDE3di01aDEwdjUiLz48L2c+PC9zdmc+;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="974" y="223.0" width="44" height="44" />
         </mxCell>
-        <mxCell id="permission-DEVELOP" value="DEVELOP&#10;workflows / tasks" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="365" y="388" width="255" height="62" />
+        <mxCell id="resource-K8S_NAMESPACE-text" value="Kubernetes namespace" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1030" y="223" width="270" height="44" />
         </mxCell>
-        <mxCell id="permission-PUBLISH" value="PUBLISH&#10;publish / unpublish" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="95" y="464" width="255" height="62" />
+        <mxCell id="resource-WORKER_GROUP" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="960" y="286" width="350" height="54" />
         </mxCell>
-        <mxCell id="permission-EXECUTE" value="EXECUTE&#10;start / rerun / control" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="365" y="464" width="255" height="62" />
+        <mxCell id="resource-WORKER_GROUP-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjQiIHk9IjQiIHdpZHRoPSIxNSIgaGVpZ2h0PSIyMCIgcng9IjEiLz48cmVjdCB4PSIyOSIgeT0iNCIgd2lkdGg9IjE1IiBoZWlnaHQ9IjIwIiByeD0iMSIvPjxwYXRoIGQ9Ik04IDloN004IDE0aDdNMzMgOWg3TTMzIDE0aDdNMTEgMjR2OWgyNnYtOU0yNCAzM3YxME0xNCA0M2gyMCIvPjwvZz48L3N2Zz4=;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="974" y="291.0" width="44" height="44" />
         </mxCell>
-        <mxCell id="permission-MANAGE_SCHEDULES" value="MANAGE_SCHEDULES&#10;schedule management" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="95" y="540" width="255" height="62" />
+        <mxCell id="resource-WORKER_GROUP-text" value="Worker group" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1030" y="291" width="270" height="44" />
         </mxCell>
-        <mxCell id="permission-MANAGE_MEMBERS" value="MANAGE_MEMBERS&#10;member permissions" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="365" y="540" width="255" height="62" />
+        <mxCell id="resource-TENANT" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="960" y="354" width="350" height="54" />
         </mxCell>
-        <mxCell id="resource-set" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#f7f7f7;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="700" y="320" width="585" height="320" />
+        <mxCell id="resource-TENANT-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjE5IiBjeT0iMTMiIHI9IjYiLz48cGF0aCBkPSJNNiAzOHYtNmMwLTcgNS0xMSAxMy0xMXMxMyA0IDEzIDExdjZ6Ii8+PHJlY3QgeD0iMzAiIHk9IjI0IiB3aWR0aD0iMTQiIGhlaWdodD0iMTgiIHJ4PSIxIi8+PHBhdGggZD0iTTM0IDMwaDZNMzQgMzVoNiIvPjwvZz48L3N2Zz4=;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="974" y="359.0" width="44" height="44" />
         </mxCell>
-        <mxCell id="resources-heading" value="Shared resources → project use grants" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=22;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="720" y="334" width="545" height="32" />
+        <mxCell id="resource-TENANT-text" value="Tenant" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1030" y="359" width="270" height="44" />
         </mxCell>
-        <mxCell id="resource-DATASOURCE" value="Datasource" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="720" y="385" width="265" height="45" />
+        <mxCell id="resource-QUEUE" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="960" y="422" width="350" height="54" />
         </mxCell>
-        <mxCell id="resource-WORKER_GROUP" value="Worker group" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="1000" y="385" width="265" height="45" />
+        <mxCell id="resource-QUEUE-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjQiIHk9IjciIHdpZHRoPSIyOSIgaGVpZ2h0PSI3IiByeD0iMSIvPjxyZWN0IHg9IjQiIHk9IjIwIiB3aWR0aD0iMjkiIGhlaWdodD0iNyIgcng9IjEiLz48cmVjdCB4PSI0IiB5PSIzMyIgd2lkdGg9IjI5IiBoZWlnaHQ9IjciIHJ4PSIxIi8+PHBhdGggZD0iTTM4IDl2MjhNMzQgMzNsNCA1IDQtNSIvPjwvZz48L3N2Zz4=;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="974" y="427.0" width="44" height="44" />
         </mxCell>
-        <mxCell id="resource-TENANT" value="Tenant" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="720" y="443" width="265" height="45" />
+        <mxCell id="resource-QUEUE-text" value="Queue" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1030" y="427" width="270" height="44" />
         </mxCell>
-        <mxCell id="resource-QUEUE" value="Queue" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="1000" y="443" width="265" height="45" />
+        <mxCell id="resource-ENVIRONMENT" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="960" y="490" width="350" height="54" />
         </mxCell>
-        <mxCell id="resource-ENVIRONMENT" value="Environment" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="720" y="501" width="265" height="45" />
+        <mxCell id="resource-ENVIRONMENT-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjQiIHk9IjciIHdpZHRoPSI0MCIgaGVpZ2h0PSIzNCIgcng9IjEiLz48cGF0aCBkPSJNNCAxNWg0ME0xMSAyMmw3IDYtNyA2TTI1IDM0aDExIi8+PC9nPjwvc3ZnPg==;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="974" y="495.0" width="44" height="44" />
         </mxCell>
-        <mxCell id="resource-ALERT_GROUP" value="Alert group" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="1000" y="501" width="265" height="45" />
+        <mxCell id="resource-ENVIRONMENT-text" value="Environment" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1030" y="495" width="270" height="44" />
         </mxCell>
-        <mxCell id="resource-K8S_NAMESPACE" value="Kubernetes namespace" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="720" y="559" width="265" height="45" />
+        <mxCell id="resource-ALERT_GROUP" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="960" y="558" width="350" height="54" />
         </mxCell>
-        <mxCell id="resource-TASK_GROUP" value="Task group" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="1000" y="559" width="265" height="45" />
+        <mxCell id="resource-ALERT_GROUP-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0xMCAzM2gyOGwtNS04di05YzAtMTItMTgtMTItMTggMHY5ek0xOSAzOWMxIDYgOSA2IDEwIDBNMjQgNFYxIi8+PHBhdGggZD0iTTcgMTRsLTMtM000MSAxNGwzLTMiLz48L2c+PC9zdmc+;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="974" y="563.0" width="44" height="44" />
         </mxCell>
-        <mxCell id="permission-store" value="ProjectUserPermission&#10;project_code · user_id · permission" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#fafafa;align=center;verticalAlign=middle;spacing=8;shape=cylinder3;size=16;boundedLbl=1;backgroundOutline=1;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="100" y="705" width="510" height="100" />
+        <mxCell id="resource-ALERT_GROUP-text" value="Alert group" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1030" y="563" width="270" height="44" />
         </mxCell>
-        <mxCell id="resource-store" value="ProjectResourceAuthorization&#10;project_code · resource_type · resource_key" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#fafafa;align=center;verticalAlign=middle;spacing=8;shape=cylinder3;size=16;boundedLbl=1;backgroundOutline=1;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="725" y="705" width="560" height="100" />
+        <mxCell id="resource-TASK_GROUP" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="960" y="626" width="350" height="54" />
         </mxCell>
-        <mxCell id="manager-permissions" value="assign permissions" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="member-manager" target="permission-set">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="resource-TASK_GROUP-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjE2IiB5PSIzIiB3aWR0aD0iMTYiIGhlaWdodD0iMTEiIHJ4PSIxIi8+PHJlY3QgeD0iMiIgeT0iMzMiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxMSIgcng9IjEiLz48cmVjdCB4PSIzMCIgeT0iMzMiIHdpZHRoPSIxNiIgaGVpZ2h0PSIxMSIgcng9IjEiLz48cGF0aCBkPSJNMjQgMTR2MTBNMTAgMzN2LTloMjh2OSIvPjwvZz48L3N2Zz4=;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="974" y="631.0" width="44" height="44" />
         </mxCell>
-        <mxCell id="admin-resources" value="grant / revoke resources" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="administrator" target="resource-set">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="resource-TASK_GROUP-text" value="Task group" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1030" y="631" width="270" height="44" />
         </mxCell>
-        <mxCell id="admin-permissions" value="assign member permissions" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=0.1;exitY=1;entryX=0.94;entryY=0;" edge="1" parent="1" source="administrator" target="permission-set">
+        <mxCell id="project-scope" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;dashed=1;dashPattern=5 4;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="390" y="170" width="440" height="565" />
+        </mxCell>
+        <mxCell id="project-scope-label" value="Project P" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=22;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="406" y="182" width="408" height="32" />
+        </mxCell>
+        <mxCell id="project" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#f3f3f3;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="415" y="234" width="390" height="80" />
+        </mxCell>
+        <mxCell id="project-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik00IDEzaDE1bDUgNWgyMHYyM0g0eiIvPjxwYXRoIGQ9Ik00IDEzVjhoMTVsNSA1aDIwdjUiLz48L2c+PC9zdmc+;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="429" y="252.0" width="44" height="44" />
+        </mxCell>
+        <mxCell id="project-text" value="Project P" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=23;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="485" y="239" width="310" height="70" />
+        </mxCell>
+        <mxCell id="user" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#f3f3f3;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="65" y="330" width="240" height="92" />
+        </mxCell>
+        <mxCell id="user-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxjaXJjbGUgY3g9IjI0IiBjeT0iMTMiIHI9IjciLz48cGF0aCBkPSJNMTAgNDF2LTdjMC04IDYtMTIgMTQtMTJzMTQgNCAxNCAxMnY3eiIvPjwvZz48L3N2Zz4=;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="79" y="354.0" width="44" height="44" />
+        </mxCell>
+        <mxCell id="user-text" value="User A" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=23;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="135" y="335" width="160" height="82" />
+        </mxCell>
+        <mxCell id="permissions-heading" value="User A’s operation permissions in P" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=19;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=center;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="415" y="337" width="390" height="30" />
+        </mxCell>
+        <mxCell id="permission-VIEW" value="VIEW" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=17;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;spacing=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="410" y="385" width="190" height="37" />
+        </mxCell>
+        <mxCell id="permission-DEVELOP" value="DEVELOP" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=17;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;spacing=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="610" y="385" width="190" height="37" />
+        </mxCell>
+        <mxCell id="permission-PUBLISH" value="PUBLISH" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=17;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;spacing=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="410" y="434" width="190" height="37" />
+        </mxCell>
+        <mxCell id="permission-EXECUTE" value="EXECUTE" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=17;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;spacing=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="610" y="434" width="190" height="37" />
+        </mxCell>
+        <mxCell id="permission-MANAGE_SCHEDULES" value="MANAGE_SCHEDULES" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=17;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;spacing=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="410" y="483" width="190" height="37" />
+        </mxCell>
+        <mxCell id="permission-MANAGE_MEMBERS" value="MANAGE_MEMBERS" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=17;fillColor=#ffffff;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;spacing=1;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="610" y="483" width="190" height="37" />
+        </mxCell>
+        <mxCell id="permission-anchor" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;fillOpacity=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="410" y="376" width="390" height="155" />
+        </mxCell>
+        <mxCell id="user-project-operations" value="6 ops" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#555555;strokeWidth=2.2;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=7;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=1;exitY=0.5;entryX=0;entryY=0;" edge="1" parent="1" source="user" target="permission-anchor">
           <mxGeometry as="geometry" relative="1">
             <Array as="points">
-              <mxPoint x="790" y="220" />
-              <mxPoint x="606" y="220" />
+              <mxPoint x="350" y="376" />
+              <mxPoint x="350" y="376" />
             </Array>
           </mxGeometry>
         </mxCell>
-        <mxCell id="persist-permissions" value="persist" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="permission-set" target="permission-store">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="project-grants" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#eeeeee;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="415" y="592" width="390" height="75" />
         </mxCell>
-        <mxCell id="persist-grants" value="persist" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="resource-set" target="resource-store">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="project-grants-icon" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;shape=image;image=data:image/svg+xml,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0OCIgaGVpZ2h0PSI0OCIgdmlld0JveD0iMCAwIDQ4IDQ4Ij48ZyBmaWxsPSJub25lIiBzdHJva2U9IiM1NTU1NTUiIHN0cm9rZS13aWR0aD0iMi41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxyZWN0IHg9IjkiIHk9IjIxIiB3aWR0aD0iMzAiIGhlaWdodD0iMjMiIHJ4PSIxIi8+PHBhdGggZD0iTTE1IDIxVjEyYzAtMTIgMTgtMTIgMTggMHY5TTI0IDMwdjciLz48L2c+PC9zdmc+;imageAspect=0;aspect=fixed;strokeColor=none;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="429" y="607.5" width="44" height="44" />
         </mxCell>
-        <mxCell id="api" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;dashed=1;dashPattern=5 4;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="40" y="915" width="1280" height="485" />
+        <mxCell id="project-grants-text" value="Resource-use grants" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=22;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="485" y="597" width="310" height="65" />
         </mxCell>
-        <mxCell id="api-title" value="API / service authorization" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=23;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="58" y="927" width="1244" height="32" />
+        <mxCell id="project-grants-bus" style="edgeStyle=none;html=0;rounded=0;strokeColor=#555555;strokeWidth=2.2;endArrow=none;" edge="1" parent="1">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="805" y="629.5" />
+            <mxPoint as="targetPoint" x="880" y="177" />
+            <Array as="points">
+              <mxPoint x="880" y="629.5" />
+            </Array>
+          </mxGeometry>
         </mxCell>
-        <mxCell id="resolve" value="Resolve project&#10;&#10;Requested project or&#10;actual instance project" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#f3f3f3;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="75" y="1060" width="245" height="120" />
+        <mxCell id="project-grants-bus-bottom" style="edgeStyle=none;html=0;rounded=0;strokeColor=#555555;strokeWidth=2.2;endArrow=none;" edge="1" parent="1">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="880" y="629.5" />
+            <mxPoint as="targetPoint" x="880" y="653" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="op-check" value="Required project&#10;permission?" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#f3f3f3;align=center;verticalAlign=middle;spacing=8;shape=rhombus;rounded=0;spacing=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="375" y="1040" width="250" height="160" />
+        <mxCell id="project-grant-DATASOURCE" style="edgeStyle=none;html=0;strokeColor=#555555;strokeWidth=2.2;endArrow=block;endFill=1;endSize=7;entryX=0;entryY=0.5;" edge="1" parent="1" target="resource-DATASOURCE">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="880" y="177" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="resource-check" value="All required project&#10;resource grants?" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#f3f3f3;align=center;verticalAlign=middle;spacing=8;shape=rhombus;rounded=0;spacing=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="715" y="1040" width="300" height="160" />
+        <mxCell id="project-grant-K8S_NAMESPACE" style="edgeStyle=none;html=0;strokeColor=#555555;strokeWidth=2.2;endArrow=block;endFill=1;endSize=7;entryX=0;entryY=0.5;" edge="1" parent="1" target="resource-K8S_NAMESPACE">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="880" y="245" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="allow" value="Allow&#10;operation" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=22;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#eeeeee;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="1100" y="1080" width="175" height="80" />
+        <mxCell id="project-grant-WORKER_GROUP" style="edgeStyle=none;html=0;strokeColor=#555555;strokeWidth=2.2;endArrow=block;endFill=1;endSize=7;entryX=0;entryY=0.5;" edge="1" parent="1" target="resource-WORKER_GROUP">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="880" y="313" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="deny" value="Deny when a required check fails" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#fafafa;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="375" y="1260" width="640" height="58" />
+        <mxCell id="project-grant-TENANT" style="edgeStyle=none;html=0;strokeColor=#555555;strokeWidth=2.2;endArrow=block;endFill=1;endSize=7;entryX=0;entryY=0.5;" edge="1" parent="1" target="resource-TENANT">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="880" y="381" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="request-op" value="" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="resolve" target="op-check">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="project-grant-QUEUE" style="edgeStyle=none;html=0;strokeColor=#555555;strokeWidth=2.2;endArrow=block;endFill=1;endSize=7;entryX=0;entryY=0.5;" edge="1" parent="1" target="resource-QUEUE">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="880" y="449" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="op-resource" value="pass" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="op-check" target="resource-check">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="project-grant-ENVIRONMENT" style="edgeStyle=none;html=0;strokeColor=#555555;strokeWidth=2.2;endArrow=block;endFill=1;endSize=7;entryX=0;entryY=0.5;" edge="1" parent="1" target="resource-ENVIRONMENT">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="880" y="517" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="resource-allow" value="pass" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="resource-check" target="allow">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="project-grant-ALERT_GROUP" style="edgeStyle=none;html=0;strokeColor=#555555;strokeWidth=2.2;endArrow=block;endFill=1;endSize=7;entryX=0;entryY=0.5;" edge="1" parent="1" target="resource-ALERT_GROUP">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="880" y="585" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="op-deny" value="fail" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=0.5;exitY=1;entryX=0.1953125;entryY=0;" edge="1" parent="1" source="op-check" target="deny">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="project-grant-TASK_GROUP" style="edgeStyle=none;html=0;strokeColor=#555555;strokeWidth=2.2;endArrow=block;endFill=1;endSize=7;entryX=0;entryY=0.5;" edge="1" parent="1" target="resource-TASK_GROUP">
+          <mxGeometry as="geometry" relative="1">
+            <mxPoint as="sourcePoint" x="880" y="653" />
+          </mxGeometry>
         </mxCell>
-        <mxCell id="resource-deny" value="fail" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;exitX=0.5;exitY=1;entryX=0.765625;entryY=0;" edge="1" parent="1" source="resource-check" target="deny">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="project-grants-label" value="grants" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=center;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="838" y="684" width="90" height="35" />
         </mxCell>
-        <mxCell id="read-permission" value="read permissions" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;dashed=1;dashPattern=5 4;exitX=0.5;exitY=0;entryX=0.745098;entryY=1;" edge="1" parent="1" source="op-check" target="permission-store">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="user-role" value="User permissions decide&#10;what User A can do&#10;inside project P." style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=center;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="45" y="464" width="285" height="85" />
         </mxCell>
-        <mxCell id="read-resource" value="read project grants" style="html=0;whiteSpace=nowrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;strokeColor=#6b6b6b;strokeWidth=1.3;sketch=0;shadow=0;edgeStyle=orthogonalEdgeStyle;rounded=0;endArrow=block;endFill=1;endSize=6;labelBackgroundColor=#ffffff;labelBorderColor=none;dashed=1;dashPattern=5 4;exitX=0.5;exitY=0;entryX=0.28;entryY=1;" edge="1" parent="1" source="resource-check" target="resource-store">
-          <mxGeometry as="geometry" relative="1" />
+        <mxCell id="project-note" value="Grants belong to P, not to User A." style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=19;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=center;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="410" y="685" width="395" height="28" />
         </mxCell>
-        <mxCell id="request-types" value="Configuration / publication / schedules / manual execution and rerun" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=center;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="65" y="1345" width="1230" height="32" />
+        <mxCell id="notes" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=#fafafa;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="775" width="1285" height="135" />
         </mxCell>
-        <mxCell id="notes" value="" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=#ffffff;align=center;verticalAlign=middle;spacing=8;dashed=1;dashPattern=5 4;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="40" y="1440" width="1280" height="200" />
+        <mxCell id="note1" value="USER → PROJECT: 6 operation permissions.  PROJECT → RESOURCES: one grant model for all 8 types." style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=21;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="792" width="1245" height="28" />
         </mxCell>
-        <mxCell id="notes-title" value="Scope and lifecycle" style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=23;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="58" y="1452" width="1244" height="32" />
+        <mxCell id="note2" value="A protected operation requires its project permission AND all required project resource grants." style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=20;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="829" width="1245" height="28" />
         </mxCell>
-        <mxCell id="note-0" value="Project selectors filter in SQL and return safe metadata; use grants confer no edit / delete / re-grant rights." style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=19;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="60" y="1490" width="1240" height="30" />
-        </mxCell>
-        <mxCell id="note-1" value="System admins pass the operation check; required resource grants still apply. Child workflows use their own project." style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=19;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="60" y="1523" width="1240" height="30" />
-        </mxCell>
-        <mxCell id="note-2" value="Resource files retain existing authorization. Running / queued instances, scheduled triggers and retries are not rechecked." style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=19;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="60" y="1556" width="1240" height="30" />
-        </mxCell>
-        <mxCell id="note-3" value="3.5.0 upgrade: retain legacy data; no automatic migration or fallback. Explicitly reassign both kinds of grants." style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=19;strokeColor=#9c9c9c;strokeWidth=1.3;sketch=0;shadow=0;rounded=1;absoluteArcSize=1;arcSize=8;fillColor=none;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
-          <mxGeometry as="geometry" x="60" y="1589" width="1240" height="30" />
+        <mxCell id="note3" value="System admins grant resources; members with MANAGE_MEMBERS assign project permissions. Upgrade/lifecycle: see PR text." style="html=0;whiteSpace=wrap;fontFamily=Helvetica Neue,PingFang SC;fontColor=#343434;fontSize=18;fillColor=none;strokeColor=#9c9c9c;strokeWidth=1.3;rounded=1;absoluteArcSize=1;arcSize=8;shadow=0;sketch=0;align=center;verticalAlign=middle;spacing=8;strokeColor=none;spacing=0;align=left;fontStyle=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="868" width="1245" height="26" />
         </mxCell>
       </root>
     </mxGraphModel>
