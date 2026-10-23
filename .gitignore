@@ -62,6 +62,4 @@ docs/superpowers/
 CLAUDE.local.md
 AGENT.local.md
 .cursor/
-.github/prompts/
-.github/skills/
 openspec/
