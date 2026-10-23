@@ -1771,6 +1771,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     projectCode, code, version);
             throw new ServiceException(Status.SWITCH_WORKFLOW_DEFINITION_VERSION_ERROR);
         }
+        schedulerService.offlineSchedulerByWorkflowCode(code);
 
         saveWorkflowLineage(workflowDefinitionLog.getProjectCode(), workflowDefinitionLog.getCode(),
                 workflowDefinitionLog.getVersion(), taskDefinitionLogList);
