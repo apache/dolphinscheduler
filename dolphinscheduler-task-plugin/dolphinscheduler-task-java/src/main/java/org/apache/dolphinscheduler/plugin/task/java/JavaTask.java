@@ -39,6 +39,10 @@ import org.apache.dolphinscheduler.plugin.task.java.exception.RunTypeNotFoundExc
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
@@ -50,6 +54,8 @@ import com.google.common.base.Preconditions;
 public class JavaTask extends AbstractTask {
 
     private JavaParameters javaParameters;
+
+    private Path jshellScriptPath;
 
     private final ShellCommandExecutor shellCommandExecutor;
 
@@ -99,6 +105,9 @@ public class JavaTask extends AbstractTask {
                 case JavaConstants.RUN_TYPE_NORMAL_JAR:
                     command = buildNormalJarCommand();
                     break;
+                case JavaConstants.RUN_TYPE_JSHELL:
+                    command = buildJshellCommand();
+                    break;
                 default:
                     throw new RunTypeNotFoundException("run type is required, but it is null now.");
             }
@@ -123,6 +132,19 @@ public class JavaTask extends AbstractTask {
             log.error("java task failed ", e);
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("run java task error", e);
+        } finally {
+            if (jshellScriptPath != null) {
+                try {
+                    Files.deleteIfExists(jshellScriptPath);
+                } catch (IOException e) {
+                    log.warn(
+                            "Failed to delete temporary JShell script {}",
+                            jshellScriptPath,
+                            e);
+                } finally {
+                    jshellScriptPath = null;
+                }
+            }
         }
     }
 
@@ -173,6 +195,77 @@ public class JavaTask extends AbstractTask {
                 .append(mainJarName).append(Constants.SPACE)
                 .append(javaParameters.getMainArgs().trim());
         return parseParameter(builder.toString());
+    }
+
+    protected String buildJshellCommand() throws IOException {
+        Path executePath = Paths.get(taskRequest.getExecutePath());
+
+        jshellScriptPath = Files.createTempFile(
+                executePath, "jshell-", ".jsh");
+
+        String source = parseParameter(javaParameters.getJshellScript());
+
+        Files.write(
+                jshellScriptPath,
+                source.getBytes(StandardCharsets.UTF_8));
+
+        StringBuilder builder = new StringBuilder(getJshellCommandPath());
+
+        String jvmArgs = StringUtils.trimToEmpty(javaParameters.getJvmArgs());
+
+        if (!jvmArgs.isEmpty()) {
+            for (String argument : jvmArgs.split("\\s+")) {
+                builder.append(Constants.SPACE)
+                        .append("-R")
+                        .append(argument);
+            }
+        }
+
+        builder.append(Constants.SPACE)
+                .append("--feedback concise")
+                .append(Constants.SPACE)
+                .append(buildJshellResourcePath())
+                .append(" - < ")
+                .append(quoteShellArgument(
+                        jshellScriptPath.toAbsolutePath().toString()));
+
+        return parseParameter(builder.toString());
+    }
+
+    private String getJshellCommandPath() {
+        return "\"" + Paths.get(JAVA_HOME_VAR, "bin", "jshell") + "\"";
+    }
+
+    protected String buildJshellResourcePath() {
+        StringBuilder resourcePath = new StringBuilder(
+                JavaConstants.CLASSPATH_CURRENT_DIR);
+
+        resourcePath.append(JavaConstants.PATH_SEPARATOR)
+                .append(taskRequest.getExecutePath());
+
+        ResourceContext resourceContext = taskRequest.getResourceContext();
+
+        if (resourceContext != null
+                && javaParameters.getResourceFilesList() != null) {
+            for (ResourceInfo info : javaParameters.getResourceFilesList()) {
+                ResourceContext.ResourceItem resourceItem =
+                        resourceContext.getResourceItem(info.getResourceName());
+
+                resourcePath.append(JavaConstants.PATH_SEPARATOR)
+                        .append(resourceItem.getResourceAbsolutePathInLocal());
+            }
+        }
+
+        String pathOption = javaParameters.isModulePath()
+                ? "--module-path"
+                : "--class-path";
+
+        return pathOption + Constants.SPACE
+                + quoteShellArgument(resourcePath.toString());
+    }
+
+    private String quoteShellArgument(String argument) {
+        return "'" + argument.replace("'", "'\\''") + "'";
     }
 
     @Override
