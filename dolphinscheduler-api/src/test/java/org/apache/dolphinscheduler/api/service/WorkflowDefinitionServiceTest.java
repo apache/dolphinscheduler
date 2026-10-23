@@ -42,6 +42,7 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
+import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCopyVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
@@ -507,8 +508,13 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         }
         when(workflowDefinitionDao.queryByCodes(definitionCodes)).thenReturn(workflowDefinitionList);
         when(processService.saveWorkflowDefine(user, definition, Boolean.TRUE, Boolean.TRUE)).thenReturn(2);
-        Assertions.assertDoesNotThrow(() -> workflowDefinitionService.batchCopyWorkflowDefinition(
-                user, projectCodeOther, String.valueOf(processDefinitionCode), projectCode));
+        List<WorkflowDefinitionCopyVO> copyResponses = Assertions.assertDoesNotThrow(
+                () -> workflowDefinitionService.batchCopyWorkflowDefinition(
+                        user, projectCodeOther, String.valueOf(processDefinitionCode), projectCode));
+
+        Assertions.assertEquals(1, copyResponses.size());
+        Assertions.assertEquals(projectCode, copyResponses.get(0).getProjectCode());
+        Assertions.assertEquals(definition.getCode(), copyResponses.get(0).getWorkflowDefinitionCode());
     }
 
     @Test
