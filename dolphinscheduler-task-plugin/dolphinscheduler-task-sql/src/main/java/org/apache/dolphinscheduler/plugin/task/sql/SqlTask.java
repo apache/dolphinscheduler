@@ -91,7 +91,8 @@ public class SqlTask extends AbstractTask {
             "create or replace temporary function {0} as ''{1}''";
 
     /**
-     * default query sql limit
+     * default max rows fetched when the task-level "limit" parameter is not set, overridable
+     * via the sql.task.query.max.rows property in common.properties
      */
     private static final int QUERY_LIMIT = 10000;
 
@@ -122,6 +123,9 @@ public class SqlTask extends AbstractTask {
 
     private final int alertMaxContentBytes =
             PropertyUtils.getInt(Constants.SQL_TASK_ALERT_MAX_CONTENT_BYTES, DEFAULT_ALERT_MAX_CONTENT_BYTES);
+
+    private final int queryMaxRows =
+            PropertyUtils.getInt(Constants.SQL_TASK_QUERY_MAX_ROWS, QUERY_LIMIT);
 
     private final SQLTaskExecutionContext sqlTaskExecutionContext;
 
@@ -519,7 +523,7 @@ public class SqlTask extends AbstractTask {
             if (timeoutFlag) {
                 stmt.setQueryTimeout(taskExecutionContext.getTaskTimeout());
             }
-            stmt.setMaxRows(sqlParameters.getLimit() <= 0 ? QUERY_LIMIT : sqlParameters.getLimit());
+            stmt.setMaxRows(sqlParameters.getLimit() <= 0 ? queryMaxRows : sqlParameters.getLimit());
             Map<Integer, Property> params = sqlBinds.getParamsMap();
             if (params != null) {
                 for (Map.Entry<Integer, Property> entry : params.entrySet()) {
