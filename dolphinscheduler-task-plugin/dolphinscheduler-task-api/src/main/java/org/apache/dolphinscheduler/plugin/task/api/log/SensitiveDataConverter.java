@@ -55,13 +55,6 @@ public class SensitiveDataConverter extends MessageConverter {
     private static final Set<String> maskPatterns = new HashSet<>();
 
     /**
-     * Skip literals shorter than this to avoid over-masking common log text (e.g. "123"
-     * matching inside timestamps or numeric IDs). Very short secrets provide little
-     * security value while their literal masking destroys log readability.
-     */
-    private static final int MIN_SENSITIVE_LITERAL_LENGTH = 6;
-
-    /**
      * taskInstanceId -> sensitive plaintext values for that task only.
      * Values are stored longest-first so longer secrets are masked before their prefixes.
      */
@@ -88,7 +81,9 @@ public class SensitiveDataConverter extends MessageConverter {
 
     /**
      * Register sensitive plaintext values from this task's prepareParamsMap.
-     * Empty / {@code ******} / values shorter than {@link #MIN_SENSITIVE_LITERAL_LENGTH} are skipped.
+     * Empty / {@code ******} placeholder values are skipped. Every registered value is
+     * masked in the logs of this task (no length threshold here; the minimum length of a
+     * sensitive value is enforced at save time by {@code SENSITIVE_FIELD_RULE}).
      * Safe to call multiple times (replaces prior set).
      */
     public static void registerTaskSensitiveValues(final int taskInstanceId,
@@ -104,8 +99,7 @@ public class SensitiveDataConverter extends MessageConverter {
             }
             String value = property.getValue();
             if (StringUtils.isEmpty(value)
-                    || TaskConstants.SENSITIVE_DATA_MASK.equals(value)
-                    || value.length() < MIN_SENSITIVE_LITERAL_LENGTH) {
+                    || TaskConstants.SENSITIVE_DATA_MASK.equals(value)) {
                 continue;
             }
             values.add(value);
