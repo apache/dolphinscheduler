@@ -24,17 +24,34 @@ public class FlinkConstants {
     }
 
     /**
+     * flink home
+     */
+    public static final String FLINK_HOME = "FLINK_HOME";
+
+    /**
      * flink command
      * usage: flink run [OPTIONS] <jar-file> <arguments>
      */
-    public static final String FLINK_COMMAND = "${FLINK_HOME}/bin/flink";
+    public static final String FLINK_COMMAND = "${" + FLINK_HOME + "}/bin/flink";
     public static final String FLINK_RUN = "run";
 
     /**
      * flink sql command
      * usage: sql-client.sh -i <initialization file>, -f <script file>
      */
-    public static final String FLINK_SQL_COMMAND = "${FLINK_HOME}/bin/sql-client.sh";
+    public static final String FLINK_SQL_COMMAND = "${" + FLINK_HOME + "}/bin/sql-client.sh";
+
+    /**
+     * The timeout of waiting for a flink command, e.g. `flink cancel`, to finish
+     */
+    public static final int FLINK_COMMAND_TIMEOUT_SECONDS = 30;
+
+    /**
+     * The timeout of waiting for `flink savepoint` to finish. Taking a savepoint of a large stateful
+     * job takes much longer than cancelling it, so it does not reuse
+     * {@link #FLINK_COMMAND_TIMEOUT_SECONDS}.
+     */
+    public static final int FLINK_SAVEPOINT_TIMEOUT_SECONDS = 600;
 
     /**
      * flink run options
@@ -50,6 +67,7 @@ public class FlinkConstants {
     public static final String FLINK_APP_NAME = "-ynm";
     public static final String FLINK_YARN_QUEUE_FOR_MODE = "-yqu";
     public static final String FLINK_YARN_QUEUE_FOR_TARGETS = "-Dyarn.application.queue";
+    public static final String FLINK_YARN_APPLICATION_ID = "-yid";
     public static final String FLINK_TASK_MANAGE = "-yn";
     public static final String FLINK_JOB_MANAGE_MEM = "-yjm";
     public static final String FLINK_TASK_MANAGE_MEM = "-ytm";

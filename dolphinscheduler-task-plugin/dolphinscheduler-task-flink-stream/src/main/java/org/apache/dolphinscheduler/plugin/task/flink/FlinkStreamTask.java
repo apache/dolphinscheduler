@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.plugin.task.flink;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -26,7 +25,6 @@ import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 import lombok.extern.slf4j.Slf4j;
@@ -65,40 +63,55 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     }
 
     @Override
-    public void cancelApplication() throws TaskException {
-        List<String> appIds = getApplicationIds();
-        if (CollectionUtils.isEmpty(appIds)) {
-            log.error("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
-            return;
+    public void savePoint() throws Exception {
+        // `flink savepoint` takes the Flink JobID. The YARN/K8s application id is a different
+        // identifier: it is not the savepoint target, it only targets the cluster which runs the
+        // job, and is passed as the `-yid` option. It is kept per job, because the SQL Client with
+        // `yarn-per-job` submits every job into its own application.
+        List<FlinkJobSubmission> submissions = getFlinkJobSubmissions();
+        failOnPendingSynchronousSubmissions();
+        if (CollectionUtils.isEmpty(submissions)) {
+            throw new TaskException(
+                    "Cannot find the flink JobID of the task, taskInstanceId: "
+                            + taskExecutionContext.getTaskInstanceId());
         }
-        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
-        List<String> args = FlinkArgsUtils.buildCancelCommandLine(taskExecutionContext);
+        List<List<String>> clusterConnectionOptionsPerJob = getClusterConnectionOptionsPerJob();
+        // a job which the scripts do not describe uses the last configuration of the submission
+        List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
+        for (int i = 0; i < submissions.size(); i++) {
+            FlinkJobSubmission submission = submissions.get(i);
+            List<String> clusterConnectionOptions = i < clusterConnectionOptionsPerJob.size()
+                    ? clusterConnectionOptionsPerJob.get(i)
+                    : lastClusterConnectionOptions;
+            if (submission.isYarnApplicationUnresolved() && CollectionUtils.isEmpty(clusterConnectionOptions)) {
+                // the job runs in one of several applications and nothing else selects the cluster it
+                // runs in, so a savepoint would be triggered against an arbitrary one
+                throw new TaskException("Cannot determine the YARN application which runs flink job "
+                        + submission.getJobId() + ", the task submitted it to one of several applications and the "
+                        + "task log does not say which one, taskInstanceId: "
+                        + taskExecutionContext.getTaskInstanceId());
+            }
+            List<String> args = FlinkArgsUtils.buildSavePointCommandLine(submission.getJobId(),
+                    submission.getYarnApplicationId(), clusterConnectionOptions);
 
-        log.info("cancel application args:{}", args);
-
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(args);
-        try {
-            processBuilder.start();
-        } catch (IOException e) {
-            throw new TaskException("cancel application error", e);
+            if (!executeFlinkSavepointCommand(args)) {
+                throw new TaskException("Trigger savepoint for flink job " + submission.getJobId()
+                        + " failed, taskInstanceId: " + taskExecutionContext.getTaskInstanceId());
+            }
         }
     }
 
-    @Override
-    public void savePoint() throws Exception {
-        List<String> appIds = getApplicationIds();
-        if (CollectionUtils.isEmpty(appIds)) {
-            log.warn("can not get appId, taskInstanceId:{}", taskExecutionContext.getTaskInstanceId());
-            return;
+    /**
+     * A synchronous submission which the SQL Client is still running prints no JobID and cannot be
+     * checkpointed, so the savepoint of the task must not be reported as successful.
+     */
+    private void failOnPendingSynchronousSubmissions() throws TaskException {
+        int pendingSynchronousSubmissions = countPendingSynchronousSubmissions();
+        if (pendingSynchronousSubmissions > 0) {
+            throw new TaskException(String.format(
+                    "%d synchronous SQL submission(s) of the task were still running, the SQL Client prints no JobID "
+                            + "for them so no savepoint can be triggered, taskInstanceId: %s",
+                    pendingSynchronousSubmissions, taskExecutionContext.getTaskInstanceId()));
         }
-
-        taskExecutionContext.setAppIds(String.join(TaskConstants.COMMA, appIds));
-        List<String> args = FlinkArgsUtils.buildSavePointCommandLine(taskExecutionContext);
-        log.info("savepoint args:{}", args);
-
-        ProcessBuilder processBuilder = new ProcessBuilder();
-        processBuilder.command(args);
-        processBuilder.start();
     }
 }

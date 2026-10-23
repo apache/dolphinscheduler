@@ -39,13 +39,13 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
@@ -55,6 +55,12 @@ public abstract class AbstractCommandExecutor {
 
     protected volatile Map<String, String> taskOutputParams = new HashMap<>();
     private Process process;
+
+    /**
+     * The future which writes the output of the process into the task log. It is kept so that a caller
+     * which stops the process outside of {@link #run} can wait for the output to be collected.
+     */
+    private volatile CompletableFuture<Void> collectProcessLogFuture;
 
     protected TaskExecutionContext taskRequest;
 
@@ -101,7 +107,7 @@ public abstract class AbstractCommandExecutor {
         process = iShellInterceptor.execute();
 
         // parse process output
-        final CompletableFuture<Void> collectProcessLogFuture = collectProcessLog(this.process);
+        collectProcessLogFuture = collectProcessLog(this.process);
 
         // collect pod log
         final Optional<CompletableFuture<?>> collectPodLogFuture = collectPodLogIfNeeded();
@@ -163,6 +169,44 @@ public abstract class AbstractCommandExecutor {
 
     public Map<String, String> getTaskOutputParams() {
         return taskOutputParams;
+    }
+
+    /**
+     * Wait until the output of the process has been written to the task log, at most the given time.
+     * A caller which stops the process outside of {@link #run} uses it to make sure that the tail of
+     * the output is available in the task log.
+     *
+     * @param timeoutMillis the maximum time to wait
+     * @return true if the output was collected, false if the wait timed out
+     */
+    public boolean awaitOutputCollected(long timeoutMillis) {
+        return awaitCollected(collectProcessLogFuture, timeoutMillis);
+    }
+
+    /**
+     * Wait until the given output collection completes, at most the given time. Kept as a static
+     * method so that the waiting itself can be verified without starting a process.
+     *
+     * @param future the output collection, may be null when no process was started
+     * @param timeoutMillis the maximum time to wait
+     * @return true if the output was collected, false if the wait timed out
+     */
+    static boolean awaitCollected(CompletableFuture<Void> future, long timeoutMillis) {
+        if (future == null) {
+            return true;
+        }
+        try {
+            future.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        } catch (Exception e) {
+            log.error("Collect the process output failed", e);
+            return true;
+        }
     }
 
     public void cancelApplication() throws InterruptedException {
@@ -266,18 +310,7 @@ public abstract class AbstractCommandExecutor {
      * @return process id
      */
     private int getProcessId(Process process) {
-        int processId = 0;
-
-        try {
-            Field f = process.getClass().getDeclaredField(TaskConstants.PID);
-            f.setAccessible(true);
-
-            processId = f.getInt(process);
-        } catch (Exception e) {
-            log.error("Get task pid failed", e);
-        }
-
-        return processId;
+        return ProcessUtils.getProcessId(process);
     }
 
 }
