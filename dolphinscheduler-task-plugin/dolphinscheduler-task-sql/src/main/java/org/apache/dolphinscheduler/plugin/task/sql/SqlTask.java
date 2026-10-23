@@ -306,22 +306,21 @@ public class SqlTask extends AbstractTask {
                 }
             }
 
+            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
+                    : TaskConstants.DEFAULT_DISPLAY_ROWS;
+            log.info("display the first {} rows of sql result as follows:", displayRows);
             while (resultSet.next()) {
                 ObjectNode mapOfColValues = JSONUtils.createObjectNode();
                 for (int i = 1; i <= num; i++) {
                     mapOfColValues.set(columnLabels[i - 1], JSONUtils.toJsonNode(resultSet.getObject(i)));
                 }
                 resultJSONArray.add(mapOfColValues);
+                if (resultJSONArray.size() <= displayRows) {
+                    log.info("row {} : {}", resultJSONArray.size(), JSONUtils.toJsonString(mapOfColValues));
+                }
             }
-
-            int displayRows = sqlParameters.getDisplayRows() > 0 ? sqlParameters.getDisplayRows()
-                    : TaskConstants.DEFAULT_DISPLAY_ROWS;
-            displayRows = Math.min(displayRows, resultJSONArray.size());
-            log.info("display sql result {} rows as follows:", displayRows);
-            for (int i = 0; i < displayRows; i++) {
-                String row = JSONUtils.toJsonString(resultJSONArray.get(i));
-                log.info("row {} : {}", i + 1, row);
-            }
+            log.info("displayed {} of {} rows", Math.min(displayRows, resultJSONArray.size()),
+                    resultJSONArray.size());
         }
 
         String result;
@@ -389,43 +388,71 @@ public class SqlTask extends AbstractTask {
      */
     private String limitAlertContent(ArrayNode resultJSONArray) {
         int totalRows = resultJSONArray.size();
-        ArrayNode limited = JSONUtils.createArrayNode();
-        int rowsToKeep = Math.min(totalRows, alertMaxRows);
-        for (int i = 0; i < rowsToKeep; i++) {
-            limited.add(limitRowValues(resultJSONArray.get(i)));
+
+        // Serialize each kept row once and track the running UTF-8 byte size, so the budget
+        // check on every dropped row is O(1) instead of rebuilding and re-encoding the whole
+        // content (which would turn the drop loop into O(rows^2)).
+        List<String> serializedRows = new ArrayList<>(Math.min(totalRows, alertMaxRows));
+        int rowsBytes = 0;
+        for (int i = 0; i < totalRows && i < alertMaxRows; i++) {
+            String rowJson = JSONUtils.toJsonString(limitRowValues(resultJSONArray.get(i)));
+            serializedRows.add(rowJson);
+            rowsBytes += rowJson.getBytes(StandardCharsets.UTF_8).length;
         }
 
-        int omittedRows = totalRows - rowsToKeep;
-        while (true) {
-            if (omittedRows > 0) {
-                limited.add(createOmissionMarker(omittedRows));
-            }
-            String content = JSONUtils.toJsonString(limited);
-            if (content.getBytes(StandardCharsets.UTF_8).length <= alertMaxContentBytes) {
-                return content;
-            }
-            if (omittedRows > 0) {
-                limited.remove(limited.size() - 1);
-            }
-            if (limited.isEmpty()) {
-                // Even a lone marker exceeds the budget (pathological budget); return the minimal notice.
-                return JSONUtils.toJsonString(createOmissionMarkerArray(totalRows));
-            }
-            limited.remove(limited.size() - 1);
+        int omittedRows = totalRows - serializedRows.size();
+        while (!serializedRows.isEmpty()
+                && contentBytes(rowsBytes, serializedRows.size(), omittedRows) > alertMaxContentBytes) {
+            int last = serializedRows.size() - 1;
+            rowsBytes -= serializedRows.remove(last).getBytes(StandardCharsets.UTF_8).length;
             omittedRows++;
         }
+        return buildAlertContent(serializedRows, omittedRows);
+    }
+
+    /**
+     * UTF-8 byte size of the alert content that buildAlertContent produces from the kept rows
+     * and the omission marker, i.e. "[" + rows joined by "," + ("," + marker)? + "]".
+     */
+    private int contentBytes(int rowsBytes, int rowCount, int omittedRows) {
+        int bytes = 2; // '[' and ']'
+        if (rowCount > 0) {
+            bytes += rowsBytes + rowCount - 1; // the rows plus their ',' separators
+        }
+        if (omittedRows > 0) {
+            bytes += (rowCount > 0 ? 1 : 0)
+                    + JSONUtils.toJsonString(createOmissionMarker(omittedRows)).getBytes(StandardCharsets.UTF_8).length;
+        }
+        return bytes;
+    }
+
+    /**
+     * Assemble the alert content from the kept rows and the omission marker,
+     * i.e. "[" + rows joined by "," + ("," + marker)? + "]".
+     */
+    private String buildAlertContent(List<String> serializedRows, int omittedRows) {
+        StringBuilder content = new StringBuilder();
+        content.append('[');
+        for (int i = 0; i < serializedRows.size(); i++) {
+            if (i > 0) {
+                content.append(',');
+            }
+            content.append(serializedRows.get(i));
+        }
+        if (omittedRows > 0) {
+            if (!serializedRows.isEmpty()) {
+                content.append(',');
+            }
+            content.append(JSONUtils.toJsonString(createOmissionMarker(omittedRows)));
+        }
+        content.append(']');
+        return content.toString();
     }
 
     private ObjectNode createOmissionMarker(int omittedRows) {
         ObjectNode omitted = JSONUtils.createObjectNode();
         omitted.put("...", omittedRows + " more rows omitted");
         return omitted;
-    }
-
-    private ArrayNode createOmissionMarkerArray(int totalRows) {
-        ArrayNode markerArray = JSONUtils.createArrayNode();
-        markerArray.add(createOmissionMarker(totalRows));
-        return markerArray;
     }
 
     private JsonNode limitRowValues(JsonNode row) {

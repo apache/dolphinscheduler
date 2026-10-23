@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCopyVO;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
@@ -194,14 +195,18 @@ public class WorkflowDefinitionControllerTest {
     public void testBatchCopyWorkflowDefinition() {
         long projectCode = 1L;
         long targetProjectCode = 2L;
+        long targetWorkflowDefinitionCode = 3L;
         String code = "1";
+        List<WorkflowDefinitionCopyVO> copyResponses = Collections.singletonList(
+                new WorkflowDefinitionCopyVO(targetProjectCode, targetWorkflowDefinitionCode));
 
-        doNothing().when(processDefinitionService)
-                .batchCopyWorkflowDefinition(user, projectCode, code, targetProjectCode);
-        Result<Void> response =
+        Mockito.when(processDefinitionService.batchCopyWorkflowDefinition(user, projectCode, code, targetProjectCode))
+                .thenReturn(copyResponses);
+        Result<List<WorkflowDefinitionCopyVO>> response =
                 workflowDefinitionController.copyWorkflowDefinition(user, projectCode, code, targetProjectCode);
 
-        Assertions.assertTrue(response != null && response.isSuccess());
+        Assertions.assertTrue(response.isSuccess());
+        Assertions.assertEquals(copyResponses, response.getData());
     }
 
     @Test

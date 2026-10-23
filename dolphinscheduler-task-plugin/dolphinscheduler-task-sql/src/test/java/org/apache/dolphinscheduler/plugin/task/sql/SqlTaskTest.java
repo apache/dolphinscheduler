@@ -52,7 +52,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,6 +63,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -386,6 +394,145 @@ class SqlTaskTest {
         Assertions.assertTrue(
                 cause.getMessage().contains("duplicate column name"),
                 "TaskException message should mention duplicate column name");
+    }
+
+    @Test
+    void testResultProcessLogsRowsWhileFetchingAndOnlyUpToDisplayRows() throws Exception {
+        String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\",\"displayRows\":2}";
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams(taskParams);
+        ctx.setTaskName("display_rows_task");
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+
+        SqlTask task = new SqlTask(ctx);
+
+        ListAppender<ILoggingEvent> appender = attachLogAppender();
+        try {
+            ResultSet mockResultSet = mock(ResultSet.class);
+            ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+            when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+            when(mockMetaData.getColumnCount()).thenReturn(1);
+            when(mockMetaData.getColumnLabel(1)).thenReturn("id");
+            AtomicInteger fetchedRows = new AtomicInteger();
+            when(mockResultSet.next()).thenAnswer(inv -> fetchedRows.incrementAndGet() <= 5);
+            when(mockResultSet.getObject(1)).thenAnswer(inv -> {
+                int currentRow = fetchedRows.get();
+                if (currentRow > 1) {
+                    long loggedRows = appender.list.stream()
+                            .map(ILoggingEvent::getFormattedMessage)
+                            .filter(message -> message.startsWith("row "))
+                            .count();
+                    Assertions.assertEquals(Math.min(currentRow - 1, 2), loggedRows, "before fetching row "
+                            + currentRow + ", the first " + Math.min(currentRow - 1, 2)
+                            + " rows should already be logged");
+                }
+                return "v" + currentRow;
+            });
+
+            Method resultProcessMethod = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+            resultProcessMethod.setAccessible(true);
+            String result = (String) resultProcessMethod.invoke(task, mockResultSet);
+
+            List<String> messages = appender.list.stream()
+                    .map(ILoggingEvent::getFormattedMessage)
+                    .collect(Collectors.toList());
+            Assertions.assertTrue(messages.contains("display the first 2 rows of sql result as follows:"));
+            Assertions.assertTrue(messages.contains("row 1 : {\"id\":\"v1\"}"));
+            Assertions.assertTrue(messages.contains("row 2 : {\"id\":\"v2\"}"));
+            Assertions.assertEquals(2, messages.stream().filter(message -> message.startsWith("row ")).count(),
+                    "only the first displayRows=2 rows should be logged");
+            Assertions.assertTrue(messages.contains("displayed 2 of 5 rows"));
+            // the full result set is kept regardless of the display limit
+            Assertions.assertTrue(result.contains("v3"));
+            Assertions.assertTrue(result.contains("v5"));
+        } finally {
+            detachLogAppender(appender);
+        }
+    }
+
+    @Test
+    void testResultProcessLogsAllRowsWhenResultSmallerThanDefaultDisplayRows() throws Exception {
+        String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\"}";
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams(taskParams);
+        ctx.setTaskName("default_display_rows_task");
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+
+        SqlTask task = new SqlTask(ctx);
+
+        ListAppender<ILoggingEvent> appender = attachLogAppender();
+        try {
+            ResultSet mockResultSet = mock(ResultSet.class);
+            ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+            when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+            when(mockMetaData.getColumnCount()).thenReturn(1);
+            when(mockMetaData.getColumnLabel(1)).thenReturn("id");
+            when(mockResultSet.next()).thenReturn(true, true, false);
+            when(mockResultSet.getObject(1)).thenReturn("v");
+
+            Method resultProcessMethod = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+            resultProcessMethod.setAccessible(true);
+            resultProcessMethod.invoke(task, mockResultSet);
+
+            List<String> messages = appender.list.stream()
+                    .map(ILoggingEvent::getFormattedMessage)
+                    .collect(Collectors.toList());
+            Assertions.assertTrue(messages.contains("display the first 10 rows of sql result as follows:"));
+            Assertions.assertTrue(messages.contains("row 1 : {\"id\":\"v\"}"));
+            Assertions.assertTrue(messages.contains("row 2 : {\"id\":\"v\"}"));
+            Assertions.assertEquals(2, messages.stream().filter(message -> message.startsWith("row ")).count());
+            Assertions.assertTrue(messages.contains("displayed 2 of 2 rows"));
+        } finally {
+            detachLogAppender(appender);
+        }
+    }
+
+    @Test
+    void testResultProcessLogsNoRowForEmptyResultSet() throws Exception {
+        String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\",\"displayRows\":3}";
+        TaskExecutionContext ctx = new TaskExecutionContext();
+        ctx.setTaskParams(taskParams);
+        ctx.setTaskName("empty_result_display_rows_task");
+        ctx.setResourceParametersHelper(getResourceParametersHelperWithDatasourceType(DbType.HIVE));
+
+        SqlTask task = new SqlTask(ctx);
+
+        ListAppender<ILoggingEvent> appender = attachLogAppender();
+        try {
+            ResultSet mockResultSet = mock(ResultSet.class);
+            ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+            when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+            when(mockMetaData.getColumnCount()).thenReturn(1);
+            when(mockMetaData.getColumnLabel(1)).thenReturn("id");
+            when(mockResultSet.next()).thenReturn(false);
+
+            Method resultProcessMethod = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+            resultProcessMethod.setAccessible(true);
+            resultProcessMethod.invoke(task, mockResultSet);
+
+            List<String> messages = appender.list.stream()
+                    .map(ILoggingEvent::getFormattedMessage)
+                    .collect(Collectors.toList());
+            Assertions.assertTrue(messages.contains("display the first 3 rows of sql result as follows:"));
+            Assertions.assertEquals(0, messages.stream().filter(message -> message.startsWith("row ")).count());
+            Assertions.assertTrue(messages.contains("displayed 0 of 0 rows"));
+        } finally {
+            detachLogAppender(appender);
+        }
+    }
+
+    private ListAppender<ILoggingEvent> attachLogAppender() {
+        Logger logger = (Logger) LoggerFactory.getLogger(SqlTask.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        return appender;
+    }
+
+    private void detachLogAppender(ListAppender<ILoggingEvent> appender) {
+        Logger logger = (Logger) LoggerFactory.getLogger(SqlTask.class);
+        logger.detachAppender(appender);
+        appender.stop();
     }
 
     @Test
@@ -751,6 +898,53 @@ class SqlTaskTest {
         JsonNode only = contentArray.get(0);
         Assertions.assertTrue(only.has("..."));
         Assertions.assertEquals("1 more rows omitted", only.get("...").asText());
+    }
+
+    @Test
+    void testPrepareTaskResultAlertKeepsMaxRowsFittingExactByteBudget() throws Exception {
+        // each row {"id":"N"} serializes to 10 UTF-8 bytes and the marker row to 29 bytes,
+        // so keeping 2 rows costs exactly 53 bytes: brackets(2) + rows(20) + separator(1) + marker(30)
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        for (int i = 0; i < 5; i++) {
+            resultArray.add(JSONUtils.parseObject("{\"id\":\"" + i + "\"}"));
+        }
+
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.rows", 30)).thenReturn(5);
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.row.value.length", 100))
+                    .thenReturn(100);
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.content.bytes", 60000)).thenReturn(53);
+
+            TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "exact byte budget test", 1);
+
+            TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+            Assertions.assertEquals("[{\"id\":\"0\"},{\"id\":\"1\"},{\"...\":\"3 more rows omitted\"}]",
+                    alertInfo.getContent());
+        }
+    }
+
+    @Test
+    void testPrepareTaskResultAlertMeasuresUtf8BytesNotChars() throws Exception {
+        // each row {"id":"中中中"} is 12 chars but 18 UTF-8 bytes, so a char-based budget
+        // check would keep 2 rows while the byte-based check keeps only 1
+        ArrayNode resultArray = JSONUtils.createArrayNode();
+        for (int i = 0; i < 5; i++) {
+            resultArray.add(JSONUtils.parseObject("{\"id\":\"" + repeatChar('\u4e2d', 3) + "\"}"));
+        }
+
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.rows", 30)).thenReturn(5);
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.row.value.length", 100))
+                    .thenReturn(100);
+            propertyUtils.when(() -> PropertyUtils.getInt("sql.task.alert.max.content.bytes", 60000)).thenReturn(60);
+
+            TaskExecutionContext ctx = createSqlTaskWithAlert(resultArray, 10, "utf8 bytes test", 1);
+
+            TaskAlertInfo alertInfo = ctx.getTaskAlertInfo();
+            Assertions.assertEquals(
+                    "[{\"id\":\"\u4e2d\u4e2d\u4e2d\"},{\"...\":\"4 more rows omitted\"}]",
+                    alertInfo.getContent());
+        }
     }
 
     private String repeatChar(char c, int count) {
