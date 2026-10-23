@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one or more
+contributor license agreements. See the NOTICE file distributed with
+this work for additional information regarding copyright ownership.
+The ASF licenses this file to You under the Apache License, Version 2.0
+(the "License"); you may not use this file except in compliance with
+the License. You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<mxfile host="Electron" agent="draw.io" version="29.0.0" type="device">
+  <diagram id="dsip104-project-authorization" name="Project authorization">
+    <mxGraphModel dx="1360" dy="1500" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1360" pageHeight="1500" math="0" shadow="0" background="#FFFFFF">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" value="DSIP-104  |  Project-scoped authorization" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=34;fillColor=none;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;fontColor=#172B4D;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="24" width="1280" height="48" />
+        </mxCell>
+        <mxCell id="subtitle" value="Two independent grants: what a user can do in a project, and which resources that project can use." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=none;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;fontColor=#52657D;fontStyle=0;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="82" width="1280" height="34" />
+        </mxCell>
+        <mxCell id="section1" value="01   CONFIGURE AUTHORIZATION FOR PROJECT P" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=20;fillColor=none;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;fontColor=#172B4D;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="138" width="1280" height="32" />
+        </mxCell>
+        <mxCell id="member-panel" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F5F8FF;strokeColor=#C7D6F7;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="187" width="610" height="458" />
+        </mxCell>
+        <mxCell id="resource-panel" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F2FAF5;strokeColor=#BDDFC9;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="680" y="187" width="640" height="458" />
+        </mxCell>
+        <mxCell id="member-label" value="USER → PROJECT: OPERATION PERMISSIONS" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=20;fillColor=none;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;fontColor=#2563EB;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="60" y="203" width="570" height="30" />
+        </mxCell>
+        <mxCell id="resource-label" value="RESOURCE → PROJECT: USE GRANTS" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=20;fillColor=none;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;fontColor=#15803D;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="700" y="203" width="600" height="30" />
+        </mxCell>
+        <mxCell id="member-actor" value="&lt;b&gt;System administrator&lt;/b&gt; or member with&lt;br/&gt;&lt;b&gt;MANAGE_MEMBERS&lt;/b&gt; in project P" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#E2EBFF;strokeColor=#AFC3EF;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="65" y="250" width="560" height="64" />
+        </mxCell>
+        <mxCell id="resource-actor" value="&lt;b&gt;System administrator only&lt;/b&gt;&lt;br/&gt;Grant or revoke shared resources for project P" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#DCF2E3;strokeColor=#9ACBAC;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="705" y="250" width="590" height="64" />
+        </mxCell>
+        <mxCell id="member-assign" value="assign to project members" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;strokeWidth=2;fontFamily=Helvetica;fontSize=18;fontColor=#2563EB;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="member-actor" target="permission-list">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="permission-list" value="&lt;b&gt;VIEW&lt;/b&gt; · view project content&lt;br/&gt;&lt;b&gt;DEVELOP&lt;/b&gt; · edit workflows and tasks&lt;br/&gt;&lt;b&gt;PUBLISH&lt;/b&gt; · publish / unpublish definitions&lt;br/&gt;&lt;b&gt;EXECUTE&lt;/b&gt; · manual start / rerun / control&lt;br/&gt;&lt;b&gt;MANAGE_SCHEDULES&lt;/b&gt; · manage schedules&lt;br/&gt;&lt;b&gt;MANAGE_MEMBERS&lt;/b&gt; · assign member permissions" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#FFFFFF;strokeColor=#B9CBEF;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;spacingLeft=22;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="65" y="352" width="560" height="186" />
+        </mxCell>
+        <mxCell id="resource-grant" value="authorize resource use" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#15803D;strokeWidth=2;fontFamily=Helvetica;fontSize=18;fontColor=#15803D;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="resource-actor" target="resource-grid">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="resource-grid" value="" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#FFFFFF;strokeColor=#AED3BA;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="705" y="352" width="590" height="186" />
+        </mxCell>
+        <mxCell id="res-datasource" value="Datasource" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F1F8F3;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="717" y="361" width="280" height="36" />
+        </mxCell>
+        <mxCell id="res-worker-group" value="Worker group" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F1F8F3;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1009" y="361" width="280" height="36" />
+        </mxCell>
+        <mxCell id="res-tenant" value="Tenant" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F1F8F3;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="717" y="404" width="280" height="36" />
+        </mxCell>
+        <mxCell id="res-queue" value="Queue" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F1F8F3;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1009" y="404" width="280" height="36" />
+        </mxCell>
+        <mxCell id="res-environment" value="Environment" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F1F8F3;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="717" y="447" width="280" height="36" />
+        </mxCell>
+        <mxCell id="res-alert-group" value="Alert group" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F1F8F3;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1009" y="447" width="280" height="36" />
+        </mxCell>
+        <mxCell id="res-k8s" value="Kubernetes namespace" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F1F8F3;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="717" y="490" width="280" height="36" />
+        </mxCell>
+        <mxCell id="res-task-group" value="Task group" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F1F8F3;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;spacing=2;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1009" y="490" width="280" height="36" />
+        </mxCell>
+        <mxCell id="permission-storage" value="&lt;b&gt;ProjectUserPermission&lt;/b&gt;&lt;br/&gt;project_code + user_id + permission" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=19;fillColor=#EAF0FE;strokeColor=#B9CBEF;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="65" y="565" width="560" height="58" />
+        </mxCell>
+        <mxCell id="resource-storage" value="&lt;b&gt;ProjectResourceAuthorization&lt;/b&gt;&lt;br/&gt;project_code + resource_type + resource_key" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=19;fillColor=#E7F5EC;strokeColor=#AED3BA;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="705" y="565" width="590" height="58" />
+        </mxCell>
+        <mxCell id="save-member" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;strokeWidth=2;fontFamily=Helvetica;fontSize=18;fontColor=#2563EB;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="permission-list" target="permission-storage">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="save-resource" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#15803D;strokeWidth=2;fontFamily=Helvetica;fontSize=18;fontColor=#15803D;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;entryX=0.5;entryY=0;" edge="1" parent="1" source="resource-grid" target="resource-storage">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="section2" value="02   ENFORCE AT PROTECTED API / SERVICE ENTRY POINTS" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=20;fillColor=none;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;fontColor=#172B4D;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="684" width="1280" height="32" />
+        </mxCell>
+        <mxCell id="entrypoints" value="Workflow / task configuration · publication · schedule management · manual execution / rerun&lt;br/&gt;Resource checks apply to the resources actually referenced by each operation." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=none;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;fontColor=#52657D;fontStyle=0;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="728" width="1280" height="48" />
+        </mxCell>
+        <mxCell id="resolve" value="&lt;b&gt;Resolve project P&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Validate target project;&lt;br/&gt;use the actual project&lt;br/&gt;of an existing instance." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F1F5F9;strokeColor=#B6C4D5;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="818" width="255" height="142" />
+        </mxCell>
+        <mxCell id="operation-check" value="&lt;b&gt;Check operation&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;User has the required&lt;br/&gt;permission in project P?&lt;br/&gt;System admin passes." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#EAF0FE;strokeColor=#8CAAE7;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="345" y="818" width="270" height="142" />
+        </mxCell>
+        <mxCell id="resource-check" value="&lt;b&gt;Check referenced resources&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Every required resource&lt;br/&gt;is granted to project P?&lt;br/&gt;Use grants are project-scoped." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#E7F5EC;strokeColor=#86BA98;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="665" y="818" width="345" height="142" />
+        </mxCell>
+        <mxCell id="allow" value="&lt;b&gt;ALLOW&lt;/b&gt;&lt;br/&gt;Both dimensions pass" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=25;fillColor=#DCF2E3;strokeColor=#73AC88;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="1070" y="845" width="250" height="86" />
+        </mxCell>
+        <mxCell id="resolve-operation" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;strokeWidth=2;fontFamily=Helvetica;fontSize=18;fontColor=#2563EB;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="resolve" target="operation-check">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="operation-resource" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#2563EB;strokeWidth=2;fontFamily=Helvetica;fontSize=18;fontColor=#2563EB;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="operation-check" target="resource-check">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="resource-allow" value="yes" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#15803D;strokeWidth=2;fontFamily=Helvetica;fontSize=18;fontColor=#15803D;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.5;entryX=0;entryY=0.5;" edge="1" parent="1" source="resource-check" target="allow">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="deny" value="&lt;b&gt;DENY&lt;/b&gt;  ·  Missing operation permission or required resource grant" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#FEF2F2;strokeColor=#E2A3A3;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="345" y="1023" width="665" height="64" />
+        </mxCell>
+        <mxCell id="operation-deny" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#B91C1C;strokeWidth=2;fontFamily=Helvetica;fontSize=18;fontColor=#B91C1C;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;entryX=0.2;entryY=0;" edge="1" parent="1" source="operation-check" target="deny">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="resource-deny" value="no" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;strokeColor=#B91C1C;strokeWidth=2;fontFamily=Helvetica;fontSize=18;fontColor=#B91C1C;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1;entryX=0.75;entryY=0;" edge="1" parent="1" source="resource-check" target="deny">
+          <mxGeometry as="geometry" relative="1" />
+        </mxCell>
+        <mxCell id="grant-note" value="System admins pass the operation check; required project resource grants still apply.&lt;br/&gt;Nested subworkflows are checked against each child workflow's own project and resource grants." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=20;fillColor=none;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=center;fontColor=#52657D;fontStyle=0;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="1098" width="1280" height="60" />
+        </mxCell>
+        <mxCell id="section3" value="03   SCOPE AND UPGRADE BOUNDARIES" style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=20;fillColor=none;strokeColor=none;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;fontColor=#172B4D;fontStyle=1;spacing=0;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="1170" width="1280" height="32" />
+        </mxCell>
+        <mxCell id="access-boundary" value="&lt;b&gt;Resource use and visibility&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Use grants do not grant edit / delete / re-grant rights.&lt;br/&gt;Project selectors filter in SQL and return safe metadata.&lt;br/&gt;Resource files retain the existing authorization model;&lt;br/&gt;they are outside this project-resource grant model." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=20;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;spacingLeft=18;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="1221" width="610" height="156" />
+        </mxCell>
+        <mxCell id="lifecycle-boundary" value="&lt;b&gt;Revocation and existing activity&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;No grant recheck for running / queued instances,&lt;br/&gt;scheduled triggers or automatic retries.&lt;br/&gt;Revocation does not stop instances or disable schedules." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=20;fillColor=#FFF9ED;strokeColor=#E4C790;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;align=left;spacingLeft=18;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="680" y="1221" width="640" height="156" />
+        </mxCell>
+        <mxCell id="migration" value="&lt;b&gt;Upgrade to 3.5.0:&lt;/b&gt; legacy authorization data is retained; no automatic migration or legacy fallback.&lt;br/&gt;Administrators must explicitly reassign project member permissions and project resource grants." style="rounded=1;arcSize=12;whiteSpace=wrap;html=1;fontFamily=Helvetica;fontColor=#172B4D;fontSize=21;fillColor=#F1F5F9;strokeColor=#B6C4D5;strokeWidth=1.5;spacing=12;align=center;verticalAlign=middle;" vertex="1" parent="1">
+          <mxGeometry as="geometry" x="40" y="1402" width="1280" height="74" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
