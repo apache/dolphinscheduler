@@ -120,6 +120,42 @@ public class SessionServiceTest {
         Assertions.assertTrue(sessionService.isSessionExpire(expired));
     }
 
+    @Test
+    public void testCreateSessionIfAbsentReusesUnexpiredSession() {
+        User user = new User();
+        user.setUserType(UserType.GENERAL_USER);
+        user.setId(1);
+        // fixture session's lastLoginTime is 40 days in the future -> unexpired
+        Mockito.when(sessionDao.queryByUserId(1)).thenReturn(getSessions());
+
+        Session session = sessionService.createSessionIfAbsent(user);
+
+        Assertions.assertNotNull(session);
+        Assertions.assertEquals(sessionId, session.getId());
+        Mockito.verify(sessionDao).updateById(session);
+        Mockito.verify(sessionDao, Mockito.never()).deleteById(Mockito.anyString());
+        Mockito.verify(sessionDao, Mockito.never()).insert(Mockito.any(Session.class));
+    }
+
+    @Test
+    public void testCreateSessionIfAbsentReplacesExpiredSession() {
+        User user = new User();
+        user.setUserType(UserType.GENERAL_USER);
+        user.setId(1);
+        Session expired = getSession();
+        expired.setLastLoginTime(DateUtils.add(new Date(), Calendar.DAY_OF_MONTH, -40));
+        List<Session> sessions = new ArrayList<>();
+        sessions.add(expired);
+        Mockito.when(sessionDao.queryByUserId(1)).thenReturn(sessions);
+
+        Session session = sessionService.createSessionIfAbsent(user);
+
+        Assertions.assertNotNull(session);
+        Assertions.assertNotEquals(sessionId, session.getId());
+        Mockito.verify(sessionDao).deleteById(sessionId);
+        Mockito.verify(sessionDao).insert(Mockito.any(Session.class));
+    }
+
     private Session getSession() {
         Session session = new Session();
         session.setId(sessionId);
