@@ -1191,6 +1191,32 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testSwitchWorkflowDefinitionVersionShouldOfflineSchedule() {
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog();
+        workflowDefinitionLog.setCode(processDefinitionCode);
+        workflowDefinitionLog.setProjectCode(projectCode);
+        workflowDefinitionLog.setVersion(1);
+        WorkflowTaskRelation workflowTaskRelation =
+                getWorkflowTaskRelation(1, 1, projectCode, processDefinitionCode, 0, 0, 123456789L, 1);
+        TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
+        taskDefinitionLog.setTaskType("SHELL");
+
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(workflowDefinitionLog);
+        when(workflowTaskRelationDao.queryWorkflowTaskRelationsByWorkflowDefinitionCode(processDefinitionCode, 1))
+                .thenReturn(Collections.singletonList(workflowTaskRelation));
+        when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
+                .thenReturn(Collections.singletonList(taskDefinitionLog));
+        when(processService.switchVersion(workflowDefinition, workflowDefinitionLog)).thenReturn(1);
+
+        workflowDefinitionService.switchWorkflowDefinitionVersion(user, projectCode, processDefinitionCode, 1);
+
+        verify(schedulerService).offlineSchedulerByWorkflowCode(processDefinitionCode);
+    }
+
+    @Test
     public void testOnlineWorkflowDefinitionShouldRejectUnauthorizedDatasource() {
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
         WorkflowTaskRelation workflowTaskRelation =
