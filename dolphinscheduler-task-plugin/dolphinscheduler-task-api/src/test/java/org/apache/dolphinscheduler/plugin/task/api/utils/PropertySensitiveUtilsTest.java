@@ -145,6 +145,80 @@ class PropertySensitiveUtilsTest {
         Assertions.assertEquals("abc", parsed.get(0).getValue());
     }
 
+    @Test
+    void findInvalidSensitiveFieldIsNullWhenAllValuesMatch() {
+        List<Property> properties = Arrays.asList(
+                sensitive("pwd", "Secret123"),
+                sensitive("token", "long-token-value"),
+                nonSensitive("name", "a"));
+
+        Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(properties));
+    }
+
+    @Test
+    void findInvalidSensitiveFieldReportsPropWhenTooShort() {
+        Assertions.assertEquals("pwd",
+                PropertySensitiveUtils.findInvalidSensitiveField(
+                        Collections.singletonList(sensitive("pwd", "abc"))));
+        Assertions.assertEquals("pwd",
+                PropertySensitiveUtils.findInvalidSensitiveField(
+                        Collections.singletonList(sensitive("pwd", "12345"))));
+    }
+
+    @Test
+    void findInvalidSensitiveFieldAcceptsLengthGreaterThanOrEqualToSix() {
+        // Boundary: exactly 6 characters is the minimum and passes.
+        Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(
+                Collections.singletonList(sensitive("pwd", "123456"))));
+        Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(
+                Collections.singletonList(sensitive("pwd", "1234567"))));
+    }
+
+    @Test
+    void findInvalidSensitiveFieldSkipsPlaceholderAndEmpty() {
+        List<Property> properties = Arrays.asList(
+                sensitive("mask", TaskConstants.SENSITIVE_DATA_MASK),
+                sensitive("empty", ""),
+                sensitive("null", null));
+
+        Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(properties));
+    }
+
+    @Test
+    void findInvalidSensitiveFieldIgnoresNonSensitiveShortValue() {
+        List<Property> properties = Arrays.asList(
+                nonSensitive("short", "a"),
+                sensitive("pwd", "Secret123"));
+
+        Assertions.assertNull(PropertySensitiveUtils.findInvalidSensitiveField(properties));
+    }
+
+    @Test
+    void findInvalidSensitiveFieldReturnsEmptyPropWhenViolatingPropertyHasNoProp() {
+        // A malformed property with a null prop must not silently pass validation:
+        // an empty string (not null) is returned so callers can still detect the violation.
+        Property noProp = Property.builder()
+                .direct(Direct.IN)
+                .type(DataType.VARCHAR)
+                .value("abc")
+                .sensitive(true)
+                .build();
+
+        Assertions.assertEquals("", PropertySensitiveUtils.findInvalidSensitiveField(
+                Collections.singletonList(noProp)));
+    }
+
+    @Test
+    void findPlaceholderPropReturnsEmptyPropWhenPlaceholderPropertyHasNoProp() {
+        Property noProp = Property.builder()
+                .value(TaskConstants.SENSITIVE_DATA_MASK)
+                .sensitive(true)
+                .build();
+
+        Assertions.assertEquals("", PropertySensitiveUtils.findPlaceholderProp(
+                Collections.singletonList(noProp)));
+    }
+
     private static Property sensitive(String prop, String value) {
         return Property.builder()
                 .prop(prop)

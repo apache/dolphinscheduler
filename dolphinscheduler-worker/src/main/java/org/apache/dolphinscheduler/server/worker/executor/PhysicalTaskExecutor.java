@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
@@ -116,7 +117,12 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     public void finalizeTask() {
-        clearTaskInstanceWorkingDirectoryIfNeeded();
+        try {
+            clearTaskInstanceWorkingDirectoryIfNeeded();
+        } finally {
+            // Must clear on success / failure / kill so later tasks are not polluted.
+            SensitiveDataConverter.clearTaskSensitiveValues(taskExecutionContext.getTaskInstanceId());
+        }
     }
 
     private void clearTaskInstanceWorkingDirectoryIfNeeded() {
@@ -128,6 +134,11 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
 
     @Override
     protected void initializeTaskContext() {
+        // Register before any context logging (including super) so worker logs are masked too.
+        SensitiveDataConverter.registerTaskSensitiveValues(
+                taskExecutionContext.getTaskInstanceId(),
+                taskExecutionContext.getPrepareParamsMap());
+
         super.initializeTaskContext();
 
         taskExecutionContext.setTaskAppId(String.valueOf(taskExecutionContext.getTaskInstanceId()));
