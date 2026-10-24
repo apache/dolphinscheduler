@@ -44,6 +44,14 @@
             <artifactId>dolphinscheduler-datasource-api</artifactId>
             <version>${project.version}</version>
             <scope>provided</scope>
+            <exclusions>
+                <!-- keep logback (brought by dolphinscheduler-common) the only slf4j binding on this
+                     module's classpath, so tests can capture logs through the logback api -->
+                <exclusion>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-reload4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
