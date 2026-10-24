@@ -63,6 +63,7 @@ import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
@@ -1114,8 +1115,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
         when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, 1))
                 .thenReturn(workflowDefinitionLog);
-        when(workflowTaskRelationDao.queryWorkflowTaskRelationsByWorkflowDefinitionCode(processDefinitionCode, 1))
-                .thenReturn(Collections.singletonList(workflowTaskRelation));
+        when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(Collections.singletonList(new WorkflowTaskRelationLog(workflowTaskRelation)));
         when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
                 .thenReturn(Collections.singletonList(new TaskDefinitionLog()));
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
@@ -1126,8 +1127,38 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                         user, projectCode, processDefinitionCode, 1));
 
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        verify(workflowTaskRelationLogMapper).queryByWorkflowCodeAndVersion(processDefinitionCode, 1);
+        verify(workflowTaskRelationDao, Mockito.never())
+                .queryWorkflowTaskRelationsByWorkflowDefinitionCode(anyLong(), Mockito.anyInt());
+        verify(taskDefinitionLogMapper)
+                .queryByTaskDefinitions(Mockito.argThat(taskDefinitions -> taskDefinitions.size() == 1
+                        && taskDefinitions.iterator().next().getCode() == workflowTaskRelation.getPostTaskCode()
+                        && taskDefinitions.iterator().next().getVersion() == workflowTaskRelation
+                                .getPostTaskVersion()));
         Mockito.verify(processService, Mockito.never())
                 .switchVersion(any(WorkflowDefinition.class), any(WorkflowDefinitionLog.class));
+    }
+
+    @Test
+    public void testSwitchWorkflowDefinitionVersionShouldNotQueryAllTasksWhenTargetVersionHasNoRelations() {
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog();
+        workflowDefinitionLog.setCode(processDefinitionCode);
+        workflowDefinitionLog.setProjectCode(projectCode);
+        workflowDefinitionLog.setVersion(1);
+
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
+        when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(workflowDefinitionLog);
+        when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(Collections.emptyList());
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.switchWorkflowDefinitionVersion(
+                        user, projectCode, processDefinitionCode, 1));
+
+        verify(taskDefinitionLogMapper, Mockito.never()).queryByTaskDefinitions(anyList());
+        verify(processService).switchVersion(workflowDefinition, workflowDefinitionLog);
     }
 
     @Test
@@ -1143,8 +1174,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
         when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, 1))
                 .thenReturn(workflowDefinitionLog);
-        when(workflowTaskRelationDao.queryWorkflowTaskRelationsByWorkflowDefinitionCode(processDefinitionCode, 1))
-                .thenReturn(Collections.singletonList(workflowTaskRelation));
+        when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(Collections.singletonList(new WorkflowTaskRelationLog(workflowTaskRelation)));
         when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
                 .thenReturn(Collections.singletonList(new TaskDefinitionLog()));
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
@@ -1174,8 +1205,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(workflowDefinition));
         when(workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(processDefinitionCode, 1))
                 .thenReturn(workflowDefinitionLog);
-        when(workflowTaskRelationDao.queryWorkflowTaskRelationsByWorkflowDefinitionCode(processDefinitionCode, 1))
-                .thenReturn(Collections.singletonList(workflowTaskRelation));
+        when(workflowTaskRelationLogMapper.queryByWorkflowCodeAndVersion(processDefinitionCode, 1))
+                .thenReturn(Collections.singletonList(new WorkflowTaskRelationLog(workflowTaskRelation)));
         when(taskDefinitionLogMapper.queryByTaskDefinitions(anyList()))
                 .thenReturn(Collections.singletonList(taskDefinitionLog));
         when(processService.switchVersion(workflowDefinition, workflowDefinitionLog)).thenReturn(1);
