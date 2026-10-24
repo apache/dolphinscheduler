@@ -57,13 +57,13 @@ Select `JSHELL` as the run type and provide the code in the JShell Script field.
 
 For example:
 
-  ```java
-  System.out.println("Hello from JShell!");
+```java
+System.out.println("Hello from JShell!");
 
-  int a = 10;
-  int b = 20;
-  System.out.println(a + b);
-  ```
+int a = 10;
+int b = 20;
+System.out.println(a + b);
+```
 
 The script can contain multiple statements and expressions. Configure resources and JVM parameters as supported by the JShell execution mode when the task requires them.
 
@@ -73,3 +73,4 @@ The script can contain multiple statements and expressions. Configure resources 
 2. NORMAL_JAR should provide the main class name (optional), while FAT_JAR does not need to provide the main class name.
 3. `JSHELL` requires JDK 9 or later. Ensure that the configured worker JDK includes the `jshell` executable.
 4. A main JAR and main class are not required when using the `JSHELL` run type.
+

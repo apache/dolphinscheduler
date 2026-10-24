@@ -57,6 +57,8 @@ public class JavaTask extends AbstractTask {
 
     private Path jshellScriptPath;
 
+    private Path userScriptPath;
+
     private final ShellCommandExecutor shellCommandExecutor;
 
     public JavaTask(TaskExecutionContext taskRequest) {
@@ -137,12 +139,14 @@ public class JavaTask extends AbstractTask {
                 try {
                     Files.deleteIfExists(jshellScriptPath);
                 } catch (IOException e) {
-                    log.warn(
-                            "Failed to delete temporary JShell script {}",
-                            jshellScriptPath,
-                            e);
-                } finally {
-                    jshellScriptPath = null;
+                    log.warn("Failed to delete temporary JShell script {}", jshellScriptPath, e);
+                }
+            }
+            if (userScriptPath != null) {
+                try {
+                    Files.deleteIfExists(userScriptPath);
+                } catch (IOException e) {
+                    log.warn("Failed to delete temporary User script {}", userScriptPath, e);
                 }
             }
         }
@@ -200,68 +204,134 @@ public class JavaTask extends AbstractTask {
     protected String buildJshellCommand() throws IOException {
         Path executePath = Paths.get(taskRequest.getExecutePath());
 
-        jshellScriptPath = Files.createTempFile(
-                executePath, "jshell-", ".jsh");
+        userScriptPath = Files.createTempFile(executePath, "user-script-", ".jsh");
+        jshellScriptPath = Files.createTempFile(executePath, "jshell-wrapper-", ".java");
 
-        String source = parseParameter(javaParameters.getJshellScript());
-
-        Files.write(
-                jshellScriptPath,
-                source.getBytes(StandardCharsets.UTF_8));
-
-        StringBuilder builder = new StringBuilder(getJshellCommandPath());
-
-        String jvmArgs = StringUtils.trimToEmpty(javaParameters.getJvmArgs());
-
-        if (!jvmArgs.isEmpty()) {
-            for (String argument : jvmArgs.split("\\s+")) {
-                builder.append(Constants.SPACE)
-                        .append("-R")
-                        .append(argument);
-            }
+        if (!userScriptPath.toFile().setReadable(true, false)) {
+            throw new IOException("Failed to set world-readable permissions on " + userScriptPath);
+        }
+        if (!jshellScriptPath.toFile().setReadable(true, false)) {
+            throw new IOException("Failed to set world-readable permissions on " + jshellScriptPath);
         }
 
+        String source = parseParameter(javaParameters.getJshellScript());
+        Files.write(userScriptPath, source.getBytes(StandardCharsets.UTF_8));
+
+        String wrapperCode = generateJshellWrapper();
+        Files.write(jshellScriptPath, wrapperCode.getBytes(StandardCharsets.UTF_8));
+
+        StringBuilder builder = new StringBuilder(getJavaCommandPath());
+
         builder.append(Constants.SPACE)
-                .append("--feedback concise")
+                .append(buildResourcePath())
                 .append(Constants.SPACE)
-                .append(buildJshellResourcePath())
-                .append(" - < ")
-                .append(quoteShellArgument(
-                        jshellScriptPath.toAbsolutePath().toString()));
+                .append(quoteShellArgument(jshellScriptPath.toAbsolutePath().toString()))
+                .append(Constants.SPACE)
+                .append(quoteShellArgument(userScriptPath.toAbsolutePath().toString()));
+
+        String jvmArgs = StringUtils.trimToEmpty(javaParameters.getJvmArgs());
+        if (!jvmArgs.isEmpty()) {
+            builder.append(Constants.SPACE).append(jvmArgs);
+        }
 
         return parseParameter(builder.toString());
+    }
+
+    /**
+     * Generates a Java program that explicitly evaluates the JShell script using SourceCodeAnalysis,
+     * configures the JShell execution environment, and propagates a failure exit code.
+     */
+    private String generateJshellWrapper() {
+        String pathOption = javaParameters.isModulePath() ? "--module-path" : "--class-path";
+        String resolvedPath = buildJshellResourcePath();
+
+        return "import jdk.jshell.JShell;\n" +
+                "import jdk.jshell.SnippetEvent;\n" +
+                "import jdk.jshell.SourceCodeAnalysis;\n" +
+                "import java.nio.file.Files;\n" +
+                "import java.nio.file.Paths;\n" +
+                "import java.util.List;\n" +
+                "import java.util.ArrayList;\n" +
+                "import java.util.Arrays;\n\n" +
+                "public class JShellExecutor {\n" +
+                "    public static void main(String[] args) throws Exception {\n" +
+                "        if (args.length < 1) {\n" +
+                "            throw new IllegalArgumentException(\"Missing user script path\");\n" +
+                "        }\n" +
+                "        String source = new String(Files.readAllBytes(Paths.get(args[0])));\n" +
+                "        \n" +
+                "        List<String> remoteOptions = new ArrayList<>();\n" +
+                "        remoteOptions.add(\"" + pathOption + "\");\n" +
+                "        remoteOptions.add(\"" + resolvedPath.replace("\\", "\\\\") + "\");\n" +
+                "        if (args.length > 1) {\n" +
+                "            remoteOptions.addAll(Arrays.asList(args).subList(1, args.length));\n" +
+                "        }\n" +
+                "        \n" +
+                "        try (JShell jshell = JShell.builder()\n" +
+                "                .compilerOptions(\"" + pathOption + "\", \"" + resolvedPath.replace("\\", "\\\\")
+                + "\")\n" +
+                "                .remoteVMOptions(remoteOptions.toArray(new String[0]))\n" +
+                "                .build()) {\n" +
+                "            \n" +
+                "            boolean hasError = false;\n" +
+                "            SourceCodeAnalysis analyzer = jshell.sourceCodeAnalysis();\n" +
+                "            \n" +
+                "            while (!source.trim().isEmpty()) {\n" +
+                "                SourceCodeAnalysis.CompletionInfo info = analyzer.analyzeCompletion(source);\n" +
+                "                if (!info.completeness().isComplete()) {\n" +
+                "                    System.err.println(\"Incomplete snippet detected: \" + info.source());\n" +
+                "                    hasError = true;\n" +
+                "                    break;\n" +
+                "                }\n" +
+                "                \n" +
+                "                List<SnippetEvent> events = jshell.eval(info.source());\n" +
+                "                for (SnippetEvent event : events) {\n" +
+                "                    if (event.status() == jdk.jshell.Snippet.Status.REJECTED) {\n" +
+                "                        System.err.println(\"Compilation failed: \" + event.snippet().source());\n" +
+                "                        jshell.diagnostics(event.snippet()).forEach(diag -> \n" +
+                "                            System.err.println(diag.getMessage(java.util.Locale.getDefault()))\n" +
+                "                        );\n" +
+                "                        hasError = true;\n" +
+                "                    } else if (event.exception() != null) {\n" +
+                "                        System.err.println(\"Exception during execution:\");\n" +
+                "                        event.exception().printStackTrace();\n" +
+                "                        hasError = true;\n" +
+                "                    }\n" +
+                "                }\n" +
+                "                if (hasError) break;\n" +
+                "                source = info.remaining();\n" +
+                "            }\n" +
+                "            if (hasError) {\n" +
+                "                System.exit(1);\n" +
+                "            }\n" +
+                "        }\n" +
+                "    }\n" +
+                "}\n";
     }
 
     private String getJshellCommandPath() {
         return "\"" + Paths.get(JAVA_HOME_VAR, "bin", "jshell") + "\"";
     }
 
+    /**
+     * Returns the unquoted raw classpath/module-path string to be injected
+     * directly into the generated JShell wrapper environment.
+     */
     protected String buildJshellResourcePath() {
-        StringBuilder resourcePath = new StringBuilder(
-                JavaConstants.CLASSPATH_CURRENT_DIR);
+        StringBuilder resourcePath = new StringBuilder(JavaConstants.CLASSPATH_CURRENT_DIR);
 
         resourcePath.append(JavaConstants.PATH_SEPARATOR)
                 .append(taskRequest.getExecutePath());
 
         ResourceContext resourceContext = taskRequest.getResourceContext();
-
-        if (resourceContext != null
-                && javaParameters.getResourceFilesList() != null) {
+        if (resourceContext != null && javaParameters.getResourceFilesList() != null) {
             for (ResourceInfo info : javaParameters.getResourceFilesList()) {
-                ResourceContext.ResourceItem resourceItem =
-                        resourceContext.getResourceItem(info.getResourceName());
-
+                ResourceContext.ResourceItem resourceItem = resourceContext.getResourceItem(info.getResourceName());
                 resourcePath.append(JavaConstants.PATH_SEPARATOR)
                         .append(resourceItem.getResourceAbsolutePathInLocal());
             }
         }
-
-        String pathOption = javaParameters.isModulePath()
-                ? "--module-path"
-                : "--class-path";
-
-        return pathOption + Constants.SPACE
-                + quoteShellArgument(resourcePath.toString());
+        return resourcePath.toString();
     }
 
     private String quoteShellArgument(String argument) {

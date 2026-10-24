@@ -45,6 +45,7 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -130,41 +131,149 @@ class JavaTaskTest {
                 executePath,
                 createJshellJavaParameters(source));
 
-        Path scriptPath = null;
+        Path jshellScriptPath = null;
+        Path userScriptPath = null;
 
         try {
             String command = javaTask.buildJshellCommand();
 
-            assertThat(command).contains("\"${JAVA_HOME}/bin/jshell\"");
-            assertThat(command).contains("-R-Xms64m");
-            assertThat(command).contains("--feedback concise");
-            assertThat(command).contains("--class-path");
-            assertThat(command).contains(executePath.toString());
-            assertThat(command).contains(" - < '");
+            // The new implementation uses the 'java' binary to run the wrapper
+            assertThat(command).contains("${JAVA_HOME}/bin/java");
 
+            // JVM args are now passed directly without the -R prefix
+            assertThat(command).contains("-Xms64m");
+            assertThat(command).contains("-classpath");
+            assertThat(command).contains(executePath.toString());
+
+            // Check for the generated wrapper and user scripts
             try (Stream<Path> files = Files.list(executePath)) {
-                scriptPath = files
-                        .filter(path -> path.getFileName().toString()
-                                .startsWith("jshell-"))
-                        .filter(path -> path.getFileName().toString()
-                                .endsWith(".jsh"))
+                jshellScriptPath = files
+                        .filter(path -> path.getFileName().toString().startsWith("jshell-wrapper-"))
+                        .findFirst()
+                        .orElse(null);
+            }
+            try (Stream<Path> files = Files.list(executePath)) {
+                userScriptPath = files
+                        .filter(path -> path.getFileName().toString().startsWith("user-script-"))
                         .findFirst()
                         .orElse(null);
             }
 
-            assertThat(scriptPath).isNotNull();
-            assertThat(command).contains(scriptPath.toAbsolutePath().toString());
+            assertThat(jshellScriptPath).isNotNull();
+            assertThat(userScriptPath).isNotNull();
 
+            // The command should execute the wrapper script
+            assertThat(command).contains("'" + jshellScriptPath.toAbsolutePath().toString() + "'");
+
+            // Verify the user script contains the actual source code
             String actualSource = new String(
-                    Files.readAllBytes(scriptPath),
+                    Files.readAllBytes(userScriptPath),
                     StandardCharsets.UTF_8);
-
             assertThat(actualSource).isEqualTo(source);
+
+            // Verify the wrapper script contains the JShell API execution logic
+            String wrapperSource = new String(
+                    Files.readAllBytes(jshellScriptPath),
+                    StandardCharsets.UTF_8);
+            assertThat(wrapperSource).contains("class JShellExecutor");
+            assertThat(wrapperSource).contains("JShell.builder()");
+            assertThat(wrapperSource).contains("SourceCodeAnalysis");
+
         } finally {
-            if (scriptPath != null) {
-                Files.deleteIfExists(scriptPath);
+            if (jshellScriptPath != null) {
+                Files.deleteIfExists(jshellScriptPath);
+            }
+            if (userScriptPath != null) {
+                Files.deleteIfExists(userScriptPath);
             }
         }
+    }
+
+    @Test
+    void executeJshellWrapperAsDifferentTenant(@TempDir Path executePath) throws Exception {
+        // 1. Check if we are on a Unix-like system
+        String os = System.getProperty("os.name").toLowerCase();
+        Assumptions.assumeTrue(os.contains("linux") || os.contains("mac"),
+                "Tenant switching test is only applicable on Unix-like systems.");
+
+        // 2. Check if we can run commands as 'nobody' without a password prompt.
+        // If this fails (returns non-zero), the test is safely skipped instead of failing the build.
+        Process checkSudo = new ProcessBuilder("sudo", "-n", "-u", "nobody", "id").start();
+        Assumptions.assumeTrue(checkSudo.waitFor() == 0,
+                "Skipping test: requires passwordless sudo for the 'nobody' user to simulate tenant switching.");
+
+        // 3. Setup the task
+        String source = "System.out.println(\"hello from tenant\");";
+        JavaParameters parameters = createJshellJavaParameters(source);
+        JavaTask javaTask = createJshellTask(executePath, parameters);
+
+        String command = javaTask.buildJshellCommand();
+        String javaHome = System.getProperty("java.home");
+        String actualCommand = command.replace("${JAVA_HOME}", javaHome);
+
+        // Ensure the temp directory itself is world-accessible so the 'nobody' user can enter it
+        executePath.toFile().setExecutable(true, false);
+        executePath.toFile().setReadable(true, false);
+
+        // 4. Run the generated command specifically as the 'nobody' user
+        ProcessBuilder processBuilder = new ProcessBuilder("sudo", "-n", "-u", "nobody", "bash", "-c", actualCommand);
+        processBuilder.directory(executePath.toFile());
+
+        Process process = processBuilder.start();
+        int exitCode = process.waitFor();
+
+        // 5. Assert it succeeds. If it fails, it means the generated files lacked proper read permissions.
+        assertThat(exitCode).isEqualTo(0);
+    }
+
+    @Test
+    void buildJshellCommandHandlesQuotedJvmArgs(@TempDir Path executePath) throws IOException {
+        JavaParameters parameters = createJshellJavaParameters("System.out.println(System.getProperty(\"message\"));");
+        // Add a JVM arg with quotes and spaces
+        parameters.setJvmArgs("-Xms64m -Dmessage=\"hello world\"");
+
+        JavaTask javaTask = createJshellTask(executePath, parameters);
+        String command = javaTask.buildJshellCommand();
+
+        // Verify the command retains the exact quoted string
+        assertThat(command).contains("-Dmessage=\"hello world\"");
+    }
+
+    @Test
+    void executeJshellWrapperEndToEnd(@TempDir Path executePath) throws Exception {
+        // 1. Success case
+        int successExitCode = runJshellSnippet(executePath, "System.out.println(\"hello\");");
+        assertThat(successExitCode).isEqualTo(0);
+
+        // 2. Compilation Failure case
+        int compileFailExitCode = runJshellSnippet(executePath, "int x = ;");
+        assertThat(compileFailExitCode).isNotEqualTo(0);
+
+        // 3. Runtime Exception case
+        int runtimeFailExitCode = runJshellSnippet(executePath, "throw new RuntimeException(\"failed\");");
+        assertThat(runtimeFailExitCode).isNotEqualTo(0);
+    }
+
+    /**
+     * Helper method to actually execute the generated wrapper script in a real JVM process
+     */
+    private int runJshellSnippet(Path executePath, String source) throws Exception {
+        JavaParameters parameters = createJshellJavaParameters(source);
+        JavaTask javaTask = createJshellTask(executePath, parameters);
+
+        // Generate the files and the command
+        String command = javaTask.buildJshellCommand();
+
+        // Replace DolphinScheduler's ${JAVA_HOME} placeholder with the actual test environment java
+        String javaHome = System.getProperty("java.home");
+        String actualCommand = command.replace("${JAVA_HOME}", javaHome);
+
+        // Execute the command in a shell to handle classpath strings and quotes properly
+        ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", actualCommand);
+        processBuilder.directory(executePath.toFile());
+
+        Process process = processBuilder.start();
+        return process.waitFor();
     }
 
     @Test
@@ -176,7 +285,8 @@ class JavaTaskTest {
 
         String resourcePath = javaTask.buildJshellResourcePath();
 
-        assertThat(resourcePath).startsWith("--class-path ");
+        // The path should no longer include the command-line flag, just the raw path
+        assertThat(resourcePath).doesNotContain("--class-path");
         assertThat(resourcePath).contains(executePath.toString());
     }
 
@@ -190,7 +300,8 @@ class JavaTaskTest {
 
         String resourcePath = javaTask.buildJshellResourcePath();
 
-        assertThat(resourcePath).startsWith("--module-path ");
+        // The path should no longer include the command-line flag, just the raw path
+        assertThat(resourcePath).doesNotContain("--module-path");
         assertThat(resourcePath).contains(executePath.toString());
     }
 
