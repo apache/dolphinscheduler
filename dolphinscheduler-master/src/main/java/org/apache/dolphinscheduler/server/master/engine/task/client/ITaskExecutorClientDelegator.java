@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.engine.task.client;
 
+import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
@@ -55,6 +56,6 @@ public interface ITaskExecutorClientDelegator {
      * Ack the task executor lifecycle event.
      */
     void ackTaskExecutorLifecycleEvent(
-                                       final ITaskExecution taskExecution,
+                                       final TaskInstance taskInstance,
                                        final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck);
 }

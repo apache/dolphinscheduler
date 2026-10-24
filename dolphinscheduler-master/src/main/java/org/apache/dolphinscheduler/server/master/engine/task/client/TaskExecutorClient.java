@@ -95,21 +95,31 @@ public class TaskExecutorClient implements ITaskExecutorClient {
     public void ackTaskExecutorLifecycleEvent(
                                               final ITaskExecution taskExecution,
                                               final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
+        ackTaskExecutorLifecycleEvent(taskExecution.getTaskInstance(), taskExecutorLifecycleEventAck);
+    }
+
+    @Override
+    public void ackTaskExecutorLifecycleEvent(
+                                              final TaskInstance taskInstance,
+                                              final ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck) {
         try {
-            if (StringUtils.isEmpty(taskExecution.getTaskInstance().getHost())) {
+            if (StringUtils.isEmpty(taskInstance.getHost())) {
                 log.info("The task: {} is didn't dispatched to executor, skip ack taskExecutorLifecycleEventAck: {}",
-                        taskExecution.getName(), taskExecutorLifecycleEventAck);
+                        taskInstance.getName(), taskExecutorLifecycleEventAck);
                 return;
             }
-            getTaskExecutorClientDelegator(taskExecution)
-                    .ackTaskExecutorLifecycleEvent(taskExecution, taskExecutorLifecycleEventAck);
+            getTaskExecutorClientDelegator(taskInstance)
+                    .ackTaskExecutorLifecycleEvent(taskInstance, taskExecutorLifecycleEventAck);
         } catch (Exception ex) {
             log.error("Send taskExecutorLifecycleEventAck: {} failed", taskExecutorLifecycleEventAck, ex);
         }
     }
 
     private ITaskExecutorClientDelegator getTaskExecutorClientDelegator(final ITaskExecution taskExecution) {
-        final TaskInstance taskInstance = taskExecution.getTaskInstance();
+        return getTaskExecutorClientDelegator(taskExecution.getTaskInstance());
+    }
+
+    private ITaskExecutorClientDelegator getTaskExecutorClientDelegator(final TaskInstance taskInstance) {
         checkArgument(taskInstance != null, "taskType cannot be empty");
         if (TaskTypeUtils.isLogicTask(taskInstance.getTaskType())) {
             return logicTaskExecutorClientDelegator;

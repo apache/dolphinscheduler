@@ -400,7 +400,7 @@ class TaskSuccessPersistenceRecoveryTest {
                 .doNothing()
                 .when(delegator)
                 .ackTaskExecutorLifecycleEvent(
-                        eq(taskExecution),
+                        eq(taskInstance),
                         any(ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck.class));
         handler = new TestableTaskSuccessLifecycleEventHandler(realTaskExecutorClient, workflowAlertManager);
         handler.setTaskStateActionFactory(taskStateActionFactory);
@@ -421,7 +421,7 @@ class TaskSuccessPersistenceRecoveryTest {
         verify(workflowEventBus, times(1))
                 .publish(any(WorkflowTopologyLogicalTransitionWithTaskFinishLifecycleEvent.class));
         verify(delegator, times(2)).ackTaskExecutorLifecycleEvent(
-                eq(taskExecution), any(ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck.class));
+                eq(taskInstance), any(ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck.class));
     }
 
     @Test
