@@ -141,12 +141,12 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         if (checkDescriptionLength(dataSourceParam.getNote())) {
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
-        // check password，if the password is not updated, set to the old password.
+
+        // if the password is not updated, set to the old password.
+        // The password is treated as not updated when it is blank or equals the mask value returned by the query APIs
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(dataSourceParam);
-
-        String password = connectionParam.getPassword();
-
-        if (StringUtils.isBlank(password)) {
+        String password = dataSourceParam.getPassword();
+        if (StringUtils.isBlank(password) || getHiddenPassword().equals(password)) {
             String oldConnectionParams = dataSource.getConnectionParams();
             ObjectNode oldParams = JSONUtils.parseObject(oldConnectionParams);
             connectionParam.setPassword(oldParams.path(Constants.PASSWORD).asText());
