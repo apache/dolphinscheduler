@@ -77,7 +77,9 @@ public class BackfillWorkflowRequestTransformer implements ITransformer<Workflow
                 .environmentCode(workflowBackFillRequest.getEnvironmentCode())
                 .startParamList(SensitivePropertyUtils.restoreStartParams(
                         PropertyUtils.startParamsTransformPropertyList(workflowBackFillRequest.getStartParamList()),
-                        GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams())))
+                        SensitivePropertyUtils.decodeAfterLoad(
+                                GlobalParameterUtils.deserializeGlobalParameter(
+                                        workflowDefinition.getGlobalParams()))))
                 .dryRun(workflowBackFillRequest.getDryRun())
                 .triggerCode(CodeGenerateUtils.genCode())
                 .backfillParams(backfillParams)

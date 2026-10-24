@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.utils;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.ErrorCommand;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
@@ -27,6 +28,8 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
+import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
+import org.apache.dolphinscheduler.plugin.datasource.api.utils.PasswordUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
@@ -39,6 +42,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 class SensitivePropertyUtilsTest {
 
@@ -278,6 +283,98 @@ class SensitivePropertyUtilsTest {
         Assertions.assertFalse(masked.getCommandParam().contains("Secret123"));
         Assertions.assertTrue(masked.getCommandParam().contains(TaskConstants.SENSITIVE_DATA_MASK));
         Assertions.assertNotSame(original, masked);
+    }
+
+    @Test
+    void encodeForPersistEncryptsWhenEnabled() {
+        try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
+            mockEncryptionEnabled(mocked);
+            List<Property> encoded = SensitivePropertyUtils.encodeForPersist(
+                    Collections.singletonList(sensitive("pwd", "Secret123")));
+            Assertions.assertNotEquals("Secret123", encoded.get(0).getValue());
+            Assertions.assertEquals("Secret123", PasswordUtils.decodePassword(encoded.get(0).getValue()));
+        }
+    }
+
+    @Test
+    void encodeForPersistSkipsWhenDisabled() {
+        try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
+            mockEncryptionDisabled(mocked);
+            List<Property> encoded = SensitivePropertyUtils.encodeForPersist(
+                    Collections.singletonList(sensitive("pwd", "Secret123")));
+            Assertions.assertEquals("Secret123", encoded.get(0).getValue());
+        }
+    }
+
+    @Test
+    void mergeThenEncodeKeepOriginalIsDeterministic() {
+        try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
+            mockEncryptionEnabled(mocked);
+            String ciphertext = PasswordUtils.encodePassword("Secret123");
+            List<Property> existingRaw = Collections.singletonList(sensitive("pwd", ciphertext));
+            List<Property> merged = SensitivePropertyUtils.merge(
+                    Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
+                    SensitivePropertyUtils.decodeAfterLoad(existingRaw));
+            List<Property> encoded = SensitivePropertyUtils.encodeForPersist(merged);
+            Assertions.assertEquals(ciphertext, encoded.get(0).getValue());
+        }
+    }
+
+    @Test
+    void mergeThenEncodeFalseToTrueWithPlaceholderThenEncrypts() {
+        try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
+            mockEncryptionEnabled(mocked);
+            List<Property> merged = SensitivePropertyUtils.merge(
+                    Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
+                    Collections.singletonList(nonSensitive("pwd", "plain")));
+            List<Property> encoded = SensitivePropertyUtils.encodeForPersist(merged);
+            Assertions.assertNotEquals("plain", encoded.get(0).getValue());
+            Assertions.assertEquals("plain", PasswordUtils.decodePassword(encoded.get(0).getValue()));
+            Assertions.assertTrue(encoded.get(0).isSensitive());
+        }
+    }
+
+    @Test
+    void normalizeResubmittedCiphertextTrueToFalse() {
+        try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
+            mockEncryptionEnabled(mocked);
+            String ciphertext = PasswordUtils.encodePassword("Secret123");
+            List<Property> existingRaw = Collections.singletonList(sensitive("pwd", ciphertext));
+            List<Property> merged = SensitivePropertyUtils.merge(
+                    Collections.singletonList(nonSensitive("pwd", ciphertext)),
+                    SensitivePropertyUtils.decodeAfterLoad(existingRaw));
+            List<Property> normalized =
+                    SensitivePropertyUtils.normalizeResubmittedCiphertext(merged, existingRaw);
+            Assertions.assertEquals("Secret123", normalized.get(0).getValue());
+            Assertions.assertFalse(normalized.get(0).isSensitive());
+        }
+    }
+
+    @Test
+    void restoreStartParamsUsesDecodedDefinitionGlobals() {
+        try (MockedStatic<PropertyUtils> mocked = Mockito.mockStatic(PropertyUtils.class)) {
+            mockEncryptionEnabled(mocked);
+            String ciphertext = PasswordUtils.encodePassword("Secret123");
+            List<Property> restored = SensitivePropertyUtils.restoreStartParams(
+                    Collections.singletonList(sensitive("pwd", TaskConstants.SENSITIVE_DATA_MASK)),
+                    SensitivePropertyUtils.decodeAfterLoad(
+                            Collections.singletonList(sensitive("pwd", ciphertext))));
+            Assertions.assertEquals("Secret123", restored.get(0).getValue());
+            Assertions.assertTrue(restored.get(0).isSensitive());
+        }
+    }
+
+    private static void mockEncryptionEnabled(MockedStatic<PropertyUtils> mocked) {
+        mocked.when(() -> PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, false))
+                .thenReturn(true);
+        mocked.when(() -> PropertyUtils.getString(DataSourceConstants.DATASOURCE_ENCRYPTION_SALT,
+                DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT))
+                .thenReturn(DataSourceConstants.DATASOURCE_ENCRYPTION_SALT_DEFAULT);
+    }
+
+    private static void mockEncryptionDisabled(MockedStatic<PropertyUtils> mocked) {
+        mocked.when(() -> PropertyUtils.getBoolean(DataSourceConstants.DATASOURCE_ENCRYPTION_ENABLE, false))
+                .thenReturn(false);
     }
 
     private static Property sensitive(String prop, String value) {

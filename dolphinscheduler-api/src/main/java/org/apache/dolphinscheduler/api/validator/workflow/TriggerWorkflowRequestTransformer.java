@@ -60,7 +60,9 @@ public class TriggerWorkflowRequestTransformer implements ITransformer<WorkflowT
                 .environmentCode(workflowTriggerRequest.getEnvironmentCode())
                 .startParamList(SensitivePropertyUtils.restoreStartParams(
                         PropertyUtils.startParamsTransformPropertyList(workflowTriggerRequest.getStartParamList()),
-                        GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams())))
+                        SensitivePropertyUtils.decodeAfterLoad(
+                                GlobalParameterUtils.deserializeGlobalParameter(
+                                        workflowDefinition.getGlobalParams()))))
                 .dryRun(workflowTriggerRequest.getDryRun())
                 .build();
         triggerWorkflowDTO.setWorkflowDefinition(workflowDefinition);
