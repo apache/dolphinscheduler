@@ -54,6 +54,13 @@ export default {
   oracle_sid: 'SID',
   compatible_mode: '兼容模式',
   compatible_mode_tips: '请输入兼容模式',
+  kyuubi_keep_password_tips:
+    '留空保留原密码；测试编辑后的连接时请重新输入密码。',
+  connection_configuration: '连接配置方式',
+  standard_configuration: '常规配置',
+  raw_jdbc_url_required: '请输入完整 JDBC URL',
+  raw_jdbc_url_tips:
+    'jdbc:kyuubi://host:port/schema;客户端参数?会话参数；用户名和密码在下方填写。',
   jdbc_connect_parameters: 'jdbc连接参数',
   principal_tips: '请输入Principal',
   krb5_conf_tips: '请输入kerberos认证参数 java.security.krb5.conf',

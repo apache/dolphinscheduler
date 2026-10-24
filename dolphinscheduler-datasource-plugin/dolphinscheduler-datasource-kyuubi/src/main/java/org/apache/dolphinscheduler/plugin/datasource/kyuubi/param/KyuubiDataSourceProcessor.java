@@ -30,17 +30,32 @@ import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.kyuubi.jdbc.hive.JdbcConnectionParams;
+import org.apache.kyuubi.jdbc.hive.JdbcUriParseException;
+import org.apache.kyuubi.jdbc.hive.Utils;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import com.google.auto.service.AutoService;
 
 @AutoService(DataSourceProcessor.class)
 public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
+
+    @Override
+    public void checkDatasourceParam(BaseDataSourceParamDTO datasourceParam) {
+        KyuubiDataSourceParamDTO kyuubiParam = (KyuubiDataSourceParamDTO) datasourceParam;
+        if (StringUtils.isNotBlank(kyuubiParam.getRawJdbcUrl())) {
+            parseRawJdbcUrl(kyuubiParam.getRawJdbcUrl().trim());
+        } else {
+            super.checkDatasourceParam(datasourceParam);
+        }
+    }
 
     @Override
     public BaseDataSourceParamDTO castDatasourceParamDTO(String paramJson) {
@@ -54,6 +69,10 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
         kyuubiDataSourceParamDTO.setDatabase(kyuubiConnectionParam.getDatabase());
         kyuubiDataSourceParamDTO.setUserName(kyuubiConnectionParam.getUser());
         kyuubiDataSourceParamDTO.setOther(kyuubiConnectionParam.getOther());
+        if (StringUtils.isNotBlank(kyuubiConnectionParam.getRawJdbcUrl())) {
+            kyuubiDataSourceParamDTO.setRawJdbcUrl(kyuubiConnectionParam.getRawJdbcUrl());
+            return kyuubiDataSourceParamDTO;
+        }
 
         String[] tmpArray = kyuubiConnectionParam.getAddress().split(Constants.DOUBLE_SLASH);
         StringBuilder hosts = new StringBuilder();
@@ -71,6 +90,21 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public BaseConnectionParam createConnectionParams(BaseDataSourceParamDTO datasourceParam) {
         KyuubiDataSourceParamDTO kyuubiParam = (KyuubiDataSourceParamDTO) datasourceParam;
+        if (StringUtils.isNotBlank(kyuubiParam.getRawJdbcUrl())) {
+            String rawJdbcUrl = kyuubiParam.getRawJdbcUrl().trim();
+            JdbcConnectionParams parsed = parseRawJdbcUrl(rawJdbcUrl);
+            KyuubiConnectionParam connectionParam = new KyuubiConnectionParam();
+            connectionParam.setRawJdbcUrl(rawJdbcUrl);
+            connectionParam.setJdbcUrl(rawJdbcUrl);
+            connectionParam.setAddress(rawJdbcUrl.substring(0, rawJdbcUrl.indexOf("://") + 3)
+                    + parsed.getSuppliedURLAuthority());
+            connectionParam.setDatabase(parsed.getDbName());
+            connectionParam.setUser(kyuubiParam.getUserName());
+            connectionParam.setPassword(PasswordUtils.encodePassword(kyuubiParam.getPassword()));
+            connectionParam.setDriverClassName(getDatasourceDriver());
+            connectionParam.setValidationQuery(getValidationQuery());
+            return connectionParam;
+        }
         StringBuilder address = new StringBuilder();
         address.append(DataSourceConstants.JDBC_KYUUBI);
         for (String zkHost : kyuubiParam.getHost().split(",")) {
@@ -92,8 +126,13 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public ConnectionParam createConnectionParams(String connectionJson) {
-        return JSONUtils.parseObject(connectionJson, KyuubiConnectionParam.class);
-
+        KyuubiConnectionParam connectionParam = JSONUtils.parseObject(connectionJson, KyuubiConnectionParam.class);
+        if (StringUtils.isNotBlank(connectionParam.getRawJdbcUrl())) {
+            connectionParam.setRawJdbcUrl(connectionParam.getRawJdbcUrl().trim());
+            connectionParam.setJdbcUrl(connectionParam.getRawJdbcUrl());
+            connectionParam.setOther(null);
+        }
+        return connectionParam;
     }
 
     @Override
@@ -109,6 +148,9 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
         KyuubiConnectionParam kyuubiConnectionParam = (KyuubiConnectionParam) connectionParam;
+        if (StringUtils.isNotBlank(kyuubiConnectionParam.getRawJdbcUrl())) {
+            return kyuubiConnectionParam.getRawJdbcUrl().trim();
+        }
         String jdbcUrl = kyuubiConnectionParam.getJdbcUrl();
 
         if (MapUtils.isNotEmpty(kyuubiConnectionParam.getOther())) {
@@ -137,6 +179,23 @@ public class KyuubiDataSourceProcessor extends AbstractDataSourceProcessor {
     @Override
     public DataSourceProcessor create() {
         return new KyuubiDataSourceProcessor();
+    }
+
+    private JdbcConnectionParams parseRawJdbcUrl(String rawJdbcUrl) {
+        try {
+            // Extract components only: saving a datasource must not contact ZooKeeper or the server.
+            JdbcConnectionParams parsed = Utils.extractURLComponents(rawJdbcUrl, new Properties());
+            if (parsed.getSessionVars().containsKey(JdbcConnectionParams.AUTH_USER)
+                    || parsed.getSessionVars().containsKey(JdbcConnectionParams.AUTH_PASSWD)) {
+                throw new IllegalArgumentException(
+                        "Use the datasource username and password fields instead of URL credentials");
+            }
+            return parsed;
+        } catch (JdbcUriParseException | IllegalArgumentException e) {
+            // Driver parse errors may contain the URL, so do not propagate the original message/cause.
+            throw new IllegalArgumentException(
+                    "Invalid Kyuubi JDBC URL; use a supported URL without user/password properties");
+        }
     }
 
     private String transformOther(Map<String, String> otherMap) {
