@@ -21,6 +21,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.DataType.VARCHAR;
 import static org.apache.dolphinscheduler.plugin.task.api.enums.Direct.IN;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_FAT_JAR;
+import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_JSHELL;
 import static org.apache.dolphinscheduler.plugin.task.java.JavaConstants.RUN_TYPE_NORMAL_JAR;
 
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -31,17 +32,22 @@ import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.jar.Attributes;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
+import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 @Slf4j
 class JavaTaskTest {
@@ -78,6 +84,226 @@ class JavaTaskTest {
         assertThat(javaTask.buildNormalJarCommand())
                 .isEqualTo(
                         "${JAVA_HOME}/bin/java -xms:1G -classpath .:/tmp/dolphinscheduler/test/executepath:/tmp/dolphinscheduler/test/executepath/opt/share/jar/resource2.jar Test -host 0.0.0.0 -port 12345");
+    }
+
+    @Test
+    void jshellParametersDoNotRequireMainJar() {
+        JavaParameters parameters =
+                createJshellJavaParameters("System.out.println(\"Hello JShell\");");
+
+        assertThat(parameters.getMainJar()).isNull();
+        assertThat(parameters.checkParameters()).isTrue();
+    }
+
+    @Test
+    void jshellParametersRejectEmptyScript() {
+        JavaParameters parameters = createJshellJavaParameters("");
+
+        assertThat(parameters.checkParameters()).isFalse();
+
+        parameters.setJshellScript("   \n  ");
+
+        assertThat(parameters.checkParameters()).isFalse();
+    }
+
+    @Test
+    void jarRunTypesStillRequireMainJar() {
+        JavaParameters fatJarParameters =
+                createJavaParametersObject(RUN_TYPE_FAT_JAR);
+        fatJarParameters.setMainJar(null);
+
+        assertThat(fatJarParameters.checkParameters()).isFalse();
+
+        JavaParameters normalJarParameters =
+                createNormalJarJavaParameters(RUN_TYPE_NORMAL_JAR);
+        normalJarParameters.setMainJar(null);
+
+        assertThat(normalJarParameters.checkParameters()).isFalse();
+    }
+
+    @Test
+    void buildJshellCommand(@TempDir Path executePath) throws IOException {
+        String source = "System.out.println(\"Hello JShell\");\n"
+                + "int result = 10 + 20;\n"
+                + "System.out.println(\"Result = \" + result);\n";
+
+        JavaTask javaTask = createJshellTask(
+                executePath,
+                createJshellJavaParameters(source));
+
+        Path jshellScriptPath = null;
+        Path userScriptPath = null;
+
+        try {
+            String command = javaTask.buildJshellCommand();
+
+            assertThat(command).contains("${JAVA_HOME}/bin/java");
+
+            assertThat(command).contains("-Xms64m");
+            assertThat(command).contains("-classpath");
+            assertThat(command).contains(executePath.toString());
+
+            try (Stream<Path> files = Files.list(executePath)) {
+                jshellScriptPath = files
+                        .filter(path -> path.getFileName().toString().startsWith("jshell-wrapper-"))
+                        .findFirst()
+                        .orElse(null);
+            }
+            try (Stream<Path> files = Files.list(executePath)) {
+                userScriptPath = files
+                        .filter(path -> path.getFileName().toString().startsWith("user-script-"))
+                        .findFirst()
+                        .orElse(null);
+            }
+
+            assertThat(jshellScriptPath).isNotNull();
+            assertThat(userScriptPath).isNotNull();
+            assertThat(command).contains("'" + jshellScriptPath.toAbsolutePath() + "'");
+
+            String actualSource = new String(
+                    Files.readAllBytes(userScriptPath),
+                    StandardCharsets.UTF_8);
+            assertThat(actualSource).isEqualTo(source);
+
+            String wrapperSource = new String(
+                    Files.readAllBytes(jshellScriptPath),
+                    StandardCharsets.UTF_8);
+            assertThat(wrapperSource).contains("class JShellExecutor");
+            assertThat(wrapperSource).contains("JShell.builder()");
+            assertThat(wrapperSource).contains("SourceCodeAnalysis");
+
+        } finally {
+            if (jshellScriptPath != null) {
+                Files.deleteIfExists(jshellScriptPath);
+            }
+            if (userScriptPath != null) {
+                Files.deleteIfExists(userScriptPath);
+            }
+        }
+    }
+
+    @Test
+    void executeJshellWrapperAsDifferentTenant(@TempDir Path executePath) throws Exception {
+        String os = System.getProperty("os.name").toLowerCase();
+        Assumptions.assumeTrue(os.contains("linux") || os.contains("mac"),
+                "Tenant switching test is only applicable on Unix-like systems.");
+
+        Process checkSudo = new ProcessBuilder("sudo", "-n", "-u", "nobody", "id").start();
+        Assumptions.assumeTrue(checkSudo.waitFor() == 0,
+                "Skipping test: requires passwordless sudo for the 'nobody' user to simulate tenant switching.");
+
+        String source = "System.out.println(\"hello from tenant\");";
+        JavaParameters parameters = createJshellJavaParameters(source);
+        JavaTask javaTask = createJshellTask(executePath, parameters);
+
+        String command = javaTask.buildJshellCommand();
+        String javaHome = System.getProperty("java.home");
+        String actualCommand = command.replace("${JAVA_HOME}", javaHome);
+
+        executePath.toFile().setExecutable(true, false);
+        executePath.toFile().setReadable(true, false);
+
+        ProcessBuilder processBuilder = new ProcessBuilder("sudo", "-n", "-u", "nobody", "bash", "-c", actualCommand);
+        processBuilder.directory(executePath.toFile());
+
+        Process process = processBuilder.start();
+        int exitCode = process.waitFor();
+
+        assertThat(exitCode).isEqualTo(0);
+    }
+
+    @Test
+    void buildJshellCommandHandlesQuotedJvmArgs(@TempDir Path executePath) throws IOException {
+        JavaParameters parameters = createJshellJavaParameters("System.out.println(System.getProperty(\"message\"));");
+        parameters.setJvmArgs("-Xms64m -Dmessage=\"hello world\"");
+
+        JavaTask javaTask = createJshellTask(executePath, parameters);
+        String command = javaTask.buildJshellCommand();
+
+        assertThat(command).contains("-Dmessage=\"hello world\"");
+    }
+
+    @Test
+    void executeJshellWrapperEndToEnd(@TempDir Path executePath) throws Exception {
+        int successExitCode = runJshellSnippet(executePath, "System.out.println(\"hello\");");
+        assertThat(successExitCode).isEqualTo(0);
+
+        int compileFailExitCode = runJshellSnippet(executePath, "int x = ;");
+        assertThat(compileFailExitCode).isNotEqualTo(0);
+
+        int runtimeFailExitCode = runJshellSnippet(executePath, "throw new RuntimeException(\"failed\");");
+        assertThat(runtimeFailExitCode).isNotEqualTo(0);
+    }
+
+    private int runJshellSnippet(Path executePath, String source) throws Exception {
+        JavaParameters parameters = createJshellJavaParameters(source);
+        JavaTask javaTask = createJshellTask(executePath, parameters);
+
+        String command = javaTask.buildJshellCommand();
+
+        String javaHome = System.getProperty("java.home");
+        String actualCommand = command.replace("${JAVA_HOME}", javaHome);
+
+        ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", actualCommand);
+        processBuilder.directory(executePath.toFile());
+
+        Process process = processBuilder.start();
+        return process.waitFor();
+    }
+
+    @Test
+    void buildJshellResourcePathUsesClassPathByDefault(@TempDir Path executePath) {
+        JavaParameters parameters =
+                createJshellJavaParameters("System.out.println(1);");
+
+        JavaTask javaTask = createJshellTask(executePath, parameters);
+
+        String resourcePath = javaTask.buildJshellResourcePath();
+
+        assertThat(resourcePath).doesNotContain("--class-path");
+        assertThat(resourcePath).contains(executePath.toString());
+    }
+
+    @Test
+    void buildJshellResourcePathUsesModulePathWhenEnabled(@TempDir Path executePath) {
+        JavaParameters parameters =
+                createJshellJavaParameters("System.out.println(1);");
+        parameters.setModulePath(true);
+
+        JavaTask javaTask = createJshellTask(executePath, parameters);
+
+        String resourcePath = javaTask.buildJshellResourcePath();
+
+        assertThat(resourcePath).doesNotContain("--module-path");
+        assertThat(resourcePath).contains(executePath.toString());
+    }
+
+    private JavaParameters createJshellJavaParameters(String source) {
+        JavaParameters javaParameters = new JavaParameters();
+        javaParameters.setRunType(RUN_TYPE_JSHELL);
+        javaParameters.setJshellScript(source);
+        javaParameters.setJvmArgs("-Xms64m");
+        javaParameters.setMainArgs("");
+        javaParameters.setModulePath(false);
+        javaParameters.setResourceList(new ArrayList<>());
+        return javaParameters;
+    }
+
+    private JavaTask createJshellTask(
+                                      Path executePath,
+                                      JavaParameters javaParameters) {
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+
+        taskExecutionContext.setTaskParams(
+                JSONUtils.toJsonString(javaParameters));
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTaskAppId("runJshellType");
+        taskExecutionContext.setResourceContext(new ResourceContext());
+
+        JavaTask javaTask = new JavaTask(taskExecutionContext);
+        javaTask.init();
+
+        return javaTask;
     }
 
     /**

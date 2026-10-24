@@ -1,6 +1,6 @@
 # Overview
 
-This node is used to execute tasks of the `Java` type and supports running `jar` packages of the `FAT_JAR` and `NORMAL_JAR` types.
+This node is used to execute Java tasks and supports running packaged Java applications using the `FAT_JAR` and `NORMAL_JAR` execution modes, as well as executing Java code snippets using `JSHELL`.
 
 # Create Tasks
 
@@ -21,10 +21,11 @@ This node is used to execute tasks of the `Java` type and supports running `jar`
 | Main Package       | Select the main program package to run the application.                                                                                       |
 | Resources          | External JAR packages or other resource files that are added to the classpath or module path and can be easily retrieved in your JAVA script. |
 | Custom Parameters  | User-defined parameters local to JAVA, will replace content in the main program parameters and JVM parameters like ${variable}.               |
+| JShell Script      | Java code snippets to execute using JShell. Only applicable when the run type is `JSHELL`.                                                    |
 
 ## Example
 
-There are two execution modes for Java task types, which will be demonstrated separately here.
+There are three execution modes for Java task types, which are demonstrated separately below.
 
 The main configuration parameters are as follows:
 - Run Type
@@ -48,8 +49,28 @@ As shown in the figure.
 
 `normal1.jar` is the entry point of the program, and `normal2.jar` contains the required dependencies. The entry point of the program must be specified in the main program package, and all the dependencies along with the program entry `jar` files should be selected in the resource file to ensure correct execution.
 
+- JSHELL
+
+The `JSHELL` run type executes Java code snippets using the Java Shell tool included with JDK 9 and later. It is suitable for running short Java scripts without packaging them into a JAR file.
+
+Select `JSHELL` as the run type and provide the code in the JShell Script field. The worker must have a compatible JDK configured through the environment management module, and the configured JDK must provide the `jshell` executable.
+
+For example:
+
+```java
+System.out.println("Hello from JShell!");
+
+int a = 10;
+int b = 20;
+System.out.println(a + b);
+```
+
+The script can contain multiple statements and expressions. Configure resources and JVM parameters as supported by the JShell execution mode when the task requires them.
+
 ## Note
 
 1. For security reasons, when executing JAVA tasks, please use the environment management module to configure the JDK environment, such as `JAVA_HOME` and other environment variables.
 2. NORMAL_JAR should provide the main class name (optional), while FAT_JAR does not need to provide the main class name.
+3. `JSHELL` requires JDK 9 or later. Ensure that the configured worker JDK includes the `jshell` executable.
+4. A main JAR and main class are not required when using the `JSHELL` run type.
 
