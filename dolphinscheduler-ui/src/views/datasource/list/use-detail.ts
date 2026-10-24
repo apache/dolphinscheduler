@@ -37,7 +37,18 @@ export function useDetail(getFieldsValue: Function) {
   let PREV_NAME: string
 
   const formatParams = (): IDataSource => {
-    const values = getFieldsValue()
+    const { connectionMode, rawJdbcUrl, ...values } = getFieldsValue()
+    if (values.type === 'KYUUBI' && connectionMode === 'url') {
+      return {
+        type: values.type,
+        id: values.id,
+        name: values.name,
+        note: values.note,
+        userName: values.userName,
+        password: values.password,
+        rawJdbcUrl: rawJdbcUrl.trim()
+      }
+    }
     return {
       ...values,
       other: values.other ? JSON.parse(values.other) : null
