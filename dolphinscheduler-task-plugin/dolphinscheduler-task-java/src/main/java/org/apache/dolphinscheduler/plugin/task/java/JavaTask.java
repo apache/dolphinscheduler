@@ -237,10 +237,6 @@ public class JavaTask extends AbstractTask {
         return parseParameter(builder.toString());
     }
 
-    /**
-     * Generates a Java program that explicitly evaluates the JShell script using SourceCodeAnalysis,
-     * configures the JShell execution environment, and propagates a failure exit code.
-     */
     private String generateJshellWrapper() {
         String pathOption = javaParameters.isModulePath() ? "--module-path" : "--class-path";
         String resolvedPath = buildJshellResourcePath();
@@ -313,10 +309,6 @@ public class JavaTask extends AbstractTask {
         return "\"" + Paths.get(JAVA_HOME_VAR, "bin", "jshell") + "\"";
     }
 
-    /**
-     * Returns the unquoted raw classpath/module-path string to be injected
-     * directly into the generated JShell wrapper environment.
-     */
     protected String buildJshellResourcePath() {
         StringBuilder resourcePath = new StringBuilder(JavaConstants.CLASSPATH_CURRENT_DIR);
 
