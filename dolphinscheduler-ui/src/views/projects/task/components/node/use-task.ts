@@ -68,7 +68,9 @@ export function useTask({
   model.preTasks = taskStore.getPreTasks
   model.name = taskStore.getName
   model.taskExecuteType =
-    TASK_TYPES_MAP[data.taskType || 'SHELL'].taskExecuteType || 'BATCH'
+    data.taskExecuteType ||
+    TASK_TYPES_MAP[data.taskType || 'SHELL'].taskExecuteType ||
+    'BATCH'
 
   const getElements = () => {
     const { rules, elements } = getElementByJson(jsonRef.value, model)

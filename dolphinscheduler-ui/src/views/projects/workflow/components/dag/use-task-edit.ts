@@ -18,6 +18,7 @@
 import { ref, onMounted, watch } from 'vue'
 import { remove, cloneDeep } from 'lodash'
 import { TaskType } from '@/store/project/types'
+import { TASK_TYPES_MAP } from '@/store/project/task-type'
 import { formatParams } from '@/views/projects/task/components/node/format-data'
 import { useCellUpdate } from './dag-hooks'
 import type { Ref } from 'vue'
@@ -48,6 +49,7 @@ export function useTaskEdit(options: Options) {
     getTargets,
     setNodeName,
     setNodeFillColor,
+    setNodeExecuteType,
     setNodeEdge
   } = useCellUpdate({
     graph
@@ -91,9 +93,16 @@ export function useTaskEdit(options: Options) {
     flag: string,
     coordinate: Coordinate
   ) {
-    addNode(code + '', type, name, flag, coordinate)
     const definition = workflowDefinition.value.taskDefinitionList.find(
       (t) => t.code === targetCode
+    )
+    addNode(
+      code + '',
+      type,
+      name,
+      flag,
+      coordinate,
+      definition?.taskExecuteType
     )
 
     const newDefinition = {
@@ -149,7 +158,7 @@ export function useTaskEdit(options: Options) {
       (t) => t.code === code
     )
     if (definition) {
-      currTask.value = definition
+      currTask.value = cloneDeep(definition)
     }
     updatePreTasks(getSources(String(code)), code)
     updatePostTasks(code)
@@ -177,6 +186,12 @@ export function useTaskEdit(options: Options) {
           setNodeFillColor(task.code + '', fillColor)
 
           setNodeEdge(String(task.code), data.preTasks)
+          setNodeExecuteType(
+            String(task.code),
+            taskDef.taskExecuteType ||
+              TASK_TYPES_MAP[currTask.value.taskType].taskExecuteType ||
+              'BATCH'
+          )
           updatePreTasks(data.preTasks, task.code)
           return {
             ...taskDef,

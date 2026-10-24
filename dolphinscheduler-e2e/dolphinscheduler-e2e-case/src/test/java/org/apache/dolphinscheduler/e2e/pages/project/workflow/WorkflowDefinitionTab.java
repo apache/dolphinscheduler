@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.e2e.pages.project.workflow;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.project.ProjectDetailPage;
 
@@ -33,6 +34,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 
 @Getter
@@ -95,6 +97,21 @@ public final class WorkflowDefinitionTab extends NavBarPage implements ProjectDe
         driver.executeScript("arguments[0].click();", buttonConfirm());
 
         return this;
+    }
+
+    public WorkflowForm edit(String workflow) {
+        workflowList()
+                .stream()
+                .filter(it -> it.findElement(By.className("workflow-name")).getAttribute("innerText").equals(workflow))
+                .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
+                .filter(WebElement::isDisplayed)
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Can not find edit button in workflow definition"))
+                .click();
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions
+                .visibilityOfElementLocated(By.cssSelector(".dag-container .x6-graph-svg")));
+
+        return new WorkflowForm(driver);
     }
 
     public WorkflowRunDialog run(String workflow) {

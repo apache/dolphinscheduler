@@ -56,6 +56,16 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
 
   return [
     {
+      type: 'radio',
+      field: 'taskExecuteType',
+      name: t('project.node.task_execute_type'),
+      class: 'seatunnel-execute-type',
+      options: [
+        { label: t('project.task.batch_task'), value: 'BATCH' },
+        { label: t('project.task.stream_task'), value: 'STREAM' }
+      ]
+    },
+    {
       type: 'select',
       field: 'startupScript',
       span: 15,
