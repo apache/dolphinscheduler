@@ -48,6 +48,8 @@ export function useForm(id?: number) {
     database: '',
     connectType: '',
     other: '',
+    rawJdbcUrl: '',
+    connectionMode: 'standard',
     endpoint: '',
     MSIClientId: '',
     dbUser: '',
@@ -87,7 +89,7 @@ export function useForm(id?: number) {
       host: {
         trigger: ['input'],
         validator() {
-          if (!state.detailForm.host && state.showHost) {
+          if (!isRawJdbcUrl() && !state.detailForm.host && state.showHost) {
             return new Error(t('datasource.ip_tips'))
           }
         }
@@ -95,7 +97,10 @@ export function useForm(id?: number) {
       port: {
         trigger: ['input'],
         validator() {
-          if (state.showMode && state.detailForm.mode === 'IAM-accessKey') {
+          if (
+            isRawJdbcUrl() ||
+            (state.showMode && state.detailForm.mode === 'IAM-accessKey')
+          ) {
             return
           }
           if (!state.detailForm.port && state.showPort) {
@@ -143,7 +148,11 @@ export function useForm(id?: number) {
       database: {
         trigger: ['input'],
         validator() {
-          if (!state.detailForm.database && state.requiredDataBase) {
+          if (
+            !isRawJdbcUrl() &&
+            !state.detailForm.database &&
+            state.requiredDataBase
+          ) {
             return new Error(t('datasource.database_name_tips'))
           }
         }
@@ -164,10 +173,22 @@ export function useForm(id?: number) {
           }
         }
       },
+      rawJdbcUrl: {
+        trigger: ['input', 'blur'],
+        validator() {
+          if (isRawJdbcUrl() && !state.detailForm.rawJdbcUrl?.trim()) {
+            return new Error(t('datasource.raw_jdbc_url_required'))
+          }
+        }
+      },
       other: {
         trigger: ['input', 'blur'],
         validator() {
-          if (state.detailForm.other && !utils.isJson(state.detailForm.other)) {
+          if (
+            !isRawJdbcUrl() &&
+            state.detailForm.other &&
+            !utils.isJson(state.detailForm.other)
+          ) {
             return new Error(t('datasource.jdbc_format_tips'))
           }
         }
@@ -237,6 +258,10 @@ export function useForm(id?: number) {
       }
     ]
   })
+
+  const isRawJdbcUrl = () =>
+    state.detailForm.type === 'KYUUBI' &&
+    state.detailForm.connectionMode === 'url'
 
   const changeType = async (type: IDataBase, options: IDataBaseOption) => {
     state.detailForm.port = options.previousPort || options.defaultPort
@@ -344,7 +369,13 @@ export function useForm(id?: number) {
     state.detailForm = {
       ...state.detailForm,
       ...values,
-      other: values.other ? JSON.stringify(values.other) : values.other
+      ...(values.type === 'KYUUBI' && values.id ? { password: '' } : {}),
+      other: values.other ? JSON.stringify(values.other) : values.other,
+      rawJdbcUrl: values.rawJdbcUrl || '',
+      connectionMode:
+        values.type === 'KYUUBI' && values.rawJdbcUrl?.trim()
+          ? 'url'
+          : 'standard'
     }
   }
 

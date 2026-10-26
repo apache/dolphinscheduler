@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowDefinitionVariablesDTO;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCopyVO;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.DependentSimplifyDefinition;
@@ -100,10 +101,10 @@ public interface WorkflowDefinitionService {
     /**
      * batch copy workflow definition
      */
-    void batchCopyWorkflowDefinition(User loginUser,
-                                     long projectCode,
-                                     String codes,
-                                     long targetProjectCode);
+    List<WorkflowDefinitionCopyVO> batchCopyWorkflowDefinition(User loginUser,
+                                                               long projectCode,
+                                                               String codes,
+                                                               long targetProjectCode);
 
     /**
      * batch move workflow definition
