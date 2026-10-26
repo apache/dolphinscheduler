@@ -71,7 +71,7 @@ public class SessionServiceImpl extends BaseServiceImpl implements SessionServic
                 }
             }
             session = sessionList.get(0);
-            if (isSessionExpire(session)) {
+            if (!isSessionExpire(session)) {
                 session.setLastLoginTime(new Date());
                 sessionDao.updateById(session);
                 return session;
