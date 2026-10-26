@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.e2e.core.UiInteraction;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Locale;
 
@@ -93,6 +94,54 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
         }
 
         UiInteraction.click(driver, ".dialog-create-data-source .btn-submit");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.invisibilityOfElementLocated(
+                By.cssSelector(".dialog-create-data-source")));
+
+        return this;
+    }
+
+    public DataSourcePage editDataSource(String name) {
+        // The edit button has no dedicated class, it is the only button in the row besides the delete one.
+        dataSourceItemsList()
+                .stream()
+                .filter(it -> it.getText().contains(name))
+                .flatMap(it -> it.findElements(By.tagName("button")).stream())
+                .filter(WebElement::isDisplayed)
+                .filter(it -> !it.getAttribute("class").contains("btn-delete"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("No edit button in data source list"))
+                .click();
+
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.visibilityOfElementLocated(
+                By.className("dialog-create-data-source")));
+
+        return this;
+    }
+
+    public DataSourcePage testConnection() {
+        // The edit form echoes the password masked by the query APIs, and the click is dropped by
+        // form validation until the async queryById has filled the form.
+        WebDriverWaitFactory.createWebDriverWait(driver)
+                .until(ExpectedConditions.textToBePresentInElementValue(
+                        By.cssSelector(".dialog-create-data-source .input-password input"), "******"));
+        UiInteraction.click(driver, ".dialog-create-data-source .btn-test-connection");
+        // The success message is the only feedback of the connection test, a failed one shows nothing.
+        WebDriverWaitFactory.createWebDriverWait(driver, Duration.ofSeconds(30)).until(
+                ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".n-message--success-type")));
+
+        return this;
+    }
+
+    public DataSourcePage submit() {
+        UiInteraction.click(driver, ".dialog-create-data-source .btn-submit");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.invisibilityOfElementLocated(
+                By.cssSelector(".dialog-create-data-source")));
+
+        return this;
+    }
+
+    public DataSourcePage cancel() {
+        UiInteraction.click(driver, ".dialog-create-data-source .btn-cancel");
         WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.invisibilityOfElementLocated(
                 By.cssSelector(".dialog-create-data-source")));
 

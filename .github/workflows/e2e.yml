@@ -132,6 +132,8 @@ jobs:
             class: org.apache.dolphinscheduler.e2e.cases.ClickhouseDataSourceE2ETest
           - name: PostgresDataSourceE2ETest
             class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceE2ETest
+          - name: PostgresDataSourceEditE2ETest
+            class: org.apache.dolphinscheduler.e2e.cases.PostgresDataSourceEditE2ETest
           - name: ShellTaskE2ETest
             class: org.apache.dolphinscheduler.e2e.cases.tasks.ShellTaskE2ETest
           - name: PythonTaskE2ETest
