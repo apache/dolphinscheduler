@@ -1694,12 +1694,15 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     Status.SWITCH_WORKFLOW_DEFINITION_VERSION_NOT_EXIST_WORKFLOW_DEFINITION_VERSION_ERROR,
                     workflowDefinition.getCode(), version);
         }
-        List<WorkflowTaskRelation> workflowTaskRelationList = workflowTaskRelationDao
-                .queryWorkflowTaskRelationsByWorkflowDefinitionCode(workflowDefinitionLog.getCode(),
-                        workflowDefinitionLog.getVersion());
+        List<WorkflowTaskRelation> workflowTaskRelationList = workflowTaskRelationLogMapper
+                .queryByWorkflowCodeAndVersion(workflowDefinitionLog.getCode(), workflowDefinitionLog.getVersion())
+                .stream()
+                .map(WorkflowTaskRelation::new)
+                .collect(Collectors.toList());
         List<TaskCodeVersionDto> taskDefinitionList = getTaskCodeVersionDtos(workflowTaskRelationList);
-        List<TaskDefinitionLog> taskDefinitionLogList =
-                taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList.stream()
+        List<TaskDefinitionLog> taskDefinitionLogList = CollectionUtils.isEmpty(taskDefinitionList)
+                ? Collections.emptyList()
+                : taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList.stream()
                         .flatMap(taskCodeVersionDto -> {
                             TaskDefinitionLog taskDefinitionLog = new TaskDefinitionLog();
                             taskDefinitionLog.setCode(taskCodeVersionDto.getCode());
