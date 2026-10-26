@@ -280,6 +280,28 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
+    public void checkConnection(User loginUser, BaseDataSourceParamDTO dataSourceParam,
+                                ConnectionParam connectionParam) {
+        if (dataSourceParam.getId() != null && dataSourceParam.getId() > 0
+                && getHiddenPassword().equals(dataSourceParam.getPassword())) {
+            // The request echoes the mask value back, which means the user did not change the
+            // password: verify the connectivity against the credentials already stored for
+            // this datasource instead of connecting with the mask value.
+            DataSource dataSource = dataSourceDao.queryById(dataSourceParam.getId());
+            if (dataSource == null) {
+                throw new ServiceException(Status.RESOURCE_NOT_EXIST);
+            }
+            if (!canOperatorPermissions(loginUser, new Object[]{dataSource.getId()}, AuthorizationType.DATASOURCE,
+                    ApiFuncIdentificationConstant.DATASOURCE)) {
+                throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            }
+            ObjectNode storedParams = JSONUtils.parseObject(dataSource.getConnectionParams());
+            connectionParam.setPassword(storedParams.path(Constants.PASSWORD).asText());
+        }
+        checkConnection(dataSourceParam.getType(), connectionParam);
+    }
+
+    @Override
     public void connectionTest(User loginUser, int id) {
         DataSource dataSource = dataSourceDao.queryById(id);
 

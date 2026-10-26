@@ -290,6 +290,94 @@ public class DataSourceServiceTest {
         assertStoredPasswordAfterUpdate("newSecret");
     }
 
+    @Test
+    public void testCheckConnectionUsesStoredPasswordWhenEditingWithMaskedPassword() {
+        DataSource dataSource = buildStoredPostgreSQLDataSource("oldSecret");
+        when(dataSourceDao.queryById(1)).thenReturn(dataSource);
+        passResourcePermissionCheckService();
+
+        PostgreSQLDataSourceParamDTO paramDTO = buildPostgreSQLUpdateParam(Constants.XXXXXX);
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(paramDTO);
+        Assertions.assertEquals(Constants.XXXXXX, connectionParam.getPassword());
+
+        try (
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils = Mockito.mockStatic(DataSourceUtils.class)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+            when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
+            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
+
+            assertDoesNotThrow(() -> dataSourceService.checkConnection(getAdminUser(), paramDTO, connectionParam));
+
+            ArgumentCaptor<ConnectionParam> connectionParamCaptor = ArgumentCaptor.forClass(ConnectionParam.class);
+            Mockito.verify(dataSourceProcessor).checkDataSourceConnectivity(connectionParamCaptor.capture());
+            Assertions.assertEquals("oldSecret", connectionParamCaptor.getValue().getPassword());
+        }
+    }
+
+    @Test
+    public void testCheckConnectionUsesSubmittedPasswordWhenCreatingWithMaskedPassword() {
+        PostgreSQLDataSourceParamDTO paramDTO = buildPostgreSQLUpdateParam(Constants.XXXXXX);
+        paramDTO.setId(null);
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(paramDTO);
+
+        try (
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils = Mockito.mockStatic(DataSourceUtils.class)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+            when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
+            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
+
+            assertDoesNotThrow(() -> dataSourceService.checkConnection(getAdminUser(), paramDTO, connectionParam));
+
+            Mockito.verifyNoInteractions(dataSourceDao);
+            ArgumentCaptor<ConnectionParam> connectionParamCaptor = ArgumentCaptor.forClass(ConnectionParam.class);
+            Mockito.verify(dataSourceProcessor).checkDataSourceConnectivity(connectionParamCaptor.capture());
+            Assertions.assertEquals(Constants.XXXXXX, connectionParamCaptor.getValue().getPassword());
+        }
+    }
+
+    @Test
+    public void testCheckConnectionUsesSubmittedPasswordWhenEditingWithNewPassword() {
+        PostgreSQLDataSourceParamDTO paramDTO = buildPostgreSQLUpdateParam("newSecret");
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(paramDTO);
+
+        try (
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils = Mockito.mockStatic(DataSourceUtils.class)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+            when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
+            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
+
+            assertDoesNotThrow(() -> dataSourceService.checkConnection(getAdminUser(), paramDTO, connectionParam));
+
+            Mockito.verifyNoInteractions(dataSourceDao);
+            ArgumentCaptor<ConnectionParam> connectionParamCaptor = ArgumentCaptor.forClass(ConnectionParam.class);
+            Mockito.verify(dataSourceProcessor).checkDataSourceConnectivity(connectionParamCaptor.capture());
+            Assertions.assertEquals("newSecret", connectionParamCaptor.getValue().getPassword());
+        }
+    }
+
+    @Test
+    public void testCheckConnectionFailsWithNoPermWhenEditingWithMaskedPassword() {
+        DataSource dataSource = buildStoredPostgreSQLDataSource("oldSecret");
+        when(dataSourceDao.queryById(1)).thenReturn(dataSource);
+
+        PostgreSQLDataSourceParamDTO paramDTO = buildPostgreSQLUpdateParam(Constants.XXXXXX);
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(paramDTO);
+
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> dataSourceService.checkConnection(getAdminUser(), paramDTO, connectionParam));
+    }
+
+    @Test
+    public void testCheckConnectionFailsWhenEditingMaskedPasswordOfNonexistentDatasource() {
+        when(dataSourceDao.queryById(1)).thenReturn(null);
+
+        PostgreSQLDataSourceParamDTO paramDTO = buildPostgreSQLUpdateParam(Constants.XXXXXX);
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(paramDTO);
+
+        assertThrowsServiceException(Status.RESOURCE_NOT_EXIST,
+                () -> dataSourceService.checkConnection(getAdminUser(), paramDTO, connectionParam));
+    }
+
     private DataSource buildStoredPostgreSQLDataSource(String password) {
         PostgreSQLDataSourceParamDTO paramDTO = new PostgreSQLDataSourceParamDTO();
         paramDTO.setName("pg-datasource");
