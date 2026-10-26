@@ -260,6 +260,10 @@ alert:
 
 api:
   audit-enable: false
+  # Whether to test the connectivity of a datasource with the effective credentials
+  # that are about to be persisted before creating or updating the datasource.
+  # Take effect on server restart.
+  datasource-connection-check-enabled: false
   # The lifetime of a login session, measured from the moment the user logs in.
   # Accepts a Duration, e.g. 30m, 12h, 1d. Defaults to 2h when unset.
   session-timeout: 2h

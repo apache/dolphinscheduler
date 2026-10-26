@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_DELETE;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE_UPDATE;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
@@ -76,6 +77,9 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     private DataSourceDao dataSourceDao;
 
     @Autowired
+    private ApiConfig apiConfig;
+
+    @Autowired
     private DataSourceUserDao datasourceUserDao;
 
     private static final String TABLE = "TABLE";
@@ -99,6 +103,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             throw new ServiceException(Status.DESCRIPTION_TOO_LONG_ERROR);
         }
         ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(datasourceParam);
+        checkConnectionBeforePersist(datasourceParam.getType(), connectionParam);
 
         // build datasource
         DataSource dataSource = new DataSource();
@@ -117,6 +122,17 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             return dataSource;
         } catch (DuplicateKeyException ex) {
             throw new ServiceException(Status.DATASOURCE_EXIST);
+        }
+    }
+
+    /**
+     * Test the connection with the effective credentials that are about to be persisted,
+     * gated by the api.datasource-connection-check-enabled config. Must be called after
+     * the password resolution so a kept password is verified against the old value.
+     */
+    private void checkConnectionBeforePersist(DbType type, ConnectionParam connectionParam) {
+        if (apiConfig.isDatasourceConnectionCheckEnabled()) {
+            checkConnection(type, connectionParam);
         }
     }
 
@@ -151,6 +167,8 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
             ObjectNode oldParams = JSONUtils.parseObject(oldConnectionParams);
             connectionParam.setPassword(oldParams.path(Constants.PASSWORD).asText());
         }
+
+        checkConnectionBeforePersist(dataSource.getType(), connectionParam);
 
         Date now = new Date();
 
