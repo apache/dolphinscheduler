@@ -23,16 +23,15 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
-import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.extract.master.command.RunWorkflowCommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.AbstractMasterIntegrationTestCase;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.executor.LogicTaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.server.master.engine.executor.LogicTaskExecutorRepository;
-import org.apache.dolphinscheduler.server.master.engine.task.client.LogicTaskExecutorClientDelegator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowOperator;
 import org.apache.dolphinscheduler.server.master.integration.WorkflowTestCaseContext;
+import org.apache.dolphinscheduler.server.master.rpc.LogicTaskExecutorOperatorImpl;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter.TaskExecutorLifecycleEventAck;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorLifecycleEventType;
 
@@ -49,7 +48,7 @@ import org.springframework.boot.test.mock.mockito.SpyBean;
 class TaskTerminalAckRecoveryTestCase extends AbstractMasterIntegrationTestCase {
 
     @SpyBean
-    private LogicTaskExecutorClientDelegator taskExecutorClientDelegator;
+    private LogicTaskExecutorOperatorImpl taskExecutorOperator;
 
     @Autowired
     private IWorkflowRepository workflowRepository;
@@ -66,18 +65,19 @@ class TaskTerminalAckRecoveryTestCase extends AbstractMasterIntegrationTestCase 
                 "/it/start/workflow_with_two_serial_fake_task_success.yaml");
         final AtomicInteger lostAckTaskId = new AtomicInteger();
         final AtomicBoolean allowTerminalAck = new AtomicBoolean();
+        final AtomicInteger rejectedAcks = new AtomicInteger();
         doAnswer(invocation -> {
-            final TaskInstance taskInstance = invocation.getArgument(0);
-            final TaskExecutorLifecycleEventAck ack = invocation.getArgument(1);
-            if ("B".equals(taskInstance.getName())
-                    && ack.getTaskExecutorLifecycleEventType() == TaskExecutorLifecycleEventType.SUCCESS
+            final TaskExecutorLifecycleEventAck ack = invocation.getArgument(0);
+            if (ack.getTaskExecutorLifecycleEventType() == TaskExecutorLifecycleEventType.SUCCESS
+                    && taskExecutorRepository.get(ack.getTaskExecutorId())
+                            .map(executor -> "B".equals(executor.getName())).orElse(false)
                     && !allowTerminalAck.get()) {
-                lostAckTaskId.set(taskInstance.getId());
+                lostAckTaskId.set(ack.getTaskExecutorId());
+                rejectedAcks.incrementAndGet();
                 throw new IllegalStateException("synthetic terminal ACK send failure");
             }
             return invocation.callRealMethod();
-        }).when(taskExecutorClientDelegator).ackTaskExecutorLifecycleEvent(
-                any(TaskInstance.class), any(TaskExecutorLifecycleEventAck.class));
+        }).when(taskExecutorOperator).ackTaskExecutorLifecycleEvent(any(TaskExecutorLifecycleEventAck.class));
 
         final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(
                 WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -98,6 +98,15 @@ class TaskTerminalAckRecoveryTestCase extends AbstractMasterIntegrationTestCase 
 
         // Reset the reporter's retry clock without waiting three minutes. The real reporter thread,
         // RPC listener, database fallback and executor finalization still process the pending report.
+        // Exercise recovery while the ACK receiver is still unavailable. Both the normal client and
+        // the recovery module must reach this receiver, so neither can bypass the injected failure.
+        final int rejectedBeforeRecovery = rejectedAcks.get();
+        taskExecutorEventReporter.onWorkflowInstanceHostChanged(lostAckTaskId.get());
+        await().atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> assertThat(rejectedAcks.get()).isGreaterThan(rejectedBeforeRecovery));
+        assertThat(taskExecutorEventReporter.getEventChannels()).containsKey(lostAckTaskId.get());
+        assertThat(taskExecutorRepository.get(lostAckTaskId.get())).isPresent();
+
         allowTerminalAck.set(true);
         taskExecutorEventReporter.onWorkflowInstanceHostChanged(lostAckTaskId.get());
 
@@ -111,17 +120,17 @@ class TaskTerminalAckRecoveryTestCase extends AbstractMasterIntegrationTestCase 
                 "/it/pause/workflow_with_fake_task_failed_retrying.yaml");
         final AtomicInteger lostAckTaskId = new AtomicInteger();
         final AtomicBoolean allowTerminalAck = new AtomicBoolean();
+        final AtomicInteger rejectedAcks = new AtomicInteger();
         doAnswer(invocation -> {
-            final TaskInstance taskInstance = invocation.getArgument(0);
-            final TaskExecutorLifecycleEventAck ack = invocation.getArgument(1);
+            final TaskExecutorLifecycleEventAck ack = invocation.getArgument(0);
             if (ack.getTaskExecutorLifecycleEventType() == TaskExecutorLifecycleEventType.FAILED
                     && !allowTerminalAck.get()) {
-                lostAckTaskId.set(taskInstance.getId());
+                lostAckTaskId.set(ack.getTaskExecutorId());
+                rejectedAcks.incrementAndGet();
                 throw new IllegalStateException("synthetic terminal ACK send failure");
             }
             return invocation.callRealMethod();
-        }).when(taskExecutorClientDelegator).ackTaskExecutorLifecycleEvent(
-                any(TaskInstance.class), any(TaskExecutorLifecycleEventAck.class));
+        }).when(taskExecutorOperator).ackTaskExecutorLifecycleEvent(any(TaskExecutorLifecycleEventAck.class));
 
         final Integer workflowInstanceId = workflowOperator.manualTriggerWorkflow(
                 WorkflowOperator.WorkflowTriggerDTO.builder()
@@ -158,6 +167,15 @@ class TaskTerminalAckRecoveryTestCase extends AbstractMasterIntegrationTestCase 
         assertThat(taskExecutorEventReporter.getEventChannels()).containsKey(lostAckTaskId.get());
         assertThat(taskExecutorEventReporter.getEventChannels().get(lostAckTaskId.get()).peek().getType())
                 .isEqualTo(TaskExecutorLifecycleEventType.FAILED);
+        assertThat(taskExecutorRepository.get(lostAckTaskId.get())).isPresent();
+
+        // Exercise recovery while the ACK receiver is still unavailable. Both the normal client and
+        // the recovery module must reach this receiver, so neither can bypass the injected failure.
+        final int rejectedBeforeRecovery = rejectedAcks.get();
+        taskExecutorEventReporter.onWorkflowInstanceHostChanged(lostAckTaskId.get());
+        await().atMost(Duration.ofSeconds(30))
+                .untilAsserted(() -> assertThat(rejectedAcks.get()).isGreaterThan(rejectedBeforeRecovery));
+        assertThat(taskExecutorEventReporter.getEventChannels()).containsKey(lostAckTaskId.get());
         assertThat(taskExecutorRepository.get(lostAckTaskId.get())).isPresent();
 
         allowTerminalAck.set(true);
