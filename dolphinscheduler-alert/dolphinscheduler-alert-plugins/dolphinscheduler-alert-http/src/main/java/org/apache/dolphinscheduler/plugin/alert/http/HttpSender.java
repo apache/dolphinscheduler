@@ -32,6 +32,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import lombok.SneakyThrows;
@@ -213,16 +214,29 @@ public final class HttpSender {
      * set body params
      */
     private void setMsgInRequestBody(String msg) {
-        if (bodyParams == null) {
+        if (bodyParams == null || msg == null) {
             return;
         }
 
-        bodyParams.forEach((key, value) -> {
-            String valueOf = String.valueOf(value);
-            if (valueOf.contains(HttpAlertConstants.MSG_PARAMS)) {
-                bodyParams.put(key, valueOf.replace(HttpAlertConstants.MSG_PARAMS, msg));
-            }
-        });
+        replaceMsg(bodyParams, msg);
+    }
+
+    /**
+     * Recursively replace ${msg} in string nodes while keeping the json structure,
+     * so that nested objects/arrays are not flattened into a string.
+     * Characters in msg are escaped by Jackson when the request body is serialized.
+     */
+    @SuppressWarnings("unchecked")
+    private Object replaceMsg(Object value, String msg) {
+        if (value instanceof String) {
+            return ((String) value).replace(HttpAlertConstants.MSG_PARAMS, msg);
+        }
+        if (value instanceof Map) {
+            ((Map<Object, Object>) value).replaceAll((key, item) -> replaceMsg(item, msg));
+        } else if (value instanceof List) {
+            ((List<Object>) value).replaceAll(item -> replaceMsg(item, msg));
+        }
+        return value;
     }
 
 }
