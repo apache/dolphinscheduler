@@ -214,11 +214,38 @@ public final class HttpSender {
      * set body params
      */
     private void setMsgInRequestBody(String msg) {
-        if (bodyParams == null || msg == null) {
+        if (bodyParams == null) {
+            return;
+        }
+
+        if (msg == null) {
+            if (containsMsgPlaceholder(bodyParams)) {
+                throw new RuntimeException(
+                        String.format("alert content is null, can not replace %s in the body params",
+                                HttpAlertConstants.MSG_PARAMS));
+            }
             return;
         }
 
         replaceMsg(bodyParams, msg);
+    }
+
+    /**
+     * Whether the body params require an alert message, so that a static body without the
+     * placeholder can still be sent when the message is null.
+     */
+    @SuppressWarnings("unchecked")
+    private boolean containsMsgPlaceholder(Object value) {
+        if (value instanceof String) {
+            return ((String) value).contains(HttpAlertConstants.MSG_PARAMS);
+        }
+        if (value instanceof Map) {
+            return ((Map<Object, Object>) value).values().stream().anyMatch(this::containsMsgPlaceholder);
+        }
+        if (value instanceof List) {
+            return ((List<Object>) value).stream().anyMatch(this::containsMsgPlaceholder);
+        }
+        return false;
     }
 
     /**
