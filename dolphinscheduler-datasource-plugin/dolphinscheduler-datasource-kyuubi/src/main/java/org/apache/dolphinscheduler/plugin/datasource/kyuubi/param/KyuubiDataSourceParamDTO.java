@@ -20,7 +20,14 @@ package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class KyuubiDataSourceParamDTO extends BaseDataSourceParamDTO {
+
+    @Getter
+    @Setter
+    private String rawJdbcUrl;
 
     @Override
     public String toString() {
