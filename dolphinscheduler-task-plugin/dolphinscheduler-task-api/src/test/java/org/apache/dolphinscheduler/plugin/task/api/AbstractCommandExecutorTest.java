@@ -66,6 +66,18 @@ public class AbstractCommandExecutorTest {
     }
 
     @Test
+    public void testAwaitOutputCollectedReportsAFailedCollection() throws Exception {
+        // a collection which failed delivered only a part of the output, so a caller which relies on
+        // the whole output must not treat it as collected
+        AbstractCommandExecutor executor = new TestCommandExecutor(buildTaskRequest());
+        CompletableFuture<Void> failed = new CompletableFuture<>();
+        failed.completeExceptionally(new IllegalStateException("collect failed"));
+        setOutputCollection(executor, failed);
+
+        Assertions.assertFalse(executor.awaitOutputCollected(1_000L));
+    }
+
+    @Test
     public void testCancelApplicationPropagatesTheProcessTreeKillFailure() throws Exception {
         TaskExecutionContext taskRequest = buildTaskRequest();
         AbstractCommandExecutor executor = new TestCommandExecutor(taskRequest);
@@ -135,6 +147,16 @@ public class AbstractCommandExecutorTest {
         Field processField = AbstractCommandExecutor.class.getDeclaredField("process");
         processField.setAccessible(true);
         processField.set(executor, Mockito.mock(Process.class));
+    }
+
+    /**
+     * Attach the output collection of a started process, so that the wait on it can be verified.
+     */
+    private static void setOutputCollection(AbstractCommandExecutor executor,
+                                            CompletableFuture<Void> future) throws Exception {
+        Field collectionField = AbstractCommandExecutor.class.getDeclaredField("collectProcessLogFuture");
+        collectionField.setAccessible(true);
+        collectionField.set(executor, future);
     }
 
     private static class TestCommandExecutor extends AbstractCommandExecutor {

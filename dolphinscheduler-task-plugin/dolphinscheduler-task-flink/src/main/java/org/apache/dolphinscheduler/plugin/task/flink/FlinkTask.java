@@ -180,49 +180,17 @@ public class FlinkTask extends AbstractYarnTask {
      * further jobs, which would be missing from an earlier snapshot. The client stop also cancels the
      * YARN/K8s application of the task.
      *
-     * <p>Every step is attempted even when an earlier one fails, because the jobs which are already
-     * known still have to be cancelled. A step which could not do its job is never treated as a
-     * success: the failure is propagated after the attempts, so a stop which left a job running is
-     * not reported as successful.
+     * <p>A job is only cancelled from a snapshot which is known to be complete. When the client cannot
+     * be stopped it can still submit another job, and when its output cannot be collected the tail of
+     * the output can still contain the JobID of a detached job. In both cases the ids which were
+     * collected are not final, so the cancellation reports the failure instead of cancelling from an
+     * incomplete snapshot and claiming that every job was handled.
      */
     @Override
     public void cancelApplication() throws TaskException {
-        TaskException cancelFailure = null;
-        try {
-            cancelClientByProcess();
-        } catch (TaskException e) {
-            // the client may still run and submit another job, so the ids collected below are not
-            // final, but the jobs which are known have to be cancelled anyway
-            cancelFailure = new TaskException(String.format(
-                    "Failed to stop the flink client or its application, the task may still have running jobs, "
-                            + "taskInstanceId: %s",
-                    taskExecutionContext.getTaskInstanceId()), e);
-        }
-        try {
-            requireSubmissionOutputCollected();
-        } catch (TaskException e) {
-            cancelFailure = mergeCancelFailure(cancelFailure, e);
-        }
-        try {
-            cancelFlinkJob();
-        } catch (TaskException e) {
-            cancelFailure = mergeCancelFailure(cancelFailure, e);
-        }
-        if (cancelFailure != null) {
-            throw cancelFailure;
-        }
-    }
-
-    /**
-     * Keep the failure which has to be reported, and attach the following one to it instead of
-     * dropping either of them.
-     */
-    private static TaskException mergeCancelFailure(TaskException cancelFailure, TaskException failure) {
-        if (cancelFailure == null) {
-            return failure;
-        }
-        cancelFailure.addSuppressed(failure);
-        return cancelFailure;
+        cancelClientByProcess();
+        requireSubmissionOutputCollected();
+        cancelFlinkJob();
     }
 
     /**
