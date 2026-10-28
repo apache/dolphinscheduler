@@ -137,10 +137,6 @@ public class FlinkSqlGatewayExecutor {
         }
     }
 
-    static boolean isJava8OrOlder(String specificationVersion) {
-        return StringUtils.isNotBlank(specificationVersion) && specificationVersion.startsWith("1.");
-    }
-
     /**
      * A submitted job is success only after a terminal FINISHED status.
      * FAILED / CANCELED after a successful submit is still a task failure.

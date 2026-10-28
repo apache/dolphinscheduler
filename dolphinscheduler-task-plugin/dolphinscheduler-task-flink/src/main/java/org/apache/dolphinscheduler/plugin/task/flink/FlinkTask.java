@@ -65,12 +65,6 @@ public class FlinkTask extends AbstractYarnTask {
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");
         }
-        if (flinkParameters.isSqlGateway()
-                && FlinkSqlGatewayExecutor.isJava8OrOlder(System.getProperty("java.specification.version"))) {
-            throw new RuntimeException("SQL_GATEWAY requires JDK 11 or newer. "
-                    + "flink-sql-jdbc-driver-bundle 2.2.0 contains Java 11 bytecode. Current java.specification.version="
-                    + System.getProperty("java.specification.version"));
-        }
     }
 
     @Override

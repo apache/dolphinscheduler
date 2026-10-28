@@ -133,11 +133,4 @@ public class FlinkSqlGatewayExecutorTest {
                 FlinkSqlGatewayExecutor.SubmitOutcome.SUCCESS,
                 FlinkSqlGatewayExecutor.interpretSubmitResult(true, true, false, null, true));
     }
-
-    @Test
-    public void isJava8OrOlderShouldMatchSpecificationVersion() {
-        Assertions.assertTrue(FlinkSqlGatewayExecutor.isJava8OrOlder("1.8"));
-        Assertions.assertFalse(FlinkSqlGatewayExecutor.isJava8OrOlder("11"));
-        Assertions.assertFalse(FlinkSqlGatewayExecutor.isJava8OrOlder("17"));
-    }
 }

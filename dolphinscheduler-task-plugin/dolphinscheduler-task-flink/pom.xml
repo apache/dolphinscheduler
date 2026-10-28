@@ -46,11 +46,11 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- Provided: the official bundle jar is deployed once under DS libs/, not shaded into this plugin. -->
+        <!-- Provided: deploy this Java 8 bundle once under DS libs/. Gateway mode targets Flink 1.18-1.20 SQL Gateway. -->
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-sql-jdbc-driver-bundle</artifactId>
-            <version>2.2.0</version>
+            <version>1.20.4</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
