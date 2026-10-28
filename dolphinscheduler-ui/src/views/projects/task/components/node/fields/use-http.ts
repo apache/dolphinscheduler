@@ -22,7 +22,6 @@ import { ref, watch } from 'vue'
 export function useHttp(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
   const httpBodySpan = ref(0)
-  const httpParametersType = ref(GET_HTTP_PARAMETERS_TYPE)
 
   const HTTP_CHECK_CONDITIONS = [
     {
@@ -43,19 +42,6 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
     }
   ]
 
-  const resetHttpParametersType = () => {
-    switch (model.httpMethod) {
-      case 'GET':
-      case 'DELETE':
-        httpParametersType.value = GET_HTTP_PARAMETERS_TYPE
-        break
-      case 'POST':
-      case 'PUT':
-        httpParametersType.value = POST_HTTP_PARAMETERS_TYPE
-        break
-    }
-  }
-
   const resetSpan = () => {
     switch (model.httpMethod) {
       case 'GET':
@@ -73,7 +59,6 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
     () => [model.httpMethod],
     () => {
       resetSpan()
-      resetHttpParametersType()
     }
   )
 
@@ -141,7 +126,7 @@ export function useHttp(model: { [field: string]: any }): IJsonItem[] {
           type: 'select',
           field: 'httpParametersType',
           span: 6,
-          options: httpParametersType,
+          options: HTTP_PARAMETERS_TYPE,
           value: 'HEADERS'
         },
         {
@@ -251,18 +236,11 @@ const HTTP_METHODS = [
   }
 ]
 
-const GET_HTTP_PARAMETERS_TYPE = [
+const HTTP_PARAMETERS_TYPE = [
   {
     value: 'PARAMETER',
     label: 'Parameter'
   },
-  {
-    value: 'HEADERS',
-    label: 'Headers'
-  }
-]
-
-const POST_HTTP_PARAMETERS_TYPE = [
   {
     value: 'HEADERS',
     label: 'Headers'

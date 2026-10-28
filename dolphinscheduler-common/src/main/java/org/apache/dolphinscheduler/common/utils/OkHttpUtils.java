@@ -203,7 +203,7 @@ public class OkHttpUtils {
                                               int connectTimeout,
                                               int writeTimeout,
                                               int readTimeout) throws IOException {
-        return put(url, okHttpRequestHeaders, requestBodyMap,
+        return put(url, okHttpRequestHeaders, null, requestBodyMap,
                 connectTimeout, writeTimeout, readTimeout, false);
     }
 
@@ -223,8 +223,51 @@ public class OkHttpUtils {
                                               int writeTimeout,
                                               int readTimeout,
                                               boolean keepAlive) throws IOException {
+        return put(url, okHttpRequestHeaders, null, requestBodyMap,
+                connectTimeout, writeTimeout, readTimeout, keepAlive);
+    }
+
+    /**
+     * http put request
+     * @param requestParamsMap the request parameters appended to the url, same as the GET path
+     * @param connectTimeout connect timeout in milliseconds
+     * @param writeTimeout write timeout in milliseconds
+     * @param readTimeout read timeout in milliseconds
+     * @return OkHttpResponse
+     * @throws RuntimeException
+     */
+    public static @NonNull OkHttpResponse put(@NonNull String url,
+                                              @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                              @Nullable Map<String, Object> requestParamsMap,
+                                              @Nullable Map<String, Object> requestBodyMap,
+                                              int connectTimeout,
+                                              int writeTimeout,
+                                              int readTimeout) throws IOException {
+        return put(url, okHttpRequestHeaders, requestParamsMap, requestBodyMap,
+                connectTimeout, writeTimeout, readTimeout, false);
+    }
+
+    /**
+     * http put request
+     * @param requestParamsMap the request parameters appended to the url, same as the GET path
+     * @param connectTimeout connect timeout in milliseconds
+     * @param writeTimeout write timeout in milliseconds
+     * @param readTimeout read timeout in milliseconds
+     * @param keepAlive whether to enable TCP keepalive (SO_KEEPALIVE) on the socket
+     * @return OkHttpResponse
+     * @throws RuntimeException
+     */
+    public static @NonNull OkHttpResponse put(@NonNull String url,
+                                              @Nullable OkHttpRequestHeaders okHttpRequestHeaders,
+                                              @Nullable Map<String, Object> requestParamsMap,
+                                              @Nullable Map<String, Object> requestBodyMap,
+                                              int connectTimeout,
+                                              int writeTimeout,
+                                              int readTimeout,
+                                              boolean keepAlive) throws IOException {
         OkHttpClient client = getHttpClient(connectTimeout, writeTimeout, readTimeout, keepAlive);
-        Request.Builder requestBuilder = new Request.Builder().url(url);
+        String finalUrl = addUrlParams(requestParamsMap, url);
+        Request.Builder requestBuilder = new Request.Builder().url(finalUrl);
         addHeader(okHttpRequestHeaders.getHeaders(), requestBuilder);
         if (requestBodyMap != null) {
             requestBuilder = requestBuilder.put(RequestBody.create(
