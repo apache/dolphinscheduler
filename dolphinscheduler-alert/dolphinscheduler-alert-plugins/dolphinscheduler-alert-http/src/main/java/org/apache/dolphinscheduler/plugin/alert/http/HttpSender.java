@@ -30,8 +30,10 @@ import org.apache.http.HttpStatus;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -227,23 +229,22 @@ public final class HttpSender {
             return;
         }
 
-        replaceMsg(bodyParams, msg);
+        bodyParams.replaceAll((key, value) -> replaceMsg(value, msg));
     }
 
     /**
      * Whether the body params require an alert message, so that a static body without the
      * placeholder can still be sent when the message is null.
      */
-    @SuppressWarnings("unchecked")
     private boolean containsMsgPlaceholder(Object value) {
         if (value instanceof String) {
             return ((String) value).contains(HttpAlertConstants.MSG_PARAMS);
         }
         if (value instanceof Map) {
-            return ((Map<Object, Object>) value).values().stream().anyMatch(this::containsMsgPlaceholder);
+            return ((Map<?, ?>) value).values().stream().anyMatch(this::containsMsgPlaceholder);
         }
         if (value instanceof List) {
-            return ((List<Object>) value).stream().anyMatch(this::containsMsgPlaceholder);
+            return ((List<?>) value).stream().anyMatch(this::containsMsgPlaceholder);
         }
         return false;
     }
@@ -253,15 +254,19 @@ public final class HttpSender {
      * so that nested objects/arrays are not flattened into a string.
      * Characters in msg are escaped by Jackson when the request body is serialized.
      */
-    @SuppressWarnings("unchecked")
     private Object replaceMsg(Object value, String msg) {
         if (value instanceof String) {
             return ((String) value).replace(HttpAlertConstants.MSG_PARAMS, msg);
         }
         if (value instanceof Map) {
-            ((Map<Object, Object>) value).replaceAll((key, item) -> replaceMsg(item, msg));
-        } else if (value instanceof List) {
-            ((List<Object>) value).replaceAll(item -> replaceMsg(item, msg));
+            Map<String, Object> replaced = new LinkedHashMap<>();
+            ((Map<?, ?>) value).forEach((key, item) -> replaced.put(String.valueOf(key), replaceMsg(item, msg)));
+            return replaced;
+        }
+        if (value instanceof List) {
+            List<Object> replaced = new ArrayList<>();
+            ((List<?>) value).forEach(item -> replaced.add(replaceMsg(item, msg)));
+            return replaced;
         }
         return value;
     }

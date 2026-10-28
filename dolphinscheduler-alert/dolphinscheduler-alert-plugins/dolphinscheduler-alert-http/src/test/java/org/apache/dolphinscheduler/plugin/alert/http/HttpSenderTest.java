@@ -42,7 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 
 @ExtendWith(MockitoExtension.class)
 public class HttpSenderTest {
@@ -122,7 +122,6 @@ public class HttpSenderTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testHttpSenderPostWithNestedBody() throws Exception {
         String msg = "line1\n\"quoted\" message";
         String bodyParamsJson = "{\"msgtype\":\"text\",\"text\":{\"content\":[{\"message\":\"${msg}\"}]}}";
@@ -139,15 +138,10 @@ public class HttpSenderTest {
         AlertResult alertResult = httpSender.send(msg);
 
         Assertions.assertTrue(alertResult.isSuccess());
-        String responseBody = alertResult.getMessage().substring("send http alert success, response body: ".length());
-        Map<String, String> responseMap = JSONUtils.toMap(responseBody);
-        Map<String, Object> requestBody = JSONUtils.parseObject(responseMap.get("body"),
-                new TypeReference<Map<String, Object>>() {
-                });
-        Assertions.assertEquals("text", requestBody.get("msgtype"), "unexpected request body: " + requestBody);
-        Map<String, Object> text = (Map<String, Object>) requestBody.get("text");
-        List<Map<String, Object>> content = (List<Map<String, Object>>) text.get("content");
-        Assertions.assertEquals(msg, content.get(0).get("message"));
+        JsonNode requestBody = recordedRequestBody(alertResult);
+        Assertions.assertEquals("text", requestBody.get("msgtype").asText(),
+                "unexpected request body: " + requestBody);
+        Assertions.assertEquals(msg, requestBody.get("text").get("content").get(0).get("message").asText());
     }
 
     @Test
@@ -171,7 +165,6 @@ public class HttpSenderTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked")
     void testHttpSenderPostWithNullMsgAndStaticBody() throws Exception {
         paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS,
                 "{\"msgtype\":\"text\",\"text\":{\"content\":\"static message\"}}");
@@ -187,13 +180,18 @@ public class HttpSenderTest {
         AlertResult alertResult = httpSender.send(null);
 
         Assertions.assertTrue(alertResult.isSuccess());
-        String responseBody = alertResult.getMessage().substring("send http alert success, response body: ".length());
+        JsonNode requestBody = recordedRequestBody(alertResult);
+        Assertions.assertEquals("static message", requestBody.get("text").get("content").asText());
+    }
+
+    /**
+     * The mock server echoes the recorded request body, see {@link #generateMockDispatcher}.
+     */
+    private JsonNode recordedRequestBody(AlertResult alertResult) {
+        String responseBody =
+                alertResult.getMessage().substring("send http alert success, response body: ".length());
         Map<String, String> responseMap = JSONUtils.toMap(responseBody);
-        Map<String, Object> requestBody = JSONUtils.parseObject(responseMap.get("body"),
-                new TypeReference<Map<String, Object>>() {
-                });
-        Map<String, Object> text = (Map<String, Object>) requestBody.get("text");
-        Assertions.assertEquals("static message", text.get("content"));
+        return JSONUtils.parseObject(responseMap.get("body"), JsonNode.class);
     }
 
     private String createMockWebServer(String path, int actualResponseCode) throws IOException {
