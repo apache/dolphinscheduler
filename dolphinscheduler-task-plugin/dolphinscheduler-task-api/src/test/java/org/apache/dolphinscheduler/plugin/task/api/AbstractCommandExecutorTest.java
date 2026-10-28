@@ -45,11 +45,12 @@ public class AbstractCommandExecutorTest {
 
     @Test
     public void testAwaitCollectedWhenTheCollectionFailed() {
-        // a failed collection has nothing left to wait for, it must not block the caller
+        // a failed collection means the output is incomplete, the caller must not treat it as
+        // collected, otherwise a missing JobID is treated as if the submission had no job
         CompletableFuture<Void> failed = new CompletableFuture<>();
         failed.completeExceptionally(new IllegalStateException("collect failed"));
 
-        Assertions.assertTrue(AbstractCommandExecutor.awaitCollected(failed, 1_000L));
+        Assertions.assertFalse(AbstractCommandExecutor.awaitCollected(failed, 1_000L));
     }
 
     @Test

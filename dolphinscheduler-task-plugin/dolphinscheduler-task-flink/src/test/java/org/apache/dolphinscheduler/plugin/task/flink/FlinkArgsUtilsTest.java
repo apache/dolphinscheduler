@@ -407,6 +407,34 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testExtractClusterConnectionOptionsPerJobCountsAnExecutePlanAsOneJob() {
+        // `EXECUTE PLAN` submits a job as well, so the job which follows it must not take its settings
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "EXECUTE PLAN '/plans/job.json';\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO sink_b SELECT * FROM source_b;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobCountsACompileAndExecutePlanAsOneJob() {
+        // `COMPILE AND EXECUTE PLAN` is the other form which submits the compiled plan as a job
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "COMPILE AND EXECUTE PLAN '/plans/job.json';\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO sink_b SELECT * FROM source_b;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
     public void testExtractClusterConnectionOptionsPerJobCountsASingleInsertStatementSetAsOneJob() {
         // the statement set keyword, its BEGIN and the first INSERT share one semicolon-delimited
         // fragment, so the INSERT must still record the snapshot of the statement set

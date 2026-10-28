@@ -396,6 +396,38 @@ public class FlinkTaskTest {
     }
 
     @Test
+    public void testCancelApplicationKeepsTheEndpointOfACompiledPlanJob() throws Exception {
+        // a compiled plan execution submits a job, it must not be missing from the snapshots,
+        // otherwise the following job is cancelled against the wrong endpoint
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job ID: 11111111111111111111111111111111\n"
+                        + "Job ID: 22222222222222222222222222222222");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'rest.address' = 'cluster-a';\n"
+                + "EXECUTE PLAN '/plans/job.json';\n"
+                + "SET 'rest.address' = 'cluster-b';\n"
+                + "INSERT INTO sink_b SELECT * FROM source_b;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded(), cancelSucceeded());
+        task.cancelApplication();
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 11111111111111111111111111111111 -Drest.address=cluster-a",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222 -Drest.address=cluster-b",
+                String.join(" ", executedCommands.get(1)));
+    }
+
+    @Test
     public void testCancelApplicationKeepsTheEndpointWhenACommentSeparatesTokens() throws Exception {
         // a block comment between two keywords must not join them, otherwise the statement is not
         // recognized and the snapshots are shifted
@@ -676,7 +708,8 @@ public class FlinkTaskTest {
     @Test
     public void testCancelApplicationFailsWhenTheSubmissionOutputIsNotCollected() throws Exception {
         // the JobID can still be buffered in the output which was not collected, so the snapshot must
-        // not be treated as the final one
+        // not be treated as the final one. A collection which failed is also reported as not
+        // collected by AbstractCommandExecutor#awaitCollected, so the same branch covers it.
         TaskExecutionContext context = buildTaskExecutionContext(
                 "Job has been submitted with JobID 11111111111111111111111111111111");
         FlinkTask task = Mockito.spy(new FlinkTask(context));

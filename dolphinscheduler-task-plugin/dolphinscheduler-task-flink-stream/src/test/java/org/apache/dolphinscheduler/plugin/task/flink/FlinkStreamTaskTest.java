@@ -217,14 +217,23 @@ public class FlinkStreamTaskTest {
     @Test
     public void testSavePointFailsWhenASynchronousSubmissionIsStillRunning() throws Exception {
         // the synchronous statement of another endpoint is still running: the client prints no JobID
-        // for it, so the savepoint of the task cannot cover every submitted job
+        // for it, so the savepoint of the task cannot cover every submitted job. The job which is
+        // already known is still checkpointed, only the failure is reported afterwards.
         TaskExecutionContext context = buildSavepointTaskExecutionContext(
                 "Job ID: 22222222222222222222222222222222\n"
                         + "Execute statement in sync mode. Please wait for the execution finish...");
         FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
 
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
+
         Assertions.assertThrows(TaskException.class, task::savePoint);
-        Mockito.verify(task, Mockito.never()).executeFlinkSavepointCommand(Mockito.anyList());
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 22222222222222222222222222222222",
+                String.join(" ", executedCommands.get(0)));
     }
 
     @Test
@@ -497,6 +506,66 @@ public class FlinkStreamTaskTest {
         Mockito.doReturn(false).when(task).executeFlinkSavepointCommand(Mockito.anyList());
 
         Assertions.assertThrows(TaskException.class, task::savePoint);
+    }
+
+    @Test
+    public void testSavePointAttemptsEveryJobBeforeReportingFailures() throws Exception {
+        // a failing savepoint must not skip the jobs which follow it, otherwise a running job can
+        // never be checkpointed through this task once an earlier job fails
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Job has been submitted with JobID 11111111111111111111111111111111\n"
+                        + "Job has been submitted with JobID 22222222222222222222222222222222");
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return executedCommands.size() > 1;
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
+
+        Assertions.assertThrows(TaskException.class, task::savePoint);
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 11111111111111111111111111111111",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 22222222222222222222222222222222",
+                String.join(" ", executedCommands.get(1)));
+    }
+
+    @Test
+    public void testSavePointKeepsTheEndpointOfACompiledPlanJob() throws Exception {
+        // `EXECUTE PLAN` submits a job as well, so the following INSERT must not take its endpoint
+        TaskExecutionContext context = buildSavepointTaskExecutionContext(
+                "Job ID: 11111111111111111111111111111111\n"
+                        + "Job ID: 22222222222222222222222222222222");
+
+        FlinkStreamParameters parameters = new FlinkStreamParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'rest.address' = 'cluster-a';\n"
+                + "EXECUTE PLAN '/plans/job.json';\n"
+                + "SET 'rest.address' = 'cluster-b';\n"
+                + "INSERT INTO sink_b SELECT * FROM source_b;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkStreamTask task = Mockito.spy(new FlinkStreamTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = new ArrayList<>();
+        Mockito.doAnswer(invocation -> {
+            executedCommands.add(invocation.getArgument(0));
+            return true;
+        }).when(task).executeFlinkSavepointCommand(Mockito.anyList());
+
+        task.savePoint();
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 11111111111111111111111111111111 -Drest.address=cluster-a",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 22222222222222222222222222222222 -Drest.address=cluster-b",
+                String.join(" ", executedCommands.get(1)));
     }
 
     @Test

@@ -157,6 +157,15 @@ public class FlinkArgsUtils {
                     + "(?:[^;'\"]|'[^']*'|\"[^\"]*\")*?\\bAS\\s+(?:SELECT|WITH|VALUES|TABLE)\\b");
 
     /**
+     * The compiled plan executions of the SQL Client, {@code EXECUTE PLAN '<path>'} and
+     * {@code COMPILE AND EXECUTE PLAN '<path>'}. They submit a job as well, and the client prints its
+     * JobID through the normal submission path, so their statement takes a place in the per-job
+     * connection snapshots like an update statement does.
+     */
+    private static final Pattern SQL_EXECUTE_PLAN_STATEMENT_REGEX =
+            Pattern.compile("(?is)^\\s*(?:COMPILE\\s+AND\\s+)?EXECUTE\\s+PLAN\\b");
+
+    /**
      * The beginning of a statement set, whose update statements are submitted as a single job. The
      * {@code BEGIN} keyword which follows the {@code EXECUTE STATEMENT SET} form belongs to the
      * boundary as well, so it does not hide an update statement which shares the fragment.
@@ -314,8 +323,9 @@ public class FlinkArgsUtils {
 
     /**
      * Scan the SQL scripts statement by statement and update the tracker: a {@code SET} or
-     * {@code RESET} statement changes the effective configuration, an update statement or a
-     * statement set submits a job whose configuration is snapshotted.
+     * {@code RESET} statement changes the effective configuration, while an update statement, a
+     * statement set, a {@code CREATE TABLE ... AS} statement or a compiled plan execution submits a
+     * job whose configuration is snapshotted.
      */
     private static void applySqlScripts(SqlClusterConnectionTracker tracker, String... scripts) {
         for (String script : scripts) {
@@ -369,7 +379,8 @@ public class FlinkArgsUtils {
             return;
         }
         if (SQL_JOB_STATEMENT_REGEX.matcher(statement).find()
-                || SQL_CREATE_TABLE_AS_SELECT_REGEX.matcher(statement).find()) {
+                || SQL_CREATE_TABLE_AS_SELECT_REGEX.matcher(statement).find()
+                || SQL_EXECUTE_PLAN_STATEMENT_REGEX.matcher(statement).find()) {
             tracker.submit();
         }
     }

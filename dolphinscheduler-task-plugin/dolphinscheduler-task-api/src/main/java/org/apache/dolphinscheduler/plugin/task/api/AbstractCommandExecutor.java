@@ -43,6 +43,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -136,8 +138,14 @@ public abstract class AbstractCommandExecutor {
         TaskExecutionStatus kubernetesStatus =
                 ProcessUtils.getApplicationStatus(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
 
-        // Wait the task log process finished.
-        collectProcessLogFuture.join();
+        // Wait the task log process finished. An output which could not be collected does not fail the
+        // task itself, its exit code is decided by the process; a caller which needs the whole output,
+        // for example the Flink cancellation, observes the failure through awaitOutputCollected.
+        try {
+            collectProcessLogFuture.join();
+        } catch (CompletionException e) {
+            log.error("Collect the output of the task process failed", e.getCause());
+        }
 
         if (collectPodLogFuture.isPresent()) {
             // Wait kubernetes pod log collection finished
@@ -194,7 +202,8 @@ public abstract class AbstractCommandExecutor {
      *
      * @param future the output collection, may be null when no process was started
      * @param timeoutMillis the maximum time to wait
-     * @return true if the output was collected, false if the wait timed out
+     * @return true if the whole output was collected, false if the wait timed out or the collection
+     *         failed
      */
     static boolean awaitCollected(CompletableFuture<Void> future, long timeoutMillis) {
         if (future == null) {
@@ -208,9 +217,14 @@ public abstract class AbstractCommandExecutor {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
             return false;
+        } catch (ExecutionException e) {
+            // the collection failed, so only a part of the output reached the caller: it must not be
+            // reported as collected, otherwise the missing tail is treated as if it did not exist
+            log.error("Collect the process output failed", e.getCause());
+            return false;
         } catch (Exception e) {
             log.error("Collect the process output failed", e);
-            return true;
+            return false;
         }
     }
 
@@ -307,11 +321,15 @@ public abstract class AbstractCommandExecutor {
                     taskOutputParameterParser.appendParseLog(line);
                 }
             } catch (Exception e) {
+                // the output is incomplete: the future has to complete exceptionally so that a caller
+                // which relies on the whole output, for example to find the JobIDs of a submission,
+                // does not treat the partial output as the complete one
                 log.error("Parse var pool error", e);
+                throw new RuntimeException("Collect the output of the task process failed", e);
             } finally {
+                taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
                 LogUtils.removeTaskInstanceLogFullPathMDC();
             }
-            taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
         }, collectProcessLogService);
 
         collectProcessLogService.shutdown();
