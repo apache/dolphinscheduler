@@ -179,6 +179,11 @@ public class FlinkTask extends AbstractYarnTask {
      * <p>The client is stopped before the JobIDs are collected: while it is running it can submit
      * further jobs, which would be missing from an earlier snapshot. The client stop also cancels the
      * YARN/K8s application of the task.
+     *
+     * <p>Every step is attempted even when an earlier one fails, because the jobs which are already
+     * known still have to be cancelled. A step which could not do its job is never treated as a
+     * success: the failure is propagated after the attempts, so a stop which left a job running is
+     * not reported as successful.
      */
     @Override
     public void cancelApplication() throws TaskException {
@@ -186,23 +191,38 @@ public class FlinkTask extends AbstractYarnTask {
         try {
             cancelClientByProcess();
         } catch (TaskException e) {
-            cancelFailure = e;
+            // the client may still run and submit another job, so the ids collected below are not
+            // final, but the jobs which are known have to be cancelled anyway
+            cancelFailure = new TaskException(String.format(
+                    "Failed to stop the flink client or its application, the task may still have running jobs, "
+                            + "taskInstanceId: %s",
+                    taskExecutionContext.getTaskInstanceId()), e);
         }
-        // the submission output is collected asynchronously, its tail has to reach the task log before
-        // the JobIDs are collected from it
-        awaitBufferedSubmissionOutput();
+        try {
+            requireSubmissionOutputCollected();
+        } catch (TaskException e) {
+            cancelFailure = mergeCancelFailure(cancelFailure, e);
+        }
         try {
             cancelFlinkJob();
         } catch (TaskException e) {
-            if (cancelFailure == null) {
-                cancelFailure = e;
-            } else {
-                cancelFailure.addSuppressed(e);
-            }
+            cancelFailure = mergeCancelFailure(cancelFailure, e);
         }
         if (cancelFailure != null) {
             throw cancelFailure;
         }
+    }
+
+    /**
+     * Keep the failure which has to be reported, and attach the following one to it instead of
+     * dropping either of them.
+     */
+    private static TaskException mergeCancelFailure(TaskException cancelFailure, TaskException failure) {
+        if (cancelFailure == null) {
+            return failure;
+        }
+        cancelFailure.addSuppressed(failure);
+        return cancelFailure;
     }
 
     /**
@@ -215,14 +235,24 @@ public class FlinkTask extends AbstractYarnTask {
 
     /**
      * Wait until the output of the submission has been written to the task log, so that the JobIDs of
-     * the jobs which were submitted right before the client was stopped are not missed. The wait is
-     * bounded, a command which does not release its output pipe must not block the cancellation.
+     * the jobs which were submitted right before the client was stopped are not missed.
+     *
+     * <p>An output which cannot be collected within the timeout is a cancellation failure: its tail
+     * can still contain the JobID of a detached job, which would otherwise be missing from the
+     * cancellation and reported as cancelled.
+     *
+     * @throws TaskException when the output could not be collected in time
      */
-    private void awaitBufferedSubmissionOutput() {
-        if (!awaitSubmissionOutputCollected(SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS)) {
-            log.warn("The submission output could not be collected within {}ms, collect the JobIDs anyway",
-                    SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS);
+    private void requireSubmissionOutputCollected() throws TaskException {
+        if (awaitSubmissionOutputCollected(SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS)) {
+            return;
         }
+        String message = String.format(
+                "The submission output could not be collected within %dms, the JobIDs of the task log may be "
+                        + "incomplete, taskInstanceId: %s",
+                SUBMISSION_OUTPUT_DRAIN_TIMEOUT_MILLIS, taskExecutionContext.getTaskInstanceId());
+        log.error(message);
+        throw new TaskException(message);
     }
 
     /**
@@ -237,7 +267,9 @@ public class FlinkTask extends AbstractYarnTask {
      * Cancel the flink jobs through the flink CLI.
      *
      * <p>Tasks submitted to YARN are not handled here: their application id is known and cancelling
-     * the application through the resource manager is the reliable way. A Kubernetes cluster is
+     * the application through the resource manager is the reliable way. The flink CLI cannot address
+     * such a job either, {@code flink cancel} accepts no {@code -yid}, so a failure of the resource
+     * manager is not retried here but reported by the caller. A Kubernetes cluster is
      * identified by a cluster id rather than by an application id, so a job submitted to Kubernetes
      * is cancelled through the CLI, with the cluster connection options of the submission.
      *
@@ -343,8 +375,11 @@ public class FlinkTask extends AbstractYarnTask {
                 }
             }
         } catch (Exception e) {
-            log.error("Read task log failed, logPath: {}", logPath, e);
-            return 0;
+            String message = String.format(
+                    "Read the task log failed, the submissions of the task are unknown, logPath: %s, taskInstanceId: %s",
+                    logPath, taskExecutionContext.getTaskInstanceId());
+            log.error(message, e);
+            throw new TaskException(message, e);
         }
         return pending;
     }
@@ -403,8 +438,11 @@ public class FlinkTask extends AbstractYarnTask {
                 }
             }
         } catch (Exception e) {
-            log.error("Read task log failed, logPath: {}", logPath, e);
-            return Collections.emptyList();
+            String message = String.format(
+                    "Read the task log failed, the submitted flink jobs are unknown, logPath: %s, taskInstanceId: %s",
+                    logPath, taskExecutionContext.getTaskInstanceId());
+            log.error(message, e);
+            throw new TaskException(message, e);
         }
         associateApplications(submissions, applicationIds);
         return submissions;

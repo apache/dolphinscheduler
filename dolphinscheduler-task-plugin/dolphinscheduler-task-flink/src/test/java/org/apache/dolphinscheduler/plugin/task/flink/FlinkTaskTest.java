@@ -638,4 +638,72 @@ public class FlinkTaskTest {
         // the YARN application is cancelled through the resource manager by the fallback
         Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
     }
+
+    @Test
+    public void testCancelApplicationFailsWhenTheClientCannotBeStopped() throws Exception {
+        // a client which could not be killed may still submit another job, so the cancellation must
+        // not be reported as successful even though the jobs which are already known are cancelled
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 11111111111111111111111111111111");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
+        Mockito.doThrow(new TaskException("Failed to kill the process tree of the flink client"))
+                .when(task).cancelClientByProcess();
+
+        Assertions.assertThrows(TaskException.class, task::cancelApplication);
+
+        // the job which is already known is still cancelled, the failure is only reported afterwards
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 11111111111111111111111111111111",
+                String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
+    public void testCancelApplicationFailsWhenTheApplicationCannotBeCancelled() throws Exception {
+        // the resource manager failure is propagated instead of being hidden behind the application id
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Submitted application application_1700000000000_0001");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        Mockito.doThrow(new TaskException("Cancel the yarn application failed"))
+                .when(task).cancelClientByProcess();
+
+        TaskException exception = Assertions.assertThrows(TaskException.class, task::cancelApplication);
+
+        Assertions.assertTrue(exception.getMessage().contains("may still have running jobs"),
+                "the failure must state that the application was not stopped, message: " + exception.getMessage());
+    }
+
+    @Test
+    public void testCancelApplicationFailsWhenTheSubmissionOutputIsNotCollected() throws Exception {
+        // the JobID can still be buffered in the output which was not collected, so the snapshot must
+        // not be treated as the final one
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 11111111111111111111111111111111");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
+        Mockito.doNothing().when(task).cancelClientByProcess();
+        Mockito.doReturn(false).when(task).awaitSubmissionOutputCollected(Mockito.anyLong());
+
+        Assertions.assertThrows(TaskException.class, task::cancelApplication);
+
+        // the job which is already in the log is still cancelled
+        Assertions.assertEquals(1, executedCommands.size());
+    }
+
+    @Test
+    public void testCancelApplicationFailsWhenTheTaskLogCannotBeRead() throws Exception {
+        // an unreadable task log means the submitted jobs are unknown, which is not a successful
+        // cancellation even when the client has been stopped
+        TaskExecutionContext context = buildTaskExecutionContext("Flink job is running");
+        Path unreadableLog = tempDir.resolve("unreadable.log");
+        // the bytes are not UTF-8, which makes the log unreadable in every environment
+        Files.write(unreadableLog, new byte[]{(byte) 0xFF, (byte) 0xFE, 'J', 'o', 'b'});
+        context.setLogPath(unreadableLog.toString());
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        Mockito.doNothing().when(task).cancelClientByProcess();
+
+        Assertions.assertThrows(TaskException.class, task::cancelApplication);
+
+        Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
+    }
 }

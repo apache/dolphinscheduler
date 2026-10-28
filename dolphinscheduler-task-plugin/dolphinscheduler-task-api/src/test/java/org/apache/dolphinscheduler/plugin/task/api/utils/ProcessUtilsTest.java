@@ -19,13 +19,18 @@ package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.am.ApplicationManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
 
 import org.apache.commons.lang3.SystemUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -262,5 +267,44 @@ public class ProcessUtilsTest {
 
         // Assert
         Assertions.assertTrue(result);
+    }
+
+    @Test
+    void testCancelApplicationPropagatesTheResourceManagerFailure() throws Exception {
+        // a stop which reports success while the application still runs leaves a detached job behind,
+        // so the resource manager failure reaches the caller
+        TaskExecutionContext taskRequest = new TaskExecutionContext();
+        taskRequest.setTaskInstanceId(16789);
+        taskRequest.setTaskAppId("16789");
+        taskRequest.setExecutePath("/tmp");
+        taskRequest.setTenantCode("");
+        taskRequest.setAppIds("application_1700000000000_0001");
+
+        ApplicationManager<?> applicationManager = Mockito.mock(ApplicationManager.class);
+        Mockito.when(applicationManager.killApplication(Mockito.any()))
+                .thenThrow(new TaskException("Kill yarn application failed"));
+
+        Map<ResourceManagerType, ApplicationManager> applicationManagerMap = applicationManagerMap();
+        ApplicationManager previousManager = applicationManagerMap.put(ResourceManagerType.YARN, applicationManager);
+        try {
+            TaskException exception = Assertions.assertThrows(TaskException.class,
+                    () -> ProcessUtils.cancelApplication(taskRequest));
+
+            Assertions.assertTrue(exception.getMessage().contains("Kill yarn application failed"),
+                    "the resource manager failure must be propagated, message: " + exception.getMessage());
+        } finally {
+            if (previousManager == null) {
+                applicationManagerMap.remove(ResourceManagerType.YARN);
+            } else {
+                applicationManagerMap.put(ResourceManagerType.YARN, previousManager);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<ResourceManagerType, ApplicationManager> applicationManagerMap() throws Exception {
+        Field field = ProcessUtils.class.getDeclaredField("applicationManagerMap");
+        field.setAccessible(true);
+        return (Map<ResourceManagerType, ApplicationManager>) field.get(null);
     }
 }

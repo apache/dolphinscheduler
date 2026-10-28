@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -825,8 +826,22 @@ public class FlinkArgsUtilsTest {
         Assertions.assertFalse(success);
         int descendantPid = Integer
                 .parseInt(new String(Files.readAllBytes(descendantPidFile), StandardCharsets.UTF_8).trim());
+        // the termination of the process tree is asynchronous, so give it the same time the kill itself
+        // may take instead of requiring the descendant to be gone the moment the command returns
+        awaitTermination(descendantPid, TimeUnit.SECONDS.toMillis(15));
         Assertions.assertFalse(isProcessAlive(descendantPid),
                 "the descendant process " + descendantPid + " must be terminated with the command");
+    }
+
+    /**
+     * Wait at most the given time for the process to be gone, the termination of a process tree is not
+     * a synchronous operation.
+     */
+    private static void awaitTermination(int processId, long timeoutMillis) throws Exception {
+        long deadline = System.currentTimeMillis() + timeoutMillis;
+        while (System.currentTimeMillis() < deadline && isProcessAlive(processId)) {
+            Thread.sleep(100L);
+        }
     }
 
     private static boolean isProcessAlive(int processId) throws Exception {

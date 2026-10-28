@@ -142,8 +142,13 @@ public abstract class AbstractCommandExecutor {
         if (collectPodLogFuture.isPresent()) {
             // Wait kubernetes pod log collection finished
             collectPodLogFuture.get().join();
-            // delete pod after successful execution and log collection
-            ProcessUtils.cancelApplication(taskRequest);
+            // delete pod after successful execution and log collection, a pod which cannot be
+            // deleted must not turn the finished task into a failure
+            try {
+                ProcessUtils.cancelApplication(taskRequest);
+            } catch (TaskException e) {
+                log.warn("Delete the kubernetes pod of the finished task failed", e);
+            }
         }
 
         // if SHELL task exit
@@ -209,10 +214,21 @@ public abstract class AbstractCommandExecutor {
         }
     }
 
+    /**
+     * Stop the process of the task and the application it runs in.
+     *
+     * <p>A failure is propagated: a caller which stops a task has to know that the process is still
+     * alive, otherwise it may treat an incomplete state as the final one, for example when the process
+     * can still submit a remote job after this call returns.
+     *
+     * @throws TaskException if the process tree or the application could not be terminated
+     */
     public void cancelApplication() throws InterruptedException {
         if (process == null) {
             return;
         }
+
+        TaskException cancelFailure = null;
 
         // Try to kill process tree
         boolean killed = ProcessUtils.kill(taskRequest);
@@ -222,10 +238,25 @@ public abstract class AbstractCommandExecutor {
         } else {
             log.error("Failed to kill process tree for task: {}, pid: {}",
                     taskRequest.getTaskAppId(), taskRequest.getProcessId());
+            cancelFailure = new TaskException(String.format(
+                    "Failed to kill the process tree of task: %s, pid: %s, it may still be running",
+                    taskRequest.getTaskAppId(), taskRequest.getProcessId()));
         }
 
         // Try to kill yarn or k8s application
-        ProcessUtils.cancelApplication(taskRequest);
+        try {
+            ProcessUtils.cancelApplication(taskRequest);
+        } catch (TaskException e) {
+            if (cancelFailure == null) {
+                cancelFailure = e;
+            } else {
+                cancelFailure.addSuppressed(e);
+            }
+        }
+
+        if (cancelFailure != null) {
+            throw cancelFailure;
+        }
     }
 
     private Optional<CompletableFuture<?>> collectPodLogIfNeeded() {

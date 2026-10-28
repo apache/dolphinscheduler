@@ -426,18 +426,29 @@ public final class ProcessUtils {
     /**
      * cancel k8s / yarn application
      *
+     * <p>The caller has to know whether the application was really cancelled: a stop which reports
+     * success while the application still runs leaves a detached job behind. A failure of the resource
+     * manager is therefore propagated instead of only being logged, the same way the process tree
+     * termination reports its failure.
+     *
      * @param taskExecutionContext
-     * @return
+     * @throws TaskException if the application could not be cancelled
      */
     public static void cancelApplication(TaskExecutionContext taskExecutionContext) {
         try {
             if (Objects.nonNull(taskExecutionContext.getK8sTaskExecutionContext())) {
                 if (!TASK_TYPE_SET_K8S.contains(taskExecutionContext.getTaskType())) {
                     // Set empty container name for Spark on K8S task
-                    applicationManagerMap.get(ResourceManagerType.KUBERNETES)
+                    boolean killed = applicationManagerMap.get(ResourceManagerType.KUBERNETES)
                             .killApplication(new KubernetesApplicationManagerContext(
                                     taskExecutionContext.getK8sTaskExecutionContext(),
                                     taskExecutionContext.getTaskAppId(), ""));
+                    if (!killed) {
+                        // the driver pod is already in a failure or unknown state, there is nothing
+                        // left to cancel, so this is not a cancellation failure
+                        log.warn("The kubernetes application of task: {} is not running any more, it is not killed",
+                                taskExecutionContext.getTaskAppId());
+                    }
                 }
             } else {
                 String host = taskExecutionContext.getHost();
@@ -469,8 +480,12 @@ public final class ProcessUtils {
                 applicationManager.killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));
                 log.info("yarn application [{}] is killed or already finished", appIds);
             }
+        } catch (TaskException e) {
+            log.error("Cancel application failed: {}", e.getMessage(), e);
+            throw e;
         } catch (Exception e) {
-            log.error("Cancel application failed: {}", e.getMessage());
+            log.error("Cancel application failed: {}", e.getMessage(), e);
+            throw new TaskException("Cancel application failed: " + e.getMessage(), e);
         }
     }
 
