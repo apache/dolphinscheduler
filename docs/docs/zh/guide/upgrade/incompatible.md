@@ -72,5 +72,3 @@
 
 ![项目权限模型](../../../../img/architecture-design/project-scoped-authorization.png)
 
-[使用 draw.io 编辑项目权限模型图](../../../../img/architecture-design/project-scoped-authorization.drawio)
-
