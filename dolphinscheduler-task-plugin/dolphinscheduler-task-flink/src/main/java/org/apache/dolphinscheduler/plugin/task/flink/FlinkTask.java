@@ -32,7 +32,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -71,9 +70,13 @@ public class FlinkTask extends AbstractYarnTask {
      * The message the flink CLI reports when the job is already in another terminal state, so it does
      * not have to be cancelled any more.
      */
-    private static final List<String> JOB_ALREADY_IN_TERMINAL_STATE_MESSAGES = Arrays.asList(
-            "already reached another terminal state",
-            "because it is not running");
+    private static final String JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE = "already reached another terminal state";
+
+    /**
+     * The message the flink CLI reports when the job does not exist on the targeted cluster any more,
+     * for example a batch job which finished right before the stop.
+     */
+    private static final String JOB_NOT_FOUND_MESSAGE = "Job could not be found";
 
     /**
      * The message the SQL Client prints when a synchronous submission has finished. Flink 1.17
@@ -319,6 +322,11 @@ public class FlinkTask extends AbstractYarnTask {
                 log.info("Cancelled flink job: {}", jobId);
                 continue;
             }
+            if (isJobNotFound(result.getOutput())) {
+                log.warn("Flink job {} could not be found on the targeted cluster, it is not running there any more",
+                        jobId);
+                continue;
+            }
             if (isJobAlreadyInTerminalState(result.getOutput())) {
                 log.info("Flink job {} is already in a terminal state, it does not need to be cancelled", jobId);
                 continue;
@@ -332,8 +340,8 @@ public class FlinkTask extends AbstractYarnTask {
         }
         if (unreportedSubmissions > 0) {
             failures.add(String.format(
-                    "%d submission(s) of the task reported no JobID and no completion, they may still be running "
-                            + "and cannot be cancelled through the flink CLI",
+                    "%d submitted job(s) reported no result from the SQL client, they may still be running and "
+                            + "cannot be cancelled through the flink CLI",
                     unreportedSubmissions));
         }
         if (CollectionUtils.isNotEmpty(failures)) {
@@ -429,8 +437,15 @@ public class FlinkTask extends AbstractYarnTask {
      * the {@code JobCancellationHandler} of flink.
      */
     private boolean isJobAlreadyInTerminalState(String output) {
-        return JOB_ALREADY_IN_TERMINAL_STATE_MESSAGES.stream()
-                .anyMatch(message -> StringUtils.contains(output, message));
+        return StringUtils.contains(output, JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE);
+    }
+
+    /**
+     * The flink CLI reports a job which does not exist on the targeted cluster, which is not a
+     * cancellation failure: there is nothing left to cancel.
+     */
+    private boolean isJobNotFound(String output) {
+        return StringUtils.contains(output, JOB_NOT_FOUND_MESSAGE);
     }
 
     /**

@@ -51,4 +51,15 @@ public class BaseShellInterceptorTest {
                         + "-Dsecurity.ssl.rest.truststore-password=******",
                 BaseShellInterceptor.maskSensitiveOptions(command));
     }
+
+    @Test
+    public void testMaskSensitiveOptionsMasksTheSeparatedOption() {
+        String command = "${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef "
+                + "-D security.ssl.rest.truststore-password=secret -D security.ssl.protocol=TLSv1.3";
+
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef "
+                        + "-D security.ssl.rest.truststore-password=****** -D security.ssl.protocol=TLSv1.3",
+                BaseShellInterceptor.maskSensitiveOptions(command));
+    }
 }

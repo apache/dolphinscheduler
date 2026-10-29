@@ -49,7 +49,7 @@ public class TaskConstants {
      *             {@code flink run}.
      */
     @Deprecated
-    public static final String FLINK_APPLICATION_REGEX = "Job\\s*ID:?\\s+(\\w+)";
+    public static final String FLINK_APPLICATION_REGEX = "JobID \\w+";
 
     public static final String DATASOURCE_PASSWORD_REGEX =
             "(?<=((?i)password((\" : \")|(\":\")|(\\\\\":\\\\\")|(=')))).*?(?=((\")|(\\\\\")|(')))";

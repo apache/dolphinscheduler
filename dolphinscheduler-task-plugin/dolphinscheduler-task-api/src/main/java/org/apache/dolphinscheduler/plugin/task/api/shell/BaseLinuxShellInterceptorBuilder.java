@@ -61,7 +61,8 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
-        log.info("Final Script Content:\n====================\n{}\n====================", finalScript);
+        log.info("Final Script Content:\n====================\n{}\n====================",
+                BaseShellInterceptor.maskSensitiveOptions(finalScript));
 
     }
 

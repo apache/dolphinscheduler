@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.MockedStatic;
@@ -847,6 +848,9 @@ public class FlinkArgsUtilsTest {
         taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
         taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
 
+        Assumptions.assumeTrue(canListProcessTree(),
+                "the host cannot list the process tree, the descendant cannot be terminated");
+
         boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
                 FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList()),
                 false, 1);
@@ -953,5 +957,26 @@ public class FlinkArgsUtilsTest {
                 "the path with a space must stay one argument, arguments: " + arguments);
         Assertions.assertTrue(arguments.contains("-Dsecurity.ssl.rest.truststore-password=pa$$ word;x"),
                 "the value with a metacharacter must reach the CLI unchanged, arguments: " + arguments);
+    }
+
+    /**
+     * Whether the host can list the process tree, which both pstree and ps provide. A restricted
+     * environment, for example a sandbox without ps, cannot terminate a descendant process at all.
+     */
+    private static boolean canListProcessTree() {
+        return canRun("pstree", "-p", "1") || canRun("ps", "-eo", "pid,ppid");
+    }
+
+    private static boolean canRun(String... command) {
+        try {
+            Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
+            byte[] buffer = new byte[1024];
+            while (process.getInputStream().read(buffer) >= 0) {
+                // drain the output, otherwise the process can block on a full pipe
+            }
+            return process.waitFor() == 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

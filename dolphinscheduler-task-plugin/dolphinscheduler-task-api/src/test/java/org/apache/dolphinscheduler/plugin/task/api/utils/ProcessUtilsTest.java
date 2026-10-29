@@ -343,4 +343,14 @@ public class ProcessUtilsTest {
             }
         }
     }
+
+    @Test
+    void testGetProcessIdReturnsThePidOfARunningProcess() throws Exception {
+        Process process = new ProcessBuilder("sleep", "5").start();
+        try {
+            Assertions.assertTrue(ProcessUtils.getProcessId(process) > 0);
+        } finally {
+            process.destroyForcibly();
+        }
+    }
 }

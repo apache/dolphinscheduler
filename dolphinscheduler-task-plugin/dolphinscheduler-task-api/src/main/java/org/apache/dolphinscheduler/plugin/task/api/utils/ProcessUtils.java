@@ -186,7 +186,8 @@ public final class ProcessUtils {
             // Java 9 exposes the pid of the process directly, the reflective access to the pid field
             // of the process implementation is denied from Java 16 on
             Method pidMethod = Process.class.getMethod("pid");
-            return (int) pidMethod.invoke(process);
+            // pid() returns a long, the reflection result is a Long which cannot be cast to Integer
+            return ((Number) pidMethod.invoke(process)).intValue();
         } catch (NoSuchMethodException e) {
             // Java 8, the pid is only reachable through the implementation field below
         } catch (Exception e) {

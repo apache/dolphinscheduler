@@ -32,7 +32,7 @@ public abstract class BaseShellInterceptor implements IShellInterceptor {
      * value masked instead of leaking the secret of the task into the log file.
      */
     private static final Pattern SENSITIVE_OPTION_PATTERN = Pattern.compile(
-            "(-D[^\\s=]*(?i:password|passwd|secret|token|credential)[^\\s=]*=)((?:'[^']*'|\"[^\"]*\"|\\S)+)");
+            "(-D[ \\t]*[^\\s=]*(?i:password|passwd|secret|token|credential)[^\\s=]*=)((?:'[^']*'|\"[^\"]*\"|\\S)+)");
 
     protected final String workingDirectory;
     protected final List<String> executeCommands;
@@ -59,7 +59,7 @@ public abstract class BaseShellInterceptor implements IShellInterceptor {
      * Mask the value of the options which carry a credential, so that the command can be logged
      * without writing the secret into the log file.
      */
-    static String maskSensitiveOptions(String command) {
+    public static String maskSensitiveOptions(String command) {
         return SENSITIVE_OPTION_PATTERN.matcher(command).replaceAll("$1******");
     }
 

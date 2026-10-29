@@ -840,4 +840,18 @@ public class FlinkTaskTest {
                 "${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222 -Drest.address=cluster-b",
                 String.join(" ", executedCommands.get(1)));
     }
+
+    @Test
+    public void testCancelApplicationIgnoresAJobWhichDoesNotExistAnyMore() throws Exception {
+        // a batch job can finish right before the stop, the CLI then reports that the job cannot be
+        // found on the cluster, which is not a cancellation failure
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job ID: 1234567890abcdef1234567890abcdef");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        stubCancelCommands(task, cancelFailed("Job could not be found."));
+
+        task.cancelApplication();
+
+        Mockito.verify(task).executeFlinkCancelCommand(Mockito.anyList());
+    }
 }

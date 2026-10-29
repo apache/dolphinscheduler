@@ -906,13 +906,22 @@ public class FlinkArgsUtils {
     private static FlinkCommandResult waitForCommand(Process process,
                                                      TaskExecutionContext taskExecutionContext,
                                                      int timeoutSeconds) throws InterruptedException {
-        StringBuilder output = new StringBuilder();
+        // the head and the tail of the output are kept, the reason of a failure is usually at the
+        // end while the beginning shows which command was executed
+        StringBuilder outputHead = new StringBuilder();
+        StringBuilder outputTail = new StringBuilder();
         Thread outputReader = new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    if (output.length() < MAX_COMMAND_OUTPUT_LENGTH) {
-                        output.append(line).append(System.lineSeparator());
+                    String outputLine = line + System.lineSeparator();
+                    if (outputHead.length() + outputLine.length() <= MAX_COMMAND_OUTPUT_LENGTH / 2) {
+                        outputHead.append(outputLine);
+                        continue;
+                    }
+                    outputTail.append(outputLine);
+                    if (outputTail.length() > MAX_COMMAND_OUTPUT_LENGTH / 2) {
+                        outputTail.delete(0, outputTail.length() - MAX_COMMAND_OUTPUT_LENGTH / 2);
                     }
                 }
             } catch (IOException e) {
@@ -925,18 +934,19 @@ public class FlinkArgsUtils {
         boolean finished = process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
         // both streams are merged into stdout by the shell interceptor, so joining the reader is enough
         outputReader.join(TimeUnit.SECONDS.toMillis(OUTPUT_READER_JOIN_TIMEOUT_SECONDS));
+        String output = commandOutput(outputHead, outputTail);
         if (!finished) {
             destroyProcessTree(process, taskExecutionContext);
             log.error("Execute flink command timeout after {}s, output: {}", timeoutSeconds, output);
-            return FlinkCommandResult.failure(output.toString());
+            return FlinkCommandResult.failure(output);
         }
         int exitCode = process.exitValue();
         if (exitCode != 0) {
             log.error("Execute flink command failed, exitCode: {}, output: {}", exitCode, output);
-            return FlinkCommandResult.failure(output.toString());
+            return FlinkCommandResult.failure(output);
         }
         log.info("Execute flink command successfully, output: {}", output);
-        return FlinkCommandResult.success(output.toString());
+        return FlinkCommandResult.success(output);
     }
 
     /**
@@ -963,6 +973,17 @@ public class FlinkArgsUtils {
         public static FlinkCommandResult failure(String output) {
             return new FlinkCommandResult(false, output);
         }
+    }
+
+    /**
+     * Compose the kept output, the part which was dropped in the middle is marked so that a log reader
+     * is not misled by an apparent jump.
+     */
+    private static String commandOutput(StringBuilder outputHead, StringBuilder outputTail) {
+        if (outputTail.length() == 0) {
+            return outputHead.toString();
+        }
+        return outputHead + System.lineSeparator() + "...(truncated)..." + System.lineSeparator() + outputTail;
     }
 
     /**

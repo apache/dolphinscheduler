@@ -89,8 +89,8 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         int unreportedSubmissions = countUnreportedSubmissions();
         if (unreportedSubmissions > 0) {
             failures.add(String.format(
-                    "%d submission(s) of the task reported no JobID and no completion, they may still be running "
-                            + "so no savepoint can be triggered for them",
+                    "%d submitted job(s) reported no result from the SQL client, they may still be running so no "
+                            + "savepoint can be triggered for them",
                     unreportedSubmissions));
         }
         if (CollectionUtils.isEmpty(submissions)) {
