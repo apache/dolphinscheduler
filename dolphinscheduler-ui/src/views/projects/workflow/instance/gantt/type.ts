@@ -14,27 +14,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { ITaskState } from '@/common/types'
 
-interface ITask {
-  taskName: string
-  startDate: Array<number>
-  endDate: Array<number>
-  isoStart: string
-  isoEnd: string
-  status: string
-  duration: string
+export type DateValue = string | number | null
+
+export interface TaskDefinition {
+  code: number
+  name: string
+  taskType?: string
+  [key: string]: unknown
 }
 
-interface IGanttRes {
-  height: number
-  taskNames: Array<number>
-  taskStatus: Object
-  tasks: Array<ITask>
+export interface TaskInstance {
+  id: number
+  taskCode: number
+  name: string
+  state: string
+  flag?: string
+  taskType?: string
+  startTime?: DateValue
+  endTime?: DateValue
+  submitTime?: DateValue
+  logPath?: string
 }
 
-interface ISeriesData {
-  [taskState: string]: Array<any>
+export interface WorkflowInstance {
+  name?: string
+  state: string
+  startTime?: DateValue
+  endTime?: DateValue
+  dagData?: { taskDefinitionList?: TaskDefinition[] }
 }
 
-export { ITask, IGanttRes, ISeriesData, ITaskState }
+export interface IGanttRes {
+  taskNames: number[]
+  tasks: {
+    taskName: string
+    startDate: number[]
+    endDate: number[]
+    isoStart?: string
+    status?: string
+  }[]
+}
+
+export interface GanttRow {
+  code: number
+  name: string
+  taskType: string
+  id?: number
+  state: string
+  start: number | null
+  end: number | null
+  duration: number | null
+  percent: number
+  logAvailable: boolean
+  definition?: TaskDefinition
+}
