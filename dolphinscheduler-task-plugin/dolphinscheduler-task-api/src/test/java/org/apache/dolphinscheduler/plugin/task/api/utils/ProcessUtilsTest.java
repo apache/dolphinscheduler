@@ -35,6 +35,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -346,6 +347,7 @@ public class ProcessUtilsTest {
 
     @Test
     void testGetProcessIdReturnsThePidOfARunningProcess() throws Exception {
+        Assumptions.assumeFalse(SystemUtils.IS_OS_WINDOWS, "the test starts a unix sleep process");
         Process process = new ProcessBuilder("sleep", "5").start();
         try {
             Assertions.assertTrue(ProcessUtils.getProcessId(process) > 0);

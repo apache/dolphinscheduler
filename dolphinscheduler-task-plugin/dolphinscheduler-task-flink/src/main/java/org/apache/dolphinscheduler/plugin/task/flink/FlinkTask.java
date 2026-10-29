@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
+import org.apache.dolphinscheduler.plugin.task.api.shell.BaseShellInterceptor;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -311,6 +312,7 @@ public class FlinkTask extends AbstractYarnTask {
         // the last configuration of the submission
         List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
         List<String> failedJobIds = new ArrayList<>();
+        List<String> notCancelledJobIds = new ArrayList<>();
         for (int i = 0; i < jobIds.size(); i++) {
             String jobId = jobIds.get(i);
             List<String> clusterConnectionOptions = i < clusterConnectionOptionsPerJob.size()
@@ -323,8 +325,20 @@ public class FlinkTask extends AbstractYarnTask {
                 continue;
             }
             if (isJobNotFound(result.getOutput())) {
-                log.warn("Flink job {} could not be found on the targeted cluster, it is not running there any more",
-                        jobId);
+                if (CollectionUtils.isEmpty(clusterConnectionOptions)) {
+                    // the job is addressed on the cluster of the submission, so a missing job is a job
+                    // which does not run any more
+                    log.warn("Flink job {} could not be found on the cluster of the submission, it is not running "
+                            + "there any more", jobId);
+                    continue;
+                }
+                // the same answer is returned when the cancel reached another cluster than the one which
+                // runs the job, for example when the targeting options are lost, so it is not a success
+                String targetedCluster = BaseShellInterceptor.maskSensitiveOptions(
+                        String.join(" ", clusterConnectionOptions));
+                log.error("Flink job {} could not be found on the targeted cluster [{}], it may still run on another "
+                        + "endpoint", jobId, targetedCluster);
+                notCancelledJobIds.add(String.format("%s (targeted %s)", jobId, targetedCluster));
                 continue;
             }
             if (isJobAlreadyInTerminalState(result.getOutput())) {
@@ -337,6 +351,12 @@ public class FlinkTask extends AbstractYarnTask {
         List<String> failures = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(failedJobIds)) {
             failures.add(String.format("the jobs %s could not be cancelled, they may still be running", failedJobIds));
+        }
+        if (CollectionUtils.isNotEmpty(notCancelledJobIds)) {
+            failures.add(String.format(
+                    "the jobs %s could not be found on the cluster they were targeted at, they may still run on "
+                            + "another endpoint",
+                    notCancelledJobIds));
         }
         if (unreportedSubmissions > 0) {
             failures.add(String.format(

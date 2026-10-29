@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -907,14 +908,17 @@ public class FlinkArgsUtils {
                                                      TaskExecutionContext taskExecutionContext,
                                                      int timeoutSeconds) throws InterruptedException {
         // the head and the tail of the output are kept, the reason of a failure is usually at the
-        // end while the beginning shows which command was executed
-        StringBuilder outputHead = new StringBuilder();
-        StringBuilder outputTail = new StringBuilder();
+        // end while the beginning shows which command was executed. The buffers are read after the
+        // reader is joined, but a timeout can leave it running, so a thread safe buffer is used.
+        StringBuffer outputHead = new StringBuffer();
+        StringBuffer outputTail = new StringBuffer();
+        AtomicLong totalOutputLength = new AtomicLong();
         Thread outputReader = new Thread(() -> {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     String outputLine = line + System.lineSeparator();
+                    totalOutputLength.addAndGet(outputLine.length());
                     if (outputHead.length() + outputLine.length() <= MAX_COMMAND_OUTPUT_LENGTH / 2) {
                         outputHead.append(outputLine);
                         continue;
@@ -934,7 +938,7 @@ public class FlinkArgsUtils {
         boolean finished = process.waitFor(timeoutSeconds, TimeUnit.SECONDS);
         // both streams are merged into stdout by the shell interceptor, so joining the reader is enough
         outputReader.join(TimeUnit.SECONDS.toMillis(OUTPUT_READER_JOIN_TIMEOUT_SECONDS));
-        String output = commandOutput(outputHead, outputTail);
+        String output = commandOutput(outputHead, outputTail, totalOutputLength.get());
         if (!finished) {
             destroyProcessTree(process, taskExecutionContext);
             log.error("Execute flink command timeout after {}s, output: {}", timeoutSeconds, output);
@@ -979,8 +983,8 @@ public class FlinkArgsUtils {
      * Compose the kept output, the part which was dropped in the middle is marked so that a log reader
      * is not misled by an apparent jump.
      */
-    private static String commandOutput(StringBuilder outputHead, StringBuilder outputTail) {
-        if (outputTail.length() == 0) {
+    private static String commandOutput(StringBuffer outputHead, StringBuffer outputTail, long totalOutputLength) {
+        if (totalOutputLength <= outputHead.length() + outputTail.length()) {
             return outputHead.toString();
         }
         return outputHead + System.lineSeparator() + "...(truncated)..." + System.lineSeparator() + outputTail;

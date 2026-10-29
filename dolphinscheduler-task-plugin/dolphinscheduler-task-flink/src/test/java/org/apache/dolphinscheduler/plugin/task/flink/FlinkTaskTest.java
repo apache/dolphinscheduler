@@ -854,4 +854,52 @@ public class FlinkTaskTest {
 
         Mockito.verify(task).executeFlinkCancelCommand(Mockito.anyList());
     }
+
+    @Test
+    public void testCancelApplicationFailsWhenAJobIsNotFoundOnATargetedCluster() throws Exception {
+        // "Job could not be found" is also the answer of a cluster which does not run the job, for
+        // example when the targeting options were lost, so it is only a success when the cancel did
+        // not target a cluster
+        TaskExecutionContext context = buildTaskExecutionContext("Job ID: 1234567890abcdef1234567890abcdef");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setOthers("-m remote-jm:8081");
+        parameters.setRawScript("INSERT INTO t SELECT * FROM s;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+        stubCancelCommands(task, cancelFailed("Job could not be found."));
+
+        TaskException exception = Assertions.assertThrows(TaskException.class, task::cancelApplication);
+
+        Assertions.assertTrue(exception.getMessage().contains("another endpoint"),
+                "the failure must say that the job may run on another endpoint, message: "
+                        + exception.getMessage());
+    }
+
+    @Test
+    public void testCancelApplicationReportsJobsWhichTheClientDidNotReport() throws Exception {
+        // the client was stopped before it reported any result, so the submitted jobs are unknown: the
+        // stop is conservative and fails instead of assuming that nothing was submitted
+        TaskExecutionContext context = buildTaskExecutionContext("Flink SQL> ");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("INSERT INTO t SELECT * FROM s;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+        context.setProcessId(4321);
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+
+        TaskException exception = Assertions.assertThrows(TaskException.class, task::cancelApplication);
+
+        Assertions.assertTrue(exception.getMessage().contains("reported no result"),
+                "the failure must name the unreported submissions, message: " + exception.getMessage());
+        Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
+    }
 }

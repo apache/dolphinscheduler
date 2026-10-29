@@ -138,8 +138,19 @@ public final class ProcessUtils {
                 return true;
             }
 
-            // Get all child processes
-            List<Integer> pidList = getPidList(processId);
+            // Get all child processes, a host which cannot list a process tree must still terminate the
+            // process itself instead of giving up the whole kill
+            List<Integer> pidList;
+            try {
+                pidList = getPidList(processId);
+            } catch (Exception e) {
+                log.warn("Cannot list the process tree of {}, only the process itself is terminated", processId, e);
+                pidList = Collections.singletonList(processId);
+            }
+            if (pidList.isEmpty()) {
+                log.warn("No process tree found for {}, only the process itself is terminated", processId);
+                pidList = Collections.singletonList(processId);
+            }
 
             // 1. Try to terminate gracefully `kill -2`
             boolean gracefulKillSuccess = sendKillSignal(SIGINT, pidList, tenantCode);
