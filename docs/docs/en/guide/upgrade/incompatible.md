@@ -71,8 +71,6 @@ The following diagrams compare the legacy authorization model with project-scope
 
 ![Legacy authorization model](../../../../img/architecture-design/project-scoped-authorization-before.png)
 
-[Edit the legacy model diagram in draw.io](../../../../img/architecture-design/project-scoped-authorization-before.drawio)
-
 ![Project-scoped authorization model](../../../../img/architecture-design/project-scoped-authorization.png)
 
 [Edit the project-scoped model diagram in draw.io](../../../../img/architecture-design/project-scoped-authorization.drawio)
