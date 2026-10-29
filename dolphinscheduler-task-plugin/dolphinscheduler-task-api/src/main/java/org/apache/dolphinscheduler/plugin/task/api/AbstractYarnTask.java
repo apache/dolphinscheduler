@@ -90,7 +90,7 @@ public abstract class AbstractYarnTask extends AbstractRemoteTask {
         try {
             shellCommandExecutor.cancelApplication();
         } catch (Exception e) {
-            throw new TaskException("cancel application error", e);
+            throw new TaskException("cancel application error: " + e.getMessage(), e);
         }
     }
 

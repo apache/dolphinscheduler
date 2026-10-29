@@ -43,6 +43,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -180,6 +181,16 @@ public final class ProcessUtils {
     public static int getProcessId(Process process) {
         if (process == null) {
             return 0;
+        }
+        try {
+            // Java 9 exposes the pid of the process directly, the reflective access to the pid field
+            // of the process implementation is denied from Java 16 on
+            Method pidMethod = Process.class.getMethod("pid");
+            return (int) pidMethod.invoke(process);
+        } catch (NoSuchMethodException e) {
+            // Java 8, the pid is only reachable through the implementation field below
+        } catch (Exception e) {
+            log.warn("Get process id from the pid method failed, fall back to the pid field", e);
         }
         try {
             Field field = process.getClass().getDeclaredField(TaskConstants.PID);

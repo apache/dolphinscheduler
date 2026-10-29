@@ -247,6 +247,12 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                 .withHost(taskInstance.getHost())
                 .triggerSavepoint(new TaskInstanceTriggerSavepointRequest(taskInstanceId));
         log.info("StreamingTaskInstance trigger savepoint response: {}", taskInstanceTriggerSavepointResponse);
+        if (taskInstanceTriggerSavepointResponse != null && !taskInstanceTriggerSavepointResponse.isSuccess()) {
+            // the savepoint runs on the worker, its failure has to reach the caller instead of being
+            // reported as a successful request
+            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, taskInstanceTriggerSavepointResponse.getMessage());
+            return result;
+        }
         putMsg(result, Status.SUCCESS);
         return result;
     }
@@ -273,6 +279,12 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                 .killTask(TaskExecutorKillRequest.of(taskInstanceId));
         log.info("TaskInstance kill response: {}", taskExecutorKillResponse);
 
+        if (taskExecutorKillResponse != null && !taskExecutorKillResponse.isSuccess()) {
+            // the stop runs on the worker, its failure has to reach the caller instead of being
+            // reported as a successful request
+            putMsg(result, Status.INTERNAL_SERVER_ERROR_ARGS, taskExecutorKillResponse.getMessage());
+            return result;
+        }
         putMsg(result, Status.SUCCESS);
         return result;
     }

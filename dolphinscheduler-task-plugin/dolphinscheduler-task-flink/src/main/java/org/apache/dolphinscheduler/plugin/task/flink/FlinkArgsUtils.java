@@ -89,8 +89,6 @@ public class FlinkArgsUtils {
     private static final Set<String> CLUSTER_CONNECTION_CONFIG_KEYS = new HashSet<>(Arrays.asList(
             "rest.address",
             "rest.port",
-            "rest.bind-address",
-            "rest.bind-port",
             "jobmanager.rpc.address",
             "jobmanager.rpc.port",
             "yarn.application.id",
@@ -207,6 +205,12 @@ public class FlinkArgsUtils {
     private static final String DYNAMIC_PROPERTY_OPTION = "-D";
 
     private static final long OUTPUT_READER_JOIN_TIMEOUT_SECONDS = 1L;
+
+    /**
+     * The maximum part of the command output which is kept for the diagnostics, so that a command
+     * which prints more than expected cannot exhaust the worker memory.
+     */
+    private static final int MAX_COMMAND_OUTPUT_LENGTH = 100_000;
 
     /**
      * build flink run command line
@@ -896,8 +900,8 @@ public class FlinkArgsUtils {
 
     /**
      * Wait for the command to finish, consuming its output so that the command cannot block on a full
-     * pipe, and keep the output for diagnostics. The command arguments are not logged, they may carry
-     * sensitive configuration values.
+     * pipe, and keep the output for diagnostics. The shell interceptor logs the command, so a value
+     * which carries a credential is masked there.
      */
     private static FlinkCommandResult waitForCommand(Process process,
                                                      TaskExecutionContext taskExecutionContext,
@@ -907,7 +911,9 @@ public class FlinkArgsUtils {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    output.append(line).append(System.lineSeparator());
+                    if (output.length() < MAX_COMMAND_OUTPUT_LENGTH) {
+                        output.append(line).append(System.lineSeparator());
+                    }
                 }
             } catch (IOException e) {
                 // the process has exited and its streams are closed

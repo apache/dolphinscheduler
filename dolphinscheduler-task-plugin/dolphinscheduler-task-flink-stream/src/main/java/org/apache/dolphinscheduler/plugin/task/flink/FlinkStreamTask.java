@@ -70,6 +70,11 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
      * savepoint is attempted for every collected JobID and the failures are reported afterwards, the
      * same way the cancellation of the task works. A second call can therefore checkpoint a job which
      * was skipped because an earlier job failed.
+     *
+     * <p>The snapshot is best effort: the SQL Client is still running while the savepoint is
+     * triggered, so the task log may not contain the JobID of a submission which was started right
+     * before the request. A savepoint does not stop the client, so it cannot wait for the output the
+     * way the cancellation does.
      */
     @Override
     public void savePoint() throws Exception {
@@ -92,6 +97,13 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
             failures.add("Cannot find the flink JobID of the task");
         } else {
             List<List<String>> clusterConnectionOptionsPerJob = getClusterConnectionOptionsPerJob();
+            if (!clusterConnectionOptionsPerJob.isEmpty()
+                    && clusterConnectionOptionsPerJob.size() != submissions.size()) {
+                log.warn("The SQL scripts describe {} job(s) but {} JobID(s) were collected, the jobs which are not "
+                        + "described use the last connection options, taskInstanceId: {}",
+                        clusterConnectionOptionsPerJob.size(), submissions.size(),
+                        taskExecutionContext.getTaskInstanceId());
+            }
             // a job which the scripts do not describe uses the last configuration of the submission
             List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
             for (int i = 0; i < submissions.size(); i++) {

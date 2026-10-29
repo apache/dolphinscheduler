@@ -32,6 +32,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -70,7 +71,9 @@ public class FlinkTask extends AbstractYarnTask {
      * The message the flink CLI reports when the job is already in another terminal state, so it does
      * not have to be cancelled any more.
      */
-    private static final String JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE = "already reached another terminal state";
+    private static final List<String> JOB_ALREADY_IN_TERMINAL_STATE_MESSAGES = Arrays.asList(
+            "already reached another terminal state",
+            "because it is not running");
 
     /**
      * The message the SQL Client prints when a synchronous submission has finished. Flink 1.17
@@ -294,6 +297,13 @@ public class FlinkTask extends AbstractYarnTask {
             return;
         }
         List<List<String>> clusterConnectionOptionsPerJob = getClusterConnectionOptionsPerJob();
+        if (!clusterConnectionOptionsPerJob.isEmpty() && clusterConnectionOptionsPerJob.size() != jobIds.size()) {
+            // the scanner and the observed JobIDs disagree, so at least one job is handled with the
+            // last configuration instead of the one it was submitted with
+            log.warn("The SQL scripts describe {} job(s) but {} JobID(s) were collected, the jobs which are not "
+                    + "described use the last connection options, taskInstanceId: {}",
+                    clusterConnectionOptionsPerJob.size(), jobIds.size(), taskExecutionContext.getTaskInstanceId());
+        }
         // a job which the scripts do not describe, for example one submitted from another file, uses
         // the last configuration of the submission
         List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
@@ -419,7 +429,8 @@ public class FlinkTask extends AbstractYarnTask {
      * the {@code JobCancellationHandler} of flink.
      */
     private boolean isJobAlreadyInTerminalState(String output) {
-        return StringUtils.contains(output, JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE);
+        return JOB_ALREADY_IN_TERMINAL_STATE_MESSAGES.stream()
+                .anyMatch(message -> StringUtils.contains(output, message));
     }
 
     /**

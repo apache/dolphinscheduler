@@ -41,6 +41,16 @@ public class TaskConstants {
      */
     public static final String FLINK_JOB_ID_REGEX = "Job\\s*ID:?\\s+([0-9a-fA-F]{32})(?![0-9a-fA-F])";
 
+    /**
+     * The pattern of the JobID printed by the Flink SQL Client, kept for the plugins which still use
+     * it.
+     *
+     * @deprecated use {@link #FLINK_JOB_ID_REGEX} instead, it also accepts the {@code JobID} form of
+     *             {@code flink run}.
+     */
+    @Deprecated
+    public static final String FLINK_APPLICATION_REGEX = "Job\\s*ID:?\\s+(\\w+)";
+
     public static final String DATASOURCE_PASSWORD_REGEX =
             "(?<=((?i)password((\" : \")|(\":\")|(\\\\\":\\\\\")|(=')))).*?(?=((\")|(\\\\\")|(')))";
 
