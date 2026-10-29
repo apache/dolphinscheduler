@@ -64,3 +64,15 @@
 * `AlertSender#getAlertData` 对 null `alertType` 增加了显式拒绝（抛 `IllegalArgumentException` 并记录错误日志），而非直接抛 `NullPointerException`。滚动升级时**必须先升级 Alert Server，再升级 Master/Worker**，否则旧 Alert Server 无法识别新增的 `alert_type` 枚举值（如 `TASK_RESULT`），会导致告警投递失败。详见[升级文档](upgrade.md#滚动升降级顺序)。([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 * SQL 任务结果告警内容有大小限制：默认最多保留 30 行，超过 100 字符的字符串字段值会被截断并以省略号标记；序列化后内容总大小限制在 60000 UTF-8 字节以内（兼容 MySQL TEXT 列 65535 字节容量），超出预算的行以省略标记对象表示。以上默认值可通过 `common.properties` 中的 `sql.task.alert.max.rows`、`sql.task.alert.max.row.value.length`、`sql.task.alert.max.content.bytes` 配置调整，修改后需重启 Worker 生效。 ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 
+### 项目权限模型
+
+以下架构图对比旧权限模型与 3.5.0 引入的项目权限模型。
+
+![旧权限模型](../../../../img/architecture-design/project-scoped-authorization-before.png)
+
+[使用 draw.io 编辑旧权限模型图](../../../../img/architecture-design/project-scoped-authorization-before.drawio)
+
+![项目权限模型](../../../../img/architecture-design/project-scoped-authorization.png)
+
+[使用 draw.io 编辑项目权限模型图](../../../../img/architecture-design/project-scoped-authorization.drawio)
+
