@@ -20,13 +20,27 @@ package org.apache.dolphinscheduler.plugin.task.flink;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
+import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 public class FlinkArgsUtilsTest {
+
+    @TempDir
+    Path tempDir;
 
     private String joinStringListWithSpace(List<String> stringList) {
         return String.join(" ", stringList);
@@ -142,5 +156,827 @@ public class FlinkArgsUtilsTest {
         Assertions.assertTrue(initOptions.contains("set jobmanager.memory.process.size=1024m"));
         Assertions.assertTrue(initOptions.contains("set taskmanager.memory.process.size=1024m"));
         Assertions.assertTrue(initOptions.contains("set parallelism.default=4"));
+    }
+
+    @Test
+    public void testBuildCancelCommandLine() {
+        // ${FLINK_HOME} is resolved when the command is executed, in the same environment as the task
+        List<String> commandLine =
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList());
+
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testBuildCancelCommandLineKeepsClusterConnectionOptions() {
+        // the job was submitted to a remote JobManager, the cancel command must target it as well
+        List<String> commandLine = FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef",
+                Arrays.asList("-m", "remote-jm:8081"));
+
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef -m remote-jm:8081",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testBuildSavePointCommandLine() {
+        // the Flink JobID is passed explicitly, the YARN/K8s application id is not used here
+        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef",
+                null, Collections.emptyList());
+
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testBuildSavePointCommandLineWithYarnApplicationId() {
+        // the YARN application id only targets the cluster, it is passed after the JobID as -yid
+        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef",
+                "application_1700000000000_0001", Collections.emptyList());
+
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef -yid application_1700000000000_0001",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testBuildSavePointCommandLineKeepsClusterConnectionOptions() {
+        List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef",
+                "application_1700000000000_0001", Arrays.asList("-m", "remote-jm:8081"));
+
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink savepoint 1234567890abcdef1234567890abcdef -yid application_1700000000000_0001 -m remote-jm:8081",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptions() {
+        // the short and the long form of the connection options are kept, in the submission order
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "--jobmanager remote-jm:8081 -t yarn-per-job");
+
+        Assertions.assertEquals(
+                Arrays.asList("--jobmanager", "remote-jm:8081", "-t", "yarn-per-job"),
+                options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsWithAttachedAndSeparatedValues() {
+        // --jobmanager=<address> and -D <key>=<value> are accepted by the flink CLI as well
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "--jobmanager=remote-jm:8081 -D rest.port=8082");
+
+        Assertions.assertEquals(
+                Arrays.asList("--jobmanager=remote-jm:8081", "-D", "rest.port=8082"),
+                options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsKeepsOnlyClusterConfigs() {
+        // only the -D options which identify the cluster are kept
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-Drest.address=remote-jm -Djobmanager.rpc.port=6123 -Dkubernetes.cluster-id=my-cluster "
+                        + "-Dexecution.target=yarn-per-job -Dyarn.application.id=application_1700000000000_0001");
+
+        Assertions.assertEquals(
+                Arrays.asList("-Drest.address=remote-jm", "-Djobmanager.rpc.port=6123",
+                        "-Dkubernetes.cluster-id=my-cluster", "-Dexecution.target=yarn-per-job",
+                        "-Dyarn.application.id=application_1700000000000_0001"),
+                options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsKeepsRestTlsConfigs() {
+        // a submission over TLS has to keep the REST TLS settings on the cancel / savepoint command
+        // as well, otherwise it falls back to a plain connection
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-m remote-jm:8081 -Dsecurity.ssl.rest.enabled=true "
+                        + "-Dsecurity.ssl.rest.truststore=/opt/flink/truststore "
+                        + "-Dparallelism.default=4");
+
+        Assertions.assertEquals(
+                Arrays.asList("-m", "remote-jm:8081", "-Dsecurity.ssl.rest.enabled=true",
+                        "-Dsecurity.ssl.rest.truststore=/opt/flink/truststore"),
+                options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsFromSqlScripts() {
+        // a SQL task configures its connection with SET statements as well
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'rest.address' = 'remote-jm';\nSET 'rest.port'='8081';",
+                "set security.ssl.rest.enabled=true;\nset parallelism.default=4;");
+
+        Assertions.assertEquals(
+                Arrays.asList("-Drest.address=remote-jm", "-Drest.port=8081", "-Dsecurity.ssl.rest.enabled=true"),
+                options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsFromSqlScriptsOnlyMatchesStatements() {
+        // a SET inside a string literal or a comment is not a statement, the double quoted form is not
+        // the SQL Client syntax, and several statements on one line are all matched
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "INSERT INTO t SELECT 'SET rest.address=literal';\n"
+                        + "SET \"rest.address\" = \"quoted\";\n"
+                        + "-- SET rest.port = 9999;\n"
+                        + "SET rest.address = remote-jm; SET rest.port = 8081;");
+
+        Assertions.assertEquals(Arrays.asList("-Drest.address=remote-jm", "-Drest.port=8081"), options);
+    }
+
+    @Test
+    public void testMergeClusterConnectionOptions() {
+        // a later option for the same key wins, so a connection setting is passed once
+        List<String> options = FlinkArgsUtils.mergeClusterConnectionOptions(
+                Arrays.asList("-m", "default-jm:8081", "-Drest.port=8081"),
+                Arrays.asList("-Drest.address=remote-jm", "-Drest.port=8082"));
+
+        Assertions.assertEquals(
+                Arrays.asList("-m", "default-jm:8081", "-Drest.port=8082", "-Drest.address=remote-jm"),
+                options);
+    }
+
+    @Test
+    public void testMergeClusterConnectionOptionsKeepsSeparatedOptions() {
+        // "-D <key>=<value>" is one option which is given as two arguments, merging it must not drop
+        // the second -D and leave its value behind as a bare argument
+        List<String> options = FlinkArgsUtils.mergeClusterConnectionOptions(
+                FlinkArgsUtils.extractClusterConnectionOptions("-D rest.address=remote-jm -D rest.port=8081"),
+                Collections.emptyList());
+
+        Assertions.assertEquals(
+                Arrays.asList("-D", "rest.address=remote-jm", "-D", "rest.port=8081"), options);
+
+        List<String> commandLine =
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", options);
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 1234567890abcdef1234567890abcdef "
+                        + "-D rest.address=remote-jm -D rest.port=8081",
+                joinStringListWithSpace(commandLine));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsFromSqlScriptsQuotesShellValues() {
+        // a value which contains a space or a shell metacharacter has to reach the flink CLI as a
+        // single argument, while a plain value is left as it is
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'security.ssl.rest.truststore' = '/opt/flink configs/client.jks';",
+                "SET 'security.ssl.rest.keystore' = '/opt/($HOME)/client.jks';",
+                "SET 'rest.address' = 'plain-host';");
+
+        Assertions.assertEquals(
+                Arrays.asList("-Dsecurity.ssl.rest.truststore='/opt/flink configs/client.jks'",
+                        "-Dsecurity.ssl.rest.keystore='/opt/($HOME)/client.jks'",
+                        "-Drest.address=plain-host"),
+                options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsFromSqlScriptsDecodesEscapedQuotes() {
+        // a doubled single quote is an escaped quote; the effective value must be preserved
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'security.ssl.rest.truststore-password' = 'pa''ss';");
+
+        Assertions.assertEquals(
+                Arrays.asList("-Dsecurity.ssl.rest.truststore-password='pa'\\''ss'"), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJob() {
+        // the SQL Client executes the statements in order, so a script which changes the connection
+        // between two jobs keeps the settings which were effective for each of them
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob("-m cli-jm:8081",
+                "SET 'rest.address'='cluster-a';\nINSERT INTO t SELECT * FROM s;",
+                "SET 'rest.address'='cluster-b';\nINSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-m", "cli-jm:8081", "-Drest.address=cluster-a"),
+                optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-m", "cli-jm:8081", "-Drest.address=cluster-b"),
+                optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsFromSqlScriptsAppliesReset() {
+        // a reset setting is not part of the final configuration of the submission
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'rest.address'='cluster-b';\nRESET 'rest.address';\nSET 'rest.port'='8081';");
+
+        Assertions.assertEquals(Arrays.asList("-Drest.port=8081"), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsFromSqlScriptsKeepsSemicolonInsideValue() {
+        // a semicolon inside a quoted value does not end the statement
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'rest.address' = 'remote;host';\nINSERT INTO t SELECT * FROM s;");
+
+        Assertions.assertEquals(Arrays.asList("-Drest.address='remote;host'"), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobIgnoresStatementsWhichSubmitNoJob() {
+        // a statement which does not submit a job must not consume a snapshot, otherwise the settings
+        // of the jobs which follow it would be shifted
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\nCREATE TABLE t (x INT);\nSELECT * FROM t;",
+                "INSERT INTO t SELECT * FROM s;");
+
+        Assertions.assertEquals(1, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobCountsAStatementSetAsOneJob() {
+        // the update statements of a statement set are submitted as a single job, so the settings of
+        // the job which follows the set are not shifted
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "EXECUTE STATEMENT SET\n"
+                        + "BEGIN\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "INSERT INTO u SELECT * FROM v;\n"
+                        + "END;\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO w SELECT * FROM x;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobCountsAnExecutePlanAsOneJob() {
+        // `EXECUTE PLAN` submits a job as well, so the job which follows it must not take its settings
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "EXECUTE PLAN '/plans/job.json';\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO sink_b SELECT * FROM source_b;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobCountsACompileAndExecutePlanAsOneJob() {
+        // `COMPILE AND EXECUTE PLAN` is the other form which submits the compiled plan as a job
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "COMPILE AND EXECUTE PLAN '/plans/job.json';\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO sink_b SELECT * FROM source_b;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobCountsASingleInsertStatementSetAsOneJob() {
+        // the statement set keyword, its BEGIN and the first INSERT share one semicolon-delimited
+        // fragment, so the INSERT must still record the snapshot of the statement set
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "EXECUTE STATEMENT SET\n"
+                        + "BEGIN\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "END;\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobWithBeginStatementSet() {
+        // the `BEGIN STATEMENT SET;` form is a statement set as well, its update statements are
+        // submitted as a single job
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "BEGIN STATEMENT SET;\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "INSERT INTO u SELECT * FROM v;\n"
+                        + "END;\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO w SELECT * FROM x;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobCountsCreateTableAsSelectAsAJob() {
+        // a CREATE TABLE ... AS SELECT statement submits a job as well, so it must record a snapshot
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "CREATE TABLE t AS SELECT * FROM s;\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobIgnoresCreateTableWithoutQuery() {
+        // registering a table without a query does not submit a job
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "CREATE TABLE t (x INT) WITH ('connector' = 'datagen');\n"
+                        + "INSERT INTO t SELECT * FROM s;");
+
+        Assertions.assertEquals(1, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobKeepsCommentsAsTokenSeparators() {
+        // a block comment between two tokens must not join them, otherwise the statement is not
+        // recognized and the snapshots are shifted
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET/* endpoint */ 'rest.address'='cluster-a';\n"
+                        + "INSERT/* first job */INTO t SELECT * FROM s;\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testMergeClusterConnectionOptionsDropsSubmissionOnlyConfigs() {
+        // a two argument -D option which does not configure the cluster is not a connection option
+        List<String> options = FlinkArgsUtils.mergeClusterConnectionOptions(
+                Arrays.asList("-D", "parallelism.default=4"),
+                Collections.singletonList("-Drest.address=remote-jm"));
+
+        Assertions.assertEquals(Arrays.asList("-Drest.address=remote-jm"), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsKeepsTheSharedRestTlsSettings() {
+        // the REST client consumes the shared TLS settings, not only the security.ssl.rest.* ones: the
+        // protocol and the provider apply to every endpoint, and the REST keystore / truststore fall
+        // back to the shared keys
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-Dsecurity.ssl.protocol=TLSv1.3 -Dsecurity.ssl.provider=OPENSSL "
+                        + "-Dsecurity.ssl.truststore=/opt/shared.jks "
+                        + "-Dsecurity.ssl.truststore-password=secret "
+                        + "-Dparallelism.default=4");
+
+        Assertions.assertEquals(Arrays.asList(
+                "-Dsecurity.ssl.protocol=TLSv1.3",
+                "-Dsecurity.ssl.provider=OPENSSL",
+                "-Dsecurity.ssl.truststore=/opt/shared.jks",
+                "-Dsecurity.ssl.truststore-password=secret"), options);
+        Assertions.assertTrue(
+                joinStringListWithSpace(FlinkArgsUtils.buildCancelCommandLine("job-id", options))
+                        .contains("-Dsecurity.ssl.protocol=TLSv1.3"));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsFromSqlKeepsTheSharedRestTlsSettings() {
+        // a SQL task configures the shared TLS settings with SET statements as well
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'security.ssl.protocol' = 'TLSv1.3';\n"
+                        + "SET 'security.ssl.truststore' = '/opt/shared.jks';\n"
+                        + "INSERT INTO t SELECT * FROM s;");
+
+        Assertions.assertEquals(Arrays.asList(
+                "-Dsecurity.ssl.protocol=TLSv1.3",
+                "-Dsecurity.ssl.truststore=/opt/shared.jks"), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobSkipsSynchronousSubmission() {
+        // a synchronous update statement is completed by the client, which prints no JobID, so it does
+        // not take a place in the snapshots: the asynchronous job which follows keeps its own endpoint
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'table.dml-sync' = 'true';\n"
+                        + "SET 'rest.address'='cluster-a';\n"
+                        + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                        + "SET 'table.dml-sync' = 'false';\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO second_sink SELECT * FROM streaming_source;");
+
+        Assertions.assertEquals(1, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(0));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobSkipsSubmissionWhenDmlSyncIsASubmissionOption() {
+        // table.dml-sync can also be given as a submission option, the statements which follow are
+        // synchronized as well
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(
+                "-Dtable.dml-sync=true",
+                "SET 'rest.address'='cluster-a';\n"
+                        + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                        + "INSERT INTO second_sink SELECT * FROM streaming_source;");
+
+        Assertions.assertTrue(optionsPerJob.isEmpty());
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobFollowsTheDmlSyncTransitions() {
+        // the submission enables the synchronous mode, a SET disables it for the second job and a
+        // RESET restores the submission value again
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(
+                "-Dtable.dml-sync=true",
+                "SET 'rest.address'='cluster-a';\n"
+                        + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                        + "SET 'table.dml-sync' = 'false';\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO second_sink SELECT * FROM streaming_source;\n"
+                        + "RESET 'table.dml-sync';\n"
+                        + "SET 'rest.address'='cluster-c';\n"
+                        + "INSERT INTO third_sink SELECT * FROM bounded_source;");
+
+        Assertions.assertEquals(1, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(0));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobIgnoresComments() {
+        // a comment which precedes an INSERT must not hide the statement, otherwise the snapshots are
+        // associated with the wrong JobID
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-a';\n"
+                        + "/* first job */ INSERT INTO t SELECT * FROM s;\n"
+                        + "-- switch the endpoint before the second job\n"
+                        + "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-a"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobAppliesReset() {
+        // RESET restores the baseline configuration of the submission, so the job which follows it is
+        // not cancelled against the endpoint of the job before it
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(
+                "-Drest.address=default-jm",
+                "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "RESET 'rest.address';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=default-jm"), optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobAppliesResetAll() {
+        // RESET without a key restores the whole baseline configuration
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(
+                "-Drest.address=default-jm -Drest.port=8081",
+                "SET 'rest.address'='cluster-b';\nSET 'rest.port'='9999';\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "RESET;\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b", "-Drest.port=9999"),
+                optionsPerJob.get(0));
+        Assertions.assertEquals(Arrays.asList("-Drest.address=default-jm", "-Drest.port=8081"),
+                optionsPerJob.get(1));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsPerJobResetWithoutBaselineUsesDefault() {
+        // without a baseline option the reset key falls back to the default configuration, so no
+        // endpoint is passed for the job which follows it
+        List<List<String>> optionsPerJob = FlinkArgsUtils.extractClusterConnectionOptionsPerJob(null,
+                "SET 'rest.address'='cluster-b';\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "RESET 'rest.address';\n"
+                        + "INSERT INTO u SELECT * FROM v;");
+
+        Assertions.assertEquals(2, optionsPerJob.size());
+        Assertions.assertEquals(Arrays.asList("-Drest.address=cluster-b"), optionsPerJob.get(0));
+        Assertions.assertTrue(optionsPerJob.get(1).isEmpty());
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsDropsSubmissionOnlyOptions() {
+        // the parallelism, slots, memory, application name, main class, savepoint and configuration
+        // of the submission only matter at submission time
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-m remote-jm:8081 -p 4 -ys 2 -ynm demo-app -yjm 1024m -ytm 2048m -c org.example.Main "
+                        + "-s hdfs:///flink/savepoint-1 -d -Dparallelism.default=4 "
+                        + "-Dtaskmanager.memory.process.size=1024m");
+
+        Assertions.assertEquals(Arrays.asList("-m", "remote-jm:8081"), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsKeepsQuotedValues() {
+        // a quoted address keeps its whitespace and is not split
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions("-ynm \"my app\" -m \"remote jm:8081\"");
+
+        Assertions.assertEquals(Arrays.asList("-m", "\"remote jm:8081\""), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsKeepsQuotesInsideTokens() {
+        // the quote does not start the token, the value with a space stays in the same token
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-Dkubernetes.config.file=\"/opt/flink configs/kube.yaml\" -Dparallelism.default=4");
+
+        Assertions.assertEquals(
+                Collections.singletonList("-Dkubernetes.config.file=\"/opt/flink configs/kube.yaml\""), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsKeepsSeparatedQuotedValues() {
+        // the value of a separated -D option may contain a quoted segment with a space as well
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptions(
+                "-D kubernetes.config.file=\"/opt/flink configs/kube.yaml\"");
+
+        Assertions.assertEquals(
+                Arrays.asList("-D", "kubernetes.config.file=\"/opt/flink configs/kube.yaml\""), options);
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsKeepsWholeQuotedOptions() {
+        // the quotes may wrap the whole key=value pair, or the whole option
+        Assertions.assertEquals(
+                Arrays.asList("-D", "\"kubernetes.config.file=/opt/flink configs/kube.yaml\""),
+                FlinkArgsUtils.extractClusterConnectionOptions(
+                        "-D \"kubernetes.config.file=/opt/flink configs/kube.yaml\""));
+
+        Assertions.assertEquals(
+                Collections.singletonList("\"-Dkubernetes.config.file=/opt/flink configs/kube.yaml\""),
+                FlinkArgsUtils.extractClusterConnectionOptions(
+                        "\"-Dkubernetes.config.file=/opt/flink configs/kube.yaml\""));
+    }
+
+    @Test
+    public void testExtractClusterConnectionOptionsWithoutOthers() {
+        Assertions.assertTrue(FlinkArgsUtils.extractClusterConnectionOptions(null).isEmpty());
+        Assertions.assertTrue(FlinkArgsUtils.extractClusterConnectionOptions("   ").isEmpty());
+    }
+
+    @Test
+    public void testExecuteCommandReuseTaskEnvironment() throws Exception {
+        // FLINK_HOME is only defined in the task environment, not in the task parameters
+        Path executePath = tempDir.resolve("execute");
+        Files.createDirectories(executePath);
+        Path flinkHome = tempDir.resolve("flink");
+        Files.createDirectories(flinkHome.resolve("bin"));
+        Path markerFile = tempDir.resolve("invoked.txt");
+        Path flinkCommand = flinkHome.resolve("bin/flink");
+        // write more output than a pipe buffer holds, so the command would block if it is not consumed
+        Files.write(flinkCommand, Arrays.asList(
+                "#!/bin/bash",
+                "echo \"$@\" > " + markerFile,
+                "for i in $(seq 1 20000); do echo \"line $i\"; done"));
+        Assertions.assertTrue(flinkCommand.toFile().setExecutable(true));
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(16789);
+        taskExecutionContext.setTaskAppId("16789");
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTenantCode("");
+        taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
+        taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
+
+        boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList()),
+                false);
+
+        Assertions.assertTrue(success);
+        Assertions.assertEquals("cancel 1234567890abcdef1234567890abcdef",
+                new String(Files.readAllBytes(markerFile), StandardCharsets.UTF_8).trim());
+    }
+
+    @Test
+    public void testExecuteCommandTimeoutKillsTheCommand() throws Exception {
+        // the command outlives its timeout, so it must be killed and reported as a failure
+        Path executePath = tempDir.resolve("timeout-execute");
+        Files.createDirectories(executePath);
+        Path flinkHome = tempDir.resolve("flink-timeout");
+        Files.createDirectories(flinkHome.resolve("bin"));
+        Path flinkCommand = flinkHome.resolve("bin/flink");
+        Files.write(flinkCommand, Arrays.asList("#!/bin/bash", "sleep 30"));
+        Assertions.assertTrue(flinkCommand.toFile().setExecutable(true));
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(16789);
+        taskExecutionContext.setTaskAppId("16789");
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTenantCode("");
+        taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
+        taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
+
+        long start = System.currentTimeMillis();
+        boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList()),
+                false, 1);
+        long elapsed = System.currentTimeMillis() - start;
+
+        Assertions.assertFalse(success);
+        // the command is killed when the timeout expires, it does not wait for the command to finish
+        Assertions.assertTrue(elapsed < 20_000, "the command must be killed on timeout, elapsed: " + elapsed + "ms");
+    }
+
+    @Test
+    public void testExecuteCommandTimeoutTerminatesTheProcessTree() throws Exception {
+        // the started process is the bootstrap shell, the flink CLI runs as its descendant, so the
+        // process tree has to be terminated instead of only the bootstrap process
+        Path executePath = tempDir.resolve("tree-execute");
+        Files.createDirectories(executePath);
+        Path flinkHome = tempDir.resolve("flink-tree");
+        Files.createDirectories(flinkHome.resolve("bin"));
+        Path flinkCommand = flinkHome.resolve("bin/flink");
+        Files.write(flinkCommand, Arrays.asList("#!/bin/bash", "sleep 30"));
+        Assertions.assertTrue(flinkCommand.toFile().setExecutable(true));
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(16789);
+        taskExecutionContext.setTaskAppId("16789");
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTenantCode("");
+        taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
+        taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
+
+        try (MockedStatic<ProcessUtils> processUtils = Mockito.mockStatic(ProcessUtils.class)) {
+            processUtils.when(() -> ProcessUtils.getProcessId(Mockito.any())).thenReturn(4321);
+            processUtils.when(() -> ProcessUtils.kill(4321, "")).thenReturn(true);
+
+            boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
+                    FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList()),
+                    false, 1);
+
+            Assertions.assertFalse(success);
+            processUtils.verify(() -> ProcessUtils.kill(4321, ""));
+        }
+    }
+
+    @Test
+    public void testExecuteCommandTimeoutStopsTheDescendantProcess() throws Exception {
+        Path executePath = tempDir.resolve("descendant-execute");
+        Files.createDirectories(executePath);
+        Path flinkHome = tempDir.resolve("flink-descendant");
+        Files.createDirectories(flinkHome.resolve("bin"));
+        Path descendantPidFile = tempDir.resolve("descendant.pid");
+        Path flinkCommand = flinkHome.resolve("bin/flink");
+        // the background process is the descendant which must not outlive the timed out command
+        Files.write(flinkCommand, Arrays.asList(
+                "#!/bin/bash",
+                "sleep 300 &",
+                "echo $! > " + descendantPidFile,
+                "wait"));
+        Assertions.assertTrue(flinkCommand.toFile().setExecutable(true));
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(16789);
+        taskExecutionContext.setTaskAppId("16789");
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTenantCode("");
+        taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
+        taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
+
+        Assumptions.assumeTrue(canListProcessTree(),
+                "the host cannot list the process tree, the descendant cannot be terminated");
+
+        boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", Collections.emptyList()),
+                false, 1);
+
+        Assertions.assertFalse(success);
+        int descendantPid = Integer
+                .parseInt(new String(Files.readAllBytes(descendantPidFile), StandardCharsets.UTF_8).trim());
+        // the termination of the process tree is asynchronous, so give it the same time the kill itself
+        // may take instead of requiring the descendant to be gone the moment the command returns
+        awaitTermination(descendantPid, TimeUnit.SECONDS.toMillis(15));
+        Assertions.assertFalse(isProcessAlive(descendantPid),
+                "the descendant process " + descendantPid + " must be terminated with the command");
+    }
+
+    /**
+     * Wait at most the given time for the process to be gone, the termination of a process tree is not
+     * a synchronous operation.
+     */
+    private static void awaitTermination(int processId, long timeoutMillis) throws Exception {
+        long deadline = System.currentTimeMillis() + timeoutMillis;
+        while (System.currentTimeMillis() < deadline && isProcessAlive(processId)) {
+            Thread.sleep(100L);
+        }
+    }
+
+    private static boolean isProcessAlive(int processId) throws Exception {
+        return new ProcessBuilder("/bin/kill", "-0", String.valueOf(processId)).start().waitFor() == 0;
+    }
+
+    @Test
+    public void testCountJobStatementsCountsSynchronousAndAsynchronousSubmissions() {
+        // the count is used to tell a finished submission from one which is still running, so it has
+        // to include the synchronous ones as well: Flink 1.17 no longer announces them
+        int jobs = FlinkArgsUtils.countJobStatements(
+                "SET 'table.dml-sync' = 'true';\n"
+                        + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                        + "SET 'table.dml-sync' = 'false';\n"
+                        + "INSERT INTO second_sink SELECT * FROM streaming_source;\n"
+                        + "CREATE TABLE t AS SELECT * FROM s;\n"
+                        + "EXECUTE PLAN '/plans/job.json';");
+
+        Assertions.assertEquals(4, jobs);
+    }
+
+    @Test
+    public void testCountJobStatementsCountsAStatementSetAsOneJob() {
+        int jobs = FlinkArgsUtils.countJobStatements(
+                "EXECUTE STATEMENT SET BEGIN\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "INSERT INTO u SELECT * FROM v;\n"
+                        + "END;");
+
+        Assertions.assertEquals(1, jobs);
+    }
+
+    @Test
+    public void testCountJobStatementsCountsAStatementSetInSyncModeAsOneJob() {
+        int jobs = FlinkArgsUtils.countJobStatements(
+                "SET 'table.dml-sync' = 'true';\n"
+                        + "EXECUTE STATEMENT SET BEGIN\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "INSERT INTO u SELECT * FROM v;\n"
+                        + "END;");
+
+        Assertions.assertEquals(1, jobs);
+    }
+
+    @Test
+    public void testExecuteCommandKeepsSqlConnectionValueWithSpacesAsOneArgument() throws Exception {
+        // a SQL SET value with a space and a metacharacter has to reach the CLI as a single argument,
+        // otherwise the shell splits it and the control command uses a different TLS configuration
+        Path executePath = tempDir.resolve("sql-value-execute");
+        Files.createDirectories(executePath);
+        Path flinkHome = tempDir.resolve("flink-sql-value");
+        Files.createDirectories(flinkHome.resolve("bin"));
+        Path markerFile = tempDir.resolve("sql-value-args.txt");
+        Path flinkCommand = flinkHome.resolve("bin/flink");
+        Files.write(flinkCommand, Arrays.asList(
+                "#!/bin/bash",
+                "printf '%s\\n' \"$@\" > " + markerFile));
+        Assertions.assertTrue(flinkCommand.toFile().setExecutable(true));
+
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'security.ssl.rest.truststore' = '/opt/flink configs/client.jks';\n"
+                        + "SET 'security.ssl.rest.truststore-password' = 'pa$$ word;x';");
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(16789);
+        taskExecutionContext.setTaskAppId("16789");
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTenantCode("");
+        taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
+        taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
+
+        boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", options),
+                false);
+
+        Assertions.assertTrue(success);
+        List<String> arguments = Files.readAllLines(markerFile);
+        Assertions.assertEquals("cancel", arguments.get(0));
+        Assertions.assertEquals("1234567890abcdef1234567890abcdef", arguments.get(1));
+        Assertions.assertTrue(arguments.contains("-Dsecurity.ssl.rest.truststore=/opt/flink configs/client.jks"),
+                "the path with a space must stay one argument, arguments: " + arguments);
+        Assertions.assertTrue(arguments.contains("-Dsecurity.ssl.rest.truststore-password=pa$$ word;x"),
+                "the value with a metacharacter must reach the CLI unchanged, arguments: " + arguments);
+    }
+
+    /**
+     * Whether the host can list the process tree, which both pstree and ps provide. A restricted
+     * environment, for example a sandbox without ps, cannot terminate a descendant process at all.
+     */
+    private static boolean canListProcessTree() {
+        return canRun("pstree", "-p", "1") || canRun("ps", "-eo", "pid,ppid");
+    }
+
+    private static boolean canRun(String... command) {
+        try {
+            Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
+            byte[] buffer = new byte[1024];
+            while (process.getInputStream().read(buffer) >= 0) {
+                // drain the output, otherwise the process can block on a full pipe
+            }
+            return process.waitFor() == 0;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

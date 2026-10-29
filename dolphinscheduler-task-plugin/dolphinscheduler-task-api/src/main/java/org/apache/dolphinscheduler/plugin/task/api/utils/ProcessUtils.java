@@ -42,14 +42,18 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -99,6 +103,12 @@ public final class ProcessUtils {
      */
     private static final Pattern PID_PATTERN = Pattern.compile("\\s+");
 
+    /**
+     * The command which lists the pid and the parent pid of every process. It is used when pstree is
+     * not available, otherwise no process tree could be terminated on such a host.
+     */
+    private static final String PS_PID_LIST_COMMAND = "ps -eo pid,ppid";
+
     private static final String SIGINT = "2";
     private static final String SIGTERM = "15";
     private static final String SIGKILL = "9";
@@ -109,26 +119,48 @@ public final class ProcessUtils {
      * @return Whether the process was successfully terminated
      */
     public static boolean kill(@NonNull TaskExecutionContext request) {
+        log.info("Begin killing task instance, processId: {}", request.getProcessId());
+        return kill(request.getProcessId(), request.getTenantCode());
+    }
+
+    /**
+     * Terminate the process tree which starts at the given process id, support multi-level signal
+     * processing and fallback strategy.
+     *
+     * @param processId the root process id, 0 means the process already finished
+     * @param tenantCode the tenant which runs the process, may be null
+     * @return Whether the process was successfully terminated
+     */
+    public static boolean kill(int processId, String tenantCode) {
         try {
-            log.info("Begin killing task instance, processId: {}", request.getProcessId());
-            int processId = request.getProcessId();
             if (processId == 0) {
                 log.info("Task instance has already finished, no need to kill");
                 return true;
             }
 
-            // Get all child processes
-            List<Integer> pidList = getPidList(processId);
+            // Get all child processes, a host which cannot list a process tree must still terminate the
+            // process itself instead of giving up the whole kill
+            List<Integer> pidList;
+            try {
+                pidList = getPidList(processId);
+            } catch (Exception e) {
+                log.warn("Cannot list the process tree of {}, only the process itself is terminated", processId, e);
+                pidList = Collections.singletonList(processId);
+            }
+            if (pidList.isEmpty()) {
+                log.warn("No process tree found for {}, only the process itself is terminated", processId);
+                pidList = Collections.singletonList(processId);
+            }
 
             // 1. Try to terminate gracefully `kill -2`
-            boolean gracefulKillSuccess = sendKillSignal(SIGINT, pidList, request.getTenantCode());
+            boolean gracefulKillSuccess = sendKillSignal(SIGINT, pidList, tenantCode);
             if (gracefulKillSuccess) {
                 log.info("Successfully killed process tree by SIGINT, processId: {}", processId);
                 return true;
             }
 
             // 2. Try to terminate gracefully `kill -15`
-            boolean termKillSuccess = sendKillSignal(SIGTERM, pidList, request.getTenantCode());
+            boolean termKillSuccess = sendKillSignal(SIGTERM, pidList, tenantCode);
             if (termKillSuccess) {
                 log.info("Successfully killed process tree by SIGTERM, processId: {}", processId);
                 return true;
@@ -137,7 +169,7 @@ public final class ProcessUtils {
             // 3. As a last resort, use `kill -9`
             log.warn("Killing process by SIGINT & SIGTERM failed, using SIGKILL as a last resort for processId: {}",
                     processId);
-            boolean forceKillSuccess = sendKillSignal(SIGKILL, pidList, request.getTenantCode());
+            boolean forceKillSuccess = sendKillSignal(SIGKILL, pidList, tenantCode);
             if (forceKillSuccess) {
                 log.info("Successfully killed process tree by SIGKILL, processId: {}", processId);
             } else {
@@ -146,8 +178,39 @@ public final class ProcessUtils {
             return forceKillSuccess;
 
         } catch (Exception e) {
-            log.error("Kill task instance error, processId: {}", request.getProcessId(), e);
+            log.error("Kill task instance error, processId: {}", processId, e);
             return false;
+        }
+    }
+
+    /**
+     * Get the process id of a process which was started by this JVM.
+     *
+     * @param process the process, may be null
+     * @return the process id, or 0 when it cannot be determined
+     */
+    public static int getProcessId(Process process) {
+        if (process == null) {
+            return 0;
+        }
+        try {
+            // Java 9 exposes the pid of the process directly, the reflective access to the pid field
+            // of the process implementation is denied from Java 16 on
+            Method pidMethod = Process.class.getMethod("pid");
+            // pid() returns a long, the reflection result is a Long which cannot be cast to Integer
+            return ((Number) pidMethod.invoke(process)).intValue();
+        } catch (NoSuchMethodException e) {
+            // Java 8, the pid is only reachable through the implementation field below
+        } catch (Exception e) {
+            log.warn("Get process id from the pid method failed, fall back to the pid field", e);
+        }
+        try {
+            Field field = process.getClass().getDeclaredField(TaskConstants.PID);
+            field.setAccessible(true);
+            return field.getInt(process);
+        } catch (Exception e) {
+            log.error("Get process id failed", e);
+            return 0;
         }
     }
 
@@ -269,14 +332,14 @@ public final class ProcessUtils {
                 rawPidStr = OSUtils.exeCmd(String.format("%s -p %d", TaskConstants.PSTREE, processId));
             }
         } catch (Exception ex) {
-            log.error("Failed to execute 'pstree' command for process ID: {}", processId, ex);
-            throw ex;
+            log.warn("Failed to execute 'pstree' command for process ID: {}, falling back to 'ps'", processId, ex);
+            return getPidListByPs(processId);
         }
 
         String pidsStr = parsePidStr(rawPidStr);
         if (StringUtils.isBlank(pidsStr)) {
-            log.warn("No PIDs found for process: {}", processId);
-            return Collections.emptyList();
+            log.warn("No PIDs found for process: {} with pstree, falling back to 'ps'", processId);
+            return getPidListByPs(processId);
         }
 
         String[] pidArray = PID_PATTERN.split(pidsStr.trim());
@@ -314,6 +377,49 @@ public final class ProcessUtils {
         return pidList;
     }
 
+    /**
+     * Get the descendant process IDs (including the given process) with {@code ps}, which is used
+     * when {@code pstree} is not available.
+     *
+     * @param processId the root process ID
+     * @return list of process IDs; returns empty list if the process does not exist
+     * @throws Exception if command execution fails unexpectedly
+     */
+    private static List<Integer> getPidListByPs(int processId) throws Exception {
+        String rawPidStr = OSUtils.exeCmd(PS_PID_LIST_COMMAND);
+        Map<Integer, List<Integer>> childrenByParentPid = new HashMap<>();
+        Set<Integer> allPids = new HashSet<>();
+        for (String line : rawPidStr.split("\\r?\\n")) {
+            String[] columns = line.trim().split("\\s+");
+            if (columns.length != 2) {
+                continue;
+            }
+            try {
+                int pid = Integer.parseInt(columns[0]);
+                int parentPid = Integer.parseInt(columns[1]);
+                allPids.add(pid);
+                childrenByParentPid.computeIfAbsent(parentPid, key -> new ArrayList<>()).add(pid);
+            } catch (NumberFormatException e) {
+                // the header of ps and any other non numeric line
+            }
+        }
+        if (!allPids.contains(processId)) {
+            log.warn("No PIDs found for process: {}", processId);
+            return Collections.emptyList();
+        }
+        List<Integer> pidList = new ArrayList<>();
+        collectPidAndDescendants(processId, childrenByParentPid, pidList);
+        return pidList;
+    }
+
+    private static void collectPidAndDescendants(int processId, Map<Integer, List<Integer>> childrenByParentPid,
+                                                 List<Integer> pidList) {
+        pidList.add(processId);
+        for (Integer childPid : childrenByParentPid.getOrDefault(processId, Collections.emptyList())) {
+            collectPidAndDescendants(childPid, childrenByParentPid, pidList);
+        }
+    }
+
     public static String parsePidStr(String rawPidStr) {
 
         log.info("prepare to parse pid, raw pid string: {}", rawPidStr);
@@ -343,18 +449,29 @@ public final class ProcessUtils {
     /**
      * cancel k8s / yarn application
      *
+     * <p>The caller has to know whether the application was really cancelled: a stop which reports
+     * success while the application still runs leaves a detached job behind. A failure of the resource
+     * manager is therefore propagated instead of only being logged, the same way the process tree
+     * termination reports its failure.
+     *
      * @param taskExecutionContext
-     * @return
+     * @throws TaskException if the application could not be cancelled
      */
     public static void cancelApplication(TaskExecutionContext taskExecutionContext) {
         try {
             if (Objects.nonNull(taskExecutionContext.getK8sTaskExecutionContext())) {
                 if (!TASK_TYPE_SET_K8S.contains(taskExecutionContext.getTaskType())) {
                     // Set empty container name for Spark on K8S task
-                    applicationManagerMap.get(ResourceManagerType.KUBERNETES)
+                    boolean killed = applicationManagerMap.get(ResourceManagerType.KUBERNETES)
                             .killApplication(new KubernetesApplicationManagerContext(
                                     taskExecutionContext.getK8sTaskExecutionContext(),
                                     taskExecutionContext.getTaskAppId(), ""));
+                    if (!killed) {
+                        // the driver pod is already in a failure or unknown state, there is nothing
+                        // left to cancel, so this is not a cancellation failure
+                        log.warn("The kubernetes application of task: {} is not running any more, it is not killed",
+                                taskExecutionContext.getTaskAppId());
+                    }
                 }
             } else {
                 String host = taskExecutionContext.getHost();
@@ -386,8 +503,12 @@ public final class ProcessUtils {
                 applicationManager.killApplication(new YarnApplicationManagerContext(executePath, tenantCode, appIds));
                 log.info("yarn application [{}] is killed or already finished", appIds);
             }
+        } catch (TaskException e) {
+            log.error("Cancel application failed: {}", e.getMessage(), e);
+            throw e;
         } catch (Exception e) {
-            log.error("Cancel application failed: {}", e.getMessage());
+            log.error("Cancel application failed: {}", e.getMessage(), e);
+            throw new TaskException("Cancel application failed: " + e.getMessage(), e);
         }
     }
 

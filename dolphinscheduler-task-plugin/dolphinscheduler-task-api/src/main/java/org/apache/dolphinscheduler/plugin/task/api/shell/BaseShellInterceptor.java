@@ -20,11 +20,19 @@ package org.apache.dolphinscheduler.plugin.task.api.shell;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public abstract class BaseShellInterceptor implements IShellInterceptor {
+
+    /**
+     * The value of a {@code -D} option which carries a credential, the command is logged with the
+     * value masked instead of leaking the secret of the task into the log file.
+     */
+    private static final Pattern SENSITIVE_OPTION_PATTERN = Pattern.compile(
+            "(-D[ \\t]*[^\\s=]*(?i:password|passwd|secret|token|credential)[^\\s=]*=)((?:'[^']*'|\"[^\"]*\"|\\S)+)");
 
     protected final String workingDirectory;
     protected final List<String> executeCommands;
@@ -43,8 +51,16 @@ public abstract class BaseShellInterceptor implements IShellInterceptor {
         // merge error information to standard output stream
         processBuilder.redirectErrorStream(true);
         processBuilder.command(executeCommands);
-        log.info("Executing shell command : {}", String.join(" ", executeCommands));
+        log.info("Executing shell command : {}", maskSensitiveOptions(String.join(" ", executeCommands)));
         return processBuilder.start();
+    }
+
+    /**
+     * Mask the value of the options which carry a credential, so that the command can be logged
+     * without writing the secret into the log file.
+     */
+    public static String maskSensitiveOptions(String command) {
+        return SENSITIVE_OPTION_PATTERN.matcher(command).replaceAll("$1******");
     }
 
 }

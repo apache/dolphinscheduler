@@ -39,13 +39,15 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import lombok.extern.slf4j.Slf4j;
 import io.fabric8.kubernetes.client.dsl.LogWatch;
@@ -55,6 +57,12 @@ public abstract class AbstractCommandExecutor {
 
     protected volatile Map<String, String> taskOutputParams = new HashMap<>();
     private Process process;
+
+    /**
+     * The future which writes the output of the process into the task log. It is kept so that a caller
+     * which stops the process outside of {@link #run} can wait for the output to be collected.
+     */
+    private volatile CompletableFuture<Void> collectProcessLogFuture;
 
     protected TaskExecutionContext taskRequest;
 
@@ -101,7 +109,7 @@ public abstract class AbstractCommandExecutor {
         process = iShellInterceptor.execute();
 
         // parse process output
-        final CompletableFuture<Void> collectProcessLogFuture = collectProcessLog(this.process);
+        collectProcessLogFuture = collectProcessLog(this.process);
 
         // collect pod log
         final Optional<CompletableFuture<?>> collectPodLogFuture = collectPodLogIfNeeded();
@@ -130,14 +138,25 @@ public abstract class AbstractCommandExecutor {
         TaskExecutionStatus kubernetesStatus =
                 ProcessUtils.getApplicationStatus(taskRequest.getK8sTaskExecutionContext(), taskRequest.getTaskAppId());
 
-        // Wait the task log process finished.
-        collectProcessLogFuture.join();
+        // Wait the task log process finished. An output which could not be collected does not fail the
+        // task itself, its exit code is decided by the process; a caller which needs the whole output,
+        // for example the Flink cancellation, observes the failure through awaitOutputCollected.
+        try {
+            collectProcessLogFuture.join();
+        } catch (CompletionException e) {
+            log.error("Collect the output of the task process failed", e.getCause());
+        }
 
         if (collectPodLogFuture.isPresent()) {
             // Wait kubernetes pod log collection finished
             collectPodLogFuture.get().join();
-            // delete pod after successful execution and log collection
-            ProcessUtils.cancelApplication(taskRequest);
+            // delete pod after successful execution and log collection, a pod which cannot be
+            // deleted must not turn the finished task into a failure
+            try {
+                ProcessUtils.cancelApplication(taskRequest);
+            } catch (TaskException e) {
+                log.warn("Delete the kubernetes pod of the finished task failed", e);
+            }
         }
 
         // if SHELL task exit
@@ -165,10 +184,65 @@ public abstract class AbstractCommandExecutor {
         return taskOutputParams;
     }
 
+    /**
+     * Wait until the output of the process has been written to the task log, at most the given time.
+     * A caller which stops the process outside of {@link #run} uses it to make sure that the tail of
+     * the output is available in the task log.
+     *
+     * @param timeoutMillis the maximum time to wait
+     * @return true if the output was collected, false if the wait timed out
+     */
+    public boolean awaitOutputCollected(long timeoutMillis) {
+        return awaitCollected(collectProcessLogFuture, timeoutMillis);
+    }
+
+    /**
+     * Wait until the given output collection completes, at most the given time. Kept as a static
+     * method so that the waiting itself can be verified without starting a process.
+     *
+     * @param future the output collection, may be null when no process was started
+     * @param timeoutMillis the maximum time to wait
+     * @return true if the whole output was collected, false if the wait timed out or the collection
+     *         failed
+     */
+    static boolean awaitCollected(CompletableFuture<Void> future, long timeoutMillis) {
+        if (future == null) {
+            return true;
+        }
+        try {
+            future.get(timeoutMillis, TimeUnit.MILLISECONDS);
+            return true;
+        } catch (TimeoutException e) {
+            return false;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        } catch (ExecutionException e) {
+            // the collection failed, so only a part of the output reached the caller: it must not be
+            // reported as collected, otherwise the missing tail is treated as if it did not exist
+            log.error("Collect the process output failed", e.getCause());
+            return false;
+        } catch (Exception e) {
+            log.error("Collect the process output failed", e);
+            return false;
+        }
+    }
+
+    /**
+     * Stop the process of the task and the application it runs in.
+     *
+     * <p>A failure is propagated: a caller which stops a task has to know that the process is still
+     * alive, otherwise it may treat an incomplete state as the final one, for example when the process
+     * can still submit a remote job after this call returns.
+     *
+     * @throws TaskException if the process tree or the application could not be terminated
+     */
     public void cancelApplication() throws InterruptedException {
         if (process == null) {
             return;
         }
+
+        TaskException cancelFailure = null;
 
         // Try to kill process tree
         boolean killed = ProcessUtils.kill(taskRequest);
@@ -178,10 +252,25 @@ public abstract class AbstractCommandExecutor {
         } else {
             log.error("Failed to kill process tree for task: {}, pid: {}",
                     taskRequest.getTaskAppId(), taskRequest.getProcessId());
+            cancelFailure = new TaskException(String.format(
+                    "Failed to kill the process tree of task: %s, pid: %s, it may still be running",
+                    taskRequest.getTaskAppId(), taskRequest.getProcessId()));
         }
 
         // Try to kill yarn or k8s application
-        ProcessUtils.cancelApplication(taskRequest);
+        try {
+            ProcessUtils.cancelApplication(taskRequest);
+        } catch (TaskException e) {
+            if (cancelFailure == null) {
+                cancelFailure = e;
+            } else {
+                cancelFailure.addSuppressed(e);
+            }
+        }
+
+        if (cancelFailure != null) {
+            throw cancelFailure;
+        }
     }
 
     private Optional<CompletableFuture<?>> collectPodLogIfNeeded() {
@@ -232,11 +321,15 @@ public abstract class AbstractCommandExecutor {
                     taskOutputParameterParser.appendParseLog(line);
                 }
             } catch (Exception e) {
+                // the output is incomplete: the future has to complete exceptionally so that a caller
+                // which relies on the whole output, for example to find the JobIDs of a submission,
+                // does not treat the partial output as the complete one
                 log.error("Parse var pool error", e);
+                throw new RuntimeException("Collect the output of the task process failed", e);
             } finally {
+                taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
                 LogUtils.removeTaskInstanceLogFullPathMDC();
             }
-            taskOutputParams = taskOutputParameterParser.getTaskOutputParams();
         }, collectProcessLogService);
 
         collectProcessLogService.shutdown();
@@ -266,18 +359,7 @@ public abstract class AbstractCommandExecutor {
      * @return process id
      */
     private int getProcessId(Process process) {
-        int processId = 0;
-
-        try {
-            Field f = process.getClass().getDeclaredField(TaskConstants.PID);
-            f.setAccessible(true);
-
-            processId = f.getInt(process);
-        } catch (Exception e) {
-            log.error("Get task pid failed", e);
-        }
-
-        return processId;
+        return ProcessUtils.getProcessId(process);
     }
 
 }
