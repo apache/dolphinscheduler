@@ -61,3 +61,5 @@ docs/superpowers/
 .claude/worktrees
 CLAUDE.local.md
 AGENT.local.md
+.cursor/
+openspec/
