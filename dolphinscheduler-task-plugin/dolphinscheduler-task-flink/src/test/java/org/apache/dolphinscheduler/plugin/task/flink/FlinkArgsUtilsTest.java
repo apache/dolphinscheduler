@@ -875,4 +875,83 @@ public class FlinkArgsUtilsTest {
     private static boolean isProcessAlive(int processId) throws Exception {
         return new ProcessBuilder("/bin/kill", "-0", String.valueOf(processId)).start().waitFor() == 0;
     }
+
+    @Test
+    public void testCountJobStatementsCountsSynchronousAndAsynchronousSubmissions() {
+        // the count is used to tell a finished submission from one which is still running, so it has
+        // to include the synchronous ones as well: Flink 1.17 no longer announces them
+        int jobs = FlinkArgsUtils.countJobStatements(
+                "SET 'table.dml-sync' = 'true';\n"
+                        + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                        + "SET 'table.dml-sync' = 'false';\n"
+                        + "INSERT INTO second_sink SELECT * FROM streaming_source;\n"
+                        + "CREATE TABLE t AS SELECT * FROM s;\n"
+                        + "EXECUTE PLAN '/plans/job.json';");
+
+        Assertions.assertEquals(4, jobs);
+    }
+
+    @Test
+    public void testCountJobStatementsCountsAStatementSetAsOneJob() {
+        int jobs = FlinkArgsUtils.countJobStatements(
+                "EXECUTE STATEMENT SET BEGIN\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "INSERT INTO u SELECT * FROM v;\n"
+                        + "END;");
+
+        Assertions.assertEquals(1, jobs);
+    }
+
+    @Test
+    public void testCountJobStatementsCountsAStatementSetInSyncModeAsOneJob() {
+        int jobs = FlinkArgsUtils.countJobStatements(
+                "SET 'table.dml-sync' = 'true';\n"
+                        + "EXECUTE STATEMENT SET BEGIN\n"
+                        + "INSERT INTO t SELECT * FROM s;\n"
+                        + "INSERT INTO u SELECT * FROM v;\n"
+                        + "END;");
+
+        Assertions.assertEquals(1, jobs);
+    }
+
+    @Test
+    public void testExecuteCommandKeepsSqlConnectionValueWithSpacesAsOneArgument() throws Exception {
+        // a SQL SET value with a space and a metacharacter has to reach the CLI as a single argument,
+        // otherwise the shell splits it and the control command uses a different TLS configuration
+        Path executePath = tempDir.resolve("sql-value-execute");
+        Files.createDirectories(executePath);
+        Path flinkHome = tempDir.resolve("flink-sql-value");
+        Files.createDirectories(flinkHome.resolve("bin"));
+        Path markerFile = tempDir.resolve("sql-value-args.txt");
+        Path flinkCommand = flinkHome.resolve("bin/flink");
+        Files.write(flinkCommand, Arrays.asList(
+                "#!/bin/bash",
+                "printf '%s\\n' \"$@\" > " + markerFile));
+        Assertions.assertTrue(flinkCommand.toFile().setExecutable(true));
+
+        List<String> options = FlinkArgsUtils.extractClusterConnectionOptionsFromSql(
+                "SET 'security.ssl.rest.truststore' = '/opt/flink configs/client.jks';\n"
+                        + "SET 'security.ssl.rest.truststore-password' = 'pa$$ word;x';");
+
+        TaskExecutionContext taskExecutionContext = new TaskExecutionContext();
+        taskExecutionContext.setTaskInstanceId(16789);
+        taskExecutionContext.setTaskAppId("16789");
+        taskExecutionContext.setExecutePath(executePath.toString());
+        taskExecutionContext.setTenantCode("");
+        taskExecutionContext.setEnvironmentConfig("export FLINK_HOME=" + flinkHome);
+        taskExecutionContext.setPrepareParamsMap(Collections.emptyMap());
+
+        boolean success = FlinkArgsUtils.executeCommand(taskExecutionContext,
+                FlinkArgsUtils.buildCancelCommandLine("1234567890abcdef1234567890abcdef", options),
+                false);
+
+        Assertions.assertTrue(success);
+        List<String> arguments = Files.readAllLines(markerFile);
+        Assertions.assertEquals("cancel", arguments.get(0));
+        Assertions.assertEquals("1234567890abcdef1234567890abcdef", arguments.get(1));
+        Assertions.assertTrue(arguments.contains("-Dsecurity.ssl.rest.truststore=/opt/flink configs/client.jks"),
+                "the path with a space must stay one argument, arguments: " + arguments);
+        Assertions.assertTrue(arguments.contains("-Dsecurity.ssl.rest.truststore-password=pa$$ word;x"),
+                "the value with a metacharacter must reach the CLI unchanged, arguments: " + arguments);
+    }
 }

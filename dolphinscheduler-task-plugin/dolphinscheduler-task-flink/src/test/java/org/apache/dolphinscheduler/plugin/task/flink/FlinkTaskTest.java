@@ -464,7 +464,8 @@ public class FlinkTaskTest {
         // a synchronous update statement is completed by the client and prints no JobID, so it is not
         // cancelled: the asynchronous job which follows is the only one and keeps its own endpoint
         TaskExecutionContext context = buildTaskExecutionContext(
-                "Job ID: 22222222222222222222222222222222");
+                "Complete execution of the SQL update statement.\n"
+                        + "Job ID: 22222222222222222222222222222222");
 
         FlinkParameters parameters = new FlinkParameters();
         parameters.setProgramType(ProgramType.SQL);
@@ -476,6 +477,7 @@ public class FlinkTaskTest {
                 + "SET 'rest.address' = 'cluster-b';\n"
                 + "INSERT INTO second_sink SELECT * FROM streaming_source;");
         context.setTaskParams(JSONUtils.toJsonString(parameters));
+        context.setProcessId(4321);
 
         FlinkTask task = Mockito.spy(new FlinkTask(context));
         task.init();
@@ -491,14 +493,24 @@ public class FlinkTaskTest {
 
     @Test
     public void testCancelApplicationFailsWhenASynchronousSubmissionIsStillRunning() throws Exception {
-        // the client waits for the synchronous statement instead of printing its JobID, so stopping
-        // the client is not proof that the remote job is cancelled: the cancellation must fail
-        TaskExecutionContext context = buildTaskExecutionContext(
-                "Execute statement in sync mode. Please wait for the execution finish...");
+        // Flink 1.17 removed the message which announced a synchronous submission, so the running
+        // statement is detected from the job count instead of the announcement: no JobID and no
+        // completion means the job may still run and the cancellation must fail
+        TaskExecutionContext context = buildTaskExecutionContext("Flink SQL> INSERT INTO t SELECT * FROM s;");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'table.dml-sync' = 'true';\n"
+                + "INSERT INTO t SELECT * FROM s;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+        context.setProcessId(4321);
 
         FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
 
         Assertions.assertThrows(TaskException.class, task::cancelApplication);
+        Assertions.assertEquals(1, task.countUnreportedSubmissions());
         Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
     }
 
@@ -508,32 +520,47 @@ public class FlinkTaskTest {
         // statement fails, so it does not wait for that submission any more: a stop which races with
         // the failure must not report a submission which cannot be cancelled
         TaskExecutionContext context = buildTaskExecutionContext(
-                "Execute statement in sync mode. Please wait for the execution finish...\n"
-                        + "Could not execute SQL statement.\n"
+                "Could not execute SQL statement.\n"
                         + "org.apache.flink.table.client.gui.shell.SqlClientException: the source table "
                         + "does not exist");
 
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'table.dml-sync' = 'true';\n"
+                + "INSERT INTO t SELECT * FROM s;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+        context.setProcessId(4321);
+
         FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
 
         task.cancelApplication();
 
-        Assertions.assertEquals(0, task.countPendingSynchronousSubmissions());
+        Assertions.assertEquals(0, task.countUnreportedSubmissions());
         Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
     }
 
     @Test
     public void testCancelApplicationFailsWhenTheSubmissionAfterAFailureIsStillRunning() throws Exception {
-        // a failed submission ends the previous synchronous execution, but the following one is still
-        // running, so the task must still report the submission which cannot be cancelled
-        TaskExecutionContext context = buildTaskExecutionContext(
-                "Execute statement in sync mode. Please wait for the execution finish...\n"
-                        + "Could not execute SQL statement.\n"
-                        + "Execute statement in sync mode. Please wait for the execution finish...");
+        // the first synchronous submission failed, the second one is still running, so the task must
+        // still report the submission which cannot be cancelled
+        TaskExecutionContext context = buildTaskExecutionContext("Could not execute SQL statement.");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'table.dml-sync' = 'true';\n"
+                + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                + "INSERT INTO second_sink SELECT * FROM streaming_source;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+        context.setProcessId(4321);
 
         FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
 
         Assertions.assertThrows(TaskException.class, task::cancelApplication);
-        Assertions.assertEquals(1, task.countPendingSynchronousSubmissions());
+        Assertions.assertEquals(1, task.countUnreportedSubmissions());
         Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
     }
 
@@ -542,15 +569,25 @@ public class FlinkTaskTest {
         // a synchronous statement which has finished has nothing left to cancel, only the
         // asynchronous job is cancelled
         TaskExecutionContext context = buildTaskExecutionContext(
-                "Execute statement in sync mode. Please wait for the execution finish...\n"
-                        + "Complete execution of the SQL update statement.\n"
+                "Complete execution of the SQL update statement.\n"
                         + "Job ID: 22222222222222222222222222222222");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'table.dml-sync' = 'true';\n"
+                + "INSERT INTO first_sink SELECT * FROM bounded_source;\n"
+                + "SET 'table.dml-sync' = 'false';\n"
+                + "INSERT INTO second_sink SELECT * FROM streaming_source;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+        context.setProcessId(4321);
 
         FlinkTask task = Mockito.spy(new FlinkTask(context));
 
         List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
         task.cancelApplication();
 
+        Assertions.assertEquals(0, task.countUnreportedSubmissions());
         Assertions.assertEquals(1, executedCommands.size());
         Assertions.assertEquals(
                 "${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222",
@@ -674,7 +711,8 @@ public class FlinkTaskTest {
     @Test
     public void testCancelApplicationFailsWhenTheClientCannotBeStopped() throws Exception {
         // a client which could not be killed may still submit another job, so the ids collected below
-        // are not final: the cancellation fails instead of cancelling from an incomplete snapshot
+        // are not final: the known jobs are still attempted, but the stop must not be reported as
+        // successful
         TaskExecutionContext context = buildTaskExecutionContext(
                 "Job has been submitted with JobID 11111111111111111111111111111111");
         FlinkTask task = Mockito.spy(new FlinkTask(context));
@@ -684,11 +722,10 @@ public class FlinkTaskTest {
 
         TaskException exception = Assertions.assertThrows(TaskException.class, task::cancelApplication);
 
-        // neither the JobID collection nor the remote cancellation proceeds from the incomplete
-        // snapshot, the failure itself is propagated
-        Assertions.assertEquals(0, executedCommands.size());
-        Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
-        Assertions.assertTrue(exception.getMessage().contains("Failed to kill the process tree"),
+        // the job which is already known is still cancelled, the failure itself is what makes the
+        // stop fail
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertTrue(exception.getMessage().contains("may still have running jobs"),
                 "the client termination failure must be propagated, message: " + exception.getMessage());
     }
 
@@ -703,7 +740,7 @@ public class FlinkTaskTest {
 
         TaskException exception = Assertions.assertThrows(TaskException.class, task::cancelApplication);
 
-        Assertions.assertTrue(exception.getMessage().contains("Cancel the yarn application failed"),
+        Assertions.assertTrue(exception.getMessage().contains("Failed to stop the flink client"),
                 "the resource manager failure must be propagated, message: " + exception.getMessage());
         Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
     }
@@ -711,9 +748,9 @@ public class FlinkTaskTest {
     @Test
     public void testCancelApplicationFailsWhenTheSubmissionOutputIsNotCollected() throws Exception {
         // the JobID can still be buffered in the output which was not collected, so the ids in the log
-        // are not final: the cancellation fails instead of cancelling from an incomplete snapshot.
-        // A collection which failed is reported as not collected by awaitCollected() as well, so the
-        // same branch covers it.
+        // are not final: the known jobs are still attempted, but the stop must not be reported as
+        // successful. A collection which failed is reported as not collected by awaitCollected() as
+        // well, so the same branch covers it.
         TaskExecutionContext context = buildTaskExecutionContext(
                 "Job has been submitted with JobID 11111111111111111111111111111111");
         FlinkTask task = Mockito.spy(new FlinkTask(context));
@@ -723,9 +760,9 @@ public class FlinkTaskTest {
 
         Assertions.assertThrows(TaskException.class, task::cancelApplication);
 
-        // the job which is already in the log is not cancelled from the incomplete snapshot
-        Assertions.assertEquals(0, executedCommands.size());
-        Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
+        // the job which is already in the log is still cancelled, the failure is what makes the stop
+        // fail
+        Assertions.assertEquals(1, executedCommands.size());
     }
 
     @Test
@@ -743,5 +780,64 @@ public class FlinkTaskTest {
         Assertions.assertThrows(TaskException.class, task::cancelApplication);
 
         Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
+    }
+
+    @Test
+    public void testCancelApplicationHandlesAJobIdWhichArrivesAfterTheDrainTimeout() throws Exception {
+        // the JobID of the last submission is still buffered when the drain times out: the stop has to
+        // report that its snapshot is not final, and the job which reached the log meanwhile is still
+        // cancelled
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job has been submitted with JobID 11111111111111111111111111111111");
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        Mockito.doNothing().when(task).cancelClientByProcess();
+        Mockito.doAnswer(invocation -> {
+            Files.write(Paths.get(context.getLogPath()),
+                    "\nJob has been submitted with JobID 22222222222222222222222222222222"
+                            .getBytes(StandardCharsets.UTF_8),
+                    StandardOpenOption.APPEND);
+            return false;
+        }).when(task).awaitSubmissionOutputCollected(Mockito.anyLong());
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded(), cancelSucceeded());
+
+        Assertions.assertThrows(TaskException.class, task::cancelApplication);
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 11111111111111111111111111111111",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals("${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222",
+                String.join(" ", executedCommands.get(1)));
+    }
+
+    @Test
+    public void testCancelApplicationKeepsTheEndpointOfACompileAndExecutePlanJob() throws Exception {
+        // `COMPILE AND EXECUTE PLAN` submits the compiled plan as a job as well, so the following
+        // INSERT must not take its endpoint
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job ID: 11111111111111111111111111111111\n"
+                        + "Job ID: 22222222222222222222222222222222");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.STANDALONE);
+        parameters.setRawScript("SET 'rest.address' = 'cluster-a';\n"
+                + "COMPILE AND EXECUTE PLAN '/plans/job.json';\n"
+                + "SET 'rest.address' = 'cluster-b';\n"
+                + "INSERT INTO sink_b SELECT * FROM source_b;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded(), cancelSucceeded());
+        task.cancelApplication();
+
+        Assertions.assertEquals(2, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 11111111111111111111111111111111 -Drest.address=cluster-a",
+                String.join(" ", executedCommands.get(0)));
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222 -Drest.address=cluster-b",
+                String.join(" ", executedCommands.get(1)));
     }
 }

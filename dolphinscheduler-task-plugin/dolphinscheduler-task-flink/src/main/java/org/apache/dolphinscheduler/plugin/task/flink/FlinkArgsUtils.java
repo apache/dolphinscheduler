@@ -322,6 +322,26 @@ public class FlinkArgsUtils {
     }
 
     /**
+     * Count the jobs the SQL scripts submit, in every deploy mode and independent of
+     * {@code table.dml-sync}.
+     *
+     * <p>The SQL Client reports exactly one result per submitted job: the JobID when it submits the
+     * job asynchronously, and the completion (or the failure) message when
+     * {@code table.dml-sync} makes it execute the statement synchronously. Flink 1.17 removed the
+     * message which announced a synchronous submission, so the number of submitted jobs together with
+     * the number of reported results is what tells a finished submission from one which is still
+     * running.
+     *
+     * @param scripts the init script and the raw script of the submission, may be null
+     * @return the number of jobs the scripts submit
+     */
+    public static int countJobStatements(String... scripts) {
+        SqlClusterConnectionTracker tracker = new SqlClusterConnectionTracker(null);
+        applySqlScripts(tracker, scripts);
+        return tracker.jobCount();
+    }
+
+    /**
      * Scan the SQL scripts statement by statement and update the tracker: a {@code SET} or
      * {@code RESET} statement changes the effective configuration, while an update statement, a
      * statement set, a {@code CREATE TABLE ... AS} statement or a compiled plan execution submits a
@@ -467,6 +487,7 @@ public class FlinkArgsUtils {
         private boolean dmlSync;
         private boolean inStatementSet;
         private boolean statementSetRecorded;
+        private int jobCount;
 
         private SqlClusterConnectionTracker(String others) {
             baseline = clusterConnectionOptionsByKey(extractClusterConnectionOptions(others));
@@ -510,17 +531,20 @@ public class FlinkArgsUtils {
         }
 
         private void submit() {
+            if (inStatementSet && statementSetRecorded) {
+                // the update statements of a statement set are submitted as a single job
+                return;
+            }
+            // a synchronous submission submits a job as well, it only prints no JobID: it is counted
+            // too, otherwise a synchronous submission which is still running cannot be detected
+            jobCount++;
+            statementSetRecorded = inStatementSet;
             if (dmlSync) {
                 // the client executes the statement synchronously and prints no JobID, so the job has
                 // no submission in the task log to associate this configuration with
                 return;
             }
-            if (inStatementSet && statementSetRecorded) {
-                // the update statements of a statement set are submitted as a single job
-                return;
-            }
             optionsPerJob.add(currentOptions());
-            statementSetRecorded = inStatementSet;
         }
 
         private List<String> currentOptions() {
@@ -531,6 +555,10 @@ public class FlinkArgsUtils {
 
         private List<List<String>> optionsPerJob() {
             return optionsPerJob;
+        }
+
+        private int jobCount() {
+            return jobCount;
         }
     }
 

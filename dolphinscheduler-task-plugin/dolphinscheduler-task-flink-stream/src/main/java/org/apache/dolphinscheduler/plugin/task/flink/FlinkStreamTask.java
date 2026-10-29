@@ -79,14 +79,14 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
         // `yarn-per-job` submits every job into its own application.
         List<FlinkJobSubmission> submissions = getFlinkJobSubmissions();
         List<String> failures = new ArrayList<>();
-        // a synchronous submission which the SQL Client is still running prints no JobID, so its job
-        // cannot be checkpointed: the savepoint of the task must not be reported as successful
-        int pendingSynchronousSubmissions = countPendingSynchronousSubmissions();
-        if (pendingSynchronousSubmissions > 0) {
+        // a submission which reported neither a JobID nor a completion can still be running, and the
+        // client prints no id for a synchronous submission, so no savepoint can be triggered for it
+        int unreportedSubmissions = countUnreportedSubmissions();
+        if (unreportedSubmissions > 0) {
             failures.add(String.format(
-                    "%d synchronous SQL submission(s) were still running, the SQL Client prints no JobID for them "
-                            + "so no savepoint can be triggered",
-                    pendingSynchronousSubmissions));
+                    "%d submission(s) of the task reported no JobID and no completion, they may still be running "
+                            + "so no savepoint can be triggered for them",
+                    unreportedSubmissions));
         }
         if (CollectionUtils.isEmpty(submissions)) {
             failures.add("Cannot find the flink JobID of the task");

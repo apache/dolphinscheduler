@@ -73,13 +73,10 @@ public class FlinkTask extends AbstractYarnTask {
     private static final String JOB_ALREADY_IN_TERMINAL_STATE_MESSAGE = "already reached another terminal state";
 
     /**
-     * The message the SQL Client prints when it waits for a synchronous submission to finish. The
-     * JobID of such a submission is never printed, so it is only reachable through the task log.
-     */
-    private static final String SYNCHRONOUS_SUBMISSION_STARTED_MESSAGE = "Execute statement in sync mode";
-
-    /**
-     * The message the SQL Client prints when a synchronous submission has finished.
+     * The message the SQL Client prints when a synchronous submission has finished. Flink 1.17
+     * removed the message which announced that a submission runs synchronously, but it still prints
+     * this message, and the JobID for an asynchronous submission, so the reported results tell a
+     * finished submission from one which is still running on every version.
      */
     private static final String SYNCHRONOUS_SUBMISSION_FINISHED_MESSAGE =
             "Complete execution of the SQL update statement";
@@ -180,17 +177,49 @@ public class FlinkTask extends AbstractYarnTask {
      * further jobs, which would be missing from an earlier snapshot. The client stop also cancels the
      * YARN/K8s application of the task.
      *
-     * <p>A job is only cancelled from a snapshot which is known to be complete. When the client cannot
-     * be stopped it can still submit another job, and when its output cannot be collected the tail of
-     * the output can still contain the JobID of a detached job. In both cases the ids which were
-     * collected are not final, so the cancellation reports the failure instead of cancelling from an
-     * incomplete snapshot and claiming that every job was handled.
+     * <p>Every known job is attempted, so a single failing job does not leave the following ones
+     * running. A step which could not do its job is never treated as a success, though: the failure is
+     * reported after the attempts, so a stop which could not guarantee that every job is gone is not
+     * reported as successful.
      */
     @Override
     public void cancelApplication() throws TaskException {
-        cancelClientByProcess();
-        requireSubmissionOutputCollected();
-        cancelFlinkJob();
+        TaskException cancelFailure = null;
+        try {
+            cancelClientByProcess();
+        } catch (TaskException e) {
+            // the client may still run and submit another job, so the ids collected below are not
+            // final: the failure is reported even though the known jobs are still cancelled
+            cancelFailure = new TaskException(String.format(
+                    "Failed to stop the flink client or its application, the task may still have running jobs, "
+                            + "taskInstanceId: %s",
+                    taskExecutionContext.getTaskInstanceId()), e);
+        }
+        try {
+            requireSubmissionOutputCollected();
+        } catch (TaskException e) {
+            cancelFailure = mergeCancelFailure(cancelFailure, e);
+        }
+        try {
+            cancelFlinkJob();
+        } catch (TaskException e) {
+            cancelFailure = mergeCancelFailure(cancelFailure, e);
+        }
+        if (cancelFailure != null) {
+            throw cancelFailure;
+        }
+    }
+
+    /**
+     * Keep the failure which has to be reported, and attach the following one to it instead of
+     * dropping either of them.
+     */
+    private static TaskException mergeCancelFailure(TaskException cancelFailure, TaskException failure) {
+        if (cancelFailure == null) {
+            return failure;
+        }
+        cancelFailure.addSuppressed(failure);
+        return cancelFailure;
     }
 
     /**
@@ -256,10 +285,10 @@ public class FlinkTask extends AbstractYarnTask {
             log.warn("Get application ids failed, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
         }
         List<String> jobIds = getFlinkJobIds();
-        // a synchronous submission which is still running prints no JobID, so it cannot be cancelled
-        // through the flink CLI: it must not be reported as cancelled either
-        int pendingSynchronousSubmissions = countPendingSynchronousSubmissions();
-        if (CollectionUtils.isEmpty(jobIds) && pendingSynchronousSubmissions == 0) {
+        // a submission which reported no JobID and no completion can still be running, and the client
+        // prints no id for a synchronous submission, so it cannot be cancelled through the flink CLI
+        int unreportedSubmissions = countUnreportedSubmissions();
+        if (CollectionUtils.isEmpty(jobIds) && unreportedSubmissions == 0) {
             log.info("Cannot find flink JobID from the task log, taskInstanceId: {}",
                     taskExecutionContext.getTaskInstanceId());
             return;
@@ -291,11 +320,11 @@ public class FlinkTask extends AbstractYarnTask {
         if (CollectionUtils.isNotEmpty(failedJobIds)) {
             failures.add(String.format("the jobs %s could not be cancelled, they may still be running", failedJobIds));
         }
-        if (pendingSynchronousSubmissions > 0) {
+        if (unreportedSubmissions > 0) {
             failures.add(String.format(
-                    "%d synchronous SQL submission(s) were still running, the SQL Client prints no JobID for them "
-                            + "so they cannot be cancelled through the flink CLI",
-                    pendingSynchronousSubmissions));
+                    "%d submission(s) of the task reported no JobID and no completion, they may still be running "
+                            + "and cannot be cancelled through the flink CLI",
+                    unreportedSubmissions));
         }
         if (CollectionUtils.isNotEmpty(failures)) {
             String message = String.format("Cancel the flink jobs of the task failed, %s, taskInstanceId: %s",
@@ -309,37 +338,70 @@ public class FlinkTask extends AbstractYarnTask {
     }
 
     /**
-     * The number of synchronous submissions which the SQL Client started but did not finish.
+     * The number of submitted jobs for which the SQL Client reported no result.
      *
-     * <p>With {@code table.dml-sync} the client waits for the job instead of printing its JobID, so a
-     * submission which is still running when the client is stopped has no id in the task log and
-     * cannot be addressed by the flink CLI. The messages which the client prints around such a
-     * submission tell it apart from one which has finished.
+     * <p>The client reports exactly one result per submitted job: the JobID when the job is submitted
+     * asynchronously, and the completion or the failure message when {@code table.dml-sync} makes the
+     * client execute the statement synchronously. A job which reported neither is still running, and
+     * the client prints no JobID for a synchronous submission, so it cannot be cancelled.
      *
-     * <p>A submission ends either with the completion message or with the failure message: the client
-     * executes the statements one by one, so the two can be paired in order. A failed submission is
-     * not pending, it is over and the client waits for nothing. In file mode the client exits on a
-     * failed statement, so a stop usually does not reach that state, but a stop which races with the
-     * failure must still not report a submission which cannot be cancelled.
+     * <p>The number of jobs the scripts submit is used because Flink 1.17 removed the message which
+     * announced a synchronous submission: counting the announcements only works for 1.13-1.16 and
+     * silently reports nothing on 1.17+.
      */
-    protected int countPendingSynchronousSubmissions() {
+    protected int countUnreportedSubmissions() {
+        int submittedJobs = countSubmittedJobs();
+        if (submittedJobs == 0) {
+            return 0;
+        }
+        return Math.max(0, submittedJobs - countReportedJobResults());
+    }
+
+    /**
+     * The jobs the SQL scripts of the task submit, in every deploy mode and independent of
+     * {@code table.dml-sync}. A task which has not been started has not submitted anything.
+     */
+    private int countSubmittedJobs() {
+        if (taskExecutionContext.getProcessId() <= 0) {
+            return 0;
+        }
+        AbstractParameters parameters = getParameters();
+        if (!(parameters instanceof FlinkParameters)) {
+            return 0;
+        }
+        FlinkParameters flinkParameters = (FlinkParameters) parameters;
+        if (flinkParameters.getProgramType() != ProgramType.SQL) {
+            // a JAR job is submitted by `flink run`, which always prints its JobID
+            return 0;
+        }
+        return FlinkArgsUtils.countJobStatements(flinkParameters.getInitScript(), flinkParameters.getRawScript());
+    }
+
+    /**
+     * The results the SQL Client reported in the task log: one per submitted job, either its JobID or
+     * the completion message of a synchronous submission, or the failure message of a statement which
+     * did not submit anything.
+     */
+    private int countReportedJobResults() {
         String logPath = taskExecutionContext.getLogPath();
         File logFile = StringUtils.isEmpty(logPath) ? null : new File(logPath);
         if (logFile == null || !logFile.isFile()) {
             return 0;
         }
-        int pending = 0;
+        Set<String> jobIds = new HashSet<>();
+        int finishedSynchronousSubmissions = 0;
         try (Stream<String> lines = Files.lines(logFile.toPath())) {
             Iterator<String> iterator = lines.iterator();
             while (iterator.hasNext()) {
                 String line = iterator.next();
-                if (StringUtils.contains(line, SYNCHRONOUS_SUBMISSION_STARTED_MESSAGE)) {
-                    pending++;
+                String jobId = findFlinkJobId(line);
+                if (jobId != null) {
+                    jobIds.add(jobId);
                 } else if (StringUtils.contains(line, SYNCHRONOUS_SUBMISSION_FINISHED_MESSAGE)
                         || StringUtils.contains(line, SYNCHRONOUS_SUBMISSION_FAILED_MESSAGE)) {
-                    // the failure message can also belong to a statement which was not submitted
-                    // synchronously, so it only ends a submission which is pending
-                    pending = Math.max(0, pending - 1);
+                    // a failed statement may not have submitted anything, but it also does not leave a
+                    // submission which still runs
+                    finishedSynchronousSubmissions++;
                 }
             }
         } catch (Exception e) {
@@ -349,7 +411,7 @@ public class FlinkTask extends AbstractYarnTask {
             log.error(message, e);
             throw new TaskException(message, e);
         }
-        return pending;
+        return jobIds.size() + finishedSynchronousSubmissions;
     }
 
     /**
