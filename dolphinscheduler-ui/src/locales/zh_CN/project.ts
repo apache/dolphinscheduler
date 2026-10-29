@@ -398,6 +398,7 @@ export default {
     minute: '分',
     second: '秒',
     delay_execution_time: '延时执行时间',
+    task_execute_type: '任务执行类型',
     namespace_cluster: '命名空间(集群)',
     min_cpu: '最小cpu',
     min_memory: '最小内存',
