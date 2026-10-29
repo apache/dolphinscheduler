@@ -24,8 +24,8 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;

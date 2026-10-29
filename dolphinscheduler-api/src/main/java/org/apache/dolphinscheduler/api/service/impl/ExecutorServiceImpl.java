@@ -29,10 +29,10 @@ import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.workflow.ExecutorClient;
-import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowRequestTransformer;
@@ -155,7 +155,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 triggerWorkflowDTO.getTenantCode(), triggerWorkflowDTO.getWarningGroupId());
         checkWorkflowResourcePermission(triggerRequest.getLoginUser(), triggerRequest.getProjectCode(),
                 triggerWorkflowDTO.getWorkflowDefinition().getCode(),
-                triggerWorkflowDTO.getWorkflowDefinition().getVersion());
+                triggerWorkflowDTO.getWorkflowDefinition().getVersion(), triggerWorkflowDTO.getWorkerGroup(),
+                triggerWorkflowDTO.getEnvironmentCode(), triggerWorkflowDTO.getTenantCode(),
+                triggerWorkflowDTO.getWarningGroupId());
         return executorClient.triggerWorkflowDefinition().execute(triggerWorkflowDTO);
     }
 
@@ -182,7 +184,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         checkWorkflowResourcePermission(workflowBackFillRequest.getLoginUser(),
                 workflowBackFillRequest.getProjectCode(),
                 backfillWorkflowDTO.getWorkflowDefinition().getCode(),
-                backfillWorkflowDTO.getWorkflowDefinition().getVersion());
+                backfillWorkflowDTO.getWorkflowDefinition().getVersion(), backfillWorkflowDTO.getWorkerGroup(),
+                backfillWorkflowDTO.getEnvironmentCode(), backfillWorkflowDTO.getTenantCode(),
+                backfillWorkflowDTO.getWarningGroupId());
         return executorClient.backfillWorkflowDefinition().execute(backfillWorkflowDTO);
     }
 
@@ -263,7 +267,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             case REPEAT_RUNNING:
                 checkInstanceExecutionSettings(workflowInstance);
                 checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
-                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
+                        workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                        workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
                 executorClient
                         .repeatRunningWorkflowInstance()
                         .onWorkflowInstance(workflowInstance)
@@ -273,7 +279,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             case START_FAILURE_TASK_PROCESS:
                 checkInstanceExecutionSettings(workflowInstance);
                 checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
-                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
+                        workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                        workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
                 executorClient.recoverFailureTaskInstance()
                         .onWorkflowInstance(workflowInstance)
                         .byUser(loginUser)
@@ -282,7 +290,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             case RECOVER_SUSPENDED_PROCESS:
                 checkInstanceExecutionSettings(workflowInstance);
                 checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
-                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
+                        workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                        workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
                 executorClient.recoverSuspendedWorkflowInstanceOperation()
                         .onWorkflowInstance(workflowInstance)
                         .byUser(loginUser)
@@ -346,7 +356,9 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 processService.findWorkflowDefinition(workflowInstance.getWorkflowDefinitionCode(),
                         workflowInstance.getWorkflowDefinitionVersion());
         checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
-                workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
+                workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
+                workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
         workflowDefinition.setReleaseState(ReleaseState.ONLINE);
         this.checkWorkflowDefinitionValid(projectCode, workflowDefinition, workflowInstance.getWorkflowDefinitionCode(),
                 workflowInstance.getWorkflowDefinitionVersion());
@@ -457,11 +469,13 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     }
 
     private void checkWorkflowResourcePermission(User loginUser, long projectCode, long workflowCode,
-                                                 int workflowVersion) {
+                                                 int workflowVersion, String workerGroup, Long environmentCode,
+                                                 String tenantCode, Integer warningGroupId) {
         List<TaskDefinitionLog> tasks =
                 taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(workflowCode, workflowVersion);
         taskResourcePermissionChecker.checkPermission(projectCode, tasks);
-        taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, tasks);
+        taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, tasks, workerGroup, environmentCode,
+                tenantCode, warningGroupId);
     }
 
 }

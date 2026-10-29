@@ -29,8 +29,6 @@ import lombok.NonNull;
 
 import org.springframework.stereotype.Repository;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-
 @Repository
 public class ProjectResourceAuthorizationDaoImpl
         extends
@@ -45,26 +43,18 @@ public class ProjectResourceAuthorizationDaoImpl
     @Override
     public boolean isAuthorized(long projectCode, @NonNull ProjectResourceType resourceType,
                                 @NonNull String resourceKey) {
-        return mybatisMapper.selectCount(new LambdaQueryWrapper<ProjectResourceAuthorization>()
-                .eq(ProjectResourceAuthorization::getProjectCode, projectCode)
-                .eq(ProjectResourceAuthorization::getResourceType, resourceType)
-                .eq(ProjectResourceAuthorization::getResourceKey, resourceKey)) > 0;
+        return mybatisMapper.countAuthorization(projectCode, resourceType, resourceKey) > 0;
     }
 
     @Override
     public List<ProjectResourceAuthorization> queryByProjectAndType(long projectCode,
                                                                     @NonNull ProjectResourceType resourceType) {
-        return mybatisMapper.selectList(new LambdaQueryWrapper<ProjectResourceAuthorization>()
-                .eq(ProjectResourceAuthorization::getProjectCode, projectCode)
-                .eq(ProjectResourceAuthorization::getResourceType, resourceType));
+        return mybatisMapper.queryByProjectAndType(projectCode, resourceType);
     }
 
     @Override
     public void revokeAuthorization(long projectCode, @NonNull ProjectResourceType resourceType,
                                     @NonNull String resourceKey) {
-        mybatisMapper.delete(new LambdaQueryWrapper<ProjectResourceAuthorization>()
-                .eq(ProjectResourceAuthorization::getProjectCode, projectCode)
-                .eq(ProjectResourceAuthorization::getResourceType, resourceType)
-                .eq(ProjectResourceAuthorization::getResourceKey, resourceKey));
+        mybatisMapper.revokeAuthorization(projectCode, resourceType, resourceKey);
     }
 }

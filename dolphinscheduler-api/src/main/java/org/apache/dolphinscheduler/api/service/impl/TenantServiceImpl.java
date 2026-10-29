@@ -24,7 +24,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.TENANT_FULL
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;

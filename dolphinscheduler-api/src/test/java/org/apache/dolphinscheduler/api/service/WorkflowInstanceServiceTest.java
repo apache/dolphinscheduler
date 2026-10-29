@@ -339,6 +339,47 @@ public class WorkflowInstanceServiceTest {
     }
 
     @Test
+    public void testTriggerQueryChecksActualInstanceProject() {
+        User user = getAdminUser();
+        when(projectDao.queryByCode(1L)).thenReturn(getProject(1L));
+        WorkflowInstanceSummaryDto instance = new WorkflowInstanceSummaryDto();
+        instance.setId(10);
+        instance.setProjectCode(2L);
+        when(workflowInstanceDao.queryByTriggerCode(999L)).thenReturn(Collections.singletonList(instance));
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectPermission(user, 2L, ProjectPermission.VIEW);
+
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                () -> workflowInstanceService.queryByTriggerCode(user, 1L, 999L));
+    }
+
+    @Test
+    public void testParentQueryChecksActualChildAndParentProjects() {
+        User user = getAdminUser();
+        when(projectDao.queryByCode(1L)).thenReturn(getProject(1L));
+        WorkflowInstance child = new WorkflowInstance();
+        child.setProjectCode(2L);
+        child.setIsSubWorkflow(Flag.YES);
+        when(processService.findWorkflowInstanceDetailById(10)).thenReturn(Optional.of(child));
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectPermission(user, 2L, ProjectPermission.VIEW);
+
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                () -> workflowInstanceService.queryParentInstanceBySubId(user, 1L, 10));
+        verify(processService, never()).findParentWorkflowInstance(10);
+
+        doNothing().when(projectService).checkProjectPermission(user, 2L, ProjectPermission.VIEW);
+        WorkflowInstance parent = new WorkflowInstance();
+        parent.setProjectCode(3L);
+        when(processService.findParentWorkflowInstance(10)).thenReturn(parent);
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectPermission(user, 3L, ProjectPermission.VIEW);
+
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
+                () -> workflowInstanceService.queryParentInstanceBySubId(user, 1L, 10));
+    }
+
+    @Test
     public void testQueryTopNLongestRunningWorkflowInstance() {
         long projectCode = 1L;
         User loginUser = getAdminUser();
@@ -860,6 +901,7 @@ public class WorkflowInstanceServiceTest {
 
         // not sub process
         WorkflowInstance workflowInstance = getProcessInstance();
+        workflowInstance.setProjectCode(projectCode);
         workflowInstance.setIsSubWorkflow(Flag.NO);
         when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.ofNullable(workflowInstance));
         assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE,

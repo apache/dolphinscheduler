@@ -19,7 +19,9 @@ package org.apache.dolphinscheduler.api.permission;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
+import org.apache.dolphinscheduler.api.service.impl.ProjectResourceAuthorizationServiceImpl;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -85,7 +87,7 @@ class ProjectResourceAuthorizationServiceTest {
     @Mock
     private TaskGroupDao taskGroupDao;
     @InjectMocks
-    private ProjectResourceAuthorizationService service;
+    private ProjectResourceAuthorizationServiceImpl service;
 
     private User admin;
 

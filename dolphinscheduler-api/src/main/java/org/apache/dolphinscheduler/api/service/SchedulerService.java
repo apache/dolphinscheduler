@@ -157,9 +157,9 @@ public interface SchedulerService {
     void onlineScheduler(User loginUser, Long projectCode, Integer schedulerId);
 
     /**
-     * Do online scheduler by workflow code, this method will not do permission check.
+     * Online the scheduler by workflow code, validating nested workflow permissions and resource grants.
      */
-    void onlineSchedulerByWorkflowCode(Long workflowDefinitionCode);
+    void onlineSchedulerByWorkflowCode(User loginUser, Long workflowDefinitionCode);
 
     /**
      * Offline the scheduler by scheduler id, will not offline the related workflow definition.

@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServi
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.k8s.K8sClientService;
-import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.impl.K8SNamespaceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;

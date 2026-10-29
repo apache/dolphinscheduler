@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
@@ -39,6 +40,7 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
@@ -103,6 +105,9 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Autowired
     private TaskDefinitionLogDao taskDefinitionLogDao;
 
+    @Autowired
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
+
     /**
      * save schedule
      *
@@ -156,7 +161,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Date now = new Date();
 
         tenantExistValidator.validate(tenantCode);
-        checkScheduleResources(workflowDefinition, workerGroup, tenantCode, environmentCode, warningGroupId);
+        checkScheduleResources(loginUser, workflowDefinition, workerGroup, tenantCode, environmentCode, warningGroupId);
 
         scheduleObj.setTenantCode(tenantCode);
         scheduleObj.setProjectName(project.getName());
@@ -266,7 +271,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                     String.valueOf(schedule.getWorkflowDefinitionCode()));
         }
 
-        return updateSchedule(schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
+        return updateSchedule(loginUser, schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
                 failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode);
     }
 
@@ -453,7 +458,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                     String.valueOf(workflowDefinitionCode));
         }
 
-        return updateSchedule(schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
+        return updateSchedule(loginUser, schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
                 failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode);
     }
 
@@ -463,17 +468,17 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.MANAGE_SCHEDULES);
         Schedule schedule = scheduleDao.queryById(schedulerId);
         checkScheduleBelongsToProject(schedule, projectCode);
-        doOnlineScheduler(schedule);
+        doOnlineScheduler(loginUser, schedule);
     }
 
     @Transactional
     @Override
-    public void onlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
+    public void onlineSchedulerByWorkflowCode(User loginUser, Long workflowDefinitionCode) {
         Schedule schedule = scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
-        doOnlineScheduler(schedule);
+        doOnlineScheduler(loginUser, schedule);
     }
 
-    private void doOnlineScheduler(Schedule schedule) {
+    private void doOnlineScheduler(User loginUser, Schedule schedule) {
         if (schedule == null) {
             return;
         }
@@ -490,7 +495,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             throw new ServiceException(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE);
         }
 
-        checkScheduleResources(workflowDefinition, schedule.getWorkerGroup(), schedule.getTenantCode(),
+        checkScheduleResources(loginUser, workflowDefinition, schedule.getWorkerGroup(), schedule.getTenantCode(),
                 schedule.getEnvironmentCode(), schedule.getWarningGroupId());
         schedule.setReleaseState(ReleaseState.ONLINE);
         schedule.setUpdateTime(new Date());
@@ -544,7 +549,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
     }
 
-    private Schedule updateSchedule(Schedule schedule, WorkflowDefinition workflowDefinition,
+    private Schedule updateSchedule(User loginUser, Schedule schedule, WorkflowDefinition workflowDefinition,
                                     String scheduleExpression, WarningType warningType, int warningGroupId,
                                     FailureStrategy failureStrategy, Priority workflowInstancePriority,
                                     String workerGroup, String tenantCode, long environmentCode) {
@@ -557,7 +562,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Date now = new Date();
 
         tenantExistValidator.validate(tenantCode);
-        checkScheduleResources(workflowDefinition, workerGroup, tenantCode, environmentCode, warningGroupId);
+        checkScheduleResources(loginUser, workflowDefinition, workerGroup, tenantCode, environmentCode, warningGroupId);
         schedule.setTenantCode(tenantCode);
 
         // updateWorkflowInstance param
@@ -615,13 +620,15 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         return schedule;
     }
 
-    private void checkScheduleResources(WorkflowDefinition workflowDefinition, String workerGroup,
+    private void checkScheduleResources(User loginUser, WorkflowDefinition workflowDefinition, String workerGroup,
                                         String tenantCode, Long environmentCode, Integer warningGroupId) {
         taskResourcePermissionChecker.checkExecutionSettings(workflowDefinition.getProjectCode(), workerGroup,
                 environmentCode, tenantCode, warningGroupId);
-        taskResourcePermissionChecker.checkPermission(workflowDefinition.getProjectCode(),
-                taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(workflowDefinition.getCode(),
-                        workflowDefinition.getVersion()));
+        List<TaskDefinitionLog> tasks = taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
+                workflowDefinition.getCode(), workflowDefinition.getVersion());
+        taskResourcePermissionChecker.checkPermission(workflowDefinition.getProjectCode(), tasks);
+        taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, tasks, workerGroup, environmentCode,
+                tenantCode, warningGroupId);
     }
 
     private void validateMissedFirePolicy(ScheduleParam scheduleParam) {

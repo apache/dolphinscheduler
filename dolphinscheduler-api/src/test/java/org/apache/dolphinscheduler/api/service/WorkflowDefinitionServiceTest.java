@@ -569,6 +569,57 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testMoveChecksActualTaskResourcesAgainstTargetProject() {
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(projectDao.queryByCode(projectCodeOther)).thenReturn(getProject(projectCodeOther));
+        WorkflowDefinition definition = getWorkflowDefinition();
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(definition));
+        TaskDefinitionLog task = new TaskDefinitionLog();
+        task.setTaskType("SHELL");
+        task.setWorkerGroup("source-only");
+        Mockito.lenient().when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
+                definition.getCode(), definition.getVersion())).thenReturn(Collections.singletonList(task));
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskResourcePermissionChecker).checkPermission(projectCodeOther, Collections.singletonList(task));
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchMoveWorkflowDefinition(user, projectCode,
+                        String.valueOf(processDefinitionCode), projectCodeOther));
+
+        verify(processService, Mockito.never()).saveWorkflowDefine(Mockito.any(), Mockito.any(), Mockito.anyBoolean(),
+                Mockito.anyBoolean());
+        Assertions.assertEquals(projectCode, definition.getProjectCode());
+    }
+
+    @Test
+    public void testMoveRejectsUnavailableSubWorkflowBeforeChangingProject() {
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(projectDao.queryByCode(projectCodeOther)).thenReturn(getProject(projectCodeOther));
+        WorkflowDefinition definition = getWorkflowDefinition();
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(definition));
+        TaskDefinitionLog reference = new TaskDefinitionLog();
+        reference.setTaskType("SUB_WORKFLOW");
+        reference.setTaskParams("{\"workflowDefinitionCode\":42}");
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(definition.getCode(),
+                definition.getVersion()))
+                        .thenReturn(Collections.singletonList(reference));
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskSubWorkflowPermissionChecker).checkPermission(user, Collections.singletonList(reference));
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchMoveWorkflowDefinition(user, projectCode,
+                        String.valueOf(processDefinitionCode), projectCodeOther));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Assertions.assertEquals(projectCode, definition.getProjectCode());
+        verify(taskResourcePermissionChecker).checkPermission(projectCodeOther, Collections.singletonList(reference));
+        verify(processService, Mockito.never()).saveWorkflowDefine(Mockito.any(), Mockito.any(), Mockito.anyBoolean(),
+                Mockito.anyBoolean());
+    }
+
+    @Test
     public void testBatchMoveWorkflowDefinitionRejectsDefinitionOutsideSourceProject() {
         Project sourceProject = getProject(projectCode);
         Project targetProject = getProject(projectCodeOther);

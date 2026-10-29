@@ -17,9 +17,29 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.dao.entity.ProjectUserPermission;
+
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Collection;
+import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface ProjectUserPermissionMapper extends BaseMapper<ProjectUserPermission> {
+
+    List<ProjectUserPermission> queryByProjectsAndUser(@Param("projectCodes") Collection<Long> projectCodes,
+                                                       @Param("userId") int userId);
+
+    int countPermission(@Param("projectCode") long projectCode, @Param("userId") int userId,
+                        @Param("permission") ProjectPermission permission);
+
+    List<ProjectUserPermission> queryByProjectAndUser(@Param("projectCode") long projectCode,
+                                                      @Param("userId") int userId);
+
+    void revokeAllPermissions(@Param("projectCode") long projectCode, @Param("userId") int userId);
+
+    void revokePermission(@Param("projectCode") long projectCode, @Param("userId") int userId,
+                          @Param("permission") ProjectPermission permission);
 }

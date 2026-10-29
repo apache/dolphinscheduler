@@ -21,7 +21,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -296,7 +296,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
         Project project = projectDao.queryByCode(projectCode);
 
-        checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
+        checkProjectOwnerOrAdministrator(loginUser, project);
 
         List<WorkflowDefinition> workflowDefinitionList =
                 workflowDefinitionDao.queryAllDefinitionList(project.getCode());
@@ -343,7 +343,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
 
         Project project = projectDao.queryByCode(projectCode);
-        checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
+        checkProjectOwnerOrAdministrator(loginUser, project);
         Project tempProject = projectDao.queryByName(projectName);
         if (tempProject != null && tempProject.getCode() != project.getCode()) {
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
@@ -358,7 +358,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         project.setName(projectName);
         project.setDescription(desc);
         project.setUpdateTime(new Date());
-        project.setUserId(user.getId());
         boolean update = projectDao.updateById(project);
         if (update) {
             log.info("Project is updated and id is :{}", project.getId());
@@ -369,6 +368,17 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.UPDATE_PROJECT_ERROR);
         }
         return result;
+    }
+
+    private void checkProjectOwnerOrAdministrator(User loginUser, Project project) {
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_EXIST);
+        }
+        if (loginUser.getUserType() != UserType.ADMIN_USER
+                && !Objects.equals(loginUser.getId(), project.getUserId())) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(),
+                    project.getCode());
+        }
     }
 
     /**

@@ -59,6 +59,7 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.5.0
 
+* Project metadata updates and deletion are restricted to system administrators and project creators. Updating project metadata preserves the original owner; `DEVELOP` does not grant these project-lifecycle operations.
 * Authorization now assigns project operation permissions to users and resource-use grants to projects. The upgrade creates `t_ds_project_user_permission` and `t_ds_project_resource_authorization`. Legacy authorization tables and data are retained, but historical permissions are not migrated automatically. Administrators must assign project member permissions and project resource grants before users can query, configure, publish or manually execute project tasks.
 * Resource queries within a project must include `projectCode` and are filtered by the project's `VIEW` permission and resource grants. Global resource catalogs without a project parameter are restricted to administrators. Personal datasource and Kubernetes namespace authorization APIs are removed; grant these resources to projects instead.
 * Project resource grants are checked when saving, publishing, manually starting or rerunning workflows. Revoking a resource grant does not recheck existing running or queued instances, scheduled triggers or automatic retries, and does not take existing schedules offline.

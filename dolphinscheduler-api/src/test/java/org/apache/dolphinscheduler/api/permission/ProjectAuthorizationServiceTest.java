@@ -19,6 +19,8 @@ package org.apache.dolphinscheduler.api.permission;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
+import org.apache.dolphinscheduler.api.service.impl.ProjectAuthorizationServiceImpl;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -62,7 +64,7 @@ class ProjectAuthorizationServiceTest {
     @BeforeEach
     void setUp() {
         authorizationService =
-                new ProjectAuthorizationService(projectDao, userPermissionDao, resourceAuthorizationDao, userDao);
+                new ProjectAuthorizationServiceImpl(projectDao, userPermissionDao, resourceAuthorizationDao, userDao);
         user = new User();
         user.setId(1);
         user.setUserName("member");

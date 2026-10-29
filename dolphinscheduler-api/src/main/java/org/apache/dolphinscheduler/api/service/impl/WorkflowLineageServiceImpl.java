@@ -100,10 +100,14 @@ public class WorkflowLineageServiceImpl extends BaseServiceImpl implements Workf
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
         projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
+        WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
+                .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode));
+        projectService.checkProjectPermission(loginUser, workflowDefinition.getProjectCode(), ProjectPermission.VIEW);
         List<WorkflowTaskLineage> upstreamWorkflowTaskLineageList =
                 workflowTaskLineageDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
         List<WorkflowTaskLineage> downstreamWorkflowTaskLineageList =
-                workflowTaskLineageDao.queryWorkFlowLineageByDept(projectCode, workflowDefinitionCode,
+                workflowTaskLineageDao.queryWorkFlowLineageByDept(workflowDefinition.getProjectCode(),
+                        workflowDefinitionCode,
                         Constants.DEPENDENT_ALL_TASK);
         List<WorkflowTaskLineage> totalWorkflowTaskLineageList =
                 Stream.of(upstreamWorkflowTaskLineageList, downstreamWorkflowTaskLineageList)

@@ -33,7 +33,6 @@ import org.apache.dolphinscheduler.api.executor.workflow.BackfillWorkflowExecuto
 import org.apache.dolphinscheduler.api.executor.workflow.ExecutorClient;
 import org.apache.dolphinscheduler.api.executor.workflow.StopWorkflowInstanceExecutorDelegate.StopWorkflowInstanceOperation;
 import org.apache.dolphinscheduler.api.executor.workflow.TriggerWorkflowExecutorDelegate;
-import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
@@ -344,7 +343,9 @@ public class ExecutorServiceTest {
         when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(200L, 3))
                 .thenReturn(Collections.singletonList(task));
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
-                .when(taskSubWorkflowPermissionChecker).checkExecutionPermission(user, Collections.singletonList(task));
+                .when(taskSubWorkflowPermissionChecker).checkExecutionPermission(user, Collections.singletonList(task),
+                        instance.getWorkerGroup(), instance.getEnvironmentCode(), instance.getTenantCode(),
+                        instance.getWarningGroupId());
 
         ServiceException exception = assertThrows(ServiceException.class,
                 () -> executorService.controlWorkflowInstance(user, 1, ExecuteType.REPEAT_RUNNING));

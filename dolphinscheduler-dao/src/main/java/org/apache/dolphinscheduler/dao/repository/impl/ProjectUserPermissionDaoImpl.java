@@ -31,8 +31,6 @@ import lombok.NonNull;
 
 import org.springframework.stereotype.Repository;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-
 @Repository
 public class ProjectUserPermissionDaoImpl extends BaseDao<ProjectUserPermission, ProjectUserPermissionMapper>
         implements
@@ -47,38 +45,26 @@ public class ProjectUserPermissionDaoImpl extends BaseDao<ProjectUserPermission,
         if (projectCodes.isEmpty()) {
             return Collections.emptyList();
         }
-        return mybatisMapper.selectList(new LambdaQueryWrapper<ProjectUserPermission>()
-                .in(ProjectUserPermission::getProjectCode, projectCodes)
-                .eq(ProjectUserPermission::getUserId, userId));
+        return mybatisMapper.queryByProjectsAndUser(projectCodes, userId);
     }
 
     @Override
     public boolean hasPermission(long projectCode, int userId, @NonNull ProjectPermission permission) {
-        return mybatisMapper.selectCount(new LambdaQueryWrapper<ProjectUserPermission>()
-                .eq(ProjectUserPermission::getProjectCode, projectCode)
-                .eq(ProjectUserPermission::getUserId, userId)
-                .eq(ProjectUserPermission::getPermission, permission)) > 0;
+        return mybatisMapper.countPermission(projectCode, userId, permission) > 0;
     }
 
     @Override
     public List<ProjectUserPermission> queryByProjectAndUser(long projectCode, int userId) {
-        return mybatisMapper.selectList(new LambdaQueryWrapper<ProjectUserPermission>()
-                .eq(ProjectUserPermission::getProjectCode, projectCode)
-                .eq(ProjectUserPermission::getUserId, userId));
+        return mybatisMapper.queryByProjectAndUser(projectCode, userId);
     }
 
     @Override
     public void revokeAllPermissions(long projectCode, int userId) {
-        mybatisMapper.delete(new LambdaQueryWrapper<ProjectUserPermission>()
-                .eq(ProjectUserPermission::getProjectCode, projectCode)
-                .eq(ProjectUserPermission::getUserId, userId));
+        mybatisMapper.revokeAllPermissions(projectCode, userId);
     }
 
     @Override
     public void revokePermission(long projectCode, int userId, @NonNull ProjectPermission permission) {
-        mybatisMapper.delete(new LambdaQueryWrapper<ProjectUserPermission>()
-                .eq(ProjectUserPermission::getProjectCode, projectCode)
-                .eq(ProjectUserPermission::getUserId, userId)
-                .eq(ProjectUserPermission::getPermission, permission));
+        mybatisMapper.revokePermission(projectCode, userId, permission);
     }
 }

@@ -17,9 +17,25 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
+
+import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 public interface ProjectResourceAuthorizationMapper extends BaseMapper<ProjectResourceAuthorization> {
+
+    int countAuthorization(@Param("projectCode") long projectCode,
+                           @Param("resourceType") ProjectResourceType resourceType,
+                           @Param("resourceKey") String resourceKey);
+
+    List<ProjectResourceAuthorization> queryByProjectAndType(@Param("projectCode") long projectCode,
+                                                             @Param("resourceType") ProjectResourceType resourceType);
+
+    void revokeAuthorization(@Param("projectCode") long projectCode,
+                             @Param("resourceType") ProjectResourceType resourceType,
+                             @Param("resourceKey") String resourceKey);
 }

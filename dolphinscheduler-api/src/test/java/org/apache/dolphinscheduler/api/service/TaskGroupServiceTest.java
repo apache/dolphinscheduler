@@ -21,7 +21,6 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServi
 
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskGroupServiceImpl;

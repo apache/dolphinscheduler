@@ -536,6 +536,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         WorkflowInstance subInstance = processService.findWorkflowInstanceDetailById(subId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, subId));
+        projectService.checkProjectPermission(loginUser, subInstance.getProjectCode(), ProjectPermission.VIEW);
         if (subInstance.getIsSubWorkflow() == Flag.NO) {
             log.warn(
                     "workflow instance is not sub workflow instance type, workflowInstanceId:{}, workflowInstanceName:{}.",
@@ -549,6 +550,8 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                     projectCode, subId);
             throw new ServiceException(Status.SUB_WORKFLOW_INSTANCE_NOT_EXIST);
         }
+        projectService.checkProjectPermission(loginUser, parentWorkflowInstance.getProjectCode(),
+                ProjectPermission.VIEW);
         return Collections.singletonMap(PARENT_WORKFLOW_INSTANCE, parentWorkflowInstance.getId());
     }
 
@@ -767,7 +770,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         if (triggerCode == null) {
             return Collections.emptyList();
         }
-        return workflowInstanceDao.queryByTriggerCode(triggerCode)
+        List<WorkflowInstanceSummaryDto> instances = workflowInstanceDao.queryByTriggerCode(triggerCode);
+        instances.stream().map(WorkflowInstanceSummaryDto::getProjectCode).distinct()
+                .forEach(actualProjectCode -> projectService.checkProjectPermission(loginUser, actualProjectCode,
+                        ProjectPermission.VIEW));
+        return instances
                 .stream()
                 .map(WorkflowInstanceSummaryVO::fromSummaryDto)
                 .collect(Collectors.toList());

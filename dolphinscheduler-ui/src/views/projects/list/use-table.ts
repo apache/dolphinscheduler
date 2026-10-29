@@ -161,8 +161,7 @@ export function useTable() {
                         type: 'info',
                         size: 'small',
                         class: 'edit',
-                        disabled:
-                          !IS_ADMIN && !row.permissions?.includes('DEVELOP'),
+                        disabled: !IS_ADMIN && row.userId !== userInfo.id,
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -227,7 +226,7 @@ export function useTable() {
               h(
                 NPopconfirm,
                 {
-                  disabled: !IS_ADMIN && !row.permissions?.includes('DEVELOP'),
+                  disabled: !IS_ADMIN && row.userId !== userInfo.id,
                   onPositiveClick: () => {
                     handleDelete(row)
                   }
@@ -246,9 +245,7 @@ export function useTable() {
                               type: 'error',
                               size: 'small',
                               class: 'delete',
-                              disabled:
-                                !IS_ADMIN &&
-                                !row.permissions?.includes('DEVELOP')
+                              disabled: !IS_ADMIN && row.userId !== userInfo.id
                             },
                             {
                               icon: () =>

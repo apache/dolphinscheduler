@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
-import org.apache.dolphinscheduler.api.permission.ProjectResourceAuthorizationService;
+import org.apache.dolphinscheduler.api.service.ProjectResourceAuthorizationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.ProjectWorkerGroupRelationService;
 import org.apache.dolphinscheduler.api.utils.Result;

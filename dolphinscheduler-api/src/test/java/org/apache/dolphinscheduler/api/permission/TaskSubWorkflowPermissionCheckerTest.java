@@ -21,21 +21,31 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.repository.IEnvironmentDao;
+import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -155,7 +165,8 @@ public class TaskSubWorkflowPermissionCheckerTest {
                 .thenReturn(Collections.singletonList(cycleReference));
 
         taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, Arrays.asList(
-                getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE), getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE)));
+                getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE), getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE)),
+                "parent-workers", 10L, "parent-tenant", 20);
 
         Mockito.verify(taskDefinitionLogDao).queryByWorkflowDefinitionCodeAndVersion(SUB_WORKFLOW_CODE, 7);
         Mockito.verify(taskDefinitionLogDao).queryByWorkflowDefinitionCodeAndVersion(ANOTHER_SUB_WORKFLOW_CODE, 8);
@@ -166,6 +177,10 @@ public class TaskSubWorkflowPermissionCheckerTest {
         Mockito.verify(taskResourcePermissionChecker).checkPermission(SUB_WORKFLOW_PROJECT_CODE,
                 Collections.singletonList(childReference));
         Mockito.verify(taskResourcePermissionChecker).checkPermission(100L, Collections.singletonList(cycleReference));
+        Mockito.verify(taskResourcePermissionChecker).checkExecutionSettings(SUB_WORKFLOW_PROJECT_CODE,
+                "parent-workers", 10L, "parent-tenant", 20);
+        Mockito.verify(taskResourcePermissionChecker).checkExecutionSettings(100L,
+                "parent-workers", 10L, "parent-tenant", 20);
     }
 
     @Test
@@ -182,7 +197,8 @@ public class TaskSubWorkflowPermissionCheckerTest {
 
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                 () -> taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser,
-                        Collections.singletonList(getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE))));
+                        Collections.singletonList(getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE)),
+                        "parent-workers", 10L, "parent-tenant", 20));
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
     }
 
@@ -195,7 +211,8 @@ public class TaskSubWorkflowPermissionCheckerTest {
 
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                 () -> taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser,
-                        Collections.singletonList(getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE))));
+                        Collections.singletonList(getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE)),
+                        "parent-workers", 10L, "parent-tenant", 20));
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
         Mockito.verifyNoInteractions(taskDefinitionLogDao, taskResourcePermissionChecker);
     }
@@ -209,6 +226,70 @@ public class TaskSubWorkflowPermissionCheckerTest {
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinition));
 
         Mockito.verifyNoInteractions(workflowDefinitionDao, projectService);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ProjectResourceType.class, names = {
+            "WORKER_GROUP", "ENVIRONMENT", "TENANT", "QUEUE", "ALERT_GROUP"})
+    public void executionRejectsInheritedResourceMissingFromChildProject(
+                                                                         ProjectResourceType missingType) {
+        ProjectResourceAuthorizationDao grants = Mockito.mock(
+                ProjectResourceAuthorizationDao.class);
+        TenantDao tenants = Mockito.mock(
+                TenantDao.class);
+        IEnvironmentDao environments = Mockito.mock(
+                IEnvironmentDao.class);
+        Tenant tenant = new Tenant();
+        tenant.setId(5);
+        tenant.setQueueId(6);
+        Environment environment =
+                new Environment();
+        environment.setId(8);
+        Mockito.lenient().when(tenants.queryByCode("parent-tenant"))
+                .thenReturn(Optional.of(tenant));
+        Mockito.lenient().when(environments.queryByEnvironmentCode(10L))
+                .thenReturn(Optional.of(environment));
+        Mockito.when(grants.isAuthorized(Mockito.eq(SUB_WORKFLOW_PROJECT_CODE), Mockito.any(), Mockito.anyString()))
+                .thenReturn(true);
+        String missingKey;
+        switch (missingType) {
+            case WORKER_GROUP:
+                missingKey = "parent-workers";
+                break;
+            case ENVIRONMENT:
+                missingKey = "8";
+                break;
+            case TENANT:
+                missingKey = "5";
+                break;
+            case QUEUE:
+                missingKey = "6";
+                break;
+            default:
+                missingKey = "20";
+        }
+        Mockito.when(grants.isAuthorized(SUB_WORKFLOW_PROJECT_CODE, missingType, missingKey)).thenReturn(false);
+        TaskResourcePermissionChecker resources = new TaskResourcePermissionChecker(
+                Mockito.mock(TaskDatasourcePermissionChecker.class), grants, environments, tenants,
+                Mockito.mock(K8sNamespaceDao.class));
+        TaskSubWorkflowPermissionChecker checker = new TaskSubWorkflowPermissionChecker(
+                workflowDefinitionDao, projectService, taskDefinitionLogDao, resources);
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(getWorkflowDefinition(SUB_WORKFLOW_CODE)));
+        TaskDefinitionLog childTask = new TaskDefinitionLog();
+        childTask.setTaskType("SHELL");
+        childTask.setWorkerGroup("child-workers");
+        Mockito.lenient().when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(SUB_WORKFLOW_CODE, 0))
+                .thenReturn(Collections.singletonList(childTask));
+        resources.checkPermission(SUB_WORKFLOW_PROJECT_CODE, Collections.singletonList(childTask));
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> checker.checkExecutionPermission(loginUser,
+                        Collections.singletonList(getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE)),
+                        "parent-workers", 10L, "parent-tenant", 20));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Mockito.verify(grants).isAuthorized(SUB_WORKFLOW_PROJECT_CODE, missingType, missingKey);
     }
 
     private TaskDefinition getSubWorkflowTaskDefinition(long workflowDefinitionCode) {

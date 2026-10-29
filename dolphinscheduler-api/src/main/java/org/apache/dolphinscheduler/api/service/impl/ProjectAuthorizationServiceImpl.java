@@ -15,10 +15,11 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.permission;
+package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.vo.UserSimpleInfoVO;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
@@ -43,28 +44,30 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class ProjectAuthorizationService {
+public class ProjectAuthorizationServiceImpl implements ProjectAuthorizationService {
 
     private final UserDao userDao;
     private final ProjectDao projectDao;
     private final ProjectUserPermissionDao userPermissionDao;
     private final ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
-    public ProjectAuthorizationService(ProjectDao projectDao,
-                                       ProjectUserPermissionDao userPermissionDao,
-                                       ProjectResourceAuthorizationDao resourceAuthorizationDao,
-                                       UserDao userDao) {
+    public ProjectAuthorizationServiceImpl(ProjectDao projectDao,
+                                           ProjectUserPermissionDao userPermissionDao,
+                                           ProjectResourceAuthorizationDao resourceAuthorizationDao,
+                                           UserDao userDao) {
         this.userDao = userDao;
         this.projectDao = projectDao;
         this.userPermissionDao = userPermissionDao;
         this.resourceAuthorizationDao = resourceAuthorizationDao;
     }
 
+    @Override
     public List<UserSimpleInfoVO> queryAssignableMembers(User loginUser, long projectCode) {
         requirePermission(loginUser, projectCode, ProjectPermission.MANAGE_MEMBERS);
         return userDao.queryAll().stream().map(UserSimpleInfoVO::new).collect(Collectors.toList());
     }
 
+    @Override
     public Set<ProjectPermission> queryMemberPermissions(User loginUser, long projectCode, int userId) {
         requirePermission(loginUser, projectCode,
                 loginUser.getId() == userId ? ProjectPermission.VIEW : ProjectPermission.MANAGE_MEMBERS);
@@ -76,6 +79,7 @@ public class ProjectAuthorizationService {
     }
 
     @Transactional
+    @Override
     public void replaceMemberPermissions(User loginUser, long projectCode, int userId,
                                          Set<ProjectPermission> permissions) {
         requirePermission(loginUser, projectCode, ProjectPermission.MANAGE_MEMBERS);
@@ -101,6 +105,7 @@ public class ProjectAuthorizationService {
         }
     }
 
+    @Override
     public Project requirePermission(@NonNull User user, long projectCode, @NonNull ProjectPermission permission) {
         Project project = projectDao.queryByCode(projectCode);
         if (project == null) {
@@ -113,6 +118,7 @@ public class ProjectAuthorizationService {
         return project;
     }
 
+    @Override
     public void requireResourceUse(@NonNull User user, long projectCode, @NonNull ProjectPermission permission,
                                    @NonNull ProjectResourceType resourceType, @NonNull String resourceKey) {
         requirePermission(user, projectCode, permission);

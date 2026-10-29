@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.api.controller;
 
-import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.vo.UserSimpleInfoVO;
 import org.apache.dolphinscheduler.common.constants.Constants;

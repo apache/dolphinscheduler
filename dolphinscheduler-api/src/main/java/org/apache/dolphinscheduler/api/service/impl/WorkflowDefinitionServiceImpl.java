@@ -1511,6 +1511,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                          List<WorkflowDefinition> sourceWorkflowDefinitions,
                                          List<String> failedWorkflowList) {
         for (WorkflowDefinition workflowDefinition : sourceWorkflowDefinitions) {
+            List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogDao
+                    .queryByWorkflowDefinitionCodeAndVersion(workflowDefinition.getCode(),
+                            workflowDefinition.getVersion());
+            taskResourcePermissionChecker.checkPermission(targetProjectCode, taskDefinitionLogs);
+            taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
             List<WorkflowTaskRelation> workflowTaskRelations =
                     workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
             List<WorkflowTaskRelationLog> taskRelationList =

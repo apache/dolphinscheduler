@@ -22,7 +22,6 @@ import static org.apache.dolphinscheduler.api.utils.ServiceTestUtil.getGeneralUs
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ProjectResourceAuthorizationService;
 import org.apache.dolphinscheduler.api.service.impl.ProjectWorkerGroupRelationServiceImpl;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;

@@ -24,7 +24,6 @@ import static org.mockito.ArgumentMatchers.eq;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -281,10 +280,9 @@ public class ProjectServiceTest {
         ServiceException missing = Assertions.assertThrows(ServiceException.class,
                 () -> projectService.deleteProject(loginUser, 11L));
         Assertions.assertEquals(Status.PROJECT_NOT_EXIST.getCode(), missing.getCode());
-        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectAuthorizationService)
-                .requirePermission(loginUser, project.getCode(), ProjectPermission.DEVELOP);
+        loginUser.setId(2);
         Assertions.assertThrows(ServiceException.class, () -> projectService.deleteProject(loginUser, 1L));
-        Mockito.reset(projectAuthorizationService);
+        loginUser.setId(1);
         Mockito.when(workflowDefinitionDao.queryAllDefinitionList(1L)).thenReturn(getProcessDefinitions());
         Result result = projectService.deleteProject(loginUser, 1L);
         Assertions.assertEquals(Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL.getCode(), result.getCode());
@@ -298,6 +296,43 @@ public class ProjectServiceTest {
                 .deleteByCondition(Mockito.argThat(grant -> grant.getProjectCode() == 1L));
         Mockito.verifyNoInteractions(taskGroupService, projectUserDao);
 
+    }
+
+    @Test
+    public void testDeveloperCannotRenameOrDeleteProject() {
+        User developer = getLoginUser();
+        developer.setId(2);
+        developer.setUserType(UserType.GENERAL_USER);
+        Project project = getProject();
+        Mockito.when(projectDao.queryByCode(1L)).thenReturn(project);
+        Mockito.when(userDao.queryById(2)).thenReturn(developer);
+        Mockito.when(projectDao.updateById(Mockito.any(Project.class))).thenReturn(true);
+        Mockito.when(projectDao.deleteById(1)).thenReturn(true);
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> projectService.update(developer, 1L, "renamed", "desc"));
+        Assertions.assertThrows(ServiceException.class, () -> projectService.deleteProject(developer, 1L));
+
+        Assertions.assertEquals(1, project.getUserId());
+        Mockito.verify(projectDao, Mockito.never()).updateById(Mockito.any(Project.class));
+        Mockito.verify(projectDao, Mockito.never()).deleteById(Mockito.anyInt());
+    }
+
+    @Test
+    public void testAdministratorMetadataUpdatePreservesProjectOwner() {
+        User administrator = getLoginUser();
+        administrator.setId(2);
+        administrator.setUserType(UserType.ADMIN_USER);
+        Project project = getProject();
+        Mockito.when(projectDao.queryByCode(1L)).thenReturn(project);
+        Mockito.when(userDao.queryById(2)).thenReturn(administrator);
+        Mockito.when(projectDao.updateById(Mockito.any(Project.class))).thenReturn(true);
+
+        Result result = projectService.update(administrator, 1L, "renamed", "desc");
+
+        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode());
+        Assertions.assertEquals(1, project.getUserId());
+        Assertions.assertEquals("renamed", project.getName());
     }
 
     @Test

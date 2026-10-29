@@ -15,10 +15,12 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.permission;
+package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
+import org.apache.dolphinscheduler.api.service.ProjectResourceAuthorizationService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
@@ -46,7 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class ProjectResourceAuthorizationService {
+public class ProjectResourceAuthorizationServiceImpl implements ProjectResourceAuthorizationService {
 
     private final ProjectAuthorizationService projectAuthorizationService;
     private final ProjectResourceAuthorizationDao resourceAuthorizationDao;
@@ -60,6 +62,7 @@ public class ProjectResourceAuthorizationService {
     private final K8sNamespaceDao namespaceDao;
     private final TaskGroupDao taskGroupDao;
 
+    @Override
     public List<ProjectResourceAuthorization> queryAuthorizations(User loginUser, long projectCode,
                                                                   ProjectResourceType resourceType) {
         projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
@@ -67,6 +70,7 @@ public class ProjectResourceAuthorizationService {
     }
 
     @Transactional
+    @Override
     public void grantResource(User loginUser, long projectCode, ProjectResourceType resourceType, String resourceKey) {
         requireAdministrator(loginUser, projectCode);
         if (!resourceExists(resourceType, resourceKey)) {
@@ -83,6 +87,7 @@ public class ProjectResourceAuthorizationService {
         resourceAuthorizationDao.insert(grant);
     }
 
+    @Override
     public void revokeResource(User loginUser, long projectCode, ProjectResourceType resourceType, String resourceKey) {
         requireAdministrator(loginUser, projectCode);
         resourceAuthorizationDao.revokeAuthorization(projectCode, resourceType, resourceKey);

@@ -65,7 +65,9 @@ public class TaskSubWorkflowPermissionChecker {
         queryAuthorizedSubWorkflows(loginUser, taskDefinitions, new HashSet<>());
     }
 
-    public void checkExecutionPermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions) {
+    public void checkExecutionPermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions,
+                                         String workerGroup, Long environmentCode, String tenantCode,
+                                         Integer warningGroupId) {
         Collection<? extends TaskDefinition> pendingTasks = taskDefinitions;
         Set<Long> visitedWorkflows = new HashSet<>();
         while (pendingTasks != null && !pendingTasks.isEmpty()) {
@@ -73,6 +75,8 @@ public class TaskSubWorkflowPermissionChecker {
                     queryAuthorizedSubWorkflows(loginUser, pendingTasks, visitedWorkflows);
             List<TaskDefinition> nextTasks = new ArrayList<>();
             for (WorkflowDefinition workflow : subWorkflows) {
+                taskResourcePermissionChecker.checkExecutionSettings(workflow.getProjectCode(), workerGroup,
+                        environmentCode, tenantCode, warningGroupId);
                 List<? extends TaskDefinition> tasks = taskDefinitionLogDao
                         .queryByWorkflowDefinitionCodeAndVersion(workflow.getCode(), workflow.getVersion());
                 taskResourcePermissionChecker.checkPermission(workflow.getProjectCode(), tasks);
