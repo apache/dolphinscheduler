@@ -265,7 +265,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
         List<TaskDefinitionLog> taskDefinitionLogs = generateTaskDefinitionList(taskDefinitionJson);
         List<WorkflowTaskRelationLog> taskRelationList = generateTaskRelationList(taskRelationJson, taskDefinitionLogs);
-        SensitivePropertyUtils.requireNoPlaceholder(GlobalParameterUtils.deserializeGlobalParameter(globalParams));
+        List<Property> submittedGlobalParams = GlobalParameterUtils.deserializeGlobalParameter(globalParams);
+        SensitivePropertyUtils.requireNoPlaceholder(submittedGlobalParams);
         for (TaskDefinitionLog taskDefinitionLog : CollectionUtils.emptyIfNull(taskDefinitionLogs)) {
             taskDefinitionLog.setTaskParams(
                     SensitivePropertyUtils.mergeLocalParams(taskDefinitionLog.getTaskParams(), null));
@@ -277,15 +278,44 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                         globalParams, locations, timeout, loginUser.getId());
         workflowDefinition.setExecutionType(executionType);
 
-        return createDagDefine(loginUser, taskRelationList, workflowDefinition, taskDefinitionLogs);
+        // encodeSensitiveParams=true: plaintext through checks, encode inside createDagDefine before save*.
+        return createDagDefine(loginUser, taskRelationList, workflowDefinition, taskDefinitionLogs, true);
+    }
+
+    /** Persist-boundary: encode task localParams immediately before {@code saveTaskDefine}. */
+    private void encodeTaskParamsForPersist(List<TaskDefinitionLog> taskDefinitionLogs) {
+        for (TaskDefinitionLog taskDefinitionLog : CollectionUtils.emptyIfNull(taskDefinitionLogs)) {
+            taskDefinitionLog.setTaskParams(
+                    SensitivePropertyUtils.encodeLocalParamsInTaskParams(taskDefinitionLog.getTaskParams()));
+        }
+    }
+
+    /** Persist-boundary: encode workflow globalParams immediately before {@code saveWorkflowDefine}. */
+    private void encodeGlobalParamsForPersist(WorkflowDefinition workflowDefinition) {
+        if (workflowDefinition != null && StringUtils.isNotEmpty(workflowDefinition.getGlobalParams())) {
+            workflowDefinition.setGlobalParams(
+                    SensitivePropertyUtils.encodeGlobalParams(workflowDefinition.getGlobalParams()));
+        }
     }
 
     protected WorkflowDefinition createDagDefine(User loginUser,
                                                  List<WorkflowTaskRelationLog> taskRelationList,
                                                  WorkflowDefinition workflowDefinition,
                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
+        // Copy / import paths already persist ciphertext — do not encode again.
+        return createDagDefine(loginUser, taskRelationList, workflowDefinition, taskDefinitionLogs, false);
+    }
+
+    protected WorkflowDefinition createDagDefine(User loginUser,
+                                                 List<WorkflowTaskRelationLog> taskRelationList,
+                                                 WorkflowDefinition workflowDefinition,
+                                                 List<TaskDefinitionLog> taskDefinitionLogs,
+                                                 boolean encodeSensitiveParams) {
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
+        if (encodeSensitiveParams) {
+            encodeTaskParamsForPersist(taskDefinitionLogs);
+        }
         int saveTaskResult = processService.saveTaskDefine(loginUser, workflowDefinition.getProjectCode(),
                 taskDefinitionLogs, Boolean.TRUE);
         if (saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
@@ -294,6 +324,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (saveTaskResult == Constants.DEFINITION_FAILURE) {
             log.error("Save task definition error.");
             throw new ServiceException(Status.CREATE_TASK_DEFINITION_ERROR);
+        }
+        if (encodeSensitiveParams) {
+            encodeGlobalParamsForPersist(workflowDefinition);
         }
         int insertVersion =
                 processService.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
@@ -690,9 +723,12 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         List<Property> submittedGlobalParams =
                 GlobalParameterUtils.deserializeGlobalParameter(globalParams);
         if (CollectionUtils.isNotEmpty(submittedGlobalParams)) {
+            List<Property> existingRaw =
+                    GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams());
+            List<Property> merged = SensitivePropertyUtils.merge(submittedGlobalParams,
+                    SensitivePropertyUtils.decodeAfterLoad(existingRaw));
             globalParams = GlobalParameterUtils.serializeGlobalParameter(
-                    SensitivePropertyUtils.merge(submittedGlobalParams,
-                            GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams())));
+                    SensitivePropertyUtils.normalizeResubmittedCiphertext(merged, existingRaw));
         }
         List<TaskDefinition> versionKeys = new ArrayList<>();
         for (TaskDefinitionLog taskDefinitionLog : CollectionUtils.emptyIfNull(taskDefinitionLogs)) {
@@ -712,6 +748,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             String existingTaskParams = submitted.getCode() <= 0 || submitted.getVersion() <= 0
                     ? null
                     : existingTaskParamsMap.get(submitted.getCode() + "_" + submitted.getVersion());
+            // Keep plaintext; encode inside updateDagDefine immediately before save*.
             submitted.setTaskParams(SensitivePropertyUtils.mergeLocalParams(
                     submitted.getTaskParams(), existingTaskParams));
         }
@@ -720,7 +757,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         workflowDefinition.set(projectCode, name, description, globalParams, locations, timeout);
         workflowDefinition.setExecutionType(executionType);
         return updateDagDefine(loginUser, taskRelationList, workflowDefinition, workflowDefinitionDeepCopy,
-                taskDefinitionLogs);
+                taskDefinitionLogs, true);
     }
 
     /**
@@ -760,8 +797,22 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                  WorkflowDefinition workflowDefinition,
                                                  WorkflowDefinition workflowDefinitionDeepCopy,
                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
+        // Move path already has ciphertext — do not encode again.
+        return updateDagDefine(loginUser, taskRelationList, workflowDefinition, workflowDefinitionDeepCopy,
+                taskDefinitionLogs, false);
+    }
+
+    protected WorkflowDefinition updateDagDefine(User loginUser,
+                                                 List<WorkflowTaskRelationLog> taskRelationList,
+                                                 WorkflowDefinition workflowDefinition,
+                                                 WorkflowDefinition workflowDefinitionDeepCopy,
+                                                 List<TaskDefinitionLog> taskDefinitionLogs,
+                                                 boolean encodeSensitiveParams) {
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
+        if (encodeSensitiveParams) {
+            encodeTaskParamsForPersist(taskDefinitionLogs);
+        }
         int saveTaskResult = processService.saveTaskDefine(loginUser, workflowDefinition.getProjectCode(),
                 taskDefinitionLogs, Boolean.TRUE);
         if (saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
@@ -771,6 +822,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.error("Update task definitions error, projectCode:{}, workflowDefinitionCode:{}.",
                     workflowDefinition.getProjectCode(), workflowDefinition.getCode());
             throw new ServiceException(Status.UPDATE_TASK_DEFINITION_ERROR);
+        }
+        // Encode globals before equals/save so comparison matches DB ciphertext (deepCopy).
+        if (encodeSensitiveParams) {
+            encodeGlobalParamsForPersist(workflowDefinition);
         }
         boolean isChange = false;
         if (workflowDefinition.equals(workflowDefinitionDeepCopy) && saveTaskResult == Constants.EXIT_CODE_SUCCESS) {
