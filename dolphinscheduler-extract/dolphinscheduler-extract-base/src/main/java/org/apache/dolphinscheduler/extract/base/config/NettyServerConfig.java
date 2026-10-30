@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.extract.base.config;
 
+import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfig;
+
 import java.time.Duration;
 
 import lombok.AllArgsConstructor;
@@ -31,6 +33,9 @@ import lombok.NoArgsConstructor;
 public class NettyServerConfig {
 
     private String serverName;
+
+    @Builder.Default
+    private RpcAuthenticationConfig authentication = RpcAuthenticationConfig.load();
 
     /**
      * init the server connectable queue
