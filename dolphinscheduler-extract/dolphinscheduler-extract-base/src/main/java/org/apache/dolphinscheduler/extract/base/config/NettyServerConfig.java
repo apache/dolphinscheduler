@@ -35,7 +35,7 @@ public class NettyServerConfig {
     private String serverName;
 
     @Builder.Default
-    private RpcAuthenticationConfig authentication = RpcAuthenticationConfig.disabled();
+    private RpcAuthenticationConfig authentication = RpcAuthenticationConfig.load();
 
     /**
      * init the server connectable queue

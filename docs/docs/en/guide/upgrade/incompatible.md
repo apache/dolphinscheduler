@@ -59,7 +59,7 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.5.0
 
-* Internal RPC authentication is disabled by default. Upgrade all services before coordinating `rpc.authentication.enabled=true` with the same `rpc.authentication.secret` in each service's `application.yaml`; authenticated and unauthenticated services cannot communicate. Spring services initialize the RPC client automatically. Non-Spring users of `Clients` must call `Clients.initialize(NettyClientConfig)` before creating proxies and `Clients.close()` when finished. See [RPC authentication](../security/authentication-type.md#inter-service-rpc-authentication).
+* Internal RPC authentication is disabled by default. Upgrade all services before coordinating `rpc.authentication.enabled=true` with the same `rpc.authentication.secret` in each service's `common.properties`; authenticated and unauthenticated services cannot communicate. Credentials are cached for the process lifetime, so enablement and rotation require restarting services. See [RPC authentication](../security/authentication-type.md#inter-service-rpc-authentication).
 
 * `AlertSender#getAlertData` now explicitly rejects a null `alertType` by throwing `IllegalArgumentException` with an error log, instead of throwing a raw `NullPointerException`. During a rolling upgrade, **the Alert Server must be upgraded before Master/Worker**, otherwise an old Alert Server cannot recognize newly introduced `alert_type` enum values (e.g. `TASK_RESULT`) and alert delivery will fail. See the [upgrade guide](upgrade.md#rolling-upgrade-order) for details.([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 

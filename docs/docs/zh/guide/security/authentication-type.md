@@ -187,20 +187,18 @@ security:
 
 ## 服务间 RPC 认证
 
-API、Master、Worker、Alert 支持使用集群共享密钥认证内部 RPC 连接，默认关闭。在每个服务的
-`conf/application.yaml` 中配置；单机模式配置在 standalone 服务的 `conf/application.yaml` 中：
+API、Master、Worker、Alert 支持使用集群共享密钥认证内部 RPC 连接，默认关闭。在各服务（包括 standalone）使用的
+`conf/common.properties` 中配置：
 
-```yaml
-rpc:
-  authentication:
-    enabled: true
-    secret: "<Base64 编码的 32 字节随机密钥>"
+```properties
+rpc.authentication.enabled=true
+rpc.authentication.secret=<Base64 编码的 32 字节随机密钥>
 ```
 
 使用 `openssl rand -base64 32` 生成随机密钥，将相同值配置到所有服务实例，不要使用人工设置的密码。
-限制 `application.yaml` 仅允许服务账户读取，并防止工作流代码读取密钥。可通过环境变量
+限制 `common.properties` 仅允许服务账户读取，并防止工作流代码读取密钥。可通过环境变量
 `RPC_AUTHENTICATION_ENABLED`、`RPC_AUTHENTICATION_SECRET`
-覆盖 YAML 配置，也可通过 Kubernetes Secret 注入密钥。解码后的密钥不会在网络上传输，认证配置错误也不会包含密钥值。
+覆盖 properties 配置，也可通过 Kubernetes Secret 注入密钥。解码后的密钥不会在网络上传输，认证配置错误也不会包含密钥值。
 
 连接在 RPC 报文解码之前执行带版本号的定长挑战应答握手。服务端和客户端各生成独立的 32 字节随机数，
 使用 HMAC-SHA256 对协议上下文、区分客户端与服务端的角色字节以及双方随机数计算证明，并使用常量时间比较验证。
@@ -214,7 +212,9 @@ rpc:
 仍须隔离 RPC 网络，并防止工作流代码读取密钥。该握手协议与 Spark 的认证协议不兼容。
 
 升级时，先在关闭认证的情况下升级全部服务，再协调所有服务开启认证并重启。
-认证开启与关闭的服务不能互通。凭据在启动时读取，修改 YAML 不会更新运行中的客户端或服务端凭据。
+认证开启与关闭的服务不能互通。配置通过 `PropertyUtils` 读取，优先级为环境变量、JVM 参数、`common.properties`。
+客户端在首次使用时自动初始化，服务启动阶段会校验凭据，无需显式调用初始化方法。
+凭据在进程内缓存，修改配置文件不会更新运行中的客户端或服务端凭据。
 轮换密钥需要协调所有服务使用新密钥重启，本期不提供双密钥过渡或热更新。
 
 本功能暂未包含 TLS/mTLS，后续可在认证处理器之前增加 TLS/mTLS，不需要修改业务 RPC 接口。

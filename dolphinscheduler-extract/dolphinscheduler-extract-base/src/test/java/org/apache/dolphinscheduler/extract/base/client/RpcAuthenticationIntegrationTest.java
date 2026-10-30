@@ -24,7 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
 import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfig;
@@ -36,7 +38,11 @@ import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.server.RpcServer;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 
+import java.io.File;
 import java.net.ServerSocket;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -50,17 +56,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+import org.mockito.MockedStatic;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.core.env.PropertiesPropertySource;
-import org.springframework.core.io.ByteArrayResource;
 
 import io.netty.channel.Channel;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.timeout.IdleStateEvent;
 
 class RpcAuthenticationIntegrationTest {
+
+    @TempDir
+    Path directory;
 
     private final List<NettyRemotingClient> clients = new ArrayList<>();
     private final AtomicInteger invocations = new AtomicInteger();
@@ -150,40 +158,52 @@ class RpcAuthenticationIntegrationTest {
     }
 
     @Test
-    void initializesStaticClientFromYamlBeforeApplicationBeanMakesRpc() throws Exception {
+    void staticClientReadsCommonPropertiesWithoutExplicitInitialization() throws Exception {
         startServer(authentication);
-        try (
-                AnnotationConfigApplicationContext context = context(
-                        "rpc:\n  authentication:\n    enabled: true\n    secret: " + secret((byte) 1)
-                                + "\n")) {
-            context.registerBean("startupRpc", String.class,
-                    () -> Clients.withService(Echo.class).withHost(host.getAddress()).echo("startup"));
-            context.refresh();
-            assertEquals("startup", context.getBean("startupRpc"));
-            assertTrue(context.getBean(RpcAuthenticationConfig.class).isEnabled());
+        Files.write(directory.resolve("common.properties"), ("rpc.authentication.enabled=true\n"
+                + "rpc.authentication.secret=" + secret((byte) 1) + "\n").getBytes(StandardCharsets.UTF_8));
+        Path output = directory.resolve("client-output");
+        Process process = new ProcessBuilder(
+                System.getProperty("java.home") + "/bin/java",
+                "-Djacoco-agent.destfile=" + directory.resolve("jacoco.exec"), "-cp",
+                directory + File.pathSeparator + System.getProperty("java.class.path"),
+                PropertyClientProcess.class.getName(), host.getAddress())
+                        .redirectErrorStream(true).redirectOutput(output.toFile()).start();
+        try {
+            assertTrue(process.waitFor(15, TimeUnit.SECONDS));
+            String result = new String(Files.readAllBytes(output), StandardCharsets.UTF_8);
+            assertEquals(0, process.exitValue(), result);
+            assertTrue(result.contains("authenticated"), result);
+            assertEquals(1, invocations.get());
+        } finally {
+            process.destroyForcibly();
         }
-        assertThrows(IllegalStateException.class,
-                () -> Clients.withService(Echo.class).withHost(host.getAddress()));
     }
 
     @Test
     void failsClientOnlyServiceStartupWhenEnabledWithoutSecret() {
-        try (AnnotationConfigApplicationContext context = context("rpc:\n  authentication:\n    enabled: true\n")) {
+        try (
+                MockedStatic<PropertyUtils> properties = mockStatic(PropertyUtils.class);
+                AnnotationConfigApplicationContext context = context()) {
+            properties.when(() -> PropertyUtils.getString("rpc.authentication.enabled", "false")).thenReturn("true");
             assertThrows(BeansException.class, context::refresh);
         }
     }
 
     @Test
     void rejectsInvalidEnabledFlagInsteadOfSilentlyDisablingAuthentication() {
-        try (AnnotationConfigApplicationContext context = context("rpc:\n  authentication:\n    enabled: typo\n")) {
+        try (
+                MockedStatic<PropertyUtils> properties = mockStatic(PropertyUtils.class);
+                AnnotationConfigApplicationContext context = context()) {
+            properties.when(() -> PropertyUtils.getString("rpc.authentication.enabled", "false")).thenReturn("typo");
             assertThrows(BeansException.class, context::refresh);
         }
     }
 
     @Test
-    void defaultsToDisabledForExistingYamlConfigurations() throws Exception {
+    void defaultsToDisabledAndKeepsExistingClientsUsage() throws Exception {
         startServer(RpcAuthenticationConfig.disabled());
-        try (AnnotationConfigApplicationContext context = context("spring:\n  application:\n    name: test\n")) {
+        try (AnnotationConfigApplicationContext context = context()) {
             context.refresh();
             assertFalse(context.getBean(RpcAuthenticationConfig.class).isEnabled());
             assertEquals("default", Clients.withService(Echo.class).withHost(host.getAddress()).echo("default"));
@@ -203,18 +223,10 @@ class RpcAuthenticationIntegrationTest {
     }
 
     @Test
-    void doesNotReuseAProxyWithThePreviousContextsCredentials() throws Exception {
+    void proxyFactoriesDoNotShareCredentials() throws Exception {
         startServer(authentication);
-        String yaml = "rpc:\n  authentication:\n    enabled: true\n    secret: ";
-        try (AnnotationConfigApplicationContext context = context(yaml + secret((byte) 1))) {
-            context.refresh();
-            assertEquals("allowed", Clients.withService(Echo.class).withHost(host.getAddress()).echo("allowed"));
-        }
-        try (AnnotationConfigApplicationContext context = context(yaml + secret((byte) 2))) {
-            context.refresh();
-            assertThrows(RemoteException.class,
-                    () -> Clients.withService(Echo.class).withHost(host.getAddress()).echo("forbidden"));
-        }
+        assertEquals("allowed", proxy(client(authentication)).echo("allowed"));
+        assertThrows(RemoteException.class, () -> proxy(client(config((byte) 2))).echo("forbidden"));
         assertEquals(1, invocations.get());
     }
 
@@ -240,14 +252,21 @@ class RpcAuthenticationIntegrationTest {
         }
     }
 
-    private AnnotationConfigApplicationContext context(String yaml) {
+    private AnnotationConfigApplicationContext context() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        YamlPropertiesFactoryBean factory = new YamlPropertiesFactoryBean();
-        factory.setResources(new ByteArrayResource(yaml.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
-        context.getEnvironment().getPropertySources()
-                .addFirst(new PropertiesPropertySource("yaml", factory.getObject()));
         context.register(RpcAuthenticationConfiguration.class);
         return context;
+    }
+
+    public static class PropertyClientProcess {
+
+        public static void main(String[] args) {
+            try (
+                    AnnotationConfigApplicationContext context =
+                            new AnnotationConfigApplicationContext(RpcAuthenticationConfiguration.class)) {
+                System.out.println(Clients.withService(Echo.class).withHost(args[0]).echo("authenticated"));
+            }
+        }
     }
 
     private RpcAuthenticationConfig config(byte value) {

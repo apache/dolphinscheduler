@@ -51,7 +51,6 @@ public class ClientsTest {
 
     @BeforeEach
     public void setUp() {
-        Clients.initialize(new NettyClientConfig());
         int listenPort = RandomUtils.nextInt(10000, 20000);
         NettyServerConfig nettyServerConfig = NettyServerConfig.builder()
                 .serverName("ApiServer")
@@ -119,7 +118,6 @@ public class ClientsTest {
     @AfterEach
     public void tearDown() {
         springServerMethodInvokerDiscovery.close();
-        Clients.close();
     }
 
     @RpcService

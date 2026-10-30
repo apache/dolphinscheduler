@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 public class NettyClientConfig {
 
     @Builder.Default
-    private RpcAuthenticationConfig authentication = RpcAuthenticationConfig.disabled();
+    private RpcAuthenticationConfig authentication = RpcAuthenticationConfig.load();
 
     /**
      * worker threads，default get machine cpus

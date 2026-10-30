@@ -398,19 +398,16 @@ Clicking the button will redirect you to your OIDC provider to authenticate. Aft
 ## Inter-service RPC authentication
 
 API, Master, Worker and Alert can authenticate internal RPC connections using a cluster-wide shared secret.
-Authentication is disabled by default. Configure the following in each service's `conf/application.yaml`, or in the
-standalone server's `conf/application.yaml`:
+Authentication is disabled by default. Configure the following in the `conf/common.properties` used by every service, including standalone:
 
-```yaml
-rpc:
-  authentication:
-    enabled: true
-    secret: "<Base64-encoded 32-byte random secret>"
+```properties
+rpc.authentication.enabled=true
+rpc.authentication.secret=<Base64-encoded 32-byte random secret>
 ```
 
 Generate a random 32-byte secret with `openssl rand -base64 32` and configure the same value on every service instance.
-Do not use a human-selected password. Restrict access to `application.yaml` to the service account and protect the secret
-from workflow code. Environment variables `RPC_AUTHENTICATION_ENABLED` and `RPC_AUTHENTICATION_SECRET` can override the YAML settings,
+Do not use a human-selected password. Restrict access to `common.properties` to the service account and protect the secret
+from workflow code. Environment variables `RPC_AUTHENTICATION_ENABLED` and `RPC_AUTHENTICATION_SECRET` can override the properties,
 including injecting the secret from a Kubernetes Secret.
 The decoded secret is never sent over the network, and authentication configuration errors do not include its value.
 
@@ -429,8 +426,9 @@ active network attacker from relaying a handshake and manipulating that traffic.
 protect the secret from workflow code. This handshake is not wire-compatible with Spark's authentication protocol.
 
 For upgrades, first deploy this version to every service with authentication disabled. Then coordinate enabling
-it on all services and restart them. Mixed authenticated/unauthenticated services cannot communicate. Credentials are
-loaded at startup; editing the YAML does not rotate a running client's or server's credentials. To rotate a secret,
+it on all services and restart them. Mixed authenticated/unauthenticated services cannot communicate. Configuration is read through `PropertyUtils` (environment > JVM properties > `common.properties`).
+The client initializes automatically on first use, and startup validation rejects invalid credentials.
+Credentials are cached for the process lifetime; editing the properties does not rotate a running client's or server's credentials. To rotate a secret,
 coordinate a restart of all services with the new secret. There is no dual-secret transition or hot reload.
 
 Transport-level TLS/mTLS is not included in this feature. It can be added before the authentication handler later without

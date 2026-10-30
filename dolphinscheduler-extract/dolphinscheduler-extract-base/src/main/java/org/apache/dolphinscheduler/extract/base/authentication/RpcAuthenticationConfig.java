@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.extract.base.authentication;
 
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 
@@ -43,6 +45,17 @@ public final class RpcAuthenticationConfig {
 
     public static RpcAuthenticationConfig disabled() {
         return new RpcAuthenticationConfig(false, 5000, null);
+    }
+
+    public static RpcAuthenticationConfig load() {
+        String enabled = PropertyUtils.getString("rpc.authentication.enabled", "false").trim();
+        if ("false".equalsIgnoreCase(enabled)) {
+            return disabled();
+        }
+        if (!"true".equalsIgnoreCase(enabled)) {
+            throw new IllegalArgumentException("rpc.authentication.enabled must be true or false");
+        }
+        return fromSecret(PropertyUtils.getString("rpc.authentication.secret"), 5000);
     }
 
     public static RpcAuthenticationConfig fromSecret(String encodedSecret, int timeoutMillis) {

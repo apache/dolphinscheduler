@@ -55,12 +55,6 @@ spring:
       org.quartz.jobStore.clusterCheckinInterval: 5000
   cloud.discovery.client.composite-indicator.enabled: false
 
-rpc:
-  authentication:
-    enabled: false
-    # Base64-encoded 32-byte random secret, shared by all services in this cluster.
-    secret: ""
-
 # Mybatis-plus configuration, you don't need to change it
 mybatis-plus:
   mapper-locations: classpath:org/apache/dolphinscheduler/dao/mapper/*Mapper.xml

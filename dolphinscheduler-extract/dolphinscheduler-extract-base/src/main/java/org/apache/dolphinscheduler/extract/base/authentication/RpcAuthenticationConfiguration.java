@@ -17,56 +17,15 @@
 
 package org.apache.dolphinscheduler.extract.base.authentication;
 
-import org.apache.dolphinscheduler.extract.base.client.Clients;
-import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
-
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.env.Environment;
 
+/** Validates RPC credentials at startup, including services that only initiate RPC calls. */
 @Configuration
 public class RpcAuthenticationConfiguration {
 
     @Bean
-    public static RpcAuthenticationConfig rpcAuthenticationConfig(Environment environment) {
-        if (!environment.getProperty("rpc.authentication.enabled", Boolean.class, false)) {
-            return RpcAuthenticationConfig.disabled();
-        }
-        return RpcAuthenticationConfig.fromSecret(
-                environment.getProperty("rpc.authentication.secret"),
-                5000);
-    }
-
-    @Bean
-    public static RpcClientInitializer rpcClientInitializer(RpcAuthenticationConfig authenticationConfig) {
-        return new RpcClientInitializer(authenticationConfig);
-    }
-
-    /** Initialize the static client before any application bean can make RPC calls. */
-    static final class RpcClientInitializer implements BeanFactoryPostProcessor, DisposableBean {
-
-        private final RpcAuthenticationConfig authenticationConfig;
-        private boolean initialized;
-
-        RpcClientInitializer(RpcAuthenticationConfig authenticationConfig) {
-            this.authenticationConfig = authenticationConfig;
-        }
-
-        @Override
-        public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-            Clients.initialize(NettyClientConfig.builder().authentication(authenticationConfig).build());
-            initialized = true;
-        }
-
-        @Override
-        public void destroy() {
-            if (initialized) {
-                Clients.close();
-            }
-        }
+    public RpcAuthenticationConfig rpcAuthenticationConfig() {
+        return RpcAuthenticationConfig.load();
     }
 }

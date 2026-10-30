@@ -22,10 +22,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mockStatic;
+
+import org.apache.dolphinscheduler.common.utils.PropertyUtils;
+import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
+import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 
 import java.util.Base64;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 class RpcAuthenticationConfigTest {
 
@@ -63,4 +69,26 @@ class RpcAuthenticationConfigTest {
         assertThrows(IllegalArgumentException.class,
                 () -> RpcAuthenticationConfig.fromSecret("secret", -1));
     }
+    @Test
+    void clientAndServerDefaultsReadSharedProperties() {
+        String secret = Base64.getEncoder().encodeToString(new byte[32]);
+        try (MockedStatic<PropertyUtils> properties = mockStatic(PropertyUtils.class)) {
+            properties.when(() -> PropertyUtils.getString("rpc.authentication.enabled", "false")).thenReturn("true");
+            properties.when(() -> PropertyUtils.getString("rpc.authentication.secret")).thenReturn(secret);
+            assertTrue(new NettyClientConfig().getAuthentication().isEnabled());
+            assertTrue(NettyClientConfig.builder().build().getAuthentication().isEnabled());
+            assertTrue(new NettyServerConfig().getAuthentication().isEnabled());
+            assertTrue(NettyServerConfig.builder().build().getAuthentication().isEnabled());
+        }
+    }
+
+    @Test
+    void disabledAuthenticationDoesNotRequireASecret() {
+        try (MockedStatic<PropertyUtils> properties = mockStatic(PropertyUtils.class)) {
+            properties.when(() -> PropertyUtils.getString("rpc.authentication.enabled", "false")).thenReturn("false");
+            assertFalse(RpcAuthenticationConfig.load().isEnabled());
+            properties.verify(() -> PropertyUtils.getString("rpc.authentication.secret"), org.mockito.Mockito.never());
+        }
+    }
+
 }
