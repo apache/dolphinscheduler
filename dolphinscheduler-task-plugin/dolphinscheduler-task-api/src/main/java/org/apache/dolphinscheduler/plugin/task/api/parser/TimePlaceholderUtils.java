@@ -51,10 +51,13 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_FIR
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.WEEK_LAST_DAY;
 import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.YEAR_WEEK;
 
+import org.apache.dolphinscheduler.common.thread.ThreadLocalContext;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -704,7 +707,7 @@ public class TimePlaceholderUtils {
 
             if (Character.isDigit(expression.charAt(index + 1))) {
                 String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = addMinutes(date, calcMinutes(addMinuteExpr));
+                Date targetDate = addOffset(date, addMinuteExpr, 1);
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
@@ -714,7 +717,7 @@ public class TimePlaceholderUtils {
 
             if (Character.isDigit(expression.charAt(index + 1))) {
                 String addMinuteExpr = expression.substring(index + 1);
-                Date targetDate = addMinutes(date, 0 - calcMinutes(addMinuteExpr));
+                Date targetDate = addOffset(date, addMinuteExpr, -1);
                 String dateFormat = expression.substring(0, index);
 
                 return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
@@ -749,9 +752,47 @@ public class TimePlaceholderUtils {
         String dateFormat = format.substring(0, opIndex);
 
         // arithmetic failures are propagated, formatTimeExpression decides how to handle them
-        int minutes = calcMinutes(addMinuteExpr);
-        Date targetDate = (op == '+') ? addMinutes(date, minutes) : addMinutes(date, -minutes);
+        Date targetDate = addOffset(date, addMinuteExpr, op == ADD_CHAR ? 1 : -1);
         return new AbstractMap.SimpleImmutableEntry<>(targetDate, dateFormat);
+    }
+
+    /**
+     * Applies a trailing offset operand to the base date.
+     * <p>An operand without a division is a number of whole days, so it is applied with
+     * calendar-day arithmetic: adding minutes would add a fixed duration of 24 hours per day and
+     * land an hour off whenever the range crosses a daylight saving time transition. An operand
+     * containing a division keeps the legacy minute semantics, e.g. -1000/24/60 means -1000 minutes.
+     *
+     * @param date             base date
+     * @param offsetExpression trailing offset operand, without its leading sign
+     * @param sign             1 for an addition, -1 for a subtraction
+     * @return shifted date
+     */
+    private static Date addOffset(Date date, String offsetExpression, int sign) {
+        if (offsetExpression.indexOf(DIVISION_CHAR) == -1) {
+            return addCalendarDays(date, sign * calculate(offsetExpression));
+        }
+        return addMinutes(date, sign * calcMinutes(offsetExpression));
+    }
+
+    /**
+     * Adds whole calendar days in the effective request timezone.
+     * <p>The placeholder is parsed and formatted in the timezone stored in {@link ThreadLocalContext},
+     * but {@code DateUtils.addDays} uses {@link Calendar#getInstance()} and therefore the JVM default
+     * timezone. When the two differ, applying the day offset in the JVM zone and formatting the result
+     * in the request zone would shift the hour across a DST transition - the very bug this change
+     * fixes. Shifting the local date in the request zone keeps the arithmetic and the formatting in
+     * the same timezone.
+     *
+     * @param date   base date
+     * @param amount number of calendar days to add (negative to subtract)
+     * @return shifted date
+     */
+    private static Date addCalendarDays(Date date, int amount) {
+        String timezone = ThreadLocalContext.getTimezone();
+        ZoneId zoneId = StringUtils.isNotEmpty(timezone) ? ZoneId.of(timezone) : ZoneId.systemDefault();
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(date.toInstant(), zoneId).plusDays(amount);
+        return Date.from(localDateTime.atZone(zoneId).toInstant());
     }
 
     /**
