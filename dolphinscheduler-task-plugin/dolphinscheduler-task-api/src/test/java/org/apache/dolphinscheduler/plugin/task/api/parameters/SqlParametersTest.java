@@ -220,6 +220,23 @@ public class SqlParametersTest {
         Assertions.assertTrue(exception.getMessage().contains("3"));
     }
 
+    @Test
+    public void testDealOutParamWithZeroRowResult() {
+        List<Property> listProperties = new ArrayList<>();
+        listProperties.add(outProperty("list_user", DataType.LIST));
+        List<Property> varcharProperties = new ArrayList<>();
+        varcharProperties.add(outProperty("varchar_user", DataType.VARCHAR));
+
+        // a LIST out parameter keeps an empty json array for a zero-row result
+        Assertions.assertEquals("[]", outParamValue(listProperties, 0, "[]"));
+
+        // a non LIST out parameter has no row to take the value from and fails fast
+        TaskException exception = Assertions.assertThrows(TaskException.class,
+                () -> outParamValue(varcharProperties, 0, "[]"));
+        Assertions.assertTrue(exception.getMessage().contains("varchar_user"));
+        Assertions.assertTrue(exception.getMessage().contains("0"));
+    }
+
     private Property outProperty(String prop, DataType dataType) {
         Property property = new Property();
         property.setProp(prop);

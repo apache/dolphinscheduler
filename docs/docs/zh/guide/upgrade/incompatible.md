@@ -60,5 +60,5 @@
 
 * `AlertSender#getAlertData` 对 null `alertType` 增加了显式拒绝（抛 `IllegalArgumentException` 并记录错误日志），而非直接抛 `NullPointerException`。滚动升级时**必须先升级 Alert Server，再升级 Master/Worker**，否则旧 Alert Server 无法识别新增的 `alert_type` 枚举值（如 `TASK_RESULT`），会导致告警投递失败。详见[升级文档](upgrade.md#滚动升降级顺序)。([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 * SQL 任务结果告警内容有大小限制：默认最多保留 30 行，超过 100 字符的字符串字段值会被截断并以省略号标记；序列化后内容总大小限制在 60000 UTF-8 字节以内（兼容 MySQL TEXT 列 65535 字节容量），超出预算的行以省略标记对象表示。以上默认值可通过 `common.properties` 中的 `sql.task.alert.max.rows`、`sql.task.alert.max.row.value.length`、`sql.task.alert.max.content.bytes` 配置调整，修改后需重启 Worker 生效。 ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
-* SQL 任务 OUT 参数不再依赖查询结果行数：`LIST` 类型 OUT 参数现在始终输出 JSON 数组（单行结果输出 `["value"]` 而非裸字符串 `value`），非 `LIST` 类型 OUT 参数在查询返回多行时任务将直接失败（此前参数会被静默置空）。依赖旧的单行裸字符串格式的下游任务需要相应调整；多行结果请使用 `LIST` 类型 OUT 参数或约束查询只返回一行。([#18750](https://github.com/apache/dolphinscheduler/issues/18750))
+* SQL 任务 OUT 参数不再依赖查询结果行数：`LIST` 类型 OUT 参数现在始终输出 JSON 数组（零行结果输出 `[]`、单行结果输出 `["value"]`，此前分别为 `[""]` 和裸字符串 `value`）；非 `LIST` 类型 OUT 参数要求查询恰好返回一行，查询返回零行或多行时任务将直接失败并给出明确报错（此前零行会得到空字符串、多行时参数被静默置空）。多行结果请使用 `LIST` 类型 OUT 参数或约束查询只返回一行。([#18750](https://github.com/apache/dolphinscheduler/issues/18750))
 

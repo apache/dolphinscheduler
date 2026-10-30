@@ -138,6 +138,17 @@ public class SqlParameters extends AbstractParameters {
                 new TypeReference<List<Map<String, String>>>() {
                 });
         if (CollectionUtils.isEmpty(sqlResult)) {
+            // the query returned zero rows: a LIST OUT parameter keeps an empty JSON array,
+            // while a non-LIST OUT parameter has no row to take the value from, so fail fast
+            // instead of silently passing an artificial value downstream
+            for (Property info : outProperty) {
+                if (info.getType() == DataType.LIST) {
+                    info.setValue(JSONUtils.toJsonString(new ArrayList<>()));
+                } else {
+                    throw nonListOutParamRowMismatch(info, 0);
+                }
+            }
+            varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
             return;
         }
         // collect the values of each column so that the OUT parameter format does not
@@ -158,15 +169,19 @@ public class SqlParameters extends AbstractParameters {
                     // fail fast instead of silently picking a non-deterministic row: without ORDER BY
                     // the row order is not guaranteed, so any picked row may be a plausible but
                     // incorrect value for downstream tasks
-                    throw new TaskException("Invalid SQL OUT parameter '" + info.getProp() + "' of type "
-                            + info.getType() + ": the query returned " + columnValues.size() + " rows, please use a"
-                            + " LIST parameter or make the query return a single row(e.g. add LIMIT 1)");
+                    throw nonListOutParamRowMismatch(info, columnValues.size());
                 }
                 info.setValue(convertOutParamValue(info, columnValues.get(0)));
             }
         }
         varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
 
+    }
+
+    private TaskException nonListOutParamRowMismatch(Property info, int rowCount) {
+        return new TaskException("Invalid SQL OUT parameter '" + info.getProp() + "' of type " + info.getType()
+                + ": the query returned " + rowCount + " rows, please use a LIST parameter or make the query"
+                + " return a single row(e.g. add LIMIT 1)");
     }
 
     private String convertOutParamValue(Property info, String value) {
