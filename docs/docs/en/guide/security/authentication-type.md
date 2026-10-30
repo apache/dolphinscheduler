@@ -410,6 +410,7 @@ Do not use a human-selected password. Restrict access to `common.properties` to 
 from workflow code. Environment variables `RPC_AUTHENTICATION_ENABLED` and `RPC_AUTHENTICATION_SECRET` can override the properties,
 including injecting the secret from a Kubernetes Secret.
 The decoded secret is never sent over the network, and authentication configuration errors do not include its value.
+As with other common properties, configuration DEBUG logs can include the secret; restrict access to those logs to trusted operators.
 
 The connection performs a versioned, fixed-size challenge-response handshake before RPC framing. The server and client
 contribute independent 32-byte random nonces. Both prove possession of the secret using HMAC-SHA256 over a protocol

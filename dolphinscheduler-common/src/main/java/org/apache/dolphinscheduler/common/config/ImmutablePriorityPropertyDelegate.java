@@ -52,26 +52,25 @@ public class ImmutablePriorityPropertyDelegate implements IPropertyDelegate {
             if (value.isPresent()) {
                 log.debug("Override config value from env, key: {} actualKey: {}, value: {}",
                         k,
-                        value.get().getActualKey(), PropertyLogUtils.redact(k, value.get().getValue()));
+                        value.get().getActualKey(), value.get().getValue());
                 return value;
             }
             value = getConfigValueFromJvm(key);
             if (value.isPresent()) {
                 log.debug("Override config value from jvm, key: {} actualKey: {}, value: {}",
-                        k, value.get().getActualKey(), PropertyLogUtils.redact(k, value.get().getValue()));
+                        k, value.get().getActualKey(), value.get().getValue());
                 return value;
             }
             value = getConfigValueFromProperties(key);
             if (value.isPresent()) {
                 log.debug("Get config value from properties, key: {} actualKey: {}, value: {}",
-                        k, value.get().getActualKey(), PropertyLogUtils.redact(k, value.get().getValue()));
+                        k, value.get().getActualKey(), value.get().getValue());
                 return value;
             }
             value = getConfigValueFromYaml(key);
             value.ifPresent(
                     stringConfigValue -> log.debug("Get config value from yaml, key: {} actualKey: {}, value: {}",
-                            k, stringConfigValue.getActualKey(),
-                            PropertyLogUtils.redact(k, stringConfigValue.getValue())));
+                            k, stringConfigValue.getActualKey(), stringConfigValue.getValue()));
             return value;
         });
         return configValue.map(ConfigValue::getValue).orElse(null);

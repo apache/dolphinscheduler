@@ -199,6 +199,7 @@ rpc.authentication.secret=<Base64 编码的 32 字节随机密钥>
 限制 `common.properties` 仅允许服务账户读取，并防止工作流代码读取密钥。可通过环境变量
 `RPC_AUTHENTICATION_ENABLED`、`RPC_AUTHENTICATION_SECRET`
 覆盖 properties 配置，也可通过 Kubernetes Secret 注入密钥。解码后的密钥不会在网络上传输，认证配置错误也不会包含密钥值。
+与其他 common 配置一致，配置 DEBUG 日志可能包含密钥，仅应允许可信运维人员访问这些日志。
 
 连接在 RPC 报文解码之前执行带版本号的定长挑战应答握手。服务端和客户端各生成独立的 32 字节随机数，
 使用 HMAC-SHA256 对协议上下文、区分客户端与服务端的角色字节以及双方随机数计算证明，并使用常量时间比较验证。

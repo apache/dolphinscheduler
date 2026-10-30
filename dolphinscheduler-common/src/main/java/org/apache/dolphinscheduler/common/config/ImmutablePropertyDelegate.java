@@ -75,6 +75,6 @@ public class ImmutablePropertyDelegate implements IPropertyDelegate {
     }
 
     private void printProperties() {
-        properties.forEach((k, v) -> log.debug("Get property {} -> {}", k, PropertyLogUtils.redact(k, v)));
+        properties.forEach((k, v) -> log.debug("Get property {} -> {}", k, v));
     }
 }
