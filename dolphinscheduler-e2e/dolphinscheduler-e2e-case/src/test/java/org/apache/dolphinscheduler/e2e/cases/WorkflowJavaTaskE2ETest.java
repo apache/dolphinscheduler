@@ -208,7 +208,10 @@ public class WorkflowJavaTaskE2ETest {
 
         userPage.update(user, user, email, phone, tenant)
                 .goToNav(ProjectPage.class)
-                .create(project);
+                .createProjectUntilSuccess(project)
+                .assignResource(project, "Tenant", tenant)
+                .assignResource(project, "Queue", "default")
+                .assignResource(project, "Environment", environmentName);
 
         ProjectPage projectPage = new ProjectPage(browser);
         Awaitility.await().untilAsserted(() -> assertThat(projectPage.projectList())

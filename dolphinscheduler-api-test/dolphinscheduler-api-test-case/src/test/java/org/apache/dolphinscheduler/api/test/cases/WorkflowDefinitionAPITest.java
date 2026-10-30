@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.test.cases;
 
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
@@ -24,6 +25,7 @@ import org.apache.dolphinscheduler.api.test.pages.LoginPage;
 import org.apache.dolphinscheduler.api.test.pages.project.ProjectPage;
 import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowDefinitionPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -94,8 +96,16 @@ public class WorkflowDefinitionAPITest {
 
             projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
                     .getBody().getData()).get(0)).get("code");
+
             ClassLoader classLoader = getClass().getClassLoader();
             File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
+            HttpResponse unauthorizedResponse = workflowDefinitionPage
+                    .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
+            Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(),
+                    unauthorizedResponse.getBody().getCode());
+
+            Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.WORKER_GROUP, "default")
+                    .getBody().getSuccess());
             HttpResponse createWorkflowDefinitionResponse = workflowDefinitionPage
                     .createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);
             Boolean successFlag = createWorkflowDefinitionResponse.getBody().getSuccess();

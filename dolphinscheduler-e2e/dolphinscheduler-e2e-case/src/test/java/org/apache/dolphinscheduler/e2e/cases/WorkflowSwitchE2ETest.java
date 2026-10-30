@@ -66,7 +66,9 @@ class WorkflowSwitchE2ETest {
                 .goToTab(TenantPage.class)
                 .create(tenant)
                 .goToNav(ProjectPage.class)
-                .create(project);
+                .createProjectUntilSuccess(project)
+                .assignResource(project, "Tenant", tenant)
+                .assignResource(project, "Queue", "default");
     }
 
     @AfterAll
