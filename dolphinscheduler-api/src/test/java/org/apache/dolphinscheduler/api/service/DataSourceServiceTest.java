@@ -22,12 +22,14 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServi
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.DATASOURCE;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.vo.DataSourceSimpleInfoVO;
+import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -65,6 +67,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
@@ -97,6 +100,9 @@ public class DataSourceServiceTest {
 
     @Mock
     private IPage<DataSource> dataSourceList;
+
+    @Mock
+    private ApiConfig apiConfig;
 
     private String randomStringWithLengthN(int n) {
         byte[] bitArray = new byte[n];
@@ -234,6 +240,140 @@ public class DataSourceServiceTest {
             assertThrowsServiceException(Status.DATASOURCE_EXIST,
                     () -> dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
         }
+    }
+
+    @Test
+    public void testCreateDataSourceSkipsConnectionCheckWhenDisabled() {
+        User loginUser = getAdminUser();
+        PostgreSQLDataSourceParamDTO postgreSqlDatasourceParam = buildPostgreSQLParam("newSecret");
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam);
+
+        try (
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils = Mockito.mockStatic(DataSourceUtils.class)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+
+            mockedStaticDataSourceUtils
+                    .when(() -> DataSourceUtils.buildConnectionParams(Mockito.any())).thenReturn(connectionParam);
+            when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
+            when(dataSourceDao.queryDataSourceByName(Mockito.anyString())).thenReturn(null);
+            passResourcePermissionCheckService();
+
+            // apiConfig mock defaults to false, the connection check is skipped
+            Assertions.assertNotNull(dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
+
+            Mockito.verify(dataSourceProcessor, Mockito.never()).checkDataSourceConnectivity(Mockito.any());
+            Mockito.verify(dataSourceDao).insert(Mockito.any(DataSource.class));
+        }
+    }
+
+    @Test
+    public void testCreateDataSourceChecksConnectionWhenEnabled() {
+        User loginUser = getAdminUser();
+        PostgreSQLDataSourceParamDTO postgreSqlDatasourceParam = buildPostgreSQLParam("newSecret");
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam);
+
+        try (
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils = Mockito.mockStatic(DataSourceUtils.class)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+
+            mockedStaticDataSourceUtils
+                    .when(() -> DataSourceUtils.buildConnectionParams(Mockito.any())).thenReturn(connectionParam);
+            when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
+            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
+            when(apiConfig.isDatasourceConnectionCheckEnabled()).thenReturn(true);
+            when(dataSourceDao.queryDataSourceByName(Mockito.anyString())).thenReturn(null);
+            passResourcePermissionCheckService();
+
+            Assertions.assertNotNull(dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
+
+            ArgumentCaptor<ConnectionParam> captor = ArgumentCaptor.forClass(ConnectionParam.class);
+            Mockito.verify(dataSourceProcessor).checkDataSourceConnectivity(captor.capture());
+            Assertions.assertEquals("newSecret", captor.getValue().getPassword());
+            Mockito.verify(dataSourceDao).insert(Mockito.any(DataSource.class));
+        }
+    }
+
+    @Test
+    public void testCreateDataSourceFailsWhenConnectionCheckFails() {
+        User loginUser = getAdminUser();
+        PostgreSQLDataSourceParamDTO postgreSqlDatasourceParam = buildPostgreSQLParam("newSecret");
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam);
+
+        try (
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils = Mockito.mockStatic(DataSourceUtils.class)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+
+            mockedStaticDataSourceUtils
+                    .when(() -> DataSourceUtils.buildConnectionParams(Mockito.any())).thenReturn(connectionParam);
+            when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
+            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(false);
+            when(apiConfig.isDatasourceConnectionCheckEnabled()).thenReturn(true);
+            when(dataSourceDao.queryDataSourceByName(Mockito.anyString())).thenReturn(null);
+            passResourcePermissionCheckService();
+
+            assertThrowsServiceException(Status.CONNECTION_TEST_FAILURE,
+                    () -> dataSourceService.createDataSource(loginUser, postgreSqlDatasourceParam));
+
+            Mockito.verify(dataSourceDao, Mockito.never()).insert(Mockito.any(DataSource.class));
+        }
+    }
+
+    @Test
+    public void testUpdateDataSourceChecksConnectionWithEffectiveCredentialsWhenEnabled() {
+        User loginUser = getAdminUser();
+        int dataSourceId = 12;
+
+        // the stored datasource keeps an old password, the update request keeps a blank password
+        DataSource dataSource = new DataSource();
+        dataSource.setId(dataSourceId);
+        dataSource.setUserId(0);
+        dataSource.setName("dataSource01");
+        dataSource.setType(DbType.POSTGRESQL);
+        dataSource.setConnectionParams(JSONUtils.toJsonString(
+                DataSourceUtils.buildConnectionParams(buildPostgreSQLParam("oldSecret"))));
+        when(dataSourceDao.queryById(dataSourceId)).thenReturn(dataSource);
+        passResourcePermissionCheckService();
+
+        PostgreSQLDataSourceParamDTO postgreSqlDatasourceParam = buildPostgreSQLParam("");
+        postgreSqlDatasourceParam.setId(dataSourceId);
+        ConnectionParam connectionParam = DataSourceUtils.buildConnectionParams(postgreSqlDatasourceParam);
+
+        try (
+                MockedStatic<DataSourceUtils> mockedStaticDataSourceUtils = Mockito.mockStatic(DataSourceUtils.class)) {
+            DataSourceProcessor dataSourceProcessor = Mockito.mock(DataSourceProcessor.class);
+
+            mockedStaticDataSourceUtils
+                    .when(() -> DataSourceUtils.buildConnectionParams(Mockito.any())).thenReturn(connectionParam);
+            when(DataSourceUtils.getDatasourceProcessor(Mockito.any())).thenReturn(dataSourceProcessor);
+            when(dataSourceProcessor.checkDataSourceConnectivity(Mockito.any())).thenReturn(true);
+            when(apiConfig.isDatasourceConnectionCheckEnabled()).thenReturn(true);
+
+            Assertions.assertNotNull(dataSourceService.updateDataSource(loginUser, postgreSqlDatasourceParam));
+
+            // the check must receive the effective credentials, i.e. the old password
+            ArgumentCaptor<ConnectionParam> captor = ArgumentCaptor.forClass(ConnectionParam.class);
+            Mockito.verify(dataSourceProcessor).checkDataSourceConnectivity(captor.capture());
+            Assertions.assertEquals("oldSecret", captor.getValue().getPassword());
+
+            // the persisted params must also keep the old password
+            ArgumentCaptor<DataSource> dataSourceCaptor = ArgumentCaptor.forClass(DataSource.class);
+            Mockito.verify(dataSourceDao).updateById(dataSourceCaptor.capture());
+            Assertions.assertEquals("oldSecret",
+                    JSONUtils.parseObject(dataSourceCaptor.getValue().getConnectionParams())
+                            .path(Constants.PASSWORD).asText());
+        }
+    }
+
+    private PostgreSQLDataSourceParamDTO buildPostgreSQLParam(String password) {
+        PostgreSQLDataSourceParamDTO postgreSqlDatasourceParam = new PostgreSQLDataSourceParamDTO();
+        postgreSqlDatasourceParam.setName("dataSource01");
+        postgreSqlDatasourceParam.setNote("test dataSource");
+        postgreSqlDatasourceParam.setHost("172.16.133.200");
+        postgreSqlDatasourceParam.setPort(5432);
+        postgreSqlDatasourceParam.setDatabase("dolphinscheduler");
+        postgreSqlDatasourceParam.setUserName("postgres");
+        postgreSqlDatasourceParam.setPassword(password);
+        return postgreSqlDatasourceParam;
     }
 
     @Test

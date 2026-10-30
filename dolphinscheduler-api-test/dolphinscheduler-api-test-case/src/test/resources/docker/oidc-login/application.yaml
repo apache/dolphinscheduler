@@ -162,6 +162,7 @@ api:
   base-url: http://localhost:12345/dolphinscheduler
   ui-url: http://localhost:5173
   audit-enable: false
+  datasource-connection-check-enabled: false
   traffic-control:
     global-switch: false
     max-global-qps-rate: 300
