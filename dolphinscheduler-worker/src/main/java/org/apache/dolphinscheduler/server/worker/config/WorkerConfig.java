@@ -42,6 +42,11 @@ public class WorkerConfig implements Validator {
 
     private int listenPort = 1234;
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
+
+    /**
+     * Maximum time to retain unacknowledged events after a task executor finishes.
+     */
+    private Duration taskEventReportMaxDuration = Duration.ofHours(1);
     private int hostWeight = 100;
     private WorkerServerLoadProtectionConfig serverLoadProtection = new WorkerServerLoadProtectionConfig();
     private String group;
@@ -64,6 +69,10 @@ public class WorkerConfig implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         WorkerConfig workerConfig = (WorkerConfig) target;
+        if (workerConfig.getTaskEventReportMaxDuration() == null
+                || workerConfig.getTaskEventReportMaxDuration().toMillis() <= 0) {
+            errors.rejectValue("task-event-report-max-duration", null, "must be a positive duration");
+        }
         if (workerConfig.getMaxHeartbeatInterval().getSeconds() <= 0) {
             errors.rejectValue("max-heartbeat-interval", null, "should be a valid duration");
         }
@@ -86,6 +95,7 @@ public class WorkerConfig implements Validator {
                 "\n****************************Worker Configuration**************************************" +
                         "\n  listen-port -> " + listenPort +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
+                        "\n  task-event-report-max-duration -> " + taskEventReportMaxDuration +
                         "\n  host-weight -> " + hostWeight +
                         "\n  tenantConfig -> " + tenantConfig +
                         "\n  server-load-protection -> " + serverLoadProtection +

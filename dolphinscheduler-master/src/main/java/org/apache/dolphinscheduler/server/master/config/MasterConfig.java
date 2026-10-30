@@ -56,6 +56,11 @@ public class MasterConfig implements Validator {
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
 
     /**
+     * Maximum time to retain unacknowledged events after a task executor finishes.
+     */
+    private Duration taskEventReportMaxDuration = Duration.ofHours(1);
+
+    /**
      * Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.
      */
     private boolean killApplicationWhenTaskFailover = true;
@@ -93,6 +98,10 @@ public class MasterConfig implements Validator {
     @Override
     public void validate(Object target, Errors errors) {
         MasterConfig masterConfig = (MasterConfig) target;
+        if (masterConfig.getTaskEventReportMaxDuration() == null
+                || masterConfig.getTaskEventReportMaxDuration().toMillis() <= 0) {
+            errors.rejectValue("task-event-report-max-duration", null, "must be a positive duration");
+        }
         if (masterConfig.getListenPort() <= 0) {
             errors.rejectValue("listen-port", null, "is invalidated");
         }
@@ -139,6 +148,7 @@ public class MasterConfig implements Validator {
                         "\n  workflow-event-bus-fire-thread-count -> " + workflowEventBusFireThreadCount +
                         "\n  logic-task-config -> " + logicTaskConfig +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
+                        "\n  task-event-report-max-duration -> " + taskEventReportMaxDuration +
                         "\n  kill-application-when-task-failover -> " + isKillApplicationWhenTaskFailover() +
                         "\n  server-load-protection -> " + serverLoadProtection +
                         "\n  master-address -> " + masterAddress +
