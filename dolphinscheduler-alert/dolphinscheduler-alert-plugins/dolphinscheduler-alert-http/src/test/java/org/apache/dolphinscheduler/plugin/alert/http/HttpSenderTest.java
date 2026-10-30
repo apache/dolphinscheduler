@@ -42,6 +42,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 @ExtendWith(MockitoExtension.class)
 public class HttpSenderTest {
 
@@ -119,12 +121,89 @@ public class HttpSenderTest {
         Assertions.assertTrue(alertResult.getMessage().contains(msg));
     }
 
+    @Test
+    void testHttpSenderPostWithNestedBody() throws Exception {
+        String msg = "line1\n\"quoted\" message";
+        String bodyParamsJson = "{\"msgtype\":\"text\",\"text\":{\"content\":[{\"message\":\"${msg}\"}]}}";
+        paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS, bodyParamsJson);
+        paramsMap.put(HttpAlertConstants.NAME_CONTENT_TYPE, OkHttpRequestHeaderContentType.APPLICATION_JSON.getValue());
+
+        String mockPostUrl = createMockWebServer("/post", HttpStatus.SC_OK);
+        paramsMap.put(HttpAlertConstants.NAME_URL, mockPostUrl);
+
+        paramsMap.put(HttpAlertConstants.NAME_REQUEST_TYPE, HttpRequestMethod.POST.name());
+
+        HttpSender httpSender = new HttpSender(paramsMap);
+
+        AlertResult alertResult = httpSender.send(msg);
+
+        Assertions.assertTrue(alertResult.isSuccess());
+        JsonNode requestBody = recordedRequestBody(alertResult);
+        Assertions.assertEquals("text", requestBody.get("msgtype").asText(),
+                "unexpected request body: " + requestBody);
+        Assertions.assertEquals(msg, requestBody.get("text").get("content").get(0).get("message").asText());
+    }
+
+    @Test
+    void testHttpSenderPostWithNullMsgAndPlaceholder() throws Exception {
+        paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS,
+                "{\"msgtype\":\"text\",\"text\":{\"content\":\"${msg}\"}}");
+        paramsMap.put(HttpAlertConstants.NAME_CONTENT_TYPE, OkHttpRequestHeaderContentType.APPLICATION_JSON.getValue());
+
+        MockWebServer server = createMockWebServerAndReturn("/post", HttpStatus.SC_OK);
+        paramsMap.put(HttpAlertConstants.NAME_URL, server.url("/post").toString());
+
+        paramsMap.put(HttpAlertConstants.NAME_REQUEST_TYPE, HttpRequestMethod.POST.name());
+
+        HttpSender httpSender = new HttpSender(paramsMap);
+
+        RuntimeException exception =
+                Assertions.assertThrows(RuntimeException.class, () -> httpSender.send(null));
+        Assertions.assertTrue(exception.getMessage().contains("alert content is null"),
+                "unexpected exception: " + exception.getMessage());
+        Assertions.assertEquals(0, server.getRequestCount(), "the request should not be sent");
+    }
+
+    @Test
+    void testHttpSenderPostWithNullMsgAndStaticBody() throws Exception {
+        paramsMap.put(HttpAlertConstants.NAME_BODY_PARAMS,
+                "{\"msgtype\":\"text\",\"text\":{\"content\":\"static message\"}}");
+        paramsMap.put(HttpAlertConstants.NAME_CONTENT_TYPE, OkHttpRequestHeaderContentType.APPLICATION_JSON.getValue());
+
+        String mockPostUrl = createMockWebServer("/post", HttpStatus.SC_OK);
+        paramsMap.put(HttpAlertConstants.NAME_URL, mockPostUrl);
+
+        paramsMap.put(HttpAlertConstants.NAME_REQUEST_TYPE, HttpRequestMethod.POST.name());
+
+        HttpSender httpSender = new HttpSender(paramsMap);
+
+        AlertResult alertResult = httpSender.send(null);
+
+        Assertions.assertTrue(alertResult.isSuccess());
+        JsonNode requestBody = recordedRequestBody(alertResult);
+        Assertions.assertEquals("static message", requestBody.get("text").get("content").asText());
+    }
+
+    /**
+     * The mock server echoes the recorded request body, see {@link #generateMockDispatcher}.
+     */
+    private JsonNode recordedRequestBody(AlertResult alertResult) {
+        String responseBody =
+                alertResult.getMessage().substring("send http alert success, response body: ".length());
+        Map<String, String> responseMap = JSONUtils.toMap(responseBody);
+        return JSONUtils.parseObject(responseMap.get("body"), JsonNode.class);
+    }
+
     private String createMockWebServer(String path, int actualResponseCode) throws IOException {
+        return createMockWebServerAndReturn(path, actualResponseCode).url(path).toString();
+    }
+
+    private MockWebServer createMockWebServerAndReturn(String path, int actualResponseCode) throws IOException {
         MockWebServer server = new MockWebServer();
         mockWebServers.add(server);
         server.start();
         server.setDispatcher(generateMockDispatcher(actualResponseCode));
-        return server.url(path).toString();
+        return server;
     }
 
     private Dispatcher generateMockDispatcher(int actualResponseCode) {
@@ -136,7 +215,7 @@ public class HttpSenderTest {
                 Map<String, String> responseMap = new HashMap<>();
                 responseMap.put("url", request.getRequestUrl().toString());
                 responseMap.put("headers", request.getHeaders().toString());
-                responseMap.put("body", request.getBody().toString());
+                responseMap.put("body", request.getBody().readUtf8());
                 String responseBody = JSONUtils.toJsonString(responseMap);
                 return new MockResponse()
                         .setResponseCode(actualResponseCode)
