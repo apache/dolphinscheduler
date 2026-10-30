@@ -176,21 +176,26 @@ public class SqlParametersTest {
 
     @Test
     public void testDealOutParamValueFormatShouldNotDependOnRowCount() {
-        List<Property> properties = new ArrayList<>();
-        properties.add(outProperty("list_user", DataType.LIST));
-        properties.add(outProperty("varchar_user", DataType.VARCHAR));
+        List<Property> listProperties = new ArrayList<>();
+        listProperties.add(outProperty("list_user", DataType.LIST));
+        List<Property> varcharProperties = new ArrayList<>();
+        varcharProperties.add(outProperty("varchar_user", DataType.VARCHAR));
 
         String multiLineResult = "[{\"list_user\":\"user2\",\"varchar_user\":\"user2\"},"
                 + "{\"list_user\":\"user3\",\"varchar_user\":\"user3\"}]";
         String singleLineResult = "[{\"list_user\":\"user2\",\"varchar_user\":\"user2\"}]";
 
         // LIST out parameter keeps the json array format in both cases
-        Assertions.assertEquals("[\"user2\",\"user3\"]", outParamValue(properties, 0, multiLineResult));
-        Assertions.assertEquals("[\"user2\"]", outParamValue(properties, 0, singleLineResult));
+        Assertions.assertEquals("[\"user2\",\"user3\"]", outParamValue(listProperties, 0, multiLineResult));
+        Assertions.assertEquals("[\"user2\"]", outParamValue(listProperties, 0, singleLineResult));
 
-        // non LIST out parameter keeps the last value(compatible with the previous single line behaviour)
-        Assertions.assertEquals("user3", outParamValue(properties, 1, multiLineResult));
-        Assertions.assertEquals("user2", outParamValue(properties, 1, singleLineResult));
+        // non LIST out parameter keeps the single row value
+        Assertions.assertEquals("user2", outParamValue(varcharProperties, 0, singleLineResult));
+
+        // non LIST out parameter rejects multi-row results instead of silently picking a non-deterministic row
+        TaskException exception = Assertions.assertThrows(TaskException.class,
+                () -> outParamValue(varcharProperties, 0, multiLineResult));
+        Assertions.assertTrue(exception.getMessage().contains("varchar_user"));
     }
 
     @Test
@@ -203,16 +208,16 @@ public class SqlParametersTest {
     }
 
     @Test
-    public void testLongOutParameterNormalizesLastRowValueForMultiLineResult() {
+    public void testNonListOutParameterRejectsMultiRowResult() {
         List<Property> properties = new ArrayList<>();
         properties.add(outProperty("SRC_CNT", DataType.LONG));
 
-        Assertions.assertEquals("11423000",
-                outParamValue(properties, 0, "[{\"SRC_CNT\":1},{\"SRC_CNT\":1.1423E+7}]"));
-
         TaskException exception = Assertions.assertThrows(TaskException.class,
-                () -> outParamValue(properties, 0, "[{\"SRC_CNT\":1},{\"SRC_CNT\":\"invalid\"}]"));
+                () -> outParamValue(properties, 0, "[{\"SRC_CNT\":1},{\"SRC_CNT\":2},{\"SRC_CNT\":3}]"));
+        // the error tells the parameter name, type and row count
         Assertions.assertTrue(exception.getMessage().contains("SRC_CNT"));
+        Assertions.assertTrue(exception.getMessage().contains("LONG"));
+        Assertions.assertTrue(exception.getMessage().contains("3"));
     }
 
     private Property outProperty(String prop, DataType dataType) {

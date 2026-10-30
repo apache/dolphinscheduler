@@ -154,9 +154,15 @@ public class SqlParameters extends AbstractParameters {
                 // LIST OUT parameter always keeps the JSON array format, even if the result only has one row
                 info.setValue(JSONUtils.toJsonString(columnValues));
             } else if (columnValues != null) {
-                // non LIST OUT parameter keeps the last row value, which is compatible with the previous
-                // single row behaviour
-                info.setValue(convertOutParamValue(info, columnValues.get(columnValues.size() - 1)));
+                if (columnValues.size() > 1) {
+                    // fail fast instead of silently picking a non-deterministic row: without ORDER BY
+                    // the row order is not guaranteed, so any picked row may be a plausible but
+                    // incorrect value for downstream tasks
+                    throw new TaskException("Invalid SQL OUT parameter '" + info.getProp() + "' of type "
+                            + info.getType() + ": the query returned " + columnValues.size() + " rows, please use a"
+                            + " LIST parameter or make the query return a single row(e.g. add LIMIT 1)");
+                }
+                info.setValue(convertOutParamValue(info, columnValues.get(0)));
             }
         }
         varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
