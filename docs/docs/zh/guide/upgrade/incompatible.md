@@ -67,6 +67,8 @@
 
 ### 项目权限模型
 
+完整的操作权限、项目资源授权、跨项目校验及撤权生效边界见[安全中心（权限系统）](../security/security.md#授予权限)。
+
 以下架构图对比旧权限模型与 3.5.0 引入的项目权限模型。
 
 ![旧权限模型](../../../../img/architecture-design/project-scoped-authorization-before.png)

@@ -68,6 +68,8 @@ This document records the incompatible updates between each version. You need to
 
 ### Project authorization model
 
+See [Security (Authorization System)](../security/security.md#granted-permissions) for operation permissions, resource grants, cross-project checks and when revocation takes effect.
+
 The following diagrams compare the legacy authorization model with project-scoped authorization introduced in 3.5.0.
 
 ![Legacy authorization model](../../../../img/architecture-design/project-scoped-authorization-before.png)
