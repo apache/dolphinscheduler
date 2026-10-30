@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.common.CommonConfiguration;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.dao.DaoConfiguration;
+import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfiguration;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourcePluginManager;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageConfiguration;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
@@ -38,7 +39,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.event.EventListener;
 
 @Slf4j
-@Import({DaoConfiguration.class,
+@Import({RpcAuthenticationConfiguration.class,
+        DaoConfiguration.class,
         CommonConfiguration.class,
         ServiceConfiguration.class,
         StorageConfiguration.class,

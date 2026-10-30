@@ -15,6 +15,12 @@
 # limitations under the License.
 #
 
+rpc:
+  authentication:
+    enabled: false
+    # Base64-encoded 32-byte random secret, shared by all services in this cluster.
+    secret: ""
+
 spring:
   application:
     name: alert-server

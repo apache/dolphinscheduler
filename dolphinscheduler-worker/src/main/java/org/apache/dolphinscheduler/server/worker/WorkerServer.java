@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.thread.DefaultUncaughtExceptionHandler;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfiguration;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
 import org.apache.dolphinscheduler.plugin.datasource.api.plugin.DataSourcePluginManager;
@@ -44,7 +45,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 @Slf4j
-@Import({CommonConfiguration.class,
+@Import({RpcAuthenticationConfiguration.class,
+        CommonConfiguration.class,
         StorageConfiguration.class,
         RegistryConfiguration.class})
 @SpringBootApplication

@@ -27,6 +27,12 @@ spring:
       - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
   cloud.discovery.client.composite-indicator.enabled: false
 
+rpc:
+  authentication:
+    enabled: false
+    # Base64-encoded 32-byte random secret, shared by all services in this cluster.
+    secret: ""
+
 registry:
   type: zookeeper
   zookeeper:

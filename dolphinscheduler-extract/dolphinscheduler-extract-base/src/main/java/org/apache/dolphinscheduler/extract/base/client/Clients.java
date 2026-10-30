@@ -33,10 +33,24 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Clients {
 
-    private static final JdkDynamicRpcClientProxyFactory jdkDynamicRpcClientProxyFactory =
-            new JdkDynamicRpcClientProxyFactory(
-                    NettyRemotingClientFactory.buildNettyRemotingClient(
-                            new NettyClientConfig()));
+    private static volatile JdkDynamicRpcClientProxyFactory jdkDynamicRpcClientProxyFactory;
+    private static NettyRemotingClient nettyRemotingClient;
+
+    public static synchronized void initialize(NettyClientConfig clientConfig) {
+        if (jdkDynamicRpcClientProxyFactory != null) {
+            throw new IllegalStateException("RPC client is already initialized");
+        }
+        nettyRemotingClient = NettyRemotingClientFactory.buildNettyRemotingClient(clientConfig);
+        jdkDynamicRpcClientProxyFactory = new JdkDynamicRpcClientProxyFactory(nettyRemotingClient);
+    }
+
+    public static synchronized void close() {
+        jdkDynamicRpcClientProxyFactory = null;
+        if (nettyRemotingClient != null) {
+            nettyRemotingClient.close();
+            nettyRemotingClient = null;
+        }
+    }
 
     public static <T> JdkDynamicRpcClientProxyBuilder<T> withService(Class<T> serviceClazz) {
         return new JdkDynamicRpcClientProxyBuilder<>(serviceClazz);
@@ -51,7 +65,11 @@ public class Clients {
         }
 
         public T withHost(String serviceHost) {
-            return jdkDynamicRpcClientProxyFactory.getProxyClient(serviceHost, serviceClazz);
+            JdkDynamicRpcClientProxyFactory factory = jdkDynamicRpcClientProxyFactory;
+            if (factory == null) {
+                throw new IllegalStateException("RPC client has not been initialized");
+            }
+            return factory.getProxyClient(serviceHost, serviceClazz);
         }
     }
 

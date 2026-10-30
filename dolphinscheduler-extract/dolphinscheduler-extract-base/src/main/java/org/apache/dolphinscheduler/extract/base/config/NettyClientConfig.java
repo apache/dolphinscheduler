@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.extract.base.config;
 
+import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfig;
+
 import java.time.Duration;
 
 import lombok.AllArgsConstructor;
@@ -29,6 +31,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class NettyClientConfig {
+
+    @Builder.Default
+    private RpcAuthenticationConfig authentication = RpcAuthenticationConfig.disabled();
 
     /**
      * worker threads，default get machine cpus

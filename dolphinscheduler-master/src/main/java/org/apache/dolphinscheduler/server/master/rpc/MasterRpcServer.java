@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.rpc;
 
+import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfig;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -29,8 +30,9 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class MasterRpcServer extends SpringServerMethodInvokerDiscovery implements AutoCloseable {
 
-    public MasterRpcServer(MasterConfig masterConfig) {
-        super(NettyServerConfig.builder().serverName("MasterRpcServer").listenPort(masterConfig.getListenPort())
+    public MasterRpcServer(MasterConfig masterConfig, RpcAuthenticationConfig authenticationConfig) {
+        super(NettyServerConfig.builder().authentication(authenticationConfig).serverName("MasterRpcServer")
+                .listenPort(masterConfig.getListenPort())
                 .build());
     }
 

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.alert.rpc;
 
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfig;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 
@@ -29,8 +30,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class AlertRpcServer extends SpringServerMethodInvokerDiscovery implements AutoCloseable {
 
-    public AlertRpcServer(AlertConfig alertConfig) {
-        super(NettyServerConfig.builder().serverName("AlertRpcServer").listenPort(alertConfig.getPort()).build());
+    public AlertRpcServer(AlertConfig alertConfig, RpcAuthenticationConfig authenticationConfig) {
+        super(NettyServerConfig.builder().authentication(authenticationConfig).serverName("AlertRpcServer")
+                .listenPort(alertConfig.getPort()).build());
     }
 
 }

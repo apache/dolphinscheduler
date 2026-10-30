@@ -18,12 +18,14 @@
 package org.apache.dolphinscheduler.alert.rpc;
 
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfig;
 
 import org.junit.jupiter.api.Test;
 
 class AlertRpcServerTest {
 
-    private final AlertRpcServer alertRpcServer = new AlertRpcServer(new AlertConfig());
+    private final AlertRpcServer alertRpcServer =
+            new AlertRpcServer(new AlertConfig(), RpcAuthenticationConfig.disabled());
 
     @Test
     void testStart() {

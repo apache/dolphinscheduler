@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.microbench.rpc;
 
 import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.server.SpringServerMethodInvokerDiscovery;
 import org.apache.dolphinscheduler.microbench.base.AbstractBaseBenchmark;
@@ -51,6 +52,7 @@ public class RpcBenchMarkTest extends AbstractBaseBenchmark {
 
     @Setup
     public void before() {
+        Clients.initialize(new NettyClientConfig());
         NettyServerConfig nettyServerConfig =
                 NettyServerConfig.builder().serverName("NettyRemotingServer").listenPort(12345).build();
         springServerMethodInvokerDiscovery = new SpringServerMethodInvokerDiscovery(nettyServerConfig);
@@ -72,5 +74,6 @@ public class RpcBenchMarkTest extends AbstractBaseBenchmark {
     @TearDown
     public void after() {
         springServerMethodInvokerDiscovery.close();
+        Clients.close();
     }
 }

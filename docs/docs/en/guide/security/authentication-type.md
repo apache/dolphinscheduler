@@ -395,3 +395,43 @@ Clicking the button will redirect you to your OIDC provider to authenticate. Aft
 
 > **Note:** When a user clicks a provider's login button, they are first directed to a specific endpoint on the DolphinScheduler backend (e.g., `/dolphinscheduler/oauth2/authorization/keycloak`). The backend then constructs the full request and redirects the user's browser to the OIDC provider's login page.
 
+## Inter-service RPC authentication
+
+API, Master, Worker and Alert can authenticate internal RPC connections using a cluster-wide shared secret.
+Authentication is disabled by default. Configure the following in each service's `conf/application.yaml`, or in the
+standalone server's `conf/application.yaml`:
+
+```yaml
+rpc:
+  authentication:
+    enabled: true
+    secret: "<Base64-encoded 32-byte random secret>"
+```
+
+Generate a random 32-byte secret with `openssl rand -base64 32` and configure the same value on every service instance.
+Do not use a human-selected password. Restrict access to `application.yaml` to the service account and protect the secret
+from workflow code. Environment variables `RPC_AUTHENTICATION_ENABLED` and `RPC_AUTHENTICATION_SECRET` can override the YAML settings,
+including injecting the secret from a Kubernetes Secret.
+The decoded secret is never sent over the network, and authentication configuration errors do not include its value.
+
+The connection performs a versioned, fixed-size challenge-response handshake before RPC framing. The server and client
+contribute independent 32-byte random nonces. Both prove possession of the secret using HMAC-SHA256 over a protocol
+context, a distinct client/server role byte, and both nonces. Proofs are compared in constant time. Successful handshakes
+are bound to their connection; reconnecting requires a new handshake. Business requests and heartbeats cannot bypass
+authentication. Invalid, missing or timed-out authentication closes the connection without falling back to plaintext RPC.
+An enabled client also refuses to use a server that does not authenticate. Missing or invalid secrets prevent service startup, including on an API server that only initiates RPC calls.
+A fixed internal five-second deadline limits how long a newly connected peer can leave authentication incomplete;
+it is separate from the business RPC request timeout and does not require configuration.
+
+This authenticates membership in the cluster. Every holder of the secret has the same RPC identity; it does not enforce
+service-role or user permissions. It does not encrypt or integrity-protect subsequent RPC traffic, and does not prevent an
+active network attacker from relaying a handshake and manipulating that traffic. Continue to isolate the RPC network and
+protect the secret from workflow code. This handshake is not wire-compatible with Spark's authentication protocol.
+
+For upgrades, first deploy this version to every service with authentication disabled. Then coordinate enabling
+it on all services and restart them. Mixed authenticated/unauthenticated services cannot communicate. Credentials are
+loaded at startup; editing the YAML does not rotate a running client's or server's credentials. To rotate a secret,
+coordinate a restart of all services with the new secret. There is no dual-secret transition or hot reload.
+
+Transport-level TLS/mTLS is not included in this feature. It can be added before the authentication handler later without
+changing business RPC interfaces.
