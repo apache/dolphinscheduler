@@ -574,10 +574,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (StringUtils.isEmpty(projectIds)) {
             return;
         }
-        int[] parsedProjectIds;
+        String[] uniqueProjectIds = Arrays.stream(projectIds.split(Constants.COMMA, -1)).distinct()
+                .toArray(String[]::new);
+        int[] parsedProjectIds = new int[uniqueProjectIds.length];
         try {
-            parsedProjectIds = Arrays.stream(projectIds.split(Constants.COMMA, -1)).distinct()
-                    .mapToInt(Integer::parseInt).toArray();
+            for (int i = 0; i < uniqueProjectIds.length; i++) {
+                parsedProjectIds[i] = Integer.parseInt(uniqueProjectIds[i]);
+            }
         } catch (NumberFormatException ex) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "projectIds");
         }

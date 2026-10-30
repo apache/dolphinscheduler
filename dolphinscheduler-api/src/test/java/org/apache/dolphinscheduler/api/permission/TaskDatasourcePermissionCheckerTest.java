@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.permission;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
+import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
@@ -52,15 +53,15 @@ public class TaskDatasourcePermissionCheckerTest {
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                 () -> checker.checkPermission(100L, Collections.singletonList(remoteShellTask())));
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
-        Mockito.verify(resourceAuthorizationDao).isAuthorized(100L, ProjectResourceType.DATASOURCE, "42");
+        Mockito.verify(resourceAuthorizationDao).queryByProjectAndType(100L, ProjectResourceType.DATASOURCE);
     }
 
     @Test
     public void shouldUseDestinationProjectInsteadOfSubmittedTaskProject() {
         TaskDefinition task = remoteShellTask();
         task.setProjectCode(200L);
-        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.DATASOURCE, "42"))
-                .thenReturn(true);
+        Mockito.when(resourceAuthorizationDao.queryByProjectAndType(100L, ProjectResourceType.DATASOURCE))
+                .thenReturn(Collections.singletonList(datasourceGrant(42)));
         Assertions.assertDoesNotThrow(() -> checker.checkPermission(100L, Collections.singletonList(task)));
         Assertions.assertThrows(ServiceException.class,
                 () -> checker.checkPermission(200L, Collections.singletonList(task)));
@@ -68,10 +69,10 @@ public class TaskDatasourcePermissionCheckerTest {
 
     @Test
     public void shouldCheckSharedDatasourceOnlyOncePerRequest() {
-        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.DATASOURCE, "42"))
-                .thenReturn(true);
+        Mockito.when(resourceAuthorizationDao.queryByProjectAndType(100L, ProjectResourceType.DATASOURCE))
+                .thenReturn(Collections.singletonList(datasourceGrant(42)));
         checker.checkPermission(100L, Arrays.asList(remoteShellTask(), remoteShellTask()));
-        Mockito.verify(resourceAuthorizationDao).isAuthorized(100L, ProjectResourceType.DATASOURCE, "42");
+        Mockito.verify(resourceAuthorizationDao).queryByProjectAndType(100L, ProjectResourceType.DATASOURCE);
     }
 
     @Test
@@ -99,13 +100,44 @@ public class TaskDatasourcePermissionCheckerTest {
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                 () -> checker.checkPermission(100L, Arrays.asList(shellTask, remoteShellTask())));
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
-        Mockito.verify(resourceAuthorizationDao).isAuthorized(100L, ProjectResourceType.DATASOURCE, "42");
+        Mockito.verify(resourceAuthorizationDao).queryByProjectAndType(100L, ProjectResourceType.DATASOURCE);
+    }
+
+    @Test
+    public void shouldRejectRequestWhenOnlySomeDatasourcesAreGranted() {
+        Mockito.when(resourceAuthorizationDao.queryByProjectAndType(100L, ProjectResourceType.DATASOURCE))
+                .thenReturn(Collections.singletonList(datasourceGrant(42)));
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> checker.checkPermission(100L, Arrays.asList(remoteShellTask(42), remoteShellTask(43))));
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Mockito.verify(resourceAuthorizationDao).queryByProjectAndType(100L, ProjectResourceType.DATASOURCE);
+    }
+
+    @Test
+    public void shouldAcceptAllGrantedDatasourcesWithOneProjectGrantQuery() {
+        Mockito.when(resourceAuthorizationDao.queryByProjectAndType(100L, ProjectResourceType.DATASOURCE))
+                .thenReturn(Arrays.asList(datasourceGrant(42), datasourceGrant(43)));
+        Assertions.assertDoesNotThrow(
+                () -> checker.checkPermission(100L, Arrays.asList(remoteShellTask(42), remoteShellTask(43))));
+        Mockito.verify(resourceAuthorizationDao).queryByProjectAndType(100L, ProjectResourceType.DATASOURCE);
+    }
+
+    private ProjectResourceAuthorization datasourceGrant(int datasourceId) {
+        ProjectResourceAuthorization grant = new ProjectResourceAuthorization();
+        grant.setProjectCode(100L);
+        grant.setResourceType(ProjectResourceType.DATASOURCE);
+        grant.setResourceKey(Integer.toString(datasourceId));
+        return grant;
     }
 
     private TaskDefinition remoteShellTask() {
+        return remoteShellTask(42);
+    }
+
+    private TaskDefinition remoteShellTask(int datasourceId) {
         TaskDefinition task = new TaskDefinition();
         task.setTaskType("REMOTESHELL");
-        task.setTaskParams("{\"rawScript\":\"echo test\",\"type\":\"SSH\",\"datasource\":42}");
+        task.setTaskParams("{\"rawScript\":\"echo test\",\"type\":\"SSH\",\"datasource\":" + datasourceId + "}");
         return task;
     }
 }

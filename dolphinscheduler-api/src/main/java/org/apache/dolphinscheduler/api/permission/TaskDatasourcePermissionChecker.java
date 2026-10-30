@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.permission;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
+import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
@@ -32,6 +33,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -74,9 +76,11 @@ public class TaskDatasourcePermissionChecker {
             return;
         }
 
+        Set<String> authorizedDatasourceIds = resourceAuthorizationDao
+                .queryByProjectAndType(projectCode, ProjectResourceType.DATASOURCE).stream()
+                .map(ProjectResourceAuthorization::getResourceKey).collect(Collectors.toSet());
         for (Integer datasourceId : datasourceIds) {
-            if (!resourceAuthorizationDao.isAuthorized(projectCode, ProjectResourceType.DATASOURCE,
-                    datasourceId.toString())) {
+            if (!authorizedDatasourceIds.contains(datasourceId.toString())) {
                 log.warn("Project is not authorized to use datasource, projectCode:{}, datasourceId:{}.",
                         projectCode, datasourceId);
                 throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
