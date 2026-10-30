@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.rpc;
 
 import org.apache.dolphinscheduler.extract.master.ITaskExecutorEventListener;
-import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
@@ -52,9 +51,6 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
 
     @Autowired
     private IWorkflowRepository workflowRepository;
-
-    @Autowired
-    private TaskExecutorTerminalAckRecovery taskExecutorTerminalAckRecovery;
 
     @Override
     public void onTaskExecutorDispatched(final TaskExecutorDispatchedLifecycleEvent taskExecutorDispatchedLifecycleEvent) {
@@ -114,16 +110,8 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
     public void onTaskExecutorSuccess(final TaskExecutorSuccessLifecycleEvent taskExecutorSuccessLifecycleEvent) {
         LogUtils.setWorkflowInstanceIdMDC(taskExecutorSuccessLifecycleEvent.getWorkflowInstanceId());
         try {
-            final IWorkflowExecution workflowExecution =
-                    workflowRepository.get(taskExecutorSuccessLifecycleEvent.getWorkflowInstanceId());
-            if (workflowExecution == null) {
-                // A finished workflow may have left the cache before its executor received the terminal ACK.
-                taskExecutorTerminalAckRecovery.recover(taskExecutorSuccessLifecycleEvent, TaskExecutionStatus.SUCCESS,
-                        taskExecutorSuccessLifecycleEvent.getTaskInstanceHost());
-                return;
-            }
             final ITaskExecution taskExecution =
-                    getTaskExecution(taskExecutorSuccessLifecycleEvent, workflowExecution);
+                    getTaskExecution(taskExecutorSuccessLifecycleEvent);
             final TaskSuccessLifecycleEvent taskSuccessEvent = TaskSuccessLifecycleEvent.builder()
                     .taskExecution(taskExecution)
                     .endTime(new Date(taskExecutorSuccessLifecycleEvent.getEndTime()))
@@ -141,16 +129,8 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
     public void onTaskExecutorFailed(final TaskExecutorFailedLifecycleEvent taskExecutorFailedLifecycleEvent) {
         LogUtils.setWorkflowInstanceIdMDC(taskExecutorFailedLifecycleEvent.getWorkflowInstanceId());
         try {
-            final IWorkflowExecution workflowExecution =
-                    workflowRepository.get(taskExecutorFailedLifecycleEvent.getWorkflowInstanceId());
-            if (workflowExecution == null) {
-                // A finished workflow may have left the cache before its executor received the terminal ACK.
-                taskExecutorTerminalAckRecovery.recover(taskExecutorFailedLifecycleEvent, TaskExecutionStatus.FAILURE,
-                        taskExecutorFailedLifecycleEvent.getTaskInstanceHost());
-                return;
-            }
             final ITaskExecution taskExecution =
-                    getTaskExecution(taskExecutorFailedLifecycleEvent, workflowExecution);
+                    getTaskExecution(taskExecutorFailedLifecycleEvent);
             final TaskFailedLifecycleEvent taskFailedEvent = TaskFailedLifecycleEvent.builder()
                     .taskExecution(taskExecution)
                     .endTime(new Date(taskExecutorFailedLifecycleEvent.getEndTime()))
@@ -165,16 +145,8 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
     public void onTaskExecutorKilled(final TaskExecutorKilledLifecycleEvent taskExecutorKilledLifecycleEvent) {
         LogUtils.setWorkflowInstanceIdMDC(taskExecutorKilledLifecycleEvent.getWorkflowInstanceId());
         try {
-            final IWorkflowExecution workflowExecution =
-                    workflowRepository.get(taskExecutorKilledLifecycleEvent.getWorkflowInstanceId());
-            if (workflowExecution == null) {
-                // A finished workflow may have left the cache before its executor received the terminal ACK.
-                taskExecutorTerminalAckRecovery.recover(taskExecutorKilledLifecycleEvent, TaskExecutionStatus.KILL,
-                        taskExecutorKilledLifecycleEvent.getTaskInstanceHost());
-                return;
-            }
             final ITaskExecution taskExecution =
-                    getTaskExecution(taskExecutorKilledLifecycleEvent, workflowExecution);
+                    getTaskExecution(taskExecutorKilledLifecycleEvent);
             final TaskKilledLifecycleEvent taskKilledEvent = TaskKilledLifecycleEvent.builder()
                     .taskExecution(taskExecution)
                     .endTime(new Date(taskExecutorKilledLifecycleEvent.getEndTime()))
@@ -189,16 +161,8 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
     public void onTaskExecutorPaused(final TaskExecutorPausedLifecycleEvent taskExecutorPausedLifecycleEvent) {
         LogUtils.setWorkflowInstanceIdMDC(taskExecutorPausedLifecycleEvent.getWorkflowInstanceId());
         try {
-            final IWorkflowExecution workflowExecution =
-                    workflowRepository.get(taskExecutorPausedLifecycleEvent.getWorkflowInstanceId());
-            if (workflowExecution == null) {
-                // A finished workflow may have left the cache before its executor received the terminal ACK.
-                taskExecutorTerminalAckRecovery.recover(taskExecutorPausedLifecycleEvent, TaskExecutionStatus.PAUSE,
-                        taskExecutorPausedLifecycleEvent.getTaskInstanceHost());
-                return;
-            }
             final ITaskExecution taskExecution =
-                    getTaskExecution(taskExecutorPausedLifecycleEvent, workflowExecution);
+                    getTaskExecution(taskExecutorPausedLifecycleEvent);
             final TaskPausedLifecycleEvent taskPausedEvent = TaskPausedLifecycleEvent.of(taskExecution);
             taskExecution.getWorkflowEventBus().publish(taskPausedEvent);
         } finally {
@@ -208,17 +172,12 @@ public class TaskExecutorEventListenerImpl implements ITaskExecutorEventListener
 
     private ITaskExecution getTaskExecution(final IReportableTaskExecutorLifecycleEvent reportableTaskExecutorLifecycleEvent) {
         final int workflowInstanceId = reportableTaskExecutorLifecycleEvent.getWorkflowInstanceId();
+        final int taskInstanceId = reportableTaskExecutorLifecycleEvent.getTaskInstanceId();
 
         final IWorkflowExecution workflowExecution = workflowRepository.get(workflowInstanceId);
         if (workflowExecution == null) {
             throw new IllegalArgumentException("Cannot find the WorkflowExecuteRunnable: " + workflowInstanceId);
         }
-        return getTaskExecution(reportableTaskExecutorLifecycleEvent, workflowExecution);
-    }
-
-    private ITaskExecution getTaskExecution(final IReportableTaskExecutorLifecycleEvent event,
-                                            final IWorkflowExecution workflowExecution) {
-        final int taskInstanceId = event.getTaskInstanceId();
         final ITaskExecution taskExecution = workflowExecution.getWorkflowExecuteContext()
                 .getWorkflowExecutionGraph()
                 .getTaskExecutionById(taskInstanceId);

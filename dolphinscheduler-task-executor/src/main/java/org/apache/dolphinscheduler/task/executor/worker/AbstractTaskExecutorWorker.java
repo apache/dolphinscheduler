@@ -60,26 +60,30 @@ public abstract class AbstractTaskExecutorWorker implements ITaskExecutorWorker 
 
     protected void onTaskExecutorSuccess(final ITaskExecutor taskExecutor) {
         taskExecutor.getTaskExecutionContext().setEndTime(System.currentTimeMillis());
-        taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorSuccessLifecycleEvent.of(taskExecutor));
+        final TaskExecutorSuccessLifecycleEvent event = TaskExecutorSuccessLifecycleEvent.of(taskExecutor);
         onTaskExecutorFinished(taskExecutor);
+        taskExecutor.getTaskExecutorEventBus().publish(event);
     }
 
     protected void onTaskExecutorKilled(final ITaskExecutor taskExecutor) {
         taskExecutor.getTaskExecutionContext().setEndTime(System.currentTimeMillis());
-        taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorKilledLifecycleEvent.of(taskExecutor));
+        final TaskExecutorKilledLifecycleEvent event = TaskExecutorKilledLifecycleEvent.of(taskExecutor);
         onTaskExecutorFinished(taskExecutor);
+        taskExecutor.getTaskExecutorEventBus().publish(event);
     }
 
     protected void onTaskExecutorPaused(final ITaskExecutor taskExecutor) {
         taskExecutor.getTaskExecutionContext().setEndTime(System.currentTimeMillis());
-        taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorPausedLifecycleEvent.of(taskExecutor));
+        final TaskExecutorPausedLifecycleEvent event = TaskExecutorPausedLifecycleEvent.of(taskExecutor);
         onTaskExecutorFinished(taskExecutor);
+        taskExecutor.getTaskExecutorEventBus().publish(event);
     }
 
     protected void onTaskExecutorFailed(final ITaskExecutor taskExecutor) {
         taskExecutor.getTaskExecutionContext().setEndTime(System.currentTimeMillis());
-        taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorFailedLifecycleEvent.of(taskExecutor));
+        final TaskExecutorFailedLifecycleEvent event = TaskExecutorFailedLifecycleEvent.of(taskExecutor);
         onTaskExecutorFinished(taskExecutor);
+        taskExecutor.getTaskExecutorEventBus().publish(event);
     }
 
     protected void onTaskExecutorFinished(final ITaskExecutor taskExecutor) {

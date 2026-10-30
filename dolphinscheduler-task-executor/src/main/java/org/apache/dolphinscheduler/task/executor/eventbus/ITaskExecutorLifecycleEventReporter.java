@@ -48,9 +48,11 @@ public interface ITaskExecutorLifecycleEventReporter extends AutoCloseable {
     void receiveTaskExecutorLifecycleEventACK(final TaskExecutorLifecycleEventAck taskExecutorLifecycleEventAck);
 
     /**
-     * Reset the events in the channel to allow them to be reported immediately.
+     * Update the report destination and reset pending events so they can be reported immediately.
+     *
+     * @return whether a pending event channel was found
      */
-    void onWorkflowInstanceHostChanged(int taskInstanceId);
+    boolean onWorkflowInstanceHostChanged(int taskInstanceId, String workflowInstanceHost);
 
     /**
      * Shutdown the reporter.

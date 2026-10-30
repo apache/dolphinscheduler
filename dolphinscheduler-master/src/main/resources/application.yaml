@@ -99,6 +99,9 @@ master:
     # The number of threads used to execute logic task.
     # task-executor-thread-count: 10
   max-heartbeat-interval: 10s
+  # Stop retrying and discard unacknowledged events after this duration from task completion.
+  # Expiration is logged as an error; it does not mean the result was persisted by the master.
+  task-event-report-max-duration: 1h
   # Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.
   kill-application-when-task-failover: true
   server-load-protection:
