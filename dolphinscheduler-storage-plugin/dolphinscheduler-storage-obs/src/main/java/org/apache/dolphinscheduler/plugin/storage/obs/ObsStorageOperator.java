@@ -185,23 +185,30 @@ public class ObsStorageOperator extends AbstractStorageOperator implements Close
     public List<StorageEntity> listStorageEntity(String resourceAbsolutePath) {
         String obsResourceAbsolutePath = transformAbsolutePathToObsKey(resourceAbsolutePath);
 
-        ListObjectsRequest request = new ListObjectsRequest();
-        request.setBucketName(bucketName);
-        request.setPrefix(obsResourceAbsolutePath);
-        request.setDelimiter("/");
-
-        ObjectListing result = obsClient.listObjects(request);
-
         List<StorageEntity> storageEntities = new ArrayList<>();
-        storageEntities.addAll(result.getCommonPrefixes()
-                .stream()
-                .map(this::transformCommonPrefixToStorageEntity)
-                .collect(Collectors.toList()));
-        storageEntities.addAll(result.getObjects()
-                .stream()
-                .filter(object -> !object.getObjectKey().equals(obsResourceAbsolutePath))
-                .map(this::transformObsObjectToStorageEntity)
-                .collect(Collectors.toList()));
+        String marker = null;
+        ObjectListing result;
+        do {
+            ListObjectsRequest request = new ListObjectsRequest();
+            request.setBucketName(bucketName);
+            request.setPrefix(obsResourceAbsolutePath);
+            request.setDelimiter("/");
+            request.setMarker(marker);
+
+            result = obsClient.listObjects(request);
+
+            storageEntities.addAll(result.getCommonPrefixes()
+                    .stream()
+                    .map(this::transformCommonPrefixToStorageEntity)
+                    .collect(Collectors.toList()));
+            storageEntities.addAll(result.getObjects()
+                    .stream()
+                    .filter(object -> !object.getObjectKey().equals(obsResourceAbsolutePath))
+                    .map(this::transformObsObjectToStorageEntity)
+                    .collect(Collectors.toList()));
+
+            marker = result.getNextMarker();
+        } while (result.isTruncated() && marker != null);
 
         return storageEntities;
     }
