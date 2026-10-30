@@ -175,6 +175,68 @@ public class SqlParametersTest {
     }
 
     @Test
+    public void testDealOutParamValueFormatShouldNotDependOnRowCount() {
+        List<Property> properties = new ArrayList<>();
+        properties.add(outProperty("list_user", DataType.LIST));
+        properties.add(outProperty("varchar_user", DataType.VARCHAR));
+
+        String multiLineResult = "[{\"list_user\":\"user2\",\"varchar_user\":\"user2\"},"
+                + "{\"list_user\":\"user3\",\"varchar_user\":\"user3\"}]";
+        String singleLineResult = "[{\"list_user\":\"user2\",\"varchar_user\":\"user2\"}]";
+
+        // LIST out parameter keeps the json array format in both cases
+        Assertions.assertEquals("[\"user2\",\"user3\"]", outParamValue(properties, 0, multiLineResult));
+        Assertions.assertEquals("[\"user2\"]", outParamValue(properties, 0, singleLineResult));
+
+        // non LIST out parameter keeps the last value(compatible with the previous single line behaviour)
+        Assertions.assertEquals("user3", outParamValue(properties, 1, multiLineResult));
+        Assertions.assertEquals("user2", outParamValue(properties, 1, singleLineResult));
+    }
+
+    @Test
+    public void testDealOutParamWithNullValue() {
+        List<Property> properties = new ArrayList<>();
+        properties.add(outProperty("users", DataType.LIST));
+
+        Assertions.assertEquals("[\"user2\",\"null\"]",
+                outParamValue(properties, 0, "[{\"users\":\"user2\"},{\"users\":null}]"));
+    }
+
+    @Test
+    public void testLongOutParameterNormalizesLastRowValueForMultiLineResult() {
+        List<Property> properties = new ArrayList<>();
+        properties.add(outProperty("SRC_CNT", DataType.LONG));
+
+        Assertions.assertEquals("11423000",
+                outParamValue(properties, 0, "[{\"SRC_CNT\":1},{\"SRC_CNT\":1.1423E+7}]"));
+
+        TaskException exception = Assertions.assertThrows(TaskException.class,
+                () -> outParamValue(properties, 0, "[{\"SRC_CNT\":1},{\"SRC_CNT\":\"invalid\"}]"));
+        Assertions.assertTrue(exception.getMessage().contains("SRC_CNT"));
+    }
+
+    private Property outProperty(String prop, DataType dataType) {
+        Property property = new Property();
+        property.setProp(prop);
+        property.setDirect(Direct.OUT);
+        property.setType(dataType);
+        return property;
+    }
+
+    private String outParamValue(List<Property> properties, int index, String sqlResult) {
+        SqlParameters sqlParameters = new SqlParameters();
+        List<Property> localParams = new ArrayList<>();
+        for (Property property : properties) {
+            Property copy = new Property(property.getProp(), property.getDirect(), property.getType(), null);
+            localParams.add(copy);
+        }
+        sqlParameters.setLocalParams(localParams);
+        sqlParameters.varPool = new ArrayList<>();
+        sqlParameters.dealOutParam(sqlResult);
+        return sqlParameters.getVarPool().get(index).getValue();
+    }
+
+    @Test
     public void testCheckParameters_variants() {
         SqlParameters p = new SqlParameters();
 
