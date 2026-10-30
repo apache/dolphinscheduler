@@ -24,13 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
 
-import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.extract.base.RpcMethod;
 import org.apache.dolphinscheduler.extract.base.RpcService;
 import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfig;
-import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfiguration;
 import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationHandler;
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
@@ -57,9 +54,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.MockedStatic;
-import org.springframework.beans.BeansException;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import io.netty.channel.Channel;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -181,33 +175,9 @@ class RpcAuthenticationIntegrationTest {
     }
 
     @Test
-    void failsClientOnlyServiceStartupWhenEnabledWithoutSecret() {
-        try (
-                MockedStatic<PropertyUtils> properties = mockStatic(PropertyUtils.class);
-                AnnotationConfigApplicationContext context = context()) {
-            properties.when(() -> PropertyUtils.getString("rpc.authentication.enabled", "false")).thenReturn("true");
-            assertThrows(BeansException.class, context::refresh);
-        }
-    }
-
-    @Test
-    void rejectsInvalidEnabledFlagInsteadOfSilentlyDisablingAuthentication() {
-        try (
-                MockedStatic<PropertyUtils> properties = mockStatic(PropertyUtils.class);
-                AnnotationConfigApplicationContext context = context()) {
-            properties.when(() -> PropertyUtils.getString("rpc.authentication.enabled", "false")).thenReturn("typo");
-            assertThrows(BeansException.class, context::refresh);
-        }
-    }
-
-    @Test
     void defaultsToDisabledAndKeepsExistingClientsUsage() throws Exception {
         startServer(RpcAuthenticationConfig.disabled());
-        try (AnnotationConfigApplicationContext context = context()) {
-            context.refresh();
-            assertFalse(context.getBean(RpcAuthenticationConfig.class).isEnabled());
-            assertEquals("default", Clients.withService(Echo.class).withHost(host.getAddress()).echo("default"));
-        }
+        assertEquals("default", Clients.withService(Echo.class).withHost(host.getAddress()).echo("default"));
     }
 
     @Test
@@ -252,20 +222,10 @@ class RpcAuthenticationIntegrationTest {
         }
     }
 
-    private AnnotationConfigApplicationContext context() {
-        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-        context.register(RpcAuthenticationConfiguration.class);
-        return context;
-    }
-
     public static class PropertyClientProcess {
 
         public static void main(String[] args) {
-            try (
-                    AnnotationConfigApplicationContext context =
-                            new AnnotationConfigApplicationContext(RpcAuthenticationConfiguration.class)) {
-                System.out.println(Clients.withService(Echo.class).withHost(args[0]).echo("authenticated"));
-            }
+            System.out.println(Clients.withService(Echo.class).withHost(args[0]).echo("authenticated"));
         }
     }
 

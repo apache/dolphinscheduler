@@ -91,4 +91,24 @@ class RpcAuthenticationConfigTest {
         }
     }
 
+    @Test
+    void clientAndServerDefaultsRejectMissingSecret() {
+        try (MockedStatic<PropertyUtils> properties = mockStatic(PropertyUtils.class)) {
+            properties.when(() -> PropertyUtils.getString("rpc.authentication.enabled", "false")).thenReturn("true");
+            assertThrows(IllegalArgumentException.class, NettyClientConfig::new);
+            assertThrows(IllegalArgumentException.class, () -> NettyClientConfig.builder().build());
+            assertThrows(IllegalArgumentException.class, NettyServerConfig::new);
+            assertThrows(IllegalArgumentException.class, () -> NettyServerConfig.builder().build());
+        }
+    }
+
+    @Test
+    void invalidEnabledFlagDoesNotSilentlyDisableAuthentication() {
+        try (MockedStatic<PropertyUtils> properties = mockStatic(PropertyUtils.class)) {
+            properties.when(() -> PropertyUtils.getString("rpc.authentication.enabled", "false")).thenReturn("typo");
+            assertThrows(IllegalArgumentException.class, NettyClientConfig::new);
+            assertThrows(IllegalArgumentException.class, NettyServerConfig::new);
+        }
+    }
+
 }

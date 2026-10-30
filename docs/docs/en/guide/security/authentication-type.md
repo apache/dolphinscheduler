@@ -416,7 +416,9 @@ contribute independent 32-byte random nonces. Both prove possession of the secre
 context, a distinct client/server role byte, and both nonces. Proofs are compared in constant time. Successful handshakes
 are bound to their connection; reconnecting requires a new handshake. Business requests and heartbeats cannot bypass
 authentication. Invalid, missing or timed-out authentication closes the connection without falling back to plaintext RPC.
-An enabled client also refuses to use a server that does not authenticate. Missing or invalid secrets prevent service startup, including on an API server that only initiates RPC calls.
+An enabled client also refuses to use a server that does not authenticate. Missing or invalid secrets fail RPC client/server configuration construction before a connection is opened.
+Master, Worker and Alert validate this while creating their RPC servers at startup; an API instance that has not used RPC
+validates on its first client use.
 A fixed internal five-second deadline limits how long a newly connected peer can leave authentication incomplete;
 it is separate from the business RPC request timeout and does not require configuration.
 
@@ -427,7 +429,7 @@ protect the secret from workflow code. This handshake is not wire-compatible wit
 
 For upgrades, first deploy this version to every service with authentication disabled. Then coordinate enabling
 it on all services and restart them. Mixed authenticated/unauthenticated services cannot communicate. Configuration is read through `PropertyUtils` (environment > JVM properties > `common.properties`).
-The client initializes automatically on first use, and startup validation rejects invalid credentials.
+The client initializes automatically on first use; no Spring authentication configuration bean or explicit initialization is required.
 Credentials are cached for the process lifetime; editing the properties does not rotate a running client's or server's credentials. To rotate a secret,
 coordinate a restart of all services with the new secret. There is no dual-secret transition or hot reload.
 

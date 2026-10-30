@@ -17,7 +17,6 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
-import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 
 import org.junit.jupiter.api.Assertions;
@@ -25,8 +24,7 @@ import org.junit.jupiter.api.Test;
 
 class WorkerRpcServerTest {
 
-    private final WorkerRpcServer workerRpcServer =
-            new WorkerRpcServer(new WorkerConfig(), RpcAuthenticationConfig.disabled());
+    private final WorkerRpcServer workerRpcServer = new WorkerRpcServer(new WorkerConfig());
 
     @Test
     void testStart() {
