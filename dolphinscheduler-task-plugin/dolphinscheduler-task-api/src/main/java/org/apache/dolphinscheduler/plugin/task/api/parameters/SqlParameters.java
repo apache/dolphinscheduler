@@ -37,7 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -139,44 +138,62 @@ public class SqlParameters extends AbstractParameters {
                 new TypeReference<List<Map<String, String>>>() {
                 });
         if (CollectionUtils.isEmpty(sqlResult)) {
-            return;
-        }
-        // if sql return more than one line
-        if (sqlResult.size() > 1) {
-            Map<String, List<String>> sqlResultFormat = new HashMap<>();
-            // init sqlResultFormat
-            Set<String> keySet = sqlResult.get(0).keySet();
-            for (String key : keySet) {
-                sqlResultFormat.put(key, new ArrayList<>());
-            }
-            for (Map<String, String> info : sqlResult) {
-                for (String key : info.keySet()) {
-                    sqlResultFormat.get(key).add(String.valueOf(info.get(key)));
-                }
-            }
+            // the query returned zero rows: a LIST OUT parameter keeps an empty JSON array,
+            // while a non-LIST OUT parameter has no row to take the value from, so fail fast
+            // instead of silently passing an artificial value downstream
             for (Property info : outProperty) {
                 if (info.getType() == DataType.LIST) {
-                    info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getProp())));
+                    info.setValue(JSONUtils.toJsonString(new ArrayList<>()));
+                } else {
+                    throw nonListOutParamRowMismatch(info, 0);
                 }
             }
-        } else {
-            // result only one line
-            Map<String, String> firstRow = sqlResult.get(0);
-            for (Property info : outProperty) {
-                String value = String.valueOf(firstRow.get(info.getProp()));
-                if (info.getType() == DataType.LONG) {
-                    try {
-                        value = Long.toString(new BigDecimal(value).longValueExact());
-                    } catch (NumberFormatException | ArithmeticException e) {
-                        throw new TaskException("Invalid SQL OUT parameter '" + info.getProp()
-                                + "' of type LONG: '" + value + "' must be an integer within the LONG range", e);
-                    }
+            varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
+            return;
+        }
+        // collect the values of each column so that the OUT parameter format does not
+        // depend on the result row count, see https://github.com/apache/dolphinscheduler/issues/18750
+        Map<String, List<String>> sqlResultFormat = new HashMap<>();
+        for (Map<String, String> row : sqlResult) {
+            for (String key : row.keySet()) {
+                sqlResultFormat.computeIfAbsent(key, k -> new ArrayList<>()).add(String.valueOf(row.get(key)));
+            }
+        }
+        for (Property info : outProperty) {
+            List<String> columnValues = sqlResultFormat.get(info.getProp());
+            if (info.getType() == DataType.LIST) {
+                // LIST OUT parameter always keeps the JSON array format, even if the result only has one row
+                info.setValue(JSONUtils.toJsonString(columnValues));
+            } else if (columnValues != null) {
+                if (columnValues.size() > 1) {
+                    // fail fast instead of silently picking a non-deterministic row: without ORDER BY
+                    // the row order is not guaranteed, so any picked row may be a plausible but
+                    // incorrect value for downstream tasks
+                    throw nonListOutParamRowMismatch(info, columnValues.size());
                 }
-                info.setValue(value);
+                info.setValue(convertOutParamValue(info, columnValues.get(0)));
             }
         }
         varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
 
+    }
+
+    private TaskException nonListOutParamRowMismatch(Property info, int rowCount) {
+        return new TaskException("Invalid SQL OUT parameter '" + info.getProp() + "' of type " + info.getType()
+                + ": the query returned " + rowCount + " rows, please use a LIST parameter or make the query"
+                + " return a single row(e.g. add LIMIT 1)");
+    }
+
+    private String convertOutParamValue(Property info, String value) {
+        if (info.getType() != DataType.LONG) {
+            return value;
+        }
+        try {
+            return Long.toString(new BigDecimal(value).longValueExact());
+        } catch (NumberFormatException | ArithmeticException e) {
+            throw new TaskException("Invalid SQL OUT parameter '" + info.getProp()
+                    + "' of type LONG: '" + value + "' must be an integer within the LONG range", e);
+        }
     }
 
     @Override

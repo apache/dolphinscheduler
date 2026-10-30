@@ -175,6 +175,90 @@ public class SqlParametersTest {
     }
 
     @Test
+    public void testDealOutParamValueFormatShouldNotDependOnRowCount() {
+        List<Property> listProperties = new ArrayList<>();
+        listProperties.add(outProperty("list_user", DataType.LIST));
+        List<Property> varcharProperties = new ArrayList<>();
+        varcharProperties.add(outProperty("varchar_user", DataType.VARCHAR));
+
+        String multiLineResult = "[{\"list_user\":\"user2\",\"varchar_user\":\"user2\"},"
+                + "{\"list_user\":\"user3\",\"varchar_user\":\"user3\"}]";
+        String singleLineResult = "[{\"list_user\":\"user2\",\"varchar_user\":\"user2\"}]";
+
+        // LIST out parameter keeps the json array format in both cases
+        Assertions.assertEquals("[\"user2\",\"user3\"]", outParamValue(listProperties, 0, multiLineResult));
+        Assertions.assertEquals("[\"user2\"]", outParamValue(listProperties, 0, singleLineResult));
+
+        // non LIST out parameter keeps the single row value
+        Assertions.assertEquals("user2", outParamValue(varcharProperties, 0, singleLineResult));
+
+        // non LIST out parameter rejects multi-row results instead of silently picking a non-deterministic row
+        TaskException exception = Assertions.assertThrows(TaskException.class,
+                () -> outParamValue(varcharProperties, 0, multiLineResult));
+        Assertions.assertTrue(exception.getMessage().contains("varchar_user"));
+    }
+
+    @Test
+    public void testDealOutParamWithNullValue() {
+        List<Property> properties = new ArrayList<>();
+        properties.add(outProperty("users", DataType.LIST));
+
+        Assertions.assertEquals("[\"user2\",\"null\"]",
+                outParamValue(properties, 0, "[{\"users\":\"user2\"},{\"users\":null}]"));
+    }
+
+    @Test
+    public void testNonListOutParameterRejectsMultiRowResult() {
+        List<Property> properties = new ArrayList<>();
+        properties.add(outProperty("SRC_CNT", DataType.LONG));
+
+        TaskException exception = Assertions.assertThrows(TaskException.class,
+                () -> outParamValue(properties, 0, "[{\"SRC_CNT\":1},{\"SRC_CNT\":2},{\"SRC_CNT\":3}]"));
+        // the error tells the parameter name, type and row count
+        Assertions.assertTrue(exception.getMessage().contains("SRC_CNT"));
+        Assertions.assertTrue(exception.getMessage().contains("LONG"));
+        Assertions.assertTrue(exception.getMessage().contains("3"));
+    }
+
+    @Test
+    public void testDealOutParamWithZeroRowResult() {
+        List<Property> listProperties = new ArrayList<>();
+        listProperties.add(outProperty("list_user", DataType.LIST));
+        List<Property> varcharProperties = new ArrayList<>();
+        varcharProperties.add(outProperty("varchar_user", DataType.VARCHAR));
+
+        // a LIST out parameter keeps an empty json array for a zero-row result
+        Assertions.assertEquals("[]", outParamValue(listProperties, 0, "[]"));
+
+        // a non LIST out parameter has no row to take the value from and fails fast
+        TaskException exception = Assertions.assertThrows(TaskException.class,
+                () -> outParamValue(varcharProperties, 0, "[]"));
+        Assertions.assertTrue(exception.getMessage().contains("varchar_user"));
+        Assertions.assertTrue(exception.getMessage().contains("0"));
+    }
+
+    private Property outProperty(String prop, DataType dataType) {
+        Property property = new Property();
+        property.setProp(prop);
+        property.setDirect(Direct.OUT);
+        property.setType(dataType);
+        return property;
+    }
+
+    private String outParamValue(List<Property> properties, int index, String sqlResult) {
+        SqlParameters sqlParameters = new SqlParameters();
+        List<Property> localParams = new ArrayList<>();
+        for (Property property : properties) {
+            Property copy = new Property(property.getProp(), property.getDirect(), property.getType(), null);
+            localParams.add(copy);
+        }
+        sqlParameters.setLocalParams(localParams);
+        sqlParameters.varPool = new ArrayList<>();
+        sqlParameters.dealOutParam(sqlResult);
+        return sqlParameters.getVarPool().get(index).getValue();
+    }
+
+    @Test
     public void testCheckParameters_variants() {
         SqlParameters p = new SqlParameters();
 

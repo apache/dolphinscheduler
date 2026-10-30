@@ -319,14 +319,13 @@ public class SqlTask extends AbstractTask {
                     resultJSONArray.size());
         }
 
-        String result;
+        String result = JSONUtils.toJsonString(resultJSONArray);
         ArrayNode alertArray = resultJSONArray;
         if (resultJSONArray.isEmpty()) {
-            ArrayNode emptyRow = generateEmptyRow(resultSet);
-            result = JSONUtils.toJsonString(emptyRow);
-            alertArray = emptyRow;
-        } else {
-            result = JSONUtils.toJsonString(resultJSONArray);
+            // the synthetic empty row is only for alert rendering so that the alert still
+            // shows the column headers; OUT parameter processing must receive the real
+            // empty result, a synthetic row would leak an artificial "" value into the varPool
+            alertArray = generateEmptyRow(resultSet);
         }
 
         if (Boolean.TRUE.equals(sqlParameters.getSendEmail())) {
