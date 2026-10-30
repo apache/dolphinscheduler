@@ -1080,7 +1080,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, codes);
         }
         HashMap<Long, Project> userProjects = new HashMap<>(Constants.DEFAULT_HASH_MAP_SIZE);
-        projectDao.queryProjectCreatedAndAuthorizedByUserId(loginUser.getId())
+        projectDao.queryVisibleProjects(loginUser.getId(), loginUser.getUserType() == UserType.ADMIN_USER)
                 .forEach(userProject -> userProjects.put(userProject.getCode(), userProject));
 
         // check workflowDefinition exist in project

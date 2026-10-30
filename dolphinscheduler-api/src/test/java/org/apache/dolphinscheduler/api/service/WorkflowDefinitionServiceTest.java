@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
@@ -53,6 +54,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.DagData;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskMainInfo;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -942,10 +944,81 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Project project1 = getProject(projectCode);
         List<Project> projects = new ArrayList<>();
         projects.add(project1);
-        when(projectDao.queryProjectCreatedAndAuthorizedByUserId(user.getId())).thenReturn(projects);
+        when(projectDao.queryVisibleProjects(user.getId(), false)).thenReturn(projects);
 
         Assertions.assertNotNull(
                 workflowDefinitionService.getNodeListMapByDefinitionCodes(user, projectCode, defineCodes));
+        verify(projectDao, Mockito.never()).queryProjectCreatedAndAuthorizedByUserId(anyInt());
+    }
+
+    @Test
+    public void testBatchTaskQueryRejectsLegacyOnlyProject() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        WorkflowDefinition workflow = getWorkflowDefinition();
+        workflow.setCode(46L);
+        workflow.setProjectCode(projectCodeOther);
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(46L)))
+                .thenReturn(Collections.singletonList(workflow));
+        Mockito.lenient().when(projectDao.queryProjectCreatedAndAuthorizedByUserId(user.getId()))
+                .thenReturn(Collections.singletonList(getProject(projectCodeOther)));
+        Mockito.lenient().when(processService.genDagData(workflow))
+                .thenReturn(new DagData(workflow, null, Collections.emptyList()));
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.getNodeListMapByDefinitionCodes(user, projectCode, "46"));
+
+        Assertions.assertEquals(Status.WORKFLOW_DEFINITION_NOT_EXIST.getCode(), exception.getCode());
+        verify(projectDao).queryVisibleProjects(user.getId(), false);
+        verify(projectDao, Mockito.never()).queryProjectCreatedAndAuthorizedByUserId(anyInt());
+        verify(processService, Mockito.never()).genDagData(any());
+    }
+
+    @Test
+    public void testBatchTaskQueryFiltersEachActualProjectWithView() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        WorkflowDefinition visible = getWorkflowDefinition();
+        visible.setCode(46L);
+        WorkflowDefinition hidden = getWorkflowDefinition();
+        hidden.setCode(47L);
+        hidden.setProjectCode(projectCodeOther);
+        when(workflowDefinitionDao.queryByCodes(new HashSet<>(Arrays.asList(46L, 47L))))
+                .thenReturn(Arrays.asList(visible, hidden));
+        when(projectDao.queryVisibleProjects(user.getId(), false)).thenReturn(Collections.singletonList(project));
+        Mockito.lenient().when(projectDao.queryProjectCreatedAndAuthorizedByUserId(user.getId()))
+                .thenReturn(Arrays.asList(project, getProject(projectCodeOther)));
+        when(processService.genDagData(visible)).thenReturn(new DagData(visible, null, Collections.emptyList()));
+        Mockito.lenient().when(processService.genDagData(hidden))
+                .thenReturn(new DagData(hidden, null, Collections.emptyList()));
+
+        Map<Long, List<TaskDefinition>> result =
+                workflowDefinitionService.getNodeListMapByDefinitionCodes(user, projectCode, "46,47");
+
+        Assertions.assertEquals(Collections.singleton(46L), result.keySet());
+        verify(processService, Mockito.never()).genDagData(hidden);
+        verify(projectDao, Mockito.never()).queryProjectCreatedAndAuthorizedByUserId(anyInt());
+    }
+
+    @Test
+    public void testBatchTaskQueryAllowsAdministratorAcrossProjects() {
+        user.setUserType(UserType.ADMIN_USER);
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        WorkflowDefinition workflow = getWorkflowDefinition();
+        workflow.setCode(46L);
+        workflow.setProjectCode(projectCodeOther);
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(46L)))
+                .thenReturn(Collections.singletonList(workflow));
+        when(projectDao.queryVisibleProjects(user.getId(), true))
+                .thenReturn(Arrays.asList(project, getProject(projectCodeOther)));
+        when(processService.genDagData(workflow)).thenReturn(new DagData(workflow, null, Collections.emptyList()));
+
+        Map<Long, List<TaskDefinition>> result =
+                workflowDefinitionService.getNodeListMapByDefinitionCodes(user, projectCode, "46");
+
+        Assertions.assertEquals(Collections.singleton(46L), result.keySet());
+        verify(projectDao, Mockito.never()).queryProjectCreatedAndAuthorizedByUserId(anyInt());
     }
 
     @Test
