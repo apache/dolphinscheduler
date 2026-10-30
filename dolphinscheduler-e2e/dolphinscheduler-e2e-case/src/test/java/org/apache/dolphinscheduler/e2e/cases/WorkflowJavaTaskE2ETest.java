@@ -290,6 +290,7 @@ public class WorkflowJavaTaskE2ETest {
         projectPage
                 .goToTab(WorkflowDefinitionTab.class)
                 .run(workflow)
+                .tenant(tenant)
                 .submit();
 
         Awaitility.await()
@@ -369,6 +370,7 @@ public class WorkflowJavaTaskE2ETest {
         projectPage
                 .goToTab(WorkflowDefinitionTab.class)
                 .run(workflow2)
+                .tenant(tenant)
                 .submit();
 
         Awaitility.await()

@@ -145,6 +145,7 @@ public class WorkflowHttpTaskE2ETest {
         projectPage
                 .goToTab(WorkflowDefinitionTab.class)
                 .run(workflow)
+                .tenant(tenant)
                 .submit();
 
         Awaitility.await().untilAsserted(() -> {

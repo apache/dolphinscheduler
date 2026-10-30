@@ -206,11 +206,24 @@ export function useModal(
   }
 
   const getTenantList = () => {
-    queryTenantList(variables.projectCode).then((res: any) => {
+    return queryTenantList(variables.projectCode).then((res: any) => {
       variables.tenantList = res.map((item: any) => ({
         label: item.tenantCode,
         value: item.tenantCode
       }))
+      const form = state.startForm || state.timingForm
+      if (!form.tenantCode) {
+        form.tenantCode =
+          variables.tenantList.find((item) => item.value === 'default')
+            ?.value ||
+          (variables.tenantList.length === 1
+            ? variables.tenantList[0].value
+            : '')
+      } else if (
+        !variables.tenantList.some((item) => item.value === form.tenantCode)
+      ) {
+        form.tenantCode = ''
+      }
     })
   }
 

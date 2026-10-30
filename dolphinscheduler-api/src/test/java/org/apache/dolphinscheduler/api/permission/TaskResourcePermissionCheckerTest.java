@@ -236,4 +236,32 @@ class TaskResourcePermissionCheckerTest {
         Mockito.verifyNoInteractions(tenantDao);
     }
 
+    @Test
+    void defaultTenantExecutionStillRequiresTenantAndQueueGrants() {
+        Tenant tenant = new Tenant();
+        tenant.setId(-1);
+        tenant.setTenantCode("default");
+        tenant.setQueueId(1);
+        Mockito.when(tenantDao.queryByCode("default")).thenReturn(Optional.of(tenant));
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "default"))
+                .thenReturn(true);
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> checker.checkExecutionSettings(100L, "default", null, "default", null));
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.TENANT, "-1"))
+                .thenReturn(true);
+        Assertions.assertThrows(ServiceException.class,
+                () -> checker.checkExecutionSettings(100L, "default", null, "default", null));
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.QUEUE, "1"))
+                .thenReturn(true);
+
+        Assertions.assertDoesNotThrow(
+                () -> checker.checkExecutionSettings(100L, "default", null, "default", null));
+
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.TENANT, "-1"))
+                .thenReturn(false);
+        Assertions.assertThrows(ServiceException.class,
+                () -> checker.checkExecutionSettings(100L, "default", null, "default", null));
+    }
+
 }

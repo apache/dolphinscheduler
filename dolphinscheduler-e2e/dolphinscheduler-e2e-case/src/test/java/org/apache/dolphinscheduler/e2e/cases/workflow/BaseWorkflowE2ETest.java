@@ -65,6 +65,7 @@ public abstract class BaseWorkflowE2ETest {
         projectPage
                 .goToTab(WorkflowDefinitionTab.class)
                 .run(workflowName)
+                .tenant(adminUser.getTenant())
                 .submit();
 
     }

@@ -134,6 +134,21 @@ class ProjectResourceQueryMapperTest extends BaseDaoTest {
     }
 
     @Test
+    void existingDefaultTenantRequiresExplicitProjectGrant() {
+        Tenant defaultTenant = tenantMapper.selectById(-1);
+        Assertions.assertNotNull(defaultTenant);
+        Assertions.assertEquals("default", defaultTenant.getTenantCode());
+        Assertions.assertTrue(tenantMapper.queryByProject(100L).isEmpty());
+
+        grant(ProjectResourceType.TENANT, -1, 100L);
+
+        Assertions.assertEquals(-1, tenantMapper.queryByProject(100L).get(0).getId());
+        Assertions.assertTrue(tenantMapper.queryByProject(200L).isEmpty());
+        resourceAuthorizationDao.revokeAuthorization(100L, ProjectResourceType.TENANT, "-1");
+        Assertions.assertTrue(tenantMapper.queryByProject(100L).isEmpty());
+    }
+
+    @Test
     void alertGroupQueryUsesExactProjectGrant() {
         AlertGroup resource = new AlertGroup();
         resource.setGroupName("alert");

@@ -205,6 +205,51 @@ class ProjectResourceAuthorizationServiceTest {
     }
 
     @Test
+    void builtInDefaultTenantCanBeGranted() {
+        Tenant tenant = new Tenant();
+        tenant.setId(-1);
+        tenant.setTenantCode("default");
+        Mockito.when(tenantDao.queryById(-1)).thenReturn(tenant);
+
+        service.grantResource(admin, 100L, ProjectResourceType.TENANT, "-1");
+
+        ArgumentCaptor<ProjectResourceAuthorization> grant =
+                ArgumentCaptor.forClass(ProjectResourceAuthorization.class);
+        Mockito.verify(resourceAuthorizationDao).insert(grant.capture());
+        Assertions.assertEquals(100L, grant.getValue().getProjectCode());
+        Assertions.assertEquals(ProjectResourceType.TENANT, grant.getValue().getResourceType());
+        Assertions.assertEquals("-1", grant.getValue().getResourceKey());
+    }
+
+    @Test
+    void reservedTenantIdMustReferToTheBuiltInDefaultTenant() {
+        Tenant tenant = new Tenant();
+        tenant.setId(-1);
+        tenant.setTenantCode("custom");
+        Mockito.lenient().when(tenantDao.queryById(-1)).thenReturn(tenant);
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> service.grantResource(admin, 100L, ProjectResourceType.TENANT, "-1"));
+
+        Mockito.verifyNoInteractions(resourceAuthorizationDao);
+    }
+
+    @Test
+    void missingDefaultTenantDoesNotCreateGrant() {
+        Assertions.assertThrows(ServiceException.class,
+                () -> service.grantResource(admin, 100L, ProjectResourceType.TENANT, "-1"));
+        Mockito.verifyNoInteractions(resourceAuthorizationDao);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ProjectResourceType.class, names = {"TENANT", "WORKER_GROUP"}, mode = EnumSource.Mode.EXCLUDE)
+    void reservedTenantIdIsInvalidForOtherNumericResources(ProjectResourceType type) {
+        Assertions.assertThrows(ServiceException.class,
+                () -> service.grantResource(admin, 100L, type, "-1"));
+        Mockito.verifyNoInteractions(resourceAuthorizationDao, tenantDao);
+    }
+
+    @Test
     void queryRequiresViewPermissionInTargetProject() {
         admin.setUserType(UserType.GENERAL_USER);
         Mockito.when(projectAuthorizationService.requirePermission(admin, 100L, ProjectPermission.VIEW))

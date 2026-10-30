@@ -22,10 +22,12 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.ProjectResourceAuthorizationService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
+import org.apache.dolphinscheduler.common.constants.TenantConstants;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
+import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
@@ -111,6 +113,10 @@ public class ProjectResourceAuthorizationServiceImpl implements ProjectResourceA
                             .anyMatch(group -> resourceKey.equals(group.getName()))
                     || workerGroupService.getConfigWorkerGroupPageDetail().stream()
                             .anyMatch(group -> resourceKey.equals(group.getName()));
+        }
+        if (resourceType == ProjectResourceType.TENANT && "-1".equals(resourceKey)) {
+            Tenant tenant = tenantDao.queryById(-1);
+            return tenant != null && TenantConstants.DEFAULT_TENANT_CODE.equals(tenant.getTenantCode());
         }
         final int resourceId;
         try {
