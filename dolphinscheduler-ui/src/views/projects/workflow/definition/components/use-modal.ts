@@ -206,26 +206,41 @@ export function useModal(
   }
 
   const getTenantList = () => {
-    queryTenantList().then((res: any) => {
+    return queryTenantList(variables.projectCode).then((res: any) => {
       variables.tenantList = res.map((item: any) => ({
         label: item.tenantCode,
         value: item.tenantCode
       }))
+      const form = state.startForm || state.timingForm
+      if (!form.tenantCode) {
+        form.tenantCode =
+          variables.tenantList.find((item) => item.value === 'default')
+            ?.value ||
+          (variables.tenantList.length === 1
+            ? variables.tenantList[0].value
+            : '')
+      } else if (
+        !variables.tenantList.some((item) => item.value === form.tenantCode)
+      ) {
+        form.tenantCode = ''
+      }
     })
   }
 
   const getEnvironmentList = () => {
-    queryAllEnvironmentList().then((res: Array<EnvironmentItem>) => {
-      variables.environmentList = res.map((item) => ({
-        label: item.name,
-        value: item.code,
-        workerGroups: item.workerGroups
-      }))
-    })
+    queryAllEnvironmentList(variables.projectCode).then(
+      (res: Array<EnvironmentItem>) => {
+        variables.environmentList = res.map((item) => ({
+          label: item.name,
+          value: item.code,
+          workerGroups: item.workerGroups
+        }))
+      }
+    )
   }
 
   const getAlertGroups = () => {
-    listAlertGroupById().then((res: any) => {
+    listAlertGroupById(variables.projectCode).then((res: any) => {
       variables.alertGroups = res.map((item: any) => ({
         label: item.groupName,
         value: item.id

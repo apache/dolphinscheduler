@@ -275,7 +275,6 @@ export default defineComponent({
 
     onMounted(() => {
       getWorkerGroups()
-      getTenantList()
       getAlertGroups()
       getEnvironmentList()
       initProjectPreferences(projectCode)
@@ -283,8 +282,9 @@ export default defineComponent({
 
     watch(
       () => props.row,
-      () => {
+      async () => {
         if (!props.row.crontab) {
+          await getTenantList()
           restructureTimingForm(timingState.timingForm)
           return
         }
@@ -305,7 +305,9 @@ export default defineComponent({
         timingState.timingForm.tenantCode = props.row.tenantCode
         initWarningGroup()
         initEnvironment()
-      }
+        await getTenantList()
+      },
+      { immediate: true }
     )
 
     return {

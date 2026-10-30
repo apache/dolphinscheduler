@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.service.impl.TaskGroupServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
@@ -58,6 +59,13 @@ public class TaskGroupServiceTest {
 
     @InjectMocks
     private TaskGroupServiceImpl taskGroupService;
+
+    @Mock
+    private ProjectAuthorizationService projectAuthorizationService;
+    @Mock
+    private ExecutorService executorService;
+    @Mock
+    private TaskGroupQueueService taskGroupQueueService;
 
     @Mock
     private TaskGroupMapper taskGroupMapper;
@@ -115,21 +123,21 @@ public class TaskGroupServiceTest {
     @Test
     public void forceStartTask() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_GROUP,
-                loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_START, serviceLogger))
-                .thenReturn(false);
-        assertThrowsServiceException(Status.NO_CURRENT_OPERATING_PERMISSION,
-                () -> taskGroupService.forceStartTask(loginUser, 1));
+        loginUser.setUserType(UserType.GENERAL_USER);
+        taskGroupService.forceStartTask(loginUser, 1);
+        Mockito.verify(executorService).forceStartTaskInstance(loginUser, 1);
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
+
     }
 
     @Test
     public void modifyPriority() {
         User loginUser = getLoginUser();
-        Mockito.when(resourcePermissionCheckService.operationPermissionCheck(AuthorizationType.TASK_GROUP,
-                loginUser.getId(), ApiFuncIdentificationConstant.TASK_GROUP_QUEUE_PRIORITY, serviceLogger))
-                .thenReturn(false);
-        assertThrowsServiceException(Status.NO_CURRENT_OPERATING_PERMISSION,
-                () -> taskGroupService.modifyPriority(loginUser, 1, 1));
+        loginUser.setUserType(UserType.GENERAL_USER);
+        taskGroupService.modifyPriority(loginUser, 1, 2);
+        Mockito.verify(taskGroupQueueService).modifyPriority(loginUser, 1, 2);
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
+
     }
 
     @Test
@@ -220,4 +228,34 @@ public class TaskGroupServiceTest {
         assertThrowsServiceException(Status.TASK_GROUP_STATUS_OPENED,
                 () -> taskGroupService.startTaskGroup(loginUser, 1));
     }
+    @Test
+    public void ordinaryProjectMembersCannotManageSharedTaskGroups() {
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        for (org.junit.jupiter.api.function.Executable operation : java.util.Arrays.<org.junit.jupiter.api.function.Executable>asList(
+                () -> taskGroupService.createTaskGroup(user, 100L, "name", "", 1),
+                () -> taskGroupService.updateTaskGroup(user, 1, "name", "", 1),
+                () -> taskGroupService.startTaskGroup(user, 1),
+                () -> taskGroupService.closeTaskGroup(user, 1),
+                () -> taskGroupService.queryTaskGroupById(user, 1),
+                () -> taskGroupService.queryAllTaskGroup(user, null, null, 1, 10))) {
+            assertThrowsServiceException(Status.USER_NO_OPERATION_PERM, operation::execute);
+        }
+        Mockito.verifyNoInteractions(taskGroupMapper, projectDao);
+    }
+
+    @Test
+    public void projectTaskGroupSelectionRequiresViewPermission() {
+        User user = getLoginUser();
+        user.setUserType(UserType.GENERAL_USER);
+        Page<TaskGroup> page = new Page<>(1, 10);
+        page.setTotal(1);
+        page.setRecords(getList());
+        Mockito.when(taskGroupMapper.queryTaskGroupPagingByProjectCode(Mockito.any(), Mockito.eq(100L)))
+                .thenReturn(page);
+        Assertions.assertEquals(1, taskGroupService.queryTaskGroupByProjectCode(user, 1, 10, 100L).getTotal());
+        Mockito.verify(projectAuthorizationService).requirePermission(user, 100L, ProjectPermission.VIEW);
+        Mockito.verifyNoInteractions(projectDao, resourcePermissionCheckService);
+    }
+
 }

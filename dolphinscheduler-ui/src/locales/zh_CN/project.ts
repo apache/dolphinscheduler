@@ -16,6 +16,37 @@
  */
 
 export default {
+  authorization: {
+    members: '成员权限',
+    select_member: '选择用户',
+    save_permissions: '保存权限',
+    revoke_member: '撤销全部权限',
+    explicit_permissions: '仅授予所勾选的操作权限。',
+    permissions: {
+      VIEW: '查看',
+      DEVELOP: '开发',
+      PUBLISH: '发布',
+      EXECUTE: '执行',
+      MANAGE_SCHEDULES: '管理调度',
+      MANAGE_MEMBERS: '管理成员'
+    },
+    resources: '资源授权',
+    resource: '资源',
+    select_resource: '选择资源',
+    grant: '授权',
+    revoke: '撤权',
+    revoke_confirm: '确认撤销项目对该资源的使用权限？',
+    types: {
+      DATASOURCE: '数据源',
+      WORKER_GROUP: 'Worker Group',
+      TENANT: '租户',
+      QUEUE: '队列',
+      ENVIRONMENT: '环境',
+      ALERT_GROUP: '告警组',
+      K8S_NAMESPACE: 'Kubernetes Namespace',
+      TASK_GROUP: '任务组'
+    }
+  },
   list: {
     create_project: '创建项目',
     edit_project: '编辑项目',

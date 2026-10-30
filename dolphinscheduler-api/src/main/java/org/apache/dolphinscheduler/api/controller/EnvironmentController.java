@@ -137,8 +137,9 @@ public class EnvironmentController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ENVIRONMENT_BY_CODE_ERROR)
     public Result<EnvironmentDto> queryEnvironmentByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                         @RequestParam("environmentCode") Long environmentCode) {
-        EnvironmentDto dto = environmentService.queryEnvironmentByCode(environmentCode);
+                                                         @RequestParam("environmentCode") Long environmentCode,
+                                                         @RequestParam(value = "projectCode", required = false) Long projectCode) {
+        EnvironmentDto dto = environmentService.queryEnvironmentByCode(loginUser, environmentCode, projectCode);
         return Result.success(dto);
     }
 
@@ -198,8 +199,9 @@ public class EnvironmentController extends BaseController {
     @GetMapping(value = "/query-environment-list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ENVIRONMENT_ERROR)
-    public Result<List<EnvironmentDto>> queryAllEnvironmentList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        List<EnvironmentDto> dtos = environmentService.queryAllEnvironmentList(loginUser);
+    public Result<List<EnvironmentDto>> queryAllEnvironmentList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                @RequestParam(value = "projectCode", required = false) Long projectCode) {
+        List<EnvironmentDto> dtos = environmentService.queryAllEnvironmentList(loginUser, projectCode);
         return Result.success(dtos);
     }
 

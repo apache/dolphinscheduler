@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.SessionService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.CheckUtils;
@@ -28,21 +29,16 @@ import org.apache.dolphinscheduler.api.vo.UserSimpleInfoVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.constants.SystemConstants;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
-import org.apache.dolphinscheduler.dao.entity.DatasourceUser;
-import org.apache.dolphinscheduler.dao.entity.K8sNamespaceUser;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.mapper.K8sNamespaceUserMapper;
 import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
 import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
-import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
-import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
@@ -52,11 +48,14 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
@@ -82,19 +81,13 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     private TenantDao tenantDao;
 
     @Autowired
-    private ProjectUserDao projectUserDao;
-
-    @Autowired
-    private DataSourceUserDao datasourceUserDao;
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Autowired
     private AlertGroupDao alertGroupDao;
 
     @Autowired
     private ProjectDao projectDao;
-
-    @Autowired
-    private K8sNamespaceUserMapper k8sNamespaceUserMapper;
 
     @Autowired
     private SessionService sessionService;
@@ -476,14 +469,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             throw new ServiceException(Status.USER_NOT_EXIST, userId);
         }
 
-        Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
-            // 3. check if project is existed
-            Project project = this.projectDao.queryDetailById(Integer.parseInt(projectId));
-            if (project != null) {
-                // 4. delete the relationship between project and user
-                this.projectUserDao.deleteProjectRelation(project.getId(), user.getId());
-            }
-        });
+        replaceProjectPermissionsByIds(loginUser, userId, projectIds, Collections.emptySet());
     }
 
     /**
@@ -510,20 +496,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
         if (StringUtils.isEmpty(projectIds)) {
             return;
         }
-        Arrays.stream(projectIds.split(Constants.COMMA)).distinct().forEach(projectId -> {
-            ProjectUser projectUserOld = projectUserDao.queryProjectRelation(Integer.parseInt(projectId), userId);
-            if (projectUserOld != null) {
-                projectUserDao.deleteProjectRelation(Integer.parseInt(projectId), userId);
-            }
-            Date now = new Date();
-            ProjectUser projectUser = new ProjectUser();
-            projectUser.setUserId(userId);
-            projectUser.setProjectId(Integer.parseInt(projectId));
-            projectUser.setPerm(Constants.READ_PERMISSION);
-            projectUser.setCreateTime(now);
-            projectUser.setUpdateTime(now);
-            projectUserDao.insert(projectUser);
-        });
+        replaceProjectPermissionsByIds(loginUser, userId, projectIds, EnumSet.of(ProjectPermission.VIEW));
     }
 
     /**
@@ -552,20 +525,7 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             log.warn("Parameter projectIds is empty.");
             return;
         }
-        Arrays.stream(projectIds.split(",")).distinct().forEach(projectId -> {
-            ProjectUser projectUserOld = projectUserDao.queryProjectRelation(Integer.parseInt(projectId), userId);
-            if (projectUserOld != null) {
-                projectUserDao.deleteProjectRelation(Integer.parseInt(projectId), userId);
-            }
-            Date now = new Date();
-            ProjectUser projectUser = new ProjectUser();
-            projectUser.setUserId(userId);
-            projectUser.setProjectId(Integer.parseInt(projectId));
-            projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
-            projectUser.setCreateTime(now);
-            projectUser.setUpdateTime(now);
-            projectUserDao.insert(projectUser);
-        });
+        replaceProjectPermissionsByIds(loginUser, userId, projectIds, writableProjectPermissions());
     }
 
     /**
@@ -592,26 +552,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
             throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
         }
 
-        // 3. only project owner can operate
-        if (!this.canOperator(loginUser, project.getUserId())) {
-            log.warn("User does not have permission for project, userId:{}, userName:{}, projectCode:{}.",
-                    loginUser.getId(), loginUser.getUserName(), projectCode);
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-
-        // 4. maintain the relationship between project and user if not exists
-        ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), userId);
-        if (projectUser == null) {
-            Date today = new Date();
-            projectUser = new ProjectUser();
-            projectUser.setUserId(userId);
-            projectUser.setProjectId(project.getId());
-            projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
-            projectUser.setCreateTime(today);
-            projectUser.setUpdateTime(today);
-            this.projectUserDao.insert(projectUser);
-        }
-        log.info("User is granted permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
+        projectAuthorizationService.replaceMemberPermissions(loginUser, projectCode, userId,
+                writableProjectPermissions());
     }
 
     /**
@@ -624,113 +566,36 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
      */
     @Override
     public void revokeProject(User loginUser, int userId, long projectCode) {
-        // 1. only admin can operate
-        if (!this.isAdmin(loginUser)) {
-            log.warn("Only admin can revoke the project permission.");
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-
-        // 2. check if user is existed
-        User user = this.userDao.queryById(userId);
-        if (user == null) {
-            log.error("User does not exist, userId:{}.", userId);
-            throw new ServiceException(Status.USER_NOT_EXIST, userId);
-        }
-
-        // 3. check if project is existed
-        Project project = this.projectDao.queryByCode(projectCode);
-        if (project == null) {
-            log.error("Project does not exist, projectCode:{}.", projectCode);
-            throw new ServiceException(Status.PROJECT_NOT_FOUND, projectCode);
-        }
-
-        // 4. delete th relationship between project and user
-        this.projectUserDao.deleteProjectRelation(project.getId(), user.getId());
-        log.info("User is revoked permission for projects, userId:{}, projectCode:{}.", userId, projectCode);
+        projectAuthorizationService.replaceMemberPermissions(loginUser, projectCode, userId, Collections.emptySet());
     }
 
-    /**
-     * grant namespace
-     *
-     * @param loginUser    login user
-     * @param userId       user id
-     * @param namespaceIds namespace id array
-     * @return grant result code
-     */
-    @Override
-    @Transactional
-    public void grantNamespaces(User loginUser, int userId, String namespaceIds) {
-        // only admin can operate
-        if (!this.isAdmin(loginUser)) {
-            log.warn("Only admin can grant namespaces.");
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-
-        // check exist
-        User tempUser = userDao.queryById(userId);
-        if (tempUser == null) {
-            log.error("User does not exist, userId:{}.", userId);
-            throw new ServiceException(Status.USER_NOT_EXIST, userId);
-        }
-
-        k8sNamespaceUserMapper.deleteNamespaceRelation(0, userId);
-        if (StringUtils.isNotEmpty(namespaceIds)) {
-            String[] namespaceIdArr = namespaceIds.split(",");
-            for (String namespaceId : namespaceIdArr) {
-                Date now = new Date();
-                K8sNamespaceUser namespaceUser = new K8sNamespaceUser();
-                namespaceUser.setUserId(userId);
-                namespaceUser.setNamespaceId(Integer.parseInt(namespaceId));
-                namespaceUser.setPerm(7);
-                namespaceUser.setCreateTime(now);
-                namespaceUser.setUpdateTime(now);
-                k8sNamespaceUserMapper.insert(namespaceUser);
-            }
-        }
-
-        log.info("User is granted permission for namespace, userId:{}.", tempUser.getId());
-    }
-
-    /**
-     * grant datasource
-     *
-     * @param loginUser     login user
-     * @param userId        user id
-     * @param datasourceIds data source id array
-     * @return grant result code
-     */
-    @Override
-    @Transactional
-    public void grantDataSource(User loginUser, int userId, String datasourceIds) {
-        // only admin can operate
-        if (!this.isAdmin(loginUser)) {
-            log.warn("Only admin can grant datasource.");
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-        User user = userDao.queryById(userId);
-        if (user == null) {
-            throw new ServiceException(Status.USER_NOT_EXIST, userId);
-        }
-
-        datasourceUserDao.deleteByUserId(userId);
-
-        if (StringUtils.isEmpty(datasourceIds)) {
+    private void replaceProjectPermissionsByIds(User loginUser, int userId, String projectIds,
+                                                Set<ProjectPermission> permissions) {
+        if (StringUtils.isEmpty(projectIds)) {
             return;
         }
-
-        String[] datasourceIdArr = datasourceIds.split(",");
-
-        for (String datasourceId : datasourceIdArr) {
-            Date now = new Date();
-
-            DatasourceUser datasourceUser = new DatasourceUser();
-            datasourceUser.setUserId(userId);
-            datasourceUser.setDatasourceId(Integer.parseInt(datasourceId));
-            datasourceUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
-            datasourceUser.setCreateTime(now);
-            datasourceUser.setUpdateTime(now);
-            datasourceUserDao.insert(datasourceUser);
+        String[] uniqueProjectIds = Arrays.stream(projectIds.split(Constants.COMMA, -1)).distinct()
+                .toArray(String[]::new);
+        int[] parsedProjectIds = new int[uniqueProjectIds.length];
+        try {
+            for (int i = 0; i < uniqueProjectIds.length; i++) {
+                parsedProjectIds[i] = Integer.parseInt(uniqueProjectIds[i]);
+            }
+        } catch (NumberFormatException ex) {
+            throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "projectIds");
         }
+        Arrays.stream(parsedProjectIds).forEach(projectId -> {
+            Project project = projectDao.queryDetailById(projectId);
+            if (project == null) {
+                throw new ServiceException(Status.PROJECT_NOT_FOUND, projectId);
+            }
+            projectAuthorizationService.replaceMemberPermissions(loginUser, project.getCode(), userId, permissions);
+        });
+    }
+
+    private Set<ProjectPermission> writableProjectPermissions() {
+        return EnumSet.of(ProjectPermission.VIEW, ProjectPermission.DEVELOP, ProjectPermission.PUBLISH,
+                ProjectPermission.EXECUTE, ProjectPermission.MANAGE_SCHEDULES);
     }
 
     /**

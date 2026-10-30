@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_DEFINITION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -30,12 +29,13 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskDefinitionServiceImpl;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -108,7 +108,7 @@ public class TaskDefinitionServiceImplTest {
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Mock
-    private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
+    private TaskResourcePermissionChecker taskResourcePermissionChecker;
 
     @Mock
     private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
@@ -154,7 +154,7 @@ public class TaskDefinitionServiceImplTest {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
         Mockito.doNothing().when(projectService)
-                .checkProjectAndAuthThrowException(user, project, TASK_DEFINITION);
+                .checkProjectPermission(user, project, ProjectPermission.VIEW);
 
         when(taskDefinitionDao.queryByName(project.getCode(), PROCESS_DEFINITION_CODE, taskName))
                 .thenReturn(new TaskDefinition());
@@ -169,7 +169,7 @@ public class TaskDefinitionServiceImplTest {
     public void switchVersion() {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+        Mockito.doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
 
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
                 .thenReturn(new TaskDefinitionLog());
@@ -187,7 +187,7 @@ public class TaskDefinitionServiceImplTest {
     public void switchVersionShouldRejectUnauthorizedDatasource() {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+        Mockito.doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
@@ -195,7 +195,7 @@ public class TaskDefinitionServiceImplTest {
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
                 .thenReturn(new TaskDefinitionLog());
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
-                .when(taskDatasourcePermissionChecker).checkPermission(eq(user), anyList());
+                .when(taskResourcePermissionChecker).checkPermission(Mockito.anyLong(), anyList());
 
         assertThrowsServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION,
                 () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
@@ -207,7 +207,7 @@ public class TaskDefinitionServiceImplTest {
     public void switchVersionShouldRejectUnavailableSubWorkflow() {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+        Mockito.doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
@@ -227,7 +227,8 @@ public class TaskDefinitionServiceImplTest {
     public void deleteByCodeAndVersion() {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(eq(user), eq(project));
+        Mockito.doNothing().when(projectService).checkProjectPermission(eq(user), eq(project),
+                eq(ProjectPermission.DEVELOP));
 
         // cross-project privilege escalation: taskCode belongs to another project - must be rejected
         TaskDefinition otherProjectTask = new TaskDefinition();
@@ -294,7 +295,7 @@ public class TaskDefinitionServiceImplTest {
     public void testReleaseTaskDefinition() {
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(getProject());
         Project project = getProject();
-        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+        Mockito.doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.PUBLISH);
 
         // check task dose not exist
         assertThrowsServiceException(Status.TASK_DEFINE_NOT_EXIST,
@@ -330,7 +331,7 @@ public class TaskDefinitionServiceImplTest {
     public void releaseTaskDefinitionShouldRejectUnavailableSubWorkflow() {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+        Mockito.doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.PUBLISH);
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
@@ -356,7 +357,10 @@ public class TaskDefinitionServiceImplTest {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+                .when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
+
+        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
+                .when(projectService).checkProjectPermission(user, project, ProjectPermission.PUBLISH);
 
         assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
                 () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
@@ -415,14 +419,14 @@ public class TaskDefinitionServiceImplTest {
         when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(getTaskDefinition());
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(getProject());
         doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM)).when(projectService)
-                .checkProjectAndAuthThrowException(user, getProject(), TASK_DEFINITION);
+                .checkProjectPermission(user, getProject(), ProjectPermission.VIEW);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> taskDefinitionService.getTaskDefinition(user, TASK_CODE));
         assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(),
                 ((ServiceException) exception).getCode());
 
         // success
-        doNothing().when(projectService).checkProjectAndAuthThrowException(user, getProject(), TASK_DEFINITION);
+        doNothing().when(projectService).checkProjectPermission(user, getProject(), ProjectPermission.VIEW);
         Assertions.assertDoesNotThrow(() -> taskDefinitionService.getTaskDefinition(user, TASK_CODE));
     }
 

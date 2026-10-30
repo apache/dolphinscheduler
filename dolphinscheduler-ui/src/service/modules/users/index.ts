@@ -22,11 +22,9 @@ import {
   UserReq,
   IdReq,
   UserIdReq,
-  GrantDataSourceReq,
   GrantResourceReq,
   GrantProject,
   ProjectCodeReq,
-  GrantNamespaceReq,
   ListAllReq,
   ListReq,
   RegisterUserReq
@@ -71,14 +69,6 @@ export function getUserInfo(): any {
   })
 }
 
-export function grantDataSource(data: GrantDataSourceReq) {
-  return axios({
-    url: '/users/grant-datasource',
-    method: 'post',
-    data
-  })
-}
-
 export function grantResource(data: GrantResourceReq) {
   return axios({
     url: '/users/grant-file',
@@ -114,14 +104,6 @@ export function grantProjectWithReadPerm(data: GrantProject) {
 export function grantProjectByCode(data: ProjectCodeReq & UserIdReq): any {
   return axios({
     url: '/users/grant-project-by-code',
-    method: 'post',
-    data
-  })
-}
-
-export function grantNamespaceFunc(data: GrantNamespaceReq & UserIdReq) {
-  return axios({
-    url: '/users/grant-namespace',
     method: 'post',
     data
   })

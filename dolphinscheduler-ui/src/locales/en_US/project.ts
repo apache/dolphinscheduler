@@ -16,6 +16,37 @@
  */
 
 export default {
+  authorization: {
+    members: 'Member Permissions',
+    select_member: 'Select a user',
+    save_permissions: 'Save permissions',
+    revoke_member: 'Revoke all permissions',
+    explicit_permissions: 'Only the selected operations are granted.',
+    permissions: {
+      VIEW: 'View',
+      DEVELOP: 'Develop',
+      PUBLISH: 'Publish',
+      EXECUTE: 'Execute',
+      MANAGE_SCHEDULES: 'Manage schedules',
+      MANAGE_MEMBERS: 'Manage members'
+    },
+    resources: 'Resource Authorization',
+    resource: 'Resource',
+    select_resource: 'Select a resource',
+    grant: 'Grant',
+    revoke: 'Revoke',
+    revoke_confirm: 'Revoke this resource from the project?',
+    types: {
+      DATASOURCE: 'Datasource',
+      WORKER_GROUP: 'Worker Group',
+      TENANT: 'Tenant',
+      QUEUE: 'Queue',
+      ENVIRONMENT: 'Environment',
+      ALERT_GROUP: 'Alert Group',
+      K8S_NAMESPACE: 'Kubernetes Namespace',
+      TASK_GROUP: 'Task Group'
+    }
+  },
   list: {
     create_project: 'Create Project',
     edit_project: 'Edit Project',

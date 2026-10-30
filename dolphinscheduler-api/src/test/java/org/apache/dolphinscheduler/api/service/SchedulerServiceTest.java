@@ -20,23 +20,29 @@ package org.apache.dolphinscheduler.api.service;
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.SchedulerServiceImpl;
 import org.apache.dolphinscheduler.api.validator.TenantExistValidator;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Assertions;
@@ -45,6 +51,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -52,6 +59,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -77,6 +85,15 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
 
     @Mock
     private TenantExistValidator tenantExistValidator;
+
+    @Mock
+    private TaskResourcePermissionChecker taskResourcePermissionChecker;
+
+    @Mock
+    private TaskDefinitionLogDao taskDefinitionLogDao;
+
+    @Mock
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
 
     @Mock
     private SchedulerApi schedulerApi;
@@ -306,14 +323,15 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Project project = this.getProject();
         Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
-                .checkHasProjectWritePermissionThrowException(user, project);
+                .checkProjectPermission(user, project, ProjectPermission.MANAGE_SCHEDULES);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
         Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(),
                 ((ServiceException) exception).getCode());
 
         // error delete mapper
-        Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+        Mockito.doNothing().when(projectService).checkProjectPermission(user, project,
+                ProjectPermission.MANAGE_SCHEDULES);
         Mockito.when(scheduleDao.deleteById(scheduleId)).thenReturn(false);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
@@ -442,9 +460,9 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Project project = this.getProject();
         Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
-                .checkHasProjectWritePermissionThrowException(user, project);
+                .checkProjectPermission(user, project, ProjectPermission.MANAGE_SCHEDULES);
         Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
-                .checkHasProjectWritePermissionThrowException(user, projectCode);
+                .checkProjectPermission(user, projectCode, ProjectPermission.MANAGE_SCHEDULES);
 
         Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.insertSchedule(
@@ -513,6 +531,118 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         schedule.setEnvironmentCode(environmentCode);
         schedule.setUserId(userId);
         return schedule;
+    }
+
+    @Test
+    public void testOnlineScheduleRejectsRevokedResourcesBeforeRegisteringTrigger() {
+        Schedule schedule = getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        WorkflowDefinition definition = getProcessDefinition();
+        definition.setReleaseState(ReleaseState.ONLINE);
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+        Mockito.when(executorService.checkSubWorkflowDefinitionValid(definition)).thenReturn(true);
+        Mockito.doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskResourcePermissionChecker).checkExecutionSettings(projectCode, schedule.getWorkerGroup(),
+                        schedule.getEnvironmentCode(), schedule.getTenantCode(), schedule.getWarningGroupId());
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.onlineScheduler(user, projectCode, scheduleId));
+
+        Assertions.assertEquals(ReleaseState.OFFLINE, schedule.getReleaseState());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any(Schedule.class));
+        Mockito.verifyNoInteractions(schedulerApi);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"create", "update", "online", "updateByWorkflow",
+            "onlineByWorkflow"})
+    public void testScheduleManagementRejectsRevokedNestedResources(String operation) {
+        Schedule schedule = getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        schedule.setWorkerGroup("parent-workers");
+        schedule.setTenantCode("parent-tenant");
+        schedule.setWarningGroupId(20);
+        WorkflowDefinition definition = getProcessDefinition();
+        definition.setReleaseState(ReleaseState.ONLINE);
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject());
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn("create".equals(operation) ? null : schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+        Mockito.when(executorService.checkSubWorkflowDefinitionValid(definition)).thenReturn(true);
+        TaskDefinitionLog reference =
+                new TaskDefinitionLog();
+        reference.setTaskType("SUB_WORKFLOW");
+        reference.setTaskParams("{\"workflowDefinitionCode\":42}");
+        TaskDefinitionLog childTask =
+                new TaskDefinitionLog();
+        childTask.setTaskType("SHELL");
+        WorkflowDefinition child = new WorkflowDefinition();
+        child.setCode(42L);
+        child.setVersion(7);
+        child.setProjectCode(99L);
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(processDefinitionCode,
+                processDefinitionVersion)).thenReturn(Collections.singletonList(reference));
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(42L)))
+                .thenReturn(Collections.singletonList(child));
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(42L, 7))
+                .thenReturn(Collections.singletonList(childTask));
+        Mockito.doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskResourcePermissionChecker)
+                .checkPermission(99L, Collections.singletonList(childTask));
+        ReflectionTestUtils.setField(schedulerService, "taskSubWorkflowPermissionChecker",
+                new TaskSubWorkflowPermissionChecker(workflowDefinitionDao, projectService, taskDefinitionLogDao,
+                        taskResourcePermissionChecker));
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class, () -> {
+            switch (operation) {
+                case "create":
+                    schedulerService.insertSchedule(user, projectCode, processDefinitionCode, scheduleExpression(null),
+                            WarningType.NONE, 20, FailureStrategy.CONTINUE, Priority.MEDIUM, "parent-workers",
+                            "parent-tenant", environmentCode);
+                    break;
+                case "update":
+                    schedulerService.updateSchedule(user, projectCode, scheduleId, scheduleExpression(null),
+                            WarningType.NONE, 20, FailureStrategy.CONTINUE, Priority.MEDIUM, "parent-workers",
+                            "parent-tenant", environmentCode);
+                    break;
+                case "updateByWorkflow":
+                    schedulerService.updateScheduleByWorkflowDefinitionCode(user, projectCode, processDefinitionCode,
+                            scheduleExpression(null), WarningType.NONE, 20, FailureStrategy.CONTINUE, Priority.MEDIUM,
+                            "parent-workers", "parent-tenant", environmentCode);
+                    break;
+                case "onlineByWorkflow":
+                    schedulerService.onlineSchedulerByWorkflowCode(user, processDefinitionCode);
+                    break;
+                default:
+                    schedulerService.onlineScheduler(user, projectCode, scheduleId);
+            }
+        });
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Assertions.assertEquals(ReleaseState.OFFLINE, schedule.getReleaseState());
+        Mockito.verify(scheduleDao, Mockito.never()).insert(Mockito.any(Schedule.class));
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any(Schedule.class));
+        Mockito.verifyNoInteractions(schedulerApi);
+        Mockito.verify(taskResourcePermissionChecker).checkExecutionSettings(99L, "parent-workers", environmentCode,
+                "parent-tenant", 20);
+    }
+
+    @Test
+    public void testOfflineScheduleDoesNotRequireResourceGrants() {
+        Schedule schedule = getSchedule();
+        schedule.setReleaseState(ReleaseState.ONLINE);
+        WorkflowDefinition definition = getProcessDefinition();
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject());
+
+        schedulerService.offlineScheduler(user, projectCode, scheduleId);
+
+        Assertions.assertEquals(ReleaseState.OFFLINE, schedule.getReleaseState());
+        Mockito.verify(projectService).checkProjectPermission(user, projectCode, ProjectPermission.MANAGE_SCHEDULES);
+        Mockito.verifyNoInteractions(taskResourcePermissionChecker, taskDefinitionLogDao);
     }
 
 }

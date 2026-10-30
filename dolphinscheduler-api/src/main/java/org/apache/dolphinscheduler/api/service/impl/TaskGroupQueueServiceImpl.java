@@ -17,19 +17,24 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.TaskGroupQueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
-import java.util.Set;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -49,6 +54,12 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     @Autowired
     private ProjectDao projectDao;
 
+    @Autowired
+    private WorkflowInstanceDao workflowInstanceDao;
+
+    @Autowired
+    private ProjectAuthorizationService projectAuthorizationService;
+
     /**
      * query tasks in task group queue by group id
      *
@@ -67,12 +78,11 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
                                                         int pageNo,
                                                         int pageSize) {
         PageInfo<TaskGroupQueue> pageInfo = new PageInfo<>(pageNo, pageSize);
-        Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
-        if (projectIds.isEmpty()) {
+        List<Project> projects = projectDao.queryVisibleProjects(loginUser.getId(),
+                loginUser.getUserType() == UserType.ADMIN_USER);
+        if (projects.isEmpty()) {
             return pageInfo;
         }
-        List<Project> projects = projectDao.queryByIds(projectIds);
         Page<TaskGroupQueue> page = new Page<>(pageNo, pageSize);
         IPage<TaskGroupQueue> taskGroupQueue = taskGroupQueueMapper.queryTaskGroupQueueByTaskGroupIdPaging(
                 page,
@@ -93,7 +103,15 @@ public class TaskGroupQueueServiceImpl extends BaseServiceImpl implements TaskGr
     }
 
     @Override
-    public void modifyPriority(Integer queueId, Integer priority) {
+    public void modifyPriority(User loginUser, Integer queueId, Integer priority) {
+        TaskGroupQueue queue = taskGroupQueueMapper.selectById(queueId);
+        if (queue == null) {
+            throw new ServiceException(Status.RESOURCE_NOT_EXIST);
+        }
+        WorkflowInstance instance = workflowInstanceDao.queryOptionalById(queue.getWorkflowInstanceId())
+                .orElseThrow(
+                        () -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, queue.getWorkflowInstanceId()));
+        projectAuthorizationService.requirePermission(loginUser, instance.getProjectCode(), ProjectPermission.EXECUTE);
         taskGroupQueueMapper.modifyPriority(queueId, priority);
     }
 

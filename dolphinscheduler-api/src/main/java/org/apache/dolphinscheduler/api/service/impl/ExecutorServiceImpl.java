@@ -29,8 +29,10 @@ import org.apache.dolphinscheduler.api.enums.ExecuteType;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.workflow.ExecutorClient;
+import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
-import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowRequestTransformer;
@@ -39,11 +41,13 @@ import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTOVali
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowRequestTransformer;
 import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.Flag;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
@@ -52,6 +56,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
@@ -79,7 +84,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorService {
 
     @Autowired
-    private ProjectService projectService;
+    private ProjectAuthorizationService projectAuthorizationService;
+
+    @Autowired
+    private TaskResourcePermissionChecker taskResourcePermissionChecker;
+
+    @Autowired
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
+
+    @Autowired
+    private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Autowired
     private WorkflowDefinitionDao workflowDefinitionDao;
@@ -124,8 +138,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     @Transactional
     public Integer triggerWorkflowDefinition(final WorkflowTriggerRequest triggerRequest) {
-        projectService.checkHasProjectWritePermissionThrowException(
-                triggerRequest.getLoginUser(), triggerRequest.getProjectCode());
+        projectAuthorizationService.requirePermission(
+                triggerRequest.getLoginUser(), triggerRequest.getProjectCode(), ProjectPermission.EXECUTE);
         final TriggerWorkflowDTO triggerWorkflowDTO = triggerWorkflowRequestTransformer.transform(triggerRequest);
         // verify the workflow definition belongs to the URL's project
         if (triggerWorkflowDTO.getWorkflowDefinition() == null
@@ -135,14 +149,24 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
         }
         // todo: use validator chain
         triggerWorkflowDTOValidator.validate(triggerWorkflowDTO);
+        taskResourcePermissionChecker.checkExecutionSettings(
+                triggerWorkflowDTO.getWorkflowDefinition().getProjectCode(),
+                triggerWorkflowDTO.getWorkerGroup(), triggerWorkflowDTO.getEnvironmentCode(),
+                triggerWorkflowDTO.getTenantCode(), triggerWorkflowDTO.getWarningGroupId());
+        checkWorkflowResourcePermission(triggerRequest.getLoginUser(), triggerRequest.getProjectCode(),
+                triggerWorkflowDTO.getWorkflowDefinition().getCode(),
+                triggerWorkflowDTO.getWorkflowDefinition().getVersion(), triggerWorkflowDTO.getWorkerGroup(),
+                triggerWorkflowDTO.getEnvironmentCode(), triggerWorkflowDTO.getTenantCode(),
+                triggerWorkflowDTO.getWarningGroupId());
         return executorClient.triggerWorkflowDefinition().execute(triggerWorkflowDTO);
     }
 
     @Override
     @Transactional
     public List<Integer> backfillWorkflowDefinition(final WorkflowBackFillRequest workflowBackFillRequest) {
-        projectService.checkHasProjectWritePermissionThrowException(
-                workflowBackFillRequest.getLoginUser(), workflowBackFillRequest.getProjectCode());
+        projectAuthorizationService.requirePermission(
+                workflowBackFillRequest.getLoginUser(), workflowBackFillRequest.getProjectCode(),
+                ProjectPermission.EXECUTE);
         final BackfillWorkflowDTO backfillWorkflowDTO =
                 backfillWorkflowRequestTransformer.transform(workflowBackFillRequest);
         // verify the workflow definition belongs to the URL's project
@@ -153,6 +177,16 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                     String.valueOf(workflowBackFillRequest.getWorkflowDefinitionCode()));
         }
         backfillWorkflowDTOValidator.validate(backfillWorkflowDTO);
+        taskResourcePermissionChecker.checkExecutionSettings(
+                backfillWorkflowDTO.getWorkflowDefinition().getProjectCode(),
+                backfillWorkflowDTO.getWorkerGroup(), backfillWorkflowDTO.getEnvironmentCode(),
+                backfillWorkflowDTO.getTenantCode(), backfillWorkflowDTO.getWarningGroupId());
+        checkWorkflowResourcePermission(workflowBackFillRequest.getLoginUser(),
+                workflowBackFillRequest.getProjectCode(),
+                backfillWorkflowDTO.getWorkflowDefinition().getCode(),
+                backfillWorkflowDTO.getWorkflowDefinition().getVersion(), backfillWorkflowDTO.getWorkerGroup(),
+                backfillWorkflowDTO.getEnvironmentCode(), backfillWorkflowDTO.getTenantCode(),
+                backfillWorkflowDTO.getWarningGroupId());
         return executorClient.backfillWorkflowDefinition().execute(backfillWorkflowDTO);
     }
 
@@ -226,10 +260,16 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 .queryOptionalById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
 
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, workflowInstance.getProjectCode());
+        projectAuthorizationService.requirePermission(loginUser, workflowInstance.getProjectCode(),
+                ProjectPermission.EXECUTE);
 
         switch (executeType) {
             case REPEAT_RUNNING:
+                checkInstanceExecutionSettings(workflowInstance);
+                checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
+                        workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                        workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
                 executorClient
                         .repeatRunningWorkflowInstance()
                         .onWorkflowInstance(workflowInstance)
@@ -237,12 +277,22 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                         .execute();
                 return;
             case START_FAILURE_TASK_PROCESS:
+                checkInstanceExecutionSettings(workflowInstance);
+                checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
+                        workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                        workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
                 executorClient.recoverFailureTaskInstance()
                         .onWorkflowInstance(workflowInstance)
                         .byUser(loginUser)
                         .execute();
                 return;
             case RECOVER_SUSPENDED_PROCESS:
+                checkInstanceExecutionSettings(workflowInstance);
+                checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
+                        workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                        workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
                 executorClient.recoverSuspendedWorkflowInstanceOperation()
                         .onWorkflowInstance(workflowInstance)
                         .byUser(loginUser)
@@ -284,10 +334,14 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
 
         WorkflowExecuteResponse response = new WorkflowExecuteResponse();
 
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.EXECUTE);
 
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
+
+        if (workflowInstance.getProjectCode() != projectCode) {
+            throw new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
+        }
 
         if (!workflowInstance.getState().isFinalState()) {
             log.error("Can not execute task for workflow instance which is not finished, workflowInstanceId:{}.",
@@ -296,9 +350,15 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
             return response;
         }
 
+        checkInstanceExecutionSettings(workflowInstance);
+
         WorkflowDefinition workflowDefinition =
                 processService.findWorkflowDefinition(workflowInstance.getWorkflowDefinitionCode(),
                         workflowInstance.getWorkflowDefinitionVersion());
+        checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
+                workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
+                workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
         workflowDefinition.setReleaseState(ReleaseState.ONLINE);
         this.checkWorkflowDefinitionValid(projectCode, workflowDefinition, workflowInstance.getWorkflowDefinitionCode(),
                 workflowInstance.getWorkflowDefinitionVersion());
@@ -368,13 +428,18 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     @Override
     public void forceStartTaskInstance(User loginUser, int queueId) {
         TaskGroupQueue taskGroupQueue = taskGroupQueueMapper.selectById(queueId);
+        if (taskGroupQueue == null) {
+            throw new ServiceException(Status.RESOURCE_NOT_EXIST);
+        }
+
         // check workflow instance exist
         WorkflowInstance workflowInstance =
                 workflowInstanceDao.queryOptionalById(taskGroupQueue.getWorkflowInstanceId())
                         .orElseThrow(
                                 () -> new ServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST,
                                         taskGroupQueue.getWorkflowInstanceId()));
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, workflowInstance.getProjectCode());
+        projectAuthorizationService.requirePermission(loginUser, workflowInstance.getProjectCode(),
+                ProjectPermission.EXECUTE);
 
         if (taskGroupQueue.getInQueue() == Flag.NO.getCode()) {
             throw new ServiceException(Status.TASK_GROUP_QUEUE_ALREADY_START);
@@ -397,4 +462,20 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                                        int dryRun) {
         throw new ServiceException("Not supported");
     }
+    private void checkInstanceExecutionSettings(WorkflowInstance workflowInstance) {
+        taskResourcePermissionChecker.checkExecutionSettings(workflowInstance.getProjectCode(),
+                workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
+    }
+
+    private void checkWorkflowResourcePermission(User loginUser, long projectCode, long workflowCode,
+                                                 int workflowVersion, String workerGroup, Long environmentCode,
+                                                 String tenantCode, Integer warningGroupId) {
+        List<TaskDefinitionLog> tasks =
+                taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(workflowCode, workflowVersion);
+        taskResourcePermissionChecker.checkPermission(projectCode, tasks);
+        taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, tasks, workerGroup, environmentCode,
+                tenantCode, warningGroupId);
+    }
+
 }

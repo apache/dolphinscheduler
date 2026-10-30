@@ -39,7 +39,12 @@ import {
 } from '@/common/column-width-config'
 import type { Router } from 'vue-router'
 import type { ProjectRes } from '@/service/modules/projects/types'
-import { ControlOutlined, DeleteOutlined, EditOutlined } from '@vicons/antd'
+import {
+  ControlOutlined,
+  DeleteOutlined,
+  EditOutlined,
+  TeamOutlined
+} from '@vicons/antd'
 import { useUserStore } from '@/store/user/user'
 import { UserInfoRes } from '@/service/modules/users/types'
 
@@ -58,7 +63,7 @@ export function useTable() {
   }
 
   const handleAssign = (row: any) => {
-    variables.showWorkerGroupModalRef = true
+    variables.showResourceModalRef = true
     variables.row = row
   }
 
@@ -140,7 +145,7 @@ export function useTable() {
       {
         title: t('project.list.operation'),
         key: 'actions',
-        ...COLUMN_WIDTH_CONFIG['operation'](3),
+        ...COLUMN_WIDTH_CONFIG['operation'](4),
         render(row: any) {
           return h(NSpace, null, {
             default: () => [
@@ -156,6 +161,7 @@ export function useTable() {
                         type: 'info',
                         size: 'small',
                         class: 'edit',
+                        disabled: !IS_ADMIN && row.userId !== userInfo.id,
                         onClick: () => {
                           handleEdit(row)
                         }
@@ -168,6 +174,29 @@ export function useTable() {
                   default: () => t('project.list.edit')
                 }
               ),
+              (IS_ADMIN || row.permissions?.includes('MANAGE_MEMBERS')) &&
+                h(
+                  NTooltip,
+                  {},
+                  {
+                    trigger: () =>
+                      h(
+                        NButton,
+                        {
+                          circle: true,
+                          type: 'info',
+                          size: 'small',
+                          class: 'assign-project-member-btn',
+                          onClick: () => {
+                            variables.row = row
+                            variables.showMemberModalRef = true
+                          }
+                        },
+                        { icon: () => h(NIcon, null, () => h(TeamOutlined)) }
+                      ),
+                    default: () => t('project.authorization.members')
+                  }
+                ),
               IS_ADMIN &&
                 h(
                   NTooltip,
@@ -182,7 +211,7 @@ export function useTable() {
                           circle: true,
                           type: 'info',
                           size: 'small',
-                          class: 'assign-worker-group-btn',
+                          class: 'assign-project-resource-btn',
                           onClick: () => {
                             handleAssign(row)
                           }
@@ -191,12 +220,13 @@ export function useTable() {
                           icon: () => h(NIcon, null, () => h(ControlOutlined))
                         }
                       ),
-                    default: () => t('project.list.assign_worker_group')
+                    default: () => t('project.authorization.resources')
                   }
                 ),
               h(
                 NPopconfirm,
                 {
+                  disabled: !IS_ADMIN && row.userId !== userInfo.id,
                   onPositiveClick: () => {
                     handleDelete(row)
                   }
@@ -214,7 +244,8 @@ export function useTable() {
                               circle: true,
                               type: 'error',
                               size: 'small',
-                              class: 'delete'
+                              class: 'delete',
+                              disabled: !IS_ADMIN && row.userId !== userInfo.id
                             },
                             {
                               icon: () =>
@@ -249,9 +280,10 @@ export function useTable() {
     totalPage: ref(1),
     totalCount: ref(0),
     showModalRef: ref(false),
-    showWorkerGroupModalRef: ref(false),
+    showResourceModalRef: ref(false),
+    showMemberModalRef: ref(false),
     statusRef: ref(0),
-    row: {},
+    row: { code: 0 },
     loadingRef: ref(false)
   })
 

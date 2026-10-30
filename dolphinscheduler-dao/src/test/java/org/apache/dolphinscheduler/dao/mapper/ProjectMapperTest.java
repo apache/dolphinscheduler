@@ -17,11 +17,16 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.ProjectUserPermission;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserPermissionDao;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -42,6 +47,9 @@ public class ProjectMapperTest extends BaseDaoTest {
 
     @Autowired
     private ProjectUserMapper projectUserMapper;
+
+    @Autowired
+    private ProjectUserPermissionDao userPermissionDao;
 
     /**
      * insert
@@ -156,6 +164,123 @@ public class ProjectMapperTest extends BaseDaoTest {
         Assertions.assertEquals(1, projectIPage1.getTotal());
     }
 
+    @Test
+    public void testVisibleProjectsAreFilteredBeforePagination() {
+        Project owned = insertVisibleProject("visible-owned", 101);
+        insertNewPermission(owned, 101, ProjectPermission.VIEW);
+        insertNewPermission(owned, 101, ProjectPermission.DEVELOP);
+        Project readable = insertVisibleProject("visible-readable", 102);
+        insertNewPermission(readable, 101, ProjectPermission.VIEW);
+        Project executable = insertVisibleProject("visible-executable", 102);
+        insertNewPermission(executable, 101, ProjectPermission.EXECUTE);
+        Project revoked = insertVisibleProject("visible-revoked", 102);
+        insertProjectPermission(revoked, 101, 0);
+        Project otherUser = insertVisibleProject("visible-other-user", 102);
+        insertNewPermission(otherUser, 103, ProjectPermission.VIEW);
+
+        IPage<Project> first = projectMapper.queryVisibleProjectListPaging(new Page<>(1, 1), 101, false, "visible-");
+        Assertions.assertEquals(2, first.getTotal());
+        Assertions.assertEquals(1, first.getRecords().size());
+        Assertions.assertEquals(readable.getId(), first.getRecords().get(0).getId());
+        Assertions.assertEquals(Constants.READ_PERMISSION, first.getRecords().get(0).getPerm());
+
+        IPage<Project> second = projectMapper.queryVisibleProjectListPaging(new Page<>(2, 1), 101, false, "visible-");
+        Assertions.assertEquals(2, second.getTotal());
+        Assertions.assertEquals(owned.getId(), second.getRecords().get(0).getId());
+        Assertions.assertEquals(Constants.READ_PERMISSION, second.getRecords().get(0).getPerm());
+
+        List<Project> visibleProjects = projectMapper.queryVisibleProjects(101, false);
+        Assertions.assertEquals(2, visibleProjects.size());
+        Assertions.assertEquals(readable.getId(), visibleProjects.get(0).getId());
+        Assertions.assertEquals(Constants.READ_PERMISSION, visibleProjects.get(0).getPerm());
+        Assertions.assertEquals(owned.getId(), visibleProjects.get(1).getId());
+        Assertions.assertEquals(Arrays.asList(readable.getCode(), owned.getCode()),
+                projectMapper.queryVisibleProjectCodes(101, false));
+
+        IPage<Project> beyondLast =
+                projectMapper.queryVisibleProjectListPaging(new Page<>(3, 1), 101, false, "visible-");
+        Assertions.assertEquals(2, beyondLast.getTotal());
+        Assertions.assertTrue(beyondLast.getRecords().isEmpty());
+    }
+
+    @Test
+    public void testVisibleProjectSearchDoesNotExposeUnauthorizedProjects() {
+        Project readable = insertVisibleProject("search-readable", 102);
+        insertNewPermission(readable, 101, ProjectPermission.VIEW);
+        insertVisibleProject("search-hidden", 102);
+
+        IPage<Project> hidden = projectMapper.queryVisibleProjectListPaging(new Page<>(1, 10), 101, false, "hidden");
+        Assertions.assertEquals(0, hidden.getTotal());
+        Assertions.assertTrue(hidden.getRecords().isEmpty());
+        IPage<Project> absentUser = projectMapper.queryVisibleProjectListPaging(new Page<>(1, 10), 104, false, null);
+        Assertions.assertEquals(0, absentUser.getTotal());
+        Assertions.assertTrue(absentUser.getRecords().isEmpty());
+    }
+
+    @Test
+    public void testAdminCanQueryAllProjectsWithoutMembership() {
+        insertVisibleProject("admin-visible-a", 102);
+        insertVisibleProject("admin-visible-b", 103);
+
+        IPage<Project> page = projectMapper.queryVisibleProjectListPaging(new Page<>(1, 1), 101, true, "admin-visible");
+        Assertions.assertEquals(2, page.getTotal());
+        Assertions.assertEquals(1, page.getRecords().size());
+        Assertions.assertEquals(Constants.ALL_PERMISSIONS, page.getRecords().get(0).getPerm());
+    }
+
+    @Test
+    public void testProjectRevocationRemovesVisibility() {
+        Project project = insertVisibleProject("revoked-project", 102);
+        insertProjectPermission(project, 101, Constants.ALL_PERMISSIONS);
+        insertNewPermission(project, 101, ProjectPermission.VIEW);
+        Assertions.assertEquals(1,
+                projectMapper.queryVisibleProjectListPaging(new Page<>(1, 10), 101, false, null).getTotal());
+
+        userPermissionDao.revokeAllPermissions(project.getCode(), 101);
+        IPage<Project> page = projectMapper.queryVisibleProjectListPaging(new Page<>(1, 10), 101, false, null);
+        Assertions.assertEquals(0, page.getTotal());
+        Assertions.assertTrue(page.getRecords().isEmpty());
+        Assertions.assertTrue(projectMapper.queryVisibleProjects(101, false).isEmpty());
+        Assertions.assertTrue(projectMapper.queryVisibleProjectCodes(101, false).isEmpty());
+    }
+
+    private Project insertVisibleProject(String name, int ownerId) {
+        Project project = new Project();
+        project.setName(name);
+        project.setCode(name.hashCode());
+        project.setUserId(ownerId);
+        project.setCreateTime(new Date());
+        project.setUpdateTime(new Date());
+        projectMapper.insert(project);
+        return project;
+    }
+
+    @Test
+    public void testLegacyGrantsAndOwnershipDoNotRestoreVisibility() {
+        Project project = insertVisibleProject("legacy-owner", 101);
+        insertProjectPermission(project, 101, Constants.ALL_PERMISSIONS);
+        Assertions.assertTrue(projectMapper.queryVisibleProjects(101, false).isEmpty());
+        Assertions.assertTrue(projectMapper.queryVisibleProjectCodes(101, false).isEmpty());
+        Assertions.assertEquals(0,
+                projectMapper.queryVisibleProjectListPaging(new Page<>(1, 10), 101, false, null).getTotal());
+    }
+
+    private void insertNewPermission(Project project, int userId, ProjectPermission permission) {
+        ProjectUserPermission grant = new ProjectUserPermission();
+        grant.setProjectCode(project.getCode());
+        grant.setUserId(userId);
+        grant.setPermission(permission);
+        userPermissionDao.insert(grant);
+    }
+
+    private void insertProjectPermission(Project project, int userId, int permission) {
+        ProjectUser relation = new ProjectUser();
+        relation.setProjectId(project.getId());
+        relation.setUserId(userId);
+        relation.setPerm(permission);
+        projectUserMapper.insert(relation);
+    }
+
     /**
      * test query project create user
      */
@@ -251,6 +376,56 @@ public class ProjectMapperTest extends BaseDaoTest {
         List<Project> projects = projectMapper.listAuthorizedProjects(user.getId(), null);
 
         Assertions.assertEquals(2, projects.size());
+    }
+
+    @Test
+    public void testMemberManagementScopeAndPermissionLevelsBeforePagination() {
+        Project readable = insertVisibleProject("manageable-reader", 101);
+        insertNewPermission(readable, 101, ProjectPermission.MANAGE_MEMBERS);
+        insertNewPermission(readable, 102, ProjectPermission.VIEW);
+        Project hidden = insertVisibleProject("unmanageable-owner", 101);
+        insertProjectPermission(hidden, 101, Constants.ALL_PERMISSIONS);
+        Project writable = insertVisibleProject("manageable-writer", 103);
+        insertNewPermission(writable, 101, ProjectPermission.MANAGE_MEMBERS);
+        for (ProjectPermission permission : ProjectPermission.values()) {
+            if (permission == ProjectPermission.MANAGE_MEMBERS) {
+                continue;
+            }
+            insertNewPermission(writable, 102, permission);
+        }
+
+        IPage<Project> first = projectMapper.queryProjectAuthorizationLevelsPaging(new Page<>(1, 1),
+                101, false, 102, null);
+        Assertions.assertEquals(2, first.getTotal());
+        Assertions.assertEquals(writable.getCode(), first.getRecords().get(0).getCode());
+        Assertions.assertEquals(Constants.ALL_PERMISSIONS, first.getRecords().get(0).getPerm());
+        IPage<Project> second = projectMapper.queryProjectAuthorizationLevelsPaging(new Page<>(2, 1),
+                101, false, 102, null);
+        Assertions.assertEquals(2, second.getTotal());
+        Assertions.assertEquals(Constants.READ_PERMISSION, second.getRecords().get(0).getPerm());
+        Assertions.assertEquals(0, projectMapper.queryProjectAuthorizationLevelsPaging(new Page<>(1, 10),
+                101, false, 102, "unmanageable").getTotal());
+        Assertions.assertEquals(3, projectMapper.queryProjectAuthorizationLevels(101, true, 102).size());
+        Assertions.assertTrue(projectMapper.queryProjectAuthorizationLevels(102, false, 101).isEmpty());
+    }
+
+    @Test
+    public void testProjectMemberListIgnoresLegacyRelationsAndDeduplicatesPermissions() {
+        Project project = insertVisibleProject("new-members", 100);
+        User member = new User();
+        member.setUserName("new-member");
+        userMapper.insert(member);
+        User legacyMember = new User();
+        legacyMember.setUserName("legacy-member");
+        userMapper.insert(legacyMember);
+        insertProjectPermission(project, legacyMember.getId(), Constants.ALL_PERMISSIONS);
+        insertNewPermission(project, member.getId(), ProjectPermission.VIEW);
+        insertNewPermission(project, member.getId(), ProjectPermission.DEVELOP);
+        List<User> members = userMapper.queryAuthedUserListByProjectId(project.getId());
+        Assertions.assertEquals(1, members.size());
+        Assertions.assertEquals(member.getId(), members.get(0).getId());
+        userPermissionDao.revokeAllPermissions(project.getCode(), member.getId());
+        Assertions.assertTrue(userMapper.queryAuthedUserListByProjectId(project.getId()).isEmpty());
     }
 
 }

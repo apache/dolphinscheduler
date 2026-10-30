@@ -23,6 +23,7 @@ import type { TypeReq } from '@/service/modules/data-source/types'
 
 export function useDatasource(
   model: { [field: string]: any },
+  projectCode: number,
   span: Ref,
   fieldType: string,
   fieldDatasource: string
@@ -48,7 +49,7 @@ export function useDatasource(
         : ''
       model.targetMysqlType = type
     }
-    const params = { type } as TypeReq
+    const params = { type, projectCode } as TypeReq
     const result = await queryDataSourceList(params)
     dataSourceList.value = result.map((item: { name: string; id: number }) => ({
       label: item.name,

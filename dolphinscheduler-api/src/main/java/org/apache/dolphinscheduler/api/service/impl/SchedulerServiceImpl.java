@@ -17,11 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
-
 import org.apache.dolphinscheduler.api.dto.ScheduleParam;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ExecutorService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.SchedulerService;
@@ -32,6 +32,7 @@ import org.apache.dolphinscheduler.api.vo.ScheduleVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -39,10 +40,12 @@ import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.scheduler.api.SchedulerApi;
 import org.apache.dolphinscheduler.service.cron.CronUtils;
@@ -96,6 +99,15 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Autowired
     private TenantExistValidator tenantExistValidator;
 
+    @Autowired
+    private TaskResourcePermissionChecker taskResourcePermissionChecker;
+
+    @Autowired
+    private TaskDefinitionLogDao taskDefinitionLogDao;
+
+    @Autowired
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
+
     /**
      * save schedule
      *
@@ -127,7 +139,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Project project = projectDao.queryByCode(projectCode);
 
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.MANAGE_SCHEDULES);
 
         // check workflow definition exists
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
@@ -149,6 +161,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Date now = new Date();
 
         tenantExistValidator.validate(tenantCode);
+        checkScheduleResources(loginUser, workflowDefinition, workerGroup, tenantCode, environmentCode, warningGroupId);
 
         scheduleObj.setTenantCode(tenantCode);
         scheduleObj.setProjectName(project.getName());
@@ -205,7 +218,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode);
         }
         Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
-        this.projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        this.projectService.checkProjectPermission(loginUser, project, ProjectPermission.MANAGE_SCHEDULES);
     }
 
     /**
@@ -239,7 +252,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Project project = projectDao.queryByCode(projectCode);
 
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.MANAGE_SCHEDULES);
 
         // check schedule exists
         Schedule schedule = scheduleDao.queryById(id);
@@ -258,7 +271,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                     String.valueOf(schedule.getWorkflowDefinitionCode()));
         }
 
-        return updateSchedule(schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
+        return updateSchedule(loginUser, schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
                 failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode);
     }
 
@@ -281,7 +294,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectDao.queryByCode(projectCode);
 
         // check project auth
-        projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
 
         if (workflowDefinitionCode != 0) {
             WorkflowDefinition workflowDefinition =
@@ -331,7 +344,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Project project = projectDao.queryByCode(projectCode);
 
         // check project auth
-        projectService.checkProjectAndAuthThrowException(loginUser, project, null);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
 
         List<Schedule> schedules = scheduleDao.querySchedulerListByProjectName(project.getName());
         List<ScheduleVO> scheduleList = new ArrayList<>();
@@ -428,7 +441,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                            String tenantCode,
                                                            long environmentCode) {
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.MANAGE_SCHEDULES);
 
         // check schedule exists
         Schedule schedule = scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
@@ -445,27 +458,27 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                     String.valueOf(workflowDefinitionCode));
         }
 
-        return updateSchedule(schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
+        return updateSchedule(loginUser, schedule, workflowDefinition, scheduleExpression, warningType, warningGroupId,
                 failureStrategy, workflowInstancePriority, workerGroup, tenantCode, environmentCode);
     }
 
     @Transactional
     @Override
     public void onlineScheduler(User loginUser, Long projectCode, Integer schedulerId) {
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.MANAGE_SCHEDULES);
         Schedule schedule = scheduleDao.queryById(schedulerId);
         checkScheduleBelongsToProject(schedule, projectCode);
-        doOnlineScheduler(schedule);
+        doOnlineScheduler(loginUser, schedule);
     }
 
     @Transactional
     @Override
-    public void onlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
+    public void onlineSchedulerByWorkflowCode(User loginUser, Long workflowDefinitionCode) {
         Schedule schedule = scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
-        doOnlineScheduler(schedule);
+        doOnlineScheduler(loginUser, schedule);
     }
 
-    private void doOnlineScheduler(Schedule schedule) {
+    private void doOnlineScheduler(User loginUser, Schedule schedule) {
         if (schedule == null) {
             return;
         }
@@ -482,6 +495,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             throw new ServiceException(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE);
         }
 
+        checkScheduleResources(loginUser, workflowDefinition, schedule.getWorkerGroup(), schedule.getTenantCode(),
+                schedule.getEnvironmentCode(), schedule.getWarningGroupId());
         schedule.setReleaseState(ReleaseState.ONLINE);
         schedule.setUpdateTime(new Date());
         scheduleDao.updateById(schedule);
@@ -493,7 +508,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Transactional
     @Override
     public void offlineScheduler(User loginUser, Long projectCode, Integer schedulerId) {
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.MANAGE_SCHEDULES);
         Schedule schedule = scheduleDao.queryById(schedulerId);
         checkScheduleBelongsToProject(schedule, projectCode);
         doOfflineScheduler(schedule);
@@ -534,7 +549,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
     }
 
-    private Schedule updateSchedule(Schedule schedule, WorkflowDefinition workflowDefinition,
+    private Schedule updateSchedule(User loginUser, Schedule schedule, WorkflowDefinition workflowDefinition,
                                     String scheduleExpression, WarningType warningType, int warningGroupId,
                                     FailureStrategy failureStrategy, Priority workflowInstancePriority,
                                     String workerGroup, String tenantCode, long environmentCode) {
@@ -547,6 +562,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Date now = new Date();
 
         tenantExistValidator.validate(tenantCode);
+        checkScheduleResources(loginUser, workflowDefinition, workerGroup, tenantCode, environmentCode, warningGroupId);
         schedule.setTenantCode(tenantCode);
 
         // updateWorkflowInstance param
@@ -602,6 +618,17 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         log.info("Schedule update complete, projectCode:{}, workflowDefinitionCode:{}, scheduleId:{}.",
                 workflowDefinition.getProjectCode(), workflowDefinition.getCode(), schedule.getId());
         return schedule;
+    }
+
+    private void checkScheduleResources(User loginUser, WorkflowDefinition workflowDefinition, String workerGroup,
+                                        String tenantCode, Long environmentCode, Integer warningGroupId) {
+        taskResourcePermissionChecker.checkExecutionSettings(workflowDefinition.getProjectCode(), workerGroup,
+                environmentCode, tenantCode, warningGroupId);
+        List<TaskDefinitionLog> tasks = taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
+                workflowDefinition.getCode(), workflowDefinition.getVersion());
+        taskResourcePermissionChecker.checkPermission(workflowDefinition.getProjectCode(), tasks);
+        taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, tasks, workerGroup, environmentCode,
+                tenantCode, warningGroupId);
     }
 
     private void validateMissedFirePolicy(ScheduleParam scheduleParam) {

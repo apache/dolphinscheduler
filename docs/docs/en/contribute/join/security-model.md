@@ -2,6 +2,12 @@
 
 This document is mainly used to describe the scope of work, responsibilities and key functions of users with different roles. By introducing user permissions and functions, it helps users understand the precautions and rules in the deployment, use, operation and maintenance stages. Developers can use this document to understand the boundaries between security vulnerabilities and normal functions.
 
+## Project authorization boundaries (from 3.5.0)
+
+Users receive independent operation permissions within projects, and projects receive use grants for eight shared-resource types. Operations using resources check both dimensions. Use grants do not grant resource modification, deletion or re-granting rights, and member management does not include project resource authorization. System administrators pass project operation checks, but the relevant projects still need resource grants. Executing users do not need personal resource grants; resource files retain their existing authorization mechanism.
+
+Revocation affects subsequent manual operations, but does not retroactively stop running or queued instances or recheck background triggers of existing schedules and automatic retries. Project authorization does not sandbox task code. See [Security (Authorization System)](../../guide/security/security.md#granted-permissions) for the full permission list, project creators' separate lifecycle permissions, cross-project checks and revocation rules.
+
 ## Apache DolphinScheduler Workflow
 
 From understanding to using Apache DolphinScheduler, users generally go through the following stages.
@@ -31,8 +37,8 @@ Service deployment personnel need to have the authority to operate the server. S
 
 ### 2. System administrator
 
-The system administrator has all the operation permissions of Apache DolphinScheduler. In actual use, the scope of use of the administrator user should be ensured, and the administrator user should be highly trusted not to abuse this function.
-(1). The administrator user can operate queue management, tenant management, user management, alarm group management, worker group management, token management and other functions. The administrator user can operate all configurations, including important information such as sensitive credentials required to connect to resources. It is necessary to ensure that the person using the administrator user can operate the corresponding resources. At the same time, the administrator user can authorize operations on resources, data sources, projects, etc. in the user management module. The administrator user needs to clearly authorize the user to have all usage permissions for the corresponding resources.
+System administrators manage global settings and pass project operation checks; operations using project resources still require project resource grants. In actual use, the scope of use of the administrator user should be ensured, and the administrator user should be highly trusted not to abuse this function.
+(1). The administrator user can operate queue management, tenant management, user management, alarm group management, worker group management, token management and other functions. The administrator user can operate all configurations, including important information such as sensitive credentials required to connect to resources. It is necessary to ensure that the person using the administrator user can operate the corresponding resources. Administrators also assign project member permissions and project resource-use grants in Project Management and must understand the scope of these grants.
 (2). System administrators have all the operational permissions that ordinary users have
 
 ### 3. Ordinary system users
@@ -51,7 +57,7 @@ In addition to the core workflow development and operation, the normal use of th
 
 ## Data source management
 
-All users can operate data source management, and administrator users can operate after authorizing ordinary users. The corresponding permissions for data source task operation are provided by the data source connection, and the connection configuration should try to control the task execution permissions. In the data source configuration, users can customize the connection parameters and they will take effect on all tasks using the data source.
+Datasource creation, modification, deletion and access to sensitive configuration follow the datasource management APIs' permission checks; project resource-use grants do not grant these management permissions. The corresponding permissions for data source task operation are provided by the data source connection, and the connection configuration should try to control the task execution permissions. In the data source configuration, users can customize the connection parameters and they will take effect on all tasks using the data source.
 
 ## Resource Center
 

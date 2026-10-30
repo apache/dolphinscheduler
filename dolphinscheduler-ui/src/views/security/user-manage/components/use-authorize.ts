@@ -17,21 +17,11 @@
 import { reactive } from 'vue'
 import { queryProjectWithAuthorizedLevelListPaging } from '@/service/modules/projects'
 import {
-  authedDatasource,
-  unAuthDatasource
-} from '@/service/modules/data-source'
-import {
-  authNamespaceFunc,
-  unAuthNamespaceFunc
-} from '@/service/modules/k8s-namespace'
-import {
-  grantDataSource,
-  grantNamespaceFunc,
   grantProject,
   grantProjectWithReadPerm,
   revokeProjectById
 } from '@/service/modules/users'
-import type { IOption, IRecord, IResourceOption, TAuthType } from '../types'
+import type { IOption, IRecord, IResourceOption } from '../types'
 
 export function useAuthorize() {
   const state = reactive({
@@ -42,10 +32,6 @@ export function useAuthorize() {
     projectWithAuthorizedLevel: [],
     authorizedProjects: [] as number[],
     unauthorizedProjects: [] as IOption[],
-    authorizedDatasources: [] as number[],
-    unauthorizedDatasources: [] as IOption[],
-    authorizedNamespaces: [] as number[],
-    unauthorizedNamespaces: [] as IOption[],
     resourceType: 'file',
     fileResources: [] as IResourceOption[],
     pagination: {
@@ -118,82 +104,13 @@ export function useAuthorize() {
     await getProjects(userId)
   }
 
-  const getDatasources = async (userId: number) => {
-    if (state.loading) return
-    state.loading = true
-    const datasources = await Promise.all([
-      authedDatasource({ userId }),
-      unAuthDatasource({ userId })
-    ])
-    state.loading = false
-    state.authorizedDatasources = datasources[0].map(
-      (item: { name: string; id: number }) => item.id
-    )
-    state.unauthorizedDatasources = [...datasources[0], ...datasources[1]].map(
-      (item: { name: string; id: number }) => ({
-        label: item.name,
-        value: item.id
-      })
-    )
-  }
-
-  const getNamespaces = async (userId: number) => {
-    if (state.loading) return
-    state.loading = true
-    const namespaces = await Promise.all([
-      authNamespaceFunc({ userId }),
-      unAuthNamespaceFunc({ userId })
-    ])
-    state.loading = false
-    state.authorizedNamespaces = namespaces[0].map(
-      (item: { id: number }) => item.id
-    )
-    state.unauthorizedNamespaces = [...namespaces[0], ...namespaces[1]].map(
-      (item: { namespace: string; id: number }) => ({
-        label: item.namespace,
-        value: item.id
-      })
-    )
-  }
-
-  const onInit = (type: TAuthType, userId: number) => {
-    if (type === 'authorize_project') {
-      getProjects(userId)
-    }
-    if (type === 'authorize_datasource') {
-      getDatasources(userId)
-    }
-    if (type === 'authorize_namespace') {
-      getNamespaces(userId)
-    }
-  }
-
-  /*
-    getParent
-  */
-  const onSave = async (type: TAuthType, userId: number) => {
-    if (state.saving) return false
-    state.saving = true
-    if (type === 'authorize_datasource') {
-      await grantDataSource({
-        userId,
-        datasourceIds: state.authorizedDatasources.join(',')
-      })
-    }
-    if (type === 'authorize_namespace') {
-      await grantNamespaceFunc({
-        userId,
-        namespaceIds: state.authorizedNamespaces.join(',')
-      })
-    }
-    state.saving = false
-    return true
+  const onInit = (userId: number) => {
+    getProjects(userId)
   }
 
   return {
     state,
     onInit,
-    onSave,
     getProjects,
     revokeProjectByIdRequest,
     grantProjectRequest,
