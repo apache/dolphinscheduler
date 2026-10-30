@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.common.constants.Constants.FOLDER_SEPA
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
 import org.apache.dolphinscheduler.plugin.storage.api.AbstractStorageOperator;
+import org.apache.dolphinscheduler.plugin.storage.api.ResourceMetadata;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
 import org.apache.dolphinscheduler.plugin.storage.api.StorageOperator;
 import org.apache.dolphinscheduler.plugin.storage.api.constants.StorageConstants;
@@ -38,8 +39,14 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,6 +58,10 @@ import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobContainerItem;
+import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobItemProperties;
+import com.azure.storage.blob.models.BlobProperties;
+import com.azure.storage.blob.models.ListBlobsOptions;
 import com.azure.storage.blob.specialized.BlockBlobClient;
 
 @Slf4j
@@ -170,17 +181,109 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public List<StorageEntity> listStorageEntity(String resourceAbsolutePath) {
-        return null;
+        final String absResourceAbsolutePath = transformAbsolutePathToAbsKey(resourceAbsolutePath);
+        ListBlobsOptions options = new ListBlobsOptions().setPrefix(absResourceAbsolutePath);
+        List<StorageEntity> storageEntities = new ArrayList<>();
+        // The returned PagedIterable fetches the following pages while iterating
+        for (BlobItem blobItem : blobContainerClient.listBlobsByHierarchy(FOLDER_SEPARATOR, options, null)) {
+            if (Boolean.TRUE.equals(blobItem.isPrefix())) {
+                storageEntities.add(transformPrefixToStorageEntity(blobItem.getName()));
+                continue;
+            }
+            // Filter out the current directory itself
+            if (blobItem.getName().equals(absResourceAbsolutePath)) {
+                continue;
+            }
+            storageEntities.add(transformBlobItemToStorageEntity(blobItem));
+        }
+        return storageEntities;
     }
 
     @Override
     public List<StorageEntity> listFileStorageEntityRecursively(String resourceAbsolutePath) {
-        return null;
+        resourceAbsolutePath = transformAbsKeyToAbsolutePath(resourceAbsolutePath);
+
+        Set<String> visited = new HashSet<>();
+        List<StorageEntity> storageEntityList = new ArrayList<>();
+        LinkedList<String> foldersToFetch = new LinkedList<>();
+        foldersToFetch.addLast(resourceAbsolutePath);
+
+        while (!foldersToFetch.isEmpty()) {
+            String pathToExplore = foldersToFetch.pop();
+            visited.add(pathToExplore);
+            List<StorageEntity> tempList = listStorageEntity(pathToExplore);
+            for (StorageEntity temp : tempList) {
+                if (temp.isDirectory()) {
+                    if (visited.contains(temp.getFullName())) {
+                        continue;
+                    }
+                    foldersToFetch.add(temp.getFullName());
+                }
+            }
+            storageEntityList.addAll(tempList);
+        }
+        return storageEntityList;
     }
 
     @Override
     public StorageEntity getStorageEntity(String resourceAbsolutePath) {
-        return null;
+        String absKey = transformAbsolutePathToAbsKey(resourceAbsolutePath);
+        BlobProperties properties = blobContainerClient.getBlobClient(absKey).getProperties();
+
+        String absolutePath = transformAbsKeyToAbsolutePath(absKey);
+        StorageEntity storageEntity = newStorageEntity(absolutePath);
+        storageEntity.setSize(properties.getBlobSize());
+        storageEntity.setCreateTime(toDate(properties.getCreationTime()));
+        storageEntity.setUpdateTime(toDate(properties.getLastModified()));
+        return storageEntity;
+    }
+
+    private StorageEntity transformBlobItemToStorageEntity(BlobItem blobItem) {
+        StorageEntity storageEntity = newStorageEntity(transformAbsKeyToAbsolutePath(blobItem.getName()));
+        BlobItemProperties properties = blobItem.getProperties();
+        if (properties != null) {
+            storageEntity.setSize(properties.getContentLength() == null ? 0L : properties.getContentLength());
+            storageEntity.setCreateTime(toDate(properties.getCreationTime()));
+            storageEntity.setUpdateTime(toDate(properties.getLastModified()));
+        }
+        return storageEntity;
+    }
+
+    private StorageEntity transformPrefixToStorageEntity(String prefix) {
+        StorageEntity storageEntity = newStorageEntity(transformAbsKeyToAbsolutePath(prefix));
+        storageEntity.setSize(0L);
+        return storageEntity;
+    }
+
+    private StorageEntity newStorageEntity(String absolutePath) {
+        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
+        StorageEntity storageEntity = new StorageEntity();
+        storageEntity.setFileName(new File(absolutePath).getName());
+        storageEntity.setFullName(absolutePath);
+        storageEntity.setPfullName(resourceMetaData.getResourceParentAbsolutePath());
+        storageEntity.setType(resourceMetaData.getResourceType());
+        storageEntity.setDirectory(resourceMetaData.isDirectory());
+        storageEntity.setRelativePath(resourceMetaData.getResourceRelativePath());
+        return storageEntity;
+    }
+
+    private Date toDate(OffsetDateTime offsetDateTime) {
+        return offsetDateTime == null ? null : Date.from(offsetDateTime.toInstant());
+    }
+
+    private String transformAbsolutePathToAbsKey(String absolutePath) {
+        ResourceMetadata resourceMetaData = getResourceMetaData(absolutePath);
+        if (resourceMetaData.isDirectory()) {
+            return FileUtils.concatFilePath(absolutePath, FOLDER_SEPARATOR);
+        }
+        return absolutePath;
+    }
+
+    private String transformAbsKeyToAbsolutePath(String absKey) {
+        if (absKey.endsWith(FOLDER_SEPARATOR)) {
+            return absKey.substring(0, absKey.length() - 1);
+        }
+        return absKey;
     }
 
     private void checkContainerNameExists(String containerName) {
