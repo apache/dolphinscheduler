@@ -402,6 +402,9 @@ conf:
     # -- max serialized UTF-8 bytes of the SQL task-result alert content, kept below the 65535-byte capacity of the MySQL TEXT column
     sql.task.alert.max.content.bytes: 60000
 
+    # -- max rows fetched from the datasource when the SQL task-level "limit" parameter is not set
+    sql.task.query.max.rows: 10000
+
 common:
   ## Configmap
   configmap:

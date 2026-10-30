@@ -226,6 +226,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 | sql.task.alert.max.rows                       | 30                                               | SQL 任务结果告警内容最多保留的行数，超出的行以省略标记表示。修改后需重启 Worker Server 生效                                                                                                                                                              |
 | sql.task.alert.max.row.value.length           | 100                                              | SQL 任务结果告警内容中单个字符串字段值最多保留的字符数，超出的值以省略号截断。修改后需重启 Worker Server 生效                                                                                                                                                     |
 | sql.task.alert.max.content.bytes              | 60000                                            | SQL 任务结果告警内容序列化后的最大 UTF-8 字节数，小于存储告警内容的 MySQL TEXT 列 65535 字节容量。修改后需重启 Worker Server 生效                                                                                                                              |
+| sql.task.query.max.rows                       | 10000                                            | 当 SQL 任务未设置任务级 `limit` 参数时，从数据源拉取的最大行数。修改后需重启 Worker Server 生效                                                                                                                                                       |
 
 ## Api-server相关配置
 
