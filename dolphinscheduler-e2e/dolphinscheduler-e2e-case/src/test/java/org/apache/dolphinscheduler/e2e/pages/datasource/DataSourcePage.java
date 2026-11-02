@@ -101,13 +101,11 @@ public class DataSourcePage extends NavBarPage implements NavBarPage.NavBarItem 
     }
 
     public DataSourcePage editDataSource(String name) {
-        // The edit button has no dedicated class, it is the only button in the row besides the delete one.
         dataSourceItemsList()
                 .stream()
                 .filter(it -> it.getText().contains(name))
-                .flatMap(it -> it.findElements(By.tagName("button")).stream())
+                .flatMap(it -> it.findElements(By.className("btn-edit")).stream())
                 .filter(WebElement::isDisplayed)
-                .filter(it -> !it.getAttribute("class").contains("btn-delete"))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("No edit button in data source list"))
                 .click();
