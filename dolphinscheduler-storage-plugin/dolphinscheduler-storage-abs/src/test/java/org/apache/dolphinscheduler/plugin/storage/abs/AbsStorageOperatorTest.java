@@ -118,6 +118,20 @@ class AbsStorageOperatorTest {
     }
 
     @Test
+    void listStorageEntityOfFilePathReturnsOnlyThatFile() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        mockListBlobsByHierarchy(containerClient);
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        List<StorageEntity> storageEntities =
+                storageOperator.listStorageEntity("dolphinscheduler/default/resources/a.sh");
+
+        assertEquals(Collections.singletonList("dolphinscheduler/default/resources/a.sh"),
+                storageEntities.stream().map(StorageEntity::getFullName).collect(Collectors.toList()));
+        assertFalse(storageEntities.get(0).isDirectory());
+    }
+
+    @Test
     void listFileStorageEntityRecursivelyWalksSubdirectories() {
         BlobContainerClient containerClient = mock(BlobContainerClient.class);
         mockListBlobsByHierarchy(containerClient);
@@ -162,6 +176,10 @@ class AbsStorageOperatorTest {
                         .setProperties(new BlobItemProperties().setContentLength(0L)),
                 new BlobItem().setName("dolphinscheduler/default/resources/dir1/").setIsPrefix(true),
                 newFileBlobItem("dolphinscheduler/default/resources/a.sh")));
+        // a prefix listing of a file path also returns the blobs that merely start with its name
+        blobsByPrefix.put("dolphinscheduler/default/resources/a.sh", Arrays.asList(
+                newFileBlobItem("dolphinscheduler/default/resources/a.sh"),
+                newFileBlobItem("dolphinscheduler/default/resources/a.sh.bak")));
         blobsByPrefix.put("dolphinscheduler/default/resources/dir1/", Collections.singletonList(
                 newFileBlobItem("dolphinscheduler/default/resources/dir1/b.sql")));
 

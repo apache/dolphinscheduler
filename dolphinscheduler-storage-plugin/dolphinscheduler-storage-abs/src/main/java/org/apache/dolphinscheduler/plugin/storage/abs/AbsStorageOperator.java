@@ -181,17 +181,26 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public List<StorageEntity> listStorageEntity(String resourceAbsolutePath) {
+        final boolean isDirectory = getResourceMetaData(resourceAbsolutePath).isDirectory();
         final String absResourceAbsolutePath = transformAbsolutePathToAbsKey(resourceAbsolutePath);
         ListBlobsOptions options = new ListBlobsOptions().setPrefix(absResourceAbsolutePath);
         List<StorageEntity> storageEntities = new ArrayList<>();
         // The returned PagedIterable fetches the following pages while iterating
         for (BlobItem blobItem : blobContainerClient.listBlobsByHierarchy(FOLDER_SEPARATOR, options, null)) {
+            boolean isExactMatch = blobItem.getName().equals(absResourceAbsolutePath);
+            if (!isDirectory) {
+                // The listing is prefix based, a file path must only return the blob with exactly that name
+                if (isExactMatch && !Boolean.TRUE.equals(blobItem.isPrefix())) {
+                    storageEntities.add(transformBlobItemToStorageEntity(blobItem));
+                }
+                continue;
+            }
             if (Boolean.TRUE.equals(blobItem.isPrefix())) {
                 storageEntities.add(transformPrefixToStorageEntity(blobItem.getName()));
                 continue;
             }
-            // Filter out the current directory itself
-            if (blobItem.getName().equals(absResourceAbsolutePath)) {
+            // Filter out the marker blob of the listed directory itself
+            if (isExactMatch) {
                 continue;
             }
             storageEntities.add(transformBlobItemToStorageEntity(blobItem));
