@@ -286,10 +286,11 @@ public class SqlTask extends AbstractTask {
      */
     private String resultProcess(ResultSet resultSet) throws Exception {
         ArrayNode resultJSONArray = JSONUtils.createArrayNode();
+        String[] columnLabels = null;
         if (resultSet != null) {
             ResultSetMetaData md = resultSet.getMetaData();
             int num = md.getColumnCount();
-            String[] columnLabels = new String[num];
+            columnLabels = new String[num];
 
             // Check for duplicates in column definitions (across all columns)
             Set<String> uniqueLabels = new HashSet<>(num);
@@ -322,6 +323,12 @@ public class SqlTask extends AbstractTask {
         String result = JSONUtils.toJsonString(resultJSONArray);
         ArrayNode alertArray = resultJSONArray;
         if (resultJSONArray.isEmpty()) {
+            // validate the OUT parameter names while the schema is still available: a zero-row
+            // result carries no column information, so a misspelled name would otherwise only
+            // fail once rows appear
+            if (columnLabels != null) {
+                sqlParameters.checkOutParamColumns(columnLabels);
+            }
             // the synthetic empty row is only for alert rendering so that the alert still
             // shows the column headers; OUT parameter processing must receive the real
             // empty result, a synthetic row would leak an artificial "" value into the varPool

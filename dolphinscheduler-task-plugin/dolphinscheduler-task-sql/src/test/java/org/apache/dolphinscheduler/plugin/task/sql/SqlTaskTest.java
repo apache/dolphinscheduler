@@ -329,6 +329,40 @@ class SqlTaskTest {
     }
 
     @Test
+    void testZeroRowResultValidatesOutParamNamesAgainstSchema() throws Exception {
+        // a misspelled LIST OUT parameter must fail on a zero-row result too: the column
+        // names are validated while the schema is still available, so the failure no longer
+        // depends on whether rows happen to appear
+        ResultSet mockResultSet = mock(ResultSet.class);
+        ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+
+        when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+        when(mockMetaData.getColumnCount()).thenReturn(1);
+        when(mockMetaData.getColumnLabel(1)).thenReturn("id");
+        when(mockResultSet.next()).thenReturn(false);
+
+        SqlParameters parameters = new SqlParameters();
+        parameters.setLocalParams(Lists.newArrayList(new Property("idd", Direct.OUT, DataType.LIST, null)));
+        parameters.varPool = Lists.newArrayList();
+        Field sqlParametersField = SqlTask.class.getDeclaredField("sqlParameters");
+        sqlParametersField.setAccessible(true);
+        sqlParametersField.set(sqlTask, parameters);
+
+        Method method = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+        method.setAccessible(true);
+
+        TaskException exception = Assertions.assertThrows(TaskException.class, () -> {
+            try {
+                method.invoke(sqlTask, mockResultSet);
+            } catch (InvocationTargetException e) {
+                throw (Exception) e.getCause();
+            }
+        });
+        Assertions.assertTrue(exception.getMessage().contains("idd"));
+        Assertions.assertTrue(exception.getMessage().contains("id"));
+    }
+
+    @Test
     void testGenerateEmptyRow_WithNullResultSet_ReturnsErrorObject() throws Exception {
         Method method = SqlTask.class.getDeclaredMethod("generateEmptyRow", ResultSet.class);
         method.setAccessible(true);

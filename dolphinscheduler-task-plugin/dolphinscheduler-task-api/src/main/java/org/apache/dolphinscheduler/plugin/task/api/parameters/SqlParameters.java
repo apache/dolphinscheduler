@@ -30,13 +30,17 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -164,9 +168,7 @@ public class SqlParameters extends AbstractParameters {
             if (columnValues == null) {
                 // the configured OUT parameter name does not match any result column, fail fast
                 // instead of propagating a null / "null" value downstream
-                throw new TaskException("Invalid SQL OUT parameter '" + info.getProp() + "': no matching column"
-                        + " in the query result(available columns: " + sqlResultFormat.keySet()
-                        + "), please make the OUT parameter name consistent with the result column name");
+                throw unmatchedOutParamColumn(info, sqlResultFormat.keySet());
             }
             if (info.getType() == DataType.LIST) {
                 // LIST OUT parameter always keeps the JSON array format, even if the result only has one row
@@ -185,10 +187,37 @@ public class SqlParameters extends AbstractParameters {
 
     }
 
+    /**
+     * Check that every OUT parameter name matches one of the given result column labels.
+     * Needed for zero-row results: the serialized result JSON carries no column
+     * information, so {@link #dealOutParam(String)} alone cannot detect a misspelled OUT
+     * parameter name and would silently succeed as an empty LIST until rows appear.
+     *
+     * @param columnLabels the labels of the query result columns
+     */
+    public void checkOutParamColumns(String[] columnLabels) {
+        List<Property> outProperty = getOutProperty(localParams);
+        if (CollectionUtils.isEmpty(outProperty) || ArrayUtils.isEmpty(columnLabels)) {
+            return;
+        }
+        Set<String> columns = new HashSet<>(Arrays.asList(columnLabels));
+        for (Property info : outProperty) {
+            if (!columns.contains(info.getProp())) {
+                throw unmatchedOutParamColumn(info, columns);
+            }
+        }
+    }
+
+    private TaskException unmatchedOutParamColumn(Property info, Set<String> availableColumns) {
+        return new TaskException("Invalid SQL OUT parameter '" + info.getProp() + "': no matching column"
+                + " in the query result(available columns: " + availableColumns
+                + "), please make the OUT parameter name consistent with the result column name");
+    }
+
     private TaskException nonListOutParamRowMismatch(Property info, int rowCount) {
         return new TaskException("Invalid SQL OUT parameter '" + info.getProp() + "' of type " + info.getType()
-                + ": the query returned " + rowCount + " rows, please use a LIST parameter or make the query"
-                + " return a single row(e.g. add LIMIT 1)");
+                + ": the query returned " + rowCount + " rows, please use a LIST parameter or adjust the"
+                + " query so that it returns exactly one row");
     }
 
     private String convertOutParamValue(Property info, String value) {
