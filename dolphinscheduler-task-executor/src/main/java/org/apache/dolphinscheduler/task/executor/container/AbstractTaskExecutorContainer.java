@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.log.remote.RemoteLogUtils;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.task.executor.ITaskExecutor;
-import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorRuntimeException;
+import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorCapacityExceededException;
 import org.apache.dolphinscheduler.task.executor.worker.TaskExecutorWorker;
 import org.apache.dolphinscheduler.task.executor.worker.TaskExecutorWorkers;
 
@@ -60,7 +60,7 @@ public abstract class AbstractTaskExecutorContainer implements ITaskExecutorCont
             if (!taskExecutorWorkerCandidate.isPresent()) {
                 log.info("All ExclusiveThreadTaskExecutorWorker are busy, cannot submit taskExecutor(id={})",
                         taskExecutor.getId());
-                throw new TaskExecutorRuntimeException("All ExclusiveThreadTaskExecutorWorker are busy");
+                throw new TaskExecutorCapacityExceededException("All ExclusiveThreadTaskExecutorWorker are busy");
             }
             final TaskExecutorWorker taskExecutorWorker = taskExecutorWorkerCandidate.get();
             taskExecutorWorker.registerTaskExecutor(taskExecutor);
@@ -90,12 +90,17 @@ public abstract class AbstractTaskExecutorContainer implements ITaskExecutorCont
     }
 
     @Override
-    public void finalize(final ITaskExecutor taskExecutor) {
+    public synchronized void cancelDispatch(final ITaskExecutor taskExecutor) {
         if (taskExecutorAssignmentTable.isTaskExecutorRegistered(taskExecutor)) {
             final Integer taskExecutorWorkerId = taskExecutorAssignmentTable.getTaskExecutorWorkerId(taskExecutor);
             taskExecutorWorkers.getWorkerById(taskExecutorWorkerId).unRegisterTaskExecutor(taskExecutor);
             taskExecutorAssignmentTable.unregisterTaskExecutor(taskExecutor);
         }
+    }
+
+    @Override
+    public void finalize(final ITaskExecutor taskExecutor) {
+        cancelDispatch(taskExecutor);
         log.info(FINALIZE_SESSION_MARKER, FINALIZE_SESSION_MARKER.toString());
         pushTaskExecutorLogToRemote(taskExecutor);
         // [Fix-17520]
