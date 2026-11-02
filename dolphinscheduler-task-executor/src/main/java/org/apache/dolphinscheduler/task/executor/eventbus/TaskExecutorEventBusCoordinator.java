@@ -193,11 +193,6 @@ public class TaskExecutorEventBusCoordinator implements ITaskExecutorEventBusCoo
                         JSONUtils.toJsonString(taskExecutorLifecycleEvent));
             } catch (Exception e) {
                 log.error("Fire TaskExecutorLifecycleEvent: {} error", taskExecutorLifecycleEvent, e);
-                if (taskExecutorLifecycleEvent.getType().isFinished()
-                        && taskExecutorRepository.contains(taskExecutor.getId())) {
-                    // The worker has stopped tracking; retain the original result until the listener can finalize it.
-                    taskExecutorEventBus.publish(headEventOptional.get());
-                }
             }
         }
     }

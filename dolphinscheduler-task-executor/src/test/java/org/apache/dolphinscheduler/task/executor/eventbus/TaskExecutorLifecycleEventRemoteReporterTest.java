@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.task.executor.eventbus;
 import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -94,6 +95,36 @@ class TaskExecutorLifecycleEventRemoteReporterTest {
         // Duplicate and late ACKs are harmless after the pending report is removed.
         reporter.receiveTaskExecutorLifecycleEventACK(
                 new TaskExecutorLifecycleEventAck(TASK_ID, TaskExecutorLifecycleEventType.SUCCESS));
+        assertTrue(reporter.getEventChannels().isEmpty());
+    }
+
+    @Test
+    void shouldAcceptTerminalEventAfterAcknowledgedChannelIsRemoved() {
+        reporter = reporter(Duration.ofHours(6), (host, event) -> {
+        });
+        reporter.reportTaskExecutorLifecycleEvent(TaskExecutorDispatchedLifecycleEvent.builder()
+                .taskInstanceId(TASK_ID).workflowInstanceId(101).type(TaskExecutorLifecycleEventType.DISPATCHED)
+                .build());
+        reporter.receiveTaskExecutorLifecycleEventACK(
+                new TaskExecutorLifecycleEventAck(TASK_ID, TaskExecutorLifecycleEventType.DISPATCHED));
+        assertTrue(reporter.getEventChannels().isEmpty());
+        assertTrue(repository.contains(TASK_ID));
+
+        final TaskExecutorSuccessLifecycleEvent result = successEvent();
+        reporter.reportTaskExecutorLifecycleEvent(result);
+
+        assertSame(result, reporter.getEventChannels().get(TASK_ID).peek());
+    }
+
+    @Test
+    void shouldNotCreateChannelWithoutExecutor() {
+        reporter = reporter(Duration.ofHours(6), (host, event) -> {
+        });
+        repository.remove(TASK_ID);
+
+        assertThrows(IllegalArgumentException.class, () -> reporter.reportTaskExecutorLifecycleEvent(successEvent()));
+
+        assertFalse(repository.contains(TASK_ID));
         assertTrue(reporter.getEventChannels().isEmpty());
     }
 
