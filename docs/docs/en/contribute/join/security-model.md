@@ -43,11 +43,11 @@ System administrators manage global settings and pass project operation checks; 
 
 ### 3. Ordinary system users
 
-Ordinary users of Apache DolphinScheduler are defined as actual workflow development and operation users. Of course, they also need to maintain some resources required during the workflow development process. These users should be highly trusted not to abuse this function.
+Ordinary users of Apache DolphinScheduler develop and operate workflows using resources granted to their projects, within their project permissions. These users should be highly trusted not to abuse this function.
 
 (1). Users can create workflows and tasks. For a list of supported task types, see [Task List]. Tasks will be executed in workers. Users can customize any command and code to run in a specified worker group. Be sure to pay attention to any command and code here. Users can execute all tasks under the task types supported by Apache DolphinScheduler, including shell, sql, and jump to other servers to execute shell scripts. At the same time, logs will be generated during the task running process. Users can view and download task running logs through the UI page.
 
-(2). Users can create data source connections, modify and delete authorized connections including corresponding configurations, especially operations on sensitive credentials of authorized connections. These operations may have a certain impact on the resources themselves or the system. Data sources include many types. For details, please see [Data Source List] on the official website.
+(2). Ordinary users can use datasources granted to projects where they hold the corresponding operation permissions. Datasource creation, global listing, details and sensitive configuration access, modification, connection testing and deletion are restricted to system administrators. Datasource creator status or project resource-use grants do not restore these management permissions for ordinary users.
 
 ### 4. Unlogged in users
 
@@ -57,7 +57,7 @@ In addition to the core workflow development and operation, the normal use of th
 
 ## Data source management
 
-Datasource creation, modification, deletion and access to sensitive configuration follow the datasource management APIs' permission checks; project resource-use grants do not grant these management permissions. The corresponding permissions for data source task operation are provided by the data source connection, and the connection configuration should try to control the task execution permissions. In the data source configuration, users can customize the connection parameters and they will take effect on all tasks using the data source.
+Datasource management is restricted to system administrators, including creation, global listing, details and sensitive configuration access, modification, connection testing and deletion. Ordinary users can query selectable datasources granted to a project where they hold `VIEW`, and configure or execute tasks within their corresponding project operation permissions. Project resource-use grants do not grant datasource management permissions. The corresponding permissions for data source task operation are provided by the data source connection, and the connection configuration should try to control the task execution permissions. In the data source configuration, users can customize the connection parameters and they will take effect on all tasks using the data source.
 
 ## Resource Center
 

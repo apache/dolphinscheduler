@@ -688,6 +688,25 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testDeleteWorkflowDefinitionByNonOwnerWithDevelopPermission() {
+        WorkflowDefinition workflowDefinition = getWorkflowDefinition();
+        workflowDefinition.setUserId(user.getId() + 1);
+        workflowDefinition.setReleaseState(ReleaseState.OFFLINE);
+        Project project = getProject(projectCode);
+        when(workflowDefinitionDao.queryByCode(workflowDefinition.getCode()))
+                .thenReturn(Optional.of(workflowDefinition));
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        when(workflowLineageService.taskDependentMsg(user, projectCode, workflowDefinition.getCode(), 0))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertDoesNotThrow(() -> workflowDefinitionService
+                .deleteWorkflowDefinitionByCode(user, workflowDefinition.getCode()));
+
+        Mockito.verify(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
+        Mockito.verify(workflowDefinitionDao).deleteByWorkflowDefinitionCode(workflowDefinition.getCode());
+    }
+
+    @Test
     public void deleteWorkflowDefinitionByCodeTest() {
         when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
 
@@ -716,14 +735,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 ((ServiceException) exception).getCode());
 
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
-        // user no auth
-        when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> workflowDefinitionService.deleteWorkflowDefinitionByCode(user, 46L));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), ((ServiceException) exception).getCode());
-
         // process definition online
-        user.setUserType(UserType.ADMIN_USER);
         workflowDefinition.setReleaseState(ReleaseState.ONLINE);
         when(workflowDefinitionDao.queryByCode(46L)).thenReturn(Optional.of(workflowDefinition));
         exception = Assertions.assertThrows(ServiceException.class,
@@ -750,7 +762,6 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.SCHEDULE_STATE_ONLINE.getCode(), ((ServiceException) exception).getCode());
 
         // process used by other task, sub process
-        user.setUserType(UserType.ADMIN_USER);
         TaskMainInfo taskMainInfo = getTaskMainInfo().get(0);
         when(workflowLineageService.taskDependentMsg(user, project.getCode(), workflowDefinition.getCode(), 0))
                 .thenReturn(Optional.of(taskMainInfo.getTaskName()));

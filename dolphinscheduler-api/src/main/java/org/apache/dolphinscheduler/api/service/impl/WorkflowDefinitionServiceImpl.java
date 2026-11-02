@@ -929,11 +929,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
         projectService.checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
 
-        // Determine if the login user is the owner of the workflow definition
-        if (loginUser.getId() != workflowDefinition.getUserId() && loginUser.getUserType() != UserType.ADMIN_USER) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-
         workflowDefinitionUsedInOtherTaskValid(loginUser, workflowDefinition);
 
         // get the timing according to the workflow definition

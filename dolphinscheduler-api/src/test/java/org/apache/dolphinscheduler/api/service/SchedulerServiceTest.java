@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.common.enums.Priority;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.ScheduleMissedFirePolicy;
+import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -285,8 +286,29 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testDeleteScheduleByNonOwnerWithManageSchedulesPermission() {
+        user.setUserType(UserType.GENERAL_USER);
+        Schedule schedule = getSchedule();
+        schedule.setUserId(userId + 1);
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        Project project = getProject();
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(getProcessDefinition()));
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        Mockito.when(scheduleDao.deleteById(scheduleId)).thenReturn(true);
+
+        Assertions.assertDoesNotThrow(() -> schedulerService.deleteSchedulesById(user, scheduleId));
+
+        Mockito.verify(projectService).checkProjectPermission(user, project, ProjectPermission.MANAGE_SCHEDULES);
+        Mockito.verify(scheduleDao).deleteById(scheduleId);
+    }
+
+    @Test
     public void testDeleteSchedules() {
+        user.setUserType(UserType.GENERAL_USER);
         Schedule schedule = this.getSchedule();
+        schedule.setUserId(userId + 1);
 
         // error schedule not exists
         exception = Assertions.assertThrows(ServiceException.class,
@@ -300,15 +322,6 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
         Assertions.assertEquals(Status.SCHEDULE_STATE_ONLINE.getCode(), ((ServiceException) exception).getCode());
         schedule.setReleaseState(ReleaseState.OFFLINE);
-
-        // error user not own schedule
-        int notOwnUserId = 2;
-        schedule.setUserId(notOwnUserId);
-        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
-        exception = Assertions.assertThrows(ServiceException.class,
-                () -> schedulerService.deleteSchedulesById(user, scheduleId));
-        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getMsg(), exception.getMessage());
-        schedule.setUserId(userId);
 
         // error process definition not exists
         Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);

@@ -134,6 +134,8 @@ Project resource selectors require `projectCode` and filter results by the user'
 
 Default resources also require explicit grants, including the `default` worker group and built-in `default` tenant when used. The built-in tenant already has a database record; do not create another one. If the tenant has a queue configured, the project also needs a grant for that queue. Grants for optional resources such as environments and alert groups are required when a concrete resource is selected.
 
+Datasource management is restricted to system administrators, including creation, global listing, details and sensitive configuration access, modification, connection testing and deletion. Ordinary users cannot perform these management operations even if they created the datasource. A project resource-use grant allows members to configure or execute tasks within their project operation permissions, and to query selectable granted datasources in projects where they hold `VIEW`.
+
 ### Checks for each operation
 
 |                                                 Operation                                                 |                              User project permission                              |                                       Project resource checks                                       |
