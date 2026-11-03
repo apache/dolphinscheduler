@@ -469,8 +469,8 @@ public final class ProcessUtils {
                     if (!killed) {
                         // the driver pod is already in a failure or unknown state, there is nothing
                         // left to cancel, so this is not a cancellation failure
-                        log.warn("The kubernetes application of task: {} is not running any more, it is not killed",
-                                taskExecutionContext.getTaskAppId());
+                        log.warn("The kubernetes application of task instance: {} is not running any more, "
+                                + "it is not killed", taskExecutionContext.getTaskInstanceId());
                     }
                 }
             } else {

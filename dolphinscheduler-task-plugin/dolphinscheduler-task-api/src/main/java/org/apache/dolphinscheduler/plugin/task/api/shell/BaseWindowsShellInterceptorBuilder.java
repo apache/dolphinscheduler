@@ -59,7 +59,9 @@ public abstract class BaseWindowsShellInterceptorBuilder<T extends BaseWindowsSh
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
-        log.info("Final Shell file is : \n{}", BaseShellInterceptor.maskSensitiveOptions(finalScript));
+        // the content is not logged: it carries the task environment and the task parameters, which
+        // can include credentials. The file itself is available for the diagnostics.
+        log.info("The final shell file is written to: {}", shellAbsolutePath.getFileName());
     }
 
     private String shellBody() {

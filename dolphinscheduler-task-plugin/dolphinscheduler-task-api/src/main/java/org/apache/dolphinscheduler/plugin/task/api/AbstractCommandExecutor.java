@@ -253,8 +253,8 @@ public abstract class AbstractCommandExecutor {
             log.error("Failed to kill process tree for task: {}, pid: {}",
                     taskRequest.getTaskAppId(), taskRequest.getProcessId());
             cancelFailure = new TaskException(String.format(
-                    "Failed to kill the process tree of task: %s, pid: %s, it may still be running",
-                    taskRequest.getTaskAppId(), taskRequest.getProcessId()));
+                    "Failed to kill the process tree of task instance: %s, pid: %s, it may still be running",
+                    taskRequest.getTaskInstanceId(), taskRequest.getProcessId()));
         }
 
         // Try to kill yarn or k8s application
