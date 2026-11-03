@@ -22,9 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
@@ -166,6 +169,64 @@ class AbsStorageOperatorTest {
         assertFalse(storageEntity.isDirectory());
         assertEquals(10L, storageEntity.getSize());
         assertEquals(Date.from(LAST_MODIFIED.toInstant()), storageEntity.getCreateTime());
+    }
+
+    @Test
+    void deleteDirectoryRecursivelyRemovesEveryBlobUnderIt() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        BlobClient marker = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1/");
+        BlobClient child = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1/b.sql");
+        BlobClient nested = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1/sub/c.sql");
+        mockListBlobs(containerClient, "dolphinscheduler/default/resources/dir1/",
+                "dolphinscheduler/default/resources/dir1/", "dolphinscheduler/default/resources/dir1/b.sql",
+                "dolphinscheduler/default/resources/dir1/sub/c.sql");
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        storageOperator.delete("dolphinscheduler/default/resources/dir1", true);
+
+        verify(marker).deleteIfExists();
+        verify(child).deleteIfExists();
+        verify(nested).deleteIfExists();
+    }
+
+    @Test
+    void deleteDirectoryNonRecursivelyOnlyRemovesItsMarker() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        BlobClient marker = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1/");
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        storageOperator.delete("dolphinscheduler/default/resources/dir1", false);
+
+        verify(marker).deleteIfExists();
+        verify(containerClient, never()).listBlobs(any(ListBlobsOptions.class), any());
+    }
+
+    @Test
+    void deleteFileOnlyRemovesThatBlob() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        BlobClient file = mockBlobClient(containerClient, "dolphinscheduler/default/resources/a.sh");
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        storageOperator.delete("dolphinscheduler/default/resources/a.sh", true);
+
+        verify(file).deleteIfExists();
+        verify(containerClient, never()).listBlobs(any(ListBlobsOptions.class), any());
+    }
+
+    private BlobClient mockBlobClient(BlobContainerClient containerClient, String name) {
+        BlobClient blobClient = mock(BlobClient.class);
+        when(containerClient.getBlobClient(name)).thenReturn(blobClient);
+        return blobClient;
+    }
+
+    private void mockListBlobs(BlobContainerClient containerClient, String prefix, String... names) {
+        @SuppressWarnings("unchecked")
+        PagedIterable<BlobItem> blobItems = mock(PagedIterable.class);
+        when(blobItems.iterator()).thenReturn(
+                Arrays.stream(names).map(name -> new BlobItem().setName(name)).collect(Collectors.toList())
+                        .iterator());
+        when(containerClient.listBlobs(argThat((ListBlobsOptions options) -> prefix.equals(options.getPrefix())),
+                isNull())).thenReturn(blobItems);
     }
 
     private void mockListBlobsByHierarchy(BlobContainerClient containerClient) {
