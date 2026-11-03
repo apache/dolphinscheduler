@@ -49,8 +49,8 @@ export default defineComponent({
       Number(router.currentRoute.value.params.projectCode)
     )
     const workflowDefinitionCodeRef = router.currentRoute.value.query
-      .workflowDefineCode
-      ? ref(Number(router.currentRoute.value.query.workflowDefineCode))
+      .workflowDefinitionCode
+      ? ref(Number(router.currentRoute.value.query.workflowDefinitionCode))
       : ref()
 
     const workflowDefinitionOptions = ref<Array<SelectMixedOption>>([])
