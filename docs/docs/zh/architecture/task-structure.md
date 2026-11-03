@@ -33,7 +33,7 @@
 | global_params    | text         | 全局参数，结构为[参数](#公共字段)组成的 JSON 数组                  |
 | flag             | tinyint(4)   | 工作流是否可用：0 不可用，1 可用                              |
 | locations        | text         | 节点在画布上的坐标，例如 `[{"taskCode":123,"x":59,"y":61}]` |
-| warning_group_id | int(11)      | 告警组 id                                          |
+| warning_group_id | int(11)      | 未使用，始终为 NULL；告警组在启动或定时调度时选择                     |
 | timeout          | int(11)      | 超时时间，单位分钟                                       |
 | execution_type   | tinyint(4)   | 执行策略：0 并行，1 串行等待，2 串行抛弃，3 串行优先                  |
 | create_time      | datetime     | 创建时间                                            |
@@ -109,17 +109,24 @@
 
 ### 公共字段
 
-|       字段        |   类型   |                 描述                 |
-|-----------------|--------|------------------------------------|
-| localParams     | Array  | 任务的本地参数                            |
-| -- prop         | String | 参数名                                |
-| -- direct       | String | 方向：`IN` 或 `OUT`                    |
-| -- type         | String | 数据类型，例如 `VARCHAR`、`INTEGER`、`DATE` |
-| -- value        | String | 参数值                                |
-| resourceList    | Array  | 任务使用的资源文件，仅支持资源的任务类型（如 SHELL）使用    |
-| -- resourceName | String | 资源文件全名                             |
+|       字段        |   类型    |                                                        描述                                                        |
+|-----------------|---------|------------------------------------------------------------------------------------------------------------------|
+| localParams     | Array   | 任务的本地参数                                                                                                          |
+| -- prop         | String  | 参数名                                                                                                              |
+| -- direct       | String  | 方向：`IN` 或 `OUT`                                                                                                  |
+| -- type         | String  | 数据类型，例如 `VARCHAR`、`INTEGER`、`DATE`                                                                               |
+| -- value        | String  | 参数值                                                                                                              |
+| -- sensitive    | Boolean | 是否为敏感参数，默认 `false`，详见下文                                                                                          |
+| resourceList    | Array   | 任务使用的资源文件。不属于 `AbstractParameters`，仅使用资源文件的任务类型定义该字段（如 SHELL、PYTHON、SPARK、MR、FLINK、DATAX）；前端对所有任务类型都会附带，其他任务类型忽略 |
+| -- resourceName | String  | 资源文件全名                                                                                                           |
 
 工作流定义的 `global_params` 与 `localParams` 结构相同。
+
+后端序列化时 `sensitive` 为 `false` 会被省略，缺省即视为 `false`（客户端仍可能传 `"sensitive": false`）。敏感参数的值在数据库中以明文存储，查询接口返回 `******`：
+
+- 创建时不允许以 `******` 作为值。
+- 更新时，只有标记为敏感且已存在同名参数时，`******` 才保留原值；新增敏感参数或取消 sensitive 时使用 `******` 会被拒绝。
+- 启动或补数据时，值为 `******` 的启动参数取同名全局参数的值。
 
 ### 各任务类型参数
 
@@ -164,6 +171,13 @@
             "direct": "IN",
             "type": "VARCHAR",
             "value": "${system.datetime}"
+        },
+        {
+            "prop": "db_password",
+            "direct": "IN",
+            "type": "VARCHAR",
+            "value": "my_secret",
+            "sensitive": true
         }
     ],
     "rawScript": "echo \"dt=${dt}\"\nsh ./run.sh",
@@ -210,22 +224,23 @@
 
 对数据源执行 SQL 语句，`task_params` 由 `dolphinscheduler-task-api` 模块的 `SqlParameters` 定义。
 
-|       字段       |   类型    |                      描述                      |
-|----------------|---------|----------------------------------------------|
-| localParams    | Array   | 本地参数，替换 SQL 中的 `${variable}`，见 [公共字段](#公共字段) |
-| resourceList   | Array   | 资源文件，SQL 任务通常为空，见 [公共字段](#公共字段)              |
-| type           | String  | 数据源类型，如 `MYSQL`、`POSTGRESQL`、`HIVE`          |
-| datasource     | Integer | 数据源 id                                       |
-| sql            | String  | SQL 语句，`sqlSource` 为 `SCRIPT` 时使用            |
-| sqlSource      | String  | SQL 来源：`SCRIPT` 内联脚本，`FILE` 资源中心文件           |
-| sqlResource    | String  | 资源中心文件路径，`sqlSource` 为 `FILE` 时使用            |
-| sqlType        | String  | SQL 类型：`0` 查询，`1` 非查询（前端以字符串保存）              |
-| preStatements  | Array   | 在主 SQL 之前执行的 SQL 语句                          |
-| postStatements | Array   | 在主 SQL 之后执行的 SQL 语句                          |
-| sendEmail      | Boolean | 是否通过告警发送查询结果，仅查询类型                           |
-| displayRows    | Integer | 日志中展示查询结果的最大行数，仅查询类型                         |
-| title          | String  | 告警标题，仅 `sendEmail` 为 true 时保存                |
-| groupId        | Integer | 告警组 id，仅 `sendEmail` 为 true 时保存              |
+|       字段       |   类型    |                                  描述                                   |
+|----------------|---------|-----------------------------------------------------------------------|
+| localParams    | Array   | 本地参数，替换 SQL 中的 `${variable}`，见 [公共字段](#公共字段)                          |
+| resourceList   | Array   | 前端对所有任务类型都会附带，本任务不使用；`sqlSource` 为 `FILE` 时的 SQL 文件由 `sqlResource` 指定 |
+| type           | String  | 数据源类型，如 `MYSQL`、`POSTGRESQL`、`HIVE`                                   |
+| datasource     | Integer | 数据源 id                                                                |
+| sql            | String  | SQL 语句，`sqlSource` 为 `SCRIPT` 时使用                                     |
+| sqlSource      | String  | SQL 来源：`SCRIPT` 内联脚本，`FILE` 资源中心文件                                    |
+| sqlResource    | String  | 资源中心文件路径，`sqlSource` 为 `FILE` 时使用                                     |
+| sqlType        | Integer | SQL 类型：`0` 查询，`1` 非查询；前端以字符串 `"0"`/`"1"` 提交，两种写法都可接受                  |
+| preStatements  | Array   | 在主 SQL 之前执行的 SQL 语句                                                   |
+| postStatements | Array   | 在主 SQL 之后执行的 SQL 语句                                                   |
+| sendEmail      | Boolean | 是否通过告警发送查询结果，仅查询类型                                                    |
+| displayRows    | Integer | 日志中展示查询结果的最大行数，仅查询类型                                                  |
+| title          | String  | 告警标题，仅 `sendEmail` 为 true 时保存                                         |
+| groupId        | Integer | 告警组 id，仅 `sendEmail` 为 true 时保存                                       |
+| limit          | Integer | 查询最多获取的行数，小于等于 0 时使用默认值                                               |
 
 **示例：**
 
@@ -261,13 +276,13 @@
 
 调用数据源中的存储过程，`task_params` 由 `dolphinscheduler-task-procedure` 模块的 `ProcedureParameters` 定义。
 
-|      字段      |   类型    |                   描述                   |
-|--------------|---------|----------------------------------------|
-| localParams  | Array   | 存储过程参数，支持 `IN` 和 `OUT`，见 [公共字段](#公共字段) |
-| resourceList | Array   | 资源文件，存储过程任务通常为空，见 [公共字段](#公共字段)        |
-| type         | String  | 数据源类型，如 `MYSQL`、`POSTGRESQL`           |
-| datasource   | Integer | 数据源 id                                 |
-| method       | String  | 存储过程名称                                 |
+|      字段      |   类型    |                                               描述                                               |
+|--------------|---------|------------------------------------------------------------------------------------------------|
+| localParams  | Array   | 存储过程参数，支持 `IN` 和 `OUT`，见 [公共字段](#公共字段)                                                         |
+| resourceList | Array   | 前端对所有任务类型都会附带，本任务不使用                                                                           |
+| type         | String  | 数据源类型，如 `MYSQL`、`POSTGRESQL`                                                                   |
+| datasource   | Integer | 数据源 id                                                                                         |
+| method       | String  | 存储过程调用语句，其中的 `${param}` 占位符按 `IN`/`OUT` 本地参数绑定，例如 `call proc_daily_stat(${in_dt}, ${out_cnt})` |
 
 **示例：**
 
@@ -290,7 +305,7 @@
     "resourceList": [],
     "type": "MYSQL",
     "datasource": 1,
-    "method": "proc_daily_stat"
+    "method": "call proc_daily_stat(${in_dt}, ${out_cnt})"
 }
 ```
 
@@ -298,21 +313,21 @@
 
 发送 HTTP 请求并校验响应，`task_params` 由 `dolphinscheduler-task-http` 模块的 `HttpParameters` 定义。
 
-|          字段           |   类型    |                                            描述                                            |
-|-----------------------|---------|------------------------------------------------------------------------------------------|
-| localParams           | Array   | 本地参数，见 [公共字段](#公共字段)                                                                     |
-| resourceList          | Array   | 资源文件，HTTP 任务通常为空，见 [公共字段](#公共字段)                                                         |
-| url                   | String  | 请求地址                                                                                     |
-| httpMethod            | String  | 请求方法：`GET`、`POST`、`PUT`、`DELETE`                                                         |
-| httpParams            | Array   | 请求参数和请求头                                                                                 |
-| -- prop               | String  | 参数或请求头名称                                                                                 |
-| -- httpParametersType | String  | 类型：`PARAMETER` 或 `HEADERS`                                                               |
-| -- value              | String  | 参数或请求头的值                                                                                 |
-| httpBody              | String  | 请求体                                                                                      |
-| httpCheckCondition    | String  | 校验条件：`STATUS_CODE_DEFAULT`（200）、`STATUS_CODE_CUSTOM`、`BODY_CONTAINS`、`BODY_NOT_CONTAINS` |
-| condition             | String  | 校验内容，条件不是 `STATUS_CODE_DEFAULT` 时必填                                                      |
-| connectTimeout        | Integer | 连接超时时间，单位毫秒                                                                              |
-| socketKeepAlive       | Boolean | 是否开启 TCP keep-alive                                                                      |
+|          字段           |   类型    |                                                                 描述                                                                  |
+|-----------------------|---------|-------------------------------------------------------------------------------------------------------------------------------------|
+| localParams           | Array   | 本地参数，见 [公共字段](#公共字段)                                                                                                                |
+| resourceList          | Array   | 前端对所有任务类型都会附带，本任务不使用                                                                                                                |
+| url                   | String  | 请求地址                                                                                                                                |
+| httpMethod            | String  | 请求方法：`GET`、`POST`、`PUT`、`DELETE`                                                                                                    |
+| httpParams            | Array   | 请求参数和请求头                                                                                                                            |
+| -- prop               | String  | 参数或请求头名称                                                                                                                            |
+| -- httpParametersType | String  | 类型：`PARAMETER`（作为 URL 查询参数发送）或 `HEADERS`。`Content-Type` 请求头不会原样发送，仅用于选择 `application/json`（默认）或 `application/x-www-form-urlencoded` |
+| -- value              | String  | 参数或请求头的值                                                                                                                            |
+| httpBody              | String  | 请求体，须为 JSON 对象，支持 `${param}` 替换；仅 `POST`、`PUT` 发送                                                                                   |
+| httpCheckCondition    | String  | 校验条件：`STATUS_CODE_DEFAULT`（200）、`STATUS_CODE_CUSTOM`、`BODY_CONTAINS`、`BODY_NOT_CONTAINS`                                            |
+| condition             | String  | 校验内容，条件不是 `STATUS_CODE_DEFAULT` 时必填                                                                                                 |
+| connectTimeout        | Integer | 超时时间，单位毫秒，同时用于连接、读、写；必须大于 0                                                                                                         |
+| socketKeepAlive       | Boolean | 是否开启 TCP keep-alive                                                                                                                 |
 
 **示例：**
 
@@ -355,12 +370,12 @@
 | mainClass        | String  | 主函数的完整类名，`PYTHON` 和 `SQL` 不使用                                                             |
 | mainJar          | Object  | 主 jar 包或 Python 文件，`SQL` 不使用                                                              |
 | -- resourceName  | String  | jar 资源的完整名称                                                                               |
-| deployMode       | String  | 部署模式：`cluster`、`client` 或 `local`；`SQL` 支持 `client` 和 `local`                             |
+| deployMode       | String  | 部署模式：`cluster`、`client` 或 `local`，为空按 `local` 处理；`SQL` 支持 `client` 和 `local`              |
 | appName          | String  | 传给 Spark 的任务名称                                                                            |
 | mainArgs         | String  | 主程序参数，支持 `${...}` 变量                                                                      |
 | others           | String  | 其他 `spark-submit` 选项，如 `--conf`、`--jars`                                                  |
-| yarnQueue        | String  | YARN 队列                                                                                   |
-| master           | String  | Master 地址，如 `yarn`                                                                        |
+| yarnQueue        | String  | YARN 队列，`local` 模式或 `others` 中已指定 `--queue` 时忽略                                           |
+| master           | String  | Master 地址，可选；为空时按 `local`（local 模式）、`k8s://...`（设置了 `namespace`）或 `yarn` 推导               |
 | driverCores      | Integer | Driver 核数                                                                                 |
 | driverMemory     | String  | Driver 内存，如 `512M`                                                                        |
 | numExecutors     | Integer | Executor 数量                                                                               |
@@ -408,18 +423,18 @@
 
 运行 Hadoop MapReduce 作业。`task_params` 由 `dolphinscheduler-task-mr` 模块的 `MapReduceParameters` 定义。
 
-|       字段        |   类型   |                       描述                        |
-|-----------------|--------|-------------------------------------------------|
-| localParams     | Array  | 本地参数，见 [公共字段](#公共字段)                            |
-| resourceList    | Array  | 任务使用的资源文件，见 [公共字段](#公共字段)                       |
-| programType     | String | 程序类型：`JAVA`、`SCALA` 或 `PYTHON`                  |
-| mainClass       | String | 主函数的完整类名                                        |
-| mainJar         | Object | MapReduce 程序的主 jar 包（`PYTHON` 时为脚本）             |
-| -- resourceName | String | jar 资源的完整名称                                     |
-| appName         | String | MapReduce 作业名称                                  |
-| mainArgs        | String | 程序的命令行参数，支持 `${...}` 变量                         |
-| others          | String | 其他参数，支持 `-D`、`-files`、`-libjars`、`-archives` 格式 |
-| yarnQueue       | String | YARN 队列                                         |
+|       字段        |   类型   |                         描述                          |
+|-----------------|--------|-----------------------------------------------------|
+| localParams     | Array  | 本地参数，见 [公共字段](#公共字段)                                |
+| resourceList    | Array  | 任务使用的资源文件，见 [公共字段](#公共字段)                           |
+| programType     | String | 程序类型：`JAVA`、`SCALA` 或 `PYTHON`                      |
+| mainClass       | String | 主函数的完整类名，`PYTHON` 不使用                               |
+| mainJar         | Object | MapReduce 程序的主 jar 包（`PYTHON` 时为脚本）                 |
+| -- resourceName | String | jar 资源的完整名称                                         |
+| appName         | String | MapReduce 作业名称                                      |
+| mainArgs        | String | 程序的命令行参数，支持 `${...}` 变量                             |
+| others          | String | 其他参数，支持 `-D`、`-files`、`-libjars`、`-archives` 格式     |
+| yarnQueue       | String | YARN 队列，`others` 中已指定 `mapreduce.job.queuename` 时忽略 |
 
 **示例：**
 
@@ -450,27 +465,27 @@
 
 通过 `flink` 命令行运行 Flink 作业。`task_params` 由 `dolphinscheduler-task-flink` 模块的 `FlinkParameters` 定义。
 
-|        字段         |   类型    |                                    描述                                     |
-|-------------------|---------|---------------------------------------------------------------------------|
-| localParams       | Array   | 本地参数，见 [公共字段](#公共字段)                                                      |
-| initScript        | String  | 初始化 SQL，仅当 `programType` 为 `SQL` 时使用，否则为空                                 |
-| rawScript         | String  | SQL 脚本，仅当 `programType` 为 `SQL` 时使用，否则为空                                  |
-| resourceList      | Array   | 任务使用的资源文件，见 [公共字段](#公共字段)                                                 |
-| programType       | String  | 程序类型：`JAVA`、`SCALA`、`PYTHON` 或 `SQL`                                      |
-| mainClass         | String  | 主函数的完整类名，`PYTHON` 和 `SQL` 不使用                                             |
-| mainJar           | Object  | 主 jar 包或 Python 文件，`SQL` 不使用                                              |
-| -- resourceName   | String  | jar 资源的完整名称                                                               |
-| deployMode        | String  | 部署模式：`cluster`、`local`、`application` 或 `standalone`，可选项取决于 `flinkVersion` |
-| appName           | String  | YARN 应用名称                                                                 |
-| mainArgs          | String  | 主程序参数，支持 `${...}` 变量                                                      |
-| others            | String  | 其他 Flink 命令选项，如 `-D`、`-C`、`-yt`                                           |
-| yarnQueue         | String  | YARN 队列                                                                   |
-| flinkVersion      | String  | 界面选择的 Flink 版本：`<1.10`、`1.11`、`>=1.12` 或 `>=1.13`                         |
-| jobManagerMemory  | String  | JobManager 内存，如 `1G`                                                      |
-| taskManagerMemory | String  | TaskManager 内存，如 `2G`                                                     |
-| slot              | Integer | 每个 TaskManager 的 slot 数                                                   |
-| taskManager       | Integer | TaskManager 数量                                                            |
-| parallelism       | Integer | 作业并行度                                                                     |
+|        字段         |   类型    |                                                                                 描述                                                                                 |
+|-------------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams       | Array   | 本地参数，见 [公共字段](#公共字段)                                                                                                                                               |
+| initScript        | String  | 初始化 SQL，仅当 `programType` 为 `SQL` 时使用，否则为空                                                                                                                          |
+| rawScript         | String  | SQL 脚本，仅当 `programType` 为 `SQL` 时使用，否则为空                                                                                                                           |
+| resourceList      | Array   | 任务使用的资源文件，见 [公共字段](#公共字段)                                                                                                                                          |
+| programType       | String  | 程序类型：`JAVA`、`SCALA`、`PYTHON` 或 `SQL`                                                                                                                               |
+| mainClass         | String  | 主函数的完整类名，`PYTHON` 和 `SQL` 不使用                                                                                                                                      |
+| mainJar           | Object  | 主 jar 包或 Python 文件，`SQL` 不使用                                                                                                                                       |
+| -- resourceName   | String  | jar 资源的完整名称                                                                                                                                                        |
+| deployMode        | String  | 部署模式：`cluster`、`local`、`application` 或 `standalone`。`SQL` 可选 `cluster`、`local`、`standalone`；其他程序类型可选 `cluster`、`local`，`flinkVersion` 不为 `<1.10` 时另有 `application` |
+| appName           | String  | YARN 应用名称                                                                                                                                                          |
+| mainArgs          | String  | 主程序参数，支持 `${...}` 变量                                                                                                                                               |
+| others            | String  | 其他 Flink 命令选项，如 `-D`、`-C`、`-yt`                                                                                                                                    |
+| yarnQueue         | String  | YARN 队列，仅 `cluster` 和 `application` 模式使用（`SQL` 在 `local` 和 `standalone` 模式下不使用）                                                                                    |
+| flinkVersion      | String  | 界面选择的 Flink 版本：`JAVA`/`SCALA`/`PYTHON` 可选 `<1.10`、`1.11`、`>=1.12`；`SQL` 固定为 `>=1.13`                                                                               |
+| jobManagerMemory  | String  | JobManager 内存，如 `1G`                                                                                                                                               |
+| taskManagerMemory | String  | TaskManager 内存，如 `2G`                                                                                                                                              |
+| slot              | Integer | 每个 TaskManager 的 slot 数                                                                                                                                            |
+| taskManager       | Integer | TaskManager 数量（`-yn`），仅 `flinkVersion` 为 `<1.10` 且 `deployMode` 不为 `local` 时使用                                                                                     |
+| parallelism       | Integer | 作业并行度                                                                                                                                                              |
 
 **示例：**
 
@@ -510,25 +525,26 @@
 
 使用 DataX 在数据源之间同步数据。`task_params` 由 `dolphinscheduler-task-datax` 模块的 `DataxParameters` 定义。
 
-|       字段       |   类型    |                            描述                             |
-|----------------|---------|-----------------------------------------------------------|
-| localParams    | Array   | 本地参数，见 [公共字段](#公共字段)                                      |
-| resourceList   | Array   | 辅助文件（如 keytab、xml），自定义配置时也可为 `.json` 作业文件，见 [公共字段](#公共字段) |
-| customConfig   | Integer | `0` 表示在界面配置源和目标，`1` 表示使用自定义 DataX JSON                    |
-| dsType         | String  | 源数据源类型，如 `MYSQL`；仅 `customConfig` 为 `0` 时存在               |
-| dataSource     | Integer | 源数据源 id；仅 `customConfig` 为 `0` 时存在                        |
-| dtType         | String  | 目标数据源类型，如 `MYSQL`；仅 `customConfig` 为 `0` 时存在              |
-| dataTarget     | Integer | 目标数据源 id；仅 `customConfig` 为 `0` 时存在                       |
-| sql            | String  | 在源端执行的查询 SQL；仅 `customConfig` 为 `0` 时存在                   |
-| targetTable    | String  | 目标表；仅 `customConfig` 为 `0` 时存在                            |
-| jobSpeedByte   | Integer | 字节限速，`0` 表示不限；仅 `customConfig` 为 `0` 时存在                  |
-| jobSpeedRecord | Integer | 记录数限速；仅 `customConfig` 为 `0` 时存在                          |
-| jobChannel     | Integer | 通道数；仅 `customConfig` 为 `0` 时存在                            |
-| preStatements  | Array   | 同步前在目标端执行的 SQL；仅 `customConfig` 为 `0` 时存在                 |
-| postStatements | Array   | 同步后在目标端执行的 SQL；仅 `customConfig` 为 `0` 时存在                 |
-| json           | String  | DataX 作业 JSON；仅 `customConfig` 为 `1` 时存在                  |
-| xms            | Integer | JVM 最小内存，单位 GB                                            |
-| xmx            | Integer | JVM 最大内存，单位 GB                                            |
+|       字段       |   类型    |                                            描述                                             |
+|----------------|---------|-------------------------------------------------------------------------------------------|
+| localParams    | Array   | 本地参数，见 [公共字段](#公共字段)                                                                      |
+| resourceList   | Array   | 辅助文件（如 keytab、xml）；自定义配置且无内联 `json` 时，必须恰好包含一个保存作业定义的 `.json` 文件，见 [公共字段](#公共字段)          |
+| customConfig   | Integer | `0` 表示在界面配置源和目标，`1` 表示使用自定义 DataX JSON                                                    |
+| dsType         | String  | 源数据源类型，如 `MYSQL`；仅 `customConfig` 为 `0` 时存在                                               |
+| dataSource     | Integer | 源数据源 id；仅 `customConfig` 为 `0` 时存在                                                        |
+| dtType         | String  | 目标数据源类型，如 `MYSQL`；仅 `customConfig` 为 `0` 时存在                                              |
+| dataTarget     | Integer | 目标数据源 id；仅 `customConfig` 为 `0` 时存在                                                       |
+| sql            | String  | 在源端执行的查询 SQL；仅 `customConfig` 为 `0` 时存在                                                   |
+| targetTable    | String  | 目标表；仅 `customConfig` 为 `0` 时存在                                                            |
+| jobSpeedByte   | Integer | 字节限速，`0` 表示不限；仅 `customConfig` 为 `0` 时存在                                                  |
+| jobSpeedRecord | Integer | 记录数限速，`0` 表示不限；仅 `customConfig` 为 `0` 时存在                                                 |
+| jobChannel     | Integer | 通道数；仅 `customConfig` 为 `0` 时存在                                                            |
+| preStatements  | Array   | 同步前在目标端执行的 SQL；仅 `customConfig` 为 `0` 时存在                                                 |
+| postStatements | Array   | 同步后在目标端执行的 SQL；仅 `customConfig` 为 `0` 时存在                                                 |
+| batchSize      | Integer | 写入端批量大小，大于 0 时才写入 DataX writer；仅 `customConfig` 为 `0` 时存在。当前 UI 表单不会保存该字段                 |
+| json           | String  | DataX 作业 JSON；仅 `customConfig` 为 `1` 时存在。为空或 `{}` 时从 `resourceList` 中唯一的 `.json` 文件读取作业定义 |
+| xms            | Integer | JVM 最小内存，单位 GB，小于 1 时按 1 处理                                                               |
+| xmx            | Integer | JVM 最大内存，单位 GB                                                                            |
 
 自定义配置（`customConfig` 为 `1`）的示例：
 
@@ -588,8 +604,8 @@
 | jobName             | String  | MapReduce 作业名称，仅 `jobType` 为 `TEMPLATE` 时存在                          |
 | hadoopCustomParams  | Array   | Hadoop 自定义参数，与 `localParams` 一样是 `prop`/`direct`/`type`/`value` 对象列表 |
 | sqoopAdvancedParams | Array   | Sqoop 高级参数，结构同 `hadoopCustomParams`                                  |
-| concurrency         | Integer | 并行度（map 任务数）                                                         |
-| splitBy             | String  | 用于切分数据的列                                                             |
+| concurrency         | Integer | 并行度（`-m`，map 任务数），`TEMPLATE` 时不能为 `0`                                |
+| splitBy             | String  | 用于在 map 任务间切分数据的列（`--split-by`），仅 `concurrency` 大于 1 时使用             |
 | modelType           | String  | 方向：`import`（RDBMS 到 HDFS/Hive）或 `export`（HDFS/Hive 到 RDBMS）          |
 | sourceType          | String  | 源类型：`MYSQL`、`ORACLE`、`SQLSERVER`、`HANA`、`HIVE` 或 `HDFS`              |
 | targetType          | String  | 目标类型，可选项同 `sourceType`                                               |
@@ -616,17 +632,17 @@
 
 `targetType` 为 `HIVE` 时的 `targetParams`：
 
-|         字段         |   类型    |             描述              |
-|--------------------|---------|-----------------------------|
-| hiveDatabase       | String  | Hive 库名                     |
-| hiveTable          | String  | Hive 表名                     |
-| createHiveTable    | Boolean | 创建 Hive 表，表已存在则任务失败         |
-| dropDelimiter      | Boolean | 去除字符串字段中的 `\n`、`\r` 和 `\01` |
-| hiveOverWrite      | Boolean | 覆盖已有数据                      |
-| hiveTargetDir      | String  | 显式指定目标目录                    |
-| replaceDelimiter   | String  | 替换 `\n`、`\r` 和 `\01` 的字符串   |
-| hivePartitionKey   | String  | 分区键                         |
-| hivePartitionValue | String  | 分区值                         |
+|         字段         |   类型    |                       描述                       |
+|--------------------|---------|------------------------------------------------|
+| hiveDatabase       | String  | Hive 库名                                        |
+| hiveTable          | String  | Hive 表名                                        |
+| createHiveTable    | Boolean | 创建 Hive 表，表已存在则任务失败                            |
+| dropDelimiter      | Boolean | 去除字符串字段中的 `\n`、`\r` 和 `\01`                    |
+| hiveOverWrite      | Boolean | 覆盖已有数据（`--hive-overwrite --delete-target-dir`） |
+| hiveTargetDir      | String  | 显式指定目标目录                                       |
+| replaceDelimiter   | String  | 替换 `\n`、`\r` 和 `\01` 的字符串                      |
+| hivePartitionKey   | String  | 分区键                                            |
+| hivePartitionValue | String  | 分区值                                            |
 
 `targetType` 为 `HDFS` 时的 `targetParams`：
 
@@ -708,27 +724,29 @@ SUB_WORKFLOW 任务把另一个工作流作为子工作流运行，`task_params`
 
 DEPENDENT 任务检查其他工作流或任务在指定时间范围内是否运行成功，`task_params` 由 `DependentParameters` 定义。
 
-|           字段            |   类型    |                                            描述                                            |
-|-------------------------|---------|------------------------------------------------------------------------------------------|
-| localParams             | Array   | 本地参数，见[公共字段](#公共字段)                                                                      |
-| resourceList            | Array   | 该任务类型不使用，为空数组                                                                            |
-| dependence              | Object  | 依赖配置，必填                                                                                  |
-| -- relation             | String  | `dependTaskList` 中各组之间的关系：`AND` 或 `OR`                                                   |
-| -- dependTaskList       | Array   | 依赖组列表，至少一项                                                                               |
-| ---- relation           | String  | `dependItemList` 中各项之间的关系：`AND` 或 `OR`                                                   |
-| ---- dependItemList     | Array   | 该组的依赖项                                                                                   |
-| ------ dependentType    | String  | `DEPENDENT_ON_WORKFLOW`（依赖整个工作流）或 `DEPENDENT_ON_TASK`（依赖单个任务）。缺省时 UI 根据 `depTaskCode` 推断 |
-| ------ projectCode      | Number  | 被依赖工作流所属项目的 code                                                                         |
-| ------ definitionCode   | Number  | 被依赖工作流定义的 code                                                                           |
-| ------ depTaskCode      | Number  | 被依赖任务的 code。依赖整个工作流时为 `0`；UI 在选择 `DEPENDENT_ON_TASK` 但尚未选任务时写入 `-1`，表示依赖工作流中的所有任务        |
-| ------ cycle            | String  | 依赖周期：`hour`、`day`、`week` 或 `month`                                                       |
-| ------ dateValue        | String  | 周期内的时间范围，取值见下表                                                                           |
-| ------ parameterPassing | Boolean | 依赖成功时是否把被依赖方的输出参数传递给下游任务，默认 `false`                                                      |
-| -- checkInterval        | Number  | 检查依赖状态的间隔，单位为秒。设置时必须大于 0，缺省为 `10`                                                        |
-| -- failurePolicy        | String  | 依赖失败时的策略：`DEPENDENT_FAILURE_FAILURE`（当前任务失败）或 `DEPENDENT_FAILURE_WAITING`（继续等待）          |
-| -- failureWaitingTime   | Number  | 等待时长，单位为分钟，仅在 `failurePolicy` 为 `DEPENDENT_FAILURE_WAITING` 时使用                          |
+|           字段            |   类型    |                                                                                  描述                                                                                   |
+|-------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams             | Array   | 本地参数，见[公共字段](#公共字段)                                                                                                                                                   |
+| resourceList            | Array   | 该任务类型不使用，为空数组                                                                                                                                                         |
+| dependence              | Object  | 依赖配置，必填                                                                                                                                                               |
+| -- relation             | String  | `dependTaskList` 中各组之间的关系：`AND` 或 `OR`                                                                                                                                |
+| -- dependTaskList       | Array   | 依赖组列表，至少一项                                                                                                                                                            |
+| ---- relation           | String  | `dependItemList` 中各项之间的关系：`AND` 或 `OR`                                                                                                                                |
+| ---- dependItemList     | Array   | 该组的依赖项                                                                                                                                                                |
+| ------ dependentType    | String  | `DEPENDENT_ON_WORKFLOW`（依赖整个工作流）或 `DEPENDENT_ON_TASK`（依赖单个任务）。仅供 UI 使用，缺省时 UI 根据 `depTaskCode` 推断                                                                     |
+| ------ projectCode      | Number  | 被依赖工作流所属项目的 code                                                                                                                                                      |
+| ------ definitionCode   | Number  | 被依赖工作流定义的 code                                                                                                                                                        |
+| ------ depTaskCode      | Number  | `0`：依赖整个工作流（工作流实例成功）；`-1`（UI 中显示为 `ALL`）：工作流实例成功，且其中所有启用的任务都有成功的实例；其他值：单个任务的 code                                                                                     |
+| ------ cycle            | String  | 依赖周期：`hour`、`day`、`week` 或 `month`；仅供 UI 用于提供 `dateValue` 选项                                                                                                          |
+| ------ dateValue        | String  | 周期内的时间范围，取值见下表                                                                                                                                                        |
+| ------ parameterPassing | Boolean | 依赖成功时，是否把被依赖工作流实例 varPool 中的 `OUT` 参数传给下游任务。仅在 `depTaskCode` 为 `0`、`-1` 或被依赖任务为流式任务时生效，默认 `false`                                                                     |
+| -- checkInterval        | Number  | 检查依赖状态的间隔，单位为秒。设置时必须大于 0，缺省为 `10`                                                                                                                                     |
+| -- failurePolicy        | String  | 依赖失败时的策略：`DEPENDENT_FAILURE_FAILURE`（当前任务失败）或 `DEPENDENT_FAILURE_WAITING`（继续检查，直到距基准时间超过 `failureWaitingTime` 分钟后失败）。未设置 `failurePolicy` 或 `failureWaitingTime` 时立即失败 |
+| -- failureWaitingTime   | Number  | 等待时长，单位为分钟，仅在 `failurePolicy` 为 `DEPENDENT_FAILURE_WAITING` 时使用                                                                                                       |
 
-`cycle` 和 `dateValue` 的取值如下。`week` 和 `month` 中的 `thisWeek`、`thisMonth` 表示截至当前的自然周、自然月。
+`cycle` 和 `dateValue` 的取值如下。所有时间范围都以当前工作流实例的调度时间为基准（非调度运行时取启动时间）；`thisWeek`、`thisMonth` 表示从周一、月初到该时间。Master 只依据 `dateValue` 和 `depTaskCode` 判断。后端还支持 `thisMonthEnd`，UI 未提供该选项。
+
+依赖自身工作流（`-1` 或任务自身）时，该工作流的第一个实例视为依赖成功。
 
 | cycle |                                                        dateValue                                                         |
 |-------|--------------------------------------------------------------------------------------------------------------------------|
@@ -765,7 +783,7 @@ DEPENDENT 任务检查其他工作流或任务在指定时间范围内是否运�
                         "depTaskCode": 137713824398177,
                         "cycle": "week",
                         "dateValue": "lastWeek",
-                        "parameterPassing": true
+                        "parameterPassing": false
                     }
                 ]
             }
@@ -781,20 +799,20 @@ DEPENDENT 任务检查其他工作流或任务在指定时间范围内是否运�
 
 CONDITIONS 任务检查上游任务的状态，并选择成功或失败分支，`task_params` 由 `ConditionsParameters` 定义。
 
-|         字段          |   类型   |                   描述                   |
-|---------------------|--------|----------------------------------------|
-| localParams         | Array  | 本地参数，见[公共字段](#公共字段)                    |
-| resourceList        | Array  | 该任务类型不使用，为空数组                          |
-| dependence          | Object | 上游条件，必填                                |
-| -- relation         | String | `dependTaskList` 中各组之间的关系：`AND` 或 `OR` |
-| -- dependTaskList   | Array  | 条件组列表，至少一项                             |
-| ---- relation       | String | `dependItemList` 中各项之间的关系：`AND` 或 `OR` |
-| ---- dependItemList | Array  | 该组的条件项                                 |
-| ------ depTaskCode  | Number | 需要检查的上游任务的 code                        |
-| ------ status       | String | 上游任务的期望状态：`SUCCESS` 或 `FAILURE`        |
-| conditionResult     | Object | 要执行的分支，必填                              |
-| -- successNode      | Array  | 条件满足时执行的下游任务 code，至少一项                 |
-| -- failedNode       | Array  | 条件不满足时执行的下游任务 code，至少一项                |
+|         字段          |   类型   |                                          描述                                          |
+|---------------------|--------|--------------------------------------------------------------------------------------|
+| localParams         | Array  | 本地参数，见[公共字段](#公共字段)                                                                  |
+| resourceList        | Array  | 该任务类型不使用，为空数组                                                                        |
+| dependence          | Object | 上游条件，必填                                                                              |
+| -- relation         | String | `dependTaskList` 中各组之间的关系：`AND` 或 `OR`                                               |
+| -- dependTaskList   | Array  | 条件组列表，至少一项                                                                           |
+| ---- relation       | String | `dependItemList` 中各项之间的关系：`AND` 或 `OR`                                               |
+| ---- dependItemList | Array  | 该组的条件项                                                                               |
+| ------ depTaskCode  | Number | 需要检查的上游任务的 code                                                                      |
+| ------ status       | String | 上游任务的期望状态：`SUCCESS` 或 `FAILURE`，需完全相等（`FORCED_SUCCESS` 不等于 `SUCCESS`）；没有实例的上游任务视为不满足 |
+| conditionResult     | Object | 要执行的分支，必填                                                                            |
+| -- successNode      | Array  | 条件满足时执行的下游任务 code，至少一项                                                               |
+| -- failedNode       | Array  | 条件不满足时执行的下游任务 code，至少一项                                                              |
 
 **示例：**
 
@@ -831,21 +849,21 @@ CONDITIONS 任务检查上游任务的状态，并选择成功或失败分支，
 }
 ```
 
-Master 还会在运行时把 `conditionResult.conditionSuccess` 写入任务实例的 `task_params`，定义时不要设置。
+Master 还会在运行时把 `conditionResult.conditionSuccess` 写入任务实例的 `task_params`，定义时不要设置。CONDITIONS 任务本身总是成功，未选中的分支会被跳过。
 
 ### SWITCH
 
 SWITCH 任务按顺序计算条件，执行第一个为真的条件对应的分支，`task_params` 由 `SwitchParameters` 定义。
 
-|        字段         |   类型   |                               描述                               |
-|-------------------|--------|----------------------------------------------------------------|
-| localParams       | Array  | 本地参数，见[公共字段](#公共字段)                                            |
-| resourceList      | Array  | 该任务类型不使用，为空数组                                                  |
-| switchResult      | Object | 分支配置，必填                                                        |
-| -- dependTaskList | Array  | 条件列表，按顺序计算，第一个为真的生效                                            |
-| ---- condition    | String | 表达式，可引用 `${flag}` 等参数，由 `javax.script.ScriptEngine` 计算。计算出错视为假 |
-| ---- nextNode     | Number | 条件为真时执行的下游任务 code                                              |
-| -- nextNode       | Number | 默认下游任务 code，所有条件都不满足时执行                                        |
+|        字段         |   类型   |                                               描述                                                |
+|-------------------|--------|-------------------------------------------------------------------------------------------------|
+| localParams       | Array  | 本地参数，见[公共字段](#公共字段)                                                                             |
+| resourceList      | Array  | 该任务类型不使用，为空数组                                                                                   |
+| switchResult      | Object | 分支配置，必填                                                                                         |
+| -- dependTaskList | Array  | 条件列表，按顺序计算，第一个为真的生效                                                                             |
+| ---- condition    | String | JavaScript 表达式，在 Nashorn 沙箱中执行，结果为 `true` 才算真；`${name}` 用全局/启动参数和 varPool 替换，字符串值会自动加引号。执行出错视为假 |
+| ---- nextNode     | Number | 条件为真时执行的下游任务 code                                                                               |
+| -- nextNode       | Number | 默认下游任务 code，所有条件都不满足时执行；未设置且无条件为真时任务失败                                                          |
 
 **示例：**
 
@@ -869,4 +887,4 @@ SWITCH 任务按顺序计算条件，执行第一个为真的条件对应的分�
 }
 ```
 
-Master 还会在任务实例的 `task_params` 中写入选中的分支 `nextBranch`，定义时不要设置。
+Master 还会在任务实例的 `task_params` 中写入选中的分支 `nextBranch`，定义时不要设置。选中的分支必须是 DAG 中的下游任务，否则任务失败；未选中的分支会被跳过。

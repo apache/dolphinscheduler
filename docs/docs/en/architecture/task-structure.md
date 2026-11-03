@@ -25,24 +25,24 @@ truth. The following sections describe the commonly used columns.
 
 Table `t_ds_workflow_definition`:
 
-|      Column      |     Type     |                                  Description                                   |
-|------------------|--------------|--------------------------------------------------------------------------------|
-| id               | int(11)      | Primary key                                                                    |
-| code             | bigint(20)   | Workflow definition code, globally unique                                      |
-| name             | varchar(255) | Workflow definition name, unique within a project                              |
-| version          | int(11)      | Workflow definition version                                                    |
-| description      | text         | Description                                                                    |
-| project_code     | bigint(20)   | Code of the project the workflow belongs to                                    |
-| release_state    | tinyint(4)   | Release state: 0 offline, 1 online                                             |
-| user_id          | int(11)      | Creator id                                                                     |
-| global_params    | text         | Global parameters, a JSON array of [parameters](#common-fields)                |
-| flag             | tinyint(4)   | Whether the workflow is available: 0 no, 1 yes                                 |
-| locations        | text         | Node coordinates on the canvas, e.g. `[{"taskCode":123,"x":59,"y":61}]`        |
-| warning_group_id | int(11)      | Alert group id                                                                 |
-| timeout          | int(11)      | Timeout, in minutes                                                            |
-| execution_type   | tinyint(4)   | Execution type: 0 parallel, 1 serial wait, 2 serial discard, 3 serial priority |
-| create_time      | datetime     | Create time                                                                    |
-| update_time      | datetime     | Update time                                                                    |
+|      Column      |     Type     |                                        Description                                         |
+|------------------|--------------|--------------------------------------------------------------------------------------------|
+| id               | int(11)      | Primary key                                                                                |
+| code             | bigint(20)   | Workflow definition code, globally unique                                                  |
+| name             | varchar(255) | Workflow definition name, unique within a project                                          |
+| version          | int(11)      | Workflow definition version                                                                |
+| description      | text         | Description                                                                                |
+| project_code     | bigint(20)   | Code of the project the workflow belongs to                                                |
+| release_state    | tinyint(4)   | Release state: 0 offline, 1 online                                                         |
+| user_id          | int(11)      | Creator id                                                                                 |
+| global_params    | text         | Global parameters, a JSON array of [parameters](#common-fields)                            |
+| flag             | tinyint(4)   | Whether the workflow is available: 0 no, 1 yes                                             |
+| locations        | text         | Node coordinates on the canvas, e.g. `[{"taskCode":123,"x":59,"y":61}]`                    |
+| warning_group_id | int(11)      | Not used, always NULL. The alert group is chosen when the workflow is started or scheduled |
+| timeout          | int(11)      | Timeout, in minutes                                                                        |
+| execution_type   | tinyint(4)   | Execution type: 0 parallel, 1 serial wait, 2 serial discard, 3 serial priority             |
+| create_time      | datetime     | Create time                                                                                |
+| update_time      | datetime     | Update time                                                                                |
 
 The tenant is not part of the workflow definition. It is chosen when the workflow is started or scheduled, and is stored
 in `t_ds_schedules.tenant_code` and `t_ds_workflow_instance.tenant_code`.
@@ -118,17 +118,28 @@ first and then `B` and `C` run in parallel is stored as three rows:
 
 ### Common Fields
 
-|      Field      |  Type  |                                       Description                                       |
-|-----------------|--------|-----------------------------------------------------------------------------------------|
-| localParams     | Array  | Local parameters of the task                                                            |
-| -- prop         | String | Parameter name                                                                          |
-| -- direct       | String | Direction: `IN` or `OUT`                                                                |
-| -- type         | String | Data type, e.g. `VARCHAR`, `INTEGER`, `DATE`                                            |
-| -- value        | String | Parameter value                                                                         |
-| resourceList    | Array  | Resource files used by the task, only for task types that support resources, e.g. SHELL |
-| -- resourceName | String | Full name of the resource file                                                          |
+|      Field      |  Type   |                                                                                                                Description                                                                                                                 |
+|-----------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams     | Array   | Local parameters of the task                                                                                                                                                                                                               |
+| -- prop         | String  | Parameter name                                                                                                                                                                                                                             |
+| -- direct       | String  | Direction: `IN` or `OUT`                                                                                                                                                                                                                   |
+| -- type         | String  | Data type, e.g. `VARCHAR`, `INTEGER`, `DATE`                                                                                                                                                                                               |
+| -- value        | String  | Parameter value                                                                                                                                                                                                                            |
+| -- sensitive    | Boolean | Whether the value is sensitive, default `false`, see below                                                                                                                                                                                 |
+| resourceList    | Array   | Resource files used by the task. Not a field of `AbstractParameters`: only task types that use resource files define it (e.g. SHELL, PYTHON, SPARK, MR, FLINK, DATAX). The UI sends it for every task type, and other task types ignore it |
+| -- resourceName | String  | Full name of the resource file                                                                                                                                                                                                             |
 
 `global_params` of the workflow definition uses the same structure as `localParams`.
+
+The backend omits `sensitive` when it is `false`, so a missing `sensitive` means `false` (a client may still send
+`"sensitive": false`). The value of a sensitive parameter is stored in plain text in the database, and query APIs return
+it as `******`:
+
+- On create, `******` is rejected as a value.
+- On update, `******` keeps the stored value only for a parameter that is marked sensitive and already exists with the
+  same name. It is rejected for a new sensitive parameter, or when `sensitive` is switched off.
+- When a workflow is started or backfilled, a start parameter whose value is `******` takes the value of the global
+  parameter with the same name.
 
 ### Parameters of Each Task Type
 
@@ -175,6 +186,13 @@ Runs a shell script on the worker. `task_params` is defined by `ShellParameters`
             "direct": "IN",
             "type": "VARCHAR",
             "value": "${system.datetime}"
+        },
+        {
+            "prop": "db_password",
+            "direct": "IN",
+            "type": "VARCHAR",
+            "value": "my_secret",
+            "sensitive": true
         }
     ],
     "rawScript": "echo \"dt=${dt}\"\nsh ./run.sh",
@@ -221,22 +239,23 @@ Runs a Python script on the worker. `task_params` is defined by `PythonParameter
 
 Runs SQL statements against a datasource. `task_params` is defined by `SqlParameters` in `dolphinscheduler-task-api`.
 
-|     Field      |  Type   |                                       Description                                       |
-|----------------|---------|-----------------------------------------------------------------------------------------|
-| localParams    | Array   | Local parameters, replace `${variable}` in the SQL, see [Common Fields](#common-fields) |
-| resourceList   | Array   | Resource files, normally empty for SQL, see [Common Fields](#common-fields)             |
-| type           | String  | Datasource type, e.g. `MYSQL`, `POSTGRESQL`, `HIVE`                                     |
-| datasource     | Integer | Datasource id                                                                           |
-| sql            | String  | SQL statements, used when `sqlSource` is `SCRIPT`                                       |
-| sqlSource      | String  | SQL source: `SCRIPT` inline text, `FILE` file in the resource center                    |
-| sqlResource    | String  | Resource center file path, used when `sqlSource` is `FILE`                              |
-| sqlType        | String  | SQL type: `0` query, `1` non-query (the UI stores it as a string)                       |
-| preStatements  | Array   | SQL statements executed before the main SQL                                             |
-| postStatements | Array   | SQL statements executed after the main SQL                                              |
-| sendEmail      | Boolean | Whether to send the query result by alert, query type only                              |
-| displayRows    | Integer | Max rows of the query result shown in the log, query type only                          |
-| title          | String  | Alert title, only when `sendEmail` is true                                              |
-| groupId        | Integer | Alert group id, only when `sendEmail` is true                                           |
+|     Field      |  Type   |                                                       Description                                                       |
+|----------------|---------|-------------------------------------------------------------------------------------------------------------------------|
+| localParams    | Array   | Local parameters, replace `${variable}` in the SQL, see [Common Fields](#common-fields)                                 |
+| resourceList   | Array   | Sent by the UI for every task type, not used by this task. The SQL file of `sqlSource` `FILE` is given by `sqlResource` |
+| type           | String  | Datasource type, e.g. `MYSQL`, `POSTGRESQL`, `HIVE`                                                                     |
+| datasource     | Integer | Datasource id                                                                                                           |
+| sql            | String  | SQL statements, used when `sqlSource` is `SCRIPT`                                                                       |
+| sqlSource      | String  | SQL source: `SCRIPT` inline text, `FILE` file in the resource center                                                    |
+| sqlResource    | String  | Resource center file path, used when `sqlSource` is `FILE`                                                              |
+| sqlType        | Integer | SQL type: `0` query, `1` non-query. The UI sends it as the string `"0"` or `"1"`, and both forms are accepted           |
+| preStatements  | Array   | SQL statements executed before the main SQL                                                                             |
+| postStatements | Array   | SQL statements executed after the main SQL                                                                              |
+| sendEmail      | Boolean | Whether to send the query result by alert, query type only                                                              |
+| displayRows    | Integer | Max rows of the query result shown in the log, query type only                                                          |
+| title          | String  | Alert title, only when `sendEmail` is true                                                                              |
+| groupId        | Integer | Alert group id, only when `sendEmail` is true                                                                           |
+| limit          | Integer | Max rows fetched by a query, the default is used when it is less than or equal to 0                                     |
 
 **Example:**
 
@@ -272,13 +291,13 @@ Runs SQL statements against a datasource. `task_params` is defined by `SqlParame
 
 Calls a stored procedure of a datasource. `task_params` is defined by `ProcedureParameters` in `dolphinscheduler-task-procedure`.
 
-|    Field     |  Type   |                                    Description                                    |
-|--------------|---------|-----------------------------------------------------------------------------------|
-| localParams  | Array   | Procedure parameters, `IN` and `OUT`, see [Common Fields](#common-fields)         |
-| resourceList | Array   | Resource files, normally empty for PROCEDURE, see [Common Fields](#common-fields) |
-| type         | String  | Datasource type, e.g. `MYSQL`, `POSTGRESQL`                                       |
-| datasource   | Integer | Datasource id                                                                     |
-| method       | String  | Stored procedure name                                                             |
+|    Field     |  Type   |                                                                        Description                                                                         |
+|--------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams  | Array   | Procedure parameters, `IN` and `OUT`, see [Common Fields](#common-fields)                                                                                  |
+| resourceList | Array   | Sent by the UI for every task type, not used by this task                                                                                                  |
+| type         | String  | Datasource type, e.g. `MYSQL`, `POSTGRESQL`                                                                                                                |
+| datasource   | Integer | Datasource id                                                                                                                                              |
+| method       | String  | Call statement of the stored procedure. `${param}` placeholders are bound to the `IN`/`OUT` localParams, e.g. `call proc_daily_stat(${in_dt}, ${out_cnt})` |
 
 **Example:**
 
@@ -301,7 +320,7 @@ Calls a stored procedure of a datasource. `task_params` is defined by `Procedure
     "resourceList": [],
     "type": "MYSQL",
     "datasource": 1,
-    "method": "proc_daily_stat"
+    "method": "call proc_daily_stat(${in_dt}, ${out_cnt})"
 }
 ```
 
@@ -309,21 +328,21 @@ Calls a stored procedure of a datasource. `task_params` is defined by `Procedure
 
 Sends an HTTP request and checks the response. `task_params` is defined by `HttpParameters` in `dolphinscheduler-task-http`.
 
-|         Field         |  Type   |                                               Description                                                |
-|-----------------------|---------|----------------------------------------------------------------------------------------------------------|
-| localParams           | Array   | Local parameters, see [Common Fields](#common-fields)                                                    |
-| resourceList          | Array   | Resource files, normally empty for HTTP, see [Common Fields](#common-fields)                             |
-| url                   | String  | Request URL                                                                                              |
-| httpMethod            | String  | Request method: `GET`, `POST`, `PUT`, `DELETE`                                                           |
-| httpParams            | Array   | Request parameters and headers                                                                           |
-| -- prop               | String  | Parameter or header name                                                                                 |
-| -- httpParametersType | String  | Kind: `PARAMETER` or `HEADERS`                                                                           |
-| -- value              | String  | Parameter or header value                                                                                |
-| httpBody              | String  | Request body                                                                                             |
-| httpCheckCondition    | String  | Check condition: `STATUS_CODE_DEFAULT` (200), `STATUS_CODE_CUSTOM`, `BODY_CONTAINS`, `BODY_NOT_CONTAINS` |
-| condition             | String  | Check content, required unless the condition is `STATUS_CODE_DEFAULT`                                    |
-| connectTimeout        | Integer | Connect timeout, in milliseconds                                                                         |
-| socketKeepAlive       | Boolean | Whether to enable TCP keep-alive                                                                         |
+|         Field         |  Type   |                                                                                          Description                                                                                           |
+|-----------------------|---------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams           | Array   | Local parameters, see [Common Fields](#common-fields)                                                                                                                                          |
+| resourceList          | Array   | Sent by the UI for every task type, not used by this task                                                                                                                                      |
+| url                   | String  | Request URL                                                                                                                                                                                    |
+| httpMethod            | String  | Request method: `GET`, `POST`, `PUT`, `DELETE`                                                                                                                                                 |
+| httpParams            | Array   | Request parameters and headers                                                                                                                                                                 |
+| -- prop               | String  | Parameter or header name                                                                                                                                                                       |
+| -- httpParametersType | String  | Kind: `PARAMETER` (sent as a URL query parameter) or `HEADERS`. A `Content-Type` header is not sent as is: it only selects `application/json` (default) or `application/x-www-form-urlencoded` |
+| -- value              | String  | Parameter or header value                                                                                                                                                                      |
+| httpBody              | String  | Request body, must be a JSON object; `${param}` placeholders are replaced. Only sent for `POST` and `PUT`                                                                                      |
+| httpCheckCondition    | String  | Check condition: `STATUS_CODE_DEFAULT` (200), `STATUS_CODE_CUSTOM`, `BODY_CONTAINS`, `BODY_NOT_CONTAINS`                                                                                       |
+| condition             | String  | Check content, required unless the condition is `STATUS_CODE_DEFAULT`                                                                                                                          |
+| connectTimeout        | Integer | Timeout in milliseconds, applied to connect, read and write; must be greater than 0                                                                                                            |
+| socketKeepAlive       | Boolean | Whether to enable TCP keep-alive                                                                                                                                                               |
 
 **Example:**
 
@@ -366,12 +385,12 @@ Runs a Spark application with `spark-submit` or `spark-sql`. `task_params` is de
 | mainClass        | String  | Full class name of the main function, not used for `PYTHON` and `SQL`                                                                                      |
 | mainJar          | Object  | Main jar or Python file, not used for `SQL`                                                                                                                |
 | -- resourceName  | String  | Full name of the jar resource                                                                                                                              |
-| deployMode       | String  | Deployment mode: `cluster`, `client` or `local`; `SQL` supports `client` and `local`                                                                       |
+| deployMode       | String  | Deployment mode: `cluster`, `client` or `local`, empty means `local`; `SQL` supports `client` and `local`                                                  |
 | appName          | String  | Task name passed to Spark                                                                                                                                  |
 | mainArgs         | String  | Arguments of the main program, supports `${...}` variables                                                                                                 |
 | others           | String  | Other `spark-submit` options, e.g. `--conf`, `--jars`                                                                                                      |
-| yarnQueue        | String  | YARN queue                                                                                                                                                 |
-| master           | String  | Master URL, e.g. `yarn`                                                                                                                                    |
+| yarnQueue        | String  | YARN queue, ignored in `local` mode or when `--queue` is given in `others`                                                                                 |
+| master           | String  | Master URL, optional. If empty, it is derived as `local` (local mode), `k8s://...` (`namespace` set) or `yarn`                                             |
 | driverCores      | Integer | Number of driver cores                                                                                                                                     |
 | driverMemory     | String  | Driver memory, e.g. `512M`                                                                                                                                 |
 | numExecutors     | Integer | Number of executors                                                                                                                                        |
@@ -419,18 +438,18 @@ Runs a Spark application with `spark-submit` or `spark-sql`. `task_params` is de
 
 Runs a Hadoop MapReduce job. `task_params` is defined by `MapReduceParameters` in `dolphinscheduler-task-mr`.
 
-|      Field      |  Type  |                             Description                              |
-|-----------------|--------|----------------------------------------------------------------------|
-| localParams     | Array  | Local parameters, see [Common Fields](#common-fields)                |
-| resourceList    | Array  | Resource files used by the task, see [Common Fields](#common-fields) |
-| programType     | String | Program type: `JAVA`, `SCALA` or `PYTHON`                            |
-| mainClass       | String | Full class name of the main function                                 |
-| mainJar         | Object | Main jar of the MapReduce program (the script for `PYTHON`)          |
-| -- resourceName | String | Full name of the jar resource                                        |
-| appName         | String | MapReduce job name                                                   |
-| mainArgs        | String | Command line arguments of the program, supports `${...}` variables   |
-| others          | String | Other options in `-D`, `-files`, `-libjars`, `-archives` format      |
-| yarnQueue       | String | YARN queue                                                           |
+|      Field      |  Type  |                               Description                               |
+|-----------------|--------|-------------------------------------------------------------------------|
+| localParams     | Array  | Local parameters, see [Common Fields](#common-fields)                   |
+| resourceList    | Array  | Resource files used by the task, see [Common Fields](#common-fields)    |
+| programType     | String | Program type: `JAVA`, `SCALA` or `PYTHON`                               |
+| mainClass       | String | Full class name of the main function, not used for `PYTHON`             |
+| mainJar         | Object | Main jar of the MapReduce program (the script for `PYTHON`)             |
+| -- resourceName | String | Full name of the jar resource                                           |
+| appName         | String | MapReduce job name                                                      |
+| mainArgs        | String | Command line arguments of the program, supports `${...}` variables      |
+| others          | String | Other options in `-D`, `-files`, `-libjars`, `-archives` format         |
+| yarnQueue       | String | YARN queue, ignored when `mapreduce.job.queuename` is given in `others` |
 
 **Example:**
 
@@ -461,27 +480,27 @@ Runs a Hadoop MapReduce job. `task_params` is defined by `MapReduceParameters` i
 
 Runs a Flink job with the `flink` command line. `task_params` is defined by `FlinkParameters` in `dolphinscheduler-task-flink`.
 
-|       Field       |  Type   |                                               Description                                                |
-|-------------------|---------|----------------------------------------------------------------------------------------------------------|
-| localParams       | Array   | Local parameters, see [Common Fields](#common-fields)                                                    |
-| initScript        | String  | Initialization SQL, used only when `programType` is `SQL`; empty otherwise                               |
-| rawScript         | String  | SQL script, used only when `programType` is `SQL`; empty otherwise                                       |
-| resourceList      | Array   | Resource files used by the task, see [Common Fields](#common-fields)                                     |
-| programType       | String  | Program type: `JAVA`, `SCALA`, `PYTHON` or `SQL`                                                         |
-| mainClass         | String  | Full class name of the main function, not used for `PYTHON` and `SQL`                                    |
-| mainJar           | Object  | Main jar or Python file, not used for `SQL`                                                              |
-| -- resourceName   | String  | Full name of the jar resource                                                                            |
-| deployMode        | String  | Deployment mode: `cluster`, `local`, `application` or `standalone`; the options depend on `flinkVersion` |
-| appName           | String  | YARN application name                                                                                    |
-| mainArgs          | String  | Arguments of the main program, supports `${...}` variables                                               |
-| others            | String  | Other Flink command options, e.g. `-D`, `-C`, `-yt`                                                      |
-| yarnQueue         | String  | YARN queue                                                                                               |
-| flinkVersion      | String  | Flink version selected in the UI: `<1.10`, `1.11`, `>=1.12` or `>=1.13`                                  |
-| jobManagerMemory  | String  | JobManager memory, e.g. `1G`                                                                             |
-| taskManagerMemory | String  | TaskManager memory, e.g. `2G`                                                                            |
-| slot              | Integer | Number of slots per TaskManager                                                                          |
-| taskManager       | Integer | Number of TaskManagers                                                                                   |
-| parallelism       | Integer | Parallelism of the job                                                                                   |
+|       Field       |  Type   |                                                                                                  Description                                                                                                  |
+|-------------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams       | Array   | Local parameters, see [Common Fields](#common-fields)                                                                                                                                                         |
+| initScript        | String  | Initialization SQL, used only when `programType` is `SQL`; empty otherwise                                                                                                                                    |
+| rawScript         | String  | SQL script, used only when `programType` is `SQL`; empty otherwise                                                                                                                                            |
+| resourceList      | Array   | Resource files used by the task, see [Common Fields](#common-fields)                                                                                                                                          |
+| programType       | String  | Program type: `JAVA`, `SCALA`, `PYTHON` or `SQL`                                                                                                                                                              |
+| mainClass         | String  | Full class name of the main function, not used for `PYTHON` and `SQL`                                                                                                                                         |
+| mainJar           | Object  | Main jar or Python file, not used for `SQL`                                                                                                                                                                   |
+| -- resourceName   | String  | Full name of the jar resource                                                                                                                                                                                 |
+| deployMode        | String  | Deployment mode: `cluster`, `local`, `application` or `standalone`. `SQL`: `cluster`, `local` or `standalone`; other program types: `cluster` or `local`, plus `application` unless `flinkVersion` is `<1.10` |
+| appName           | String  | YARN application name                                                                                                                                                                                         |
+| mainArgs          | String  | Arguments of the main program, supports `${...}` variables                                                                                                                                                    |
+| others            | String  | Other Flink command options, e.g. `-D`, `-C`, `-yt`                                                                                                                                                           |
+| yarnQueue         | String  | YARN queue, only used in `cluster` and `application` modes (for `SQL`, not used in `local` and `standalone` modes)                                                                                            |
+| flinkVersion      | String  | Flink version selected in the UI: `<1.10`, `1.11` or `>=1.12` for `JAVA`/`SCALA`/`PYTHON`; always `>=1.13` for `SQL`                                                                                          |
+| jobManagerMemory  | String  | JobManager memory, e.g. `1G`                                                                                                                                                                                  |
+| taskManagerMemory | String  | TaskManager memory, e.g. `2G`                                                                                                                                                                                 |
+| slot              | Integer | Number of slots per TaskManager                                                                                                                                                                               |
+| taskManager       | Integer | Number of TaskManagers (`-yn`), only used when `flinkVersion` is `<1.10` and `deployMode` is not `local`                                                                                                      |
+| parallelism       | Integer | Parallelism of the job                                                                                                                                                                                        |
 
 **Example:**
 
@@ -521,25 +540,26 @@ Runs a Flink job with the `flink` command line. `task_params` is defined by `Fli
 
 Synchronizes data between datasources with DataX. `task_params` is defined by `DataxParameters` in `dolphinscheduler-task-datax`.
 
-|     Field      |  Type   |                                                      Description                                                      |
-|----------------|---------|-----------------------------------------------------------------------------------------------------------------------|
-| localParams    | Array   | Local parameters, see [Common Fields](#common-fields)                                                                 |
-| resourceList   | Array   | Auxiliary files (e.g. keytab, xml) or, for a custom config, the `.json` job file; see [Common Fields](#common-fields) |
-| customConfig   | Integer | `0` to configure source and target in the UI, `1` to use a custom DataX JSON                                          |
-| dsType         | String  | Source datasource type, e.g. `MYSQL`; only when `customConfig` is `0`                                                 |
-| dataSource     | Integer | Source datasource id; only when `customConfig` is `0`                                                                 |
-| dtType         | String  | Target datasource type, e.g. `MYSQL`; only when `customConfig` is `0`                                                 |
-| dataTarget     | Integer | Target datasource id; only when `customConfig` is `0`                                                                 |
-| sql            | String  | Query SQL on the source; only when `customConfig` is `0`                                                              |
-| targetTable    | String  | Target table; only when `customConfig` is `0`                                                                         |
-| jobSpeedByte   | Integer | Speed limit in bytes, `0` for no limit; only when `customConfig` is `0`                                               |
-| jobSpeedRecord | Integer | Speed limit in records; only when `customConfig` is `0`                                                               |
-| jobChannel     | Integer | Number of channels; only when `customConfig` is `0`                                                                   |
-| preStatements  | Array   | SQL statements executed on the target before the sync; only when `customConfig` is `0`                                |
-| postStatements | Array   | SQL statements executed on the target after the sync; only when `customConfig` is `0`                                 |
-| json           | String  | DataX job JSON; only when `customConfig` is `1`                                                                       |
-| xms            | Integer | Minimum JVM memory in GB                                                                                              |
-| xmx            | Integer | Maximum JVM memory in GB                                                                                              |
+|     Field      |  Type   |                                                                                        Description                                                                                         |
+|----------------|---------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams    | Array   | Local parameters, see [Common Fields](#common-fields)                                                                                                                                      |
+| resourceList   | Array   | Auxiliary files (e.g. keytab, xml). For a custom config without inline `json`, it must contain exactly one `.json` file that holds the job definition; see [Common Fields](#common-fields) |
+| customConfig   | Integer | `0` to configure source and target in the UI, `1` to use a custom DataX JSON                                                                                                               |
+| dsType         | String  | Source datasource type, e.g. `MYSQL`; only when `customConfig` is `0`                                                                                                                      |
+| dataSource     | Integer | Source datasource id; only when `customConfig` is `0`                                                                                                                                      |
+| dtType         | String  | Target datasource type, e.g. `MYSQL`; only when `customConfig` is `0`                                                                                                                      |
+| dataTarget     | Integer | Target datasource id; only when `customConfig` is `0`                                                                                                                                      |
+| sql            | String  | Query SQL on the source; only when `customConfig` is `0`                                                                                                                                   |
+| targetTable    | String  | Target table; only when `customConfig` is `0`                                                                                                                                              |
+| jobSpeedByte   | Integer | Speed limit in bytes, `0` for no limit; only when `customConfig` is `0`                                                                                                                    |
+| jobSpeedRecord | Integer | Speed limit in records, `0` for no limit; only when `customConfig` is `0`                                                                                                                  |
+| jobChannel     | Integer | Number of channels; only when `customConfig` is `0`                                                                                                                                        |
+| preStatements  | Array   | SQL statements executed on the target before the sync; only when `customConfig` is `0`                                                                                                     |
+| postStatements | Array   | SQL statements executed on the target after the sync; only when `customConfig` is `0`                                                                                                      |
+| batchSize      | Integer | Writer batch size, written to the DataX writer only when greater than 0; only when `customConfig` is `0`. The UI form does not save it currently                                           |
+| json           | String  | DataX job JSON; only when `customConfig` is `1`. If it is blank or `{}`, the job definition is read from the single `.json` file in `resourceList`                                         |
+| xms            | Integer | Minimum JVM memory in GB, values below 1 are treated as 1                                                                                                                                  |
+| xmx            | Integer | Maximum JVM memory in GB                                                                                                                                                                   |
 
 Example with a custom config (`customConfig` is `1`):
 
@@ -590,22 +610,22 @@ Example with a custom config (`customConfig` is `1`):
 
 Transfers data between RDBMS and Hadoop with Sqoop. `task_params` is defined by `SqoopParameters` in `dolphinscheduler-task-sqoop`.
 
-|        Field        |  Type   |                                          Description                                          |
-|---------------------|---------|-----------------------------------------------------------------------------------------------|
-| localParams         | Array   | Local parameters, see [Common Fields](#common-fields)                                         |
-| resourceList        | Array   | Resource files used by the task, see [Common Fields](#common-fields)                          |
-| jobType             | String  | `TEMPLATE` (configure in the UI) or `CUSTOM` (custom shell)                                   |
-| customShell         | String  | Sqoop command, only when `jobType` is `CUSTOM`                                                |
-| jobName             | String  | MapReduce job name, only when `jobType` is `TEMPLATE`                                         |
-| hadoopCustomParams  | Array   | Hadoop custom parameters, a list of `prop`/`direct`/`type`/`value` objects like `localParams` |
-| sqoopAdvancedParams | Array   | Sqoop advanced parameters, same structure as `hadoopCustomParams`                             |
-| concurrency         | Integer | Parallelism (number of map tasks)                                                             |
-| splitBy             | String  | Column used to split the data across map tasks                                                |
-| modelType           | String  | Direction: `import` (RDBMS to HDFS/Hive) or `export` (HDFS/Hive to RDBMS)                     |
-| sourceType          | String  | Source type: `MYSQL`, `ORACLE`, `SQLSERVER`, `HANA`, `HIVE` or `HDFS`                         |
-| targetType          | String  | Target type, same options as `sourceType`                                                     |
-| sourceParams        | String  | JSON string of source parameters, depends on `sourceType`, see below                          |
-| targetParams        | String  | JSON string of target parameters, depends on `targetType`, see below                          |
+|        Field        |  Type   |                                                  Description                                                  |
+|---------------------|---------|---------------------------------------------------------------------------------------------------------------|
+| localParams         | Array   | Local parameters, see [Common Fields](#common-fields)                                                         |
+| resourceList        | Array   | Resource files used by the task, see [Common Fields](#common-fields)                                          |
+| jobType             | String  | `TEMPLATE` (configure in the UI) or `CUSTOM` (custom shell)                                                   |
+| customShell         | String  | Sqoop command, only when `jobType` is `CUSTOM`                                                                |
+| jobName             | String  | MapReduce job name, only when `jobType` is `TEMPLATE`                                                         |
+| hadoopCustomParams  | Array   | Hadoop custom parameters, a list of `prop`/`direct`/`type`/`value` objects like `localParams`                 |
+| sqoopAdvancedParams | Array   | Sqoop advanced parameters, same structure as `hadoopCustomParams`                                             |
+| concurrency         | Integer | Parallelism (`-m`, number of map tasks), must not be `0` for `TEMPLATE`                                       |
+| splitBy             | String  | Column used to split the data across map tasks (`--split-by`), only used when `concurrency` is greater than 1 |
+| modelType           | String  | Direction: `import` (RDBMS to HDFS/Hive) or `export` (HDFS/Hive to RDBMS)                                     |
+| sourceType          | String  | Source type: `MYSQL`, `ORACLE`, `SQLSERVER`, `HANA`, `HIVE` or `HDFS`                                         |
+| targetType          | String  | Target type, same options as `sourceType`                                                                     |
+| sourceParams        | String  | JSON string of source parameters, depends on `sourceType`, see below                                          |
+| targetParams        | String  | JSON string of target parameters, depends on `targetType`, see below                                          |
 
 `sourceParams` and `targetParams` are stored as JSON strings. The fields below are the content after parsing. For `jobType` `CUSTOM`, only `localParams`, `resourceList`, `jobType` and `customShell` are stored; the template-only fields are omitted.
 
@@ -627,17 +647,17 @@ Transfers data between RDBMS and Hadoop with Sqoop. `task_params` is defined by 
 
 `targetParams` when `targetType` is `HIVE`:
 
-|       Field        |  Type   |                    Description                    |
-|--------------------|---------|---------------------------------------------------|
-| hiveDatabase       | String  | Hive database                                     |
-| hiveTable          | String  | Hive table                                        |
-| createHiveTable    | Boolean | Create the Hive table, the job fails if it exists |
-| dropDelimiter      | Boolean | Drop `\n`, `\r` and `\01` from string fields      |
-| hiveOverWrite      | Boolean | Overwrite existing data                           |
-| hiveTargetDir      | String  | Explicit target directory                         |
-| replaceDelimiter   | String  | Replacement for `\n`, `\r` and `\01`              |
-| hivePartitionKey   | String  | Partition key                                     |
-| hivePartitionValue | String  | Partition value                                   |
+|       Field        |  Type   |                           Description                            |
+|--------------------|---------|------------------------------------------------------------------|
+| hiveDatabase       | String  | Hive database                                                    |
+| hiveTable          | String  | Hive table                                                       |
+| createHiveTable    | Boolean | Create the Hive table, the job fails if it exists                |
+| dropDelimiter      | Boolean | Drop `\n`, `\r` and `\01` from string fields                     |
+| hiveOverWrite      | Boolean | Overwrite existing data (`--hive-overwrite --delete-target-dir`) |
+| hiveTargetDir      | String  | Explicit target directory                                        |
+| replaceDelimiter   | String  | Replacement for `\n`, `\r` and `\01`                             |
+| hivePartitionKey   | String  | Partition key                                                    |
+| hivePartitionValue | String  | Partition value                                                  |
 
 `targetParams` when `targetType` is `HDFS`:
 
@@ -719,27 +739,33 @@ The SUB_WORKFLOW task runs another workflow as a child workflow. Its `task_param
 
 The DEPENDENT task checks whether other workflows or tasks have run successfully in a given time range. Its `task_params` is defined by `DependentParameters`.
 
-|          Field          |  Type   |                                                                                   Description                                                                                    |
-|-------------------------|---------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| localParams             | Array   | Local parameters, see [Common Fields](#common-fields)                                                                                                                            |
-| resourceList            | Array   | Not used by this task type, an empty array                                                                                                                                       |
-| dependence              | Object  | Dependency configuration, required                                                                                                                                               |
-| -- relation             | String  | Relation between the groups in `dependTaskList`: `AND` or `OR`                                                                                                                   |
-| -- dependTaskList       | Array   | Dependency groups, at least one                                                                                                                                                  |
-| ---- relation           | String  | Relation between the items in `dependItemList`: `AND` or `OR`                                                                                                                    |
-| ---- dependItemList     | Array   | Dependency items of the group                                                                                                                                                    |
-| ------ dependentType    | String  | `DEPENDENT_ON_WORKFLOW` (the whole workflow) or `DEPENDENT_ON_TASK` (one task). When it is omitted, the UI infers it from `depTaskCode`                                          |
-| ------ projectCode      | Number  | Code of the project of the dependent workflow                                                                                                                                    |
-| ------ definitionCode   | Number  | Code of the dependent workflow definition                                                                                                                                        |
-| ------ depTaskCode      | Number  | Code of the dependent task. `0` for the whole workflow; the UI writes `-1` when `DEPENDENT_ON_TASK` is selected and no task is chosen yet, which means all tasks of the workflow |
-| ------ cycle            | String  | Dependency cycle: `hour`, `day`, `week` or `month`                                                                                                                               |
-| ------ dateValue        | String  | Time range inside the cycle, see the table below                                                                                                                                 |
-| ------ parameterPassing | Boolean | Whether to pass the output parameters of the dependency to downstream tasks when it succeeds, default `false`                                                                    |
-| -- checkInterval        | Number  | Interval of checking the dependency status, in seconds. Must be greater than 0 if set, default `10` when omitted                                                                 |
-| -- failurePolicy        | String  | What to do when a dependency failed: `DEPENDENT_FAILURE_FAILURE` (the task fails) or `DEPENDENT_FAILURE_WAITING` (keep waiting)                                                  |
-| -- failureWaitingTime   | Number  | Waiting time in minutes, only used when `failurePolicy` is `DEPENDENT_FAILURE_WAITING`                                                                                           |
+|          Field          |  Type   |                                                                                                                                    Description                                                                                                                                    |
+|-------------------------|---------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams             | Array   | Local parameters, see [Common Fields](#common-fields)                                                                                                                                                                                                                             |
+| resourceList            | Array   | Not used by this task type, an empty array                                                                                                                                                                                                                                        |
+| dependence              | Object  | Dependency configuration, required                                                                                                                                                                                                                                                |
+| -- relation             | String  | Relation between the groups in `dependTaskList`: `AND` or `OR`                                                                                                                                                                                                                    |
+| -- dependTaskList       | Array   | Dependency groups, at least one                                                                                                                                                                                                                                                   |
+| ---- relation           | String  | Relation between the items in `dependItemList`: `AND` or `OR`                                                                                                                                                                                                                     |
+| ---- dependItemList     | Array   | Dependency items of the group                                                                                                                                                                                                                                                     |
+| ------ dependentType    | String  | `DEPENDENT_ON_WORKFLOW` (the whole workflow) or `DEPENDENT_ON_TASK` (one task). Only used by the UI, which infers it from `depTaskCode` when it is omitted                                                                                                                        |
+| ------ projectCode      | Number  | Code of the project of the dependent workflow                                                                                                                                                                                                                                     |
+| ------ definitionCode   | Number  | Code of the dependent workflow definition                                                                                                                                                                                                                                         |
+| ------ depTaskCode      | Number  | `0`: the whole workflow (the workflow instance succeeded). `-1` (`ALL` in the UI): the workflow instance succeeded and every enabled task in it has a successful instance. Any other value: the code of one task                                                                  |
+| ------ cycle            | String  | Dependency cycle: `hour`, `day`, `week` or `month`. Only used by the UI to offer `dateValue` options                                                                                                                                                                              |
+| ------ dateValue        | String  | Time range inside the cycle, see the table below                                                                                                                                                                                                                                  |
+| ------ parameterPassing | Boolean | Whether to pass the `OUT` parameters in the varPool of the dependent workflow instance to downstream tasks when the dependency succeeds. Only takes effect when `depTaskCode` is `0` or `-1`, or the dependent task is a streaming task. Default `false`                          |
+| -- checkInterval        | Number  | Interval of checking the dependency status, in seconds. Must be greater than 0 if set, default `10` when omitted                                                                                                                                                                  |
+| -- failurePolicy        | String  | What to do when a dependency failed: `DEPENDENT_FAILURE_FAILURE` (the task fails) or `DEPENDENT_FAILURE_WAITING` (keep checking until `failureWaitingTime` minutes after the base time, then fail). If `failurePolicy` or `failureWaitingTime` is omitted, the task fails at once |
+| -- failureWaitingTime   | Number  | Waiting time in minutes, only used when `failurePolicy` is `DEPENDENT_FAILURE_WAITING`                                                                                                                                                                                            |
 
-`cycle` and `dateValue` take the following values. For `week` and `month`, `thisWeek` and `thisMonth` cover the natural week or month up to now.
+`cycle` and `dateValue` take the following values. All ranges are relative to the schedule time of the current workflow
+instance, or the start time if it was not scheduled. `thisWeek` and `thisMonth` cover from the start of the week or
+month up to that time. The master only uses `dateValue` and `depTaskCode`. The backend also accepts `thisMonthEnd`,
+which the UI does not offer.
+
+A dependency on the task's own workflow (`-1` or the task itself) is treated as successful for the first instance of
+that workflow.
 
 | cycle |                                                            dateValue                                                             |
 |-------|----------------------------------------------------------------------------------------------------------------------------------|
@@ -776,7 +802,7 @@ The DEPENDENT task checks whether other workflows or tasks have run successfully
                         "depTaskCode": 137713824398177,
                         "cycle": "week",
                         "dateValue": "lastWeek",
-                        "parameterPassing": true
+                        "parameterPassing": false
                     }
                 ]
             }
@@ -792,20 +818,20 @@ The DEPENDENT task checks whether other workflows or tasks have run successfully
 
 The CONDITIONS task checks the status of upstream tasks and chooses the success or the failure branch. Its `task_params` is defined by `ConditionsParameters`.
 
-|        Field        |  Type  |                                   Description                                    |
-|---------------------|--------|----------------------------------------------------------------------------------|
-| localParams         | Array  | Local parameters, see [Common Fields](#common-fields)                            |
-| resourceList        | Array  | Not used by this task type, an empty array                                       |
-| dependence          | Object | Upstream conditions, required                                                    |
-| -- relation         | String | Relation between the groups in `dependTaskList`: `AND` or `OR`                   |
-| -- dependTaskList   | Array  | Condition groups, at least one                                                   |
-| ---- relation       | String | Relation between the items in `dependItemList`: `AND` or `OR`                    |
-| ---- dependItemList | Array  | Condition items of the group                                                     |
-| ------ depTaskCode  | Number | Code of the upstream task to check                                               |
-| ------ status       | String | Expected status of the upstream task: `SUCCESS` or `FAILURE`                     |
-| conditionResult     | Object | Branches to run, required                                                        |
-| -- successNode      | Array  | Codes of the downstream tasks to run when the condition is met, at least one     |
-| -- failedNode       | Array  | Codes of the downstream tasks to run when the condition is not met, at least one |
+|        Field        |  Type  |                                                                                   Description                                                                                   |
+|---------------------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams         | Array  | Local parameters, see [Common Fields](#common-fields)                                                                                                                           |
+| resourceList        | Array  | Not used by this task type, an empty array                                                                                                                                      |
+| dependence          | Object | Upstream conditions, required                                                                                                                                                   |
+| -- relation         | String | Relation between the groups in `dependTaskList`: `AND` or `OR`                                                                                                                  |
+| -- dependTaskList   | Array  | Condition groups, at least one                                                                                                                                                  |
+| ---- relation       | String | Relation between the items in `dependItemList`: `AND` or `OR`                                                                                                                   |
+| ---- dependItemList | Array  | Condition items of the group                                                                                                                                                    |
+| ------ depTaskCode  | Number | Code of the upstream task to check                                                                                                                                              |
+| ------ status       | String | Expected status of the upstream task: `SUCCESS` or `FAILURE`, compared exactly (`FORCED_SUCCESS` does not match `SUCCESS`). An upstream task without an instance does not match |
+| conditionResult     | Object | Branches to run, required                                                                                                                                                       |
+| -- successNode      | Array  | Codes of the downstream tasks to run when the condition is met, at least one                                                                                                    |
+| -- failedNode       | Array  | Codes of the downstream tasks to run when the condition is not met, at least one                                                                                                |
 
 **Example:**
 
@@ -843,20 +869,21 @@ The CONDITIONS task checks the status of upstream tasks and chooses the success 
 ```
 
 The master also writes `conditionResult.conditionSuccess` into `task_params` of the task instance at runtime; do not set it in the definition.
+The CONDITIONS task itself always succeeds, and the branch that is not chosen is skipped.
 
 ### SWITCH
 
 The SWITCH task evaluates conditions in order and runs the branch of the first one that is true. Its `task_params` is defined by `SwitchParameters`.
 
-|       Field       |  Type  |                                                                      Description                                                                       |
-|-------------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------|
-| localParams       | Array  | Local parameters, see [Common Fields](#common-fields)                                                                                                  |
-| resourceList      | Array  | Not used by this task type, an empty array                                                                                                             |
-| switchResult      | Object | Branch configuration, required                                                                                                                         |
-| -- dependTaskList | Array  | Conditions, evaluated in order; the first true one wins                                                                                                |
-| ---- condition    | String | Expression, can reference parameters such as `${flag}`; evaluated by `javax.script.ScriptEngine`. An expression that fails to evaluate counts as false |
-| ---- nextNode     | Number | Code of the downstream task to run when the condition is true                                                                                          |
-| -- nextNode       | Number | Code of the default downstream task, used when no condition is true                                                                                    |
+|       Field       |  Type  |                                                                                                                             Description                                                                                                                             |
+|-------------------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams       | Array  | Local parameters, see [Common Fields](#common-fields)                                                                                                                                                                                                               |
+| resourceList      | Array  | Not used by this task type, an empty array                                                                                                                                                                                                                          |
+| switchResult      | Object | Branch configuration, required                                                                                                                                                                                                                                      |
+| -- dependTaskList | Array  | Conditions, evaluated in order; the first true one wins                                                                                                                                                                                                             |
+| ---- condition    | String | JavaScript expression evaluated in a Nashorn sandbox; true only when it evaluates to `true`. `${name}` is replaced from global/startup parameters and the varPool, and string values are quoted automatically. An expression that fails to evaluate counts as false |
+| ---- nextNode     | Number | Code of the downstream task to run when the condition is true                                                                                                                                                                                                       |
+| -- nextNode       | Number | Code of the default downstream task, used when no condition is true. If it is not set and no condition is true, the task fails                                                                                                                                      |
 
 **Example:**
 
@@ -881,3 +908,5 @@ The SWITCH task evaluates conditions in order and runs the branch of the first o
 ```
 
 The master also writes the chosen branch into `task_params` of the task instance as `nextBranch`; do not set it in the definition.
+The chosen branch must be a downstream task in the DAG, otherwise the task fails; the branches that are not chosen are
+skipped.
