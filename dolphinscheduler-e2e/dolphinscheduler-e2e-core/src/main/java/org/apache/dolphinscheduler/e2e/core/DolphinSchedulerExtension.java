@@ -25,13 +25,16 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,8 +44,14 @@ import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.TestWatcher;
+import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.testcontainers.Testcontainers;
 import org.testcontainers.containers.BindMode;
@@ -56,7 +65,7 @@ import com.google.common.base.Strings;
 import com.google.common.net.HostAndPort;
 
 @Slf4j
-final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback {
+final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback, TestWatcher {
 
     private final boolean LOCAL_MODE = Objects.equals(System.getProperty("local"), "true");
 
@@ -73,6 +82,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
     private String rootPath;
 
     private Path record;
+    private Throwable firstFailure;
 
     private final String serviceName = "dolphinscheduler";
 
@@ -98,10 +108,17 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
         }
         browser.start();
         ChromeOptions chromeOptions = new ChromeOptions();
+        chromeOptions.setExperimentalOption("prefs", Map.of("profile.default_content_setting_values.clipboard", 1));
+        LoggingPreferences logging = new LoggingPreferences();
+        logging.enable(LogType.BROWSER, Level.ALL);
+        chromeOptions.setCapability("goog:loggingPrefs", logging);
         chromeOptions.addArguments("--allow-running-insecure-content");
         chromeOptions.addArguments(String.format("--unsafely-treat-insecure-origin-as-secure=http://%s:%s",
                 address.getHost(), address.getPort()));
         driver = new RemoteWebDriver(browser.getSeleniumAddress(), chromeOptions);
+
+        log.info("E2E environment: local={}, m1={}, address={}, browser={}, recording={}",
+                LOCAL_MODE, M1_CHIP_FLAG, address, driver.getCapabilities(), record);
 
         driver.manage().timeouts()
                 .implicitlyWait(Duration.ofSeconds(1))
@@ -185,7 +202,7 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
     @Override
     public void afterAll(ExtensionContext context) {
-        browser.afterTest(new TestDescription(context), Optional.empty());
+        browser.afterTest(new TestDescription(context), Optional.ofNullable(firstFailure));
         browser.stop();
         if (compose != null) {
             compose.stop();
@@ -194,10 +211,58 @@ final class DolphinSchedulerExtension implements BeforeAllCallback, AfterAllCall
 
     @Override
     public void beforeEach(ExtensionContext context) {
+        log.info("Starting E2E test: {}, url={}", context.getUniqueId(), driver.getCurrentUrl());
         final Object instance = context.getRequiredTestInstance();
         Stream.of(instance.getClass().getDeclaredFields())
                 .filter(f -> WebDriver.class.isAssignableFrom(f.getType()))
                 .forEach(it -> setDriver(instance, it));
+    }
+
+    @Override
+    public void testFailed(ExtensionContext context, Throwable cause) {
+        if (firstFailure == null) {
+            firstFailure = cause;
+        }
+        log.error("E2E test failed: {}", context.getUniqueId(), cause);
+        String name = context.getRequiredTestClass().getSimpleName() + "-"
+                + context.getRequiredTestMethod().getName();
+        try {
+            Files.write(record.resolve(name + ".png"), driver.getScreenshotAs(OutputType.BYTES));
+            Files.write(record.resolve(name + ".html"), driver.getPageSource().getBytes(StandardCharsets.UTF_8));
+            log.error("E2E failure screenshot and DOM saved: {}", record.resolve(name));
+            WebElement focused = driver.switchTo().activeElement();
+            log.error("E2E browser state: url={}, window={}, focusTag={}, focusClass={}",
+                    driver.getCurrentUrl(), driver.manage().window().getSize(),
+                    focused.getTagName(), focused.getDomAttribute("class"));
+            for (WebElement modal : driver.findElements(By.cssSelector("[data-modal-ready]"))) {
+                if (modal.isDisplayed()) {
+                    log.error("E2E visible modal: class={}, ready={}, location={}, size={}",
+                            modal.getDomAttribute("class"), modal.getDomAttribute("data-modal-ready"),
+                            modal.getLocation(), modal.getSize());
+                }
+            }
+            for (WebElement feedback : driver.findElements(By.cssSelector(".n-form-item-feedback-wrapper"))) {
+                if (feedback.isDisplayed() && !feedback.getText().isEmpty()) {
+                    log.error("E2E form feedback: {}", feedback.getText());
+                }
+            }
+            for (WebElement editor : driver.findElements(By.cssSelector("[data-editor-model-version]"))) {
+                log.error("E2E editor: version={}, characters={}",
+                        editor.getDomAttribute("data-editor-model-version"),
+                        editor.getDomAttribute("data-editor-content-length"));
+            }
+        } catch (Exception diagnosticFailure) {
+            cause.addSuppressed(diagnosticFailure);
+            log.error("Failed to capture E2E browser state for {}", context.getUniqueId(), diagnosticFailure);
+        }
+        try {
+            String browserLogs = driver.manage().logs().get(LogType.BROWSER).getAll().toString();
+            log.error("E2E browser console: {}", browserLogs);
+            Files.write(record.resolve(name + "-browser.log"), browserLogs.getBytes(StandardCharsets.UTF_8));
+        } catch (Exception diagnosticFailure) {
+            cause.addSuppressed(diagnosticFailure);
+            log.error("Failed to capture E2E browser console for {}", context.getUniqueId(), diagnosticFailure);
+        }
     }
 
     private void setDriver(Object object, Field field) {

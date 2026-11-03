@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -153,25 +154,34 @@ public abstract class AbstractWorkflowStateAction implements IWorkflowStateActio
 
     protected void workflowFinish(final IWorkflowExecution workflowExecution,
                                   final WorkflowExecutionStatus workflowExecutionStatus) {
-        // todo: add transaction configuration in lifecycle event, all sync lifecycle should be in transaction
+        final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
+        final WorkflowInstance workflowInstanceToUpdate = new WorkflowInstance();
+        BeanUtils.copyProperties(workflowInstance, workflowInstanceToUpdate);
+        // Lifecycle events are dispatched without an enclosing transaction, so execute commits before returning.
         transactionTemplate.execute(status -> {
-            final WorkflowInstance workflowInstance = workflowExecution.getWorkflowInstance();
-            workflowInstance.setEndTime(new Date());
-            transformWorkflowInstanceState(workflowExecution, workflowExecutionStatus);
-            WorkflowInstanceMetrics.recordWorkflowInstanceFinish(
-                    workflowExecutionStatus,
-                    workflowInstance.getWorkflowDefinitionCode());
-            if (workflowExecution.getWorkflowExecuteContext().getWorkflowDefinition().getExecutionType()
-                    .isSerial()) {
-                if (serialCommandDao.deleteByWorkflowInstanceId(workflowInstance.getId()) > 0) {
-                    log.info("Success clear SerialCommand for WorkflowExecuteRunnable: {}",
-                            workflowExecution.getName());
-                }
+            workflowInstanceToUpdate.setState(workflowExecutionStatus);
+            workflowInstanceToUpdate.setEndTime(new Date());
+            workflowInstanceDao.updateById(workflowInstanceToUpdate);
+            if (workflowExecution.getWorkflowExecuteContext().getWorkflowDefinition().getExecutionType().isSerial()
+                    && serialCommandDao.deleteByWorkflowInstanceId(workflowInstance.getId()) > 0) {
+                log.info("Deleted SerialCommand within workflow finish transaction for WorkflowExecuteRunnable: {}",
+                        workflowExecution.getName());
             }
-            workflowExecution.getWorkflowEventBus()
-                    .publish(WorkflowFinalizeLifecycleEvent.of(workflowExecution));
             return null;
         });
+        final WorkflowExecutionStatus originState = workflowInstance.getState();
+        workflowInstance.setState(workflowInstanceToUpdate.getState());
+        workflowInstance.setEndTime(workflowInstanceToUpdate.getEndTime());
+        log.info("Success set WorkflowExecuteRunnable: {} state from: {} to {}",
+                workflowInstance.getName(), originState.name(), workflowInstance.getState().name());
+        try {
+            WorkflowInstanceMetrics.recordWorkflowInstanceFinish(workflowInstance.getState(),
+                    workflowInstance.getWorkflowDefinitionCode());
+        } catch (Exception ex) {
+            // Metrics must not prevent releasing a workflow whose transaction has already committed.
+            log.warn("Record completion metric failed for workflow: {}", workflowExecution.getName(), ex);
+        }
+        workflowExecution.getWorkflowEventBus().publish(WorkflowFinalizeLifecycleEvent.of(workflowExecution));
     }
 
     /**

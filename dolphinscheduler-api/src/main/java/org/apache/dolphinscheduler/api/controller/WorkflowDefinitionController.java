@@ -44,6 +44,7 @@ import org.apache.dolphinscheduler.api.service.WorkflowDefinitionService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
+import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCopyVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
@@ -154,12 +155,13 @@ public class WorkflowDefinitionController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(BATCH_COPY_WORKFLOW_DEFINITION_ERROR)
     @OperatorLog(auditType = AuditType.WORKFLOW_COPY)
-    public Result<Void> copyWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                               @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                               @RequestParam(value = "codes", required = true) String codes,
-                                               @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
-        workflowDefinitionService.batchCopyWorkflowDefinition(loginUser, projectCode, codes, targetProjectCode);
-        return Result.success();
+    public Result<List<WorkflowDefinitionCopyVO>> copyWorkflowDefinition(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                         @RequestParam(value = "codes", required = true) String codes,
+                                                                         @RequestParam(value = "targetProjectCode", required = true) long targetProjectCode) {
+        List<WorkflowDefinitionCopyVO> copyResponses = workflowDefinitionService
+                .batchCopyWorkflowDefinition(loginUser, projectCode, codes, targetProjectCode);
+        return Result.success(copyResponses);
     }
 
     /**

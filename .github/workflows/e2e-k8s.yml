@@ -34,7 +34,7 @@ concurrency:
 jobs:
   paths-filter:
     name: E2E-K8S-Path-Filter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
@@ -51,7 +51,7 @@ jobs:
     name: E2E-K8S-Execute
     needs: paths-filter
     if: ${{ (needs.paths-filter.outputs.not-ignore == 'true') || (github.event_name == 'push') }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 40
     steps:
       - run: df -h
@@ -158,7 +158,7 @@ jobs:
           done
   result:
     name: E2E-K8S-Result
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: [ e2e-k8s, paths-filter ]
     if: always()

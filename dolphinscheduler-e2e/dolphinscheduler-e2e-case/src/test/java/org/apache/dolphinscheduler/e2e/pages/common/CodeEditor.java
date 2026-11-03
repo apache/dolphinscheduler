@@ -17,112 +17,94 @@
 
 package org.apache.dolphinscheduler.e2e.pages.common;
 
-import org.apache.dolphinscheduler.e2e.core.Constants;
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 
-import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-import lombok.Getter;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import org.junit.platform.commons.util.StringUtils;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
-@Getter
 @Slf4j
 public final class CodeEditor {
 
-    @FindBys({
-            @FindBy(className = "monaco-editor"),
-            @FindBy(className = "view-line"),
-    })
-    private List<WebElement> editor;
-
-    @FindBy(className = "pre-tasks-model")
-    private WebElement scrollBar;
-
-    private WebDriver driver;
+    private final WebDriver driver;
 
     public CodeEditor(WebDriver driver) {
-        PageFactory.initElements(driver, this);
         this.driver = driver;
     }
 
-    @SneakyThrows
     public CodeEditor content(String content) {
-        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.elementToBeClickable(editor.get(0)));
-
-        Actions actions = new Actions(this.driver);
-
-        List<String> contentList = List.of(content.split(Constants.LINE_SEPARATOR));
-
-        try {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView();", scrollBar);
-        } catch (org.openqa.selenium.NoSuchElementException ignored) {
-            log.warn("scroll bar not found, skipping...");
+        UiInteraction.click(driver, ".monaco-editor .overflow-guard");
+        WebElement focusedInput = driver.switchTo().activeElement();
+        if (!"textarea".equals(focusedInput.getTagName())
+                || !focusedInput.getDomAttribute("class").contains("inputarea")
+                || focusedInput.getDomAttribute("readonly") != null) {
+            throw new IllegalStateException("Expected focus in an editable Monaco input: " + focusedInput.getTagName());
+        }
+        WebElement editor = focusedInput.findElement(By.xpath("ancestor::*[@data-editor-model-version][1]"));
+        String initialVersion = editor.getDomAttribute("data-editor-model-version");
+        int initialLength = Integer.parseInt(editor.getDomAttribute("data-editor-content-length"));
+        String normalized = content.replace("\r\n", "\n");
+        log.info("Replacing Monaco content: characters={}, initialVersion={}, initialLength={}",
+                normalized.length(), initialVersion, initialLength);
+        if (!normalized.isEmpty() || initialLength != 0) {
+            Actions input = new Actions(driver).keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL);
+            if (normalized.isEmpty()) {
+                input.sendKeys(Keys.BACK_SPACE).perform();
+            } else {
+                clipboard(normalized);
+                input.keyDown(Keys.CONTROL).sendKeys("v").keyUp(Keys.CONTROL).perform();
+            }
+            WebDriverWaitFactory.createWebDriverWait(driver)
+                    .withMessage("Monaco paste did not update the model to " + normalized.length() + " characters")
+                    .until(ignored -> !initialVersion.equals(editor.getDomAttribute("data-editor-model-version"))
+                            && Integer.parseInt(editor.getDomAttribute("data-editor-content-length")) == normalized
+                                    .length());
         }
 
-        for (int i = 0; i < contentList.size(); i++) {
-            String editorLineText;
-            String inputContent = contentList.get(i);
-            if (i == 0) {
-                actions.moveToElement(editor.get(i))
-                        .click()
-                        .sendKeys(inputContent)
-                        .sendKeys(Constants.LINE_SEPARATOR)
-                        .perform();
-                continue;
-            } else {
-                editorLineText = editor.get(i).getText();
-            }
-
-            if (StringUtils.isNotBlank(inputContent)) {
-                if (editorLineText.isEmpty()) {
-                    actions.moveToElement(editor.get(i))
-                            .click()
-                            .sendKeys(inputContent)
-                            .sendKeys(Constants.LINE_SEPARATOR)
-                            .perform();
-                    Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
-                } else {
-                    for (int p = 0; p < editorLineText.strip().length(); p++) {
-                        clearLine(actions, editor.get(i));
-                    }
-                    if (!editorLineText.isEmpty()) {
-                        clearLine(actions, editor.get(i));
-                    }
-                    actions.moveToElement(editor.get(i))
-                            .click()
-                            .sendKeys(inputContent)
-                            .sendKeys(Constants.LINE_SEPARATOR)
-                            .perform();
-                    Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
-                }
-            } else {
-                actions.moveToElement(editor.get(i))
-                        .click()
-                        .sendKeys(Constants.LINE_SEPARATOR)
-                        .perform();
-                Thread.sleep(Constants.DEFAULT_SLEEP_MILLISECONDS);
+        if (!normalized.isEmpty()) {
+            // Clear the clipboard so an unsuccessful copy cannot validate the paste payload.
+            String sentinel = UUID.randomUUID().toString();
+            clipboard(sentinel);
+            new Actions(driver)
+                    .keyDown(Keys.CONTROL).sendKeys("a").keyUp(Keys.CONTROL)
+                    .keyDown(Keys.CONTROL).sendKeys("c").keyUp(Keys.CONTROL)
+                    .perform();
+            String actual = WebDriverWaitFactory.createWebDriverWait(driver)
+                    .withMessage("Monaco copy did not populate the clipboard")
+                    .until(ignored -> {
+                        String copied = clipboard(null);
+                        return sentinel.equals(copied) ? null : copied;
+                    }).replace("\r\n", "\n");
+            if (!normalized.equals(actual)) {
+                throw new IllegalStateException("Monaco content mismatch: expected characters=" + normalized.length()
+                        + ", copied characters=" + actual.length());
             }
         }
-
+        new Actions(driver).sendKeys(Keys.ARROW_RIGHT).perform();
+        log.info("Monaco content verified: characters={}", normalized.length());
         return this;
     }
 
-    private void clearLine(Actions actions, WebElement element) {
-        actions.moveToElement(element)
-                .click()
-                .sendKeys(Keys.BACK_SPACE)
-                .perform();
+    private String clipboard(String value) {
+        Map<?, ?> result = (Map<?, ?>) ((JavascriptExecutor) driver).executeAsyncScript(
+                "const value = arguments[0], done = arguments[arguments.length - 1];"
+                        + "if (!navigator.clipboard) { done({error: 'Clipboard API unavailable; check secure origin configuration'}); return; }"
+                        + "const operation = value === null ? navigator.clipboard.readText() : navigator.clipboard.writeText(value);"
+                        + "operation.then(text => done({text: value === null ? text : value}),"
+                        + "error => done({error: error.name + ': ' + error.message}));",
+                value);
+        if (result.containsKey("error")) {
+            throw new IllegalStateException("Monaco clipboard operation failed: " + result.get("error"));
+        }
+        return (String) result.get("text");
     }
 }

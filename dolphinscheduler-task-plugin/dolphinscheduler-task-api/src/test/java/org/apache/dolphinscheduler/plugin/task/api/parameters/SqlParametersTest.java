@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.parameters;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.SQLTaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
@@ -28,11 +30,19 @@ import org.apache.dolphinscheduler.spi.enums.DbType;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class SqlParametersTest {
 
@@ -97,6 +107,71 @@ public class SqlParametersTest {
         sqlParameters.setSql(null);
         sqlParameters.setSqlResource("/sql/demo.sql");
         Assertions.assertFalse(CollectionUtils.isEmpty(sqlParameters.getResourceFilesList()));
+    }
+
+    @Test
+    public void testBigDecimalQueryResultProducesExactLongOutParameter() {
+        Property property = new Property();
+        property.setProp("SRC_CNT");
+        property.setDirect(Direct.OUT);
+        property.setType(DataType.LONG);
+        SqlParameters parameters = new SqlParameters();
+        parameters.setLocalParams(Collections.singletonList(property));
+
+        ArrayNode result = JSONUtils.createArrayNode();
+        ObjectNode row = JSONUtils.createObjectNode();
+        // This integer cannot be represented exactly as a double and becomes
+        // scientific notation after BigDecimal node normalization.
+        row.set("SRC_CNT", JSONUtils.toJsonNode(new BigDecimal("90071992547409930")));
+        result.add(row);
+        parameters.dealOutParam(JSONUtils.toJsonString(result));
+
+        String value = parameters.getVarPool().get(0).getValue();
+        Assertions.assertEquals("90071992547409930", value);
+        Assertions.assertEquals(90071992547409930L, Long.parseLong(value));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "11423000,11423000",
+            "1.1423E+7,11423000",
+            "11423000.0,11423000",
+            "0,0",
+            "-1.1423E+7,-11423000",
+            "9.223372036854775807E+18,9223372036854775807",
+            "-9.223372036854775808E+18,-9223372036854775808",
+            "\"1.1423E7\",11423000"
+    })
+    public void testLongOutParameterNormalizesExactInteger(String jsonValue, String expected) {
+        Property property = new Property();
+        property.setProp("SRC_CNT");
+        property.setDirect(Direct.OUT);
+        property.setType(DataType.LONG);
+        SqlParameters parameters = new SqlParameters();
+        parameters.setLocalParams(Collections.singletonList(property));
+
+        parameters.dealOutParam("[{\"SRC_CNT\":" + jsonValue + "}]");
+
+        Assertions.assertEquals(expected, parameters.getVarPool().get(0).getValue());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"1.5", "9223372036854775808", "-9223372036854775809", "\"invalid\"", "null"})
+    public void testLongOutParameterRejectsInvalidValue(String jsonValue) {
+        Property property = new Property();
+        property.setProp("SRC_CNT");
+        property.setDirect(Direct.OUT);
+        property.setType(DataType.LONG);
+        SqlParameters parameters = new SqlParameters();
+        parameters.setLocalParams(Collections.singletonList(property));
+
+        TaskException exception = Assertions.assertThrows(TaskException.class,
+                () -> parameters.dealOutParam("[{\"SRC_CNT\":" + jsonValue + "}]"));
+
+        Assertions.assertTrue(exception.getMessage().contains("SRC_CNT"));
+        Assertions.assertTrue(exception.getMessage().contains("LONG"));
+        Assertions.assertNotNull(exception.getCause());
+        Assertions.assertTrue(parameters.getVarPool().isEmpty());
     }
 
     @Test

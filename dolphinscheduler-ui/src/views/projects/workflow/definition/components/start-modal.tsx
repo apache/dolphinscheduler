@@ -319,6 +319,7 @@ export default defineComponent({
     const { t } = this
     return (
       <Modal
+        class='dialog-start-workflow'
         show={this.show}
         title={t('project.workflow.set_parameters_before_starting')}
         onCancel={this.hideModal}

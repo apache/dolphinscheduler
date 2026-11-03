@@ -181,6 +181,8 @@ const DetailModal = defineComponent({
       onSubmit,
       handleSourceModalOpen
     } = this
+    const useRawJdbcUrl =
+      detailForm.type === 'KYUUBI' && detailForm.connectionMode === 'url'
     return (
       <Modal
         class='dialog-create-data-source'
@@ -244,8 +246,35 @@ const DetailModal = defineComponent({
                     placeholder={t('datasource.description_tips')}
                   />
                 </NFormItem>
+                {detailForm.type === 'KYUUBI' && (
+                  <NFormItem label={t('datasource.connection_configuration')}>
+                    <NRadioGroup v-model={[detailForm.connectionMode, 'value']}>
+                      <NSpace>
+                        <NRadio value='standard'>
+                          {t('datasource.standard_configuration')}
+                        </NRadio>
+                        <NRadio value='url'>JDBC URL</NRadio>
+                      </NSpace>
+                    </NRadioGroup>
+                  </NFormItem>
+                )}
+                {useRawJdbcUrl && (
+                  <NFormItem
+                    label='JDBC URL'
+                    path='rawJdbcUrl'
+                    show-require-mark
+                  >
+                    <NInput
+                      class='input-raw-jdbc-url'
+                      v-model={[detailForm.rawJdbcUrl, 'value']}
+                      type='textarea'
+                      autosize={{ minRows: 3, maxRows: 6 }}
+                      placeholder={t('datasource.raw_jdbc_url_tips')}
+                    />
+                  </NFormItem>
+                )}
                 <NFormItem
-                  v-show={showHost}
+                  v-show={showHost && !useRawJdbcUrl}
                   label={t('datasource.ip')}
                   path='host'
                   show-require-mark
@@ -334,7 +363,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showPort}
+                  v-show={showPort && !useRawJdbcUrl}
                   label={t('datasource.port')}
                   path='port'
                   show-require-mark={
@@ -639,7 +668,11 @@ const DetailModal = defineComponent({
                     class='input-password'
                     v-model={[detailForm.password, 'value']}
                     type='password'
-                    placeholder={t('datasource.user_password_tips')}
+                    placeholder={t(
+                      id && detailForm.type === 'KYUUBI'
+                        ? 'datasource.kyuubi_keep_password_tips'
+                        : 'datasource.user_password_tips'
+                    )}
                   />
                 </NFormItem>
                 <NFormItem
@@ -657,7 +690,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showDataBaseName}
+                  v-show={showDataBaseName && !useRawJdbcUrl}
                   label={t('datasource.database_name')}
                   path='database'
                   show-require-mark={requiredDataBase}
@@ -719,7 +752,7 @@ const DetailModal = defineComponent({
                   />
                 </NFormItem>
                 <NFormItem
-                  v-show={showJDBCConnectParameters}
+                  v-show={showJDBCConnectParameters && !useRawJdbcUrl}
                   label={t('datasource.jdbc_connect_parameters')}
                   path='other'
                 >

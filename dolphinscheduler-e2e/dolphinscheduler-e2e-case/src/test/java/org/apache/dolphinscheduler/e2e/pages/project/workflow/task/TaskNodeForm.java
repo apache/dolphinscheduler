@@ -17,12 +17,16 @@
 
 package org.apache.dolphinscheduler.e2e.pages.project.workflow.task;
 
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.project.workflow.WorkflowForm;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -35,6 +39,7 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 @Getter
+@Slf4j
 public abstract class TaskNodeForm {
 
     @FindBys({
@@ -162,22 +167,34 @@ public abstract class TaskNodeForm {
         return this;
     }
 
-    public TaskNodeForm selectResource(String resourceName) {
-        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectResource);
-
+    public TaskNodeForm selectResource(String resourceFileName) {
+        UiInteraction.click(parent.driver(), ".resource-select .n-base-selection");
+        WebElement filter = WebDriverWaitFactory.createWebDriverWait(parent.driver())
+                .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".resource-select input")));
+        filter.clear();
+        filter.sendKeys(resourceFileName);
         final By optionsLocator = By.className("n-tree-node-content__text");
-
-        WebDriverWaitFactory.createWebDriverWait(parent().driver())
-                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
-
-        parent().driver()
-                .findElements(optionsLocator)
-                .stream()
-                .filter(it -> it.getText().startsWith(resourceName))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No such resource: " + resourceName))
-                .click();
-
+        AtomicReference<List<String>> visibleNames = new AtomicReference<>();
+        WebElement resource = WebDriverWaitFactory.createWebDriverWait(parent.driver())
+                .withMessage(() -> "Resource not found by exact file name: " + resourceFileName
+                        + "; visible resources=" + visibleNames.get())
+                .until(ignored -> {
+                    List<WebElement> options = parent.driver().findElements(optionsLocator).stream()
+                            .filter(WebElement::isDisplayed)
+                            .collect(Collectors.toList());
+                    visibleNames.set(options.stream().map(WebElement::getText).collect(Collectors.toList()));
+                    List<WebElement> matches = options.stream()
+                            .filter(it -> resourceFileName.equals(it.getText().trim()))
+                            .collect(Collectors.toList());
+                    if (matches.size() > 1) {
+                        throw new IllegalStateException("Ambiguous resource file name: " + resourceFileName
+                                + "; visible resources=" + visibleNames.get());
+                    }
+                    return matches.isEmpty() ? null : matches.get(0);
+                });
+        log.info("Selecting resource by exact file name: requested={}, selected={}", resourceFileName,
+                resource.getText());
+        resource.click();
         parent.driver().switchTo().activeElement().sendKeys(Keys.ESCAPE);
         return this;
     }

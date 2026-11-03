@@ -91,17 +91,25 @@ public abstract class BaseWorkflowE2ETest {
         final ProjectDetailPage projectPage = new ProjectPage(browser)
                 .goToNav(ProjectPage.class)
                 .goTo(projectName);
-        return await()
+        log.info("Waiting for workflow instance success: project={}, workflow={}", projectName, workflowName);
+        return await("Workflow instance should succeed: " + workflowName)
                 .until(() -> {
                     browser.navigate().refresh();
-                    return projectPage
+                    List<WorkflowInstanceTab.Row> instances = projectPage
                             .goToTab(WorkflowInstanceTab.class)
                             .instances()
                             .stream()
-                            .filter(it -> it.workflowInstanceName().startsWith(workflowName))
-                            .filter(WorkflowInstanceTab.Row::isSuccess)
-                            .findFirst()
-                            .orElse(null);
+                            .filter(it -> it.workflowInstanceName().startsWith(workflowName + "-"))
+                            .collect(Collectors.toList());
+                    for (WorkflowInstanceTab.Row instance : instances) {
+                        if (instance.isFailed()) {
+                            throw new IllegalStateException(
+                                    "Workflow instance failed while waiting for success: project="
+                                            + projectName + ", instance=" + instance.workflowInstanceName()
+                                            + ", url=" + browser.getCurrentUrl());
+                        }
+                    }
+                    return instances.stream().filter(WorkflowInstanceTab.Row::isSuccess).findFirst().orElse(null);
                 }, Objects::nonNull);
     }
 

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.e2e.pages.resource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
 import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.CodeEditor;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
@@ -89,21 +90,23 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
 
     public FileManagePage createDirectory(String name) {
         waitForPageLoading();
-        buttonCreateDirectory().click();
+        UiInteraction.click(driver, ".btn-create-directory");
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(createDirectoryBox().buttonSubmit()));
-        createDirectoryBox().buttonSubmit().click();
+        UiInteraction.click(driver, ".dialog-create-directory .btn-submit");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.invisibilityOfElementLocated(
+                By.cssSelector(".dialog-create-directory")));
         return this;
     }
 
     public FileManagePage cancelCreateDirectory(String name) {
         waitForPageLoading();
-        buttonCreateDirectory().click();
+        UiInteraction.click(driver, ".btn-create-directory");
 
         createDirectoryBox().inputDirectoryName().sendKeys(name);
-        createDirectoryBox().buttonCancel().click();
+        UiInteraction.click(driver, ".dialog-create-directory .btn-cancel");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.invisibilityOfElementLocated(
+                By.cssSelector(".dialog-create-directory")));
 
         return this;
     }
@@ -136,12 +139,12 @@ public class FileManagePage extends NavBarPage implements ResourcePage.Tab {
                 .orElseThrow(() -> new RuntimeException(String.format("No %s in file manage list", directoryName)))
                 .click();
 
-        buttonCreateDirectory().click();
+        UiInteraction.click(driver, ".btn-create-directory");
 
         createDirectoryBox().inputDirectoryName().sendKeys(subDirectoryName);
-        WebDriverWaitFactory.createWebDriverWait(driver)
-                .until(ExpectedConditions.elementToBeClickable(createDirectoryBox().buttonSubmit()));
-        createDirectoryBox().buttonSubmit().click();
+        UiInteraction.click(driver, ".dialog-create-directory .btn-submit");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ExpectedConditions.invisibilityOfElementLocated(
+                By.cssSelector(".dialog-create-directory")));
 
         return this;
     }

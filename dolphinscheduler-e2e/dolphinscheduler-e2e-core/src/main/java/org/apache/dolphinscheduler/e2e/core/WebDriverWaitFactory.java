@@ -29,7 +29,7 @@ public class WebDriverWaitFactory {
     private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(10);
 
     /**
-     * Create a WebDriverWait instance with default timeout 60s and interval 100ms.
+     * Create a WebDriverWait instance with default timeout 10s and interval 500ms.
      */
     public static WebDriverWait createWebDriverWait(WebDriver driver) {
         return createWebDriverWait(driver, DEFAULT_TIMEOUT);

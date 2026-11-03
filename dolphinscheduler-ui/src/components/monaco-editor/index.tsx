@@ -90,6 +90,9 @@ export default defineComponent({
     const themeStore = useThemeStore()
     const monacoEditorThemeRef = ref(themeStore.darkTheme ? 'vs-dark' : 'vs')
     const editorRef = ref()
+    // Expose model progress without depending on Monaco's virtualized line DOM.
+    const contentLength = ref(0)
+    const modelVersion = ref(0)
     const getValue = () => editor?.getValue()
     const formItem = useFormItem({})
 
@@ -106,7 +109,12 @@ export default defineComponent({
             alwaysConsumeMouseWheel: false
           }
         })
+        const model = editor.getModel()!
+        contentLength.value = model.getValue().length
+        modelVersion.value = model.getVersionId()
         editor.onDidChangeModelContent(() => {
+          contentLength.value = model.getValue().length
+          modelVersion.value = model.getVersionId()
           const { onUpdateValue, 'onUpdate:value': _onUpdateValue } = props
           const value = editor?.getValue() || ''
 
@@ -161,12 +169,14 @@ export default defineComponent({
 
     ctx.expose({ getValue })
 
-    return { editorRef }
+    return { editorRef, contentLength, modelVersion }
   },
   render() {
     return (
       <div
         ref='editorRef'
+        data-editor-content-length={this.contentLength}
+        data-editor-model-version={this.modelVersion}
         style={{
           height: this.height,
           minHeight: '150px',

@@ -54,6 +54,13 @@ export default {
   oracle_sid: 'SID',
   compatible_mode: 'Compatible Mode',
   compatible_mode_tips: 'Please enter compatible mode',
+  kyuubi_keep_password_tips:
+    'Leave blank to keep the saved password; re-enter it to test the edited connection.',
+  connection_configuration: 'Connection configuration',
+  standard_configuration: 'Standard configuration',
+  raw_jdbc_url_required: 'Enter a complete JDBC URL',
+  raw_jdbc_url_tips:
+    'jdbc:kyuubi://host:port/schema;clientProperties?sessionProperties — enter credentials in the username and password fields below.',
   jdbc_connect_parameters: 'jdbc connect parameters',
   principal_tips: 'Please enter Principal',
   krb5_conf_tips:

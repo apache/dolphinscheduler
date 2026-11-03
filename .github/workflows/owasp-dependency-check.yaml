@@ -34,7 +34,7 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v6
@@ -44,7 +44,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           java-version: 11
-          distribution: 'adopt'
+          distribution: 'temurin'
       - name: Run OWASP Dependency Check
         run: |
           ./mvnw -B clean install verify dependency-check:check \

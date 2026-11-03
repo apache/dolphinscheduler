@@ -35,6 +35,8 @@ import org.apache.dolphinscheduler.e2e.pages.security.SecurityPage;
 import org.apache.dolphinscheduler.e2e.pages.security.TenantPage;
 import org.apache.dolphinscheduler.e2e.pages.security.UserPage;
 
+import java.util.UUID;
+
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -212,7 +214,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
 
     @Test
     void testRunShellTasks_UsingResourceFile() {
-        String testFileName = "echo";
+        String testFileName = "echo_" + UUID.randomUUID();
         new ResourcePage(browser)
                 .goToNav(ResourcePage.class)
                 .goToTab(FileManagePage.class)
@@ -231,7 +233,7 @@ public class ShellTaskE2ETest extends BaseWorkflowE2ETest {
                 .<ShellTaskForm>addTask(WorkflowForm.TaskType.SHELL)
                 .script("cat " + testFileName + ".sh")
                 .name(taskName)
-                .selectResource(testFileName)
+                .selectResource(testFileName + ".sh")
                 .submit()
 
                 .submit()

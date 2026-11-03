@@ -24,7 +24,7 @@ on:
 
 jobs:
   issueRobot:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: "Checkout ${{ github.ref }}"
         uses: actions/checkout@v6

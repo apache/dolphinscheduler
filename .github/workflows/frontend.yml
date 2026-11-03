@@ -39,7 +39,7 @@ concurrency:
 jobs:
   paths-filter:
     name: Frontend-Path-Filter
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       not-ignore: ${{ steps.filter.outputs.not-ignore }}
     steps:
@@ -60,18 +60,18 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest ]
+        os: [ ubuntu-24.04, macos-latest ]
     steps:
       - uses: actions/checkout@v6
         with:
           submodules: true
-      - if: matrix.os == 'ubuntu-latest'
+      - if: matrix.os == 'ubuntu-24.04'
         name: Cache Maven Wrapper
         uses: actions/cache@v5
         with:
           path: ~/.m2/wrapper
           key: ${{ runner.os }}-mvnw-${{ hashFiles('.mvn/wrapper/maven-wrapper.properties') }}
-      - if: matrix.os == 'ubuntu-latest'
+      - if: matrix.os == 'ubuntu-24.04'
         name: Sanity Check
         uses: ./.github/actions/sanity-check
       - name: Set up Node.js
@@ -94,7 +94,7 @@ jobs:
           pnpm run build:prod
   result:
     name: Frontend Build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 30
     needs: [ build, paths-filter ]
     if: always()

@@ -19,7 +19,14 @@ package org.apache.dolphinscheduler.plugin.datasource.kyuubi.param;
 
 import org.apache.dolphinscheduler.spi.datasource.BaseConnectionParam;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class KyuubiConnectionParam extends BaseConnectionParam {
+
+    @Getter
+    @Setter
+    private String rawJdbcUrl;
 
     @Override
     public String toString() {

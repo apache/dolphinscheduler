@@ -89,6 +89,7 @@ interface IDataSource {
   database?: string
   connectType?: string
   other?: object
+  rawJdbcUrl?: string
   restEndpoint?: string
   kubeConfig?: string
   namespace?: string
