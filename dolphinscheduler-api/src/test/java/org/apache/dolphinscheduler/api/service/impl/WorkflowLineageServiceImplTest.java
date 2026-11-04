@@ -32,6 +32,9 @@ import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
@@ -91,6 +94,37 @@ class WorkflowLineageServiceImplTest {
 
         Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), exception.getCode());
         verifyNoInteractions(workflowTaskLineageDao);
+    }
+
+    @Test
+    void lineagePreservesRelatedProjectsWithoutTheirViewPermission() {
+        User user = new User();
+        when(projectDao.queryByCode(1L)).thenReturn(new Project());
+        WorkflowDefinition root = new WorkflowDefinition();
+        root.setCode(100L);
+        root.setProjectCode(1L);
+        when(workflowDefinitionDao.queryByCode(100L)).thenReturn(Optional.of(root));
+        Mockito.lenient().doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectPermission(user, 2L, ProjectPermission.VIEW);
+        WorkflowTaskLineage relation = new WorkflowTaskLineage();
+        relation.setWorkflowDefinitionCode(100L);
+        relation.setDeptProjectCode(2L);
+        relation.setDeptWorkflowDefinitionCode(200L);
+        when(workflowTaskLineageDao.queryByWorkflowDefinitionCode(100L))
+                .thenReturn(Collections.singletonList(relation));
+        WorkFlowRelationDetail local = new WorkFlowRelationDetail();
+        local.setWorkFlowCode(100L);
+        WorkFlowRelationDetail related = new WorkFlowRelationDetail();
+        related.setWorkFlowCode(200L);
+        related.setWorkFlowName("related workflow in project B");
+        when(workflowTaskLineageDao.queryWorkFlowLineageByCode(100L)).thenReturn(Collections.singletonList(local));
+        when(workflowTaskLineageDao.queryWorkFlowLineageByCode(200L)).thenReturn(Collections.singletonList(related));
+
+        WorkFlowLineage result = workflowLineageService.queryWorkFlowLineageByCode(user, 1L, 100L);
+
+        assertThat(result.getWorkFlowRelationDetailList()).containsExactly(local, related);
+        assertThat(result.getWorkFlowRelationList()).contains(new WorkFlowRelation(200L, 100L));
+        verify(projectService, Mockito.never()).checkProjectPermission(user, 2L, ProjectPermission.VIEW);
     }
 
     @BeforeEach

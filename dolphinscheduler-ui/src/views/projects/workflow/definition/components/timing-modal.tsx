@@ -334,6 +334,7 @@ export default defineComponent({
 
     return (
       <Modal
+        class='dialog-timing-workflow'
         show={this.show}
         title={t('project.workflow.set_parameters_before_timing')}
         onCancel={this.hideModal}
@@ -343,6 +344,7 @@ export default defineComponent({
       >
         <NForm
           ref='timingFormRef'
+          model={this.timingForm}
           rules={this.rules}
           disabled={this.$props.state === 'ONLINE'}
         >
@@ -516,6 +518,7 @@ export default defineComponent({
             path='tenantCode'
           >
             <NSelect
+              class='select-tenant'
               options={this.tenantList}
               v-model:value={this.timingForm.tenantCode}
               filterable

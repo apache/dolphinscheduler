@@ -26,9 +26,11 @@ import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +53,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Service
 @Slf4j
 public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Autowired
     private ProjectAuthorizationService projectAuthorizationService;
@@ -243,6 +248,7 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
     }
 
     @Override
+    @Transactional
     public void deleteTaskGroupByProjectCode(long projectCode) {
         List<TaskGroup> taskGroups = taskGroupMapper.selectByProjectCode(projectCode);
         if (CollectionUtils.isEmpty(taskGroups)) {
@@ -253,6 +259,8 @@ public class TaskGroupServiceImpl extends BaseServiceImpl implements TaskGroupSe
                 .collect(Collectors.toList());
         taskGroupQueueService.deleteByTaskGroupIds(taskGroupIds);
         taskGroupMapper.deleteBatchIds(taskGroupIds);
+        taskGroupIds.forEach(id -> resourceAuthorizationDao.revokeByResource(ProjectResourceType.TASK_GROUP,
+                id.toString()));
     }
 
     private void requireAdministrator(User loginUser) {

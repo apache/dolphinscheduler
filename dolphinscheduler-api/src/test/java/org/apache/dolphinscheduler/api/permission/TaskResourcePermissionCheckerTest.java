@@ -241,7 +241,7 @@ class TaskResourcePermissionCheckerTest {
         Tenant tenant = new Tenant();
         tenant.setId(-1);
         tenant.setTenantCode("default");
-        tenant.setQueueId(1);
+        tenant.setQueueId(42);
         Mockito.when(tenantDao.queryByCode("default")).thenReturn(Optional.of(tenant));
         Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "default"))
                 .thenReturn(true);
@@ -252,7 +252,7 @@ class TaskResourcePermissionCheckerTest {
                 .thenReturn(true);
         Assertions.assertThrows(ServiceException.class,
                 () -> checker.checkExecutionSettings(100L, "default", null, "default", null));
-        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.QUEUE, "1"))
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.QUEUE, "42"))
                 .thenReturn(true);
 
         Assertions.assertDoesNotThrow(

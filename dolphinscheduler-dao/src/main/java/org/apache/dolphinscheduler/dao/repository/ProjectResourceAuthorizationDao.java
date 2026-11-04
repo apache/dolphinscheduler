@@ -29,4 +29,5 @@ public interface ProjectResourceAuthorizationDao extends IDao<ProjectResourceAut
     List<ProjectResourceAuthorization> queryByProjectAndType(long projectCode, ProjectResourceType resourceType);
 
     void revokeAuthorization(long projectCode, ProjectResourceType resourceType, String resourceKey);
+    void revokeByResource(ProjectResourceType resourceType, String resourceKey);
 }

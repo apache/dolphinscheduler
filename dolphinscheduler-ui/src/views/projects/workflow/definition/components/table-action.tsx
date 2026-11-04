@@ -197,6 +197,7 @@ export default defineComponent({
                 type='info'
                 tag='div'
                 circle
+                class='btn-timing'
                 onClick={this.handleTimingWorkflow}
               >
                 <NIcon>

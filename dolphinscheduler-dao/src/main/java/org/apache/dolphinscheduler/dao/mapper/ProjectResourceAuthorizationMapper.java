@@ -38,4 +38,6 @@ public interface ProjectResourceAuthorizationMapper extends BaseMapper<ProjectRe
     void revokeAuthorization(@Param("projectCode") long projectCode,
                              @Param("resourceType") ProjectResourceType resourceType,
                              @Param("resourceKey") String resourceKey);
+    void revokeByResource(@Param("resourceType") ProjectResourceType resourceType,
+                          @Param("resourceKey") String resourceKey);
 }

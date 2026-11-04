@@ -32,12 +32,14 @@ import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -63,6 +65,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Service
 @Slf4j
 public class TenantServiceImpl extends BaseServiceImpl implements TenantService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Autowired
     private ProjectAuthorizationService projectAuthorizationService;
@@ -247,6 +252,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (!tenantDao.deleteById(id)) {
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_ERROR);
         }
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.TENANT, Integer.toString(id));
 
         workflowInstanceDao.updateWorkflowInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
     }

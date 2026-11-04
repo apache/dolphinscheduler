@@ -29,9 +29,11 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -48,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -55,6 +58,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Service
 @Slf4j
 public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Autowired
     private ProjectAuthorizationService projectAuthorizationService;
@@ -223,6 +229,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @throws Exception exception
      */
     @Override
+    @Transactional
     public void deleteQueueById(User loginUser, int id) throws Exception {
 
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_DELETE)) {
@@ -250,6 +257,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         if (!queueDao.deleteById(id)) {
             throw new ServiceException(Status.DELETE_QUEUE_BY_ID_ERROR);
         }
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.QUEUE, Integer.toString(id));
 
     }
 

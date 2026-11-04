@@ -29,10 +29,12 @@ import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -56,6 +58,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Service
 @Slf4j
 public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroupService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Autowired
     private ProjectAuthorizationService projectAuthorizationService;
@@ -234,6 +239,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return delete result code
      */
     @Override
+    @Transactional
     public void deleteAlertGroupById(User loginUser, int id) {
 
         // only admin can operate
@@ -254,6 +260,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         }
 
         alertGroupDao.deleteById(id);
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.ALERT_GROUP, Integer.toString(id));
         log.info("Delete alert group complete, groupId:{}", id);
     }
 

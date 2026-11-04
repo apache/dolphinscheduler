@@ -40,6 +40,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -75,6 +76,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 @Service
 @Slf4j
 public class EnvironmentServiceImpl extends BaseServiceImpl implements EnvironmentService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Autowired
     private ProjectAuthorizationService projectAuthorizationService;
@@ -319,11 +323,13 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             throw new ServiceException(Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS);
         }
 
+        Environment environment = environmentMapper.queryByEnvironmentCode(code);
         int delete = environmentMapper.deleteByCode(code);
         if (delete <= 0) {
             log.error("Environment delete error, environmentCode:{}.", code);
             throw new ServiceException(Status.DELETE_ENVIRONMENT_ERROR);
         }
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.ENVIRONMENT, environment.getId().toString());
         relationMapper.delete(new QueryWrapper<EnvironmentWorkerGroupRelation>()
                 .lambda()
                 .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode, code));

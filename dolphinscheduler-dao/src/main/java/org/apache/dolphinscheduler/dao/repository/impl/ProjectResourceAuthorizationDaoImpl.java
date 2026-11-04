@@ -57,4 +57,8 @@ public class ProjectResourceAuthorizationDaoImpl
                                     @NonNull String resourceKey) {
         mybatisMapper.revokeAuthorization(projectCode, resourceType, resourceKey);
     }
+    @Override
+    public void revokeByResource(@NonNull ProjectResourceType resourceType, @NonNull String resourceKey) {
+        mybatisMapper.revokeByResource(resourceType, resourceKey);
+    }
 }

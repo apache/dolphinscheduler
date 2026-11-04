@@ -518,6 +518,43 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void testMoveRejectsOnlineWorkflowBeforeChangingProject() {
+        assertOnlineMoveRejected(true);
+    }
+
+    @Test
+    public void testMoveRejectsOnlineScheduleBeforeChangingProject() {
+        assertOnlineMoveRejected(false);
+    }
+
+    private void assertOnlineMoveRejected(boolean onlineWorkflow) {
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        when(projectDao.queryByCode(projectCodeOther)).thenReturn(getProject(projectCodeOther));
+        WorkflowDefinition definition = getWorkflowDefinition();
+        definition.setReleaseState(onlineWorkflow ? ReleaseState.ONLINE : ReleaseState.OFFLINE);
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(definition));
+        if (!onlineWorkflow) {
+            Schedule schedule = new Schedule();
+            schedule.setId(42);
+            schedule.setTenantCode("source-only-tenant");
+            schedule.setWorkerGroup("source-only-workers");
+            schedule.setReleaseState(ReleaseState.ONLINE);
+            Mockito.lenient().when(scheduleDao.queryByWorkflowDefinitionCode(definition.getCode()))
+                    .thenReturn(schedule);
+        }
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.batchMoveWorkflowDefinition(user, projectCode,
+                        String.valueOf(processDefinitionCode), projectCodeOther));
+
+        Assertions.assertEquals((onlineWorkflow ? Status.WORKFLOW_DEFINE_STATE_ONLINE : Status.SCHEDULE_STATE_ONLINE)
+                .getCode(), exception.getCode());
+        Assertions.assertEquals(projectCode, definition.getProjectCode());
+        Mockito.verifyNoInteractions(processService, taskResourcePermissionChecker, taskSubWorkflowPermissionChecker);
+    }
+
+    @Test
     public void testBatchMoveWorkflowDefinition() {
         Project project1 = getProject(projectCode);
         when(projectDao.queryByCode(projectCode)).thenReturn(project1);

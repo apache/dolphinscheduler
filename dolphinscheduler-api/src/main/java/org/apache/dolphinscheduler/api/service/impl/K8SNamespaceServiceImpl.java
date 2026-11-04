@@ -26,12 +26,14 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.ClusterDao;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -42,6 +44,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -52,6 +55,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Service
 @Slf4j
 public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNamespaceService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Autowired
     private K8sNamespaceDao k8sNamespaceDao;
@@ -197,6 +203,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @param id        namespace id
      */
     @Override
+    @Transactional
     public void deleteNamespaceById(User loginUser, int id) {
         if (isNotAdmin(loginUser)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
@@ -209,6 +216,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         }
 
         k8sNamespaceDao.deleteById(id);
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.K8S_NAMESPACE, Integer.toString(id));
         log.info("K8s namespace delete complete, namespace:{}.", k8sNamespaceObj.getNamespace());
     }
 

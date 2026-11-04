@@ -28,12 +28,14 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupMapper;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +61,9 @@ public class TaskGroupServiceTest {
 
     @InjectMocks
     private TaskGroupServiceImpl taskGroupService;
+
+    @Mock
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Mock
     private ProjectAuthorizationService projectAuthorizationService;
@@ -180,6 +185,17 @@ public class TaskGroupServiceTest {
         PageInfo<TaskGroup> pageInfo = taskGroupService.queryAllTaskGroup(loginUser, null, null, 1, 10);
         Assertions.assertNotNull(pageInfo.getTotalList());
         Assertions.assertEquals(1, pageInfo.getTotalList().size());
+    }
+
+    @Test
+    public void deletingProjectTaskGroupsRevokesGrantsFromEveryProject() {
+        TaskGroup group = getTaskGroup();
+        group.setId(42);
+        Mockito.when(taskGroupMapper.selectByProjectCode(100L)).thenReturn(java.util.Collections.singletonList(group));
+
+        taskGroupService.deleteTaskGroupByProjectCode(100L);
+
+        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.TASK_GROUP, "42");
     }
 
     @Test

@@ -163,6 +163,22 @@ class WorkflowE2ETest {
     }
 
     @Test
+    @Order(20)
+    void testCreateAndUpdateScheduleWithAuthorizedTenant() {
+        WorkflowDefinitionTab definitionTab = new ProjectPage(browser)
+                .goToNav(ProjectPage.class)
+                .goTo(project)
+                .goToTab(WorkflowDefinitionTab.class);
+
+        definitionTab.timing(workflow).tenant(tenant).submit();
+        // Reload so the second dialog edits the persisted schedule instead of creating a new one.
+        browser.navigate().refresh();
+        WorkflowDefinitionTab refreshedTab = new WorkflowDefinitionTab(browser);
+        Awaitility.await().untilAsserted(() -> assertThat(refreshedTab.workflowList()).isNotEmpty());
+        refreshedTab.timing(workflow).tenant(tenant).submit();
+    }
+
+    @Test
     @Order(30)
     void testRunWorkflow() {
         final ProjectDetailPage projectPage =

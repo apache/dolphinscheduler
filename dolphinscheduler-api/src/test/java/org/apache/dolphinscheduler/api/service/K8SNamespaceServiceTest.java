@@ -24,12 +24,14 @@ import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.impl.K8SNamespaceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.ClusterDao;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -60,6 +62,9 @@ public class K8SNamespaceServiceTest {
 
     @InjectMocks
     private K8SNamespaceServiceImpl k8sNamespaceService;
+
+    @Mock
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Mock
     private K8sNamespaceDao k8sNamespaceDao;
@@ -137,6 +142,7 @@ public class K8SNamespaceServiceTest {
         Mockito.when(k8sNamespaceDao.queryById(1)).thenReturn(getNamespace());
 
         Assertions.assertDoesNotThrow(() -> k8sNamespaceService.deleteNamespaceById(getLoginUser(), 1));
+        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.K8S_NAMESPACE, "1");
     }
 
     @Test

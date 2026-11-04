@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -41,6 +42,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
@@ -67,6 +69,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.base.Strings;
@@ -74,6 +78,9 @@ import com.google.common.base.Strings;
 @Service
 @Slf4j
 public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGroupService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Autowired
     private WorkerGroupDao workerGroupDao;
@@ -106,6 +113,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return create or update result code
      */
     @Override
+    @Transactional
     public WorkerGroup saveWorkerGroup(User loginUser,
                                        int id,
                                        String name,
@@ -136,11 +144,15 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 if (workerGroup == null) {
                     throw new ServiceException(Status.WORKER_GROUP_NOT_EXIST, id);
                 }
+                String previousName = workerGroup.getName();
                 workerGroup.setName(name);
                 workerGroup.setAddrList(addrList);
                 workerGroup.setUpdateTime(now);
                 workerGroup.setDescription(description);
                 workerGroupDao.updateById(workerGroup);
+                if (!name.equals(previousName)) {
+                    resourceAuthorizationDao.revokeByResource(ProjectResourceType.WORKER_GROUP, previousName);
+                }
                 log.info("Update worker group: {} success .", workerGroup);
             }
             boardCastToMasterThatWorkerGroupChanged();
@@ -320,6 +332,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         checkWorkerGroupDependencies(workerGroup);
 
         workerGroupDao.deleteById(id);
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.WORKER_GROUP, workerGroup.getName());
         boardCastToMasterThatWorkerGroupChanged();
 
         log.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());
@@ -344,6 +357,20 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     }
 
     private void boardCastToMasterThatWorkerGroupChanged() {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+                @Override
+                public void afterCommit() {
+                    refreshMasterWorkerGroups();
+                }
+            });
+        } else {
+            refreshMasterWorkerGroups();
+        }
+    }
+
+    private void refreshMasterWorkerGroups() {
         final List<Server> masters = registryClient.getServerList(RegistryNodeType.MASTER);
         if (CollectionUtils.isEmpty(masters)) {
             return;

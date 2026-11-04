@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.api.service.impl.DataSourceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.vo.DataSourceSimpleInfoVO;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.plugin.datasource.api.constants.DataSourceConstants;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
@@ -85,6 +87,9 @@ public class DataSourceServiceTest {
 
     @InjectMocks
     private DataSourceServiceImpl dataSourceService;
+
+    @Mock
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Mock
     private DataSourceDao dataSourceDao;
@@ -314,6 +319,7 @@ public class DataSourceServiceTest {
         when(dataSourceDao.queryById(dataSourceId)).thenReturn(dataSource);
         assertDoesNotThrow(() -> dataSourceService.delete(loginUser, dataSourceId));
         Mockito.verify(datasourceUserDao).deleteByDatasourceId(dataSourceId);
+        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.DATASOURCE, "1");
 
     }
 

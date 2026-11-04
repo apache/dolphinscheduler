@@ -34,10 +34,12 @@ import org.apache.dolphinscheduler.api.service.impl.AlertGroupServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -74,6 +76,9 @@ public class AlertGroupServiceTest {
 
     @InjectMocks
     private AlertGroupServiceImpl alertGroupService;
+
+    @Mock
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Mock
     private AlertGroupDao alertGroupDao;
@@ -281,6 +286,7 @@ public class AlertGroupServiceTest {
                 baseServiceLogger)).thenReturn(true);
         when(alertGroupDao.queryById(4)).thenReturn(getEntity());
         assertDoesNotThrow(() -> alertGroupService.deleteAlertGroupById(user, 4));
+        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.ALERT_GROUP, "4");
     }
 
     @Test

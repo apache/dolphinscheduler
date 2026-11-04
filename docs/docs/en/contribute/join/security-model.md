@@ -6,6 +6,8 @@ This document is mainly used to describe the scope of work, responsibilities and
 
 Users receive independent operation permissions within projects, and projects receive use grants for eight shared-resource types. Operations using resources check both dimensions. Use grants do not grant resource modification, deletion or re-granting rights, and member management does not include project resource authorization. System administrators pass project operation checks, but the relevant projects still need resource grants. Executing users do not need personal resource grants; resource files retain their existing authorization mechanism.
 
+Lineage queries expose related cross-project nodes, edges and summaries without requiring `VIEW` on every related project; accessing related workflow details and operations still requires permission on their actual projects.
+
 Revocation affects subsequent manual operations, but does not retroactively stop running or queued instances or recheck background triggers of existing schedules and automatic retries. Project authorization does not sandbox task code. See [Security (Authorization System)](../../guide/security/security.md#granted-permissions) for the full permission list, project creators' separate lifecycle permissions, cross-project checks and revocation rules.
 
 ## Apache DolphinScheduler Workflow

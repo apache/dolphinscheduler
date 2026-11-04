@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.BaseDataSourceParamDTO;
 import org.apache.dolphinscheduler.plugin.datasource.api.datasource.DataSourceProcessor;
 import org.apache.dolphinscheduler.plugin.datasource.api.utils.DataSourceUtils;
@@ -71,6 +72,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Service
 @Slf4j
 public class DataSourceServiceImpl extends BaseServiceImpl implements DataSourceService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Autowired
     private ProjectAuthorizationService projectAuthorizationService;
@@ -317,6 +321,7 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
         }
 
         dataSourceDao.deleteById(datasourceId);
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.DATASOURCE, Integer.toString(datasourceId));
         datasourceUserDao.deleteByDatasourceId(datasourceId);
     }
 

@@ -1506,6 +1506,13 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                          List<WorkflowDefinition> sourceWorkflowDefinitions,
                                          List<String> failedWorkflowList) {
         for (WorkflowDefinition workflowDefinition : sourceWorkflowDefinitions) {
+            if (workflowDefinition.getReleaseState() == ReleaseState.ONLINE) {
+                throw new ServiceException(Status.WORKFLOW_DEFINE_STATE_ONLINE, workflowDefinition.getName());
+            }
+            Schedule schedule = scheduleDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
+            if (schedule != null && schedule.getReleaseState() == ReleaseState.ONLINE) {
+                throw new ServiceException(Status.SCHEDULE_STATE_ONLINE, schedule.getId());
+            }
             List<TaskDefinitionLog> taskDefinitionLogs = taskDefinitionLogDao
                     .queryByWorkflowDefinitionCodeAndVersion(workflowDefinition.getCode(),
                             workflowDefinition.getVersion());

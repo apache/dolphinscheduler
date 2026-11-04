@@ -45,6 +45,7 @@ import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -82,6 +83,9 @@ public class EnvironmentServiceTest {
 
     @InjectMocks
     private EnvironmentServiceImpl environmentService;
+
+    @Mock
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Mock
     private ProjectAuthorizationService projectAuthorizationService;
@@ -346,8 +350,12 @@ public class EnvironmentServiceTest {
                 () -> environmentService.deleteEnvironmentByCode(adminUser, 1L));
 
         when(taskDefinitionDao.countByEnvironmentCode(1L)).thenReturn(0L);
+        Environment deletedEnvironment = new Environment();
+        deletedEnvironment.setId(42);
+        when(environmentMapper.queryByEnvironmentCode(1L)).thenReturn(deletedEnvironment);
         when(environmentMapper.deleteByCode(1L)).thenReturn(1);
         assertDoesNotThrow(() -> environmentService.deleteEnvironmentByCode(adminUser, 1L));
+        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.ENVIRONMENT, "42");
 
         when(environmentMapper.deleteByCode(1L)).thenReturn(-1);
         assertThrowsServiceException(Status.DELETE_ENVIRONMENT_ERROR,

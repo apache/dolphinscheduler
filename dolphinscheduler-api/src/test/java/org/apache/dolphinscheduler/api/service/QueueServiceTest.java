@@ -31,10 +31,13 @@ import org.apache.dolphinscheduler.api.service.impl.QueueServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.QueueDao;
+import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -71,6 +74,12 @@ public class QueueServiceTest {
 
     @InjectMocks
     private QueueServiceImpl queueService;
+
+    @Mock
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
+
+    @Mock
+    private TenantDao tenantDao;
 
     @Mock
     private QueueDao queueDao;
@@ -143,6 +152,22 @@ public class QueueServiceTest {
 
         // correct
         assertDoesNotThrow(() -> queueService.createQueue(getLoginUser(), QUEUE_NAME, QUEUE_NAME));
+    }
+
+    @Test
+    public void deleteQueueRevokesProjectGrants() throws Exception {
+        User user = getLoginUser();
+        user.setUserType(UserType.ADMIN_USER);
+        when(resourcePermissionCheckService.operationPermissionCheck(Mockito.any(), Mockito.anyInt(),
+                Mockito.anyString(), Mockito.any())).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(Mockito.any(), Mockito.any(),
+                Mockito.anyInt(), Mockito.any())).thenReturn(true);
+        when(queueDao.queryById(1)).thenReturn(getQUEUE());
+        when(queueDao.deleteById(1)).thenReturn(true);
+
+        queueService.deleteQueueById(user, 1);
+
+        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.QUEUE, "1");
     }
 
     @Test

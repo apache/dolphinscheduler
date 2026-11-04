@@ -155,9 +155,15 @@ Execution settings include the worker group, tenant and its queue, and selected 
 
 ### Cross-project operations and subworkflows
 
-Definition and instance checks use their actual owning project; resource-use checks use the grants of the project performing the operation. Permission on another project in the request path cannot replace these checks. Batch workflow-task queries only return workflows in projects where an ordinary user has `VIEW`. Legacy association records do not restore visibility. Cross-project parent/child instance and lineage queries also require `VIEW` on the corresponding projects.
+Definition and instance checks use their actual owning project; resource-use checks use the grants of the project performing the operation. Permission on another project in the request path cannot replace these checks. Batch workflow-task queries only return workflows in projects where an ordinary user has `VIEW`. Legacy association records do not restore visibility. Cross-project parent/child instance detail queries also require `VIEW` on the corresponding projects.
+
+Lineage queries preserve the complete relationship graph. A user with `VIEW` on the entry project and the requested root workflow's actual project can see related workflow nodes, edges and lineage summaries (names, release states and schedule timing), without `VIEW` on every related project. Revoking `VIEW` on a related project does not hide this lineage information. Opening a related workflow's details or operating on it still requires permission on its actual project.
 
 Saving or taking a definition online when it references a subworkflow additionally requires `EXECUTE` on that subworkflow's project. Execution and schedule configuration or enabling check subworkflows recursively: the user needs `EXECUTE` on every child project, and each child's task resources are checked against that child's own project grants. Inherited tenant, queue, worker group, environment and alert-group settings are also checked against each child project. Parent project grants cannot replace child project grants.
+
+Moving a workflow requires both the workflow and its schedule to be offline. Task resources must still be granted to the destination project. Taking the moved workflow and schedule online checks permissions and resource grants against the destination project again.
+
+Deleting a resource removes all project use grants for that resource in the same transaction. Worker groups use their names as grant keys; renaming a worker group revokes grants for the old name, and an administrator must explicitly grant the new name.
 
 ### When revocation takes effect
 

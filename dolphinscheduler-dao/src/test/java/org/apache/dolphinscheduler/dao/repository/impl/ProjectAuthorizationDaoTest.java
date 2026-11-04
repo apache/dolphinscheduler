@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.dao.repository.ProjectUserPermissionDao;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -107,6 +109,25 @@ class ProjectAuthorizationDaoTest extends BaseDaoTest {
         Assertions.assertFalse(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.DATASOURCE, "42"));
         Assertions.assertTrue(resourceAuthorizationDao.isAuthorized(200L, ProjectResourceType.DATASOURCE, "42"));
         Assertions.assertTrue(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.TASK_GROUP, "42"));
+    }
+
+    @ParameterizedTest
+    @EnumSource(ProjectResourceType.class)
+    void resourceDeletionRevokesAllProjectsWithoutRevokingOtherResources(ProjectResourceType type) {
+        grantResource(100L, type, "42");
+        grantResource(200L, type, "42");
+        grantResource(100L, type, "43");
+        ProjectResourceType otherType = type == ProjectResourceType.DATASOURCE
+                ? ProjectResourceType.TASK_GROUP
+                : ProjectResourceType.DATASOURCE;
+        grantResource(100L, otherType, "42");
+
+        resourceAuthorizationDao.revokeByResource(type, "42");
+
+        Assertions.assertFalse(resourceAuthorizationDao.isAuthorized(100L, type, "42"));
+        Assertions.assertFalse(resourceAuthorizationDao.isAuthorized(200L, type, "42"));
+        Assertions.assertTrue(resourceAuthorizationDao.isAuthorized(100L, type, "43"));
+        Assertions.assertTrue(resourceAuthorizationDao.isAuthorized(100L, otherType, "42"));
     }
 
     @Test

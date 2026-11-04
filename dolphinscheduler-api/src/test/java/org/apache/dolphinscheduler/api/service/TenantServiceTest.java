@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TenantServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Queue;
@@ -38,6 +39,7 @@ import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -76,6 +78,9 @@ public class TenantServiceTest {
 
     @InjectMocks
     private TenantServiceImpl tenantService;
+
+    @Mock
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Mock
     private QueueService queueService;
@@ -217,6 +222,7 @@ public class TenantServiceTest {
         when(tenantDao.queryDetailById(4)).thenReturn(getTenant(4));
         when(tenantDao.deleteById(4)).thenReturn(true);
         assertDoesNotThrow(() -> tenantService.deleteTenantById(getLoginUser(), 4));
+        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.TENANT, "4");
     }
 
     @Test
