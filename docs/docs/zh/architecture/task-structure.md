@@ -33,7 +33,7 @@
 | global_params    | text         | 全局参数，结构为[参数](#公共字段)组成的 JSON 数组                  |
 | flag             | tinyint(4)   | 工作流是否可用：0 不可用，1 可用                              |
 | locations        | text         | 节点在画布上的坐标，例如 `[{"taskCode":123,"x":59,"y":61}]` |
-| warning_group_id | int(11)      | 未使用，始终为 NULL；告警组在启动或定时调度时选择                     |
+| warning_group_id | int(11)      | 定时的告警组，创建或更新定时时写入，否则为 NULL                      |
 | timeout          | int(11)      | 超时时间，单位分钟                                       |
 | execution_type   | tinyint(4)   | 执行策略：0 并行，1 串行等待，2 串行抛弃，3 串行优先                  |
 | create_time      | datetime     | 创建时间                                            |
@@ -598,7 +598,7 @@
 |         字段          |   类型    |                                  描述                                  |
 |---------------------|---------|----------------------------------------------------------------------|
 | localParams         | Array   | 本地参数，见 [公共字段](#公共字段)                                                 |
-| resourceList        | Array   | 任务使用的资源文件，见 [公共字段](#公共字段)                                            |
+| resourceList        | Array   | 前端会附带，本任务不使用                                                         |
 | jobType             | String  | `TEMPLATE`（界面配置）或 `CUSTOM`（自定义脚本）                                    |
 | customShell         | String  | Sqoop 命令，仅 `jobType` 为 `CUSTOM` 时存在                                  |
 | jobName             | String  | MapReduce 作业名称，仅 `jobType` 为 `TEMPLATE` 时存在                          |
@@ -887,4 +887,4 @@ SWITCH 任务按顺序计算条件，执行第一个为真的条件对应的分�
 }
 ```
 
-Master 还会在任务实例的 `task_params` 中写入选中的分支 `nextBranch`，定义时不要设置。选中的分支必须是 DAG 中的下游任务，否则任务失败；未选中的分支会被跳过。
+Master 还会在任务实例的 `task_params` 中写入选中的分支 `nextBranch`，定义时不要设置。选中的分支必须是工作流 DAG 中的任务，否则任务失败。Master 只检查该任务是否存在于 DAG 中，不检查它是否为 SWITCH 的下游任务，配置时应选择下游任务；未选中的分支会被跳过。

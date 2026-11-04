@@ -38,7 +38,7 @@ Table `t_ds_workflow_definition`:
 | global_params    | text         | Global parameters, a JSON array of [parameters](#common-fields)                            |
 | flag             | tinyint(4)   | Whether the workflow is available: 0 no, 1 yes                                             |
 | locations        | text         | Node coordinates on the canvas, e.g. `[{"taskCode":123,"x":59,"y":61}]`                    |
-| warning_group_id | int(11)      | Not used, always NULL. The alert group is chosen when the workflow is started or scheduled |
+| warning_group_id | int(11)      | Alert group of the schedule, set when the schedule is created or updated, otherwise `NULL` |
 | timeout          | int(11)      | Timeout, in minutes                                                                        |
 | execution_type   | tinyint(4)   | Execution type: 0 parallel, 1 serial wait, 2 serial discard, 3 serial priority             |
 | create_time      | datetime     | Create time                                                                                |
@@ -613,7 +613,7 @@ Transfers data between RDBMS and Hadoop with Sqoop. `task_params` is defined by 
 |        Field        |  Type   |                                                  Description                                                  |
 |---------------------|---------|---------------------------------------------------------------------------------------------------------------|
 | localParams         | Array   | Local parameters, see [Common Fields](#common-fields)                                                         |
-| resourceList        | Array   | Resource files used by the task, see [Common Fields](#common-fields)                                          |
+| resourceList        | Array   | Sent by the UI, not used: `SqoopParameters` does not define it                                                |
 | jobType             | String  | `TEMPLATE` (configure in the UI) or `CUSTOM` (custom shell)                                                   |
 | customShell         | String  | Sqoop command, only when `jobType` is `CUSTOM`                                                                |
 | jobName             | String  | MapReduce job name, only when `jobType` is `TEMPLATE`                                                         |
@@ -908,5 +908,4 @@ The SWITCH task evaluates conditions in order and runs the branch of the first o
 ```
 
 The master also writes the chosen branch into `task_params` of the task instance as `nextBranch`; do not set it in the definition.
-The chosen branch must be a downstream task in the DAG, otherwise the task fails; the branches that are not chosen are
-skipped.
+The chosen branch must be a task of the workflow DAG, otherwise the task fails. The master only checks that the task exists in the DAG, not that it is downstream of the SWITCH task; configure the branches as downstream tasks. The branches that are not chosen are skipped.

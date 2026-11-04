@@ -23,7 +23,7 @@
 - 一个用户可以有多个项目，用户项目授权通过`t_ds_relation_project_user`表完成project_id和user_id的关系绑定；<br />
 - `t_ds_project`表中的`user_id`表示创建该项目的用户，`t_ds_relation_project_user`表中的`user_id`表示对项目有权限的用户；<br />
 - 资源由存储插件管理，图中的 `t_ds_resources` 仅被资源迁移工具读取；<br />
-- 告警组存储在 `t_ds_alertgroup` 中，由 `t_ds_schedules` 和 `t_ds_workflow_instance` 的 `warning_group_id` 引用；<br />
+- 告警组存储在 `t_ds_alertgroup` 中，由 `t_ds_schedules`、`t_ds_workflow_definition` 和 `t_ds_workflow_instance` 的 `warning_group_id` 引用；<br />
 
 ### 项目 - 租户 - 工作流定义 - 定时
 
