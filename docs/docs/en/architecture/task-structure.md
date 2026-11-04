@@ -247,9 +247,9 @@ Runs SQL statements against a datasource. `task_params` is defined by `SqlParame
 | resourceList   | Array   | Sent by the UI for every task type, not used by this task. The SQL file of `sqlSource` `FILE` is given by `sqlResource` |
 | type           | String  | Datasource type, e.g. `MYSQL`, `POSTGRESQL`, `HIVE`                                                                     |
 | datasource     | Integer | Datasource id                                                                                                           |
-| sql            | String  | SQL statements, used when `sqlSource` is `SCRIPT`                                                                       |
-| sqlSource      | String  | SQL source: `SCRIPT` inline text, `FILE` file in the resource center                                                    |
-| sqlResource    | String  | Resource center file path, used when `sqlSource` is `FILE`                                                              |
+| sql            | String  | SQL statements; run when not empty, taking precedence over `sqlResource`                                                |
+| sqlSource      | String  | SQL source chosen in the UI: `SCRIPT` inline text, `FILE` resource center file. Not read by the worker                  |
+| sqlResource    | String  | Resource center file path, read only when `sql` is empty                                                                |
 | sqlType        | Integer | SQL type: `0` query, `1` non-query. The UI sends it as the string `"0"` or `"1"`, and both forms are accepted           |
 | preStatements  | Array   | SQL statements executed before the main SQL                                                                             |
 | postStatements | Array   | SQL statements executed after the main SQL                                                                              |
@@ -446,7 +446,7 @@ Runs a Hadoop MapReduce job. `task_params` is defined by `MapReduceParameters` i
 | resourceList    | Array  | Resource files used by the task, see [Common Fields](#common-fields)    |
 | programType     | String | Program type: `JAVA`, `SCALA` or `PYTHON`                               |
 | mainClass       | String | Full class name of the main function, not used for `PYTHON`             |
-| mainJar         | Object | Main jar of the MapReduce program (the script for `PYTHON`)             |
+| mainJar         | Object | Jar run by `hadoop jar`; the Hadoop streaming jar for `PYTHON`          |
 | -- resourceName | String | Full name of the jar resource                                           |
 | appName         | String | MapReduce job name                                                      |
 | mainArgs        | String | Command line arguments of the program, supports `${...}` variables      |
@@ -765,12 +765,10 @@ A failed dependency result is cached and not checked again, so `DEPENDENT_FAILUR
 later successful instance does not change it.
 
 `cycle` and `dateValue` take the following values. All ranges are relative to the schedule time of the current workflow
-instance, or the start time if it was not scheduled. `thisWeek` and `thisMonth` cover from the start of the week or
-month up to that time. The master only uses `dateValue` and `depTaskCode`. The backend also accepts `thisMonthEnd`,
+instance, or the time the DEPENDENT task started if it was not scheduled. Ranges are split into days: `thisWeek` and `thisMonth` cover each day from Monday or the first day of the month through the base day, and every day must have a successful instance. The master only uses `dateValue` and `depTaskCode`. The backend also accepts `thisMonthEnd`,
 which the UI does not offer.
 
-A dependency on the task's own workflow (`-1` or the task itself) is treated as successful for the first instance of
-that workflow.
+A dependency on the task's own workflow (`-1` or the task itself) is treated as successful for the first instance of that workflow (the first scheduled instance if the workflow has any, otherwise the first started instance).
 
 | cycle |                                                            dateValue                                                             |
 |-------|----------------------------------------------------------------------------------------------------------------------------------|

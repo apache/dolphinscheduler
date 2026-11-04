@@ -230,9 +230,9 @@
 | resourceList   | Array   | 前端对所有任务类型都会附带，本任务不使用；`sqlSource` 为 `FILE` 时的 SQL 文件由 `sqlResource` 指定 |
 | type           | String  | 数据源类型，如 `MYSQL`、`POSTGRESQL`、`HIVE`                                   |
 | datasource     | Integer | 数据源 id                                                                |
-| sql            | String  | SQL 语句，`sqlSource` 为 `SCRIPT` 时使用                                     |
-| sqlSource      | String  | SQL 来源：`SCRIPT` 内联脚本，`FILE` 资源中心文件                                    |
-| sqlResource    | String  | 资源中心文件路径，`sqlSource` 为 `FILE` 时使用                                     |
+| sql            | String  | SQL 语句；不为空时执行，优先于 `sqlResource`                                       |
+| sqlSource      | String  | UI 中选择的 SQL 来源：`SCRIPT` 内联脚本，`FILE` 资源中心文件；Worker 不读取                 |
+| sqlResource    | String  | 资源中心文件路径，仅在 `sql` 为空时读取                                               |
 | sqlType        | Integer | SQL 类型：`0` 查询，`1` 非查询；前端以字符串 `"0"`/`"1"` 提交，两种写法都可接受                  |
 | preStatements  | Array   | 在主 SQL 之前执行的 SQL 语句                                                   |
 | postStatements | Array   | 在主 SQL 之后执行的 SQL 语句                                                   |
@@ -429,7 +429,7 @@
 | resourceList    | Array  | 任务使用的资源文件，见 [公共字段](#公共字段)                           |
 | programType     | String | 程序类型：`JAVA`、`SCALA` 或 `PYTHON`                      |
 | mainClass       | String | 主函数的完整类名，`PYTHON` 不使用                               |
-| mainJar         | Object | MapReduce 程序的主 jar 包（`PYTHON` 时为脚本）                 |
+| mainJar         | Object | `hadoop jar` 执行的 jar 包；`PYTHON` 时为 streaming jar    |
 | -- resourceName | String | jar 资源的完整名称                                         |
 | appName         | String | MapReduce 作业名称                                      |
 | mainArgs        | String | 程序的命令行参数，支持 `${...}` 变量                             |
@@ -746,9 +746,9 @@ DEPENDENT 任务检查其他工作流或任务在指定时间范围内是否运�
 
 依赖的失败结果会被缓存，之后不再重新检查，因此 `DEPENDENT_FAILURE_WAITING` 只是推迟失败，之后出现的成功实例不会改变结果。
 
-`cycle` 和 `dateValue` 的取值如下。所有时间范围都以当前工作流实例的调度时间为基准（非调度运行时取启动时间）；`thisWeek`、`thisMonth` 表示从周一、月初到该时间。Master 只依据 `dateValue` 和 `depTaskCode` 判断。后端还支持 `thisMonthEnd`，UI 未提供该选项。
+`cycle` 和 `dateValue` 的取值如下。所有时间范围都以当前工作流实例的调度时间为基准（非调度运行时取 DEPENDENT 任务开始执行的时间）。时间范围按天切分：`thisWeek`、`thisMonth` 覆盖从周一或月初到基准日的每一天，每一天都要有成功的实例。Master 只依据 `dateValue` 和 `depTaskCode` 判断。后端还支持 `thisMonthEnd`，UI 未提供该选项。
 
-依赖自身工作流（`-1` 或任务自身）时，该工作流的第一个实例视为依赖成功。
+依赖自身工作流（`-1` 或任务自身）时，该工作流的第一个实例（有调度实例时为第一个调度实例，否则为第一个启动的实例）视为依赖成功。
 
 | cycle |                                                        dateValue                                                         |
 |-------|--------------------------------------------------------------------------------------------------------------------------|
