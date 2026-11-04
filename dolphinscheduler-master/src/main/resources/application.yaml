@@ -98,7 +98,10 @@ master:
   # logic-task-config:
     # The number of threads used to execute logic task.
     # task-executor-thread-count: 10
+  # Maximum interval between failover-mark checks; metadata is sampled locally every second.
   max-heartbeat-interval: 10s
+  # RPC refresh interval for Master/Worker metadata.
+  metadata-refresh-interval: 1s
   # Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.
   kill-application-when-task-failover: true
   server-load-protection:

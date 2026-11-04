@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
@@ -49,8 +48,6 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
 
     private final MasterCoordinator masterCoordinator;
 
-    private final String heartBeatPath;
-
     private final int processId;
 
     public MasterHeartBeatTask(@NonNull MasterConfig masterConfig,
@@ -64,7 +61,6 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
         this.metricsProvider = metricsProvider;
         this.registryClient = registryClient;
         this.masterCoordinator = masterCoordinator;
-        this.heartBeatPath = masterConfig.getMasterRegistryPath();
         this.processId = OSUtils.getProcessID();
     }
 
@@ -104,12 +100,7 @@ public class MasterHeartBeatTask extends BaseHeartBeatTask<MasterHeartBeat> {
                     .stop("The master exist: " + failoverNodePath + ", means it has been failover will close myself");
             return;
         }
-        String masterHeartBeatJson = JSONUtils.toJsonString(masterHeartBeat);
-        registryClient.persistEphemeral(heartBeatPath, masterHeartBeatJson);
         MasterServerMetrics.incMasterHeartbeatCount();
-        log.debug("Success write master heartBeatInfo into registry, masterRegistryPath: {}, heartBeatInfo: {}",
-                heartBeatPath,
-                masterHeartBeatJson);
     }
 
 }

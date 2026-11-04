@@ -145,15 +145,17 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
     @Override
     public void onServerAdded(WorkerServerMetadata workerServer) {
         workerMapping.put(workerServer.getAddress(), workerServer);
-        synchronized (configWorkerGroupMapping) {
-            List<String> addWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
-            if (addWorkerGroupAddrList == null) {
-                List<String> newWorkerGroupAddrList = new ArrayList<>();
-                newWorkerGroupAddrList.add(workerServer.getAddress());
-                configWorkerGroupMapping.put(workerServer.getWorkerGroup(), newWorkerGroupAddrList);
-            } else if (!addWorkerGroupAddrList.contains(workerServer.getAddress())) {
-                addWorkerGroupAddrList.add(workerServer.getAddress());
-                configWorkerGroupMapping.put(workerServer.getWorkerGroup(), addWorkerGroupAddrList);
+        if (workerServer.getWorkerGroup() != null) {
+            synchronized (configWorkerGroupMapping) {
+                List<String> addWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
+                if (addWorkerGroupAddrList == null) {
+                    List<String> newWorkerGroupAddrList = new ArrayList<>();
+                    newWorkerGroupAddrList.add(workerServer.getAddress());
+                    configWorkerGroupMapping.put(workerServer.getWorkerGroup(), newWorkerGroupAddrList);
+                } else if (!addWorkerGroupAddrList.contains(workerServer.getAddress())) {
+                    addWorkerGroupAddrList.add(workerServer.getAddress());
+                    configWorkerGroupMapping.put(workerServer.getWorkerGroup(), addWorkerGroupAddrList);
+                }
             }
         }
         for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
@@ -162,14 +164,22 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
     }
 
     @Override
-    public void onServerRemove(WorkerServerMetadata workerServer) {
-        workerMapping.remove(workerServer.getAddress(), workerServer);
-        synchronized (configWorkerGroupMapping) {
-            List<String> removeWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
-            if (removeWorkerGroupAddrList != null && removeWorkerGroupAddrList.contains(workerServer.getAddress())) {
-                removeWorkerGroupAddrList.remove(workerServer.getAddress());
-                if (removeWorkerGroupAddrList.isEmpty()) {
-                    configWorkerGroupMapping.remove(workerServer.getWorkerGroup());
+    public void onServerRemove(WorkerServerMetadata removedServer) {
+        WorkerServerMetadata workerServer = workerMapping.get(removedServer.getAddress());
+        if (workerServer == null || workerServer.getProcessId() != removedServer.getProcessId()
+                || workerServer.getServerStartupTime() != removedServer.getServerStartupTime()
+                || !workerMapping.remove(workerServer.getAddress(), workerServer)) {
+            return;
+        }
+        if (workerServer.getWorkerGroup() != null) {
+            synchronized (configWorkerGroupMapping) {
+                List<String> removeWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
+                if (removeWorkerGroupAddrList != null
+                        && removeWorkerGroupAddrList.contains(workerServer.getAddress())) {
+                    removeWorkerGroupAddrList.remove(workerServer.getAddress());
+                    if (removeWorkerGroupAddrList.isEmpty()) {
+                        configWorkerGroupMapping.remove(workerServer.getWorkerGroup());
+                    }
                 }
             }
         }
@@ -180,7 +190,26 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
 
     @Override
     public void onServerUpdate(WorkerServerMetadata workerServer) {
-        workerMapping.put(workerServer.getAddress(), workerServer);
+        WorkerServerMetadata previous = workerMapping.put(workerServer.getAddress(), workerServer);
+        synchronized (configWorkerGroupMapping) {
+            if (previous != null && previous.getWorkerGroup() != null
+                    && !Objects.equals(previous.getWorkerGroup(), workerServer.getWorkerGroup())) {
+                List<String> addresses = configWorkerGroupMapping.get(previous.getWorkerGroup());
+                if (addresses != null) {
+                    addresses.remove(workerServer.getAddress());
+                    if (addresses.isEmpty()) {
+                        configWorkerGroupMapping.remove(previous.getWorkerGroup());
+                    }
+                }
+            }
+            if (workerServer.getWorkerGroup() != null) {
+                List<String> addresses = configWorkerGroupMapping.computeIfAbsent(workerServer.getWorkerGroup(),
+                        group -> new ArrayList<>());
+                if (!addresses.contains(workerServer.getAddress())) {
+                    addresses.add(workerServer.getAddress());
+                }
+            }
+        }
         for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
             listener.onServerUpdate(workerServer);
         }

@@ -30,8 +30,8 @@ import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
-import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.service.metadata.ServerMetadataCache;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -70,7 +70,7 @@ public class MonitorServiceTest {
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Mock
-    private RegistryClient registryClient;
+    private ServerMetadataCache serverMetadataCache;
 
     private User user;
 
@@ -94,13 +94,13 @@ public class MonitorServiceTest {
     @Test
     public void testQueryMaster() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, true);
-        Mockito.when(registryClient.getServerList(RegistryNodeType.MASTER)).thenReturn(getServerList());
+        Mockito.when(serverMetadataCache.getServerList(RegistryNodeType.MASTER)).thenReturn(getServerList());
         assertDoesNotThrow(() -> monitorService.listServer(RegistryNodeType.MASTER));
     }
 
     @Test
     public void testQueryWorker() {
-        Mockito.when(registryClient.getServerList(RegistryNodeType.WORKER)).thenReturn(getServerList());
+        Mockito.when(serverMetadataCache.getServerList(RegistryNodeType.WORKER)).thenReturn(getServerList());
         AssertionsHelper.assertDoesNotThrow(() -> monitorService.listServer(RegistryNodeType.WORKER));
     }
 
