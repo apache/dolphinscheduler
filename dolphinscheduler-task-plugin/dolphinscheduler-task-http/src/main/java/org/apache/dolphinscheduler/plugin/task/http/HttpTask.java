@@ -165,9 +165,10 @@ public class HttpTask extends AbstractTask {
         OkHttpRequestHeaders okHttpRequestHeaders = new OkHttpRequestHeaders();
         okHttpRequestHeaders.setHeaders(getHeaders());
         okHttpRequestHeaders.setOkHttpRequestHeaderContentType(getContentType());
+        Map<String, Object> requestParams = getRequestParams();
         Map<String, Object> requestBody = getRequestBody();
 
-        OkHttpResponse okHttpResponse = OkHttpUtils.post(httpParameters.getUrl(), okHttpRequestHeaders, null,
+        OkHttpResponse okHttpResponse = OkHttpUtils.post(httpParameters.getUrl(), okHttpRequestHeaders, requestParams,
                 requestBody, httpParameters.getConnectTimeout(),
                 httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout(),
                 httpParameters.isSocketKeepAlive());
@@ -180,9 +181,10 @@ public class HttpTask extends AbstractTask {
         OkHttpRequestHeaders okHttpRequestHeaders = new OkHttpRequestHeaders();
         okHttpRequestHeaders.setHeaders(getHeaders());
         okHttpRequestHeaders.setOkHttpRequestHeaderContentType(getContentType());
+        Map<String, Object> requestParams = getRequestParams();
         Map<String, Object> requestBody = getRequestBody();
 
-        OkHttpResponse okHttpResponse = OkHttpUtils.put(httpParameters.getUrl(), okHttpRequestHeaders,
+        OkHttpResponse okHttpResponse = OkHttpUtils.put(httpParameters.getUrl(), okHttpRequestHeaders, requestParams,
                 requestBody, httpParameters.getConnectTimeout(),
                 httpParameters.getConnectTimeout(), httpParameters.getConnectTimeout(),
                 httpParameters.isSocketKeepAlive());
