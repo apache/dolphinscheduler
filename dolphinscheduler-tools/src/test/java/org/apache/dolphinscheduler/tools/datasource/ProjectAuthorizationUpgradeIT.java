@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.tools.datasource;
 
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.sql.SqlScriptRunner;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
 import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectResourceAuthorizationMapper;
@@ -32,6 +33,8 @@ import org.apache.ibatis.session.SqlSession;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
@@ -71,6 +74,10 @@ class ProjectAuthorizationUpgradeIT {
             Assertions.assertEquals(0,
                     jdbc.queryForObject("select count(*) from t_ds_project_resource_authorization", Integer.class));
 
+            verifyAuditDetails(jdbc);
+            jdbc.execute(dbType == DbType.MYSQL
+                    ? "alter table t_ds_audit_log modify column detail varchar(100), modify column model_name varchar(100)"
+                    : "alter table t_ds_audit_log alter column detail type varchar(255)");
             // Reconstruct the pre-3.5.0 state using the same legacy schema.
             jdbc.execute("drop table t_ds_project_user_permission");
             jdbc.execute("drop table t_ds_project_resource_authorization");
@@ -133,6 +140,8 @@ class ProjectAuthorizationUpgradeIT {
                 Assertions.assertEquals(1,
                         jdbc.queryForObject("select release_state from t_ds_schedules where id = 900", Integer.class));
 
+                verifyAuditDetails(jdbc);
+
                 String memberGrant = "insert into t_ds_project_user_permission (project_code, user_id, permission) "
                         + "values (200, 100, 'VIEW')";
                 jdbc.update(memberGrant);
@@ -187,4 +196,26 @@ class ProjectAuthorizationUpgradeIT {
             }
         }
     }
+
+    private void verifyAuditDetails(JdbcTemplate jdbc) {
+        for (String key : Arrays.asList("workers", String.join("", Collections.nCopies(255, "w")),
+                String.join("", Collections.nCopies(255, "\u0001")))) {
+            Map<String, Object> changes = new LinkedHashMap<>();
+            changes.put("resourceType", "WORKER_GROUP");
+            changes.put("resourceKey", key);
+            changes.put("before", false);
+            changes.put("after", true);
+            String detail = JSONUtils.toJsonString(changes);
+            jdbc.update("insert into t_ds_audit_log (user_id, model_id, model_name, model_type, "
+                    + "operation_type, description, detail, latency, create_time) "
+                    + "values (1, 999, ?, 'PROJECT', 'AUTHORIZE', ?, ?, 0, current_timestamp)",
+                    String.join("", Collections.nCopies(255, "p")), "grant-project-resource", detail);
+            String stored = jdbc.queryForObject("select detail from t_ds_audit_log where model_id = 999",
+                    String.class);
+            Assertions.assertEquals(detail, stored);
+            Assertions.assertEquals(key, JSONUtils.parseObject(stored, Map.class).get("resourceKey"));
+            jdbc.update("delete from t_ds_audit_log where model_id = 999");
+        }
+    }
+
 }

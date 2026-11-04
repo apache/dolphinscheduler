@@ -1217,7 +1217,7 @@ CREATE TABLE t_ds_audit_log
     operation_type      varchar(255) NOT NULL,
     description         varchar(255) NOT NULL,
     latency             int(11) NOT NULL,
-    detail              varchar(255) DEFAULT NULL,
+    detail              varchar(2048) DEFAULT NULL,
     create_time         timestamp NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );

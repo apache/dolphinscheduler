@@ -38,3 +38,6 @@ CREATE TABLE t_ds_project_resource_authorization (
     CONSTRAINT uk_project_resource_authorization UNIQUE (project_code, resource_type, resource_key)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 CREATE INDEX idx_resource_authorization_project ON t_ds_project_resource_authorization (resource_type, resource_key, project_code);
+
+-- Preserve complete project authorization audit details.
+ALTER TABLE t_ds_audit_log MODIFY COLUMN detail varchar(2048) DEFAULT NULL, MODIFY COLUMN model_name varchar(255) DEFAULT NULL;

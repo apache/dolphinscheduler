@@ -333,7 +333,7 @@ public class ExecutorServiceTest {
 
     @ParameterizedTest
     @EnumSource(value = ExecuteType.class, names = {"START_FAILURE_TASK_PROCESS", "RECOVER_SUSPENDED_PROCESS"})
-    public void recoveryDoesNotConsultCurrentSubWorkflowDefinitions(ExecuteType executeType) {
+    public void recoveryRejectsRevokedCurrentSubWorkflowPermission(ExecuteType executeType) {
         User user = getLoginUser();
         WorkflowInstance instance = new WorkflowInstance();
         instance.setProjectCode(100L);
@@ -353,6 +353,37 @@ public class ExecutorServiceTest {
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
                 .when(taskSubWorkflowPermissionChecker).checkExecutionPermission(user,
                         Collections.singletonList(subWorkflowTask), "original-workers", 7L, "original-tenant", 8);
+        ServiceException error = assertThrows(ServiceException.class,
+                () -> executorService.controlWorkflowInstance(user, 1, executeType));
+        assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(executorClient);
+        verify(taskDefinitionLogDao).queryByWorkflowDefinitionCodeAndVersion(200L, 3);
+        verify(projectAuthorizationService).requirePermission(user, 100L, ProjectPermission.EXECUTE);
+        verify(taskResourcePermissionChecker).checkExecutionSettings(100L, "original-workers", 7L, "original-tenant",
+                8);
+        verify(taskResourcePermissionChecker).checkPermission(100L, Collections.singletonList(subWorkflowTask));
+        verify(taskSubWorkflowPermissionChecker).checkExecutionPermission(user,
+                Collections.singletonList(subWorkflowTask), "original-workers", 7L, "original-tenant", 8);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ExecuteType.class, names = {"START_FAILURE_TASK_PROCESS", "RECOVER_SUSPENDED_PROCESS"})
+    public void recoverySubmitsAfterCurrentSubWorkflowAuthorization(ExecuteType executeType) {
+        User user = getLoginUser();
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        instance.setWorkflowDefinitionCode(200L);
+        instance.setWorkflowDefinitionVersion(3);
+        instance.setWorkerGroup("original-workers");
+        instance.setTenantCode("original-tenant");
+        instance.setEnvironmentCode(7L);
+        instance.setWarningGroupId(8);
+        TaskDefinitionLog subWorkflowTask = new TaskDefinitionLog();
+        subWorkflowTask.setTaskType("SUB_WORKFLOW");
+        subWorkflowTask.setTaskParams("{\"workflowDefinitionCode\":400}");
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(200L, 3))
+                .thenReturn(Collections.singletonList(subWorkflowTask));
         if (executeType == ExecuteType.START_FAILURE_TASK_PROCESS) {
             RecoverFailureTaskInstanceOperation operation = Mockito.mock(RecoverFailureTaskInstanceOperation.class);
             when(executorClient.recoverFailureTaskInstance()).thenReturn(operation);
@@ -373,7 +404,8 @@ public class ExecutorServiceTest {
         verify(taskResourcePermissionChecker).checkExecutionSettings(100L, "original-workers", 7L, "original-tenant",
                 8);
         verify(taskResourcePermissionChecker).checkPermission(100L, Collections.singletonList(subWorkflowTask));
-        Mockito.verifyNoInteractions(taskSubWorkflowPermissionChecker);
+        verify(taskSubWorkflowPermissionChecker).checkExecutionPermission(user,
+                Collections.singletonList(subWorkflowTask), "original-workers", 7L, "original-tenant", 8);
     }
 
     @ParameterizedTest

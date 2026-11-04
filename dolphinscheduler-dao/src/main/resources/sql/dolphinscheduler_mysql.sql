@@ -1210,12 +1210,12 @@ CREATE TABLE `t_ds_audit_log` (
   `id` bigint(11) NOT NULL AUTO_INCREMENT COMMENT'key',
   `user_id` int(11) NOT NULL COMMENT 'user id',
   `model_id` bigint(20) DEFAULT NULL COMMENT 'model id',
-  `model_name` varchar(100) DEFAULT NULL COMMENT 'model name',
+  `model_name` varchar(255) DEFAULT NULL COMMENT 'model name',
   `model_type` varchar(100) NOT NULL COMMENT 'model type',
   `operation_type` varchar(100) NOT NULL COMMENT 'operation type',
   `description` varchar(100) DEFAULT NULL COMMENT 'api description',
   `latency` int(11) DEFAULT NULL COMMENT 'api cost milliseconds',
-  `detail` varchar(100) DEFAULT NULL COMMENT 'object change detail',
+  `detail` varchar(2048) DEFAULT NULL COMMENT 'object change detail',
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT 'operation time',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT= 1 DEFAULT CHARSET=utf8 COLLATE = utf8_bin;

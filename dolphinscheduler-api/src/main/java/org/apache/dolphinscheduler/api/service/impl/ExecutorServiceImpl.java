@@ -278,8 +278,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 return;
             case START_FAILURE_TASK_PROCESS:
                 checkInstanceExecutionSettings(workflowInstance);
-                checkWorkflowTaskResourcePermission(workflowInstance.getProjectCode(),
-                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
+                checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
+                        workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                        workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
                 executorClient.recoverFailureTaskInstance()
                         .onWorkflowInstance(workflowInstance)
                         .byUser(loginUser)
@@ -287,8 +289,10 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 return;
             case RECOVER_SUSPENDED_PROCESS:
                 checkInstanceExecutionSettings(workflowInstance);
-                checkWorkflowTaskResourcePermission(workflowInstance.getProjectCode(),
-                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
+                checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
+                        workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
+                        workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
                 executorClient.recoverSuspendedWorkflowInstanceOperation()
                         .onWorkflowInstance(workflowInstance)
                         .byUser(loginUser)

@@ -37,3 +37,6 @@ CREATE TABLE t_ds_project_resource_authorization (
     CONSTRAINT uk_project_resource_authorization UNIQUE (project_code, resource_type, resource_key)
 );
 CREATE INDEX idx_resource_authorization_project ON t_ds_project_resource_authorization (resource_type, resource_key, project_code);
+
+-- Preserve complete project authorization audit details.
+ALTER TABLE t_ds_audit_log ALTER COLUMN detail TYPE varchar(2048);

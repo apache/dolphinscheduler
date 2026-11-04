@@ -110,8 +110,10 @@ class ProjectAuthorizationAuditTest {
                 EnumSet.of(ProjectPermission.DEVELOP, ProjectPermission.EXECUTE));
 
         JsonNode detail = detail("replace-member-permissions");
-        Assertions.assertEquals(1, detail.path("operatorId").asInt());
-        Assertions.assertEquals(PROJECT_CODE, detail.path("projectCode").asLong());
+        Assertions.assertEquals(1, jdbc.queryForObject(
+                "select user_id from t_ds_audit_log where model_id = ?", Integer.class, PROJECT_CODE));
+        Assertions.assertFalse(detail.has("operatorId"));
+        Assertions.assertFalse(detail.has("projectCode"));
         Assertions.assertEquals(TARGET_USER, detail.path("targetUserId").asInt());
         Assertions.assertEquals("[\"VIEW\"]", detail.path("before").toString());
         Assertions.assertEquals("[\"DEVELOP\",\"EXECUTE\"]", detail.path("after").toString());

@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
@@ -41,11 +40,6 @@ public class ProjectAuthorizationAuditLogger {
 
     public void record(User operator, Project project, AuditOperationType operation, String action,
                        Map<String, Object> changes) {
-        Map<String, Object> detail = new LinkedHashMap<>(changes);
-        detail.put("action", action);
-        detail.put("operatorId", operator.getId());
-        detail.put("operatorName", operator.getUserName());
-        detail.put("projectCode", project.getCode());
         AuditLog audit = new AuditLog();
         audit.setUserId(operator.getId());
         audit.setModelType(AuditModelType.PROJECT.getName());
@@ -53,7 +47,7 @@ public class ProjectAuthorizationAuditLogger {
         audit.setModelName(project.getName());
         audit.setOperationType(operation.getName());
         audit.setDescription(action);
-        audit.setDetail(JSONUtils.toJsonString(detail));
+        audit.setDetail(JSONUtils.toJsonString(changes));
         audit.setCreateTime(new Date());
         auditService.addAudit(audit);
     }
