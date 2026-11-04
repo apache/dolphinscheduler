@@ -118,7 +118,7 @@
 | -- value        | String  | 参数值                                                                                                              |
 | -- sensitive    | Boolean | 是否为敏感参数，默认 `false`，详见下文                                                                                          |
 | resourceList    | Array   | 任务使用的资源文件。不属于 `AbstractParameters`，仅使用资源文件的任务类型定义该字段（如 SHELL、PYTHON、SPARK、MR、FLINK、DATAX）；前端对所有任务类型都会附带，其他任务类型忽略 |
-| -- resourceName | String  | 资源文件全名                                                                                                           |
+| -- resourceName | String  | 资源中心返回的 `fullName`，需完全一致，例如默认 LOCAL 存储下为 `/tmp/dolphinscheduler/default/resources/run.sh`                        |
 
 工作流定义的 `global_params` 与 `localParams` 结构相同。
 
@@ -183,7 +183,7 @@
     "rawScript": "echo \"dt=${dt}\"\nsh ./run.sh",
     "resourceList": [
         {
-            "resourceName": "file:/tmp/dolphinscheduler/default/resources/run.sh"
+            "resourceName": "/tmp/dolphinscheduler/default/resources/run.sh"
         }
     ]
 }
@@ -214,7 +214,7 @@
     "rawScript": "import sys\nprint('dt=${dt}')",
     "resourceList": [
         {
-            "resourceName": "file:/tmp/dolphinscheduler/default/resources/utils.py"
+            "resourceName": "/tmp/dolphinscheduler/default/resources/utils.py"
         }
     ]
 }
@@ -327,6 +327,7 @@
 | httpCheckCondition    | String  | 校验条件：`STATUS_CODE_DEFAULT`（200）、`STATUS_CODE_CUSTOM`、`BODY_CONTAINS`、`BODY_NOT_CONTAINS`                                            |
 | condition             | String  | 校验内容，条件不是 `STATUS_CODE_DEFAULT` 时必填                                                                                                 |
 | connectTimeout        | Integer | 超时时间，单位毫秒，同时用于连接、读、写；必须大于 0                                                                                                         |
+| socketTimeout         | Integer | UI 会提交，但后端忽略；连接、读、写都使用 `connectTimeout`                                                                                             |
 | socketKeepAlive       | Boolean | 是否开启 TCP keep-alive                                                                                                                 |
 
 **示例：**
@@ -353,6 +354,7 @@
     "httpCheckCondition": "STATUS_CODE_CUSTOM",
     "condition": "200",
     "connectTimeout": 60000,
+    "socketTimeout": 60000,
     "socketKeepAlive": false
 }
 ```
@@ -402,7 +404,7 @@
     "programType": "SCALA",
     "mainClass": "org.apache.spark.examples.SparkPi",
     "mainJar": {
-        "resourceName": "file:/tmp/dolphinscheduler/default/resources/spark-examples_2.12-3.2.0.jar"
+        "resourceName": "/tmp/dolphinscheduler/default/resources/spark-examples_2.12-3.2.0.jar"
     },
     "deployMode": "cluster",
     "appName": "spark-pi",
@@ -452,7 +454,7 @@
     "programType": "JAVA",
     "mainClass": "org.apache.hadoop.examples.WordCount",
     "mainJar": {
-        "resourceName": "file:/tmp/dolphinscheduler/default/resources/hadoop-mapreduce-examples.jar"
+        "resourceName": "/tmp/dolphinscheduler/default/resources/hadoop-mapreduce-examples.jar"
     },
     "appName": "mr-wordcount",
     "mainArgs": "/input /output",
@@ -505,7 +507,7 @@
     "programType": "JAVA",
     "mainClass": "org.apache.flink.streaming.examples.wordcount.WordCount",
     "mainJar": {
-        "resourceName": "file:/tmp/dolphinscheduler/default/resources/flink-examples-streaming.jar"
+        "resourceName": "/tmp/dolphinscheduler/default/resources/flink-examples-streaming.jar"
     },
     "deployMode": "cluster",
     "appName": "flink-wordcount",
@@ -801,20 +803,20 @@ DEPENDENT 任务检查其他工作流或任务在指定时间范围内是否运�
 
 CONDITIONS 任务检查上游任务的状态，并选择成功或失败分支，`task_params` 由 `ConditionsParameters` 定义。
 
-|         字段          |   类型   |                                          描述                                          |
-|---------------------|--------|--------------------------------------------------------------------------------------|
-| localParams         | Array  | 本地参数，见[公共字段](#公共字段)                                                                  |
-| resourceList        | Array  | 该任务类型不使用，为空数组                                                                        |
-| dependence          | Object | 上游条件，必填                                                                              |
-| -- relation         | String | `dependTaskList` 中各组之间的关系：`AND` 或 `OR`                                               |
-| -- dependTaskList   | Array  | 条件组列表，至少一项                                                                           |
-| ---- relation       | String | `dependItemList` 中各项之间的关系：`AND` 或 `OR`                                               |
-| ---- dependItemList | Array  | 该组的条件项                                                                               |
-| ------ depTaskCode  | Number | 需要检查的上游任务的 code                                                                      |
-| ------ status       | String | 上游任务的期望状态：`SUCCESS` 或 `FAILURE`，需完全相等（`FORCED_SUCCESS` 不等于 `SUCCESS`）；没有实例的上游任务视为不满足 |
-| conditionResult     | Object | 要执行的分支，必填                                                                            |
-| -- successNode      | Array  | 条件满足时执行的下游任务 code，至少一项                                                               |
-| -- failedNode       | Array  | 条件不满足时执行的下游任务 code，至少一项                                                              |
+|         字段          |   类型   |                                                         描述                                                          |
+|---------------------|--------|---------------------------------------------------------------------------------------------------------------------|
+| localParams         | Array  | 本地参数，见[公共字段](#公共字段)                                                                                                 |
+| resourceList        | Array  | 该任务类型不使用，为空数组                                                                                                       |
+| dependence          | Object | 上游条件，必填                                                                                                             |
+| -- relation         | String | `dependTaskList` 中各组之间的关系：`AND` 或 `OR`                                                                              |
+| -- dependTaskList   | Array  | 条件组列表，至少一项                                                                                                          |
+| ---- relation       | String | `dependItemList` 中各项之间的关系：`AND` 或 `OR`                                                                              |
+| ---- dependItemList | Array  | 该组的条件项                                                                                                              |
+| ------ depTaskCode  | Number | 需要检查的上游任务的 code                                                                                                     |
+| ------ status       | String | `TaskExecutionStatus` 取值，与上游任务状态完全相等才满足；UI 只提供 `SUCCESS` 和 `FAILURE`（`FORCED_SUCCESS` 不等于 `SUCCESS`）；没有实例的上游任务视为不满足 |
+| conditionResult     | Object | 要执行的分支，必填                                                                                                           |
+| -- successNode      | Array  | 条件满足时执行的下游任务 code，至少一项                                                                                              |
+| -- failedNode       | Array  | 条件不满足时执行的下游任务 code，至少一项                                                                                             |
 
 **示例：**
 

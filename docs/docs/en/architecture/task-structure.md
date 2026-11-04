@@ -129,7 +129,7 @@ first and then `B` and `C` run in parallel is stored as three rows:
 | -- value        | String  | Parameter value                                                                                                                                                                                                                            |
 | -- sensitive    | Boolean | Whether the value is sensitive, default `false`, see below                                                                                                                                                                                 |
 | resourceList    | Array   | Resource files used by the task. Not a field of `AbstractParameters`: only task types that use resource files define it (e.g. SHELL, PYTHON, SPARK, MR, FLINK, DATAX). The UI sends it for every task type, and other task types ignore it |
-| -- resourceName | String  | Full name of the resource file                                                                                                                                                                                                             |
+| -- resourceName | String  | The exact `fullName` returned by the resource center, e.g. `/tmp/dolphinscheduler/default/resources/run.sh` with the default LOCAL storage                                                                                                 |
 
 `global_params` of the workflow definition uses the same structure as `localParams`.
 
@@ -200,7 +200,7 @@ Runs a shell script on the worker. `task_params` is defined by `ShellParameters`
     "rawScript": "echo \"dt=${dt}\"\nsh ./run.sh",
     "resourceList": [
         {
-            "resourceName": "file:/tmp/dolphinscheduler/default/resources/run.sh"
+            "resourceName": "/tmp/dolphinscheduler/default/resources/run.sh"
         }
     ]
 }
@@ -231,7 +231,7 @@ Runs a Python script on the worker. `task_params` is defined by `PythonParameter
     "rawScript": "import sys\nprint('dt=${dt}')",
     "resourceList": [
         {
-            "resourceName": "file:/tmp/dolphinscheduler/default/resources/utils.py"
+            "resourceName": "/tmp/dolphinscheduler/default/resources/utils.py"
         }
     ]
 }
@@ -344,6 +344,7 @@ Sends an HTTP request and checks the response. `task_params` is defined by `Http
 | httpCheckCondition    | String  | Check condition: `STATUS_CODE_DEFAULT` (200), `STATUS_CODE_CUSTOM`, `BODY_CONTAINS`, `BODY_NOT_CONTAINS`                                                                                       |
 | condition             | String  | Check content, required unless the condition is `STATUS_CODE_DEFAULT`                                                                                                                          |
 | connectTimeout        | Integer | Timeout in milliseconds, applied to connect, read and write; must be greater than 0                                                                                                            |
+| socketTimeout         | Integer | Submitted by the UI but ignored by the backend; `connectTimeout` is used for connect, read and write                                                                                           |
 | socketKeepAlive       | Boolean | Whether to enable TCP keep-alive                                                                                                                                                               |
 
 **Example:**
@@ -370,6 +371,7 @@ Sends an HTTP request and checks the response. `task_params` is defined by `Http
     "httpCheckCondition": "STATUS_CODE_CUSTOM",
     "condition": "200",
     "connectTimeout": 60000,
+    "socketTimeout": 60000,
     "socketKeepAlive": false
 }
 ```
@@ -419,7 +421,7 @@ Runs a Spark application with `spark-submit` or `spark-sql`. `task_params` is de
     "programType": "SCALA",
     "mainClass": "org.apache.spark.examples.SparkPi",
     "mainJar": {
-        "resourceName": "file:/tmp/dolphinscheduler/default/resources/spark-examples_2.12-3.2.0.jar"
+        "resourceName": "/tmp/dolphinscheduler/default/resources/spark-examples_2.12-3.2.0.jar"
     },
     "deployMode": "cluster",
     "appName": "spark-pi",
@@ -469,7 +471,7 @@ Runs a Hadoop MapReduce job. `task_params` is defined by `MapReduceParameters` i
     "programType": "JAVA",
     "mainClass": "org.apache.hadoop.examples.WordCount",
     "mainJar": {
-        "resourceName": "file:/tmp/dolphinscheduler/default/resources/hadoop-mapreduce-examples.jar"
+        "resourceName": "/tmp/dolphinscheduler/default/resources/hadoop-mapreduce-examples.jar"
     },
     "appName": "mr-wordcount",
     "mainArgs": "/input /output",
@@ -522,7 +524,7 @@ Runs a Flink job with the `flink` command line. `task_params` is defined by `Fli
     "programType": "JAVA",
     "mainClass": "org.apache.flink.streaming.examples.wordcount.WordCount",
     "mainJar": {
-        "resourceName": "file:/tmp/dolphinscheduler/default/resources/flink-examples-streaming.jar"
+        "resourceName": "/tmp/dolphinscheduler/default/resources/flink-examples-streaming.jar"
     },
     "deployMode": "cluster",
     "appName": "flink-wordcount",
@@ -821,20 +823,20 @@ A dependency on the task's own workflow (`-1` or the task itself) is treated as 
 
 The CONDITIONS task checks the status of upstream tasks and chooses the success or the failure branch. Its `task_params` is defined by `ConditionsParameters`.
 
-|        Field        |  Type  |                                                                                   Description                                                                                   |
-|---------------------|--------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| localParams         | Array  | Local parameters, see [Common Fields](#common-fields)                                                                                                                           |
-| resourceList        | Array  | Not used by this task type, an empty array                                                                                                                                      |
-| dependence          | Object | Upstream conditions, required                                                                                                                                                   |
-| -- relation         | String | Relation between the groups in `dependTaskList`: `AND` or `OR`                                                                                                                  |
-| -- dependTaskList   | Array  | Condition groups, at least one                                                                                                                                                  |
-| ---- relation       | String | Relation between the items in `dependItemList`: `AND` or `OR`                                                                                                                   |
-| ---- dependItemList | Array  | Condition items of the group                                                                                                                                                    |
-| ------ depTaskCode  | Number | Code of the upstream task to check                                                                                                                                              |
-| ------ status       | String | Expected status of the upstream task: `SUCCESS` or `FAILURE`, compared exactly (`FORCED_SUCCESS` does not match `SUCCESS`). An upstream task without an instance does not match |
-| conditionResult     | Object | Branches to run, required                                                                                                                                                       |
-| -- successNode      | Array  | Codes of the downstream tasks to run when the condition is met, at least one                                                                                                    |
-| -- failedNode       | Array  | Codes of the downstream tasks to run when the condition is not met, at least one                                                                                                |
+|        Field        |  Type  |                                                                                                       Description                                                                                                        |
+|---------------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams         | Array  | Local parameters, see [Common Fields](#common-fields)                                                                                                                                                                    |
+| resourceList        | Array  | Not used by this task type, an empty array                                                                                                                                                                               |
+| dependence          | Object | Upstream conditions, required                                                                                                                                                                                            |
+| -- relation         | String | Relation between the groups in `dependTaskList`: `AND` or `OR`                                                                                                                                                           |
+| -- dependTaskList   | Array  | Condition groups, at least one                                                                                                                                                                                           |
+| ---- relation       | String | Relation between the items in `dependItemList`: `AND` or `OR`                                                                                                                                                            |
+| ---- dependItemList | Array  | Condition items of the group                                                                                                                                                                                             |
+| ------ depTaskCode  | Number | Code of the upstream task to check                                                                                                                                                                                       |
+| ------ status       | String | A `TaskExecutionStatus` value compared exactly with the upstream task state; the UI offers only `SUCCESS` and `FAILURE` (`FORCED_SUCCESS` does not match `SUCCESS`). An upstream task without an instance does not match |
+| conditionResult     | Object | Branches to run, required                                                                                                                                                                                                |
+| -- successNode      | Array  | Codes of the downstream tasks to run when the condition is met, at least one                                                                                                                                             |
+| -- failedNode       | Array  | Codes of the downstream tasks to run when the condition is not met, at least one                                                                                                                                         |
 
 **Example:**
 
