@@ -1685,6 +1685,14 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     code);
         }
 
+        if (workflowDefinition.getReleaseState() == ReleaseState.ONLINE) {
+            throw new ServiceException(Status.WORKFLOW_DEFINE_STATE_ONLINE, workflowDefinition.getName());
+        }
+        Schedule schedule = scheduleDao.queryByWorkflowDefinitionCode(code);
+        if (schedule != null && schedule.getReleaseState() == ReleaseState.ONLINE) {
+            throw new ServiceException(Status.SCHEDULE_STATE_ONLINE, schedule.getId());
+        }
+
         WorkflowDefinitionLog workflowDefinitionLog =
                 workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(code, version);
         if (Objects.isNull(workflowDefinitionLog)) {
@@ -1720,7 +1728,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     projectCode, code, version);
             throw new ServiceException(Status.SWITCH_WORKFLOW_DEFINITION_VERSION_ERROR);
         }
-        schedulerService.offlineSchedulerByWorkflowCode(code);
 
         saveWorkflowLineage(workflowDefinitionLog.getProjectCode(), workflowDefinitionLog.getCode(),
                 workflowDefinitionLog.getVersion(), taskDefinitionLogList);
@@ -1855,7 +1862,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Transactional
     @Override
     public void onlineWorkflowDefinition(User loginUser, Long projectCode, Long workflowDefinitionCode) {
-        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.PUBLISH);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.DEVELOP);
 
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode));
@@ -1879,7 +1886,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     @Transactional
     @Override
     public void offlineWorkflowDefinition(User loginUser, Long projectCode, Long workflowDefinitionCode) {
-        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.PUBLISH);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.DEVELOP);
 
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode));

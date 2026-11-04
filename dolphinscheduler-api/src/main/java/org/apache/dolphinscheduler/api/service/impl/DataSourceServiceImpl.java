@@ -268,7 +268,10 @@ public class DataSourceServiceImpl extends BaseServiceImpl implements DataSource
     }
 
     @Override
-    public void verifyDataSourceName(String name) {
+    public void verifyDataSourceName(User loginUser, String name) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         List<DataSource> dataSourceList = dataSourceDao.queryDataSourceByName(name);
         if (dataSourceList != null && !dataSourceList.isEmpty()) {
             throw new ServiceException(Status.DATASOURCE_EXIST);

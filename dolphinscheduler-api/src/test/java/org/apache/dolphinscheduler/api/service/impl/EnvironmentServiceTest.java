@@ -365,14 +365,14 @@ public class EnvironmentServiceTest {
     @Test
     public void testVerifyEnvironment() {
         assertThrowsServiceException(Status.ENVIRONMENT_NAME_IS_NULL,
-                () -> environmentService.verifyEnvironment(""));
+                () -> environmentService.verifyEnvironment(getAdminUser(), ""));
 
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(getEnvironment());
         assertThrowsServiceException(Status.ENVIRONMENT_NAME_EXISTS,
-                () -> environmentService.verifyEnvironment(environmentName));
+                () -> environmentService.verifyEnvironment(getAdminUser(), environmentName));
 
         when(environmentMapper.queryByEnvironmentName(environmentName)).thenReturn(null);
-        assertDoesNotThrow(() -> environmentService.verifyEnvironment(environmentName));
+        assertDoesNotThrow(() -> environmentService.verifyEnvironment(getAdminUser(), environmentName));
     }
 
     private Environment getEnvironment() {

@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.permission;
 
+import org.apache.dolphinscheduler.api.audit.ProjectAuthorizationAuditLogger;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
@@ -49,6 +50,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ProjectAuthorizationServiceTest {
 
     @Mock
+    private ProjectAuthorizationAuditLogger auditLogger;
+
+    @Mock
     private ProjectDao projectDao;
     @Mock
     private ProjectUserPermissionDao userPermissionDao;
@@ -64,11 +68,20 @@ class ProjectAuthorizationServiceTest {
     @BeforeEach
     void setUp() {
         authorizationService =
-                new ProjectAuthorizationServiceImpl(projectDao, userPermissionDao, resourceAuthorizationDao, userDao);
+                new ProjectAuthorizationServiceImpl(projectDao, userPermissionDao, resourceAuthorizationDao, userDao,
+                        auditLogger);
         user = new User();
         user.setId(1);
         user.setUserName("member");
         user.setUserType(UserType.GENERAL_USER);
+        Mockito.lenient().when(projectDao.queryByCodeForUpdate(Mockito.anyLong()))
+                .thenAnswer(invocation -> projectDao.queryByCode(invocation.getArgument(0)));
+    }
+
+    @Test
+    void projectOperationPermissionsAreTheFourIndependentCapabilities() {
+        Assertions.assertArrayEquals(new String[]{"VIEW", "DEVELOP", "EXECUTE", "MANAGE_MEMBERS"},
+                Arrays.stream(ProjectPermission.values()).map(Enum::name).toArray(String[]::new));
     }
 
     @Test

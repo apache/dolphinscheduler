@@ -47,6 +47,8 @@ public interface ProjectMapper extends BaseMapper<Project> {
      */
     Project queryByCode(@Param("projectCode") long projectCode);
 
+    Project queryByCodeForUpdate(@Param("projectCode") long projectCode);
+
     /**
      * query project detail by code list
      * @param codes codes

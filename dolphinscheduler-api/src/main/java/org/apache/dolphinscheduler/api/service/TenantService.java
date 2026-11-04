@@ -93,7 +93,7 @@ public interface TenantService {
      * @param tenantCode tenant code
      * @return true if tenant code can user, otherwise return false
      */
-    void verifyTenantCode(String tenantCode);
+    void verifyTenantCode(User loginUser, String tenantCode);
 
     /**
      * query tenant by tenant code

@@ -145,6 +145,9 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                     throw new ServiceException(Status.WORKER_GROUP_NOT_EXIST, id);
                 }
                 String previousName = workerGroup.getName();
+                if (!name.equals(previousName)) {
+                    checkWorkerGroupDependencies(workerGroup);
+                }
                 workerGroup.setName(name);
                 workerGroup.setAddrList(addrList);
                 workerGroup.setUpdateTime(now);

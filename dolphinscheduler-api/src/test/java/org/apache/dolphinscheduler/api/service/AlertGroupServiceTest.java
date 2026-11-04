@@ -292,12 +292,12 @@ public class AlertGroupServiceTest {
     @Test
     public void testVerifyGroupName() {
         // group name not exist
-        boolean result = alertGroupService.existGroupName(groupName);
+        boolean result = alertGroupService.existGroupName(getLoginUser(), groupName);
         Assertions.assertFalse(result);
         when(alertGroupDao.existGroupName(groupName)).thenReturn(true);
 
         // group name exist
-        result = alertGroupService.existGroupName(groupName);
+        result = alertGroupService.existGroupName(getLoginUser(), groupName);
         Assertions.assertTrue(result);
     }
 

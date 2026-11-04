@@ -305,11 +305,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
         WorkflowInstance workflowInstance = processService.findWorkflowInstanceDetailById(workflowInstanceId)
                 .orElseThrow(() -> new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId));
-        WorkflowDefinition workflowDefinition =
-                workflowDefinitionDao.queryByCode(workflowInstance.getWorkflowDefinitionCode()).orElse(null);
-        if (workflowDefinition != null && projectCode != workflowDefinition.getProjectCode()) {
-            log.error("workflow definition does not exist, projectCode:{}, workflowInstanceId:{}.", projectCode,
-                    workflowInstanceId);
+        if (projectCode != workflowInstance.getProjectCode()) {
             throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
         List<TaskInstance> taskInstanceList =
@@ -588,11 +584,7 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
             throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
 
-        WorkflowDefinition workflowDefinition =
-                workflowDefinitionDao.queryByCode(workflowInstance.getWorkflowDefinitionCode()).orElse(null);
-        if (workflowDefinition != null && projectCode != workflowDefinition.getProjectCode()) {
-            log.error("workflow definition does not exist, projectCode:{}, workflowDefinitionCode:{}.", projectCode,
-                    workflowInstance.getWorkflowDefinitionCode());
+        if (projectCode != workflowInstance.getProjectCode()) {
             throw new ServiceException(WORKFLOW_INSTANCE_NOT_EXIST, workflowInstanceId);
         }
 

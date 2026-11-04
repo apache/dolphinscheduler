@@ -96,6 +96,6 @@ public interface EnvironmentService {
      *
      * @param environmentName environment name
      */
-    void verifyEnvironment(String environmentName);
+    void verifyEnvironment(User loginUser, String environmentName);
 
 }

@@ -224,29 +224,33 @@ public class QueueServiceTest {
     public void testVerifyQueue() {
         // queue null
         Throwable exception =
-                Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(null, QUEUE_NAME));
+                Assertions.assertThrows(ServiceException.class,
+                        () -> queueService.verifyQueue(getLoginUser(), null, QUEUE_NAME));
         String formatter = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // queueName null
-        exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(QUEUE_NAME, null));
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> queueService.verifyQueue(getLoginUser(), QUEUE_NAME, null));
         formatter = MessageFormat.format(Status.REQUEST_PARAMS_NOT_VALID_ERROR.getMsg(), Constants.QUEUE_NAME);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // exist queueName
         when(queueDao.existQueue(EXISTS, null)).thenReturn(true);
-        exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(EXISTS, QUEUE_NAME));
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> queueService.verifyQueue(getLoginUser(), EXISTS, QUEUE_NAME));
         formatter = MessageFormat.format(Status.QUEUE_VALUE_EXIST.getMsg(), EXISTS);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // exist queue
         when(queueDao.existQueue(null, EXISTS)).thenReturn(true);
-        exception = Assertions.assertThrows(ServiceException.class, () -> queueService.verifyQueue(QUEUE, EXISTS));
+        exception = Assertions.assertThrows(ServiceException.class,
+                () -> queueService.verifyQueue(getLoginUser(), QUEUE, EXISTS));
         formatter = MessageFormat.format(Status.QUEUE_NAME_EXIST.getMsg(), EXISTS);
         Assertions.assertEquals(formatter, exception.getMessage());
 
         // success
-        AssertionsHelper.assertDoesNotThrow(() -> queueService.verifyQueue(NOT_EXISTS, NOT_EXISTS));
+        AssertionsHelper.assertDoesNotThrow(() -> queueService.verifyQueue(getLoginUser(), NOT_EXISTS, NOT_EXISTS));
     }
 
     @Test

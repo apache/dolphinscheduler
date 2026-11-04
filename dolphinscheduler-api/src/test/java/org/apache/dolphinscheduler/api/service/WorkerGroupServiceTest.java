@@ -33,14 +33,19 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -53,6 +58,8 @@ import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -77,6 +84,9 @@ public class WorkerGroupServiceTest {
 
     @Mock
     private ProjectResourceAuthorizationDao resourceAuthorizationDao;
+
+    @Mock
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
     private WorkerGroupDao workerGroupDao;
@@ -191,6 +201,43 @@ public class WorkerGroupServiceTest {
         } finally {
             TransactionSynchronizationManager.clearSynchronization();
         }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"task", "schedule", "environment"})
+    public void renamingReferencedWorkerGroupIsRejected(String reference) {
+        User operator = getLoginUser();
+        when(resourcePermissionCheckService.operationPermissionCheck(Mockito.any(), Mockito.anyInt(),
+                Mockito.anyString(), Mockito.any())).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(Mockito.any(), Mockito.any(),
+                Mockito.anyInt(), Mockito.any())).thenReturn(true);
+        WorkerGroup group = getWorkerGroup(1);
+        when(workerGroupDao.queryById(1)).thenReturn(group);
+        Status expected;
+        if ("task".equals(reference)) {
+            TaskDefinition task = new TaskDefinition();
+            task.setName("using old workers");
+            when(taskDefinitionDao.queryByWorkerGroup(group.getName()))
+                    .thenReturn(java.util.Collections.singletonList(task));
+            expected = Status.WORKER_GROUP_DEPENDENT_TASK_EXISTS;
+        } else if ("schedule".equals(reference)) {
+            Schedule schedule = new Schedule();
+            schedule.setWorkflowDefinitionCode(100L);
+            when(scheduleDao.queryScheduleByWorkerGroup(group.getName()))
+                    .thenReturn(java.util.Collections.singletonList(schedule));
+            WorkflowDefinition definition = new WorkflowDefinition();
+            definition.setName("scheduled workflow");
+            when(workflowDefinitionDao.queryByCode(100L)).thenReturn(java.util.Optional.of(definition));
+            expected = Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS;
+        } else {
+            when(environmentWorkerGroupRelationMapper.selectList(Mockito.any()))
+                    .thenReturn(java.util.Collections.singletonList(new EnvironmentWorkerGroupRelation()));
+            expected = Status.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS;
+        }
+        assertThrowsServiceException(expected,
+                () -> workerGroupService.saveWorkerGroup(operator, 1, "new-name", "", ""));
+        Mockito.verify(workerGroupDao, Mockito.never()).updateById(Mockito.any(WorkerGroup.class));
+        Mockito.verifyNoInteractions(resourceAuthorizationDao);
     }
 
     @Test

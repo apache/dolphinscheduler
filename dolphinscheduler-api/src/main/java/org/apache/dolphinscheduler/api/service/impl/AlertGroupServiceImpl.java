@@ -271,7 +271,10 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return check result code
      */
     @Override
-    public boolean existGroupName(String groupName) {
+    public boolean existGroupName(User loginUser, String groupName) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         return alertGroupDao.existGroupName(groupName);
     }
 }

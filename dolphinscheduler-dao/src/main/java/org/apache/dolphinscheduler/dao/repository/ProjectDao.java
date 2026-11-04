@@ -36,6 +36,8 @@ public interface ProjectDao extends IDao<Project> {
 
     Project queryByCode(Long projectCode);
 
+    Project queryByCodeForUpdate(long projectCode);
+
     Project queryDetailById(int projectId);
 
     Project queryByName(String projectName);

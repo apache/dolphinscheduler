@@ -138,7 +138,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Project project = projectDao.queryByCode(projectCode);
 
-        projectService.checkProjectPermission(loginUser, project, ProjectPermission.MANAGE_SCHEDULES);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.EXECUTE);
 
         // check workflow definition exists
         WorkflowDefinition workflowDefinition = workflowDefinitionDao.queryByCode(workflowDefinitionCode)
@@ -217,7 +217,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST, workflowDefinitionCode);
         }
         Project project = projectDao.queryByCode(workflowDefinition.getProjectCode());
-        this.projectService.checkProjectPermission(loginUser, project, ProjectPermission.MANAGE_SCHEDULES);
+        this.projectService.checkProjectPermission(loginUser, project, ProjectPermission.EXECUTE);
     }
 
     /**
@@ -251,7 +251,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
         Project project = projectDao.queryByCode(projectCode);
 
-        projectService.checkProjectPermission(loginUser, project, ProjectPermission.MANAGE_SCHEDULES);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.EXECUTE);
 
         // check schedule exists
         Schedule schedule = scheduleDao.queryById(id);
@@ -435,7 +435,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
                                                            String tenantCode,
                                                            long environmentCode) {
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkProjectPermission(loginUser, project, ProjectPermission.MANAGE_SCHEDULES);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.EXECUTE);
 
         // check schedule exists
         Schedule schedule = scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
@@ -459,7 +459,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Transactional
     @Override
     public void onlineScheduler(User loginUser, Long projectCode, Integer schedulerId) {
-        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.MANAGE_SCHEDULES);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.EXECUTE);
         Schedule schedule = scheduleDao.queryById(schedulerId);
         checkScheduleBelongsToProject(schedule, projectCode);
         doOnlineScheduler(loginUser, schedule);
@@ -502,7 +502,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     @Transactional
     @Override
     public void offlineScheduler(User loginUser, Long projectCode, Integer schedulerId) {
-        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.MANAGE_SCHEDULES);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.EXECUTE);
         Schedule schedule = scheduleDao.queryById(schedulerId);
         checkScheduleBelongsToProject(schedule, projectCode);
         doOfflineScheduler(schedule);

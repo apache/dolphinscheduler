@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.audit.ProjectAuthorizationAuditLogger;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.vo.UserSimpleInfoVO;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -34,7 +36,9 @@ import org.apache.dolphinscheduler.dao.repository.UserDao;
 
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,6 +50,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectAuthorizationServiceImpl implements ProjectAuthorizationService {
 
+    private final ProjectAuthorizationAuditLogger auditLogger;
     private final UserDao userDao;
     private final ProjectDao projectDao;
     private final ProjectUserPermissionDao userPermissionDao;
@@ -54,7 +59,9 @@ public class ProjectAuthorizationServiceImpl implements ProjectAuthorizationServ
     public ProjectAuthorizationServiceImpl(ProjectDao projectDao,
                                            ProjectUserPermissionDao userPermissionDao,
                                            ProjectResourceAuthorizationDao resourceAuthorizationDao,
-                                           UserDao userDao) {
+                                           UserDao userDao,
+                                           ProjectAuthorizationAuditLogger auditLogger) {
+        this.auditLogger = auditLogger;
         this.userDao = userDao;
         this.projectDao = projectDao;
         this.userPermissionDao = userPermissionDao;
@@ -87,6 +94,13 @@ public class ProjectAuthorizationServiceImpl implements ProjectAuthorizationServ
         if (permissions == null || permissions.stream().anyMatch(java.util.Objects::isNull)) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, "permissions");
         }
+        Project project = projectDao.queryByCodeForUpdate(projectCode);
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_EXIST);
+        }
+        Set<ProjectPermission> previousPermissions = EnumSet.noneOf(ProjectPermission.class);
+        userPermissionDao.queryByProjectAndUser(projectCode, userId)
+                .forEach(grant -> previousPermissions.add(grant.getPermission()));
         userPermissionDao.revokeAllPermissions(projectCode, userId);
         Date now = new Date();
         for (ProjectPermission permission : permissions) {
@@ -97,6 +111,13 @@ public class ProjectAuthorizationServiceImpl implements ProjectAuthorizationServ
             grant.setCreateTime(now);
             userPermissionDao.insert(grant);
         }
+        Map<String, Object> changes = new LinkedHashMap<>();
+        changes.put("targetUserId", userId);
+        changes.put("before", previousPermissions);
+        changes.put("after", EnumSet.copyOf(permissions.isEmpty()
+                ? EnumSet.noneOf(ProjectPermission.class)
+                : permissions));
+        auditLogger.record(loginUser, project, AuditOperationType.UPDATE, "replace-member-permissions", changes);
     }
 
     private void requireUser(int userId) {

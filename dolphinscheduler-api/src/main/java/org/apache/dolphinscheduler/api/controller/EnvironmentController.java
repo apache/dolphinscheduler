@@ -220,7 +220,7 @@ public class EnvironmentController extends BaseController {
     @ApiException(VERIFY_ENVIRONMENT_ERROR)
     public Result<Void> verifyEnvironment(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                           @RequestParam(value = "environmentName") String environmentName) {
-        environmentService.verifyEnvironment(environmentName);
+        environmentService.verifyEnvironment(loginUser, environmentName);
         return Result.success();
     }
 }

@@ -66,9 +66,7 @@ export function revokeProjectResource(
 export const projectPermissions = [
   'VIEW',
   'DEVELOP',
-  'PUBLISH',
   'EXECUTE',
-  'MANAGE_SCHEDULES',
   'MANAGE_MEMBERS'
 ] as const
 export type ProjectPermission = (typeof projectPermissions)[number]

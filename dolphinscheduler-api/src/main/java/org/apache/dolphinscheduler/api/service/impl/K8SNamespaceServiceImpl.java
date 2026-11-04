@@ -172,7 +172,10 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @return true if the k8s and namespace not exists, otherwise return false
      */
     @Override
-    public Result<Object> verifyNamespaceK8s(String namespace, Long clusterCode) {
+    public Result<Object> verifyNamespaceK8s(User loginUser, String namespace, Long clusterCode) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         Result<Object> result = new Result<>();
         if (StringUtils.isEmpty(namespace)) {
             log.warn("Parameter namespace is empty.");

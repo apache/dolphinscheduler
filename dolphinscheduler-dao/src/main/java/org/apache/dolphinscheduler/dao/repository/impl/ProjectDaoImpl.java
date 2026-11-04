@@ -62,6 +62,11 @@ public class ProjectDaoImpl extends BaseDao<Project, ProjectMapper> implements P
     }
 
     @Override
+    public Project queryByCodeForUpdate(long projectCode) {
+        return mybatisMapper.queryByCodeForUpdate(projectCode);
+    }
+
+    @Override
     public Project queryDetailById(int projectId) {
         return mybatisMapper.queryDetailById(projectId);
     }

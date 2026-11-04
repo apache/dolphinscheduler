@@ -32,6 +32,13 @@
         where code = #{projectCode}
     </select>
 
+    <select id="queryByCodeForUpdate" resultType="org.apache.dolphinscheduler.dao.entity.Project">
+        select <include refid="baseSql"/>
+        from t_ds_project
+        where code = #{projectCode}
+        for update
+    </select>
+
     <select id="queryByCodes" resultType="org.apache.dolphinscheduler.dao.entity.Project">
         select
         <include refid="baseSql"/>
@@ -109,7 +116,7 @@
         , case
             when (select count(*) from t_ds_project_user_permission target
                 where target.project_code = p.code and target.user_id = #{targetUserId}
-                    and target.permission in ('VIEW', 'DEVELOP', 'PUBLISH', 'EXECUTE', 'MANAGE_SCHEDULES')) = 5 then 7
+                    and target.permission in ('VIEW', 'DEVELOP', 'EXECUTE')) = 3 then 7
             when exists (select 1 from t_ds_project_user_permission target
                 where target.project_code = p.code and target.user_id = #{targetUserId}
                     and target.permission = 'VIEW') then 2

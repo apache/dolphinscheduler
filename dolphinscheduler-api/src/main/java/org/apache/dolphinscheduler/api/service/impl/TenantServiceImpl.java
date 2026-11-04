@@ -293,7 +293,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return true if tenant code can use, otherwise return false
      */
     @Override
-    public void verifyTenantCode(String tenantCode) {
+    public void verifyTenantCode(User loginUser, String tenantCode) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         if (checkTenantExists(tenantCode)) {
             throw new ServiceException(Status.OS_TENANT_CODE_EXIST, tenantCode);
         }

@@ -131,7 +131,7 @@ public class K8sNamespaceController extends BaseController {
                                   @RequestParam(value = "namespace") String namespace,
                                   @RequestParam(value = "clusterCode") Long clusterCode) {
 
-        return k8sNamespaceService.verifyNamespaceK8s(namespace, clusterCode);
+        return k8sNamespaceService.verifyNamespaceK8s(loginUser, namespace, clusterCode);
     }
 
     /**

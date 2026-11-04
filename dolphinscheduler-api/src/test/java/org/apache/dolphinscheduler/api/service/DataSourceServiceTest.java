@@ -339,7 +339,7 @@ public class DataSourceServiceTest {
         String dataSourceName = "dataSource1";
         when(dataSourceDao.queryDataSourceByName(dataSourceName)).thenReturn(getDataSourceList());
         assertThrowsServiceException(Status.DATASOURCE_EXIST,
-                () -> dataSourceService.verifyDataSourceName(dataSourceName));
+                () -> dataSourceService.verifyDataSourceName(getAdminUser(), dataSourceName));
     }
 
     @Test

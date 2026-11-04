@@ -300,7 +300,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
 
         Assertions.assertDoesNotThrow(() -> schedulerService.deleteSchedulesById(user, scheduleId));
 
-        Mockito.verify(projectService).checkProjectPermission(user, project, ProjectPermission.MANAGE_SCHEDULES);
+        Mockito.verify(projectService).checkProjectPermission(user, project, ProjectPermission.EXECUTE);
         Mockito.verify(scheduleDao).deleteById(scheduleId);
     }
 
@@ -336,7 +336,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Project project = this.getProject();
         Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
-                .checkProjectPermission(user, project, ProjectPermission.MANAGE_SCHEDULES);
+                .checkProjectPermission(user, project, ProjectPermission.EXECUTE);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
         Assertions.assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(),
@@ -344,7 +344,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
 
         // error delete mapper
         Mockito.doNothing().when(projectService).checkProjectPermission(user, project,
-                ProjectPermission.MANAGE_SCHEDULES);
+                ProjectPermission.EXECUTE);
         Mockito.when(scheduleDao.deleteById(scheduleId)).thenReturn(false);
         exception = Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.deleteSchedulesById(user, scheduleId));
@@ -473,9 +473,9 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Project project = this.getProject();
         Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
-                .checkProjectPermission(user, project, ProjectPermission.MANAGE_SCHEDULES);
+                .checkProjectPermission(user, project, ProjectPermission.EXECUTE);
         Mockito.doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
-                .checkProjectPermission(user, projectCode, ProjectPermission.MANAGE_SCHEDULES);
+                .checkProjectPermission(user, projectCode, ProjectPermission.EXECUTE);
 
         Assertions.assertThrows(ServiceException.class,
                 () -> schedulerService.insertSchedule(
@@ -654,7 +654,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         schedulerService.offlineScheduler(user, projectCode, scheduleId);
 
         Assertions.assertEquals(ReleaseState.OFFLINE, schedule.getReleaseState());
-        Mockito.verify(projectService).checkProjectPermission(user, projectCode, ProjectPermission.MANAGE_SCHEDULES);
+        Mockito.verify(projectService).checkProjectPermission(user, projectCode, ProjectPermission.EXECUTE);
         Mockito.verifyNoInteractions(taskResourcePermissionChecker, taskDefinitionLogDao);
     }
 

@@ -90,7 +90,7 @@ public interface DataSourceService {
      * @param name the datasource name to verify
      * @throws ServiceException if the datasource name already exists (Status.DATASOURCE_EXIST)
      */
-    void verifyDataSourceName(String name);
+    void verifyDataSourceName(User loginUser, String name);
 
     /**
      * check the connectivity of a datasource based on the provided type and parameters

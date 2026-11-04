@@ -228,7 +228,7 @@ public class AlertGroupController extends BaseController {
     public Result verifyGroupName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "groupName") String groupName) {
 
-        boolean exist = alertGroupService.existGroupName(groupName);
+        boolean exist = alertGroupService.existGroupName(loginUser, groupName);
         Result result = new Result();
         if (exist) {
             log.error("group {} has exist, can't create again.", groupName);

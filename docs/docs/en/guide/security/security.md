@@ -109,18 +109,18 @@ The following rules apply to project authorization introduced in 3.5.0. Authoriz
 
 ### User permissions within a project
 
-|     Permission     |                                               Allowed operations                                               |
-|--------------------|----------------------------------------------------------------------------------------------------------------|
-| `VIEW`             | View projects, workflow and task definitions, instances, logs, and selectable resources granted to the project |
-| `DEVELOP`          | Create, edit and delete workflow and task definitions; import, copy or move definitions                        |
-| `PUBLISH`          | Take workflow and task definitions online or offline                                                           |
-| `EXECUTE`          | Manually start, backfill, rerun, recover, pause or stop workflow instances, and execute tasks within instances |
-| `MANAGE_SCHEDULES` | Create, update, enable, disable or delete schedules                                                            |
-| `MANAGE_MEMBERS`   | Assign or revoke these operation permissions for users within the current project                              |
+|    Permission    |                                                          Operations                                                           |
+|------------------|-------------------------------------------------------------------------------------------------------------------------------|
+| `VIEW`           | View projects, definitions, instances, logs and authorized project resource selectors                                         |
+| `DEVELOP`        | Create, edit, delete, import, copy or move definitions, switch versions, and take workflow/task definitions online or offline |
+| `EXECUTE`        | Manually run, backfill, rerun, recover, pause or stop instances, and create, update, enable, disable or delete schedules      |
+| `MANAGE_MEMBERS` | Assign or revoke the above permissions within the project                                                                     |
 
-Permissions are independent. For example, `DEVELOP` does not include `PUBLISH` or `EXECUTE`. Granting an operation permission does not automatically add `VIEW`; using the project through the UI generally also requires an explicit `VIEW` grant.
+Permissions are independent. For example, `DEVELOP` does not include `EXECUTE`. Granting an operation permission does not automatically add `VIEW`; using the project through the UI generally also requires an explicit `VIEW` grant.
 
-A project creator receives all six explicit permissions at project creation, and these can subsequently be revoked. Ordinary users cannot bypass project operation checks through creator status, legacy authorization records or resource ownership. **Project metadata updates and project deletion are separate lifecycle operations restricted to system administrators or the recorded project creator**, subject to business constraints such as whether the project can be deleted. Neither `DEVELOP` nor `MANAGE_MEMBERS` grants these operations. Revoking a creator's member permissions does not change the recorded creator, and editing project metadata does not transfer ownership.
+These four capabilities are operation permissions assigned directly to project members, not separate roles. This change does not introduce role entities or custom role management.
+
+A project creator receives all four explicit permissions at project creation, and these can subsequently be revoked. Ordinary users cannot bypass project operation checks through creator status, legacy authorization records or resource ownership. **Project metadata updates and project deletion are separate lifecycle operations restricted to system administrators or the recorded project creator**, subject to business constraints such as whether the project can be deleted. Neither `DEVELOP` nor `MANAGE_MEMBERS` grants these operations. Revoking a creator's member permissions does not change the recorded creator, and editing project metadata does not transfer ownership.
 
 System administrators pass project operation permission checks. However, when saving, taking definitions online or executing workflows, the project must still hold the required resource grants.
 
@@ -142,11 +142,11 @@ Datasource management is restricted to system administrators, including creation
 |-----------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|
 | Create, update or import workflow/task definitions                                                        | `DEVELOP`                                                                         | Check resources referenced by the tasks being saved                                                 |
 | Copy or move workflows to another project                                                                 | Source `VIEW` for copy; source `DEVELOP` for move; destination `DEVELOP` for both | Check task resources against the destination project; source grants do not move with the definition |
-| Take a workflow or task definition online                                                                 | `PUBLISH`                                                                         | Check resources referenced by tasks in that version                                                 |
+| Take a workflow or task definition online                                                                 | `DEVELOP`                                                                         | Check resources referenced by tasks in that version                                                 |
 | Manually start, backfill, rerun, recover failed or suspended instances, or execute tasks within instances | `EXECUTE`                                                                         | Check resources in the executed version and resources used by the effective execution settings      |
-| Create, update or enable schedules                                                                        | `MANAGE_SCHEDULES`                                                                | Check task resources and resources used by the schedule's execution settings                        |
-| Take a workflow or task definition offline                                                                | `PUBLISH`                                                                         | Does not require restoring revoked resource grants                                                  |
-| Disable or delete schedules                                                                               | `MANAGE_SCHEDULES`                                                                | Does not require restoring revoked resource grants                                                  |
+| Create, update or enable schedules                                                                        | `EXECUTE`                                                                         | Check task resources and resources used by the schedule's execution settings                        |
+| Take a workflow or task definition offline                                                                | `DEVELOP`                                                                         | Does not require restoring revoked resource grants                                                  |
+| Disable or delete schedules                                                                               | `EXECUTE`                                                                         | Does not require restoring revoked resource grants                                                  |
 | Pause or stop existing instances                                                                          | `EXECUTE`                                                                         | Does not require restoring revoked resource grants                                                  |
 
 Execution settings include the worker group, tenant and its queue, and selected environment and alert group. Rerunning or recovering an existing instance checks its recorded workflow version and execution settings, rather than only the latest definition.
@@ -161,9 +161,11 @@ Lineage queries preserve the complete relationship graph. A user with `VIEW` on 
 
 Saving or taking a definition online when it references a subworkflow additionally requires `EXECUTE` on that subworkflow's project. Execution and schedule configuration or enabling check subworkflows recursively: the user needs `EXECUTE` on every child project, and each child's task resources are checked against that child's own project grants. Inherited tenant, queue, worker group, environment and alert-group settings are also checked against each child project. Parent project grants cannot replace child project grants.
 
+Switching a workflow version requires both the workflow and its schedule to be offline and does not implicitly change the schedule state. Historical instances are authorized through their persisted project; moving a definition does not transfer ownership of its existing instances.
+
 Moving a workflow requires both the workflow and its schedule to be offline. Task resources must still be granted to the destination project. Taking the moved workflow and schedule online checks permissions and resource grants against the destination project again.
 
-Deleting a resource removes all project use grants for that resource in the same transaction. Worker groups use their names as grant keys; renaming a worker group revokes grants for the old name, and an administrator must explicitly grant the new name.
+Deleting a resource removes all project use grants for that resource in the same transaction. Worker groups use their names as grant keys; renaming is rejected while tasks, schedules or environments reference the old name. An allowed rename revokes old-name grants; an administrator must explicitly grant the new name.
 
 ### When revocation takes effect
 
@@ -173,9 +175,11 @@ Deleting a resource removes all project use grants for that resource in the same
 
 Project authorization controls DolphinScheduler operations and resource selection. Tasks still run on Workers using the configured tenants and resource credentials. Access to files, networks and database objects also depends on the operating system, deployment environment and datasource credentials. Project authorization does not sandbox task code or provide database table-level authorization.
 
+Global existence checks for datasource names, tenants, queues, environments, namespaces and alert groups are administrator-only. Member-permission replacement and project resource grant/revoke operations write to the existing audit table, recording the operator, project, target user or resource, and before/after state without credentials or resource configuration. Authorization changes and audit records share the same transaction; rollback leaves no successful audit.
+
 ### Configuration and upgrades
 
-In Project Management, system administrators or users with `MANAGE_MEMBERS` use the member-permissions action to select and save permissions for a member. Saving replaces that member's permission set in the current project; an empty set revokes all member permissions. System administrators use resource authorization to select a resource type and resource, then grant or revoke project access. Member managers can assign all six project permissions to themselves or other users, including `MANAGE_MEMBERS`, so choose trusted member managers with that scope in mind.
+In Project Management, system administrators or users with `MANAGE_MEMBERS` use the member-permissions action to select and save permissions for a member. Saving replaces that member's permission set in the current project; an empty set revokes all member permissions. System administrators use resource authorization to select a resource type and resource, then grant or revoke project access. Member managers can assign all four project permissions to themselves or other users, including `MANAGE_MEMBERS`, so choose trusted member managers with that scope in mind.
 
 Upgrades retain legacy authorization tables and data without automatic migration or fallback. Administrators must reassign project member permissions and project resource grants, including default resources that are used. See the [incompatible changes](../upgrade/incompatible.md#350).
 

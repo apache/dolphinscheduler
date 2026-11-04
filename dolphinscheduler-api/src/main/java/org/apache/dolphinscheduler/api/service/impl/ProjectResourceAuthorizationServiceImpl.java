@@ -17,15 +17,18 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
+import org.apache.dolphinscheduler.api.audit.ProjectAuthorizationAuditLogger;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.ProjectResourceAuthorizationService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.common.constants.TenantConstants;
+import org.apache.dolphinscheduler.common.enums.AuditOperationType;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -33,6 +36,7 @@ import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 import org.apache.dolphinscheduler.dao.repository.IEnvironmentDao;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupDao;
@@ -41,7 +45,9 @@ import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,6 +58,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ProjectResourceAuthorizationServiceImpl implements ProjectResourceAuthorizationService {
 
+    private final ProjectAuthorizationAuditLogger auditLogger;
+    private final ProjectDao projectDao;
     private final ProjectAuthorizationService projectAuthorizationService;
     private final ProjectResourceAuthorizationDao resourceAuthorizationDao;
     private final DataSourceDao dataSourceDao;
@@ -78,6 +86,10 @@ public class ProjectResourceAuthorizationServiceImpl implements ProjectResourceA
         if (!resourceExists(resourceType, resourceKey)) {
             throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
         }
+        Project project = projectDao.queryByCodeForUpdate(projectCode);
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_EXIST);
+        }
         if (resourceAuthorizationDao.isAuthorized(projectCode, resourceType, resourceKey)) {
             return;
         }
@@ -87,12 +99,32 @@ public class ProjectResourceAuthorizationServiceImpl implements ProjectResourceA
         grant.setResourceKey(resourceKey);
         grant.setCreateTime(new Date());
         resourceAuthorizationDao.insert(grant);
+        recordResourceChange(loginUser, project, resourceType, resourceKey, true);
     }
 
+    @Transactional
     @Override
     public void revokeResource(User loginUser, long projectCode, ProjectResourceType resourceType, String resourceKey) {
         requireAdministrator(loginUser, projectCode);
-        resourceAuthorizationDao.revokeAuthorization(projectCode, resourceType, resourceKey);
+        Project project = projectDao.queryByCodeForUpdate(projectCode);
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_EXIST);
+        }
+        if (resourceAuthorizationDao.isAuthorized(projectCode, resourceType, resourceKey)) {
+            resourceAuthorizationDao.revokeAuthorization(projectCode, resourceType, resourceKey);
+            recordResourceChange(loginUser, project, resourceType, resourceKey, false);
+        }
+    }
+
+    private void recordResourceChange(User operator, Project project, ProjectResourceType type, String key,
+                                      boolean granted) {
+        Map<String, Object> changes = new LinkedHashMap<>();
+        changes.put("resourceType", type);
+        changes.put("resourceKey", key);
+        changes.put("before", !granted);
+        changes.put("after", granted);
+        auditLogger.record(operator, project, granted ? AuditOperationType.AUTHORIZE : AuditOperationType.UN_AUTHORIZE,
+                granted ? "grant-project-resource" : "revoke-project-resource", changes);
     }
 
     private void requireAdministrator(User loginUser, long projectCode) {

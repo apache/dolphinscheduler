@@ -4,7 +4,7 @@ This document is mainly used to describe the scope of work, responsibilities and
 
 ## Project authorization boundaries (from 3.5.0)
 
-Users receive independent operation permissions within projects, and projects receive use grants for eight shared-resource types. Operations using resources check both dimensions. Use grants do not grant resource modification, deletion or re-granting rights, and member management does not include project resource authorization. System administrators pass project operation checks, but the relevant projects still need resource grants. Executing users do not need personal resource grants; resource files retain their existing authorization mechanism.
+The four project operation permissions are `VIEW`, `DEVELOP` (including definition publishing), `EXECUTE` (including schedule management) and `MANAGE_MEMBERS`. Users receive independent operation permissions within projects, and projects receive use grants for eight shared-resource types. Operations using resources check both dimensions. Use grants do not grant resource modification, deletion or re-granting rights, and member management does not include project resource authorization. System administrators pass project operation checks, but the relevant projects still need resource grants. Executing users do not need personal resource grants; resource files retain their existing authorization mechanism.
 
 Lineage queries expose related cross-project nodes, edges and summaries without requiring `VIEW` on every related project; accessing related workflow details and operations still requires permission on their actual projects.
 

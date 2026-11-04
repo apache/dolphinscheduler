@@ -397,11 +397,11 @@ public class UsersServiceTest {
         assertDoesNotThrow(() -> usersService.grantProject(loginUser, userId, projectIds));
 
         Mockito.verify(projectAuthorizationService).replaceMemberPermissions(loginUser, 10L, userId,
-                EnumSet.of(ProjectPermission.VIEW, ProjectPermission.DEVELOP, ProjectPermission.PUBLISH,
-                        ProjectPermission.EXECUTE, ProjectPermission.MANAGE_SCHEDULES));
+                EnumSet.of(ProjectPermission.VIEW, ProjectPermission.DEVELOP,
+                        ProjectPermission.EXECUTE));
         Mockito.verify(projectAuthorizationService).replaceMemberPermissions(loginUser, 20L, userId,
-                EnumSet.of(ProjectPermission.VIEW, ProjectPermission.DEVELOP, ProjectPermission.PUBLISH,
-                        ProjectPermission.EXECUTE, ProjectPermission.MANAGE_SCHEDULES));
+                EnumSet.of(ProjectPermission.VIEW, ProjectPermission.DEVELOP,
+                        ProjectPermission.EXECUTE));
         Mockito.verifyNoInteractions(projectUserDao);
 
         // ERROR: NO_CURRENT_OPERATING_PERMISSION

@@ -687,7 +687,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
                 .when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkProjectPermission(user, projectCode, ProjectPermission.PUBLISH);
+                .when(projectService).checkProjectPermission(user, projectCode, ProjectPermission.DEVELOP);
 
         ServiceException switchEx = Assertions.assertThrows(ServiceException.class,
                 () -> workflowDefinitionService.switchWorkflowDefinitionVersion(
@@ -1366,7 +1366,39 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     }
 
     @Test
-    public void testSwitchWorkflowDefinitionVersionShouldOfflineSchedule() {
+    public void switchingVersionRejectsOnlineWorkflowBeforeReadingHistory() {
+        WorkflowDefinition definition = getWorkflowDefinition();
+        definition.setReleaseState(ReleaseState.ONLINE);
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.switchWorkflowDefinitionVersion(user, projectCode,
+                        processDefinitionCode, 1));
+
+        Assertions.assertEquals(Status.WORKFLOW_DEFINE_STATE_ONLINE.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(processService, workflowDefinitionLogMapper, schedulerService);
+    }
+
+    @Test
+    public void switchingVersionRejectsOnlineScheduleBeforeReadingHistory() {
+        WorkflowDefinition definition = getWorkflowDefinition();
+        definition.setReleaseState(ReleaseState.OFFLINE);
+        when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+        Schedule schedule = new Schedule();
+        schedule.setId(42);
+        schedule.setReleaseState(ReleaseState.ONLINE);
+        Mockito.lenient().when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(schedule);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.switchWorkflowDefinitionVersion(user, projectCode,
+                        processDefinitionCode, 1));
+
+        Assertions.assertEquals(Status.SCHEDULE_STATE_ONLINE.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(processService, workflowDefinitionLogMapper, schedulerService);
+    }
+
+    @Test
+    public void testSwitchWorkflowDefinitionVersionLeavesScheduleUnchanged() {
         WorkflowDefinition workflowDefinition = getWorkflowDefinition();
         WorkflowDefinitionLog workflowDefinitionLog = new WorkflowDefinitionLog();
         workflowDefinitionLog.setCode(processDefinitionCode);
@@ -1388,7 +1420,7 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
         workflowDefinitionService.switchWorkflowDefinitionVersion(user, projectCode, processDefinitionCode, 1);
 
-        verify(schedulerService).offlineSchedulerByWorkflowCode(processDefinitionCode);
+        verify(schedulerService, Mockito.never()).offlineSchedulerByWorkflowCode(processDefinitionCode);
     }
 
     @Test

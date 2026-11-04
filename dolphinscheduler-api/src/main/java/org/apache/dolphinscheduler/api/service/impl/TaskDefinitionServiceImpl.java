@@ -335,7 +335,7 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     @Override
     public void releaseTaskDefinition(User loginUser, long projectCode, long code, ReleaseState releaseState) {
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkProjectPermission(loginUser, project, ProjectPermission.PUBLISH);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
 
         if (null == releaseState) {
             throw new ServiceException(Status.REQUEST_PARAMS_NOT_VALID_ERROR, Constants.RELEASE_STATE);

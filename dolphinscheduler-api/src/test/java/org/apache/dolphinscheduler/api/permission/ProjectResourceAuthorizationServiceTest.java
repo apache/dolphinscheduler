@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.permission;
 
+import org.apache.dolphinscheduler.api.audit.ProjectAuthorizationAuditLogger;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
@@ -29,6 +30,7 @@ import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
@@ -40,6 +42,7 @@ import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 import org.apache.dolphinscheduler.dao.repository.IEnvironmentDao;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupDao;
@@ -64,6 +67,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ProjectResourceAuthorizationServiceTest {
 
+    @Mock
+    private ProjectDao projectDao;
+    @Mock
+    private ProjectAuthorizationAuditLogger auditLogger;
     @Mock
     private ProjectAuthorizationService projectAuthorizationService;
     @Mock
@@ -96,6 +103,8 @@ class ProjectResourceAuthorizationServiceTest {
         admin = new User();
         admin.setId(1);
         admin.setUserType(UserType.ADMIN_USER);
+        Mockito.lenient().when(projectDao.queryByCodeForUpdate(100L))
+                .thenReturn(Project.builder().code(100L).name("project").build());
     }
 
     @ParameterizedTest
@@ -199,6 +208,8 @@ class ProjectResourceAuthorizationServiceTest {
 
     @Test
     void revokeOnlyRemovesSelectedGrantEvenIfResourceWasDeleted() {
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.DATASOURCE, "42"))
+                .thenReturn(true);
         service.revokeResource(admin, 100L, ProjectResourceType.DATASOURCE, "42");
         Mockito.verify(resourceAuthorizationDao).revokeAuthorization(100L, ProjectResourceType.DATASOURCE, "42");
         Mockito.verifyNoInteractions(dataSourceDao);

@@ -143,10 +143,11 @@ public class TenantServiceTest {
 
         // tenantCode exist
         assertThrowsServiceException(Status.OS_TENANT_CODE_EXIST,
-                () -> tenantService.verifyTenantCode(getTenant().getTenantCode()));
+                () -> tenantService.verifyTenantCode(getLoginUser(), getTenant().getTenantCode()));
 
         // success
-        assertDoesNotThrow(() -> tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf"));
+        assertDoesNotThrow(
+                () -> tenantService.verifyTenantCode(getLoginUser(), "s00000000000l887888885554444sfjdskfjslakslkdf"));
     }
 
     @Test
@@ -230,9 +231,10 @@ public class TenantServiceTest {
         when(tenantDao.existTenant(tenantCode)).thenReturn(true);
         // tenantCode exist
         assertThrowsServiceException(Status.OS_TENANT_CODE_EXIST,
-                () -> tenantService.verifyTenantCode(getTenant().getTenantCode()));
+                () -> tenantService.verifyTenantCode(getLoginUser(), getTenant().getTenantCode()));
         // success
-        assertDoesNotThrow(() -> tenantService.verifyTenantCode("s00000000000l887888885554444sfjdskfjslakslkdf"));
+        assertDoesNotThrow(
+                () -> tenantService.verifyTenantCode(getLoginUser(), "s00000000000l887888885554444sfjdskfjslakslkdf"));
     }
 
     @Test

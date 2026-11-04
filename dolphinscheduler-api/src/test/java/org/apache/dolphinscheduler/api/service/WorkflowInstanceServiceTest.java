@@ -96,6 +96,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -473,6 +475,65 @@ public class WorkflowInstanceServiceTest {
                 workflowInstance.getWorkflowDefinitionVersion())).thenReturn(null);
         assertThrowsServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
                 () -> workflowInstanceService.queryWorkflowInstanceById(loginUser, projectCode, 1));
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    public void movedDefinitionDoesNotTransferHistoricalInstanceAccess(boolean variables) {
+        User viewer = getAdminUser();
+        viewer.setUserType(UserType.GENERAL_USER);
+        WorkflowInstance instance = getProcessInstance();
+        instance.setProjectCode(1L);
+        instance.setState(WorkflowExecutionStatus.SUCCESS);
+        WorkflowDefinition movedDefinition = new WorkflowDefinition();
+        movedDefinition.setProjectCode(2L);
+        Mockito.lenient().when(workflowDefinitionDao.queryByCode(instance.getWorkflowDefinitionCode()))
+                .thenReturn(Optional.of(movedDefinition));
+        Mockito.lenient().when(projectDao.queryByCode(2L)).thenReturn(getProject(2L));
+        if (variables) {
+            when(workflowInstanceDao.queryDetailById(1)).thenReturn(instance);
+        } else {
+            when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(instance));
+        }
+
+        assertThrowsServiceException(Status.WORKFLOW_INSTANCE_NOT_EXIST, () -> {
+            if (variables) {
+                workflowInstanceService.viewVariables(viewer, 2L, 1);
+            } else {
+                workflowInstanceService.queryTaskListByWorkflowInstanceId(viewer, 2L, 1);
+            }
+        });
+        Mockito.verifyNoInteractions(taskInstanceDao, taskInstanceContextDao);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    public void originalProjectCanStillReadHistoricalInstanceAfterMove(boolean variables) {
+        User viewer = getAdminUser();
+        viewer.setUserType(UserType.GENERAL_USER);
+        WorkflowInstance instance = getProcessInstance();
+        instance.setProjectCode(1L);
+        instance.setState(WorkflowExecutionStatus.SUCCESS);
+        instance.setCommandType(CommandType.SCHEDULER);
+        instance.setScheduleTime(new Date());
+        instance.setGlobalParams("");
+        WorkflowDefinition movedDefinition = new WorkflowDefinition();
+        movedDefinition.setProjectCode(2L);
+        Mockito.lenient().when(workflowDefinitionDao.queryByCode(instance.getWorkflowDefinitionCode()))
+                .thenReturn(Optional.of(movedDefinition));
+        Mockito.lenient().when(projectDao.queryByCode(1L)).thenReturn(getProject(1L));
+        if (variables) {
+            when(workflowInstanceDao.queryDetailById(1)).thenReturn(instance);
+        } else {
+            when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(instance));
+        }
+        Assertions.assertDoesNotThrow(() -> {
+            if (variables) {
+                workflowInstanceService.viewVariables(viewer, 1L, 1);
+            } else {
+                workflowInstanceService.queryTaskListByWorkflowInstanceId(viewer, 1L, 1);
+            }
+        });
     }
 
     @Test
@@ -1215,6 +1276,7 @@ public class WorkflowInstanceServiceTest {
      */
     private WorkflowInstance getProcessInstance() {
         WorkflowInstance workflowInstance = new WorkflowInstance();
+        workflowInstance.setProjectCode(1L);
         workflowInstance.setId(1);
         workflowInstance.setName("test_process_instance");
         workflowInstance.setWorkflowDefinitionCode(46L);

@@ -276,8 +276,10 @@ public class DataSourceController extends BaseController {
     @GetMapping(value = "/verify-name")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(VERIFY_DATASOURCE_NAME_FAILURE)
-    public Result<Boolean> verifyDataSourceName(@RequestParam(value = "name") String name) {
-        dataSourceService.verifyDataSourceName(name);
+    public Result<Boolean> verifyDataSourceName(
+                                                @Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @RequestParam(value = "name") String name) {
+        dataSourceService.verifyDataSourceName(loginUser, name);
         return Result.success(true);
     }
 

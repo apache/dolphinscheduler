@@ -116,22 +116,22 @@ public class K8SNamespaceServiceTest {
         Mockito.when(k8sNamespaceDao.existNamespace(namespace, clusterCode)).thenReturn(true);
 
         // namespace null
-        Result result = k8sNamespaceService.verifyNamespaceK8s(null, clusterCode);
+        Result result = k8sNamespaceService.verifyNamespaceK8s(getLoginUser(), null, clusterCode);
         logger.info(result.toString());
         Assertions.assertEquals(result.getCode().intValue(), Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
 
         // k8s null
-        result = k8sNamespaceService.verifyNamespaceK8s(namespace, null);
+        result = k8sNamespaceService.verifyNamespaceK8s(getLoginUser(), namespace, null);
         logger.info(result.toString());
         Assertions.assertEquals(result.getCode().intValue(), Status.REQUEST_PARAMS_NOT_VALID_ERROR.getCode());
 
         // exist
-        result = k8sNamespaceService.verifyNamespaceK8s(namespace, clusterCode);
+        result = k8sNamespaceService.verifyNamespaceK8s(getLoginUser(), namespace, clusterCode);
         logger.info(result.toString());
         Assertions.assertEquals(result.getCode().intValue(), Status.K8S_NAMESPACE_EXIST.getCode());
 
         // not exist
-        result = k8sNamespaceService.verifyNamespaceK8s(namespace, 9999L);
+        result = k8sNamespaceService.verifyNamespaceK8s(getLoginUser(), namespace, 9999L);
         logger.info(result.toString());
         Assertions.assertEquals(result.getCode().intValue(), Status.SUCCESS.getCode());
     }

@@ -24,10 +24,8 @@ export default {
     explicit_permissions: 'Only the selected operations are granted.',
     permissions: {
       VIEW: 'View',
-      DEVELOP: 'Develop',
-      PUBLISH: 'Publish',
-      EXECUTE: 'Execute',
-      MANAGE_SCHEDULES: 'Manage schedules',
+      DEVELOP: 'Develop and publish',
+      EXECUTE: 'Execute and schedule',
       MANAGE_MEMBERS: 'Manage members'
     },
     resources: 'Resource Authorization',

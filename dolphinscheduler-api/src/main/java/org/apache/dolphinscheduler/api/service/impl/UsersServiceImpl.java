@@ -594,8 +594,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
     }
 
     private Set<ProjectPermission> writableProjectPermissions() {
-        return EnumSet.of(ProjectPermission.VIEW, ProjectPermission.DEVELOP, ProjectPermission.PUBLISH,
-                ProjectPermission.EXECUTE, ProjectPermission.MANAGE_SCHEDULES);
+        return EnumSet.of(ProjectPermission.VIEW, ProjectPermission.DEVELOP,
+                ProjectPermission.EXECUTE);
     }
 
     /**

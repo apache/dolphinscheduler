@@ -425,7 +425,10 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param environmentName environment name
      */
     @Override
-    public void verifyEnvironment(String environmentName) {
+    public void verifyEnvironment(User loginUser, String environmentName) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         if (StringUtils.isEmpty(environmentName)) {
             log.warn("parameter environment name is empty.");
             throw new ServiceException(Status.ENVIRONMENT_NAME_IS_NULL);

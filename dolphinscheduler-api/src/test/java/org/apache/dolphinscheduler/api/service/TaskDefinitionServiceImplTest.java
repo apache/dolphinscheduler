@@ -295,7 +295,7 @@ public class TaskDefinitionServiceImplTest {
     public void testReleaseTaskDefinition() {
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(getProject());
         Project project = getProject();
-        Mockito.doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.PUBLISH);
+        Mockito.doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
 
         // check task dose not exist
         assertThrowsServiceException(Status.TASK_DEFINE_NOT_EXIST,
@@ -331,7 +331,7 @@ public class TaskDefinitionServiceImplTest {
     public void releaseTaskDefinitionShouldRejectUnavailableSubWorkflow() {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
-        Mockito.doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.PUBLISH);
+        Mockito.doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
 
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
@@ -360,7 +360,7 @@ public class TaskDefinitionServiceImplTest {
                 .when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
 
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkProjectPermission(user, project, ProjectPermission.PUBLISH);
+                .when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
 
         assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
                 () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));

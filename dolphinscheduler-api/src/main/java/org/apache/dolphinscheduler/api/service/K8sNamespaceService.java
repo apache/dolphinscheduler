@@ -55,7 +55,7 @@ public interface K8sNamespaceService {
      * @param clusterCode cluster code
      * @return true if the k8s and namespace not exists, otherwise return false
      */
-    Result<Object> verifyNamespaceK8s(String namespace, Long clusterCode);
+    Result<Object> verifyNamespaceK8s(User loginUser, String namespace, Long clusterCode);
 
     /**
      * delete namespace by id

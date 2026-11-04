@@ -269,7 +269,10 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue name not exists, otherwise return false
      */
     @Override
-    public void verifyQueue(String queue, String queueName) {
+    public void verifyQueue(User loginUser, String queue, String queueName) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         Queue queueValidator = new Queue(queueName, queue);
         validQueue(queueValidator);
     }

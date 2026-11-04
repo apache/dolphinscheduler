@@ -204,7 +204,7 @@ public class TenantController extends BaseController {
     @ApiException(VERIFY_OS_TENANT_CODE_ERROR)
     public Result<Boolean> verifyTenantCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "tenantCode") String tenantCode) {
-        tenantService.verifyTenantCode(tenantCode);
+        tenantService.verifyTenantCode(loginUser, tenantCode);
         return Result.success(true);
     }
 

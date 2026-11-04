@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.tools.datasource;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.sql.SqlScriptRunner;
 import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
+import org.apache.dolphinscheduler.dao.mapper.ProjectMapper;
 import org.apache.dolphinscheduler.dao.mapper.ProjectResourceAuthorizationMapper;
 import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
@@ -161,8 +162,13 @@ class ProjectAuthorizationUpgradeIT {
                 factory.setDataSource(dataSource);
                 MybatisConfiguration configuration = new MybatisConfiguration();
                 configuration.addMapper(ProjectResourceAuthorizationMapper.class);
+                configuration.addMapper(ProjectMapper.class);
                 factory.setConfiguration(configuration);
+                jdbc.update("insert into t_ds_project (code, name, user_id, create_time) "
+                        + "values (200, 'authorization-lock', 1, current_timestamp)");
                 try (SqlSession session = factory.getObject().openSession(true)) {
+                    Assertions.assertEquals("authorization-lock",
+                            session.getMapper(ProjectMapper.class).queryByCodeForUpdate(200L).getName());
                     ProjectResourceAuthorizationDao grants = new ProjectResourceAuthorizationDaoImpl(
                             session.getMapper(ProjectResourceAuthorizationMapper.class));
                     Assertions.assertTrue(grants.isAuthorized(200L, ProjectResourceType.WORKER_GROUP, "工作组"));

@@ -20,8 +20,6 @@ package org.apache.dolphinscheduler.common.enums;
 public enum ProjectPermission {
     VIEW,
     DEVELOP,
-    PUBLISH,
     EXECUTE,
-    MANAGE_SCHEDULES,
     MANAGE_MEMBERS
 }

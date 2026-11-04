@@ -24,10 +24,8 @@ export default {
     explicit_permissions: '仅授予所勾选的操作权限。',
     permissions: {
       VIEW: '查看',
-      DEVELOP: '开发',
-      PUBLISH: '发布',
-      EXECUTE: '执行',
-      MANAGE_SCHEDULES: '管理调度',
+      DEVELOP: '开发与发布',
+      EXECUTE: '执行与调度',
       MANAGE_MEMBERS: '管理成员'
     },
     resources: '资源授权',
