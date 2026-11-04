@@ -14,7 +14,7 @@
 - 任务关系通过 `code + version` 引用任务；工作流实例（`t_ds_workflow_instance`）和任务实例（`t_ds_task_instance`）引用创建它们时的具体定义版本。
 - 各任务类型特有的配置以 JSON 形式存储在 `t_ds_task_definition.task_params` 中，详见[任务参数](#任务参数)。
 
-表结构以 `dolphinscheduler-dao/src/main/resources/sql` 下的 SQL 文件为准，下文介绍常用字段。
+表结构以 `dolphinscheduler-dao/src/main/resources/sql` 下的 SQL 文件为准，下文介绍常用字段，字段类型取自 `dolphinscheduler_mysql.sql`，PostgreSQL 和 H2 请参考 `dolphinscheduler_postgresql.sql` 和 `dolphinscheduler_h2.sql`。
 
 ## 工作流定义
 
@@ -33,7 +33,7 @@
 | global_params    | text         | 全局参数，结构为[参数](#公共字段)组成的 JSON 数组                  |
 | flag             | tinyint(4)   | 工作流是否可用：0 不可用，1 可用                              |
 | locations        | text         | 节点在画布上的坐标，例如 `[{"taskCode":123,"x":59,"y":61}]` |
-| warning_group_id | int(11)      | 定时的告警组，创建或更新定时时写入，否则为 NULL                      |
+| warning_group_id | int(11)      | 最近一次创建或更新定时时复制的告警组，删除定时不清空                      |
 | timeout          | int(11)      | 超时时间，单位分钟                                       |
 | execution_type   | tinyint(4)   | 执行策略：0 并行，1 串行等待，2 串行抛弃，3 串行优先                  |
 | create_time      | datetime     | 创建时间                                            |
@@ -741,8 +741,10 @@ DEPENDENT 任务检查其他工作流或任务在指定时间范围内是否运�
 | ------ dateValue        | String  | 周期内的时间范围，取值见下表                                                                                                                                                        |
 | ------ parameterPassing | Boolean | 依赖成功时，是否把被依赖工作流实例 varPool 中的 `OUT` 参数传给下游任务。仅在 `depTaskCode` 为 `0`、`-1` 或被依赖任务为流式任务时生效，默认 `false`                                                                     |
 | -- checkInterval        | Number  | 检查依赖状态的间隔，单位为秒。设置时必须大于 0，缺省为 `10`                                                                                                                                     |
-| -- failurePolicy        | String  | 依赖失败时的策略：`DEPENDENT_FAILURE_FAILURE`（当前任务失败）或 `DEPENDENT_FAILURE_WAITING`（继续检查，直到距基准时间超过 `failureWaitingTime` 分钟后失败）。未设置 `failurePolicy` 或 `failureWaitingTime` 时立即失败 |
+| -- failurePolicy        | String  | 依赖失败时的策略：`DEPENDENT_FAILURE_FAILURE`（当前任务失败）或 `DEPENDENT_FAILURE_WAITING`（保持等待，直到距基准时间超过 `failureWaitingTime` 分钟后失败）。未设置 `failurePolicy` 或 `failureWaitingTime` 时立即失败 |
 | -- failureWaitingTime   | Number  | 等待时长，单位为分钟，仅在 `failurePolicy` 为 `DEPENDENT_FAILURE_WAITING` 时使用                                                                                                       |
+
+依赖的失败结果会被缓存，之后不再重新检查，因此 `DEPENDENT_FAILURE_WAITING` 只是推迟失败，之后出现的成功实例不会改变结果。
 
 `cycle` 和 `dateValue` 的取值如下。所有时间范围都以当前工作流实例的调度时间为基准（非调度运行时取启动时间）；`thisWeek`、`thisMonth` 表示从周一、月初到该时间。Master 只依据 `dateValue` 和 `depTaskCode` 判断。后端还支持 `thisMonthEnd`，UI 未提供该选项。
 

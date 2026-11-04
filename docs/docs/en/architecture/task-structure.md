@@ -19,7 +19,9 @@ A workflow is not stored as a single JSON document. Its definition is split into
   [Task Params](#task-params).
 
 The table schema is defined by the SQL files under `dolphinscheduler-dao/src/main/resources/sql`, which are the source of
-truth. The following sections describe the commonly used columns.
+truth. The following sections describe the commonly used columns. The column types
+shown follow `dolphinscheduler_mysql.sql`; see `dolphinscheduler_postgresql.sql` and `dolphinscheduler_h2.sql` for
+PostgreSQL and H2.
 
 ## Workflow Definition
 
@@ -38,7 +40,7 @@ Table `t_ds_workflow_definition`:
 | global_params    | text         | Global parameters, a JSON array of [parameters](#common-fields)                            |
 | flag             | tinyint(4)   | Whether the workflow is available: 0 no, 1 yes                                             |
 | locations        | text         | Node coordinates on the canvas, e.g. `[{"taskCode":123,"x":59,"y":61}]`                    |
-| warning_group_id | int(11)      | Alert group of the schedule, set when the schedule is created or updated, otherwise `NULL` |
+| warning_group_id | int(11)      | Alert group copied from the last created or updated schedule; not cleared if it is deleted |
 | timeout          | int(11)      | Timeout, in minutes                                                                        |
 | execution_type   | tinyint(4)   | Execution type: 0 parallel, 1 serial wait, 2 serial discard, 3 serial priority             |
 | create_time      | datetime     | Create time                                                                                |
@@ -756,8 +758,11 @@ The DEPENDENT task checks whether other workflows or tasks have run successfully
 | ------ dateValue        | String  | Time range inside the cycle, see the table below                                                                                                                                                                                                                                  |
 | ------ parameterPassing | Boolean | Whether to pass the `OUT` parameters in the varPool of the dependent workflow instance to downstream tasks when the dependency succeeds. Only takes effect when `depTaskCode` is `0` or `-1`, or the dependent task is a streaming task. Default `false`                          |
 | -- checkInterval        | Number  | Interval of checking the dependency status, in seconds. Must be greater than 0 if set, default `10` when omitted                                                                                                                                                                  |
-| -- failurePolicy        | String  | What to do when a dependency failed: `DEPENDENT_FAILURE_FAILURE` (the task fails) or `DEPENDENT_FAILURE_WAITING` (keep checking until `failureWaitingTime` minutes after the base time, then fail). If `failurePolicy` or `failureWaitingTime` is omitted, the task fails at once |
+| -- failurePolicy        | String  | What to do when a dependency failed: `DEPENDENT_FAILURE_FAILURE` (the task fails) or `DEPENDENT_FAILURE_WAITING` (still waiting until `failureWaitingTime` minutes after the base time, then fail). If `failurePolicy` or `failureWaitingTime` is omitted, the task fails at once |
 | -- failureWaitingTime   | Number  | Waiting time in minutes, only used when `failurePolicy` is `DEPENDENT_FAILURE_WAITING`                                                                                                                                                                                            |
+
+A failed dependency result is cached and not checked again, so `DEPENDENT_FAILURE_WAITING` only delays the failure; a
+later successful instance does not change it.
 
 `cycle` and `dateValue` take the following values. All ranges are relative to the schedule time of the current workflow
 instance, or the start time if it was not scheduled. `thisWeek` and `thisMonth` cover from the start of the week or
