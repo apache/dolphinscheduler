@@ -175,8 +175,13 @@ public final class RpcAuthenticationHandler extends ByteToMessageDecoder {
     }
 
     private void fail(ChannelHandlerContext ctx, String message) {
+        fail(ctx, message, null);
+    }
+
+    private void fail(ChannelHandlerContext ctx, String message, Throwable cause) {
         if (authentication.tryFailure(new RemoteException(message))) {
-            log.warn("{} for {}", message, ctx.channel().remoteAddress());
+            log.warn("{} for {} (role={})", message, ctx.channel().remoteAddress(), server ? "server" : "client",
+                    cause);
         }
         if (timeout != null) {
             timeout.cancel(false);
@@ -192,6 +197,6 @@ public final class RpcAuthenticationHandler extends ByteToMessageDecoder {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-        fail(ctx, "RPC authentication failed");
+        fail(ctx, "RPC authentication failed", cause);
     }
 }

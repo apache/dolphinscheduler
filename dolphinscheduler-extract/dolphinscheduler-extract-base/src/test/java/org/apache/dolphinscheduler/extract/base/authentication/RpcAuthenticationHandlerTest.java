@@ -20,20 +20,29 @@ package org.apache.dolphinscheduler.extract.base.authentication;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 import org.apache.dolphinscheduler.extract.base.protocal.HeartBeatTransporter;
 import org.apache.dolphinscheduler.extract.base.protocal.Transporter;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterDecoder;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterEncoder;
 
+import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.ThrowableProxy;
+import ch.qos.logback.core.read.ListAppender;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.embedded.EmbeddedChannel;
@@ -179,6 +188,52 @@ class RpcAuthenticationHandlerTest {
         client.writeInbound(challenge);
         assertFalse(client.isActive());
         assertFalse(RpcAuthenticationHandler.isAuthenticated(client));
+    }
+
+    @Test
+    void logsLocalClientAuthenticationException() throws Exception {
+        assertLocalAuthenticationExceptionIsLogged(false);
+    }
+
+    @Test
+    void logsLocalServerAuthenticationException() throws Exception {
+        assertLocalAuthenticationExceptionIsLogged(true);
+    }
+
+    private void assertLocalAuthenticationExceptionIsLogged(boolean serverRole) throws Exception {
+        RpcAuthenticationConfig failingConfig = spy(config);
+        GeneralSecurityException cause = new GeneralSecurityException("HMAC provider failure");
+        doThrow(cause).when(failingConfig).newMac();
+        Logger logger = (Logger) LoggerFactory.getLogger(RpcAuthenticationHandler.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        EmbeddedChannel failingChannel = new EmbeddedChannel(new RpcAuthenticationHandler(failingConfig, serverRole));
+        try {
+            if (serverRole) {
+                client.writeInbound((ByteBuf) failingChannel.readOutbound());
+                failingChannel.writeInbound((ByteBuf) client.readOutbound());
+            } else {
+                failingChannel.writeInbound((ByteBuf) server.readOutbound());
+            }
+            assertFalse(failingChannel.isActive());
+            assertFalse(RpcAuthenticationHandler.isAuthenticated(failingChannel));
+            Throwable failure = RpcAuthenticationHandler.authenticationFuture(failingChannel).cause();
+            assertEquals("RPC authentication failed", failure.getMessage());
+            assertNull(failure.getCause());
+            assertNull(failingChannel.readInbound());
+            assertNull(failingChannel.readOutbound());
+            assertEquals(1, appender.list.size());
+            ILoggingEvent event = appender.list.get(0);
+            assertEquals("RPC authentication failed for embedded (role=" + (serverRole ? "server" : "client") + ")",
+                    event.getFormattedMessage());
+            assertSame(cause, ((ThrowableProxy) event.getThrowableProxy()).getThrowable().getCause());
+            assertTrue(event.getThrowableProxy().getStackTraceElementProxyArray().length > 0);
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+            failingChannel.finishAndReleaseAll();
+        }
     }
 
     @Test
