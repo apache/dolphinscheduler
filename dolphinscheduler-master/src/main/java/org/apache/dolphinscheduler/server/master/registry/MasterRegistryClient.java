@@ -20,9 +20,12 @@ package org.apache.dolphinscheduler.server.master.registry;
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
+import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
@@ -38,11 +41,11 @@ import org.springframework.stereotype.Component;
 
 /**
  * <p>DolphinScheduler master register client, used to connect to registry and hand the registry events.
- * <p>When the Master node startup, it will register in registry center. And start a {@link MasterHeartBeatTask} to update its metadata in registry.
+ * <p>When the Master node startup, it will register in registry center. And start a {@link MasterHeartBeatTask} to sample its metadata locally and check failover marks.
  */
 @Component
 @Slf4j
-public class MasterRegistryClient implements AutoCloseable {
+public class MasterRegistryClient implements AutoCloseable, IMasterMetadataService {
 
     @Autowired
     private RegistryClient registryClient;
@@ -98,7 +101,8 @@ public class MasterRegistryClient implements AutoCloseable {
 
         // remove before persist
         registryClient.remove(masterRegistryPath);
-        registryClient.persistEphemeral(masterRegistryPath, JSONUtils.toJsonString(masterHeartBeatTask.getHeartBeat()));
+        registryClient.persistEphemeral(masterRegistryPath,
+                JSONUtils.toJsonString(ServerRegistration.fromHeartBeat(masterHeartBeatTask.getLatestHeartBeat())));
 
         while (!registryClient.checkNodeExists(NetUtils.getHost(), RegistryNodeType.MASTER)) {
             log.warn("The current master server node:{} cannot find in registry", NetUtils.getHost());
@@ -121,6 +125,14 @@ public class MasterRegistryClient implements AutoCloseable {
         } catch (Exception e) {
             log.error("MasterServer remove registry path exception ", e);
         }
+    }
+
+    @Override
+    public MasterHeartBeat getServerMetadata() {
+        if (masterHeartBeatTask == null) {
+            throw new IllegalStateException("Master metadata is not initialized");
+        }
+        return masterHeartBeatTask.getLatestHeartBeat();
     }
 
     public boolean isAvailable() {

@@ -35,6 +35,8 @@ public abstract class BaseHeartBeatTask<T extends HeartBeat> extends BaseDaemonT
 
     protected T lastHeartBeat = null;
 
+    private volatile T latestHeartBeat;
+
     public BaseHeartBeatTask(String threadName, long heartBeatInterval) {
         super(threadName);
         this.threadName = threadName;
@@ -54,8 +56,10 @@ public abstract class BaseHeartBeatTask<T extends HeartBeat> extends BaseDaemonT
         while (runningFlag) {
             try {
                 T heartBeat = getHeartBeat();
-                // if first time or heartBeat status changed, write heartBeatInfo into registry
+                latestHeartBeat = heartBeat;
+                // Run the heartbeat action periodically or when the server status changes.
                 if (System.currentTimeMillis() - lastWriteTime >= heartBeatInterval
+                        || lastHeartBeat == null
                         || !lastHeartBeat.getServerStatus().equals(heartBeat.getServerStatus())) {
                     lastHeartBeat = heartBeat;
                     writeHeartBeat(heartBeat);
@@ -81,6 +85,15 @@ public abstract class BaseHeartBeatTask<T extends HeartBeat> extends BaseDaemonT
     private void handleInterruptException(InterruptedException ex) {
         log.warn("{} has been interrupted", threadName, ex);
         Thread.currentThread().interrupt();
+    }
+
+    public T getLatestHeartBeat() {
+        T snapshot = latestHeartBeat;
+        if (snapshot == null) {
+            snapshot = getHeartBeat();
+            latestHeartBeat = snapshot;
+        }
+        return snapshot;
     }
 
     public abstract T getHeartBeat();

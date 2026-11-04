@@ -33,8 +33,8 @@ import org.apache.dolphinscheduler.extract.master.transportor.WorkflowExecutorQu
 import org.apache.dolphinscheduler.extract.worker.ITaskExecutorQueryClient;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutorQueryRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutorQueryResponse;
-import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.service.metadata.ServerMetadataCache;
 import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 
 import java.util.List;
@@ -42,6 +42,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.google.common.collect.Lists;
@@ -54,7 +55,8 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
     private DatabaseMonitor databaseMonitor;
 
     @Autowired
-    private RegistryClient registryClient;
+    @Qualifier("apiMetadataCache")
+    private ServerMetadataCache serverMetadataCache;
 
     /**
      * query database state
@@ -69,7 +71,7 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
 
     @Override
     public List<Server> listServer(RegistryNodeType nodeType) {
-        return registryClient.getServerList(nodeType);
+        return serverMetadataCache.getServerList(nodeType);
     }
 
     @Override

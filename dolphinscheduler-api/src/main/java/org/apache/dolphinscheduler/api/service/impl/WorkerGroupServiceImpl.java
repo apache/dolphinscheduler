@@ -51,6 +51,7 @@ import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IMasterContainerService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.service.metadata.ServerMetadataCache;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -66,6 +67,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -85,6 +87,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
 
     @Autowired
     private RegistryClient registryClient;
+
+    @Autowired
+    @Qualifier("apiMetadataCache")
+    private ServerMetadataCache serverMetadataCache;
 
     @Autowired
     private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
@@ -378,7 +384,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public List<WorkerGroupPageDetail> getConfigWorkerGroupPageDetail() {
         List<WorkerGroupPageDetail> workerGroupPageDetails = new ArrayList<>();
-        registryClient.getServerList(RegistryNodeType.WORKER).forEach(server -> {
+        serverMetadataCache.getServerList(RegistryNodeType.WORKER).forEach(server -> {
+            if (server.getHeartBeatInfo() == null) {
+                return;
+            }
             WorkerGroupPageDetail workerGroupPageDetail = new WorkerGroupPageDetail();
             WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(server.getHeartBeatInfo(), WorkerHeartBeat.class);
             workerGroupPageDetail.setName(workerHeartBeat.getWorkerGroup());

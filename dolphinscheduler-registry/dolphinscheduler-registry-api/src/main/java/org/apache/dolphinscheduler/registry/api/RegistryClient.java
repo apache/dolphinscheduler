@@ -20,9 +20,8 @@ package org.apache.dolphinscheduler.registry.api;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
-import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -89,20 +88,12 @@ public class RegistryClient {
             Server server = new Server();
             switch (registryNodeType) {
                 case MASTER:
-                    MasterHeartBeat masterHeartBeat = JSONUtils.parseObject(heartBeatJson, MasterHeartBeat.class);
-                    server.setCreateTime(new Date(masterHeartBeat.getStartupTime()));
-                    server.setLastHeartbeatTime(new Date(masterHeartBeat.getReportTime()));
-                    server.setId(masterHeartBeat.getProcessId());
-                    server.setHost(masterHeartBeat.getHost());
-                    server.setPort(masterHeartBeat.getPort());
-                    break;
                 case WORKER:
-                    WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(heartBeatJson, WorkerHeartBeat.class);
-                    server.setCreateTime(new Date(workerHeartBeat.getStartupTime()));
-                    server.setLastHeartbeatTime(new Date(workerHeartBeat.getReportTime()));
-                    server.setId(workerHeartBeat.getProcessId());
-                    server.setHost(workerHeartBeat.getHost());
-                    server.setPort(workerHeartBeat.getPort());
+                    ServerRegistration registration = JSONUtils.parseObject(heartBeatJson, ServerRegistration.class);
+                    server.setCreateTime(new Date(registration.getStartupTime()));
+                    server.setId(registration.getProcessId());
+                    server.setHost(registration.getHost());
+                    server.setPort(registration.getPort());
                     break;
                 case ALERT_SERVER:
                     AlertServerHeartBeat alertServerHeartBeat =

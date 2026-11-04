@@ -21,9 +21,12 @@ import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_
 
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
+import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
@@ -48,7 +51,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class WorkerRegistryClient implements AutoCloseable {
+public class WorkerRegistryClient implements AutoCloseable, IWorkerMetadataService {
 
     @Autowired
     private WorkerConfig workerConfig;
@@ -90,7 +93,8 @@ public class WorkerRegistryClient implements AutoCloseable {
         String workerRegistryPath = workerConfig.getWorkerRegistryPath();
         // remove before persist
         registryClient.remove(workerRegistryPath);
-        registryClient.persistEphemeral(workerRegistryPath, JSONUtils.toJsonString(workerHeartBeatTask.getHeartBeat()));
+        registryClient.persistEphemeral(workerRegistryPath,
+                JSONUtils.toJsonString(ServerRegistration.fromHeartBeat(workerHeartBeatTask.getLatestHeartBeat())));
         log.info("Worker node: {} registry to registry center {} successfully", workerConfig.getWorkerAddress(),
                 workerRegistryPath);
 
@@ -122,6 +126,14 @@ public class WorkerRegistryClient implements AutoCloseable {
         }
         registryClient.close();
         log.info("Closed WorkerRegistryClient");
+    }
+
+    @Override
+    public WorkerHeartBeat getServerMetadata() {
+        if (workerHeartBeatTask == null) {
+            throw new IllegalStateException("Worker metadata is not initialized");
+        }
+        return workerHeartBeatTask.getLatestHeartBeat();
     }
 
     public boolean isAvailable() {

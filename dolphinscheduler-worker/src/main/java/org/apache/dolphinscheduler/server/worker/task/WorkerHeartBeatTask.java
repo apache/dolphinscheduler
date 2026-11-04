@@ -21,7 +21,6 @@ import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeatTask;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
@@ -102,14 +101,7 @@ public class WorkerHeartBeatTask extends BaseHeartBeatTask<WorkerHeartBeat> {
                     .stop("The worker exist: " + failoverNodePath + ", means it has been failover will close myself");
             return;
         }
-        String workerHeartBeatJson = JSONUtils.toJsonString(workerHeartBeat);
-        String workerRegistryPath = workerConfig.getWorkerRegistryPath();
-        registryClient.persistEphemeral(workerRegistryPath, workerHeartBeatJson);
         WorkerServerMetrics.incWorkerHeartbeatCount();
-        log.debug(
-                "Success write worker group heartBeatInfo into registry, workerRegistryPath: {} workerHeartBeatInfo: {}",
-                workerRegistryPath,
-                workerHeartBeatJson);
     }
 
 }

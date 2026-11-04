@@ -137,6 +137,8 @@ registry:
     digest: ~
 
 api:
+  # RPC refresh interval for Master/Worker metadata.
+  metadata-refresh-interval: 5s
   # The base URL for the API server, used for constructing callback URLs for features like OIDC.
   # This should be the public-facing URL of the DolphinScheduler API.
   base-url: http://127.0.0.1:12345/dolphinscheduler

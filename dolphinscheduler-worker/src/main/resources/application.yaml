@@ -44,7 +44,7 @@ registry:
 worker:
   # worker listener port
   listen-port: 1234
-  # worker heartbeat interval
+  # Maximum interval between failover-mark checks; metadata is sampled locally every second.
   max-heartbeat-interval: 10s
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
