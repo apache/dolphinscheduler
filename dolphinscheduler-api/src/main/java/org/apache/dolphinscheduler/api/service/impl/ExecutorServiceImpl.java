@@ -278,10 +278,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 return;
             case START_FAILURE_TASK_PROCESS:
                 checkInstanceExecutionSettings(workflowInstance);
-                checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
-                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
-                        workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
-                        workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
+                checkWorkflowTaskResourcePermission(workflowInstance.getProjectCode(),
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
                 executorClient.recoverFailureTaskInstance()
                         .onWorkflowInstance(workflowInstance)
                         .byUser(loginUser)
@@ -289,10 +287,8 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
                 return;
             case RECOVER_SUSPENDED_PROCESS:
                 checkInstanceExecutionSettings(workflowInstance);
-                checkWorkflowResourcePermission(loginUser, workflowInstance.getProjectCode(),
-                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion(),
-                        workflowInstance.getWorkerGroup(), workflowInstance.getEnvironmentCode(),
-                        workflowInstance.getTenantCode(), workflowInstance.getWarningGroupId());
+                checkWorkflowTaskResourcePermission(workflowInstance.getProjectCode(),
+                        workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
                 executorClient.recoverSuspendedWorkflowInstanceOperation()
                         .onWorkflowInstance(workflowInstance)
                         .byUser(loginUser)
@@ -471,11 +467,17 @@ public class ExecutorServiceImpl extends BaseServiceImpl implements ExecutorServ
     private void checkWorkflowResourcePermission(User loginUser, long projectCode, long workflowCode,
                                                  int workflowVersion, String workerGroup, Long environmentCode,
                                                  String tenantCode, Integer warningGroupId) {
+        List<TaskDefinitionLog> tasks = checkWorkflowTaskResourcePermission(projectCode, workflowCode, workflowVersion);
+        taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, tasks, workerGroup, environmentCode,
+                tenantCode, warningGroupId);
+    }
+
+    private List<TaskDefinitionLog> checkWorkflowTaskResourcePermission(long projectCode, long workflowCode,
+                                                                        int workflowVersion) {
         List<TaskDefinitionLog> tasks =
                 taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(workflowCode, workflowVersion);
         taskResourcePermissionChecker.checkPermission(projectCode, tasks);
-        taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, tasks, workerGroup, environmentCode,
-                tenantCode, warningGroupId);
+        return tasks;
     }
 
 }
