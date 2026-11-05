@@ -246,7 +246,11 @@ In the early schedule design, if there is no priority design and use the fair sc
 - For details, please refer to the logback configuration of Master and Worker, as shown in the following example:
 
 ```xml
-<conversionRule conversionWord="message" converterClass="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter"/>
+<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+    <layout class="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataLayout">
+        <pattern>%message%n</pattern>
+    </layout>
+</encoder>
 <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
     <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
     <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">

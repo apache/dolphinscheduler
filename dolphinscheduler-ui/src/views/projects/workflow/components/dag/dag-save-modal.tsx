@@ -41,7 +41,7 @@ import { useRoute } from 'vue-router'
 import { verifyName } from '@/service/modules/workflow-definition'
 import './x6-style.scss'
 import { positiveIntegerRegex } from '@/utils/regex'
-import { applySensitiveToggle, isValidSensitiveValue } from '@/utils/sensitive-param'
+import { applySensitiveToggle } from '@/utils/sensitive-param'
 import type { SaveForm, WorkflowDefinition, WorkflowInstance } from './types'
 
 const props = {
@@ -106,9 +106,6 @@ export default defineComponent({
           for (const param of globalParams) {
             if (!param.key || param.key.trim() === '') {
               return new Error(t('project.dag.prop_key_empty'))
-            }
-            if (param.sensitive && !isValidSensitiveValue(param.value)) {
-              return new Error(t('project.dag.sensitive_value_invalid'))
             }
           }
 

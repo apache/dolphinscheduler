@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptor;
@@ -204,7 +205,8 @@ public abstract class AbstractCommandExecutor {
                     String line;
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                         while ((line = reader.readLine()) != null) {
-                            log.info("[K8S-pod-log-{}]: {}", taskRequest.getTaskName(), line);
+                            log.info(TaskLogMarkers.skipTaskParamMask(),
+                                    "[K8S-pod-log-{}]: {}", taskRequest.getTaskName(), line);
                         }
                     }
                 }
@@ -228,7 +230,7 @@ public abstract class AbstractCommandExecutor {
                 LogUtils.setTaskInstanceLogFullPathMDC(taskRequest.getLogPath());
                 String line;
                 while ((line = inReader.readLine()) != null) {
-                    log.info(" -> {}", line);
+                    log.info(TaskLogMarkers.skipTaskParamMask(), " -> {}", line);
                     taskOutputParameterParser.appendParseLog(line);
                 }
             } catch (Exception e) {
