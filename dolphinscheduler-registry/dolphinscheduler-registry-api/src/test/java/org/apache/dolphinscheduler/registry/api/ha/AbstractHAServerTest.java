@@ -46,10 +46,11 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.AfterEach;
@@ -64,10 +65,11 @@ class AbstractHAServerTest {
     private static final String ADDRESS = "master-0:5678";
 
     private final List<AbstractHAServer> servers = new ArrayList<>();
-    private final List<ExecutorService> electionExecutors = new ArrayList<>();
+    private final List<ScheduledThreadPoolExecutor> electionExecutors = new ArrayList<>();
     private final AtomicReference<Runnable> retryAction = new AtomicReference<>(() -> {
     });
-    private ExecutorService electionExecutor;
+    private ScheduledThreadPoolExecutor electionExecutor;
+    private long recoveryDelayMillis = TimeUnit.DAYS.toMillis(1);
     private final AtomicReference<Throwable> workerFailure = new AtomicReference<>();
 
     private Registry registry;
@@ -207,20 +209,36 @@ class AbstractHAServerTest {
     @Test
     void testUnacquiredLockIsNotReleased() {
         when(registry.acquireLock(ELECTION_LOCK)).thenReturn(false);
-        server.start();
+        assertThrows(IllegalStateException.class, server::start);
         assertFalse(server.isActive());
         verify(registry, never()).releaseLock(ELECTION_LOCK);
         verify(statusListener, never()).changeToActive();
     }
 
     @Test
-    void testActiveServerDemotesWhenLockCannotBeAcquired() {
+    void testLockContentionRetriesWithoutDemotingCurrentOwner() {
         server.start();
-        when(registry.acquireLock(ELECTION_LOCK)).thenReturn(false);
+        when(registry.acquireLock(ELECTION_LOCK)).thenReturn(false, true);
         remove("");
+        assertTrue(server.isActive());
+        verify(statusListener, never()).changeToStandBy();
+        verify(registry, times(3)).acquireLock(ELECTION_LOCK);
+        verify(registry, times(2)).releaseLock(ELECTION_LOCK);
+    }
+
+    @Test
+    void testOwnRemovalDemotesBeforeRetryingFailedOwnershipRead() {
+        server.start();
+        String removedOwner = owner.get();
+        owner.set("master-1:5678#peer-instance");
+        when(registry.exists(SELECTOR_PATH))
+                .thenThrow(new IllegalStateException("registry unavailable"))
+                .thenReturn(true);
+        retryAction.set(() -> assertFalse(server.isActive(), "demotion must precede the first retry"));
+        remove(removedOwner);
         assertFalse(server.isActive());
         verify(statusListener).changeToStandBy();
-        verify(registry, times(1)).releaseLock(ELECTION_LOCK);
+        verify(registry, times(3)).acquireLock(ELECTION_LOCK);
     }
 
     @Test
@@ -255,14 +273,14 @@ class AbstractHAServerTest {
         when(registry.exists(SELECTOR_PATH)).thenThrow(new IllegalStateException("registry unavailable"));
         // Asynchronous callback failures are logged by the worker, not thrown on the Registry thread.
         remove("");
-        // Exception-driven demotion is deliberately outside this minimal candidate.
+        // An empty REMOVE payload does not confirm the loss of this instance's selector.
         assertTrue(server.isActive());
         verify(statusListener, never()).changeToStandBy();
         verify(registry, times(21)).releaseLock(ELECTION_LOCK);
     }
 
     @Test
-    void testRemoveCannotBeOverwrittenByEarlierStartupElection() throws Exception {
+    void testRemoveInvalidatesEarlierStartupPromotion() throws Exception {
         CountDownLatch startupElectionFinished = new CountDownLatch(1);
         CountDownLatch allowStartupToReturn = new CountDownLatch(1);
         AtomicBoolean firstRelease = new AtomicBoolean(true);
@@ -278,14 +296,121 @@ class AbstractHAServerTest {
         try {
             Future<?> startup = caller.submit(server::start);
             assertTrue(startupElectionFinished.await(5, TimeUnit.SECONDS));
-            owner.set("master-1:5678#peer-instance");
-            notifyRemove("");
+            String removedOwner = owner.get();
+            String peerOwner = "master-1:5678#peer-instance";
+            owner.set(peerOwner);
+            notifyRemove(removedOwner);
             allowStartupToReturn.countDown();
             startup.get(5, TimeUnit.SECONDS);
             drain();
             assertFalse(server.isActive());
+            verify(statusListener, never()).changeToActive();
+            verify(statusListener, never()).changeToStandBy();
+            assertTrue(electionExecutor.getQueue().isEmpty(), "a definitive result cancels recovery");
+
+            owner.set(null);
+            remove(peerOwner);
+            assertTrue(server.isActive());
+            assertEquals(removedOwner, owner.get());
             verify(statusListener).changeToActive();
-            verify(statusListener).changeToStandBy();
+        } finally {
+            allowStartupToReturn.countDown();
+            caller.shutdownNow();
+            assertTrue(caller.awaitTermination(5, TimeUnit.SECONDS));
+        }
+    }
+
+    @Test
+    void testDeferredPromotionRecoversWithoutAnotherRemove() throws Exception {
+        recoveryDelayMillis = 0;
+        CountDownLatch activated = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            activated.countDown();
+            return null;
+        }).when(statusListener).changeToActive();
+
+        // The queued check exhausts 20 attempts; the first scheduled check also fails.
+        deferStartupPromotion(21);
+
+        assertTrue(activated.await(5, TimeUnit.SECONDS));
+        drain();
+        assertTrue(server.isActive());
+        verify(statusListener).changeToActive();
+        verify(registry, times(23)).exists(SELECTOR_PATH);
+        assertTrue(electionExecutor.getQueue().isEmpty());
+    }
+
+    @Test
+    void testOwnRemovalDemotionRecoversWithoutAnotherRemove() throws Exception {
+        recoveryDelayMillis = 0;
+        server.start();
+        String currentOwner = owner.get();
+        CountDownLatch reactivated = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            reactivated.countDown();
+            return null;
+        }).when(statusListener).changeToActive();
+        AtomicInteger remainingFailures = new AtomicInteger(20);
+        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
+            if (remainingFailures.getAndUpdate(value -> Math.max(0, value - 1)) > 0) {
+                throw new IllegalStateException("registry unavailable");
+            }
+            return true;
+        });
+
+        // This notification belongs to an earlier selector. The current selector still belongs to A.
+        notifyRemove(currentOwner);
+
+        assertTrue(reactivated.await(5, TimeUnit.SECONDS));
+        drain();
+        assertEquals(currentOwner, owner.get());
+        assertTrue(server.isActive());
+        verify(statusListener).changeToStandBy();
+        verify(statusListener, times(2)).changeToActive();
+        verify(registry, times(22)).exists(SELECTOR_PATH);
+        assertTrue(electionExecutor.getQueue().isEmpty());
+    }
+
+    @Test
+    void testCloseCancelsDeferredPromotionRecovery() throws Exception {
+        deferStartupPromotion(20);
+        drain();
+
+        assertFalse(server.isActive());
+        assertEquals(1, electionExecutor.getQueue().size());
+        server.close();
+        assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
+        verify(statusListener, never()).changeToActive();
+        verify(registry, times(21)).exists(SELECTOR_PATH);
+    }
+
+    private void deferStartupPromotion(int readFailures) throws Exception {
+        CountDownLatch startupElectionFinished = new CountDownLatch(1);
+        CountDownLatch allowStartupToReturn = new CountDownLatch(1);
+        AtomicBoolean firstRelease = new AtomicBoolean(true);
+        AtomicInteger remainingFailures = new AtomicInteger();
+        when(registry.releaseLock(ELECTION_LOCK)).thenAnswer(invocation -> {
+            if (firstRelease.getAndSet(false)) {
+                startupElectionFinished.countDown();
+                await(allowStartupToReturn);
+            }
+            return true;
+        });
+        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
+            if (remainingFailures.getAndUpdate(value -> Math.max(0, value - 1)) > 0) {
+                throw new IllegalStateException("registry unavailable");
+            }
+            return owner.get() != null;
+        });
+        ExecutorService caller = Executors.newSingleThreadExecutor();
+        try {
+            Future<?> startup = caller.submit(server::start);
+            assertTrue(startupElectionFinished.await(5, TimeUnit.SECONDS));
+            remainingFailures.set(readFailures);
+            // A delayed predecessor notification arrives while A already holds the new selector.
+            notifyRemove("predecessor#1");
+            allowStartupToReturn.countDown();
+            startup.get(5, TimeUnit.SECONDS);
         } finally {
             allowStartupToReturn.countDown();
             caller.shutdownNow();
@@ -422,12 +547,11 @@ class AbstractHAServerTest {
             assertTrue(workerBlocked.await(5, TimeUnit.SECONDS));
             Future<?> startup = caller.submit(server::start);
             // Observe the submitted Future in the queue, not just subscribe() before submission.
-            ThreadPoolExecutor executor = (ThreadPoolExecutor) electionExecutor;
             long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
-            while (executor.getQueue().isEmpty() && System.nanoTime() < deadline) {
+            while (electionExecutor.getQueue().isEmpty() && System.nanoTime() < deadline) {
                 Thread.yield();
             }
-            assertEquals(1, executor.getQueue().size());
+            assertEquals(1, electionExecutor.getQueue().size());
             server.close();
             releaseWorker.countDown();
             startup.get(5, TimeUnit.SECONDS);
@@ -530,24 +654,33 @@ class AbstractHAServerTest {
     }
 
     private AbstractHAServer newServer(String address) {
-        ExecutorService executor = new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<>(), runnable -> {
-                    Thread thread = new Thread(() -> {
-                        // Static mocks are thread-local, so install the retry delay stub on the election worker.
-                        try (
-                                MockedStatic<ThreadUtils> threadUtils =
-                                        mockStatic(ThreadUtils.class, CALLS_REAL_METHODS)) {
-                            threadUtils.when(() -> ThreadUtils.sleep(anyLong())).thenAnswer(invocation -> {
-                                retryAction.get().run();
-                                return null;
-                            });
-                            runnable.run();
-                        }
-                    }, "test-ha-election");
-                    thread.setUncaughtExceptionHandler(
-                            (failedThread, failure) -> workerFailure.compareAndSet(null, failure));
-                    return thread;
-                });
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, runnable -> {
+            Thread thread = new Thread(() -> {
+                // Static mocks are thread-local, so install the retry delay stub on the election worker.
+                try (
+                        MockedStatic<ThreadUtils> threadUtils =
+                                mockStatic(ThreadUtils.class, CALLS_REAL_METHODS)) {
+                    threadUtils.when(() -> ThreadUtils.sleep(anyLong())).thenAnswer(invocation -> {
+                        retryAction.get().run();
+                        return null;
+                    });
+                    runnable.run();
+                }
+            }, "test-ha-election");
+            thread.setUncaughtExceptionHandler(
+                    (failedThread, failure) -> workerFailure.compareAndSet(null, failure));
+            return thread;
+        }) {
+
+            @Override
+            public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
+                if (delay > 0) {
+                    // Control the timer without sleeps or wall-clock assumptions in the tests.
+                    return super.schedule(command, recoveryDelayMillis, TimeUnit.MILLISECONDS);
+                }
+                return super.schedule(command, delay, unit);
+            }
+        };
         electionExecutors.add(executor);
         AbstractHAServer result = new AbstractHAServer(registry, SELECTOR_PATH, address, executor) {
         };

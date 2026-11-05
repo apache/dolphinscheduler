@@ -58,7 +58,7 @@ import com.google.common.collect.Lists;
 class TaskGroupCoordinatorTest {
 
     @InjectMocks
-    private TaskGroupCoordinator taskGroupCoordinator;
+    private TaskGroupCoordinator taskGroupCoordinator = new TaskGroupCoordinator(0);
 
     @Mock
     private TaskGroupDao taskGroupDao;
@@ -242,8 +242,7 @@ class TaskGroupCoordinatorTest {
         starter.setDaemon(true);
         try {
             taskGroupCoordinator.start();
-            // Allow the coordinator's normal one-minute startup delay before observing the DAO call.
-            Assertions.assertTrue(fetching.await(90, TimeUnit.SECONDS));
+            Assertions.assertTrue(fetching.await(5, TimeUnit.SECONDS));
             closer.start();
             Assertions.assertTrue(canceled.await(5, TimeUnit.SECONDS));
             if (interruptCloser) {
@@ -256,8 +255,7 @@ class TaskGroupCoordinatorTest {
             Assertions.assertEquals(1L, restarted.getCount());
             releaseFetch.countDown();
             Assertions.assertTrue(closed.await(5, TimeUnit.SECONDS));
-            // A new worker also observes the normal startup delay.
-            Assertions.assertTrue(restarted.await(90, TimeUnit.SECONDS));
+            Assertions.assertTrue(restarted.await(5, TimeUnit.SECONDS));
             closer.join(5000);
             starter.join(5000);
             Assertions.assertFalse(closer.isAlive());
@@ -296,8 +294,7 @@ class TaskGroupCoordinatorTest {
         });
         try {
             taskGroupCoordinator.start();
-            // Exercise the actual worker after its normal one-minute startup delay.
-            Assertions.assertTrue(checked.await(90, TimeUnit.SECONDS));
+            Assertions.assertTrue(checked.await(5, TimeUnit.SECONDS));
             Assertions.assertNull(failure.get());
             // Rejection must leave lifecycle state unchanged so the owner can still close the worker.
             Assertions.assertThrows(IllegalStateException.class, () -> taskGroupCoordinator.start());

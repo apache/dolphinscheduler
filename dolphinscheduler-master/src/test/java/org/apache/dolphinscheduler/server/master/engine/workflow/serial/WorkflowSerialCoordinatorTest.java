@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
 import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
 import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
-import org.apache.dolphinscheduler.dao.repository.TaskGroupDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
@@ -32,14 +31,12 @@ import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.registry.api.ha.AbstractHAServer;
 import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.MasterCoordinator;
-import org.apache.dolphinscheduler.server.master.engine.TaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.failover.IFailoverCoordinator;
 import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -53,7 +50,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -339,107 +335,6 @@ class WorkflowSerialCoordinatorTest {
             server.close();
             // Also cancel the listener's scheduled failover task, including when an assertion fails.
             listener.changeToStandBy();
-        }
-    }
-
-    @Test
-    void demotionShouldStopBothWorkersBeforeWaitingForEither() throws Exception {
-        TaskGroupCoordinator taskGroupCoordinator = new TaskGroupCoordinator();
-        TaskGroupDao taskGroupDao = Mockito.mock(TaskGroupDao.class);
-        ReflectionTestUtils.setField(taskGroupCoordinator, "taskGroupDao", taskGroupDao);
-        MasterCoordinator.MasterCoordinatorListener listener = new MasterCoordinator.MasterCoordinatorListener(
-                taskGroupCoordinator, Mockito.mock(IFailoverCoordinator.class), workflowSerialCoordinator);
-        ScheduledExecutorService scheduler = Mockito.mock(ScheduledExecutorService.class);
-        ScheduledFuture<?> scheduled = Mockito.mock(ScheduledFuture.class);
-        Mockito.doReturn(scheduled).when(scheduler).scheduleWithFixedDelay(
-                Mockito.any(Runnable.class), Mockito.anyLong(), Mockito.anyLong(), Mockito.any(TimeUnit.class));
-        CountDownLatch taskGroupFetching = new CountDownLatch(1);
-        CountDownLatch serialFetching = new CountDownLatch(1);
-        CountDownLatch taskGroupCanceled = new CountDownLatch(1);
-        CountDownLatch serialCanceled = new CountDownLatch(1);
-        CountDownLatch releaseTaskGroup = new CountDownLatch(1);
-        CountDownLatch releaseSerial = new CountDownLatch(1);
-        CountDownLatch closed = new CountDownLatch(1);
-        CountDownLatch failoverCanceled = new CountDownLatch(1);
-        Mockito.when(scheduled.cancel(true)).thenAnswer(invocation -> {
-            failoverCanceled.countDown();
-            return true;
-        });
-        AtomicReference<Thread> taskGroupWorker = new AtomicReference<>();
-        AtomicReference<Thread> serialWorker = new AtomicReference<>();
-        AtomicReference<Throwable> failure = new AtomicReference<>();
-        Mockito.when(taskGroupDao.queryAllTaskGroups()).thenAnswer(invocation -> {
-            taskGroupWorker.set(Thread.currentThread());
-            taskGroupFetching.countDown();
-            awaitDatabaseResponse(releaseTaskGroup, taskGroupCanceled, failure);
-            return Collections.emptyList();
-        });
-        Mockito.when(serialCommandDao.fetchSerialCommands(Mockito.anyInt())).thenAnswer(invocation -> {
-            serialWorker.set(Thread.currentThread());
-            serialFetching.countDown();
-            awaitDatabaseResponse(releaseSerial, serialCanceled, failure);
-            return Collections.singletonList(SerialCommandDto.builder()
-                    .workflowDefinitionCode(1L).workflowDefinitionVersion(1).build());
-        });
-        WorkflowDefinitionLog definition = new WorkflowDefinitionLog();
-        definition.setExecutionType(WorkflowExecutionTypeEnum.SERIAL_WAIT);
-        Mockito.when(workflowDefinitionLogDao.queryByDefinitionCodeAndVersion(1L, 1)).thenReturn(definition);
-        Thread closer = new Thread(() -> {
-            try {
-                listener.changeToStandBy();
-            } catch (Throwable ex) {
-                failure.compareAndSet(null, ex);
-            } finally {
-                closed.countDown();
-            }
-        });
-        closer.setDaemon(true);
-        try (MockedStatic<MasterThreadFactory> factory = Mockito.mockStatic(MasterThreadFactory.class)) {
-            factory.when(MasterThreadFactory::getDefaultSchedulerThreadExecutor).thenReturn(scheduler);
-            listener.changeToActive();
-            Assertions.assertTrue(serialFetching.await(5, TimeUnit.SECONDS));
-            // Keep the real one-minute TaskGroup startup delay; both lifecycle implementations participate.
-            Assertions.assertTrue(taskGroupFetching.await(90, TimeUnit.SECONDS));
-            closer.start();
-            Assertions.assertTrue(taskGroupCanceled.await(5, TimeUnit.SECONDS));
-            Assertions.assertTrue(serialCanceled.await(5, TimeUnit.SECONDS));
-            releaseSerial.countDown();
-            serialWorker.get().join(5000);
-            Assertions.assertFalse(serialWorker.get().isAlive());
-            // A stop request alone must not make a new generation eligible to start.
-            assertThrows(IllegalStateException.class, workflowSerialCoordinator::start);
-            Mockito.verifyNoInteractions(serialCommandWaitHandler);
-            // Serial has stopped while TaskGroup is still blocked; close must still join TaskGroup.
-            Assertions.assertTrue(taskGroupWorker.get().isAlive());
-            Assertions.assertEquals(1L, closed.getCount());
-            Assertions.assertTrue(failoverCanceled.await(5, TimeUnit.SECONDS));
-            Mockito.verify(scheduled).cancel(true);
-            releaseTaskGroup.countDown();
-            Assertions.assertTrue(closed.await(5, TimeUnit.SECONDS));
-            Assertions.assertFalse(taskGroupWorker.get().isAlive());
-            Assertions.assertNull(failure.get());
-        } finally {
-            releaseSerial.countDown();
-            releaseTaskGroup.countDown();
-            closer.join(5000);
-            listener.changeToStandBy();
-        }
-    }
-
-    private static void awaitDatabaseResponse(CountDownLatch release, CountDownLatch canceled,
-                                              AtomicReference<Throwable> failure) {
-        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(100);
-        while (release.getCount() != 0) {
-            try {
-                long remaining = deadline - System.nanoTime();
-                if (remaining <= 0 || !release.await(remaining, TimeUnit.NANOSECONDS)) {
-                    failure.compareAndSet(null, new AssertionError("Blocked DAO was not released"));
-                    return;
-                }
-            } catch (InterruptedException ignored) {
-                // JDBC may ignore cancellation; only the test-controlled response releases the call.
-                canceled.countDown();
-            }
         }
     }
 

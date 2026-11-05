@@ -22,12 +22,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
+import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +48,15 @@ public abstract class AbstractHAServer implements HAServer {
 
     private volatile ServerStatus serverStatus;
 
-    private final ExecutorService electionExecutor;
+    private final ScheduledThreadPoolExecutor electionExecutor;
+
+    private final Object electionStateLock = new Object();
+
+    // Guarded by electionStateLock. Only the election worker clears it before checking ownership.
+    private boolean removeReceived;
+
+    // Guarded by electionStateLock.
+    private ScheduledFuture<?> promotionRecovery;
 
     private final List<ServerStatusChangeListener> serverStatusChangeListeners;
 
@@ -55,13 +66,14 @@ public abstract class AbstractHAServer implements HAServer {
 
     public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
         this(registry, selectorPath, serverIdentify,
-                ThreadUtils.newDaemonFixedThreadExecutor("HA-Election-%d", 1));
+                new ScheduledThreadPoolExecutor(1, ThreadUtils.newDaemonThreadFactory("HA-Election-%d")));
     }
 
     @VisibleForTesting
     AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify,
-                     final ExecutorService electionExecutor) {
+                     final ScheduledThreadPoolExecutor electionExecutor) {
         this.electionExecutor = electionExecutor;
+        electionExecutor.setRemoveOnCancelPolicy(true);
         this.registry = registry;
         this.selectorPath = checkNotNull(selectorPath);
         // Include the creation time to distinguish restarts at the same address.
@@ -78,7 +90,7 @@ public abstract class AbstractHAServer implements HAServer {
                 @Override
                 public void notify(Event event) {
                     if (Event.Type.REMOVE.equals(event.getType())) {
-                        enqueueElection();
+                        enqueueElection(serverIdentify.equals(event.getEventData()));
                     }
                 }
 
@@ -88,7 +100,7 @@ public abstract class AbstractHAServer implements HAServer {
                 }
             });
             // Preserve startup completion and failure semantics; callbacks only enqueue work.
-            electionExecutor.submit(this::reconcileElection).get();
+            electionExecutor.submit(() -> reconcileElection(false, DEFAULT_MAX_RETRY_TIMES)).get();
         } catch (InterruptedException e) {
             close();
             Thread.currentThread().interrupt();
@@ -105,14 +117,14 @@ public abstract class AbstractHAServer implements HAServer {
         }
     }
 
-    private void enqueueElection() {
-        if (electionExecutor.isShutdown()) {
-            return;
+    private void enqueueElection(boolean ownSelectorRemoved) {
+        synchronized (electionStateLock) {
+            removeReceived = true;
         }
         try {
             electionExecutor.execute(() -> {
                 try {
-                    reconcileElection();
+                    reconcileElection(ownSelectorRemoved, DEFAULT_MAX_RETRY_TIMES);
                 } catch (Exception e) {
                     log.error("Failed to reconcile HA ownership for {}", serverIdentify, e);
                 }
@@ -125,24 +137,53 @@ public abstract class AbstractHAServer implements HAServer {
         }
     }
 
-    private void reconcileElection() {
-        // REMOVE is a request to recheck ownership, not a role decision to replay later.
-        boolean elected = participateElection();
-        if (electionExecutor.isShutdown()) {
-            return;
+    private void reconcileElection(boolean ownSelectorRemoved, int maxAttempts) {
+        // A fresh ownership check accounts for REMOVE events already received.
+        synchronized (electionStateLock) {
+            removeReceived = false;
         }
-        if (elected) {
-            statusChange(ServerStatus.ACTIVE);
-        } else {
-            statusChange(ServerStatus.STAND_BY);
-            log.info("Server {} is standby", serverIdentify);
+        boolean elected = participateElection(ownSelectorRemoved, maxAttempts);
+        statusChange(elected ? ServerStatus.ACTIVE : ServerStatus.STAND_BY);
+    }
+
+    // Called under electionStateLock so close() can cancel the only pending recovery.
+    private void schedulePromotionRecovery() {
+        if (promotionRecovery == null && !electionExecutor.isShutdown()) {
+            promotionRecovery = electionExecutor.schedule(this::recoverPromotion,
+                    DEFAULT_RETRY_INTERVAL, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private void recoverPromotion() {
+        synchronized (electionStateLock) {
+            promotionRecovery = null;
+        }
+        try {
+            // One attempt per scheduled run leaves the worker free for watch callbacks between retries.
+            reconcileElection(false, 1);
+        } catch (Exception e) {
+            log.warn("Failed to recheck deferred HA promotion for {}, retrying in {}ms",
+                    serverIdentify, DEFAULT_RETRY_INTERVAL, e);
+            synchronized (electionStateLock) {
+                schedulePromotionRecovery();
+            }
+        }
+    }
+
+    private void cancelPromotionRecovery() {
+        if (promotionRecovery != null) {
+            promotionRecovery.cancel(false);
+            promotionRecovery = null;
         }
     }
 
     @Override
     public void close() {
-        // Let queued startup futures finish as no-ops. shutdownNow would strand their callers.
-        electionExecutor.shutdown();
+        synchronized (electionStateLock) {
+            // Cancel delayed recovery, but let queued startup futures finish as no-ops.
+            electionExecutor.shutdown();
+            cancelPromotionRecovery();
+        }
         synchronized (this) {
             // Wait for any publication already in progress, without joining the event worker:
             // an Alert listener can close this server from that worker itself.
@@ -156,26 +197,22 @@ public abstract class AbstractHAServer implements HAServer {
 
     @Override
     public boolean participateElection() {
+        return participateElection(false, DEFAULT_MAX_RETRY_TIMES);
+    }
+
+    private boolean participateElection(boolean ownSelectorRemoved, int maxAttempts) {
         final String electionLock = selectorPath + "-lock";
-        // If meet exception during participate election, will retry.
-        // This can avoid the situation that the server is not elected as leader due to network jitter.
-        for (int i = 0; i < DEFAULT_MAX_RETRY_TIMES; i++) {
-            if (electionExecutor.isShutdown()) {
-                return false;
-            }
+        int failedAttempts = 0;
+        while (!electionExecutor.isShutdown()) {
             try {
                 if (!registry.acquireLock(electionLock)) {
-                    return false;
+                    throw new RegistryException("Could not acquire election lock " + electionLock);
                 }
                 try {
                     if (electionExecutor.isShutdown()) {
                         return false;
                     }
-                    boolean selectorExists = registry.exists(selectorPath);
-                    if (electionExecutor.isShutdown()) {
-                        return false;
-                    }
-                    if (selectorExists) {
+                    if (registry.exists(selectorPath)) {
                         return serverIdentify.equals(registry.get(selectorPath));
                     }
                     registry.put(selectorPath, serverIdentify, true);
@@ -184,16 +221,26 @@ public abstract class AbstractHAServer implements HAServer {
                     registry.releaseLock(electionLock);
                 }
             } catch (Exception e) {
-                log.error("Participate election error, meet an exception, will retry after {}ms",
-                        DEFAULT_RETRY_INTERVAL, e);
-                if (electionExecutor.isShutdown()) {
-                    return false;
+                // If we cannot verify ownership after our selector was deleted, stop before retrying.
+                if (ownSelectorRemoved && isActive()) {
+                    statusChange(ServerStatus.STAND_BY);
+                    synchronized (electionStateLock) {
+                        // A delayed own REMOVE can leave our current selector in place.
+                        schedulePromotionRecovery();
+                    }
                 }
-                ThreadUtils.sleep(DEFAULT_RETRY_INTERVAL);
+                if (++failedAttempts == maxAttempts) {
+                    throw new IllegalStateException("Could not complete HA election after " + maxAttempts
+                            + " attempt(s)", e);
+                }
+                if (!electionExecutor.isShutdown()) {
+                    log.warn("Failed to check HA ownership for {}, retrying in {}ms",
+                            serverIdentify, DEFAULT_RETRY_INTERVAL, e);
+                    ThreadUtils.sleep(DEFAULT_RETRY_INTERVAL);
+                }
             }
         }
-        throw new IllegalStateException(
-                "Participate election failed after retry " + DEFAULT_MAX_RETRY_TIMES + " times");
+        return false;
     }
 
     @Override
@@ -211,8 +258,19 @@ public abstract class AbstractHAServer implements HAServer {
         if (electionExecutor.isShutdown()) {
             return;
         }
-        final ServerStatus originStatus = serverStatus;
-        serverStatus = targetStatus;
+        final ServerStatus originStatus;
+        synchronized (electionStateLock) {
+            if (targetStatus == ServerStatus.ACTIVE && removeReceived) {
+                if (serverStatus == ServerStatus.STAND_BY) {
+                    // Keep a fallback until a recheck can publish a definite result.
+                    schedulePromotionRecovery();
+                }
+                return;
+            }
+            originStatus = serverStatus;
+            serverStatus = targetStatus;
+            cancelPromotionRecovery();
+        }
         try {
             serverStatusChangeListeners.forEach(listener -> {
                 // A listener may close this server; do not invoke subsequent listeners after that.
