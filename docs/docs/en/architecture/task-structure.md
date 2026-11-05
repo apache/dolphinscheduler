@@ -141,7 +141,8 @@ it as `******`:
 - On update, `******` keeps the stored value only for a parameter that is marked sensitive and already exists with the
   same name. It is rejected for a new sensitive parameter, or when `sensitive` is switched off.
 - When a workflow is started or backfilled, a start parameter whose value is `******` takes the value of the global
-  parameter with the same name.
+  parameter with the same name. A start parameter without a global parameter of the same name is dropped if its value is
+  `******`; otherwise it is kept and treated as non-sensitive.
 
 ### Parameters of Each Task Type
 
@@ -725,7 +726,7 @@ The SUB_WORKFLOW task runs another workflow as a child workflow. Its `task_param
 
 |         Field          |  Type  |                          Description                          |
 |------------------------|--------|---------------------------------------------------------------|
-| localParams            | Array  | Local parameters, see [Common Fields](#common-fields)         |
+| localParams            | Array  | Not used by this task type, an empty array                    |
 | resourceList           | Array  | Not used by this task type, an empty array                    |
 | workflowDefinitionCode | Number | Code of the child workflow definition, must be greater than 0 |
 
@@ -738,6 +739,9 @@ The SUB_WORKFLOW task runs another workflow as a child workflow. Its `task_param
     "workflowDefinitionCode": 137713824398176
 }
 ```
+
+The child workflow does not get its start parameters from `localParams`. They are merged from the global parameters, the
+start parameters and the `varPool` of the parent workflow instance; for the same name, the later one wins.
 
 ### DEPENDENT
 
@@ -767,7 +771,7 @@ A failed dependency result is cached and not checked again, so `DEPENDENT_FAILUR
 later successful instance does not change it.
 
 `cycle` and `dateValue` take the following values. All ranges are relative to the schedule time of the current workflow
-instance, or the time the DEPENDENT task started if it was not scheduled. Ranges are split into days: `thisWeek` and `thisMonth` cover each day from Monday or the first day of the month through the base day, and every day must have a successful instance. The master only uses `dateValue` and `depTaskCode`. The backend also accepts `thisMonthEnd`,
+instance, or the time the DEPENDENT task started if it was not scheduled. `hour` ranges are split into hours, and `day`, `week` and `month` ranges into days: `thisWeek` and `thisMonth` cover each day from Monday or the first day of the month through the base day. Every hour or day must have a successful instance. The master only uses `dateValue` and `depTaskCode`. The backend also accepts `thisMonthEnd`,
 which the UI does not offer.
 
 A dependency on the task's own workflow (`-1` or the task itself) is treated as successful for the first instance of that workflow (the first scheduled instance if the workflow has any, otherwise the first started instance).
