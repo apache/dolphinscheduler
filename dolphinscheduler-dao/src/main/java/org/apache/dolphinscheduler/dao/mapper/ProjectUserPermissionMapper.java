@@ -40,6 +40,8 @@ public interface ProjectUserPermissionMapper extends BaseMapper<ProjectUserPermi
 
     void revokeAllPermissions(@Param("projectCode") long projectCode, @Param("userId") int userId);
 
+    void revokeAllPermissionsByUserId(@Param("userId") int userId);
+
     void revokePermission(@Param("projectCode") long projectCode, @Param("userId") int userId,
                           @Param("permission") ProjectPermission permission);
 }

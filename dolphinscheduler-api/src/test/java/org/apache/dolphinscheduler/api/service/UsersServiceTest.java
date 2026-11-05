@@ -46,6 +46,7 @@ import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 import org.apache.dolphinscheduler.dao.repository.DataSourceUserDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserPermissionDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
@@ -92,6 +93,9 @@ public class UsersServiceTest {
 
     @Mock
     private ProjectUserDao projectUserDao;
+
+    @Mock
+    private ProjectUserPermissionDao projectUserPermissionDao;
 
     @Mock
     private ProjectAuthorizationService projectAuthorizationService;
@@ -367,10 +371,12 @@ public class UsersServiceTest {
         Mockito.when(projectDao.queryProjectCreatedByUser(1)).thenReturn(Lists.newArrayList(new Project()));
         assertThrowsServiceException(Status.TRANSFORM_PROJECT_OWNERSHIP,
                 () -> usersService.deleteUserById(loginUser, 1));
+        Mockito.verifyNoInteractions(projectUserPermissionDao);
 
         // success
         Mockito.when(projectDao.queryProjectCreatedByUser(1)).thenReturn(null);
         assertDoesNotThrow(() -> usersService.deleteUserById(loginUser, 1));
+        Mockito.verify(projectUserPermissionDao).revokeAllPermissionsByUserId(1);
     }
 
     @Test

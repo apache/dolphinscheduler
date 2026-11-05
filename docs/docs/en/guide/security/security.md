@@ -162,9 +162,13 @@ Lineage queries preserve the complete relationship graph. A user with `VIEW` on 
 
 Saving or taking a definition online when it references a subworkflow additionally requires `EXECUTE` on that subworkflow's project. New starts, backfills, reruns and schedule configuration or enabling check subworkflows recursively: the user needs `EXECUTE` on every child project, and each child's task resources are checked against that child's own project grants. Inherited tenant, queue, worker group, environment and alert-group settings are also checked against each child project. Parent project grants cannot replace child project grants.
 
+Manual starts, backfills, reruns, failed/suspended recovery and schedule enabling additionally require every recursively referenced current child definition to be `ONLINE`. Offline schedule creation and updates still check child-project permissions, resource grants and inherited execution settings recursively, but may reference offline child definitions.
+
 Switching a workflow version requires both the workflow and its schedule to be offline and does not implicitly change the schedule state. Historical instances are authorized through their persisted project; moving a definition does not transfer ownership of its existing instances.
 
 Moving a workflow requires both the workflow and its schedule to be offline. Task resources must still be granted to the destination project. Taking the moved workflow and schedule online checks permissions and resource grants against the destination project again.
+
+Deleting a user removes that user's explicit permissions from all projects in the same transaction.
 
 Deleting a resource removes all project use grants for that resource in the same transaction. Worker groups use their names as grant keys; renaming is rejected while tasks, schedules or environments reference the old name. An allowed rename revokes old-name grants; an administrator must explicitly grant the new name.
 

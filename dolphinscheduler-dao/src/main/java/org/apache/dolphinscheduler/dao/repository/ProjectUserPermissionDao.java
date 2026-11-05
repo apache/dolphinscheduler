@@ -33,5 +33,7 @@ public interface ProjectUserPermissionDao extends IDao<ProjectUserPermission> {
 
     void revokeAllPermissions(long projectCode, int userId);
 
+    void revokeAllPermissionsByUserId(int userId);
+
     void revokePermission(long projectCode, int userId, ProjectPermission permission);
 }

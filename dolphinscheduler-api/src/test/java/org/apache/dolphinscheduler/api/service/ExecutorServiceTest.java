@@ -45,6 +45,7 @@ import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowRequestTransformer;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -54,6 +55,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
@@ -64,12 +66,14 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -469,6 +473,76 @@ public class ExecutorServiceTest {
 
         assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
         Mockito.verifyNoInteractions(executorClient);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"start", "backfill", "rerun", "recoverFailure", "recoverSuspend"})
+    public void executionRejectsOfflineGrandchildBeforeCommandSubmission(String operation) {
+        User user = getLoginUser();
+        WorkflowDefinition parent = new WorkflowDefinition();
+        parent.setCode(200L);
+        parent.setVersion(3);
+        parent.setProjectCode(100L);
+        parent.setReleaseState(ReleaseState.ONLINE);
+        WorkflowDefinition child = new WorkflowDefinition();
+        child.setCode(400L);
+        child.setProjectCode(101L);
+        child.setVersion(4);
+        child.setReleaseState(ReleaseState.ONLINE);
+        WorkflowDefinition grandchild = new WorkflowDefinition();
+        grandchild.setCode(500L);
+        grandchild.setProjectCode(102L);
+        grandchild.setReleaseState(ReleaseState.OFFLINE);
+        TaskDefinitionLog childReference = new TaskDefinitionLog();
+        childReference.setTaskType("SUB_WORKFLOW");
+        childReference.setTaskParams("{\"workflowDefinitionCode\":400}");
+        TaskDefinitionLog grandchildReference = new TaskDefinitionLog();
+        grandchildReference.setTaskType("SUB_WORKFLOW");
+        grandchildReference.setTaskParams("{\"workflowDefinitionCode\":500}");
+        WorkflowDefinitionDao definitions = Mockito.mock(WorkflowDefinitionDao.class);
+        when(definitions.queryByCodes(Collections.singleton(400L))).thenReturn(Collections.singletonList(child));
+        when(definitions.queryByCodes(Collections.singleton(500L))).thenReturn(Collections.singletonList(grandchild));
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(200L, 3))
+                .thenReturn(Collections.singletonList(childReference));
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(400L, 4))
+                .thenReturn(Collections.singletonList(grandchildReference));
+        ReflectionTestUtils.setField(executorService, "taskSubWorkflowPermissionChecker",
+                new TaskSubWorkflowPermissionChecker(definitions, Mockito.mock(ProjectService.class),
+                        taskDefinitionLogDao, taskResourcePermissionChecker));
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        instance.setWorkflowDefinitionCode(200L);
+        instance.setWorkflowDefinitionVersion(3);
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            switch (operation) {
+                case "start":
+                    WorkflowTriggerRequest request = WorkflowTriggerRequest.builder()
+                            .loginUser(user).projectCode(100L).workflowDefinitionCode(200L).build();
+                    when(triggerWorkflowRequestTransformer.transform(request)).thenReturn(TriggerWorkflowDTO.builder()
+                            .loginUser(user).workflowDefinition(parent).build());
+                    executorService.triggerWorkflowDefinition(request);
+                    break;
+                case "backfill":
+                    WorkflowBackFillRequest backfill = WorkflowBackFillRequest.builder()
+                            .loginUser(user).projectCode(100L).workflowDefinitionCode(200L).build();
+                    when(backfillWorkflowRequestTransformer.transform(backfill))
+                            .thenReturn(BackfillWorkflowDTO.builder()
+                                    .loginUser(user).workflowDefinition(parent).build());
+                    executorService.backfillWorkflowDefinition(backfill);
+                    break;
+                default:
+                    ExecuteType executeType = "rerun".equals(operation) ? ExecuteType.REPEAT_RUNNING
+                            : "recoverFailure".equals(operation) ? ExecuteType.START_FAILURE_TASK_PROCESS
+                                    : ExecuteType.RECOVER_SUSPENDED_PROCESS;
+                    executorService.controlWorkflowInstance(user, 1, executeType);
+            }
+        });
+
+        assertEquals(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE.getCode(), exception.getCode());
+        Mockito.verifyNoInteractions(executorClient);
+        verify(taskDefinitionLogDao, never()).queryByWorkflowDefinitionCodeAndVersion(500L, 0);
     }
 
     @Test

@@ -39,6 +39,7 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
 import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserPermissionDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 
@@ -88,6 +89,9 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
     @Autowired
     private ProjectDao projectDao;
+
+    @Autowired
+    private ProjectUserPermissionDao projectUserPermissionDao;
 
     @Autowired
     private SessionService sessionService;
@@ -439,6 +443,8 @@ public class UsersServiceImpl extends BaseServiceImpl implements UsersService {
 
         accessTokenDao.deleteByUserId(id);
         sessionService.expireSession(id);
+
+        projectUserPermissionDao.revokeAllPermissionsByUserId(id);
 
         if (!userDao.deleteById(id)) {
             log.error("User delete error, userId:{}.", id);

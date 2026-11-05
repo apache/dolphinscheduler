@@ -64,6 +64,11 @@ public class ProjectUserPermissionDaoImpl extends BaseDao<ProjectUserPermission,
     }
 
     @Override
+    public void revokeAllPermissionsByUserId(int userId) {
+        mybatisMapper.revokeAllPermissionsByUserId(userId);
+    }
+
+    @Override
     public void revokePermission(long projectCode, int userId, @NonNull ProjectPermission permission) {
         mybatisMapper.revokePermission(projectCode, userId, permission);
     }

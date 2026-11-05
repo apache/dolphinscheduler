@@ -595,6 +595,7 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         child.setCode(42L);
         child.setVersion(7);
         child.setProjectCode(99L);
+        child.setReleaseState(ReleaseState.ONLINE);
         Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(processDefinitionCode,
                 processDefinitionVersion)).thenReturn(Collections.singletonList(reference));
         Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(42L)))
@@ -640,6 +641,91 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Mockito.verifyNoInteractions(schedulerApi);
         Mockito.verify(taskResourcePermissionChecker).checkExecutionSettings(99L, "parent-workers", environmentCode,
                 "parent-tenant", 20);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"online", "onlineByWorkflow"})
+    public void enablingScheduleRejectsOfflineGrandchildBeforeRegisteringTrigger(String operation) {
+        Schedule schedule = prepareScheduleWithOfflineGrandchild();
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class, () -> {
+            if ("online".equals(operation)) {
+                schedulerService.onlineScheduler(user, projectCode, scheduleId);
+            } else {
+                schedulerService.onlineSchedulerByWorkflowCode(user, processDefinitionCode);
+            }
+        });
+
+        Assertions.assertEquals(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE.getCode(), exception.getCode());
+        Assertions.assertEquals(ReleaseState.OFFLINE, schedule.getReleaseState());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any(Schedule.class));
+        Mockito.verifyNoInteractions(schedulerApi);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"create", "update", "updateByWorkflow"})
+    public void offlineScheduleConfigurationAllowsOfflineGrandchildAndChecksItsResources(String operation) {
+        prepareScheduleWithOfflineGrandchild();
+        if ("create".equals(operation)) {
+            Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(null);
+            schedulerService.insertSchedule(user, projectCode, processDefinitionCode, scheduleExpression(null),
+                    WarningType.NONE, 0, FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenant",
+                    environmentCode);
+            ArgumentCaptor<Schedule> inserted = ArgumentCaptor.forClass(Schedule.class);
+            Mockito.verify(scheduleDao).insert(inserted.capture());
+            Assertions.assertEquals(ReleaseState.OFFLINE, inserted.getValue().getReleaseState());
+        } else if ("update".equals(operation)) {
+            schedulerService.updateSchedule(user, projectCode, scheduleId, scheduleExpression(null), WarningType.NONE,
+                    0, FailureStrategy.CONTINUE, Priority.MEDIUM, "default", "tenant", environmentCode);
+        } else {
+            schedulerService.updateScheduleByWorkflowDefinitionCode(user, projectCode, processDefinitionCode,
+                    scheduleExpression(null), WarningType.NONE, 0, FailureStrategy.CONTINUE, Priority.MEDIUM,
+                    "default", "tenant", environmentCode);
+        }
+
+        Mockito.verify(taskResourcePermissionChecker).checkExecutionSettings(100L, "default", environmentCode,
+                "tenant", 0);
+        Mockito.verify(taskResourcePermissionChecker).checkPermission(100L, Collections.emptyList());
+        Mockito.verifyNoInteractions(schedulerApi);
+    }
+
+    private Schedule prepareScheduleWithOfflineGrandchild() {
+        Schedule schedule = getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        WorkflowDefinition parent = getProcessDefinition();
+        parent.setReleaseState(ReleaseState.ONLINE);
+        WorkflowDefinition child = new WorkflowDefinition();
+        child.setCode(42L);
+        child.setVersion(7);
+        child.setProjectCode(99L);
+        child.setReleaseState(ReleaseState.ONLINE);
+        WorkflowDefinition grandchild = new WorkflowDefinition();
+        grandchild.setCode(43L);
+        grandchild.setProjectCode(100L);
+        grandchild.setReleaseState(ReleaseState.OFFLINE);
+        TaskDefinitionLog reference = new TaskDefinitionLog();
+        reference.setTaskType("SUB_WORKFLOW");
+        reference.setTaskParams("{\"workflowDefinitionCode\":42}");
+        TaskDefinitionLog nestedReference = new TaskDefinitionLog();
+        nestedReference.setTaskType("SUB_WORKFLOW");
+        nestedReference.setTaskParams("{\"workflowDefinitionCode\":43}");
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(getProject());
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(parent));
+        Mockito.when(executorService.checkSubWorkflowDefinitionValid(parent)).thenReturn(true);
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(processDefinitionCode,
+                processDefinitionVersion)).thenReturn(Collections.singletonList(reference));
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(42L)))
+                .thenReturn(Collections.singletonList(child));
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(42L, 7))
+                .thenReturn(Collections.singletonList(nestedReference));
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(43L)))
+                .thenReturn(Collections.singletonList(grandchild));
+        ReflectionTestUtils.setField(schedulerService, "taskSubWorkflowPermissionChecker",
+                new TaskSubWorkflowPermissionChecker(workflowDefinitionDao, projectService, taskDefinitionLogDao,
+                        taskResourcePermissionChecker));
+        return schedule;
     }
 
     @Test

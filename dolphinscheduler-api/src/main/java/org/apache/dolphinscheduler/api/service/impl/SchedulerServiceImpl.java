@@ -160,7 +160,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Date now = new Date();
 
         tenantExistValidator.validate(tenantCode);
-        checkScheduleResources(loginUser, workflowDefinition, workerGroup, tenantCode, environmentCode, warningGroupId);
+        checkScheduleResources(loginUser, workflowDefinition, workerGroup, tenantCode, environmentCode, warningGroupId,
+                false);
 
         scheduleObj.setTenantCode(tenantCode);
         scheduleObj.setProjectName(project.getName());
@@ -490,7 +491,7 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         }
 
         checkScheduleResources(loginUser, workflowDefinition, schedule.getWorkerGroup(), schedule.getTenantCode(),
-                schedule.getEnvironmentCode(), schedule.getWarningGroupId());
+                schedule.getEnvironmentCode(), schedule.getWarningGroupId(), true);
         schedule.setReleaseState(ReleaseState.ONLINE);
         schedule.setUpdateTime(new Date());
         scheduleDao.updateById(schedule);
@@ -556,7 +557,8 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
         Date now = new Date();
 
         tenantExistValidator.validate(tenantCode);
-        checkScheduleResources(loginUser, workflowDefinition, workerGroup, tenantCode, environmentCode, warningGroupId);
+        checkScheduleResources(loginUser, workflowDefinition, workerGroup, tenantCode, environmentCode, warningGroupId,
+                false);
         schedule.setTenantCode(tenantCode);
 
         // updateWorkflowInstance param
@@ -615,14 +617,20 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
     }
 
     private void checkScheduleResources(User loginUser, WorkflowDefinition workflowDefinition, String workerGroup,
-                                        String tenantCode, Long environmentCode, Integer warningGroupId) {
+                                        String tenantCode, Long environmentCode, Integer warningGroupId,
+                                        boolean requireOnline) {
         taskResourcePermissionChecker.checkExecutionSettings(workflowDefinition.getProjectCode(), workerGroup,
                 environmentCode, tenantCode, warningGroupId);
         List<TaskDefinitionLog> tasks = taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
                 workflowDefinition.getCode(), workflowDefinition.getVersion());
         taskResourcePermissionChecker.checkPermission(workflowDefinition.getProjectCode(), tasks);
-        taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, tasks, workerGroup, environmentCode,
-                tenantCode, warningGroupId);
+        if (requireOnline) {
+            taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, tasks, workerGroup, environmentCode,
+                    tenantCode, warningGroupId);
+        } else {
+            taskSubWorkflowPermissionChecker.checkResourcePermission(loginUser, tasks, workerGroup, environmentCode,
+                    tenantCode, warningGroupId);
+        }
     }
 
     private void validateMissedFirePolicy(ScheduleParam scheduleParam) {

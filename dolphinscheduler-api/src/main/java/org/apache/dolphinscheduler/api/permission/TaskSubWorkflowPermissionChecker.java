@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -68,6 +69,18 @@ public class TaskSubWorkflowPermissionChecker {
     public void checkExecutionPermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions,
                                          String workerGroup, Long environmentCode, String tenantCode,
                                          Integer warningGroupId) {
+        checkResources(loginUser, taskDefinitions, workerGroup, environmentCode, tenantCode, warningGroupId, true);
+    }
+
+    public void checkResourcePermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions,
+                                        String workerGroup, Long environmentCode, String tenantCode,
+                                        Integer warningGroupId) {
+        checkResources(loginUser, taskDefinitions, workerGroup, environmentCode, tenantCode, warningGroupId, false);
+    }
+
+    private void checkResources(User loginUser, Collection<? extends TaskDefinition> taskDefinitions,
+                                String workerGroup, Long environmentCode, String tenantCode,
+                                Integer warningGroupId, boolean requireOnline) {
         Collection<? extends TaskDefinition> pendingTasks = taskDefinitions;
         Set<Long> visitedWorkflows = new HashSet<>();
         while (pendingTasks != null && !pendingTasks.isEmpty()) {
@@ -75,6 +88,9 @@ public class TaskSubWorkflowPermissionChecker {
                     queryAuthorizedSubWorkflows(loginUser, pendingTasks, visitedWorkflows);
             List<TaskDefinition> nextTasks = new ArrayList<>();
             for (WorkflowDefinition workflow : subWorkflows) {
+                if (requireOnline && workflow.getReleaseState() != ReleaseState.ONLINE) {
+                    throw new ServiceException(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE);
+                }
                 taskResourcePermissionChecker.checkExecutionSettings(workflow.getProjectCode(), workerGroup,
                         environmentCode, tenantCode, warningGroupId);
                 List<? extends TaskDefinition> tasks = taskDefinitionLogDao

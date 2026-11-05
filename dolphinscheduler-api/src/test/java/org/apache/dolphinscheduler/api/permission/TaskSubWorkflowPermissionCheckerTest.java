@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -140,6 +141,47 @@ public class TaskSubWorkflowPermissionCheckerTest {
 
         Mockito.verify(projectService, Mockito.times(1))
                 .checkProjectPermission(loginUser, SUB_WORKFLOW_PROJECT_CODE, ProjectPermission.EXECUTE);
+    }
+
+    @Test
+    public void executionRejectsOfflineChildBeforeReadingItsTasks() {
+        WorkflowDefinition child = getWorkflowDefinition(SUB_WORKFLOW_CODE);
+        child.setReleaseState(ReleaseState.OFFLINE);
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(child));
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser,
+                        Collections.singletonList(getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE)),
+                        "parent-workers", 10L, "parent-tenant", 20));
+
+        Assertions.assertEquals(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE.getCode(), exception.getCode());
+        Mockito.verifyNoInteractions(taskDefinitionLogDao, taskResourcePermissionChecker);
+    }
+
+    @Test
+    public void executionRejectsOfflineGrandchildOfOnlineChild() {
+        WorkflowDefinition child = getWorkflowDefinition(SUB_WORKFLOW_CODE);
+        WorkflowDefinition grandchild = getWorkflowDefinition(ANOTHER_SUB_WORKFLOW_CODE);
+        grandchild.setReleaseState(ReleaseState.OFFLINE);
+        TaskDefinitionLog reference = new TaskDefinitionLog();
+        reference.setTaskType("SUB_WORKFLOW");
+        reference.setTaskParams("{\"workflowDefinitionCode\":43}");
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(child));
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(ANOTHER_SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(grandchild));
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(SUB_WORKFLOW_CODE, 0))
+                .thenReturn(Collections.singletonList(reference));
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser,
+                        Collections.singletonList(getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE)),
+                        "parent-workers", 10L, "parent-tenant", 20));
+
+        Assertions.assertEquals(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE.getCode(), exception.getCode());
+        Mockito.verify(taskDefinitionLogDao, Mockito.never())
+                .queryByWorkflowDefinitionCodeAndVersion(ANOTHER_SUB_WORKFLOW_CODE, 0);
     }
 
     @Test
@@ -303,6 +345,7 @@ public class TaskSubWorkflowPermissionCheckerTest {
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(workflowDefinitionCode);
         workflowDefinition.setProjectCode(SUB_WORKFLOW_PROJECT_CODE);
+        workflowDefinition.setReleaseState(ReleaseState.ONLINE);
         return workflowDefinition;
     }
 }

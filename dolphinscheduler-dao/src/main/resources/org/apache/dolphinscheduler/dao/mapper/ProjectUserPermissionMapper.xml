@@ -53,4 +53,9 @@
         delete from t_ds_project_user_permission
         where project_code = #{projectCode} and user_id = #{userId} and permission = #{permission}
     </delete>
+
+    <delete id="revokeAllPermissionsByUserId">
+        delete from t_ds_project_user_permission
+        where user_id = #{userId}
+    </delete>
 </mapper>
