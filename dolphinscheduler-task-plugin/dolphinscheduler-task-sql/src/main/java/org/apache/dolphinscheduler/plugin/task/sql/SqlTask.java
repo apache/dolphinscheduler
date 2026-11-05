@@ -92,7 +92,7 @@ public class SqlTask extends AbstractTask {
 
     /**
      * default max rows fetched when the task-level "limit" parameter is not set, overridable
-     * via the sql.task.query.max.rows property in common.properties
+     * via the sql.task.query.max.rows property in common.properties, which must be a positive integer
      */
     private static final int QUERY_LIMIT = 10000;
 
@@ -124,8 +124,7 @@ public class SqlTask extends AbstractTask {
     private final int alertMaxContentBytes =
             PropertyUtils.getInt(Constants.SQL_TASK_ALERT_MAX_CONTENT_BYTES, DEFAULT_ALERT_MAX_CONTENT_BYTES);
 
-    private final int queryMaxRows =
-            PropertyUtils.getInt(Constants.SQL_TASK_QUERY_MAX_ROWS, QUERY_LIMIT);
+    private final int queryMaxRows = readQueryMaxRows();
 
     private final SQLTaskExecutionContext sqlTaskExecutionContext;
 
@@ -133,6 +132,23 @@ public class SqlTask extends AbstractTask {
 
     private Connection sessionConnection;
     private Statement sessionStatement;
+
+    private static int readQueryMaxRows() {
+        String value = PropertyUtils.getString(Constants.SQL_TASK_QUERY_MAX_ROWS);
+        if (value == null) {
+            return QUERY_LIMIT;
+        }
+        try {
+            int rows = Integer.parseInt(value.trim());
+            if (rows > 0) {
+                return rows;
+            }
+        } catch (NumberFormatException ignored) {
+            // reported by the validation error below
+        }
+        throw new IllegalArgumentException(String.format(
+                "Property %s must be a positive integer, but got: %s", Constants.SQL_TASK_QUERY_MAX_ROWS, value));
+    }
 
     public SqlTask(TaskExecutionContext taskRequest) {
         super(taskRequest);
