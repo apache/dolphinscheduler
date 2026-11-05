@@ -83,6 +83,17 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
 
     private static final int DEFAULT_LIMIT = 1000;
 
+    private final long startupDelayMillis;
+
+    public TaskGroupCoordinator() {
+        this(TimeUnit.MINUTES.toMillis(1));
+    }
+
+    @VisibleForTesting
+    TaskGroupCoordinator(long startupDelayMillis) {
+        this.startupDelayMillis = startupDelayMillis;
+    }
+
     public synchronized void start() {
         log.info("TaskGroupCoordinator starting...");
         if (flag) {
@@ -107,25 +118,15 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     private void doStart() {
         // Sleep 1 minutes here to make sure the previous task group slot has been released.
         // This step is not necessary, since the wakeup operation is idempotent, but we can avoid confusion warning.
-        ThreadUtils.sleep(TimeUnit.MINUTES.toMillis(1));
+        ThreadUtils.sleep(startupDelayMillis);
 
         while (flag) {
             try {
                 final StopWatch taskGroupCoordinatorRoundCost = StopWatch.createStarted();
 
-                // A database call may outlive a stop request; check flag before starting the next phase.
                 amendTaskGroupUseSize();
-                if (!flag) {
-                    return;
-                }
                 amendTaskGroupQueueStatus();
-                if (!flag) {
-                    return;
-                }
                 dealWithForceStartTaskGroupQueue();
-                if (!flag) {
-                    return;
-                }
                 dealWithWaitingTaskGroupQueue();
 
                 taskGroupCoordinatorRoundCost.stop();
@@ -157,10 +158,6 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 return;
             }
             int actualUseSize = taskGroupQueueDao.countUsingTaskGroupQueueByGroupId(taskGroup.getId());
-            // The query may finish after a stop request; do not start the update in that case.
-            if (!flag) {
-                return;
-            }
             if (taskGroup.getUseSize() == actualUseSize) {
                 continue;
             }
@@ -207,9 +204,6 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 .collect(Collectors.toMap(TaskInstance::getId, Function.identity()));
 
         for (TaskGroupQueue taskGroupQueue : taskGroupQueues) {
-            if (!flag) {
-                return;
-            }
             int taskId = taskGroupQueue.getTaskId();
             final TaskInstance taskInstance = taskInstanceMap.get(taskId);
 
@@ -257,9 +251,6 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         // Notify the related waiting task instance
         // Set the taskGroupQueue status to RELEASE and remove it from queue
         for (final TaskGroupQueue taskGroupQueue : taskGroupQueues) {
-            if (!flag) {
-                return;
-            }
             try {
                 LogUtils.setTaskInstanceIdMDC(taskGroupQueue.getTaskId());
                 if (!notifyForceStartTaskGroupQueue(taskGroupQueue)) {
@@ -305,6 +296,9 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     }
 
     private void dealWithWaitingTaskGroupQueue() {
+        if (!flag) {
+            return;
+        }
         // Find the TaskGroup which usage < maxSize.
         // Find the highest priority inQueue task group queue(Which is inQueue and status is Waiting and force start is
         // NO) belong to the
@@ -334,10 +328,10 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 log.debug("There is no waiting task group queue for task group {}", taskGroup.getName());
                 continue;
             }
+            if (!flag) {
+                return;
+            }
             for (TaskGroupQueue taskGroupQueue : taskGroupQueues) {
-                if (!flag) {
-                    return;
-                }
                 try {
                     LogUtils.setTaskInstanceIdMDC(taskGroupQueue.getTaskId());
                     if (!acquireTaskGroupSlotAndNotify(taskGroupQueue)) {
