@@ -1094,6 +1094,20 @@ class SqlTaskTest {
     }
 
     @Test
+    void testQueryMaxRowsRejectsMalformedValuePreservingCause() {
+        try (MockedStatic<PropertyUtils> propertyUtils = Mockito.mockStatic(PropertyUtils.class)) {
+            propertyUtils.when(() -> PropertyUtils.getString("sql.task.query.max.rows"))
+                    .thenReturn("1000x");
+            IllegalArgumentException exception =
+                    Assertions.assertThrows(IllegalArgumentException.class, () -> createSqlTaskWithQueryLimit(0));
+            Assertions.assertEquals(
+                    "Property sql.task.query.max.rows must be a positive integer, but got: 1000x",
+                    exception.getMessage());
+            Assertions.assertInstanceOf(NumberFormatException.class, exception.getCause());
+        }
+    }
+
+    @Test
     void testResultProcessSendEmailDisabledDoesNotSetNeedAlert() throws Exception {
         // Build a SqlTask with sendEmail = false
         String taskParams = "{\"type\":\"HIVE\",\"datasource\":1,\"sql\":\"select 1\",\"sendEmail\":false}";

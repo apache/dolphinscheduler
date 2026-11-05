@@ -138,16 +138,25 @@ public class SqlTask extends AbstractTask {
         if (value == null) {
             return QUERY_LIMIT;
         }
+        int rows;
         try {
-            int rows = Integer.parseInt(value.trim());
-            if (rows > 0) {
-                return rows;
-            }
-        } catch (NumberFormatException ignored) {
-            // reported by the validation error below
+            rows = Integer.parseInt(value.trim());
+        } catch (NumberFormatException exception) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Property %s must be a positive integer, but got: %s",
+                            Constants.SQL_TASK_QUERY_MAX_ROWS,
+                            value),
+                    exception);
         }
-        throw new IllegalArgumentException(String.format(
-                "Property %s must be a positive integer, but got: %s", Constants.SQL_TASK_QUERY_MAX_ROWS, value));
+        if (rows <= 0) {
+            throw new IllegalArgumentException(
+                    String.format(
+                            "Property %s must be a positive integer, but got: %s",
+                            Constants.SQL_TASK_QUERY_MAX_ROWS,
+                            value));
+        }
+        return rows;
     }
 
     public SqlTask(TaskExecutionContext taskRequest) {
