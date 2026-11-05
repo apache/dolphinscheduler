@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskExecutionContextLogRedactor;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.ApplicationInfo;
 import org.apache.dolphinscheduler.plugin.task.api.resource.ResourceContext;
@@ -135,9 +136,7 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
     @Override
     protected void initializeTaskContext() {
         // Register before any context logging (including super) so worker logs are masked too.
-        SensitiveDataConverter.registerTaskSensitiveValues(
-                taskExecutionContext.getTaskInstanceId(),
-                taskExecutionContext.getPrepareParamsMap());
+        SensitiveDataConverter.registerTaskSensitiveValues(taskExecutionContext);
 
         super.initializeTaskContext();
 
@@ -157,7 +156,7 @@ public class PhysicalTaskExecutor extends AbstractTaskExecutor {
         log.info("Download resources successfully: {}", taskExecutionContext.getResourceContext());
 
         log.info(TaskLogMarkers.excludeInTaskLog(), "Initialized Task Context{}",
-                JSONUtils.toPrettyJsonString(taskExecutionContext));
+                JSONUtils.toPrettyJsonString(TaskExecutionContextLogRedactor.redactForLog(taskExecutionContext)));
 
     }
 

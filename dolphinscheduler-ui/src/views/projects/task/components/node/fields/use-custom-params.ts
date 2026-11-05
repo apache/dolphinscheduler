@@ -16,7 +16,7 @@
  */
 import { Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { applySensitiveToggle, isValidSensitiveValue } from '@/utils/sensitive-param'
+import { applySensitiveToggle } from '@/utils/sensitive-param'
 import type { IJsonItem } from '../types'
 
 export function useCustomParams({
@@ -98,15 +98,6 @@ export function useCustomParams({
             placeholder: t('project.node.value_tips'),
             maxLength: 256
           },
-          rule: {
-            trigger: ['input', 'blur'],
-            validator(validate: any, value: string) {
-              const row = i === undefined ? undefined : model[field][i]
-              if (row && row.sensitive && !isValidSensitiveValue(value)) {
-                return new Error(t('project.node.sensitive_value_invalid'))
-              }
-            }
-          }
         }),
         (i?: number) => ({
           type: 'checkbox' as const,

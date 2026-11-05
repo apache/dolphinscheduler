@@ -21,14 +21,12 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import lombok.experimental.UtilityClass;
@@ -39,21 +37,6 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class PropertySensitiveUtils {
-
-    /**
-     * TODO: Optimize the sensitive-value identification so sensitive values can be recognized
-     * accurately instead of relying on a regex / length heuristic; once that lands, this rule
-     * restriction can be removed.
-     * <p>
-     * Regex rule for a valid sensitive property value. Kept as a regex so the rule can be
-     * extended later. It is matched with {@link Pattern#DOTALL} so the whole value must match.
-     * <p>
-     * Currently it requires at least 6 characters ({@code .{6,}}).
-     */
-    public static final String SENSITIVE_FIELD_RULE = ".{6,}";
-
-    private static final Pattern SENSITIVE_FIELD_RULE_PATTERN =
-            Pattern.compile(SENSITIVE_FIELD_RULE, Pattern.DOTALL);
 
     public boolean isSensitive(Property property) {
         return property != null && property.isSensitive();
@@ -165,35 +148,6 @@ public class PropertySensitiveUtils {
             }
             if (existing == null) {
                 return propOrEmpty(submitted);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Check that every sensitive property has a value which satisfies {@link #SENSITIVE_FIELD_RULE}.
-     * <p>
-     * Empty / null values and the {@code ******} keep-original placeholder are skipped, since
-     * they are not real plaintext inputs and are handled separately by the create / update logic.
-     *
-     * @return the prop name of the first sensitive property whose value violates the rule
-     *         ({@code ""} when the offending property has no prop), or {@code null} when every
-     *         sensitive value is valid.
-     */
-    public String findInvalidSensitiveField(List<Property> properties) {
-        if (CollectionUtils.isEmpty(properties)) {
-            return null;
-        }
-        for (Property property : properties) {
-            if (property == null || !property.isSensitive()) {
-                continue;
-            }
-            String value = property.getValue();
-            if (StringUtils.isEmpty(value) || isSensitiveValuePlaceholder(value)) {
-                continue;
-            }
-            if (!SENSITIVE_FIELD_RULE_PATTERN.matcher(value).matches()) {
-                return propOrEmpty(property);
             }
         }
         return null;

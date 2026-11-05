@@ -195,7 +195,11 @@
 - 详情可参考Master和Worker的logback配置，如下示例：
 
 ```xml
-<conversionRule conversionWord="message" converterClass="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter"/>
+<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+    <layout class="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataLayout">
+        <pattern>%message%n</pattern>
+    </layout>
+</encoder>
 <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
     <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
     <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">

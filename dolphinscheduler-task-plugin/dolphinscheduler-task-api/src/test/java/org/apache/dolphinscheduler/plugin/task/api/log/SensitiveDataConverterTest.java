@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -174,15 +175,30 @@ class SensitiveDataConverterTest {
 
     @Test
     void registerMasksValuesOfAnyLength() {
-        // No length threshold when registering: the minimum length of a sensitive value
-        // is enforced at save time by SENSITIVE_FIELD_RULE, so historical short values
-        // must still be masked in logs.
         Map<String, Property> params = new HashMap<>();
         params.put("one", sensitive("one", "1"));
         params.put("five", sensitive("five", "abc12"));
         SensitiveDataConverter.registerTaskSensitiveValues(101, params);
 
         assertEquals("echo ****** ******", SensitiveDataConverter.maskSensitiveData("echo 1 abc12", 101));
+    }
+
+    @Test
+    void registerAlsoCollectsGlobalParamsAndJsonEscapes() {
+        Map<String, Property> prepare = new HashMap<>();
+        prepare.put("token", sensitive("token", "local-override"));
+        String globalParams = org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils
+                .serializeGlobalParameter(
+                        Collections.singletonList(sensitive("token", "global\"secret\nline")));
+        SensitiveDataConverter.registerTaskSensitiveValues(101, prepare, globalParams, null);
+
+        Set<String> registered = SensitiveDataConverter.getTaskSensitiveValues(101);
+        assertTrue(registered.contains("local-override"));
+        assertTrue(registered.contains("global\"secret\nline"));
+        assertTrue(registered.contains(SensitiveDataConverter.jsonEscape("global\"secret\nline")));
+
+        String jsonSnippet = "{\"value\":\"global\\\"secret\\nline\"}";
+        assertFalse(SensitiveDataConverter.maskSensitiveData(jsonSnippet, 101).contains("global\\\"secret"));
     }
 
     @Test
