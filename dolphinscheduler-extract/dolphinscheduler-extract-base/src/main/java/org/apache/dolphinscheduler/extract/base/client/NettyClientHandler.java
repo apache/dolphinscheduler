@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.extract.base.client;
 
 import org.apache.dolphinscheduler.extract.base.StandardRpcResponse;
+import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationHandler;
 import org.apache.dolphinscheduler.extract.base.future.ResponseFuture;
 import org.apache.dolphinscheduler.extract.base.protocal.HeartBeatTransporter;
 import org.apache.dolphinscheduler.extract.base.protocal.Transporter;
@@ -44,7 +45,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) {
         log.info("Channel inactive: {}", ctx.channel());
-        nettyRemotingClient.onChannelInactive(ChannelUtils.toAddress(ctx.channel()));
+        nettyRemotingClient.onChannelInactive(ChannelUtils.toAddress(ctx.channel()), ctx.channel());
         ctx.channel().close();
     }
 
@@ -67,13 +68,16 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         log.error("NettyClientHandler catch an exception on channel: {}", ctx.channel(), cause);
-        nettyRemotingClient.onChannelInactive(ChannelUtils.toAddress(ctx.channel()));
+        nettyRemotingClient.onChannelInactive(ChannelUtils.toAddress(ctx.channel()), ctx.channel());
         ctx.channel().close();
     }
 
     @Override
     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
         if (evt instanceof IdleStateEvent) {
+            if (!RpcAuthenticationHandler.isAuthenticated(ctx.channel())) {
+                return;
+            }
             ctx.channel()
                     .writeAndFlush(HeartBeatTransporter.getHeartBeatTransporter())
                     .addListener(ChannelFutureListener.CLOSE_ON_FAILURE);
