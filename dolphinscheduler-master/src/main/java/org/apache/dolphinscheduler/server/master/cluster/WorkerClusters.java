@@ -18,54 +18,45 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
-import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
 import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
-import org.apache.dolphinscheduler.registry.api.cluster.AbstractCluster;
-import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.registry.api.Event;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.function.LongSupplier;
 import java.util.stream.Collectors;
 
-public class WorkerClusters extends AbstractCluster<WorkerServerMetadata>
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class WorkerClusters
         implements
             IClusters<WorkerServerMetadata>,
             IClusters.IClustersChangeListener<WorkerServerMetadata>,
+            SubscribeListener,
+            AutoCloseable,
             WorkerGroupChangeNotifier.WorkerGroupListener {
 
-    public WorkerClusters() {
-        super(RegistryNodeType.WORKER);
-    }
-
-    @Override
-    protected WorkerHeartBeat fetchHeartbeat(String address) {
-        return Clients.withService(IWorkerMetadataService.class).withHost(address).getServerMetadata();
-    }
-
-    @Override
-    protected WorkerServerMetadata parseHeartbeat(BaseHeartBeat heartbeat) {
-        return WorkerServerMetadata.parseFromHeartBeat((WorkerHeartBeat) heartbeat);
-    }
-
-    @Override
-    protected WorkerServerMetadata initialMetadata(ServerRegistration registration) {
-        return WorkerServerMetadata.builder().address(registration.getAddress()).processId(registration.getProcessId())
-                .serverStartupTime(registration.getStartupTime()).workerGroup(null).serverStatus(ServerStatus.BUSY)
-                .build();
-    }
+    // WorkerIdentifier(workerAddress) -> worker
+    private final Map<String, WorkerServerMetadata> workerMapping = new ConcurrentHashMap<>();
 
     // WorkerGroup from db -> WorkerIdentifier(workerAddress)
     private final Map<String, List<String>> dbWorkerGroupMapping = new ConcurrentHashMap<>();
@@ -76,28 +67,31 @@ public class WorkerClusters extends AbstractCluster<WorkerServerMetadata>
     private final List<IClustersChangeListener<WorkerServerMetadata>> workerClusterChangeListeners =
             new CopyOnWriteArrayList<>();
 
+    private final Set<String> fetching = ConcurrentHashMap.newKeySet();
+    private boolean closed;
+
+    private LongSupplier nanoTime = System::nanoTime;
+
     @Override
     public List<WorkerServerMetadata> getServers() {
-        return UnmodifiableList.unmodifiableList(getValues());
+        return UnmodifiableList.unmodifiableList(new ArrayList<>(workerMapping.values()));
     }
 
     @Override
     public Optional<WorkerServerMetadata> getServer(final String address) {
-        return getValue(address);
+        return Optional.ofNullable(workerMapping.get(address));
     }
 
     public List<String> getDbWorkerServerAddressByGroup(String workerGroup) {
         if (WorkerGroupUtils.getDefaultWorkerGroup().equals(workerGroup)) {
-            return UnmodifiableList.unmodifiableList(
-                    getValues().stream().map(WorkerServerMetadata::getAddress).collect(Collectors.toList()));
+            return UnmodifiableList.unmodifiableList(new ArrayList<>(workerMapping.keySet()));
         }
         return dbWorkerGroupMapping.getOrDefault(workerGroup, Collections.emptyList());
     }
 
     public List<String> getConfigWorkerServerAddressByGroup(String workerGroup) {
         if (WorkerGroupUtils.getDefaultWorkerGroup().equals(workerGroup)) {
-            return UnmodifiableList.unmodifiableList(
-                    getValues().stream().map(WorkerServerMetadata::getAddress).collect(Collectors.toList()));
+            return UnmodifiableList.unmodifiableList(new ArrayList<>(workerMapping.keySet()));
         }
         return configWorkerGroupMapping.getOrDefault(workerGroup, Collections.emptyList());
     }
@@ -105,14 +99,14 @@ public class WorkerClusters extends AbstractCluster<WorkerServerMetadata>
     public List<String> getNormalWorkerServerAddressByGroup(String workerGroup) {
         List<String> dbWorkerAddresses = getDbWorkerServerAddressByGroup(workerGroup)
                 .stream()
-                .map(address -> getValue(address).orElse(null))
+                .map(workerMapping::get)
                 .filter(Objects::nonNull)
                 .filter(workerServer -> workerServer.getServerStatus() == ServerStatus.NORMAL)
                 .map(WorkerServerMetadata::getAddress)
                 .collect(Collectors.toList());
         List<String> configWorkerAddresses = getConfigWorkerServerAddressByGroup(workerGroup)
                 .stream()
-                .map(address -> getValue(address).orElse(null))
+                .map(workerMapping::get)
                 .filter(Objects::nonNull)
                 .filter(workerServer -> workerServer.getServerStatus() == ServerStatus.NORMAL)
                 .map(WorkerServerMetadata::getAddress)
@@ -160,13 +154,19 @@ public class WorkerClusters extends AbstractCluster<WorkerServerMetadata>
     }
 
     @Override
-    public void onServerAdded(WorkerServerMetadata workerServer) {
-        putServer(workerServer.toRegistration(), workerServer);
-        onAdded(workerServer);
-    }
-
-    @Override
-    protected void onAdded(WorkerServerMetadata workerServer) {
+    public synchronized void onServerAdded(WorkerServerMetadata workerServer) {
+        if (closed) {
+            return;
+        }
+        WorkerServerMetadata current = workerMapping.get(workerServer.getAddress());
+        if (current != null) {
+            if (current.getProcessId() == workerServer.getProcessId()
+                    && current.getServerStartupTime() == workerServer.getServerStartupTime()) {
+                return;
+            }
+            onServerRemove(current);
+        }
+        workerMapping.put(workerServer.getAddress(), workerServer);
         if (workerServer.getWorkerGroup() != null) {
             synchronized (configWorkerGroupMapping) {
                 List<String> addWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
@@ -186,12 +186,13 @@ public class WorkerClusters extends AbstractCluster<WorkerServerMetadata>
     }
 
     @Override
-    public void onServerRemove(WorkerServerMetadata removedServer) {
-        removeServer(removedServer.toRegistration());
-    }
-
-    @Override
-    protected void onRemoved(WorkerServerMetadata workerServer) {
+    public synchronized void onServerRemove(WorkerServerMetadata removedServer) {
+        WorkerServerMetadata workerServer = workerMapping.get(removedServer.getAddress());
+        if (closed || workerServer == null || workerServer.getProcessId() != removedServer.getProcessId()
+                || workerServer.getServerStartupTime() != removedServer.getServerStartupTime()
+                || !workerMapping.remove(workerServer.getAddress(), workerServer)) {
+            return;
+        }
         if (workerServer.getWorkerGroup() != null) {
             synchronized (configWorkerGroupMapping) {
                 List<String> removeWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
@@ -210,14 +211,11 @@ public class WorkerClusters extends AbstractCluster<WorkerServerMetadata>
     }
 
     @Override
-    public void onServerUpdate(WorkerServerMetadata workerServer) {
-        WorkerServerMetadata previous = putServer(workerServer.toRegistration(), workerServer);
-        onUpdated(previous, workerServer, false);
-    }
-
-    @Override
-    protected void onUpdated(WorkerServerMetadata previous, WorkerServerMetadata workerServer, boolean stale) {
-        workerServer.setMetadataStale(stale);
+    public synchronized void onServerUpdate(WorkerServerMetadata workerServer) {
+        if (closed) {
+            return;
+        }
+        WorkerServerMetadata previous = workerMapping.put(workerServer.getAddress(), workerServer);
         synchronized (configWorkerGroupMapping) {
             if (previous != null && previous.getWorkerGroup() != null
                     && !Objects.equals(previous.getWorkerGroup(), workerServer.getWorkerGroup())) {
@@ -240,5 +238,86 @@ public class WorkerClusters extends AbstractCluster<WorkerServerMetadata>
         for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
             listener.onServerUpdate(workerServer);
         }
+    }
+
+    @Override
+    public SubscribeScope getSubscribeScope() {
+        return SubscribeScope.CHILDREN_ONLY;
+    }
+
+    @Override
+    public synchronized void notify(Event event) {
+        ServerRegistration registration = JSONUtils.parseObject(event.getEventData(), ServerRegistration.class);
+        if (registration == null) {
+            log.error("Invalid registration event: {}", event);
+            return;
+        }
+        WorkerServerMetadata server = WorkerServerMetadata.fromRegistration(registration);
+        if (event.getType() == Event.Type.ADD) {
+            onServerAdded(server);
+        } else if (event.getType() == Event.Type.REMOVE) {
+            onServerRemove(server);
+        }
+    }
+
+    WorkerHeartBeat fetchHeartbeat(String address) {
+        return Clients.withService(IWorkerMetadataService.class).withHost(address).getServerMetadata();
+    }
+
+    public synchronized void refreshHeartbeats(ExecutorService executor, Duration interval) {
+        if (closed) {
+            return;
+        }
+        long staleAfterNanos = interval.toNanos() * 3;
+        for (String address : getServerAddresses()) {
+            WorkerServerMetadata expected = workerMapping.get(address);
+            if (expected == null) {
+                continue;
+            }
+            if (!expected.isMetadataStale() && isStale(expected, staleAfterNanos)) {
+                expected.setMetadataStale(true);
+                onServerUpdate(expected);
+            }
+            if (fetching.add(address)) {
+                executor.execute(() -> {
+                    try {
+                        synchronized (this) {
+                            if (closed || workerMapping.get(address) != expected) {
+                                return;
+                            }
+                        }
+                        WorkerHeartBeat heartbeat = fetchHeartbeat(address);
+                        synchronized (this) {
+                            if (!closed && workerMapping.get(address) == expected
+                                    && expected.toRegistration().matches(heartbeat)) {
+                                WorkerServerMetadata updated = WorkerServerMetadata.parseFromHeartBeat(heartbeat);
+                                updated.setHeartbeatProgressNanos(expected.getHeartbeatProgressNanos() == null
+                                        || expected.getHeartbeatReportTime() != heartbeat.getReportTime()
+                                                ? nanoTime.getAsLong()
+                                                : expected.getHeartbeatProgressNanos());
+                                updated.setMetadataStale(isStale(updated, staleAfterNanos));
+                                onServerUpdate(updated);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        log.debug("Failed to fetch Worker heartbeat from {}", address, ex);
+                    } finally {
+                        fetching.remove(address);
+                    }
+                });
+            }
+        }
+    }
+
+    private boolean isStale(WorkerServerMetadata worker, long staleAfterNanos) {
+        return worker.getHeartbeatProgressNanos() == null
+                || nanoTime.getAsLong() - worker.getHeartbeatProgressNanos() >= staleAfterNanos;
+    }
+
+    @Override
+    public synchronized void close() {
+        closed = true;
+        workerMapping.clear();
+        fetching.clear();
     }
 }

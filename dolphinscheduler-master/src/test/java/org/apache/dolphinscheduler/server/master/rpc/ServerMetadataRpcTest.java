@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -64,12 +65,12 @@ class ServerMetadataRpcTest {
                 .threadPoolUsage(0.5).build();
         String address = "localhost:" + port;
         RegistryClient registry = mock(RegistryClient.class);
-        when(registry.getServerNodeSet(RegistryNodeType.MASTER)).thenReturn(Collections.singleton(address));
-        when(registry.getServerNodeSet(RegistryNodeType.WORKER)).thenReturn(Collections.singleton(address));
-        when(registry.get(RegistryNodeType.MASTER.getRegistryPath() + "/" + address))
-                .thenReturn(JSONUtils.toJsonString(ServerRegistration.fromHeartBeat(master)));
-        when(registry.get(RegistryNodeType.WORKER.getRegistryPath() + "/" + address))
-                .thenReturn(JSONUtils.toJsonString(ServerRegistration.fromHeartBeat(worker)));
+        Server masterRegistration = new Server();
+        masterRegistration.setHeartBeatInfo(JSONUtils.toJsonString(ServerRegistration.fromHeartBeat(master)));
+        Server workerRegistration = new Server();
+        workerRegistration.setHeartBeatInfo(JSONUtils.toJsonString(ServerRegistration.fromHeartBeat(worker)));
+        when(registry.getServerList(RegistryNodeType.MASTER)).thenReturn(Collections.singletonList(masterRegistration));
+        when(registry.getServerList(RegistryNodeType.WORKER)).thenReturn(Collections.singletonList(workerRegistration));
         MasterConfig config = new MasterConfig();
         config.setMasterAddress("local-master:5678");
         config.setHeartbeatFetchInterval(Duration.ofMillis(50));

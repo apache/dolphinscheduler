@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
+import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 
@@ -66,13 +69,23 @@ public class ClusterManager implements AutoCloseable {
         Duration interval = masterConfig.getHeartbeatFetchInterval();
         masterClusters.registerListener(new MasterSlotChangeListenerAdaptor(masterSlotManager, masterClusters));
         masterClusters.setLocalHeartbeat(masterConfig.getMasterAddress(), masterRegistryClient::getServerMetadata);
-        masterClusters.start(registryClient, interval, executor);
-        workerClusters.start(registryClient, interval, executor);
+        synchronized (masterClusters) {
+            registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), masterClusters);
+            registryClient.getServerList(RegistryNodeType.MASTER).forEach(server -> masterClusters.onServerAdded(
+                    MasterServerMetadata.fromRegistration(
+                            JSONUtils.parseObject(server.getHeartBeatInfo(), ServerRegistration.class))));
+        }
+        synchronized (workerClusters) {
+            registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), workerClusters);
+            registryClient.getServerList(RegistryNodeType.WORKER).forEach(server -> workerClusters.onServerAdded(
+                    WorkerServerMetadata.fromRegistration(
+                            JSONUtils.parseObject(server.getHeartBeatInfo(), ServerRegistration.class))));
+        }
         workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerClusters);
         workerGroupChangeNotifier.start();
         timer.scheduleWithFixedDelay(() -> {
-            masterClusters.refreshHeartbeats();
-            workerClusters.refreshHeartbeats();
+            masterClusters.refreshHeartbeats(executor);
+            workerClusters.refreshHeartbeats(executor, interval);
         }, 0, interval.toMillis(), TimeUnit.MILLISECONDS);
         log.info("ClusterManager started...");
     }

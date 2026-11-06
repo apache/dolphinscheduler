@@ -21,10 +21,15 @@ import org.apache.dolphinscheduler.common.enums.ServerStatus;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public interface IClusters<S extends IClusters.IServerMetadata> {
 
     List<S> getServers();
+
+    default List<String> getServerAddresses() {
+        return getServers().stream().map(IServerMetadata::getAddress).collect(Collectors.toList());
+    }
 
     Optional<S> getServer(final String address);
 
