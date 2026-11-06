@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.server.master.cluster;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
@@ -27,10 +28,10 @@ import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -41,12 +42,22 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.function.LongSupplier;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 @Slf4j
+@Component
 public class WorkerClusters
         implements
             IClusters<WorkerServerMetadata>,
@@ -71,6 +82,20 @@ public class WorkerClusters
     private boolean closed;
 
     private LongSupplier nanoTime = System::nanoTime;
+
+    @Autowired
+    private MasterConfig masterConfig;
+
+    private final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1,
+            ThreadUtils.newDaemonThreadFactory("WorkerHeartbeatTimer-%d"));
+    private final ExecutorService executor = Executors.newFixedThreadPool(8,
+            ThreadUtils.newDaemonThreadFactory("WorkerHeartbeatFetch-%d"));
+
+    @PostConstruct
+    public void start() {
+        timer.scheduleWithFixedDelay(this::refreshHeartbeats, 0,
+                masterConfig.getHeartbeatFetchInterval().toMillis(), TimeUnit.MILLISECONDS);
+    }
 
     @Override
     public List<WorkerServerMetadata> getServers() {
@@ -264,11 +289,11 @@ public class WorkerClusters
         return Clients.withService(IWorkerMetadataService.class).withHost(address).getServerMetadata();
     }
 
-    public synchronized void refreshHeartbeats(ExecutorService executor, Duration interval) {
+    public synchronized void refreshHeartbeats() {
         if (closed) {
             return;
         }
-        long staleAfterNanos = interval.toNanos() * 3;
+        long staleAfterNanos = masterConfig.getHeartbeatFetchInterval().toNanos() * 3;
         for (String address : getServerAddresses()) {
             WorkerServerMetadata expected = workerMapping.get(address);
             if (expected == null) {
@@ -315,8 +340,11 @@ public class WorkerClusters
     }
 
     @Override
+    @PreDestroy
     public synchronized void close() {
         closed = true;
+        timer.shutdownNow();
+        executor.shutdownNow();
         workerMapping.clear();
         fetching.clear();
     }

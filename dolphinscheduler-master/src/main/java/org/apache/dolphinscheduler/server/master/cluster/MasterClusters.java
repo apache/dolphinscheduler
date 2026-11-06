@@ -20,11 +20,14 @@ package org.apache.dolphinscheduler.server.master.cluster;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 
@@ -36,12 +39,22 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
-import java.util.function.Supplier;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
 @Slf4j
+@Component
 public class MasterClusters
         implements
             IClusters<MasterServerMetadata>,
@@ -60,8 +73,23 @@ public class MasterClusters
     private final Set<String> fetching = ConcurrentHashMap.newKeySet();
     private boolean closed;
 
-    private String localAddress;
-    private Supplier<MasterHeartBeat> localHeartbeat;
+    @Lazy
+    @Autowired
+    private MasterRegistryClient masterRegistryClient;
+
+    @Autowired
+    private MasterConfig masterConfig;
+
+    private final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1,
+            ThreadUtils.newDaemonThreadFactory("MasterHeartbeatTimer-%d"));
+    private final ExecutorService executor = Executors.newFixedThreadPool(8,
+            ThreadUtils.newDaemonThreadFactory("MasterHeartbeatFetch-%d"));
+
+    @PostConstruct
+    public void start() {
+        timer.scheduleWithFixedDelay(this::refreshHeartbeats, 0,
+                masterConfig.getHeartbeatFetchInterval().toMillis(), TimeUnit.MILLISECONDS);
+    }
 
     @Override
     public List<MasterServerMetadata> getServers() {
@@ -149,17 +177,12 @@ public class MasterClusters
         }
     }
 
-    void setLocalHeartbeat(String address, Supplier<MasterHeartBeat> heartbeat) {
-        localAddress = address;
-        localHeartbeat = heartbeat;
-    }
-
     MasterHeartBeat fetchHeartbeat(String address) {
-        return address.equals(localAddress) ? localHeartbeat.get()
+        return address.equals(masterConfig.getMasterAddress()) ? masterRegistryClient.getServerMetadata()
                 : Clients.withService(IMasterMetadataService.class).withHost(address).getServerMetadata();
     }
 
-    public synchronized void refreshHeartbeats(ExecutorService executor) {
+    public synchronized void refreshHeartbeats() {
         if (closed) {
             return;
         }
@@ -191,8 +214,11 @@ public class MasterClusters
     }
 
     @Override
+    @PreDestroy
     public synchronized void close() {
         closed = true;
+        timer.shutdownNow();
+        executor.shutdownNow();
         masterServerMap.clear();
         fetching.clear();
     }

@@ -35,8 +35,10 @@ import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
+import org.apache.dolphinscheduler.server.master.cluster.MasterClusters;
 import org.apache.dolphinscheduler.server.master.cluster.MasterServerMetadata;
 import org.apache.dolphinscheduler.server.master.cluster.MasterSlotManager;
+import org.apache.dolphinscheduler.server.master.cluster.WorkerClusters;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerGroupChangeNotifier;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerServerMetadata;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
@@ -77,15 +79,22 @@ class ServerMetadataRpcTest {
         try (
                 RpcServer server = new RpcServer(NettyServerConfig.builder().serverName("MetadataRpcTest")
                         .listenPort(port).build());
-                ClusterManager manager = new ClusterManager()) {
+                MasterClusters masters = new MasterClusters();
+                WorkerClusters workers = new WorkerClusters()) {
+            ClusterManager manager = new ClusterManager();
+            ReflectionTestUtils.setField(manager, "masterClusters", masters);
+            ReflectionTestUtils.setField(manager, "workerClusters", workers);
             ReflectionTestUtils.setField(manager, "registryClient", registry);
-            ReflectionTestUtils.setField(manager, "masterConfig", config);
-            ReflectionTestUtils.setField(manager, "masterRegistryClient", mock(MasterRegistryClient.class));
+            ReflectionTestUtils.setField(masters, "masterConfig", config);
+            ReflectionTestUtils.setField(workers, "masterConfig", config);
+            ReflectionTestUtils.setField(masters, "masterRegistryClient", mock(MasterRegistryClient.class));
             ReflectionTestUtils.setField(manager, "masterSlotManager", mock(MasterSlotManager.class));
             ReflectionTestUtils.setField(manager, "workerGroupChangeNotifier", mock(WorkerGroupChangeNotifier.class));
             server.registerServerMethodInvokerProvider((IMasterMetadataService) () -> master);
             server.registerServerMethodInvokerProvider((IWorkerMetadataService) () -> worker);
             server.start();
+            masters.start();
+            workers.start();
             manager.start();
             Awaitility.await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
                 MasterServerMetadata masterSnapshot = manager.getMasterClusters().getServer(address).orElse(null);
