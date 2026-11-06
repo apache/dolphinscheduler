@@ -37,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -94,10 +95,51 @@ class TaskResourcePermissionCheckerTest {
     }
 
     @ParameterizedTest
+    @ValueSource(strings = {"SCALA", "PYTHON"})
+    void sparkMainJarDoesNotPreventWorkerGroupAuthorization(String programType) {
+        task.setTaskType("SPARK");
+        task.setTaskParams("{\"mainClass\":\"org.apache.spark.examples.SparkPi\","
+                + "\"mainJar\":{\"resourceName\":\"spark-examples.jar\"},\"programType\":\"" + programType
+                + "\",\"driverCores\":1,\"localParams\":[],\"resourceList\":[]}");
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "workers"))
+                .thenReturn(true);
+
+        checker.checkPermission(100L, Collections.singletonList(task));
+
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "workers"))
+                .thenReturn(false);
+        Assertions.assertThrows(ServiceException.class,
+                () -> checker.checkPermission(100L, Collections.singletonList(task)));
+        Mockito.verify(resourceAuthorizationDao, Mockito.times(2))
+                .isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "workers");
+        Mockito.verifyNoInteractions(namespaceDao);
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = {
+            "localParams|[{\"prop\":\"p\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"v\"}]",
+            "resourceList|[{\"resourceName\":\"file.txt\"}]",
+            "customizedLabels|[{\"key\":\"app\",\"value\":\"demo\"}]"
+    }, delimiter = '|')
+    void k8sObjectArraysWithNullNamespaceStillCheckWorkerGroup(String field, String value) {
+        task.setTaskType("K8S");
+        task.setTaskParams("{\"namespace\":null,\"" + field + "\":" + value + "}");
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "workers"))
+                .thenReturn(true);
+
+        checker.checkPermission(100L, Collections.singletonList(task));
+
+        Mockito.verify(resourceAuthorizationDao).isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "workers");
+        Mockito.verifyNoInteractions(namespaceDao);
+    }
+
+    @ParameterizedTest
     @ValueSource(strings = {"K8S", "KUBEFLOW", "SPARK"})
     void namespaceGrantMustMatchBothNameAndCluster(String taskType) {
         task.setTaskType(taskType);
-        task.setTaskParams("{\"namespace\":\"{\\\"name\\\":\\\"jobs\\\",\\\"cluster\\\":\\\"production\\\"}\"}");
+        task.setTaskParams("{\"namespace\":\"{\\\"name\\\":\\\"jobs\\\",\\\"cluster\\\":\\\"production\\\"}\","
+                + "\"localParams\":[{\"prop\":\"p\",\"value\":\"v\"}],"
+                + "\"resourceList\":[{\"resourceName\":\"file.txt\"}]}");
         Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "workers"))
                 .thenReturn(true);
         K8sNamespace namespace = new K8sNamespace();
@@ -110,6 +152,36 @@ class TaskResourcePermissionCheckerTest {
         namespace.setClusterName("production");
         checker.checkPermission(100L, Arrays.asList(task, task));
         Mockito.verify(namespaceDao, Mockito.times(2)).queryByProject(100L);
+    }
+
+    @Test
+    void sparkMainJarStillRequiresNamespaceGrant() {
+        task.setTaskType("SPARK");
+        task.setTaskParams("{\"mainJar\":{\"resourceName\":\"spark-examples.jar\"},"
+                + "\"namespace\":\"{\\\"name\\\":\\\"jobs\\\",\\\"cluster\\\":\\\"production\\\"}\"}");
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "workers"))
+                .thenReturn(true);
+        Mockito.when(namespaceDao.queryByProject(100L)).thenReturn(Collections.emptyList());
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> checker.checkPermission(100L, Collections.singletonList(task)));
+
+        K8sNamespace namespace = new K8sNamespace();
+        namespace.setNamespace("jobs");
+        namespace.setClusterName("production");
+        Mockito.when(namespaceDao.queryByProject(100L)).thenReturn(Collections.singletonList(namespace));
+        checker.checkPermission(100L, Collections.singletonList(task));
+        Mockito.verify(namespaceDao, Mockito.times(2)).queryByProject(100L);
+    }
+
+    @Test
+    void namespaceObjectCannotBypassNamespaceAuthorization() {
+        task.setTaskType("K8S");
+        task.setTaskParams("{\"namespace\":{\"name\":\"jobs\",\"cluster\":\"production\"}}");
+
+        Assertions.assertThrows(ServiceException.class,
+                () -> checker.checkPermission(100L, Collections.singletonList(task)));
+        Mockito.verifyNoInteractions(namespaceDao, resourceAuthorizationDao);
     }
 
     @Test

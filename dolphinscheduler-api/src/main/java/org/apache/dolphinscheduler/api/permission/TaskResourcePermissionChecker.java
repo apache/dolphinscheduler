@@ -46,6 +46,8 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 @Component
 @RequiredArgsConstructor
 public class TaskResourcePermissionChecker {
@@ -82,7 +84,11 @@ public class TaskResourcePermissionChecker {
             }
             if ("K8S".equals(task.getTaskType()) || "KUBEFLOW".equals(task.getTaskType())
                     || "SPARK".equals(task.getTaskType())) {
-                String namespace = JSONUtils.toMap(task.getTaskParams()).get("namespace");
+                JsonNode namespaceNode = JSONUtils.parseObject(task.getTaskParams()).get("namespace");
+                if (namespaceNode != null && !namespaceNode.isNull() && !namespaceNode.isTextual()) {
+                    throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+                }
+                String namespace = namespaceNode == null || namespaceNode.isNull() ? null : namespaceNode.asText();
                 if (StringUtils.isNotEmpty(namespace)) {
                     Map<String, String> selection = JSONUtils.toMap(namespace);
                     if (selection == null || StringUtils.isBlank(selection.get("name"))
