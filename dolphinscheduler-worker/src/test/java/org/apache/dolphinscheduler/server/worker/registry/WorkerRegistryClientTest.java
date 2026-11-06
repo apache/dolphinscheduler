@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.server.worker.registry;
 import static org.mockito.BDDMockito.given;
 
 import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
@@ -84,10 +86,26 @@ public class WorkerRegistryClientTest {
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(RegistryNodeType.class)))
                 .willReturn(true);
 
-        workerRegistryClient.initWorkRegistry();
-        workerRegistryClient.start();
-
         workerRegistryClient.setRegistryStoppable(stoppable);
+        workerRegistryClient.start();
+        Assertions.assertDoesNotThrow(() -> workerRegistryClient.close());
+    }
+
+    @Test
+    void buildsFreshHeartbeatOnEveryRequestWithoutRegistryWrites() {
+        ExclusiveThreadTaskExecutorContainer container = Mockito.mock(ExclusiveThreadTaskExecutorContainer.class);
+        given(physicalTaskExecutorContainerDelegator.getExecutorContainer()).willReturn(container);
+        given(container.slotUsage()).willReturn(0.2, 0.8);
+        given(metricsProvider.getSystemMetrics()).willReturn(new SystemMetrics());
+        given(workerServerLoadProtection.isOverload(Mockito.any())).willReturn(false, true);
+        WorkerHeartBeat first = workerRegistryClient.getServerMetadata();
+        WorkerHeartBeat second = workerRegistryClient.getServerMetadata();
+        Assertions.assertNotSame(first, second);
+        Assertions.assertEquals(0.2, first.getThreadPoolUsage());
+        Assertions.assertEquals(0.8, second.getThreadPoolUsage());
+        Assertions.assertEquals(ServerStatus.NORMAL, first.getServerStatus());
+        Assertions.assertEquals(ServerStatus.BUSY, second.getServerStatus());
+        Mockito.verify(registryClient, Mockito.never()).persistEphemeral(Mockito.any(), Mockito.any());
     }
 
     @Test

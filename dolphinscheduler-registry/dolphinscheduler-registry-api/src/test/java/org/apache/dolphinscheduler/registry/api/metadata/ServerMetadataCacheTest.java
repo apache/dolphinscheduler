@@ -155,7 +155,7 @@ class ServerMetadataCacheTest {
     }
 
     @Test
-    void stalledSamplingExpiresEvenWhenRpcKeepsSucceeding() {
+    void unchangedHeartbeatExpiresEvenWhenRpcKeepsSucceeding() {
         WorkerHeartBeat metadata = worker(1);
         register(RegistryNodeType.WORKER, metadata);
         query = (type, address) -> metadata;

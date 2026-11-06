@@ -98,7 +98,7 @@ master:
   # logic-task-config:
     # The number of threads used to execute logic task.
     # task-executor-thread-count: 10
-  # Maximum interval between failover-mark checks; metadata is sampled locally every second.
+  # Interval between failover-mark checks; heartbeat data is built on RPC requests.
   max-heartbeat-interval: 10s
   # Interval for fetching heartbeat data from other services over RPC.
   heartbeat-fetch-interval: 1s
