@@ -20,19 +20,25 @@ package org.apache.dolphinscheduler.server.master.registry;
 import static org.apache.dolphinscheduler.common.constants.Constants.SLEEP_TIME_MILLIS;
 
 import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.registry.api.FailoverMarkChecker;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
 import org.apache.dolphinscheduler.server.master.engine.MasterCoordinator;
+import org.apache.dolphinscheduler.server.master.metrics.MasterServerMetrics;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -41,7 +47,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * <p>DolphinScheduler master register client, used to connect to registry and hand the registry events.
- * <p>When the Master node startup, it will register in registry center. And start a {@link MasterHeartBeatTask} to sample its metadata locally and check failover marks.
+ * <p>The Master registers stable process identity and serves heartbeat snapshots on demand.
  */
 @Component
 @Slf4j
@@ -62,12 +68,12 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
     @Autowired
     private MasterCoordinator masterCoordinator;
 
-    private MasterHeartBeatTask masterHeartBeatTask;
+    private final int processId = OSUtils.getProcessID();
+
+    private FailoverMarkChecker failoverMarkChecker;
 
     public void start() {
         try {
-            this.masterHeartBeatTask = new MasterHeartBeatTask(masterConfig, masterServerLoadProtection,
-                    metricsProvider, registryClient, masterCoordinator);
             // master registry
             registry();
             registryClient.addConnectionStateListener(new MasterConnectionStateListener(registryClient));
@@ -83,8 +89,8 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
     @Override
     public void close() {
         // TODO unsubscribe MasterRegistryDataListener
-        if (masterHeartBeatTask != null) {
-            masterHeartBeatTask.shutdown();
+        if (failoverMarkChecker != null) {
+            failoverMarkChecker.close();
         }
         if (registryClient.isConnected()) {
             deregister();
@@ -98,18 +104,21 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
     void registry() {
         log.info("Master node : {} registering to registry center", masterConfig.getMasterAddress());
         String masterRegistryPath = masterConfig.getMasterRegistryPath();
+        ServerRegistration registration = ServerRegistration.fromHeartBeat(getServerMetadata());
 
         // remove before persist
         registryClient.remove(masterRegistryPath);
         registryClient.persistEphemeral(masterRegistryPath,
-                JSONUtils.toJsonString(ServerRegistration.fromHeartBeat(masterHeartBeatTask.getLatestHeartBeat())));
+                JSONUtils.toJsonString(registration));
 
         while (!registryClient.checkNodeExists(NetUtils.getHost(), RegistryNodeType.MASTER)) {
             log.warn("The current master server node:{} cannot find in registry", NetUtils.getHost());
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
-        masterHeartBeatTask.start();
+        failoverMarkChecker = new FailoverMarkChecker(registryClient, registration,
+                masterConfig.getMaxHeartbeatInterval());
+        failoverMarkChecker.start();
         log.info("Master node : {} registered to registry center successfully", masterConfig.getMasterAddress());
 
     }
@@ -118,8 +127,8 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
         try {
             registryClient.remove(masterConfig.getMasterRegistryPath());
             log.info("Master node : {} unRegistry to register center.", masterConfig.getMasterAddress());
-            if (masterHeartBeatTask != null) {
-                masterHeartBeatTask.shutdown();
+            if (failoverMarkChecker != null) {
+                failoverMarkChecker.close();
             }
             registryClient.close();
         } catch (Exception e) {
@@ -129,10 +138,27 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
 
     @Override
     public MasterHeartBeat getServerMetadata() {
-        if (masterHeartBeatTask == null) {
-            throw new IllegalStateException("Master metadata is not initialized");
-        }
-        return masterHeartBeatTask.getLatestHeartBeat();
+        SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+        MasterServerMetrics.incMasterHeartbeatCount();
+        return MasterHeartBeat.builder()
+                .startupTime(ServerLifeCycleManager.getServerStartupTime())
+                .reportTime(System.currentTimeMillis())
+                .jvmCpuUsage(systemMetrics.getJvmCpuUsagePercentage())
+                .cpuUsage(systemMetrics.getSystemCpuUsagePercentage())
+                .jvmMemoryUsage(systemMetrics.getJvmMemoryUsedPercentage())
+                .jvmHeapUsed(systemMetrics.getJvmHeapUsed())
+                .jvmHeapMax(systemMetrics.getJvmHeapMax())
+                .jvmNonHeapUsed(systemMetrics.getJvmNonHeapUsed())
+                .jvmNonHeapMax(systemMetrics.getJvmNonHeapMax())
+                .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
+                .diskUsage(systemMetrics.getDiskUsedPercentage())
+                .processId(processId)
+                .serverStatus(
+                        masterServerLoadProtection.isOverload(systemMetrics) ? ServerStatus.BUSY : ServerStatus.NORMAL)
+                .host(NetUtils.getHost())
+                .port(masterConfig.getListenPort())
+                .isCoordinator(masterCoordinator.isActive())
+                .build();
     }
 
     public boolean isAvailable() {
