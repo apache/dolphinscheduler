@@ -45,7 +45,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.service.metadata.ServerMetadataCache;
+import org.apache.dolphinscheduler.registry.api.metadata.ServerMetadataCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;

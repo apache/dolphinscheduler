@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.service.metadata.ServerMetadataCache;
+import org.apache.dolphinscheduler.registry.api.metadata.ServerMetadataCache;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

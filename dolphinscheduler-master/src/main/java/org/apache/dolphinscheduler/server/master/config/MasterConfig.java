@@ -55,7 +55,10 @@ public class MasterConfig implements Validator {
      */
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
 
-    private Duration metadataRefreshInterval = Duration.ofSeconds(1);
+    /**
+     * Interval for fetching heartbeat data from other services over RPC.
+     */
+    private Duration heartbeatFetchInterval = Duration.ofSeconds(1);
 
     /**
      * Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.
@@ -107,8 +110,8 @@ public class MasterConfig implements Validator {
             errors.rejectValue("max-heartbeat-interval", null, "should be a valid duration");
         }
 
-        if (metadataRefreshInterval.toMillis() <= 0) {
-            errors.rejectValue("metadata-refresh-interval", null, "should be positive");
+        if (heartbeatFetchInterval.toMillis() <= 0) {
+            errors.rejectValue("heartbeatFetchInterval", null, "should be positive");
         }
 
         if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() < 10) {
@@ -145,7 +148,7 @@ public class MasterConfig implements Validator {
                         "\n  workflow-event-bus-fire-thread-count -> " + workflowEventBusFireThreadCount +
                         "\n  logic-task-config -> " + logicTaskConfig +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
-                        "\n  metadata-refresh-interval -> " + metadataRefreshInterval +
+                        "\n  heartbeat-fetch-interval -> " + heartbeatFetchInterval +
                         "\n  kill-application-when-task-failover -> " + isKillApplicationWhenTaskFailover() +
                         "\n  server-load-protection -> " + serverLoadProtection +
                         "\n  master-address -> " + masterAddress +

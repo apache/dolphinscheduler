@@ -47,7 +47,10 @@ public class ApiConfig implements Validator {
     private boolean auditEnable = false;
     private Duration sessionTimeout = Duration.ofHours(2);
 
-    private Duration metadataRefreshInterval = Duration.ofSeconds(5);
+    /**
+     * Interval for fetching heartbeat data from other services over RPC.
+     */
+    private Duration heartbeatFetchInterval = Duration.ofSeconds(5);
 
     private TrafficConfiguration trafficControl = new TrafficConfiguration();
 
@@ -62,8 +65,8 @@ public class ApiConfig implements Validator {
     public void validate(Object target, Errors errors) {
         validatePythonGateway(errors);
         validateSessionTimeout(errors);
-        if (metadataRefreshInterval.toMillis() <= 0) {
-            errors.rejectValue("metadataRefreshInterval", null, "should be positive");
+        if (heartbeatFetchInterval.toMillis() <= 0) {
+            errors.rejectValue("heartbeatFetchInterval", null, "should be positive");
         }
         printConfig();
     }
@@ -85,7 +88,7 @@ public class ApiConfig implements Validator {
         log.info("API config: uiUrl -> {} ", uiUrl);
         log.info("API config: auditEnable -> {} ", auditEnable);
         log.info("API config: sessionTimeout -> {} ", sessionTimeout);
-        log.info("API config: metadataRefreshInterval -> {} ", metadataRefreshInterval);
+        log.info("API config: heartbeatFetchInterval -> {} ", heartbeatFetchInterval);
         log.info("API config: trafficControl -> {} ", trafficControl);
         log.info("API config: pythonGateway -> {} ", pythonGateway);
     }

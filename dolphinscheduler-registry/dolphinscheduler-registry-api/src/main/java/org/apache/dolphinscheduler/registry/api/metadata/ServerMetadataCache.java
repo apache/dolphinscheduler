@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.service.metadata;
+package org.apache.dolphinscheduler.registry.api.metadata;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
@@ -25,9 +25,6 @@ import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.extract.base.client.Clients;
-import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
-import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
 import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -55,7 +52,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ServerMetadataCache implements AutoCloseable {
 
     private final RegistryClient registryClient;
-    private final long refreshIntervalMillis;
+    private final long heartbeatFetchIntervalMillis;
     private final BiFunction<RegistryNodeType, String, BaseHeartBeat> metadataQuery;
     private final ScheduledThreadPoolExecutor executor;
     private final Map<RegistryNodeType, Map<String, Entry>> entries = new EnumMap<>(RegistryNodeType.class);
@@ -66,18 +63,18 @@ public class ServerMetadataCache implements AutoCloseable {
     private boolean initializing;
     private boolean closed;
 
-    public ServerMetadataCache(RegistryClient registryClient, Duration refreshInterval,
+    public ServerMetadataCache(RegistryClient registryClient, Duration heartbeatFetchInterval,
                                BiFunction<RegistryNodeType, String, BaseHeartBeat> metadataQuery) {
-        this(registryClient, refreshInterval, metadataQuery, newExecutor(), System::nanoTime);
+        this(registryClient, heartbeatFetchInterval, metadataQuery, newExecutor(), System::nanoTime);
     }
 
-    ServerMetadataCache(RegistryClient registryClient, Duration refreshInterval,
+    ServerMetadataCache(RegistryClient registryClient, Duration heartbeatFetchInterval,
                         BiFunction<RegistryNodeType, String, BaseHeartBeat> metadataQuery,
                         ScheduledThreadPoolExecutor executor, LongSupplier nanoTime) {
         this.registryClient = registryClient;
-        this.refreshIntervalMillis = refreshInterval.toMillis();
-        if (refreshIntervalMillis <= 0) {
-            throw new IllegalArgumentException("Metadata refresh interval must be positive");
+        this.heartbeatFetchIntervalMillis = heartbeatFetchInterval.toMillis();
+        if (heartbeatFetchIntervalMillis <= 0) {
+            throw new IllegalArgumentException("Heartbeat fetch interval must be positive");
         }
         this.metadataQuery = metadataQuery;
         this.executor = executor;
@@ -90,14 +87,7 @@ public class ServerMetadataCache implements AutoCloseable {
     }
 
     private static ScheduledThreadPoolExecutor newExecutor() {
-        return new ScheduledThreadPoolExecutor(8, ThreadUtils.newDaemonThreadFactory("ServerMetadataRefresh-%d"));
-    }
-
-    public static BaseHeartBeat queryMetadata(RegistryNodeType type, String address) {
-        if (type == RegistryNodeType.MASTER) {
-            return Clients.withService(IMasterMetadataService.class).withHost(address).getServerMetadata();
-        }
-        return Clients.withService(IWorkerMetadataService.class).withHost(address).getServerMetadata();
+        return new ScheduledThreadPoolExecutor(8, ThreadUtils.newDaemonThreadFactory("ServerHeartbeatFetch-%d"));
     }
 
     public synchronized void addListener(RegistryNodeType type, SubscribeListener listener) {
@@ -172,7 +162,7 @@ public class ServerMetadataCache implements AutoCloseable {
             log.error("Failed to reconcile server registrations", ex);
             synchronized (this) {
                 if (!closed) {
-                    executor.schedule(this::reconcile, refreshIntervalMillis, TimeUnit.MILLISECONDS);
+                    executor.schedule(this::reconcile, heartbeatFetchIntervalMillis, TimeUnit.MILLISECONDS);
                 }
             }
         } finally {
@@ -222,7 +212,7 @@ public class ServerMetadataCache implements AutoCloseable {
         publish(type, entry, Event.Type.ADD);
         // One fixed-delay task per member: requests for the same instance never overlap or accumulate.
         entry.future = executor.scheduleWithFixedDelay(() -> refresh(type, entry),
-                ThreadLocalRandom.current().nextLong(refreshIntervalMillis), refreshIntervalMillis,
+                ThreadLocalRandom.current().nextLong(heartbeatFetchIntervalMillis), heartbeatFetchIntervalMillis,
                 TimeUnit.MILLISECONDS);
     }
 
@@ -268,7 +258,7 @@ public class ServerMetadataCache implements AutoCloseable {
 
     private boolean isStale(Entry entry) {
         return entry.metadata == null || nanoTime.getAsLong() - entry.lastProgressNanos >= TimeUnit.MILLISECONDS
-                .toNanos(3 * refreshIntervalMillis);
+                .toNanos(3 * heartbeatFetchIntervalMillis);
     }
 
     private void publish(RegistryNodeType type, Entry entry, Event.Type eventType) {

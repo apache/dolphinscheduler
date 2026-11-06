@@ -17,10 +17,13 @@
 
 package org.apache.dolphinscheduler.server.master.config;
 
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
+import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.registry.api.metadata.ServerMetadataCache;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
-import org.apache.dolphinscheduler.service.metadata.ServerMetadataCache;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,9 +34,14 @@ public class MasterMetadataConfiguration {
     @Bean(destroyMethod = "close")
     public ServerMetadataCache masterMetadataCache(RegistryClient registryClient, MasterConfig config,
                                                    MasterRegistryClient masterRegistryClient) {
-        return new ServerMetadataCache(registryClient, config.getMetadataRefreshInterval(),
-                (type, address) -> type == RegistryNodeType.MASTER && address.equals(config.getMasterAddress())
-                        ? masterRegistryClient.getServerMetadata()
-                        : ServerMetadataCache.queryMetadata(type, address));
+        return new ServerMetadataCache(registryClient, config.getHeartbeatFetchInterval(),
+                (type, address) -> {
+                    if (type == RegistryNodeType.MASTER) {
+                        return address.equals(config.getMasterAddress()) ? masterRegistryClient.getServerMetadata()
+                                : Clients.withService(IMasterMetadataService.class).withHost(address)
+                                        .getServerMetadata();
+                    }
+                    return Clients.withService(IWorkerMetadataService.class).withHost(address).getServerMetadata();
+                });
     }
 }
