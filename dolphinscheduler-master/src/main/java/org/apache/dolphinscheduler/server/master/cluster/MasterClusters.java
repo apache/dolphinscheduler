@@ -18,45 +18,74 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
+import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
+import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
+import org.apache.dolphinscheduler.registry.api.cluster.AbstractCluster;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MasterClusters
+public class MasterClusters extends AbstractCluster<MasterServerMetadata>
         implements
             IClusters<MasterServerMetadata>,
             IClusters.IClustersChangeListener<MasterServerMetadata> {
 
-    /**
-     * Master address -> MasterServer
-     **/
-    private final Map<String, MasterServerMetadata> masterServerMap = new ConcurrentHashMap<>();
+    private String localAddress;
+    private Supplier<MasterHeartBeat> localHeartbeat;
+
+    public MasterClusters() {
+        super(RegistryNodeType.MASTER);
+    }
+
+    void setLocalHeartbeat(String address, Supplier<MasterHeartBeat> heartbeat) {
+        localAddress = address;
+        localHeartbeat = heartbeat;
+    }
+
+    @Override
+    protected MasterHeartBeat fetchHeartbeat(String address) {
+        return address.equals(localAddress) ? localHeartbeat.get()
+                : Clients.withService(IMasterMetadataService.class).withHost(address).getServerMetadata();
+    }
+
+    @Override
+    protected MasterServerMetadata parseHeartbeat(BaseHeartBeat heartbeat) {
+        return MasterServerMetadata.parseFromHeartBeat((MasterHeartBeat) heartbeat);
+    }
+
+    @Override
+    protected MasterServerMetadata initialMetadata(ServerRegistration registration) {
+        return MasterServerMetadata.builder().address(registration.getAddress()).processId(registration.getProcessId())
+                .serverStartupTime(registration.getStartupTime()).build();
+    }
 
     private final List<IClustersChangeListener<MasterServerMetadata>> masterClusterChangeListeners =
             new CopyOnWriteArrayList<>();
 
     @Override
     public List<MasterServerMetadata> getServers() {
-        return UnmodifiableList.unmodifiableList(new ArrayList<>(masterServerMap.values()));
+        return UnmodifiableList.unmodifiableList(getValues());
     }
 
     @Override
     public Optional<MasterServerMetadata> getServer(final String address) {
-        return Optional.ofNullable(masterServerMap.get(address));
+        return getValue(address);
     }
 
     public List<MasterServerMetadata> getNormalServers() {
-        List<MasterServerMetadata> normalMasterServers = masterServerMap.values()
+        List<MasterServerMetadata> normalMasterServers = getValues()
                 .stream()
                 .filter(masterServer -> masterServer.getServerStatus() == ServerStatus.NORMAL)
                 .collect(Collectors.toList());
@@ -70,7 +99,12 @@ public class MasterClusters
 
     @Override
     public void onServerAdded(final MasterServerMetadata masterServer) {
-        masterServerMap.put(masterServer.getAddress(), masterServer);
+        putServer(masterServer.toRegistration(), masterServer);
+        onAdded(masterServer);
+    }
+
+    @Override
+    protected void onAdded(MasterServerMetadata masterServer) {
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerAdded(masterServer);
         }
@@ -78,7 +112,11 @@ public class MasterClusters
 
     @Override
     public void onServerRemove(final MasterServerMetadata masterServer) {
-        masterServerMap.remove(masterServer.getAddress());
+        removeServer(masterServer.toRegistration());
+    }
+
+    @Override
+    protected void onRemoved(MasterServerMetadata masterServer) {
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerRemove(masterServer);
         }
@@ -86,7 +124,12 @@ public class MasterClusters
 
     @Override
     public void onServerUpdate(final MasterServerMetadata masterServer) {
-        masterServerMap.put(masterServer.getAddress(), masterServer);
+        MasterServerMetadata previous = putServer(masterServer.toRegistration(), masterServer);
+        onUpdated(previous, masterServer, false);
+    }
+
+    @Override
+    protected void onUpdated(MasterServerMetadata previous, MasterServerMetadata masterServer, boolean stale) {
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerUpdate(masterServer);
         }

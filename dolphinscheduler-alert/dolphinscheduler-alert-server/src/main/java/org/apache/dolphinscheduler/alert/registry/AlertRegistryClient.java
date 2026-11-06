@@ -22,18 +22,16 @@ import org.apache.dolphinscheduler.alert.metrics.AlertServerMetrics;
 import org.apache.dolphinscheduler.alert.service.AlertHAServer;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
-import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.extract.alert.IAlertMetadataService;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,7 +40,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class AlertRegistryClient implements AutoCloseable {
+public class AlertRegistryClient implements AutoCloseable, IAlertMetadataService {
 
     @Autowired
     private RegistryClient registryClient;
@@ -53,13 +51,8 @@ public class AlertRegistryClient implements AutoCloseable {
     @Autowired
     private MetricsProvider metricsProvider;
 
-    private final ScheduledExecutorService registryUpdater =
-            ThreadUtils.newSingleDaemonScheduledExecutorService("AlertRegistryUpdate");
-
     private final int processId = OSUtils.getProcessID();
     private final long startupTime = System.currentTimeMillis();
-    private ScheduledFuture<?> registrationFuture;
-    private long lastRegistrationTime;
     private boolean closed;
 
     @Autowired
@@ -67,26 +60,32 @@ public class AlertRegistryClient implements AutoCloseable {
 
     public synchronized void start() {
         log.info("AlertRegistryClient starting...");
-        registrationFuture = registryUpdater.scheduleWithFixedDelay(this::updateRegistration, 0, 1, TimeUnit.SECONDS);
+        registryClient.addConnectionStateListener(state -> {
+            if (state == ConnectionState.RECONNECTED) {
+                register();
+            }
+        });
+        register();
         log.info("AlertRegistryClient started...");
     }
 
-    private synchronized void updateRegistration() {
-        if (closed || System.currentTimeMillis() - lastRegistrationTime < alertConfig.getMaxHeartbeatInterval()
-                .toMillis()) {
+    private synchronized void register() {
+        if (closed) {
             return;
         }
-        try {
-            String path = RegistryNodeType.ALERT_SERVER.getRegistryPath() + "/" + alertConfig.getAlertServerAddress();
-            registryClient.persistEphemeral(path, JSONUtils.toJsonString(getHeartBeat()));
-            lastRegistrationTime = System.currentTimeMillis();
-            AlertServerMetrics.incAlertHeartbeatCount();
-        } catch (Exception ex) {
-            log.error("Failed to update Alert Server registration", ex);
-        }
+        Host host = Host.of(alertConfig.getAlertServerAddress());
+        ServerRegistration registration = new ServerRegistration();
+        registration.setHost(host.getIp());
+        registration.setPort(host.getPort());
+        registration.setProcessId(processId);
+        registration.setStartupTime(startupTime);
+        registryClient.persistEphemeral(RegistryNodeType.ALERT_SERVER.getRegistryPath() + "/" + host.getAddress(),
+                JSONUtils.toJsonString(registration));
     }
 
-    private AlertServerHeartBeat getHeartBeat() {
+    @Override
+    public AlertServerHeartBeat getServerMetadata() {
+        AlertServerMetrics.incAlertHeartbeatCount();
         SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
         return AlertServerHeartBeat.builder()
                 .processId(processId)
@@ -99,7 +98,7 @@ public class AlertRegistryClient implements AutoCloseable {
                 .diskUsage(systemMetrics.getDiskUsedPercentage())
                 .serverStatus(ServerStatus.NORMAL)
                 .isActive(alertHAServer.isActive())
-                .host(NetUtils.getHost())
+                .host(Host.of(alertConfig.getAlertServerAddress()).getIp())
                 .port(alertConfig.getPort())
                 .build();
     }
@@ -111,10 +110,6 @@ public class AlertRegistryClient implements AutoCloseable {
         }
         log.info("AlertRegistryClient closing...");
         closed = true;
-        if (registrationFuture != null) {
-            registrationFuture.cancel(false);
-        }
-        registryUpdater.shutdown();
         log.info("AlertRegistryClient closed...");
     }
 

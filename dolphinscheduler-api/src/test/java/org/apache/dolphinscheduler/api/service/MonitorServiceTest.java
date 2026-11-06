@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service;
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThrow;
 
 import org.apache.dolphinscheduler.api.AssertionsHelper;
+import org.apache.dolphinscheduler.api.cluster.ClusterManager;
 import org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
@@ -61,6 +62,9 @@ public class MonitorServiceTest {
 
     @Mock
     private DatabaseMonitor databaseMonitor;
+
+    @Mock
+    private ClusterManager clusterManager;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;

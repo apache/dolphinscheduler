@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.registry.api;
 
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
-import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -89,20 +88,12 @@ public class RegistryClient {
             switch (registryNodeType) {
                 case MASTER:
                 case WORKER:
+                case ALERT_SERVER:
                     ServerRegistration registration = JSONUtils.parseObject(heartBeatJson, ServerRegistration.class);
                     server.setCreateTime(new Date(registration.getStartupTime()));
                     server.setId(registration.getProcessId());
                     server.setHost(registration.getHost());
                     server.setPort(registration.getPort());
-                    break;
-                case ALERT_SERVER:
-                    AlertServerHeartBeat alertServerHeartBeat =
-                            JSONUtils.parseObject(heartBeatJson, AlertServerHeartBeat.class);
-                    server.setCreateTime(new Date(alertServerHeartBeat.getStartupTime()));
-                    server.setLastHeartbeatTime(new Date(alertServerHeartBeat.getReportTime()));
-                    server.setId(alertServerHeartBeat.getProcessId());
-                    server.setHost(alertServerHeartBeat.getHost());
-                    server.setPort(alertServerHeartBeat.getPort());
                     break;
                 default:
                     log.warn("unknown registry node type: {}", registryNodeType);
