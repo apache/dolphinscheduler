@@ -22,15 +22,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -40,6 +40,7 @@ import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.Test;
 
 import io.netty.channel.Channel;
+import io.netty.channel.embedded.EmbeddedChannel;
 
 class NettyRemotingClientTest {
 
@@ -51,8 +52,8 @@ class NettyRemotingClientTest {
         CountDownLatch release = new CountDownLatch(1);
         Host slowHost = Host.of("127.0.0.1:10001");
         Host healthyHost = Host.of("127.0.0.1:10002");
-        Channel slowChannel = mock(Channel.class);
-        Channel healthyChannel = mock(Channel.class);
+        Channel slowChannel = new EmbeddedChannel();
+        Channel healthyChannel = new EmbeddedChannel();
         doAnswer(invocation -> {
             connecting.countDown();
             assertTrue(release.await(5, TimeUnit.SECONDS));
@@ -79,8 +80,7 @@ class NettyRemotingClientTest {
         ExecutorService calls = Executors.newFixedThreadPool(2);
         CountDownLatch connecting = new CountDownLatch(1);
         CountDownLatch release = new CountDownLatch(1);
-        Channel channel = mock(Channel.class);
-        when(channel.isActive()).thenReturn(true);
+        Channel channel = new EmbeddedChannel();
         Host host = Host.of("127.0.0.1:10001");
         doAnswer(invocation -> {
             connecting.countDown();
@@ -101,4 +101,40 @@ class NettyRemotingClientTest {
             client.close();
         }
     }
+    @Test
+    @SuppressWarnings("unchecked")
+    void inactiveChannelCleanupDoesNotWaitForReconnect() throws Exception {
+        NettyRemotingClient client = spy(new NettyRemotingClient(NettyClientConfig.builder().workerThreads(1).build()));
+        ExecutorService calls = Executors.newFixedThreadPool(2);
+        CountDownLatch connecting = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        Host host = Host.of("127.0.0.1:10001");
+        Channel previous = new EmbeddedChannel();
+        previous.close();
+        Channel replacement = new EmbeddedChannel();
+        Field field = NettyRemotingClient.class.getDeclaredField("channels");
+        field.setAccessible(true);
+        ((Map<Host, Channel>) field.get(client)).put(host, previous);
+        doAnswer(invocation -> {
+            connecting.countDown();
+            assertTrue(release.await(5, TimeUnit.SECONDS));
+            return replacement;
+        }).when(client).createChannel(host);
+        try {
+            Future<Channel> reconnect = calls.submit(() -> client.getOrCreateChannel(host));
+            assertTrue(connecting.await(5, TimeUnit.SECONDS));
+            // A Netty event loop must be able to finish the old channel's inactive callback while connecting.
+            Future<?> cleanup = calls.submit(() -> client.onChannelInactive(host, previous));
+            cleanup.get(1, TimeUnit.SECONDS);
+            release.countDown();
+            assertSame(replacement, reconnect.get(1, TimeUnit.SECONDS));
+            assertSame(replacement, client.getOrCreateChannel(host));
+            verify(client, times(1)).createChannel(host);
+        } finally {
+            release.countDown();
+            calls.shutdownNow();
+            client.close();
+        }
+    }
+
 }
