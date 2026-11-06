@@ -36,6 +36,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -197,10 +198,12 @@ public class SqlParameters extends AbstractParameters {
      */
     public void checkOutParamColumns(String[] columnLabels) {
         List<Property> outProperty = getOutProperty(localParams);
-        if (CollectionUtils.isEmpty(outProperty) || ArrayUtils.isEmpty(columnLabels)) {
+        if (CollectionUtils.isEmpty(outProperty)) {
             return;
         }
-        Set<String> columns = new HashSet<>(Arrays.asList(columnLabels));
+        Set<String> columns = ArrayUtils.isEmpty(columnLabels)
+                ? Collections.emptySet()
+                : new HashSet<>(Arrays.asList(columnLabels));
         for (Property info : outProperty) {
             if (!columns.contains(info.getProp())) {
                 throw unmatchedOutParamColumn(info, columns);

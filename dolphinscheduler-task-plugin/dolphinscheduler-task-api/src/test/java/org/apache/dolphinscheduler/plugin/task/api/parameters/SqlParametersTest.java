@@ -259,6 +259,20 @@ public class SqlParametersTest {
         Assertions.assertTrue(varcharException.getMessage().contains("user"));
     }
 
+    @Test
+    public void testCheckOutParamColumnsRejectsMissingColumnInformation() {
+        SqlParameters sqlParameters = new SqlParameters();
+        sqlParameters.setLocalParams(Collections.singletonList(outProperty("list_user", DataType.LIST)));
+
+        // with OUT parameters to validate, missing column information can never match, so
+        // it fails fast instead of silently skipping the validation
+        TaskException exception = Assertions.assertThrows(TaskException.class,
+                () -> sqlParameters.checkOutParamColumns(new String[0]));
+        Assertions.assertTrue(exception.getMessage().contains("list_user"));
+
+        Assertions.assertDoesNotThrow(() -> sqlParameters.checkOutParamColumns(new String[]{"list_user"}));
+    }
+
     private Property outProperty(String prop, DataType dataType) {
         Property property = new Property();
         property.setProp(prop);
