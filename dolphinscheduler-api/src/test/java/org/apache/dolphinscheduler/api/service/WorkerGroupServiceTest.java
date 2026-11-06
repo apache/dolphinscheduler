@@ -45,7 +45,6 @@ import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.registry.api.metadata.ServerMetadataCache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,7 +87,7 @@ public class WorkerGroupServiceTest {
     private RegistryClient registryClient;
 
     @Mock
-    private ServerMetadataCache serverMetadataCache;
+    private MonitorService monitorService;
 
     @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
@@ -111,7 +110,7 @@ public class WorkerGroupServiceTest {
         Server available = new Server();
         available.setHeartBeatInfo(JSONUtils.toJsonString(WorkerHeartBeat.builder().host("localhost").port(1234)
                 .startupTime(1).reportTime(100).workerGroup("analytics").build()));
-        when(serverMetadataCache.getServerList(RegistryNodeType.WORKER))
+        when(monitorService.listServer(RegistryNodeType.WORKER))
                 .thenReturn(java.util.Arrays.asList(pending, available));
         Assertions.assertEquals(1, workerGroupService.getConfigWorkerGroupPageDetail().size());
         Assertions.assertEquals("analytics", workerGroupService.getConfigWorkerGroupPageDetail().get(0).getName());

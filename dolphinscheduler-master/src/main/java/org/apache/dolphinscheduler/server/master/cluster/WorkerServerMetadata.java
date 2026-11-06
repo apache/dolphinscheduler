@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 
 import lombok.Builder;
@@ -39,8 +40,23 @@ public class WorkerServerMetadata extends BaseServerMetadata {
 
     private final double taskThreadPoolUsage;
 
+    @EqualsAndHashCode.Exclude
+    private Long heartbeatProgressNanos;
+
+    @EqualsAndHashCode.Exclude
+    private final long heartbeatReportTime;
+
+    @EqualsAndHashCode.Exclude
+    private volatile boolean metadataStale;
+
+    @Override
+    public ServerStatus getServerStatus() {
+        return metadataStale ? ServerStatus.BUSY : super.getServerStatus();
+    }
+
     public static WorkerServerMetadata parseFromHeartBeat(final WorkerHeartBeat workerHeartBeat) {
         return WorkerServerMetadata.builder()
+                .heartbeatReportTime(workerHeartBeat.getReportTime())
                 .processId(workerHeartBeat.getProcessId())
                 .serverStartupTime(workerHeartBeat.getStartupTime())
                 .address(workerHeartBeat.getHost() + Constants.COLON + workerHeartBeat.getPort())
