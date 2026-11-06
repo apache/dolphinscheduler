@@ -100,7 +100,7 @@ public class SqlParameters extends AbstractParameters {
     /**
      * max rows fetched for query sql
      * takes precedence over the sql.task.query.max.rows property when positive, otherwise falls back to it
-     * only settable via the taskParams JSON of the API, there is no form field for it in the web UI
+     * configurable in the SQL task definition UI; leave blank to use the global default
      */
     private int limit;
 

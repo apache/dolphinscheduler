@@ -311,6 +311,7 @@ interface ITaskParams {
   sqlType?: string
   sendEmail?: boolean
   displayRows?: number
+  limit?: number
   title?: string
   groupId?: string
   preStatements?: string[]
