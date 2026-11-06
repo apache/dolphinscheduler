@@ -17,8 +17,12 @@
 
 package org.apache.dolphinscheduler.api.configuration;
 
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
+import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
-import org.apache.dolphinscheduler.service.metadata.ServerMetadataCache;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.registry.api.metadata.ServerMetadataCache;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +32,9 @@ public class ApiMetadataConfiguration {
 
     @Bean(initMethod = "start", destroyMethod = "close")
     public ServerMetadataCache apiMetadataCache(RegistryClient registryClient, ApiConfig config) {
-        return new ServerMetadataCache(registryClient, config.getMetadataRefreshInterval(),
-                ServerMetadataCache::queryMetadata);
+        return new ServerMetadataCache(registryClient, config.getHeartbeatFetchInterval(),
+                (type, address) -> type == RegistryNodeType.MASTER
+                        ? Clients.withService(IMasterMetadataService.class).withHost(address).getServerMetadata()
+                        : Clients.withService(IWorkerMetadataService.class).withHost(address).getServerMetadata());
     }
 }

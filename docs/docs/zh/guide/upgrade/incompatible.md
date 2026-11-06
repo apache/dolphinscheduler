@@ -60,7 +60,7 @@
 
 * 内部 RPC 认证默认关闭。升级全部服务后，再协调所有服务在各自的 `common.properties` 中开启 `rpc.authentication.enabled=true` 并配置相同的 `rpc.authentication.secret`，认证开启与关闭的服务不能互通。凭据在进程内缓存，启用认证和轮换密钥需要重启服务。参见 [RPC 认证](../security/authentication-type.md#服务间-rpc-认证)。
 
-* Master 和 Worker 的注册节点改为只保存稳定的进程身份，运行期元数据由 Master 和 API 通过 RPC 拉取。Master、Worker 和 API 必须协调升级，不支持新旧版本混合滚动升级。元数据刷新间隔分别通过 `master.metadata-refresh-interval`（默认 `1s`）和 `api.metadata-refresh-interval`（默认 `5s`）配置；`max-heartbeat-interval` 改为控制 failover 标记检查间隔，不再控制元数据写入。首次拉取成功前，监控响应的 `heartBeatInfo` 和 `lastHeartbeatTime` 可能为 null，新增 `metadataStale` 表示元数据缺失或过期。([#18768](https://github.com/apache/dolphinscheduler/issues/18768))
+* Master 和 Worker 的注册节点改为只保存稳定的进程身份，心跳数据由 Master 和 API 通过 RPC 拉取。Master、Worker 和 API 必须协调升级，不支持新旧版本混合滚动升级。服务间心跳数据拉取间隔分别通过 `master.heartbeat-fetch-interval`（默认 `1s`）和 `api.heartbeat-fetch-interval`（默认 `5s`）配置；`max-heartbeat-interval` 改为控制 failover 标记检查间隔，不再控制心跳数据写入。首次拉取成功前，监控响应的 `heartBeatInfo` 和 `lastHeartbeatTime` 可能为 null，新增 `metadataStale` 表示心跳数据缺失或过期。([#18768](https://github.com/apache/dolphinscheduler/issues/18768))
 
 * `AlertSender#getAlertData` 对 null `alertType` 增加了显式拒绝（抛 `IllegalArgumentException` 并记录错误日志），而非直接抛 `NullPointerException`。滚动升级时**必须先升级 Alert Server，再升级 Master/Worker**，否则旧 Alert Server 无法识别新增的 `alert_type` 枚举值（如 `TASK_RESULT`），会导致告警投递失败。详见[升级文档](upgrade.md#滚动升降级顺序)。([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 

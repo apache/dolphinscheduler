@@ -34,7 +34,7 @@ import org.apache.dolphinscheduler.extract.worker.ITaskExecutorQueryClient;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutorQueryRequest;
 import org.apache.dolphinscheduler.extract.worker.transportor.TaskExecutorQueryResponse;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.service.metadata.ServerMetadataCache;
+import org.apache.dolphinscheduler.registry.api.metadata.ServerMetadataCache;
 import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 
 import java.util.List;
