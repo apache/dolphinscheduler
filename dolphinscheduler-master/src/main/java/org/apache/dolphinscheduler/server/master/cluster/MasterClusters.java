@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
-import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 
@@ -34,9 +32,10 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MasterClusters extends AbstractClusterSubscribeListener<MasterServerMetadata>
+public class MasterClusters
         implements
-            IClusters<MasterServerMetadata> {
+            IClusters<MasterServerMetadata>,
+            IClusters.IClustersChangeListener<MasterServerMetadata> {
 
     /**
      * Master address -> MasterServer
@@ -67,15 +66,6 @@ public class MasterClusters extends AbstractClusterSubscribeListener<MasterServe
     @Override
     public void registerListener(final IClustersChangeListener<MasterServerMetadata> listener) {
         masterClusterChangeListeners.add(listener);
-    }
-
-    @Override
-    MasterServerMetadata parseServerFromHeartbeat(final String masterHeartBeatJson) {
-        MasterHeartBeat masterHeartBeat = JSONUtils.parseObject(masterHeartBeatJson, MasterHeartBeat.class);
-        if (masterHeartBeat == null) {
-            return null;
-        }
-        return MasterServerMetadata.parseFromHeartBeat(masterHeartBeat);
     }
 
     @Override

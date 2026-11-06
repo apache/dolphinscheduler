@@ -60,12 +60,17 @@ public class FixedWeightedRoundRobinWorkerLoadBalancer implements IWorkerLoadBal
 
             @Override
             public void onServerRemove(WorkerServerMetadata server) {
-                weightedServerMap.remove(server.getAddress(), new WeightedServer<>(server, server.getWorkerWeight()));
+                weightedServerMap.remove(server.getAddress());
             }
 
             @Override
             public void onServerUpdate(WorkerServerMetadata server) {
-                // don't care the update event, since this will not affect the weight
+                weightedServerMap.compute(server.getAddress(), (address, previous) -> {
+                    if (previous == null || previous.getWeight() != server.getWorkerWeight()) {
+                        return new WeightedServer<>(server, server.getWorkerWeight());
+                    }
+                    return previous;
+                });
             }
         });
     }

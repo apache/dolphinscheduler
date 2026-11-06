@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.MonitorService;
 import org.apache.dolphinscheduler.api.service.WorkerGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
@@ -51,7 +52,6 @@ import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IMasterContainerService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.registry.api.metadata.ServerMetadataCache;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -67,7 +67,6 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,8 +88,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     private RegistryClient registryClient;
 
     @Autowired
-    @Qualifier("apiMetadataCache")
-    private ServerMetadataCache serverMetadataCache;
+    private MonitorService monitorService;
 
     @Autowired
     private EnvironmentWorkerGroupRelationMapper environmentWorkerGroupRelationMapper;
@@ -384,7 +382,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public List<WorkerGroupPageDetail> getConfigWorkerGroupPageDetail() {
         List<WorkerGroupPageDetail> workerGroupPageDetails = new ArrayList<>();
-        serverMetadataCache.getServerList(RegistryNodeType.WORKER).forEach(server -> {
+        monitorService.listServer(RegistryNodeType.WORKER).forEach(server -> {
             if (server.getHeartBeatInfo() == null) {
                 return;
             }

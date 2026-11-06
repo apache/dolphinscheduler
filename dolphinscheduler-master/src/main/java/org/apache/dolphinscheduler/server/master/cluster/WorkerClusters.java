@@ -18,8 +18,6 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
-import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
 
@@ -35,9 +33,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServerMetadata>
+public class WorkerClusters
         implements
             IClusters<WorkerServerMetadata>,
+            IClusters.IClustersChangeListener<WorkerServerMetadata>,
             WorkerGroupChangeNotifier.WorkerGroupListener {
 
     // WorkerIdentifier(workerAddress) -> worker
@@ -131,15 +130,6 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
                 dbWorkerGroupMapping.put(workerGroup.getName(), workerAddresses);
             }
         }
-    }
-
-    @Override
-    WorkerServerMetadata parseServerFromHeartbeat(String serverHeartBeatJson) {
-        WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(serverHeartBeatJson, WorkerHeartBeat.class);
-        if (workerHeartBeat == null) {
-            return null;
-        }
-        return WorkerServerMetadata.parseFromHeartBeat(workerHeartBeat);
     }
 
     @Override

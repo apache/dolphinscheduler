@@ -33,9 +33,12 @@ import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
 import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.registry.api.metadata.ServerMetadataCache;
+import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
+import org.apache.dolphinscheduler.server.master.cluster.MasterServerMetadata;
+import org.apache.dolphinscheduler.server.master.cluster.MasterSlotManager;
+import org.apache.dolphinscheduler.server.master.cluster.WorkerGroupChangeNotifier;
+import org.apache.dolphinscheduler.server.master.cluster.WorkerServerMetadata;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.config.MasterMetadataConfiguration;
 import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 
 import java.net.ServerSocket;
@@ -44,6 +47,7 @@ import java.util.Collections;
 
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class ServerMetadataRpcTest {
 
@@ -72,24 +76,26 @@ class ServerMetadataRpcTest {
         try (
                 RpcServer server = new RpcServer(NettyServerConfig.builder().serverName("MetadataRpcTest")
                         .listenPort(port).build());
-                ServerMetadataCache cache = new MasterMetadataConfiguration()
-                        .masterMetadataCache(registry, config, mock(MasterRegistryClient.class))) {
+                ClusterManager manager = new ClusterManager()) {
+            ReflectionTestUtils.setField(manager, "registryClient", registry);
+            ReflectionTestUtils.setField(manager, "masterConfig", config);
+            ReflectionTestUtils.setField(manager, "masterRegistryClient", mock(MasterRegistryClient.class));
+            ReflectionTestUtils.setField(manager, "masterSlotManager", mock(MasterSlotManager.class));
+            ReflectionTestUtils.setField(manager, "workerGroupChangeNotifier", mock(WorkerGroupChangeNotifier.class));
             server.registerServerMethodInvokerProvider((IMasterMetadataService) () -> master);
             server.registerServerMethodInvokerProvider((IWorkerMetadataService) () -> worker);
             server.start();
-            cache.start();
+            manager.start();
             Awaitility.await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
-                MasterHeartBeat masterSnapshot = JSONUtils.parseObject(
-                        cache.getServerList(RegistryNodeType.MASTER).get(0).getHeartBeatInfo(), MasterHeartBeat.class);
+                MasterServerMetadata masterSnapshot = manager.getMasterClusters().getServer(address).orElse(null);
                 assertNotNull(masterSnapshot);
                 assertEquals(ServerStatus.BUSY, masterSnapshot.getServerStatus());
                 assertEquals(0.75, masterSnapshot.getCpuUsage());
-                WorkerHeartBeat workerSnapshot = JSONUtils.parseObject(
-                        cache.getServerList(RegistryNodeType.WORKER).get(0).getHeartBeatInfo(), WorkerHeartBeat.class);
+                WorkerServerMetadata workerSnapshot = manager.getWorkerClusters().getServer(address).orElse(null);
                 assertNotNull(workerSnapshot);
                 assertEquals("analytics", workerSnapshot.getWorkerGroup());
-                assertEquals(80, workerSnapshot.getWorkerHostWeight());
-                assertEquals(0.5, workerSnapshot.getThreadPoolUsage());
+                assertEquals(80, workerSnapshot.getWorkerWeight());
+                assertEquals(0.5, workerSnapshot.getTaskThreadPoolUsage());
             });
         }
     }
