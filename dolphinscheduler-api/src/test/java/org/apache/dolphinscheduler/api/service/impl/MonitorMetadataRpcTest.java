@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.cluster;
+package org.apache.dolphinscheduler.api.service.impl;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.apache.dolphinscheduler.api.configuration.ApiConfig;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
@@ -41,14 +40,12 @@ import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.net.ServerSocket;
-import java.time.Duration;
 import java.util.Collections;
 
-import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class ClusterMetadataRpcTest {
+class MonitorMetadataRpcTest {
 
     @Test
     void apiFetchesMasterWorkerAndAlertSnapshotsOverRpc() throws Exception {
@@ -66,40 +63,38 @@ class ClusterMetadataRpcTest {
         register(registry, RegistryNodeType.MASTER, master);
         register(registry, RegistryNodeType.WORKER, worker);
         register(registry, RegistryNodeType.ALERT_SERVER, alert);
-        ApiConfig config = new ApiConfig();
-        config.setHeartbeatFetchInterval(Duration.ofSeconds(1));
         try (
                 RpcServer server = new RpcServer(NettyServerConfig.builder().serverName("ApiMetadataRpcTest")
                         .listenPort(port).build());
-                ClusterManager manager = new ClusterManager()) {
+                MonitorServiceImpl manager = new MonitorServiceImpl()) {
             server.registerServerMethodInvokerProvider((IMasterMetadataService) () -> master);
             server.registerServerMethodInvokerProvider((IWorkerMetadataService) () -> worker);
             server.registerServerMethodInvokerProvider((IAlertMetadataService) () -> alert);
             server.start();
             ReflectionTestUtils.setField(manager, "registryClient", registry);
-            ReflectionTestUtils.setField(manager, "apiConfig", config);
-            manager.start();
-            Awaitility.await().atMost(Duration.ofSeconds(10)).untilAsserted(() -> {
-                assertFalse(manager.listServer(RegistryNodeType.MASTER).get(0).isMetadataStale());
-                assertFalse(manager.listServer(RegistryNodeType.WORKER).get(0).isMetadataStale());
-                assertEquals(0.75, JSONUtils.parseObject(manager.listServer(RegistryNodeType.MASTER).get(0)
-                        .getHeartBeatInfo(), MasterHeartBeat.class).getCpuUsage());
-                assertEquals("analytics", JSONUtils.parseObject(manager.listServer(RegistryNodeType.WORKER).get(0)
-                        .getHeartBeatInfo(), WorkerHeartBeat.class).getWorkerGroup());
-                Server alertServer = manager.listServer(RegistryNodeType.ALERT_SERVER).get(0);
-                assertFalse(alertServer.isMetadataStale());
-                AlertServerHeartBeat snapshot =
-                        JSONUtils.parseObject(alertServer.getHeartBeatInfo(), AlertServerHeartBeat.class);
-                assertTrue(snapshot.isActive());
-                assertEquals(0.25, snapshot.getCpuUsage());
-            });
+
+            assertFalse(manager.listServer(RegistryNodeType.MASTER).get(0).isMetadataStale());
+            assertFalse(manager.listServer(RegistryNodeType.WORKER).get(0).isMetadataStale());
+            assertEquals(0.75, JSONUtils.parseObject(manager.listServer(RegistryNodeType.MASTER).get(0)
+                    .getHeartBeatInfo(), MasterHeartBeat.class).getCpuUsage());
+            assertEquals("analytics", JSONUtils.parseObject(manager.listServer(RegistryNodeType.WORKER).get(0)
+                    .getHeartBeatInfo(), WorkerHeartBeat.class).getWorkerGroup());
+            Server alertServer = manager.listServer(RegistryNodeType.ALERT_SERVER).get(0);
+            assertFalse(alertServer.isMetadataStale());
+            AlertServerHeartBeat snapshot =
+                    JSONUtils.parseObject(alertServer.getHeartBeatInfo(), AlertServerHeartBeat.class);
+            assertTrue(snapshot.isActive());
+            assertEquals(0.25, snapshot.getCpuUsage());
         }
     }
 
     private void register(RegistryClient registry, RegistryNodeType type, BaseHeartBeat heartbeat) {
         ServerRegistration registration = ServerRegistration.fromHeartBeat(heartbeat);
-        when(registry.getServerNodeSet(type)).thenReturn(Collections.singleton(registration.getAddress()));
-        when(registry.get(type.getRegistryPath() + "/" + registration.getAddress()))
-                .thenReturn(JSONUtils.toJsonString(registration));
+        Server server = new Server();
+        server.setHost(registration.getHost());
+        server.setPort(registration.getPort());
+        server.setId(registration.getProcessId());
+        server.setCreateTime(new java.util.Date(registration.getStartupTime()));
+        when(registry.getServerList(type)).thenReturn(Collections.singletonList(server));
     }
 }

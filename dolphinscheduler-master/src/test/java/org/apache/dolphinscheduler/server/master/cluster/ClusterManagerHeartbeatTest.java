@@ -22,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -32,13 +31,12 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
+import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
-import org.apache.dolphinscheduler.registry.api.ConnectionListener;
-import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
@@ -57,6 +55,7 @@ import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Queue;
@@ -70,7 +69,6 @@ import java.util.function.LongSupplier;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -106,7 +104,6 @@ class ClusterManagerHeartbeatTest {
         ReflectionTestUtils.setField(owner, "executor", executor);
         ReflectionTestUtils.setField(owner, "masterClusters", masterClusters);
         ReflectionTestUtils.setField(owner, "workerClusters", workerClusters);
-        ReflectionTestUtils.setField(masterClusters, "nanoTime", (LongSupplier) ticker::get);
         ReflectionTestUtils.setField(workerClusters, "nanoTime", (LongSupplier) ticker::get);
         doAnswer(invocation -> query.apply(RegistryNodeType.MASTER, invocation.getArgument(0)))
                 .when(masterClusters).fetchHeartbeat(anyString());
@@ -125,8 +122,8 @@ class ClusterManagerHeartbeatTest {
     }
 
     private void poll() {
-        masterClusters.refreshHeartbeats();
-        workerClusters.refreshHeartbeats();
+        masterClusters.refreshHeartbeats(executor);
+        workerClusters.refreshHeartbeats(executor, java.time.Duration.ofSeconds(1));
         while (!jobs.isEmpty()) {
             jobs.remove().run();
         }
@@ -139,9 +136,13 @@ class ClusterManagerHeartbeatTest {
 
     private void register(RegistryNodeType type, BaseHeartBeat heartbeat) {
         ServerRegistration registration = ServerRegistration.fromHeartBeat(heartbeat);
-        when(registry.getServerNodeSet(type)).thenReturn(Collections.singleton(registration.getAddress()));
-        when(registry.get(type.getRegistryPath() + "/" + registration.getAddress()))
-                .thenReturn(JSONUtils.toJsonString(registration));
+        Server server = new Server();
+        server.setHost(registration.getHost());
+        server.setPort(registration.getPort());
+        server.setId(registration.getProcessId());
+        server.setCreateTime(new Date(registration.getStartupTime()));
+        server.setHeartBeatInfo(JSONUtils.toJsonString(registration));
+        when(registry.getServerList(type)).thenReturn(Collections.singletonList(server));
     }
 
     private void notify(RegistryNodeType type, Event.Type eventType, BaseHeartBeat heartbeat) {
@@ -267,32 +268,32 @@ class ClusterManagerHeartbeatTest {
     }
 
     @Test
-    void removalDuringInitialListingIsAppliedAfterSnapshot() {
+    void removalDuringInitialListingIsAppliedAfterSnapshot() throws InterruptedException {
         WorkerHeartBeat heartbeat = worker(1);
         register(RegistryNodeType.WORKER, heartbeat);
-        when(registry.getServerNodeSet(RegistryNodeType.WORKER)).thenAnswer(invocation -> {
-            notify(RegistryNodeType.WORKER, Event.Type.REMOVE, heartbeat);
-            return Collections.singleton("localhost:1234");
+        java.util.List<Server> snapshot = registry.getServerList(RegistryNodeType.WORKER);
+        Thread[] removal = new Thread[1];
+        when(registry.getServerList(RegistryNodeType.WORKER)).thenAnswer(invocation -> {
+            removal[0] = new Thread(() -> notify(RegistryNodeType.WORKER, Event.Type.REMOVE, heartbeat));
+            removal[0].start();
+            return snapshot;
         });
         owner.start();
+        removal[0].join(3000);
         assertTrue(owner.getWorkerClusters().getServers().isEmpty());
     }
 
     @Test
-    void failedReconciliationKeepsMembersAndRetries() {
+    void registryDataUpdateDoesNotReplaceTheRpcSnapshot() {
         WorkerHeartBeat heartbeat = worker(1);
         register(RegistryNodeType.WORKER, heartbeat);
         query = (type, address) -> heartbeat;
         owner.start();
-        when(registry.getServerNodeSet(RegistryNodeType.WORKER)).thenThrow(new IllegalStateException("disconnected"));
-        ArgumentCaptor<ConnectionListener> listener = ArgumentCaptor.forClass(ConnectionListener.class);
-        verify(registry, org.mockito.Mockito.times(2)).addConnectionStateListener(listener.capture());
-        listener.getAllValues().forEach(value -> value.onUpdate(ConnectionState.RECONNECTED));
         poll();
-        assertEquals(1, owner.getWorkerClusters().getServers().size());
-        doReturn(Collections.emptySet()).when(registry).getServerNodeSet(RegistryNodeType.WORKER);
-        poll();
-        assertTrue(owner.getWorkerClusters().getServers().isEmpty());
+        WorkerServerMetadata snapshot = workerView();
+        notify(RegistryNodeType.WORKER, Event.Type.UPDATE, heartbeat);
+        assertEquals(snapshot, workerView());
+        assertEquals(ServerStatus.NORMAL, workerView().getServerStatus());
     }
 
     @Test
@@ -350,11 +351,11 @@ class ClusterManagerHeartbeatTest {
         query = (type, address) -> heartbeat;
         owner.start();
         poll();
-        masterClusters.refreshHeartbeats();
-        workerClusters.refreshHeartbeats();
+        masterClusters.refreshHeartbeats(executor);
+        workerClusters.refreshHeartbeats(executor, java.time.Duration.ofSeconds(1));
         ticker.set(TimeUnit.SECONDS.toNanos(4));
-        masterClusters.refreshHeartbeats();
-        workerClusters.refreshHeartbeats();
+        masterClusters.refreshHeartbeats(executor);
+        workerClusters.refreshHeartbeats(executor, java.time.Duration.ofSeconds(1));
         assertEquals(1, jobs.size());
         assertEquals(ServerStatus.BUSY, workerView().getServerStatus());
         heartbeat.setReportTime(101);

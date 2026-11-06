@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
+import org.apache.dolphinscheduler.common.model.ServerRegistration;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,6 +33,11 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 public class MasterServerMetadata extends BaseServerMetadata implements Comparable<MasterServerMetadata> {
+
+    public static MasterServerMetadata fromRegistration(ServerRegistration registration) {
+        return MasterServerMetadata.builder().address(registration.getAddress()).processId(registration.getProcessId())
+                .serverStartupTime(registration.getStartupTime()).build();
+    }
 
     public static MasterServerMetadata parseFromHeartBeat(final MasterHeartBeat masterHeartBeat) {
         checkNotNull(masterHeartBeat);

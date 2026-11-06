@@ -60,9 +60,9 @@
 
 * 内部 RPC 认证默认关闭。升级全部服务后，再协调所有服务在各自的 `common.properties` 中开启 `rpc.authentication.enabled=true` 并配置相同的 `rpc.authentication.secret`，认证开启与关闭的服务不能互通。凭据在进程内缓存，启用认证和轮换密钥需要重启服务。参见 [RPC 认证](../security/authentication-type.md#服务间-rpc-认证)。
 
-* Master、Worker 和 Alert Server 现在按 RPC 请求生成心跳快照，并发请求共享一秒刷新间隔的线程安全系统指标缓存。`BaseHeartBeatTask` 及 Master、Worker、Alert 的心跳任务子类已移除，自定义扩展如继承这些类，需要自行管理调度。Alert Server 取消定期写注册心跳，只在启动时注册稳定进程身份，并在重连时恢复注册。`alert.max-heartbeat-interval` 已移除，API 通过 RPC 拉取 Alert 心跳，沿用 `api.heartbeat-fetch-interval`。
+* Master、Worker 和 Alert Server 现在按 RPC 请求生成心跳快照，并发请求共享一秒刷新间隔的线程安全系统指标缓存。`BaseHeartBeatTask` 及 Master、Worker、Alert 的心跳任务子类已移除，自定义扩展如继承这些类，需要自行管理调度。Alert Server 取消定期写注册心跳，只在启动时注册稳定进程身份，并在重连时恢复注册。`alert.max-heartbeat-interval` 已移除，API 在收到查询请求时直接通过 RPC 获取 Alert 心跳。
 
-* Master、Worker 和 Alert Server 的注册节点改为只保存稳定的进程身份。Master 通过 RPC 拉取 Master/Worker 心跳，API 拉取 Master/Worker/Alert 心跳。Master、Worker、Alert 和 API 必须协调升级，不支持新旧版本混合滚动升级。服务间心跳数据拉取间隔分别通过 `master.heartbeat-fetch-interval`（默认 `1s`）和 `api.heartbeat-fetch-interval`（默认 `5s`）配置；`max-heartbeat-interval` 改为控制 failover 标记检查间隔，不再控制心跳数据写入。首次拉取成功前，监控响应的 `heartBeatInfo` 和 `lastHeartbeatTime` 可能为 null，新增 `metadataStale` 表示心跳数据缺失或过期。([#18768](https://github.com/apache/dolphinscheduler/issues/18768))
+* Master、Worker 和 Alert Server 的注册节点改为只保存稳定的进程身份。Master 定时通过 RPC 拉取 Master/Worker 心跳；API 在每次请求时直接查询 Master/Worker/Alert 心跳，不维护心跳缓存。Master、Worker、Alert 和 API 必须协调升级，不支持新旧版本混合滚动升级。Master 的服务间心跳数据拉取间隔通过 `master.heartbeat-fetch-interval`（默认 `1s`）配置；`max-heartbeat-interval` 改为控制 failover 标记检查间隔，不再控制心跳数据写入。节点心跳查询失败时，监控响应的 `heartBeatInfo` 和 `lastHeartbeatTime` 可能为 null，新增 `metadataStale` 表示心跳数据不可用。([#18768](https://github.com/apache/dolphinscheduler/issues/18768))
 
 * `AlertSender#getAlertData` 对 null `alertType` 增加了显式拒绝（抛 `IllegalArgumentException` 并记录错误日志），而非直接抛 `NullPointerException`。滚动升级时**必须先升级 Alert Server，再升级 Master/Worker**，否则旧 Alert Server 无法识别新增的 `alert_type` 枚举值（如 `TASK_RESULT`），会导致告警投递失败。详见[升级文档](upgrade.md#滚动升降级顺序)。([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 

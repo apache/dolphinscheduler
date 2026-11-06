@@ -18,74 +18,63 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
-import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
 import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
-import org.apache.dolphinscheduler.registry.api.cluster.AbstractCluster;
-import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
+import org.apache.dolphinscheduler.registry.api.Event;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class MasterClusters extends AbstractCluster<MasterServerMetadata>
+public class MasterClusters
         implements
             IClusters<MasterServerMetadata>,
-            IClusters.IClustersChangeListener<MasterServerMetadata> {
+            IClusters.IClustersChangeListener<MasterServerMetadata>,
+            SubscribeListener,
+            AutoCloseable {
 
-    private String localAddress;
-    private Supplier<MasterHeartBeat> localHeartbeat;
-
-    public MasterClusters() {
-        super(RegistryNodeType.MASTER);
-    }
-
-    void setLocalHeartbeat(String address, Supplier<MasterHeartBeat> heartbeat) {
-        localAddress = address;
-        localHeartbeat = heartbeat;
-    }
-
-    @Override
-    protected MasterHeartBeat fetchHeartbeat(String address) {
-        return address.equals(localAddress) ? localHeartbeat.get()
-                : Clients.withService(IMasterMetadataService.class).withHost(address).getServerMetadata();
-    }
-
-    @Override
-    protected MasterServerMetadata parseHeartbeat(BaseHeartBeat heartbeat) {
-        return MasterServerMetadata.parseFromHeartBeat((MasterHeartBeat) heartbeat);
-    }
-
-    @Override
-    protected MasterServerMetadata initialMetadata(ServerRegistration registration) {
-        return MasterServerMetadata.builder().address(registration.getAddress()).processId(registration.getProcessId())
-                .serverStartupTime(registration.getStartupTime()).build();
-    }
+    /**
+     * Master address -> MasterServer
+     **/
+    private final Map<String, MasterServerMetadata> masterServerMap = new ConcurrentHashMap<>();
 
     private final List<IClustersChangeListener<MasterServerMetadata>> masterClusterChangeListeners =
             new CopyOnWriteArrayList<>();
 
+    private final Set<String> fetching = ConcurrentHashMap.newKeySet();
+    private boolean closed;
+
+    private String localAddress;
+    private Supplier<MasterHeartBeat> localHeartbeat;
+
     @Override
     public List<MasterServerMetadata> getServers() {
-        return UnmodifiableList.unmodifiableList(getValues());
+        return UnmodifiableList.unmodifiableList(new ArrayList<>(masterServerMap.values()));
     }
 
     @Override
     public Optional<MasterServerMetadata> getServer(final String address) {
-        return getValue(address);
+        return Optional.ofNullable(masterServerMap.get(address));
     }
 
     public List<MasterServerMetadata> getNormalServers() {
-        List<MasterServerMetadata> normalMasterServers = getValues()
+        List<MasterServerMetadata> normalMasterServers = masterServerMap.values()
                 .stream()
                 .filter(masterServer -> masterServer.getServerStatus() == ServerStatus.NORMAL)
                 .collect(Collectors.toList());
@@ -98,41 +87,113 @@ public class MasterClusters extends AbstractCluster<MasterServerMetadata>
     }
 
     @Override
-    public void onServerAdded(final MasterServerMetadata masterServer) {
-        putServer(masterServer.toRegistration(), masterServer);
-        onAdded(masterServer);
-    }
-
-    @Override
-    protected void onAdded(MasterServerMetadata masterServer) {
+    public synchronized void onServerAdded(final MasterServerMetadata masterServer) {
+        if (closed) {
+            return;
+        }
+        MasterServerMetadata current = masterServerMap.get(masterServer.getAddress());
+        if (current != null) {
+            if (current.getProcessId() == masterServer.getProcessId()
+                    && current.getServerStartupTime() == masterServer.getServerStartupTime()) {
+                return;
+            }
+            onServerRemove(current);
+        }
+        masterServerMap.put(masterServer.getAddress(), masterServer);
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerAdded(masterServer);
         }
     }
 
     @Override
-    public void onServerRemove(final MasterServerMetadata masterServer) {
-        removeServer(masterServer.toRegistration());
-    }
-
-    @Override
-    protected void onRemoved(MasterServerMetadata masterServer) {
+    public synchronized void onServerRemove(final MasterServerMetadata masterServer) {
+        MasterServerMetadata current = masterServerMap.get(masterServer.getAddress());
+        if (closed || current == null || current.getProcessId() != masterServer.getProcessId()
+                || current.getServerStartupTime() != masterServer.getServerStartupTime()
+                || !masterServerMap.remove(masterServer.getAddress(), current)) {
+            return;
+        }
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
-            listener.onServerRemove(masterServer);
+            listener.onServerRemove(current);
         }
     }
 
     @Override
-    public void onServerUpdate(final MasterServerMetadata masterServer) {
-        MasterServerMetadata previous = putServer(masterServer.toRegistration(), masterServer);
-        onUpdated(previous, masterServer, false);
-    }
-
-    @Override
-    protected void onUpdated(MasterServerMetadata previous, MasterServerMetadata masterServer, boolean stale) {
+    public synchronized void onServerUpdate(final MasterServerMetadata masterServer) {
+        if (closed) {
+            return;
+        }
+        masterServerMap.put(masterServer.getAddress(), masterServer);
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerUpdate(masterServer);
         }
     }
 
+    @Override
+    public SubscribeScope getSubscribeScope() {
+        return SubscribeScope.CHILDREN_ONLY;
+    }
+
+    @Override
+    public synchronized void notify(Event event) {
+        ServerRegistration registration = JSONUtils.parseObject(event.getEventData(), ServerRegistration.class);
+        if (registration == null) {
+            log.error("Invalid registration event: {}", event);
+            return;
+        }
+        MasterServerMetadata server = MasterServerMetadata.fromRegistration(registration);
+        if (event.getType() == Event.Type.ADD) {
+            onServerAdded(server);
+        } else if (event.getType() == Event.Type.REMOVE) {
+            onServerRemove(server);
+        }
+    }
+
+    void setLocalHeartbeat(String address, Supplier<MasterHeartBeat> heartbeat) {
+        localAddress = address;
+        localHeartbeat = heartbeat;
+    }
+
+    MasterHeartBeat fetchHeartbeat(String address) {
+        return address.equals(localAddress) ? localHeartbeat.get()
+                : Clients.withService(IMasterMetadataService.class).withHost(address).getServerMetadata();
+    }
+
+    public synchronized void refreshHeartbeats(ExecutorService executor) {
+        if (closed) {
+            return;
+        }
+        for (String address : getServerAddresses()) {
+            MasterServerMetadata expected = masterServerMap.get(address);
+            if (expected != null && fetching.add(address)) {
+                executor.execute(() -> {
+                    try {
+                        synchronized (this) {
+                            if (closed || masterServerMap.get(address) != expected) {
+                                return;
+                            }
+                        }
+                        MasterHeartBeat heartbeat = fetchHeartbeat(address);
+                        synchronized (this) {
+                            if (!closed && masterServerMap.get(address) == expected
+                                    && expected.toRegistration().matches(heartbeat)) {
+                                onServerUpdate(MasterServerMetadata.parseFromHeartBeat(heartbeat));
+                            }
+                        }
+                    } catch (Exception ex) {
+                        log.debug("Failed to fetch Master heartbeat from {}", address, ex);
+                    } finally {
+                        fetching.remove(address);
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public synchronized void close() {
+        closed = true;
+        masterServerMap.clear();
+        fetching.clear();
+    }
 }
