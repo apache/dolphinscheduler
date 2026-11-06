@@ -273,7 +273,7 @@ Location: `api-server/conf/application.yaml`
 
 ### Master Server related configuration
 
-Master and Worker registrations contain only stable process identity. Master and Worker build heartbeat data on RPC requests, reusing a system-metrics cache with a one-second refresh interval. Worker metadata becomes unavailable for new task allocation after three refresh intervals without a new snapshot; RPC failure does not trigger node failover. Master retains the last known peer status for slot allocation. Node removal still follows registry events. This changes the registry payload and requires a coordinated upgrade of Master, Worker and API; mixed-version rolling upgrades are not supported.
+Master, Worker and Alert Server registrations contain only stable process identity. Master fetches heartbeat data from peer Masters and Workers; API fetches data from Masters, Workers and Alert Servers. These servers build heartbeat data on RPC requests, reusing a system-metrics cache with a one-second refresh interval. Worker metadata becomes unavailable for new task allocation after three refresh intervals without a new snapshot; RPC failure does not trigger node failover. Master retains the last known peer status for slot allocation. Node removal still follows registry events. This changes the registry payload and requires a coordinated upgrade of Master, Worker, Alert and API; mixed-version rolling upgrades are not supported.
 
 Location: `master-server/conf/application.yaml`
 
@@ -322,6 +322,8 @@ Location: `worker-server/conf/application.yaml`
 ### Alert Server related configuration
 
 Location: `alert-server/conf/application.yaml`
+
+Alert Server registers stable process identity at startup and restores it on reconnect. It does not periodically write heartbeat data to the registry. The former `alert.max-heartbeat-interval` setting is removed; API fetches Alert heartbeat data using `api.heartbeat-fetch-interval`.
 
 | Parameters  | Default value |       Description        |
 |-------------|---------------|--------------------------|

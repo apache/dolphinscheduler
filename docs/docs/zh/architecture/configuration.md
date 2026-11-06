@@ -273,7 +273,7 @@ common.properties配置文件目前主要是配置hadoop/s3/yarn/applicationId�
 
 ## Master Server相关配置
 
-Master 和 Worker 的注册信息仅包含稳定的进程身份。Master 和 Worker 在 RPC 请求到来时组装心跳数据，系统指标使用一秒刷新缓存。Worker 连续三个刷新间隔没有新快照后，不再用于新任务分配；RPC 失败不触发节点 failover。Master 保留其他 Master 最近一次状态用于 slot 分配，节点下线仍由注册中心事件驱动。本次变更修改了注册数据格式，需要协调升级 Master、Worker 和 API，不支持新旧版本混合滚动升级。
+Master、Worker 和 Alert Server 的注册信息仅包含稳定的进程身份。Master 拉取其他 Master 和 Worker 的心跳，API 拉取 Master、Worker 和 Alert Server 的心跳。这些服务在 RPC 请求到来时组装心跳数据，系统指标使用一秒刷新缓存。Worker 连续三个刷新间隔没有新快照后，不再用于新任务分配；RPC 失败不触发节点 failover。Master 保留其他 Master 最近一次状态用于 slot 分配，节点下线仍由注册中心事件驱动。本次变更修改了注册数据格式，需要协调升级 Master、Worker、Alert 和 API，不支持新旧版本混合滚动升级。
 
 位置：`master-server/conf/application.yaml`
 
@@ -330,6 +330,8 @@ Master 和 Worker 的注册信息仅包含稳定的进程身份。Master 和 Wor
 ## Alert Server相关配置
 
 位置：`alert-server/conf/application.yaml`
+
+Alert Server 只在启动时注册稳定进程身份，并在重连时恢复注册，不再定期向注册中心写心跳。原 `alert.max-heartbeat-interval` 配置已移除，API 使用 `api.heartbeat-fetch-interval` 拉取 Alert 心跳。
 
 |     参数      |  默认值  |        描述        |
 |-------------|-------|------------------|

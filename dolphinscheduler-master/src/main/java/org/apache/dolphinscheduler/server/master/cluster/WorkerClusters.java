@@ -18,8 +18,15 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
+import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
+import org.apache.dolphinscheduler.registry.api.cluster.AbstractCluster;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 
@@ -33,14 +40,32 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-public class WorkerClusters
+public class WorkerClusters extends AbstractCluster<WorkerServerMetadata>
         implements
             IClusters<WorkerServerMetadata>,
             IClusters.IClustersChangeListener<WorkerServerMetadata>,
             WorkerGroupChangeNotifier.WorkerGroupListener {
 
-    // WorkerIdentifier(workerAddress) -> worker
-    private final Map<String, WorkerServerMetadata> workerMapping = new ConcurrentHashMap<>();
+    public WorkerClusters() {
+        super(RegistryNodeType.WORKER);
+    }
+
+    @Override
+    protected WorkerHeartBeat fetchHeartbeat(String address) {
+        return Clients.withService(IWorkerMetadataService.class).withHost(address).getServerMetadata();
+    }
+
+    @Override
+    protected WorkerServerMetadata parseHeartbeat(BaseHeartBeat heartbeat) {
+        return WorkerServerMetadata.parseFromHeartBeat((WorkerHeartBeat) heartbeat);
+    }
+
+    @Override
+    protected WorkerServerMetadata initialMetadata(ServerRegistration registration) {
+        return WorkerServerMetadata.builder().address(registration.getAddress()).processId(registration.getProcessId())
+                .serverStartupTime(registration.getStartupTime()).workerGroup(null).serverStatus(ServerStatus.BUSY)
+                .build();
+    }
 
     // WorkerGroup from db -> WorkerIdentifier(workerAddress)
     private final Map<String, List<String>> dbWorkerGroupMapping = new ConcurrentHashMap<>();
@@ -53,24 +78,26 @@ public class WorkerClusters
 
     @Override
     public List<WorkerServerMetadata> getServers() {
-        return UnmodifiableList.unmodifiableList(new ArrayList<>(workerMapping.values()));
+        return UnmodifiableList.unmodifiableList(getValues());
     }
 
     @Override
     public Optional<WorkerServerMetadata> getServer(final String address) {
-        return Optional.ofNullable(workerMapping.get(address));
+        return getValue(address);
     }
 
     public List<String> getDbWorkerServerAddressByGroup(String workerGroup) {
         if (WorkerGroupUtils.getDefaultWorkerGroup().equals(workerGroup)) {
-            return UnmodifiableList.unmodifiableList(new ArrayList<>(workerMapping.keySet()));
+            return UnmodifiableList.unmodifiableList(
+                    getValues().stream().map(WorkerServerMetadata::getAddress).collect(Collectors.toList()));
         }
         return dbWorkerGroupMapping.getOrDefault(workerGroup, Collections.emptyList());
     }
 
     public List<String> getConfigWorkerServerAddressByGroup(String workerGroup) {
         if (WorkerGroupUtils.getDefaultWorkerGroup().equals(workerGroup)) {
-            return UnmodifiableList.unmodifiableList(new ArrayList<>(workerMapping.keySet()));
+            return UnmodifiableList.unmodifiableList(
+                    getValues().stream().map(WorkerServerMetadata::getAddress).collect(Collectors.toList()));
         }
         return configWorkerGroupMapping.getOrDefault(workerGroup, Collections.emptyList());
     }
@@ -78,14 +105,14 @@ public class WorkerClusters
     public List<String> getNormalWorkerServerAddressByGroup(String workerGroup) {
         List<String> dbWorkerAddresses = getDbWorkerServerAddressByGroup(workerGroup)
                 .stream()
-                .map(workerMapping::get)
+                .map(address -> getValue(address).orElse(null))
                 .filter(Objects::nonNull)
                 .filter(workerServer -> workerServer.getServerStatus() == ServerStatus.NORMAL)
                 .map(WorkerServerMetadata::getAddress)
                 .collect(Collectors.toList());
         List<String> configWorkerAddresses = getConfigWorkerServerAddressByGroup(workerGroup)
                 .stream()
-                .map(workerMapping::get)
+                .map(address -> getValue(address).orElse(null))
                 .filter(Objects::nonNull)
                 .filter(workerServer -> workerServer.getServerStatus() == ServerStatus.NORMAL)
                 .map(WorkerServerMetadata::getAddress)
@@ -134,7 +161,12 @@ public class WorkerClusters
 
     @Override
     public void onServerAdded(WorkerServerMetadata workerServer) {
-        workerMapping.put(workerServer.getAddress(), workerServer);
+        putServer(workerServer.toRegistration(), workerServer);
+        onAdded(workerServer);
+    }
+
+    @Override
+    protected void onAdded(WorkerServerMetadata workerServer) {
         if (workerServer.getWorkerGroup() != null) {
             synchronized (configWorkerGroupMapping) {
                 List<String> addWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
@@ -155,12 +187,11 @@ public class WorkerClusters
 
     @Override
     public void onServerRemove(WorkerServerMetadata removedServer) {
-        WorkerServerMetadata workerServer = workerMapping.get(removedServer.getAddress());
-        if (workerServer == null || workerServer.getProcessId() != removedServer.getProcessId()
-                || workerServer.getServerStartupTime() != removedServer.getServerStartupTime()
-                || !workerMapping.remove(workerServer.getAddress(), workerServer)) {
-            return;
-        }
+        removeServer(removedServer.toRegistration());
+    }
+
+    @Override
+    protected void onRemoved(WorkerServerMetadata workerServer) {
         if (workerServer.getWorkerGroup() != null) {
             synchronized (configWorkerGroupMapping) {
                 List<String> removeWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
@@ -180,7 +211,13 @@ public class WorkerClusters
 
     @Override
     public void onServerUpdate(WorkerServerMetadata workerServer) {
-        WorkerServerMetadata previous = workerMapping.put(workerServer.getAddress(), workerServer);
+        WorkerServerMetadata previous = putServer(workerServer.toRegistration(), workerServer);
+        onUpdated(previous, workerServer, false);
+    }
+
+    @Override
+    protected void onUpdated(WorkerServerMetadata previous, WorkerServerMetadata workerServer, boolean stale) {
+        workerServer.setMetadataStale(stale);
         synchronized (configWorkerGroupMapping) {
             if (previous != null && previous.getWorkerGroup() != null
                     && !Objects.equals(previous.getWorkerGroup(), workerServer.getWorkerGroup())) {

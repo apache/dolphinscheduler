@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-package org.apache.dolphinscheduler.api.service.impl;
+package org.apache.dolphinscheduler.api.cluster;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -64,7 +64,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class MonitorServiceImplHeartbeatTest {
+class ClusterManagerTest {
 
     private final RegistryClient registry = mock(RegistryClient.class);
     private final ExecutorService executor = mock(ExecutorService.class);
@@ -73,15 +73,17 @@ class MonitorServiceImplHeartbeatTest {
     private final Map<RegistryNodeType, SubscribeListener> watches = new EnumMap<>(RegistryNodeType.class);
     private final Queue<Runnable> jobs = new ArrayDeque<>();
     private BiFunction<RegistryNodeType, String, BaseHeartBeat> query;
-    private final MonitorServiceImpl owner = spy(new MonitorServiceImpl());
+    private final ClusterManager owner = new ClusterManager();
+    private final MasterCluster masterCluster = spy(new MasterCluster());
+    private final WorkerCluster workerCluster = spy(new WorkerCluster());
+    private final AlertCluster alertCluster = spy(new AlertCluster());
 
     @BeforeEach
     void setUp() {
         doAnswer(invocation -> {
             String path = invocation.getArgument(0);
-            RegistryNodeType type = path.equals(RegistryNodeType.MASTER.getRegistryPath())
-                    ? RegistryNodeType.MASTER
-                    : RegistryNodeType.WORKER;
+            RegistryNodeType type = java.util.Arrays.stream(RegistryNodeType.values())
+                    .filter(value -> path.equals(value.getRegistryPath())).findFirst().get();
             watches.put(type, invocation.getArgument(1));
             return null;
         }).when(registry).subscribe(anyString(), any());
@@ -92,9 +94,18 @@ class MonitorServiceImplHeartbeatTest {
         ReflectionTestUtils.setField(owner, "registryClient", registry);
         ReflectionTestUtils.setField(owner, "timer", timer);
         ReflectionTestUtils.setField(owner, "executor", executor);
-        ReflectionTestUtils.setField(owner, "nanoTime", (LongSupplier) ticker::get);
-        doAnswer(invocation -> query.apply(invocation.getArgument(0), invocation.getArgument(1)))
-                .when(owner).fetchHeartbeat(any(), anyString());
+        ReflectionTestUtils.setField(owner, "masterCluster", masterCluster);
+        ReflectionTestUtils.setField(owner, "workerCluster", workerCluster);
+        ReflectionTestUtils.setField(owner, "alertCluster", alertCluster);
+        ReflectionTestUtils.setField(masterCluster, "nanoTime", (LongSupplier) ticker::get);
+        ReflectionTestUtils.setField(workerCluster, "nanoTime", (LongSupplier) ticker::get);
+        ReflectionTestUtils.setField(alertCluster, "nanoTime", (LongSupplier) ticker::get);
+        doAnswer(invocation -> query.apply(RegistryNodeType.MASTER, invocation.getArgument(0)))
+                .when(masterCluster).fetchHeartbeat(anyString());
+        doAnswer(invocation -> query.apply(RegistryNodeType.WORKER, invocation.getArgument(0)))
+                .when(workerCluster).fetchHeartbeat(anyString());
+        doAnswer(invocation -> query.apply(RegistryNodeType.ALERT_SERVER, invocation.getArgument(0)))
+                .when(alertCluster).fetchHeartbeat(anyString());
         ApiConfig config = new ApiConfig();
         config.setHeartbeatFetchInterval(java.time.Duration.ofSeconds(1));
         ReflectionTestUtils.setField(owner, "apiConfig", config);
@@ -106,7 +117,9 @@ class MonitorServiceImplHeartbeatTest {
     }
 
     private void poll() {
-        owner.refreshHeartbeats();
+        masterCluster.refreshHeartbeats();
+        workerCluster.refreshHeartbeats();
+        alertCluster.refreshHeartbeats();
         while (!jobs.isEmpty()) {
             jobs.remove().run();
         }
@@ -239,8 +252,8 @@ class MonitorServiceImplHeartbeatTest {
         owner.start();
         when(registry.getServerNodeSet(RegistryNodeType.WORKER)).thenThrow(new IllegalStateException("disconnected"));
         ArgumentCaptor<ConnectionListener> listener = ArgumentCaptor.forClass(ConnectionListener.class);
-        verify(registry).addConnectionStateListener(listener.capture());
-        listener.getValue().onUpdate(ConnectionState.RECONNECTED);
+        verify(registry, org.mockito.Mockito.times(3)).addConnectionStateListener(listener.capture());
+        listener.getAllValues().forEach(value -> value.onUpdate(ConnectionState.RECONNECTED));
         poll();
         assertEquals(1, owner.listServer(RegistryNodeType.WORKER).size());
         doReturn(Collections.emptySet()).when(registry).getServerNodeSet(RegistryNodeType.WORKER);
@@ -313,14 +326,40 @@ class MonitorServiceImplHeartbeatTest {
         query = (type, address) -> heartbeat;
         owner.start();
         poll();
-        owner.refreshHeartbeats();
+        masterCluster.refreshHeartbeats();
+        workerCluster.refreshHeartbeats();
+        alertCluster.refreshHeartbeats();
         ticker.set(TimeUnit.SECONDS.toNanos(4));
-        owner.refreshHeartbeats();
+        masterCluster.refreshHeartbeats();
+        workerCluster.refreshHeartbeats();
+        alertCluster.refreshHeartbeats();
         assertEquals(1, jobs.size());
         assertTrue(workerView().isMetadataStale());
         heartbeat.setReportTime(101);
         jobs.remove().run();
         assertFalse(workerView().isMetadataStale());
+    }
+
+    @Test
+    void alertMonitoringUsesRpcAndExpiresWithoutRemovingMembership() {
+        org.apache.dolphinscheduler.common.model.AlertServerHeartBeat heartbeat =
+                org.apache.dolphinscheduler.common.model.AlertServerHeartBeat.builder()
+                        .host("localhost").port(50052).processId(10).startupTime(1).reportTime(100)
+                        .cpuUsage(0.25).isActive(true).serverStatus(ServerStatus.NORMAL).build();
+        register(RegistryNodeType.ALERT_SERVER, heartbeat);
+        query = (type, address) -> heartbeat;
+        owner.start();
+        assertNull(owner.listServer(RegistryNodeType.ALERT_SERVER).get(0).getHeartBeatInfo());
+        poll();
+        Server server = owner.listServer(RegistryNodeType.ALERT_SERVER).get(0);
+        assertFalse(server.isMetadataStale());
+        org.apache.dolphinscheduler.common.model.AlertServerHeartBeat snapshot = JSONUtils.parseObject(
+                server.getHeartBeatInfo(), org.apache.dolphinscheduler.common.model.AlertServerHeartBeat.class);
+        assertEquals(0.25, snapshot.getCpuUsage());
+        assertTrue(snapshot.isActive());
+        ticker.set(TimeUnit.SECONDS.toNanos(4));
+        assertTrue(owner.listServer(RegistryNodeType.ALERT_SERVER).get(0).isMetadataStale());
+        verify(registry, never()).persistEphemeral(anyString(), anyString());
     }
 
     private Server workerView() {

@@ -41,12 +41,6 @@ public class WorkerServerMetadata extends BaseServerMetadata {
     private final double taskThreadPoolUsage;
 
     @EqualsAndHashCode.Exclude
-    private Long heartbeatProgressNanos;
-
-    @EqualsAndHashCode.Exclude
-    private final long heartbeatReportTime;
-
-    @EqualsAndHashCode.Exclude
     private volatile boolean metadataStale;
 
     @Override
@@ -56,7 +50,6 @@ public class WorkerServerMetadata extends BaseServerMetadata {
 
     public static WorkerServerMetadata parseFromHeartBeat(final WorkerHeartBeat workerHeartBeat) {
         return WorkerServerMetadata.builder()
-                .heartbeatReportTime(workerHeartBeat.getReportTime())
                 .processId(workerHeartBeat.getProcessId())
                 .serverStartupTime(workerHeartBeat.getStartupTime())
                 .address(workerHeartBeat.getHost() + Constants.COLON + workerHeartBeat.getPort())

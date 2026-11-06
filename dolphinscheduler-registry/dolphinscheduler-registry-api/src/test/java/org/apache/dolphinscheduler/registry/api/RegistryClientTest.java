@@ -44,6 +44,11 @@ class RegistryClientTest {
         assertStableRegistration(RegistryNodeType.WORKER);
     }
 
+    @Test
+    void alertDiscoveryNeedsOnlyStableRegistration() {
+        assertStableRegistration(RegistryNodeType.ALERT_SERVER);
+    }
+
     private void assertStableRegistration(RegistryNodeType type) {
         Registry registry = mock(Registry.class);
         when(registry.exists(anyString())).thenReturn(true);

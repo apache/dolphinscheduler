@@ -48,9 +48,7 @@ interface WorkerNode extends ServerNode {
   threadPoolUsage?: number
 }
 
-interface AlertNode extends MasterNode {
-  heartBeatInfo: string
-}
+type AlertNode = MasterNode
 
 interface WorkflowExecutor {
   id: number

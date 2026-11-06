@@ -18,13 +18,12 @@
 package org.apache.dolphinscheduler.alert.registry;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,16 +31,14 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
 import org.apache.dolphinscheduler.alert.service.AlertHAServer;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
+import org.apache.dolphinscheduler.common.model.ServerRegistration;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.registry.api.ConnectionListener;
+import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
-
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -52,9 +49,7 @@ class AlertRegistryClientTest {
     private final AlertRegistryClient client = new AlertRegistryClient();
     private final RegistryClient registry = mock(RegistryClient.class);
     private final MetricsProvider metrics = mock(MetricsProvider.class);
-    private final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
-    private final ScheduledFuture<?> future = mock(ScheduledFuture.class);
-    private Runnable update;
+    private final AlertHAServer ha = mock(AlertHAServer.class);
 
     @BeforeEach
     void setUp() {
@@ -64,55 +59,48 @@ class AlertRegistryClientTest {
         ReflectionTestUtils.setField(client, "registryClient", registry);
         ReflectionTestUtils.setField(client, "alertConfig", config);
         ReflectionTestUtils.setField(client, "metricsProvider", metrics);
-        ReflectionTestUtils.setField(client, "alertHAServer", mock(AlertHAServer.class));
-        ReflectionTestUtils.setField(client, "registryUpdater", executor);
+        ReflectionTestUtils.setField(client, "alertHAServer", ha);
         when(metrics.getSystemMetrics()).thenReturn(SystemMetrics.builder().systemCpuUsagePercentage(0.2).build());
-        doReturn(future).when(executor).scheduleWithFixedDelay(any(Runnable.class), eq(0L), eq(1L),
-                eq(TimeUnit.SECONDS));
-        client.start();
-        ArgumentCaptor<Runnable> action = ArgumentCaptor.forClass(Runnable.class);
-        verify(executor).scheduleWithFixedDelay(action.capture(), eq(0L), eq(1L), eq(TimeUnit.SECONDS));
-        update = action.getValue();
-    }
-
-    @AfterEach
-    void tearDown() {
-        client.close();
     }
 
     @Test
-    void updatesRegistrationAtConfiguredIntervalWithStableIdentity() {
-        update.run();
-        update.run();
-        verify(registry).persistEphemeral(eq("/nodes/alert-server/localhost:50052"), anyString());
-        ReflectionTestUtils.setField(client, "lastRegistrationTime", 0L);
-        update.run();
+    void registersStableIdentityAndDoesNotWriteOnHeartbeatRequests() {
+        client.start();
+        when(ha.isActive()).thenReturn(true);
+        AlertServerHeartBeat heartbeat = client.getServerMetadata();
+        assertTrue(heartbeat.isActive());
+        assertEquals(0.2, heartbeat.getCpuUsage());
+        when(ha.isActive()).thenReturn(false);
+        assertFalse(client.getServerMetadata().isActive());
+        ArgumentCaptor<String> path = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> json = ArgumentCaptor.forClass(String.class);
+        verify(registry).persistEphemeral(path.capture(), json.capture());
+        assertEquals("/nodes/alert-server/localhost:50052", path.getValue());
+        ServerRegistration registration = JSONUtils.parseObject(json.getValue(), ServerRegistration.class);
+        assertTrue(registration.matches(heartbeat));
+        assertFalse(JSONUtils.parseObject(json.getValue()).has("reportTime"));
+        assertFalse(JSONUtils.parseObject(json.getValue()).has("cpuUsage"));
+        assertFalse(JSONUtils.parseObject(json.getValue()).has("active"));
+    }
+
+    @Test
+    void reconnectRestoresSameRegistrationAndClosePreventsReregistration() {
+        client.start();
+        ArgumentCaptor<ConnectionListener> listener = ArgumentCaptor.forClass(ConnectionListener.class);
+        verify(registry).addConnectionStateListener(listener.capture());
+        listener.getValue().onUpdate(ConnectionState.SUSPENDED);
+        listener.getValue().onUpdate(ConnectionState.RECONNECTED);
         ArgumentCaptor<String> json = ArgumentCaptor.forClass(String.class);
         verify(registry, times(2)).persistEphemeral(anyString(), json.capture());
-        AlertServerHeartBeat first = JSONUtils.parseObject(json.getAllValues().get(0), AlertServerHeartBeat.class);
-        AlertServerHeartBeat second = JSONUtils.parseObject(json.getAllValues().get(1), AlertServerHeartBeat.class);
-        assertEquals(0.2, first.getCpuUsage());
-        assertEquals(50052, first.getPort());
-        assertEquals(first.getStartupTime(), second.getStartupTime());
-        assertEquals(first.getProcessId(), second.getProcessId());
-    }
-
-    @Test
-    void failedWriteIsRetriedOnNextTick() {
-        doThrow(new IllegalStateException("disconnected")).doNothing().when(registry)
-                .persistEphemeral(anyString(), anyString());
-        update.run();
-        update.run();
-        update.run();
+        assertEquals(json.getAllValues().get(0), json.getAllValues().get(1));
+        client.close();
+        listener.getValue().onUpdate(ConnectionState.RECONNECTED);
         verify(registry, times(2)).persistEphemeral(anyString(), anyString());
     }
 
     @Test
-    void closeCancelsUpdatesAndPreventsReregistration() {
-        client.close();
-        update.run();
-        verify(future).cancel(false);
-        verify(executor).shutdown();
-        verify(registry, never()).persistEphemeral(anyString(), anyString());
+    void failedInitialRegistrationFailsStartup() {
+        doThrow(new IllegalStateException("disconnected")).when(registry).persistEphemeral(anyString(), anyString());
+        assertThrows(IllegalStateException.class, client::start);
     }
 }

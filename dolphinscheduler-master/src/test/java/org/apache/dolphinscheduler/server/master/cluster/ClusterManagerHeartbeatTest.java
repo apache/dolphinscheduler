@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -84,7 +83,9 @@ class ClusterManagerHeartbeatTest {
     private final Map<RegistryNodeType, SubscribeListener> watches = new EnumMap<>(RegistryNodeType.class);
     private final Queue<Runnable> jobs = new ArrayDeque<>();
     private BiFunction<RegistryNodeType, String, BaseHeartBeat> query;
-    private final ClusterManager owner = spy(new ClusterManager());
+    private final ClusterManager owner = new ClusterManager();
+    private final MasterClusters masterClusters = spy(new MasterClusters());
+    private final WorkerClusters workerClusters = spy(new WorkerClusters());
 
     @BeforeEach
     void setUp() {
@@ -103,11 +104,17 @@ class ClusterManagerHeartbeatTest {
         ReflectionTestUtils.setField(owner, "registryClient", registry);
         ReflectionTestUtils.setField(owner, "timer", timer);
         ReflectionTestUtils.setField(owner, "executor", executor);
-        ReflectionTestUtils.setField(owner, "nanoTime", (LongSupplier) ticker::get);
-        doAnswer(invocation -> query.apply(invocation.getArgument(0), invocation.getArgument(1)))
-                .when(owner).fetchHeartbeat(any(), anyString());
+        ReflectionTestUtils.setField(owner, "masterClusters", masterClusters);
+        ReflectionTestUtils.setField(owner, "workerClusters", workerClusters);
+        ReflectionTestUtils.setField(masterClusters, "nanoTime", (LongSupplier) ticker::get);
+        ReflectionTestUtils.setField(workerClusters, "nanoTime", (LongSupplier) ticker::get);
+        doAnswer(invocation -> query.apply(RegistryNodeType.MASTER, invocation.getArgument(0)))
+                .when(masterClusters).fetchHeartbeat(anyString());
+        doAnswer(invocation -> query.apply(RegistryNodeType.WORKER, invocation.getArgument(0)))
+                .when(workerClusters).fetchHeartbeat(anyString());
         MasterConfig config = new MasterConfig();
         ReflectionTestUtils.setField(owner, "masterConfig", config);
+        ReflectionTestUtils.setField(owner, "masterRegistryClient", mock(MasterRegistryClient.class));
         ReflectionTestUtils.setField(owner, "masterSlotManager", mock(MasterSlotManager.class));
         ReflectionTestUtils.setField(owner, "workerGroupChangeNotifier", mock(WorkerGroupChangeNotifier.class));
     }
@@ -118,7 +125,8 @@ class ClusterManagerHeartbeatTest {
     }
 
     private void poll() {
-        owner.refreshHeartbeats();
+        masterClusters.refreshHeartbeats();
+        workerClusters.refreshHeartbeats();
         while (!jobs.isEmpty()) {
             jobs.remove().run();
         }
@@ -278,8 +286,8 @@ class ClusterManagerHeartbeatTest {
         owner.start();
         when(registry.getServerNodeSet(RegistryNodeType.WORKER)).thenThrow(new IllegalStateException("disconnected"));
         ArgumentCaptor<ConnectionListener> listener = ArgumentCaptor.forClass(ConnectionListener.class);
-        verify(registry).addConnectionStateListener(listener.capture());
-        listener.getValue().onUpdate(ConnectionState.RECONNECTED);
+        verify(registry, org.mockito.Mockito.times(2)).addConnectionStateListener(listener.capture());
+        listener.getAllValues().forEach(value -> value.onUpdate(ConnectionState.RECONNECTED));
         poll();
         assertEquals(1, owner.getWorkerClusters().getServers().size());
         doReturn(Collections.emptySet()).when(registry).getServerNodeSet(RegistryNodeType.WORKER);
@@ -299,8 +307,7 @@ class ClusterManagerHeartbeatTest {
         poll();
         notify(RegistryNodeType.WORKER, Event.Type.REMOVE, heartbeat);
         notify(RegistryNodeType.WORKER, Event.Type.ADD, worker(2));
-        assertEquals(1, workerView().getServerStartupTime());
-        assertNull(workerView().getHeartbeatProgressNanos());
+        assertTrue(owner.getWorkerClusters().getServers().isEmpty());
         verify(executor).shutdownNow();
         verify(timer).shutdownNow();
     }
@@ -343,9 +350,11 @@ class ClusterManagerHeartbeatTest {
         query = (type, address) -> heartbeat;
         owner.start();
         poll();
-        owner.refreshHeartbeats();
+        masterClusters.refreshHeartbeats();
+        workerClusters.refreshHeartbeats();
         ticker.set(TimeUnit.SECONDS.toNanos(4));
-        owner.refreshHeartbeats();
+        masterClusters.refreshHeartbeats();
+        workerClusters.refreshHeartbeats();
         assertEquals(1, jobs.size());
         assertEquals(ServerStatus.BUSY, workerView().getServerStatus());
         heartbeat.setReportTime(101);

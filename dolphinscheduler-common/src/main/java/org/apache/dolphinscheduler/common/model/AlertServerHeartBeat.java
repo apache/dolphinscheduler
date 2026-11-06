@@ -17,7 +17,9 @@
 
 package org.apache.dolphinscheduler.common.model;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 @SuperBuilder
@@ -27,6 +29,8 @@ public class AlertServerHeartBeat extends BaseHeartBeat implements HeartBeat {
     /**
      * If the alert server is active or standby
      */
+    @Getter
+    @Setter
     private boolean isActive;
 
 }
