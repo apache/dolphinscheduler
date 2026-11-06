@@ -18,57 +18,35 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.model.ServerRegistration;
-import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
-import org.apache.dolphinscheduler.server.master.config.MasterConfig;
-import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
-
-import java.time.Duration;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.PreDestroy;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class ClusterManager implements AutoCloseable {
+public class ClusterManager {
 
     @Getter
-    private final MasterClusters masterClusters = new MasterClusters();
+    @Autowired
+    private MasterClusters masterClusters;
     @Getter
-    private final WorkerClusters workerClusters = new WorkerClusters();
+    @Autowired
+    private WorkerClusters workerClusters;
     @Autowired
     private MasterSlotManager masterSlotManager;
     @Autowired
     private WorkerGroupChangeNotifier workerGroupChangeNotifier;
     @Autowired
     private RegistryClient registryClient;
-    @Autowired
-    private MasterConfig masterConfig;
-    @Lazy
-    @Autowired
-    private MasterRegistryClient masterRegistryClient;
-
-    private final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1,
-            ThreadUtils.newDaemonThreadFactory("MasterHeartbeatTimer-%d"));
-    private final ExecutorService executor = Executors.newFixedThreadPool(8,
-            ThreadUtils.newDaemonThreadFactory("MasterHeartbeatFetch-%d"));
 
     public void start() {
-        Duration interval = masterConfig.getHeartbeatFetchInterval();
         masterClusters.registerListener(new MasterSlotChangeListenerAdaptor(masterSlotManager, masterClusters));
-        masterClusters.setLocalHeartbeat(masterConfig.getMasterAddress(), masterRegistryClient::getServerMetadata);
         synchronized (masterClusters) {
             registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), masterClusters);
             registryClient.getServerList(RegistryNodeType.MASTER).forEach(server -> masterClusters.onServerAdded(
@@ -83,19 +61,7 @@ public class ClusterManager implements AutoCloseable {
         }
         workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerClusters);
         workerGroupChangeNotifier.start();
-        timer.scheduleWithFixedDelay(() -> {
-            masterClusters.refreshHeartbeats(executor);
-            workerClusters.refreshHeartbeats(executor, interval);
-        }, 0, interval.toMillis(), TimeUnit.MILLISECONDS);
         log.info("ClusterManager started...");
     }
 
-    @Override
-    @PreDestroy
-    public void close() {
-        masterClusters.close();
-        workerClusters.close();
-        timer.shutdownNow();
-        executor.shutdownNow();
-    }
 }

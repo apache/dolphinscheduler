@@ -75,8 +75,10 @@ import org.springframework.test.util.ReflectionTestUtils;
 class ClusterManagerHeartbeatTest {
 
     private final RegistryClient registry = mock(RegistryClient.class);
-    private final ExecutorService executor = mock(ExecutorService.class);
-    private final ScheduledThreadPoolExecutor timer = mock(ScheduledThreadPoolExecutor.class);
+    private final ExecutorService masterExecutor = mock(ExecutorService.class);
+    private final ExecutorService workerExecutor = mock(ExecutorService.class);
+    private final ScheduledThreadPoolExecutor masterTimer = mock(ScheduledThreadPoolExecutor.class);
+    private final ScheduledThreadPoolExecutor workerTimer = mock(ScheduledThreadPoolExecutor.class);
     private final AtomicLong ticker = new AtomicLong();
     private final Map<RegistryNodeType, SubscribeListener> watches = new EnumMap<>(RegistryNodeType.class);
     private final Queue<Runnable> jobs = new ArrayDeque<>();
@@ -95,13 +97,17 @@ class ClusterManagerHeartbeatTest {
             watches.put(type, invocation.getArgument(1));
             return null;
         }).when(registry).subscribe(anyString(), any());
-        doAnswer(invocation -> {
-            jobs.add(invocation.getArgument(0));
-            return null;
-        }).when(executor).execute(any(Runnable.class));
+        for (ExecutorService executor : new ExecutorService[]{masterExecutor, workerExecutor}) {
+            doAnswer(invocation -> {
+                jobs.add(invocation.getArgument(0));
+                return null;
+            }).when(executor).execute(any(Runnable.class));
+        }
         ReflectionTestUtils.setField(owner, "registryClient", registry);
-        ReflectionTestUtils.setField(owner, "timer", timer);
-        ReflectionTestUtils.setField(owner, "executor", executor);
+        ReflectionTestUtils.setField(masterClusters, "timer", masterTimer);
+        ReflectionTestUtils.setField(masterClusters, "executor", masterExecutor);
+        ReflectionTestUtils.setField(workerClusters, "timer", workerTimer);
+        ReflectionTestUtils.setField(workerClusters, "executor", workerExecutor);
         ReflectionTestUtils.setField(owner, "masterClusters", masterClusters);
         ReflectionTestUtils.setField(owner, "workerClusters", workerClusters);
         ReflectionTestUtils.setField(workerClusters, "nanoTime", (LongSupplier) ticker::get);
@@ -110,20 +116,22 @@ class ClusterManagerHeartbeatTest {
         doAnswer(invocation -> query.apply(RegistryNodeType.WORKER, invocation.getArgument(0)))
                 .when(workerClusters).fetchHeartbeat(anyString());
         MasterConfig config = new MasterConfig();
-        ReflectionTestUtils.setField(owner, "masterConfig", config);
-        ReflectionTestUtils.setField(owner, "masterRegistryClient", mock(MasterRegistryClient.class));
+        ReflectionTestUtils.setField(masterClusters, "masterConfig", config);
+        ReflectionTestUtils.setField(workerClusters, "masterConfig", config);
+        ReflectionTestUtils.setField(masterClusters, "masterRegistryClient", mock(MasterRegistryClient.class));
         ReflectionTestUtils.setField(owner, "masterSlotManager", mock(MasterSlotManager.class));
         ReflectionTestUtils.setField(owner, "workerGroupChangeNotifier", mock(WorkerGroupChangeNotifier.class));
     }
 
     @AfterEach
     void tearDown() {
-        owner.close();
+        masterClusters.close();
+        workerClusters.close();
     }
 
     private void poll() {
-        masterClusters.refreshHeartbeats(executor);
-        workerClusters.refreshHeartbeats(executor, java.time.Duration.ofSeconds(1));
+        masterClusters.refreshHeartbeats();
+        workerClusters.refreshHeartbeats();
         while (!jobs.isEmpty()) {
             jobs.remove().run();
         }
@@ -158,6 +166,7 @@ class ClusterManagerHeartbeatTest {
             context.getBeanFactory().registerSingleton("registry", mock(Registry.class));
             MasterConfig config = mock(MasterConfig.class);
             when(config.getMasterAddress()).thenReturn("localhost:5678");
+            when(config.getHeartbeatFetchInterval()).thenReturn(java.time.Duration.ofSeconds(1));
             context.getBeanFactory().registerSingleton("masterConfig", config);
             context.getBeanFactory().registerSingleton("masterSlotManager", mock(MasterSlotManager.class));
             context.getBeanFactory().registerSingleton("workerGroupChangeNotifier",
@@ -172,8 +181,8 @@ class ClusterManagerHeartbeatTest {
             context.getBeanFactory().registerSingleton("taskFailover", mock(TaskFailover.class));
             context.getBeanFactory().registerSingleton("workflowInstanceDao", mock(WorkflowInstanceDao.class));
             context.getBeanFactory().registerSingleton("workflowFailover", mock(WorkflowFailover.class));
-            context.register(ClusterManager.class, MasterRegistryClient.class, MasterCoordinator.class,
-                    FailoverCoordinator.class);
+            context.register(ClusterManager.class, MasterClusters.class, WorkerClusters.class,
+                    MasterRegistryClient.class, MasterCoordinator.class, FailoverCoordinator.class);
             context.refresh();
             assertEquals(context.getBean(ClusterManager.class),
                     ReflectionTestUtils.getField(context.getBean(FailoverCoordinator.class), "clusterManager"));
@@ -302,15 +311,18 @@ class ClusterManagerHeartbeatTest {
         register(RegistryNodeType.WORKER, heartbeat);
         owner.start();
         query = (type, address) -> {
-            owner.close();
+            masterClusters.close();
+            workerClusters.close();
             return heartbeat;
         };
         poll();
         notify(RegistryNodeType.WORKER, Event.Type.REMOVE, heartbeat);
         notify(RegistryNodeType.WORKER, Event.Type.ADD, worker(2));
         assertTrue(owner.getWorkerClusters().getServers().isEmpty());
-        verify(executor).shutdownNow();
-        verify(timer).shutdownNow();
+        verify(masterExecutor).shutdownNow();
+        verify(workerExecutor).shutdownNow();
+        verify(masterTimer).shutdownNow();
+        verify(workerTimer).shutdownNow();
     }
 
     @Test
@@ -351,15 +363,34 @@ class ClusterManagerHeartbeatTest {
         query = (type, address) -> heartbeat;
         owner.start();
         poll();
-        masterClusters.refreshHeartbeats(executor);
-        workerClusters.refreshHeartbeats(executor, java.time.Duration.ofSeconds(1));
+        masterClusters.refreshHeartbeats();
+        workerClusters.refreshHeartbeats();
         ticker.set(TimeUnit.SECONDS.toNanos(4));
-        masterClusters.refreshHeartbeats(executor);
-        workerClusters.refreshHeartbeats(executor, java.time.Duration.ofSeconds(1));
+        masterClusters.refreshHeartbeats();
+        workerClusters.refreshHeartbeats();
         assertEquals(1, jobs.size());
         assertEquals(ServerStatus.BUSY, workerView().getServerStatus());
         heartbeat.setReportTime(101);
         jobs.remove().run();
+        assertEquals(ServerStatus.NORMAL, workerView().getServerStatus());
+    }
+
+    @Test
+    void closingMasterPollingDoesNotStopWorkerPolling() {
+        masterClusters.start();
+        workerClusters.start();
+        verify(masterTimer).scheduleWithFixedDelay(any(Runnable.class), org.mockito.ArgumentMatchers.eq(0L),
+                org.mockito.ArgumentMatchers.eq(1000L), org.mockito.ArgumentMatchers.eq(TimeUnit.MILLISECONDS));
+        verify(workerTimer).scheduleWithFixedDelay(any(Runnable.class), org.mockito.ArgumentMatchers.eq(0L),
+                org.mockito.ArgumentMatchers.eq(1000L), org.mockito.ArgumentMatchers.eq(TimeUnit.MILLISECONDS));
+        WorkerHeartBeat heartbeat = worker(1);
+        register(RegistryNodeType.WORKER, heartbeat);
+        query = (type, address) -> heartbeat;
+        owner.start();
+        masterClusters.close();
+        poll();
+        verify(masterExecutor).shutdownNow();
+        verify(workerExecutor, never()).shutdownNow();
         assertEquals(ServerStatus.NORMAL, workerView().getServerStatus());
     }
 
