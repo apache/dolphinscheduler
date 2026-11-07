@@ -21,8 +21,10 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryLock;
@@ -30,8 +32,11 @@ import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
 import org.apache.dolphinscheduler.server.master.cluster.MasterClusters;
 import org.apache.dolphinscheduler.server.master.cluster.MasterServerMetadata;
+import org.apache.dolphinscheduler.server.master.cluster.WorkerClusters;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
+import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
 import org.apache.dolphinscheduler.server.master.engine.system.event.MasterFailoverEvent;
+import org.apache.dolphinscheduler.server.master.engine.system.event.WorkerFailoverEvent;
 
 import java.util.Collections;
 import java.util.Date;
@@ -90,10 +95,10 @@ class FailoverCoordinatorTest {
                 .serverStartupTime(System.currentTimeMillis())
                 .address(masterAddress)
                 .build();
-        final MasterFailoverEvent event = MasterFailoverEvent.of(metadata, new Date(), 0L);
+        final MasterFailoverEvent event = MasterFailoverEvent.of(metadata.toIdentity(), new Date(), 0L);
 
         when(clusterManager.getMasterClusters()).thenReturn(masterClusters);
-        when(masterClusters.getServer(masterAddress)).thenReturn(Optional.empty());
+        when(masterClusters.getServerIdentity(masterAddress)).thenReturn(Optional.empty());
         when(registryClient.getLock(anyString())).thenReturn(registryLock);
         when(registryClient.exists(anyString())).thenReturn(false);
         when(workflowInstanceDao.queryNeedFailoverWorkflowInstances(masterAddress))
@@ -107,4 +112,54 @@ class FailoverCoordinatorTest {
                 .isEqualTo(RegistryUtils.getMasterFailoverLockPath(masterAddress));
         verify(registryLock, times(1)).close();
     }
+    @Test
+    void registeredMasterWithoutHeartbeatSkipsFailover() {
+        try (MasterClusters clusters = new MasterClusters()) {
+            ServerIdentity identity = MasterServerMetadata.builder().address("localhost:5678")
+                    .processId(10).serverStartupTime(1000).build().toIdentity();
+            clusters.onServerRegistered(identity);
+            assertThat(clusters.getServer(identity.getAddress())).isEmpty();
+            when(clusterManager.getMasterClusters()).thenReturn(clusters);
+
+            failoverCoordinator.failoverMaster(MasterFailoverEvent.of(identity, new Date(), 0));
+
+            verifyNoInteractions(registryClient, workflowInstanceDao, workflowFailover);
+        }
+    }
+
+    @Test
+    void registeredWorkerWithoutHeartbeatSkipsFailover() {
+        try (WorkerClusters clusters = new WorkerClusters()) {
+            ServerIdentity identity = MasterServerMetadata.builder().address("localhost:1234")
+                    .processId(10).serverStartupTime(1000).build().toIdentity();
+            clusters.onServerRegistered(identity);
+            assertThat(clusters.getServer(identity.getAddress())).isEmpty();
+            when(clusterManager.getWorkerClusters()).thenReturn(clusters);
+
+            failoverCoordinator.failoverWorker(WorkerFailoverEvent.of(identity, new Date(), 0));
+
+            verifyNoInteractions(registryClient, taskFailover);
+        }
+    }
+
+    @Test
+    void globalFailoverUsesRegisteredStartupTimeWithoutHeartbeat() {
+        try (MasterClusters clusters = new MasterClusters()) {
+            ServerIdentity identity = MasterServerMetadata.builder().address("localhost:5678")
+                    .processId(10).serverStartupTime(1000).build().toIdentity();
+            clusters.onServerRegistered(identity);
+            when(clusterManager.getMasterClusters()).thenReturn(clusters);
+            when(workflowInstanceDao.queryNeedFailoverMasters())
+                    .thenReturn(Collections.singletonList(identity.getAddress()));
+            when(workflowInstanceDao.queryNeedFailoverWorkflowInstances(identity.getAddress()))
+                    .thenReturn(Collections.emptyList());
+            when(registryClient.getLock(anyString())).thenReturn(registryLock);
+
+            failoverCoordinator.globalMasterFailover(GlobalMasterFailoverEvent.of(new Date(2000)));
+
+            verify(registryClient).persist(RegistryUtils.getGlobalMasterFailoverNodePath(identity.getAddress()),
+                    "1000");
+        }
+    }
+
 }

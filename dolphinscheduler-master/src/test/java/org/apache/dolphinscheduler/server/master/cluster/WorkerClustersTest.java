@@ -144,6 +144,43 @@ class WorkerClustersTest {
         assertThat(workerClusters.getServers()).containsExactly(normalWorkerServerMetadata, workerServerMetadata);
     }
 
+    @Test
+    void testFirstMetadataPopulatesConfiguredWorkerGroup() {
+        WorkerClusters clusters = new WorkerClusters();
+        WorkerServerMetadata registration = WorkerServerMetadata.builder().address("localhost:1234")
+                .workerGroup(null).serverStartupTime(1).processId(10).build();
+        clusters.onServerRegistered(registration.toIdentity());
+        assertThat(clusters.getNormalWorkerServerAddressByGroup("default")).isEmpty();
+        WorkerServerMetadata metadata = WorkerServerMetadata.builder().address("localhost:1234")
+                .workerGroup("analytics").serverStartupTime(1).processId(10).serverStatus(ServerStatus.NORMAL).build();
+        clusters.onServerAdded(metadata);
+        assertThat(clusters.getNormalWorkerServerAddressByGroup("analytics")).containsExactly("localhost:1234");
+        clusters.onServerUnregistered(registration.toIdentity());
+        assertThat(clusters.getServers()).isEmpty();
+        assertThat(clusters.getConfigWorkerServerAddressByGroup("analytics")).isEmpty();
+    }
+
+    @Test
+    void testWorkerGroupChangeUpdatesMapping() {
+        WorkerClusters clusters = new WorkerClusters();
+        clusters.onServerAdded(WorkerServerMetadata.builder().address("localhost:1234").workerGroup("old").build());
+        clusters.onServerUpdate(WorkerServerMetadata.builder().address("localhost:1234").workerGroup("new").build());
+        assertThat(clusters.getConfigWorkerServerAddressByGroup("old")).isEmpty();
+        assertThat(clusters.getConfigWorkerServerAddressByGroup("new")).containsExactly("localhost:1234");
+    }
+
+    @Test
+    void testRemovalOfPreviousProcessKeepsRestartedWorker() {
+        WorkerClusters clusters = new WorkerClusters();
+        WorkerServerMetadata restarted = WorkerServerMetadata.builder().address("localhost:1234")
+                .serverStartupTime(2).workerGroup("new").build();
+        clusters.onServerAdded(restarted);
+        clusters.onServerRemove(WorkerServerMetadata.builder().address("localhost:1234")
+                .serverStartupTime(1).workerGroup("old").build());
+        assertThat(clusters.getServers()).containsExactly(restarted);
+        assertThat(clusters.getConfigWorkerServerAddressByGroup("new")).containsExactly("localhost:1234");
+    }
+
     private WorkerServerMetadata getNormalWorkerServerMetadata() {
         return WorkerServerMetadata.builder()
                 .address("127.0.0.1:1235")

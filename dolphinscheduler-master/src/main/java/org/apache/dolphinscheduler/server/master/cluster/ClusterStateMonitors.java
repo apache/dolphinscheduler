@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.server.master.engine.system.SystemEventBus;
 import org.apache.dolphinscheduler.server.master.engine.system.event.MasterFailoverEvent;
 import org.apache.dolphinscheduler.server.master.engine.system.event.WorkerFailoverEvent;
@@ -40,19 +41,19 @@ public class ClusterStateMonitors {
 
     public void start() {
         clusterManager.getMasterClusters()
-                .registerListener((IClusters.ServerRemovedListener<MasterServerMetadata>) this::masterRemoved);
+                .registerServerRemovedListener(this::masterRemoved);
         clusterManager.getWorkerClusters()
-                .registerListener((IClusters.ServerRemovedListener<WorkerServerMetadata>) this::workerRemoved);
+                .registerServerRemovedListener(this::workerRemoved);
         log.info("ClusterStateMonitors started...");
     }
 
-    void masterRemoved(final MasterServerMetadata masterServer) {
+    void masterRemoved(final ServerIdentity masterServer) {
         // We set a delay of 30 seconds for the master failover event
         // If the master can reconnect to registry within 30 seconds, the master will skip failover.
         systemEventBus.publish(MasterFailoverEvent.of(masterServer, new Date(), 30_000));
     }
 
-    void workerRemoved(final WorkerServerMetadata workerServer) {
+    void workerRemoved(final ServerIdentity workerServer) {
         // We set a delay of 30 seconds for the worker failover event
         // If the worker can reconnect to registry within 30 seconds, the worker will skip failover.
         systemEventBus.publish(WorkerFailoverEvent.of(workerServer, new Date(), 30_000));

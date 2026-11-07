@@ -19,7 +19,15 @@ package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
+import org.apache.dolphinscheduler.registry.api.Event;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
+import org.apache.dolphinscheduler.server.master.registry.MasterRegistryClient;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 
@@ -29,14 +37,28 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
+
 @Slf4j
-public class MasterClusters extends AbstractClusterSubscribeListener<MasterServerMetadata>
+@Component
+public class MasterClusters
         implements
-            IClusters<MasterServerMetadata> {
+            IClusters<MasterServerMetadata>,
+            IClusters.IClustersChangeListener<MasterServerMetadata>,
+            SubscribeListener,
+            AutoCloseable {
 
     /**
      * Master address -> MasterServer
@@ -46,9 +68,66 @@ public class MasterClusters extends AbstractClusterSubscribeListener<MasterServe
     private final List<IClustersChangeListener<MasterServerMetadata>> masterClusterChangeListeners =
             new CopyOnWriteArrayList<>();
 
+    private final Map<String, ServerIdentity> registeredServers = new ConcurrentHashMap<>();
+    private final List<Consumer<ServerIdentity>> serverRemovedListeners = new CopyOnWriteArrayList<>();
+    private volatile boolean closed;
+
+    @Lazy
+    @Autowired
+    private MasterRegistryClient masterRegistryClient;
+
+    @Autowired
+    private MasterConfig masterConfig;
+
+    private final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1,
+            ThreadUtils.newDaemonThreadFactory("MasterHeartbeatTimer-%d"));
+
+    @PostConstruct
+    public void start() {
+        timer.scheduleWithFixedDelay(this::refreshHeartbeats, 0,
+                masterConfig.getHeartbeatFetchInterval().toMillis(), TimeUnit.MILLISECONDS);
+    }
+
     @Override
     public List<MasterServerMetadata> getServers() {
         return UnmodifiableList.unmodifiableList(new ArrayList<>(masterServerMap.values()));
+    }
+
+    @Override
+    public List<String> getServerAddresses() {
+        return new ArrayList<>(registeredServers.keySet());
+    }
+
+    @Override
+    public Optional<ServerIdentity> getServerIdentity(String address) {
+        return Optional.ofNullable(registeredServers.get(address));
+    }
+
+    @Override
+    public void registerServerRemovedListener(Consumer<ServerIdentity> listener) {
+        serverRemovedListeners.add(listener);
+    }
+
+    public synchronized void onServerRegistered(ServerIdentity identity) {
+        if (closed || identity.equals(registeredServers.get(identity.getAddress()))) {
+            return;
+        }
+        ServerIdentity previous = registeredServers.get(identity.getAddress());
+        if (previous != null) {
+            onServerUnregistered(previous);
+        }
+        registeredServers.put(identity.getAddress(), identity);
+    }
+
+    public synchronized void onServerUnregistered(ServerIdentity identity) {
+        if (closed || !registeredServers.remove(identity.getAddress(), identity)) {
+            return;
+        }
+        MasterServerMetadata metadata = masterServerMap.get(identity.getAddress());
+        if (metadata != null) {
+            onServerRemove(metadata);
+        }
+        serverRemovedListeners.forEach(listener -> listener.accept(identity));
     }
 
     @Override
@@ -70,16 +149,18 @@ public class MasterClusters extends AbstractClusterSubscribeListener<MasterServe
     }
 
     @Override
-    MasterServerMetadata parseServerFromHeartbeat(final String masterHeartBeatJson) {
-        MasterHeartBeat masterHeartBeat = JSONUtils.parseObject(masterHeartBeatJson, MasterHeartBeat.class);
-        if (masterHeartBeat == null) {
-            return null;
+    public synchronized void onServerAdded(final MasterServerMetadata masterServer) {
+        if (closed) {
+            return;
         }
-        return MasterServerMetadata.parseFromHeartBeat(masterHeartBeat);
-    }
-
-    @Override
-    public void onServerAdded(final MasterServerMetadata masterServer) {
+        MasterServerMetadata current = masterServerMap.get(masterServer.getAddress());
+        if (current != null) {
+            if (current.getProcessId() == masterServer.getProcessId()
+                    && current.getServerStartupTime() == masterServer.getServerStartupTime()) {
+                return;
+            }
+            onServerRemove(current);
+        }
         masterServerMap.put(masterServer.getAddress(), masterServer);
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerAdded(masterServer);
@@ -87,19 +168,89 @@ public class MasterClusters extends AbstractClusterSubscribeListener<MasterServe
     }
 
     @Override
-    public void onServerRemove(final MasterServerMetadata masterServer) {
-        masterServerMap.remove(masterServer.getAddress());
+    public synchronized void onServerRemove(final MasterServerMetadata masterServer) {
+        MasterServerMetadata current = masterServerMap.get(masterServer.getAddress());
+        if (closed || current == null || current.getProcessId() != masterServer.getProcessId()
+                || current.getServerStartupTime() != masterServer.getServerStartupTime()
+                || !masterServerMap.remove(masterServer.getAddress(), current)) {
+            return;
+        }
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
-            listener.onServerRemove(masterServer);
+            listener.onServerRemove(current);
         }
     }
 
     @Override
-    public void onServerUpdate(final MasterServerMetadata masterServer) {
+    public synchronized void onServerUpdate(final MasterServerMetadata masterServer) {
+        if (closed) {
+            return;
+        }
         masterServerMap.put(masterServer.getAddress(), masterServer);
         for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
             listener.onServerUpdate(masterServer);
         }
     }
 
+    @Override
+    public SubscribeScope getSubscribeScope() {
+        return SubscribeScope.CHILDREN_ONLY;
+    }
+
+    @Override
+    public synchronized void notify(Event event) {
+        ServerIdentity identity = JSONUtils.parseObject(event.getEventData(), ServerIdentity.class);
+        if (identity == null) {
+            log.error("Invalid registration event: {}", event);
+            return;
+        }
+        if (event.getType() == Event.Type.ADD) {
+            onServerRegistered(identity);
+        } else if (event.getType() == Event.Type.REMOVE) {
+            onServerUnregistered(identity);
+        }
+    }
+
+    MasterHeartBeat fetchHeartbeat(String address) {
+        return address.equals(masterConfig.getMasterAddress()) ? masterRegistryClient.getServerMetadata()
+                : Clients.withService(IMasterMetadataService.class).withHost(address).getServerMetadata();
+    }
+
+    public void refreshHeartbeats() {
+        for (ServerIdentity expected : new ArrayList<>(registeredServers.values())) {
+            if (closed) {
+                return;
+            }
+            MasterHeartBeat heartbeat = null;
+            try {
+                heartbeat = fetchHeartbeat(expected.getAddress());
+            } catch (Exception ex) {
+                log.debug("Failed to fetch Master heartbeat from {}", expected.getAddress(), ex);
+            }
+            synchronized (this) {
+                if (closed || registeredServers.get(expected.getAddress()) != expected) {
+                    continue;
+                }
+                MasterServerMetadata previous = masterServerMap.get(expected.getAddress());
+                if (expected.matches(heartbeat)) {
+                    MasterServerMetadata updated = MasterServerMetadata.parseFromHeartBeat(heartbeat);
+                    if (previous == null) {
+                        onServerAdded(updated);
+                    } else {
+                        onServerUpdate(updated);
+                    }
+                } else if (previous != null) {
+                    onServerRemove(previous);
+                }
+            }
+        }
+    }
+
+    @Override
+    @PreDestroy
+    public synchronized void close() {
+        closed = true;
+        timer.shutdownNow();
+        masterServerMap.clear();
+        registeredServers.clear();
+    }
 }

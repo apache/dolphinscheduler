@@ -18,6 +18,8 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 import lombok.Data;
 import lombok.ToString;
@@ -40,6 +42,19 @@ public abstract class BaseServerMetadata implements IClusters.IServerMetadata {
     private final double memoryUsage;
 
     private final ServerStatus serverStatus;
+
+    // Local time in milliseconds when the heartbeat was received.
+    private final long heartbeatReceivedTime;
+
+    public ServerIdentity toIdentity() {
+        Host host = Host.of(address);
+        ServerIdentity identity = new ServerIdentity();
+        identity.setHost(host.getIp());
+        identity.setPort(host.getPort());
+        identity.setProcessId(processId);
+        identity.setStartupTime(serverStartupTime);
+        return identity;
+    }
 
     @Override
     public String getAddress() {

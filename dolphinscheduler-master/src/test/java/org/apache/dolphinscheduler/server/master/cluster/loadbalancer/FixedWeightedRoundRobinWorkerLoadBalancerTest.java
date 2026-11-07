@@ -56,6 +56,26 @@ class FixedWeightedRoundRobinWorkerLoadBalancerTest {
     }
 
     @Test
+    void firstHeartbeatSuppliesRegisteredWorkersWeight() {
+        WorkerClusters clusters = new WorkerClusters();
+        FixedWeightedRoundRobinWorkerLoadBalancer loadBalancer =
+                new FixedWeightedRoundRobinWorkerLoadBalancer(clusters);
+        clusters.onServerRegistered(WorkerServerMetadata.builder().address("worker-1:1234").workerGroup(null)
+                .serverStatus(ServerStatus.BUSY).build().toIdentity());
+        clusters.onServerRegistered(WorkerServerMetadata.builder().address("worker-2:1234").workerGroup(null)
+                .serverStatus(ServerStatus.BUSY).build().toIdentity());
+        clusters.onServerUpdate(WorkerServerMetadata.builder().address("worker-1:1234").workerWeight(1)
+                .serverStatus(ServerStatus.NORMAL).build());
+        clusters.onServerUpdate(WorkerServerMetadata.builder().address("worker-2:1234").workerWeight(3)
+                .serverStatus(ServerStatus.NORMAL).build());
+        Map<String, Integer> counts = new HashMap<>();
+        for (int i = 0; i < 1000; i++) {
+            counts.merge(loadBalancer.select("default").get(), 1, Integer::sum);
+        }
+        Truth.assertThat(Math.abs(counts.get("worker-2:1234") - counts.get("worker-1:1234") * 3)).isWithin(10);
+    }
+
+    @Test
     void select_emptyWorkerGroup() {
         FixedWeightedRoundRobinWorkerLoadBalancer loadBalancer = createFixedWeightedRoundRobinWorkerLoadBalancer();
         Truth.assertThat(loadBalancer.select("busyCluster")).isEmpty();

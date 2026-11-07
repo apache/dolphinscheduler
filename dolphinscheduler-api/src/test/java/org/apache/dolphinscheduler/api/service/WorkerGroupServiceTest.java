@@ -32,6 +32,9 @@ import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
@@ -84,6 +87,9 @@ public class WorkerGroupServiceTest {
     private RegistryClient registryClient;
 
     @Mock
+    private MonitorService monitorService;
+
+    @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Mock
@@ -96,6 +102,19 @@ public class WorkerGroupServiceTest {
     private ScheduleDao scheduleDao;
 
     private final String GROUP_NAME = "testWorkerGroup";
+
+    @Test
+    void testConfiguredGroupsSkipWorkersWithoutMetadata() {
+        Server pending = new Server();
+        pending.setHost("pending");
+        Server available = new Server();
+        available.setHeartBeatInfo(JSONUtils.toJsonString(WorkerHeartBeat.builder().host("localhost").port(1234)
+                .startupTime(1).reportTime(100).workerGroup("analytics").build()));
+        when(monitorService.listServer(RegistryNodeType.WORKER))
+                .thenReturn(java.util.Arrays.asList(pending, available));
+        Assertions.assertEquals(1, workerGroupService.getConfigWorkerGroupPageDetail().size());
+        Assertions.assertEquals("analytics", workerGroupService.getConfigWorkerGroupPageDetail().get(0).getName());
+    }
 
     private User getLoginUser() {
         User loginUser = new User();
