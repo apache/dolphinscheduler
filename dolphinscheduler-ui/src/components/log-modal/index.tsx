@@ -35,6 +35,7 @@ import {
   SyncOutlined
 } from '@vicons/antd'
 import screenfull from 'screenfull'
+import { subscribeToFullscreenChanges } from './fullscreen-listener'
 
 const props = {
   showModalRef: {
@@ -95,12 +96,14 @@ export default defineComponent({
       ctx.emit('downloadLogs', props.row)
     }
 
+    let unsubscribeFullscreen = () => {}
+
     onMounted(() => {
-      screenfull.on('change', change)
+      unsubscribeFullscreen = subscribeToFullscreenChanges(screenfull, change)
     })
 
     onUnmounted(() => {
-      screenfull.on('change', change)
+      unsubscribeFullscreen()
     })
 
     return {
