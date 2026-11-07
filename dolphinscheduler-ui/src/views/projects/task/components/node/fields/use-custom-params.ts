@@ -89,7 +89,7 @@ export function useCustomParams({
             disabled: isSimple
           }
         },
-        {
+        (i?: number) => ({
           type: 'input',
           field: 'value',
           span: 5,
@@ -97,8 +97,8 @@ export function useCustomParams({
           props: {
             placeholder: t('project.node.value_tips'),
             maxLength: 256
-          }
-        },
+          },
+        }),
         (i?: number) => ({
           type: 'checkbox' as const,
           field: 'sensitive',
