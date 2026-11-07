@@ -44,14 +44,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
-class FailoverMarkCheckerTest {
+class SelfFailoverMonitorTest {
 
     private final RegistryClient registry = mock(RegistryClient.class);
     private final IStoppable stoppable = mock(IStoppable.class);
     private final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
     private final ScheduledFuture<?> future = mock(ScheduledFuture.class);
     private final ServerRegistration registration = new ServerRegistration();
-    private FailoverMarkChecker checker;
+    private SelfFailoverMonitor monitor;
     private Runnable check;
     private String path;
 
@@ -65,8 +65,8 @@ class FailoverMarkCheckerTest {
         when(registry.getStoppable()).thenReturn(stoppable);
         doReturn(future).when(executor).scheduleWithFixedDelay(any(Runnable.class), eq(0L), eq(1000L),
                 eq(TimeUnit.MILLISECONDS));
-        checker = new FailoverMarkChecker(registry, registration, Duration.ofSeconds(1), executor);
-        checker.start();
+        monitor = new SelfFailoverMonitor(registry, registration, Duration.ofSeconds(1), executor);
+        monitor.start();
         ArgumentCaptor<Runnable> action = ArgumentCaptor.forClass(Runnable.class);
         verify(executor).scheduleWithFixedDelay(action.capture(), eq(0L), eq(1000L), eq(TimeUnit.MILLISECONDS));
         check = action.getValue();
@@ -99,7 +99,7 @@ class FailoverMarkCheckerTest {
 
     @Test
     void closeCancelsChecksAndRejectsQueuedWork() {
-        checker.close();
+        monitor.close();
         check.run();
         verify(future).cancel(false);
         verify(executor).shutdown();
@@ -112,20 +112,20 @@ class FailoverMarkCheckerTest {
         ScheduledExecutorService actual = Executors.newSingleThreadScheduledExecutor();
         AtomicBoolean interrupted = new AtomicBoolean(true);
         CountDownLatch stopped = new CountDownLatch(1);
-        FailoverMarkChecker actualChecker =
-                new FailoverMarkChecker(registry, registration, Duration.ofSeconds(1), actual);
+        SelfFailoverMonitor actualMonitor =
+                new SelfFailoverMonitor(registry, registration, Duration.ofSeconds(1), actual);
         when(registry.exists(path)).thenReturn(true);
         when(registry.getStoppable()).thenReturn(reason -> {
-            actualChecker.close();
+            actualMonitor.close();
             interrupted.set(Thread.currentThread().isInterrupted());
             stopped.countDown();
         });
         try {
-            actualChecker.start();
+            actualMonitor.start();
             assertTrue(stopped.await(5, TimeUnit.SECONDS));
             assertFalse(interrupted.get());
         } finally {
-            actualChecker.close();
+            actualMonitor.close();
             actual.shutdownNow();
         }
     }

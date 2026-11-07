@@ -33,9 +33,9 @@ import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
-import org.apache.dolphinscheduler.registry.api.FailoverMarkChecker;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
+import org.apache.dolphinscheduler.registry.api.SelfFailoverMonitor;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.worker.config.WorkerConfig;
 import org.apache.dolphinscheduler.server.worker.config.WorkerServerLoadProtection;
@@ -74,7 +74,7 @@ public class WorkerRegistryClient implements AutoCloseable, IWorkerMetadataServi
 
     private final int processId = OSUtils.getProcessID();
 
-    private FailoverMarkChecker failoverMarkChecker;
+    private SelfFailoverMonitor selfFailoverMonitor;
 
     public void start() {
         try {
@@ -99,9 +99,9 @@ public class WorkerRegistryClient implements AutoCloseable, IWorkerMetadataServi
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
-        failoverMarkChecker = new FailoverMarkChecker(registryClient, registration,
+        selfFailoverMonitor = new SelfFailoverMonitor(registryClient, registration,
                 workerConfig.getMaxHeartbeatInterval());
-        failoverMarkChecker.start();
+        selfFailoverMonitor.start();
         log.info("Worker node: {} registry finished", workerConfig.getWorkerAddress());
     }
 
@@ -120,8 +120,8 @@ public class WorkerRegistryClient implements AutoCloseable, IWorkerMetadataServi
 
     @Override
     public void close() throws IOException {
-        if (failoverMarkChecker != null) {
-            failoverMarkChecker.close();
+        if (selfFailoverMonitor != null) {
+            selfFailoverMonitor.close();
         }
         registryClient.close();
         log.info("Closed WorkerRegistryClient");
