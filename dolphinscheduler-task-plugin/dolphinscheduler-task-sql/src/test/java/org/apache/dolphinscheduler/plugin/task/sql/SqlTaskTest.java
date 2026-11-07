@@ -294,6 +294,75 @@ class SqlTaskTest {
     }
 
     @Test
+    void testZeroRowResultPassedToDealOutParam_IsRealEmptyResult() throws Exception {
+        // a query that returns zero rows must feed the real empty result into OUT parameter
+        // processing: the synthetic all-empty-string row is only for alert rendering
+        ResultSet mockResultSet = mock(ResultSet.class);
+        ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+
+        when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+        when(mockMetaData.getColumnCount()).thenReturn(2);
+        when(mockMetaData.getColumnLabel(1)).thenReturn("id");
+        when(mockMetaData.getColumnLabel(2)).thenReturn("name");
+        when(mockResultSet.next()).thenReturn(false);
+
+        Method method = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+        method.setAccessible(true);
+        String result = (String) method.invoke(sqlTask, mockResultSet);
+
+        Assertions.assertEquals("[]", result);
+
+        // LIST out parameter gets an empty json array
+        SqlParameters listParameters = new SqlParameters();
+        listParameters.setLocalParams(Lists.newArrayList(new Property("id", Direct.OUT, DataType.LIST, null)));
+        listParameters.varPool = Lists.newArrayList();
+        listParameters.dealOutParam(result);
+        Assertions.assertEquals("[]", listParameters.getVarPool().get(0).getValue());
+
+        // non LIST out parameter fails fast instead of passing an artificial value
+        SqlParameters varcharParameters = new SqlParameters();
+        varcharParameters.setLocalParams(Lists.newArrayList(new Property("id", Direct.OUT, DataType.VARCHAR, null)));
+        varcharParameters.varPool = Lists.newArrayList();
+        TaskException exception = Assertions.assertThrows(TaskException.class,
+                () -> varcharParameters.dealOutParam(result));
+        Assertions.assertTrue(exception.getMessage().contains("id"));
+    }
+
+    @Test
+    void testZeroRowResultValidatesOutParamNamesAgainstSchema() throws Exception {
+        // a misspelled LIST OUT parameter must fail on a zero-row result too: the column
+        // names are validated while the schema is still available, so the failure no longer
+        // depends on whether rows happen to appear
+        ResultSet mockResultSet = mock(ResultSet.class);
+        ResultSetMetaData mockMetaData = mock(ResultSetMetaData.class);
+
+        when(mockResultSet.getMetaData()).thenReturn(mockMetaData);
+        when(mockMetaData.getColumnCount()).thenReturn(1);
+        when(mockMetaData.getColumnLabel(1)).thenReturn("id");
+        when(mockResultSet.next()).thenReturn(false);
+
+        SqlParameters parameters = new SqlParameters();
+        parameters.setLocalParams(Lists.newArrayList(new Property("idd", Direct.OUT, DataType.LIST, null)));
+        parameters.varPool = Lists.newArrayList();
+        Field sqlParametersField = SqlTask.class.getDeclaredField("sqlParameters");
+        sqlParametersField.setAccessible(true);
+        sqlParametersField.set(sqlTask, parameters);
+
+        Method method = SqlTask.class.getDeclaredMethod("resultProcess", ResultSet.class);
+        method.setAccessible(true);
+
+        TaskException exception = Assertions.assertThrows(TaskException.class, () -> {
+            try {
+                method.invoke(sqlTask, mockResultSet);
+            } catch (InvocationTargetException e) {
+                throw (Exception) e.getCause();
+            }
+        });
+        Assertions.assertTrue(exception.getMessage().contains("idd"));
+        Assertions.assertTrue(exception.getMessage().contains("id"));
+    }
+
+    @Test
     void testGenerateEmptyRow_WithNullResultSet_ReturnsErrorObject() throws Exception {
         Method method = SqlTask.class.getDeclaredMethod("generateEmptyRow", ResultSet.class);
         method.setAccessible(true);
@@ -339,8 +408,10 @@ class SqlTaskTest {
 
         String result = (String) resultProcessMethod.invoke(sqlTask, (ResultSet) null);
 
+        // OUT parameter processing receives the real empty result; the synthetic error row
+        // is only for alert rendering and must not leak into the task result
         Assertions.assertNotNull(result);
-        Assertions.assertTrue(result.equalsIgnoreCase("[{\"error\":\"resultSet is null\"}]"));
+        Assertions.assertEquals("[]", result);
     }
 
     @Test
@@ -359,11 +430,10 @@ class SqlTaskTest {
 
         String result = (String) resultProcessMethod.invoke(sqlTask, mockResultSet);
 
+        // OUT parameter processing receives the real empty result; the synthetic all-empty-string
+        // row is only for alert rendering and must not leak into the task result
         Assertions.assertNotNull(result);
-        Assertions.assertTrue(result.contains("\"id\":\"\""));
-        Assertions.assertTrue(result.contains("\"name\":\"\""));
-        Assertions.assertTrue(result.startsWith("[{"));
-        Assertions.assertTrue(result.endsWith("}]"));
+        Assertions.assertEquals("[]", result);
     }
 
     @Test
