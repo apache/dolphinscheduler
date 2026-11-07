@@ -86,10 +86,11 @@ public class PhysicalTaskEngineDelegator implements AutoCloseable {
         final Optional<ITaskExecutor> taskExecutorOptional = physicalTaskExecutorRepository.get(taskInstanceId);
         if (taskExecutorOptional.isPresent()) {
             taskExecutorOptional.get().getTaskExecutionContext().setWorkflowInstanceHost(workflowHost);
-            physicalTaskExecutorEventReporter.onWorkflowInstanceHostChanged(taskInstanceId);
-            return true;
         }
-        return false;
+        // A completed executor may already be finalized while its result is still waiting for an ACK.
+        final boolean hasPendingEvents =
+                physicalTaskExecutorEventReporter.onWorkflowInstanceHostChanged(taskInstanceId, workflowHost);
+        return taskExecutorOptional.isPresent() || hasPendingEvents;
     }
 
     @Override
