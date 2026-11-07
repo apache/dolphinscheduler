@@ -18,7 +18,7 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 import lombok.Data;
@@ -43,14 +43,14 @@ public abstract class BaseServerMetadata implements IClusters.IServerMetadata {
 
     private final ServerStatus serverStatus;
 
-    public ServerRegistration toRegistration() {
+    public ServerIdentity toIdentity() {
         Host host = Host.of(address);
-        ServerRegistration registration = new ServerRegistration();
-        registration.setHost(host.getIp());
-        registration.setPort(host.getPort());
-        registration.setProcessId(processId);
-        registration.setStartupTime(serverStartupTime);
-        return registration;
+        ServerIdentity identity = new ServerIdentity();
+        identity.setHost(host.getIp());
+        identity.setPort(host.getPort());
+        identity.setProcessId(processId);
+        identity.setStartupTime(serverStartupTime);
+        return identity;
     }
 
     @Override

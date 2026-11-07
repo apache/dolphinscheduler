@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.extract.base.client.Clients;
@@ -164,12 +164,12 @@ public class MasterClusters
 
     @Override
     public synchronized void notify(Event event) {
-        ServerRegistration registration = JSONUtils.parseObject(event.getEventData(), ServerRegistration.class);
-        if (registration == null) {
+        ServerIdentity identity = JSONUtils.parseObject(event.getEventData(), ServerIdentity.class);
+        if (identity == null) {
             log.error("Invalid registration event: {}", event);
             return;
         }
-        MasterServerMetadata server = MasterServerMetadata.fromRegistration(registration);
+        MasterServerMetadata server = MasterServerMetadata.fromIdentity(identity);
         if (event.getType() == Event.Type.ADD) {
             onServerAdded(server);
         } else if (event.getType() == Event.Type.REMOVE) {
@@ -199,7 +199,7 @@ public class MasterClusters
                         MasterHeartBeat heartbeat = fetchHeartbeat(address);
                         synchronized (this) {
                             if (!closed && masterServerMap.get(address) == expected
-                                    && expected.toRegistration().matches(heartbeat)) {
+                                    && expected.toIdentity().matches(heartbeat)) {
                                 onServerUpdate(MasterServerMetadata.parseFromHeartBeat(heartbeat));
                             }
                         }

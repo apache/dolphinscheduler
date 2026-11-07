@@ -26,21 +26,21 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
 import org.junit.jupiter.api.Test;
 
-class ServerRegistrationTest {
+class ServerIdentityTest {
 
     @Test
-    void registrationContainsIdentityButNoRuntimeMetadata() {
+    void containsOnlyStableProcessIdentity() {
         WorkerHeartBeat metadata = WorkerHeartBeat.builder().host("localhost").port(1234).processId(10).startupTime(1)
                 .reportTime(100).serverStatus(ServerStatus.NORMAL).cpuUsage(0.5).workerGroup("analytics").build();
-        ServerRegistration registration = ServerRegistration.fromHeartBeat(metadata);
-        String json = JSONUtils.toJsonString(registration);
+        ServerIdentity identity = ServerIdentity.fromHeartBeat(metadata);
+        String json = JSONUtils.toJsonString(identity);
         assertFalse(json.contains("cpuUsage"));
         assertFalse(json.contains("serverStatus"));
         assertFalse(json.contains("workerGroup"));
         assertFalse(json.contains("reportTime"));
-        assertEquals(registration, JSONUtils.parseObject(json, ServerRegistration.class));
-        assertTrue(registration.matches(metadata));
+        assertEquals(identity, JSONUtils.parseObject(json, ServerIdentity.class));
+        assertTrue(identity.matches(metadata));
         metadata.setStartupTime(2);
-        assertFalse(registration.matches(metadata));
+        assertFalse(identity.matches(metadata));
     }
 }

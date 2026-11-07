@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.extract.alert.IAlertMetadataService;
@@ -89,12 +89,12 @@ class MonitorMetadataRpcTest {
     }
 
     private void register(RegistryClient registry, RegistryNodeType type, BaseHeartBeat heartbeat) {
-        ServerRegistration registration = ServerRegistration.fromHeartBeat(heartbeat);
+        ServerIdentity identity = ServerIdentity.fromHeartBeat(heartbeat);
         Server server = new Server();
-        server.setHost(registration.getHost());
-        server.setPort(registration.getPort());
-        server.setId(registration.getProcessId());
-        server.setCreateTime(new java.util.Date(registration.getStartupTime()));
+        server.setHost(identity.getHost());
+        server.setPort(identity.getPort());
+        server.setId(identity.getProcessId());
+        server.setCreateTime(new java.util.Date(identity.getStartupTime()));
         when(registry.getServerList(type)).thenReturn(Collections.singletonList(server));
     }
 }

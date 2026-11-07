@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -50,14 +50,14 @@ public class ClusterManager {
         synchronized (masterClusters) {
             registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), masterClusters);
             registryClient.getServerList(RegistryNodeType.MASTER).forEach(server -> masterClusters.onServerAdded(
-                    MasterServerMetadata.fromRegistration(
-                            JSONUtils.parseObject(server.getHeartBeatInfo(), ServerRegistration.class))));
+                    MasterServerMetadata.fromIdentity(
+                            JSONUtils.parseObject(server.getHeartBeatInfo(), ServerIdentity.class))));
         }
         synchronized (workerClusters) {
             registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), workerClusters);
             registryClient.getServerList(RegistryNodeType.WORKER).forEach(server -> workerClusters.onServerAdded(
-                    WorkerServerMetadata.fromRegistration(
-                            JSONUtils.parseObject(server.getHeartBeatInfo(), ServerRegistration.class))));
+                    WorkerServerMetadata.fromIdentity(
+                            JSONUtils.parseObject(server.getHeartBeatInfo(), ServerIdentity.class))));
         }
         workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerClusters);
         workerGroupChangeNotifier.start();

@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
@@ -104,19 +104,19 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
     void registry() {
         log.info("Master node : {} registering to registry center", masterConfig.getMasterAddress());
         String masterRegistryPath = masterConfig.getMasterRegistryPath();
-        ServerRegistration registration = ServerRegistration.fromHeartBeat(getServerMetadata());
+        ServerIdentity identity = ServerIdentity.fromHeartBeat(getServerMetadata());
 
         // remove before persist
         registryClient.remove(masterRegistryPath);
         registryClient.persistEphemeral(masterRegistryPath,
-                JSONUtils.toJsonString(registration));
+                JSONUtils.toJsonString(identity));
 
         while (!registryClient.checkNodeExists(NetUtils.getHost(), RegistryNodeType.MASTER)) {
             log.warn("The current master server node:{} cannot find in registry", NetUtils.getHost());
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
-        selfFailoverMonitor = new SelfFailoverMonitor(registryClient, registration,
+        selfFailoverMonitor = new SelfFailoverMonitor(registryClient, identity,
                 masterConfig.getMaxHeartbeatInterval());
         selfFailoverMonitor.start();
         log.info("Master node : {} registered to registry center successfully", masterConfig.getMasterAddress());
