@@ -22,7 +22,7 @@ import org.apache.dolphinscheduler.alert.metrics.AlertServerMetrics;
 import org.apache.dolphinscheduler.alert.service.AlertHAServer;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.extract.alert.IAlertMetadataService;
@@ -74,13 +74,13 @@ public class AlertRegistryClient implements AutoCloseable, IAlertMetadataService
             return;
         }
         Host host = Host.of(alertConfig.getAlertServerAddress());
-        ServerRegistration registration = new ServerRegistration();
-        registration.setHost(host.getIp());
-        registration.setPort(host.getPort());
-        registration.setProcessId(processId);
-        registration.setStartupTime(startupTime);
+        ServerIdentity identity = new ServerIdentity();
+        identity.setHost(host.getIp());
+        identity.setPort(host.getPort());
+        identity.setProcessId(processId);
+        identity.setStartupTime(startupTime);
         registryClient.persistEphemeral(RegistryNodeType.ALERT_SERVER.getRegistryPath() + "/" + host.getAddress(),
-                JSONUtils.toJsonString(registration));
+                JSONUtils.toJsonString(identity));
     }
 
     @Override

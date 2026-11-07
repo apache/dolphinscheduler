@@ -20,23 +20,23 @@ package org.apache.dolphinscheduler.common.model;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/** Stable identity stored in the registry for one server process. */
+/** Stable identity of one server process. */
 @Data
 @NoArgsConstructor
-public class ServerRegistration {
+public class ServerIdentity {
 
     private String host;
     private int port;
     private int processId;
     private long startupTime;
 
-    public static ServerRegistration fromHeartBeat(BaseHeartBeat heartBeat) {
-        ServerRegistration registration = new ServerRegistration();
-        registration.setHost(heartBeat.getHost());
-        registration.setPort(heartBeat.getPort());
-        registration.setProcessId(heartBeat.getProcessId());
-        registration.setStartupTime(heartBeat.getStartupTime());
-        return registration;
+    public static ServerIdentity fromHeartBeat(BaseHeartBeat heartBeat) {
+        ServerIdentity identity = new ServerIdentity();
+        identity.setHost(heartBeat.getHost());
+        identity.setPort(heartBeat.getPort());
+        identity.setProcessId(heartBeat.getProcessId());
+        identity.setStartupTime(heartBeat.getStartupTime());
+        return identity;
     }
 
     public String getAddress() {

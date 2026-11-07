@@ -29,7 +29,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.IStoppable;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 
 import java.time.Duration;
@@ -50,22 +50,22 @@ class SelfFailoverMonitorTest {
     private final IStoppable stoppable = mock(IStoppable.class);
     private final ScheduledExecutorService executor = mock(ScheduledExecutorService.class);
     private final ScheduledFuture<?> future = mock(ScheduledFuture.class);
-    private final ServerRegistration registration = new ServerRegistration();
+    private final ServerIdentity identity = new ServerIdentity();
     private SelfFailoverMonitor monitor;
     private Runnable check;
     private String path;
 
     @BeforeEach
     void setUp() {
-        registration.setHost("localhost");
-        registration.setPort(1234);
-        registration.setProcessId(10);
-        registration.setStartupTime(100);
+        identity.setHost("localhost");
+        identity.setPort(1234);
+        identity.setProcessId(10);
+        identity.setStartupTime(100);
         path = RegistryUtils.getFailoveredNodePath("localhost:1234", 100, 10);
         when(registry.getStoppable()).thenReturn(stoppable);
         doReturn(future).when(executor).scheduleWithFixedDelay(any(Runnable.class), eq(0L), eq(1000L),
                 eq(TimeUnit.MILLISECONDS));
-        monitor = new SelfFailoverMonitor(registry, registration, Duration.ofSeconds(1), executor);
+        monitor = new SelfFailoverMonitor(registry, identity, Duration.ofSeconds(1), executor);
         monitor.start();
         ArgumentCaptor<Runnable> action = ArgumentCaptor.forClass(Runnable.class);
         verify(executor).scheduleWithFixedDelay(action.capture(), eq(0L), eq(1000L), eq(TimeUnit.MILLISECONDS));
@@ -113,7 +113,7 @@ class SelfFailoverMonitorTest {
         AtomicBoolean interrupted = new AtomicBoolean(true);
         CountDownLatch stopped = new CountDownLatch(1);
         SelfFailoverMonitor actualMonitor =
-                new SelfFailoverMonitor(registry, registration, Duration.ofSeconds(1), actual);
+                new SelfFailoverMonitor(registry, identity, Duration.ofSeconds(1), actual);
         when(registry.exists(path)).thenReturn(true);
         when(registry.getStoppable()).thenReturn(reason -> {
             actualMonitor.close();

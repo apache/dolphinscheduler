@@ -24,7 +24,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -52,14 +52,14 @@ class RegistryClientTest {
     private void assertStableRegistration(RegistryNodeType type) {
         Registry registry = mock(Registry.class);
         when(registry.exists(anyString())).thenReturn(true);
-        ServerRegistration registration = new ServerRegistration();
-        registration.setHost("localhost");
-        registration.setPort(1234);
-        registration.setProcessId(10);
-        registration.setStartupTime(100);
+        ServerIdentity identity = new ServerIdentity();
+        identity.setHost("localhost");
+        identity.setPort(1234);
+        identity.setProcessId(10);
+        identity.setStartupTime(100);
         when(registry.children(type.getRegistryPath())).thenReturn(Collections.singletonList("localhost:1234"));
         when(registry.get(type.getRegistryPath() + "/localhost:1234"))
-                .thenReturn(JSONUtils.toJsonString(registration));
+                .thenReturn(JSONUtils.toJsonString(identity));
         Server server = new RegistryClient(registry).getServerList(type).get(0);
         assertEquals("localhost", server.getHost());
         assertEquals(1234, server.getPort());

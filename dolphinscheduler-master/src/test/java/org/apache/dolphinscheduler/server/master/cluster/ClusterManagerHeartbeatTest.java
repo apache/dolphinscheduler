@@ -32,7 +32,7 @@ import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.BaseHeartBeat;
 import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
@@ -143,19 +143,19 @@ class ClusterManagerHeartbeatTest {
     }
 
     private void register(RegistryNodeType type, BaseHeartBeat heartbeat) {
-        ServerRegistration registration = ServerRegistration.fromHeartBeat(heartbeat);
+        ServerIdentity identity = ServerIdentity.fromHeartBeat(heartbeat);
         Server server = new Server();
-        server.setHost(registration.getHost());
-        server.setPort(registration.getPort());
-        server.setId(registration.getProcessId());
-        server.setCreateTime(new Date(registration.getStartupTime()));
-        server.setHeartBeatInfo(JSONUtils.toJsonString(registration));
+        server.setHost(identity.getHost());
+        server.setPort(identity.getPort());
+        server.setId(identity.getProcessId());
+        server.setCreateTime(new Date(identity.getStartupTime()));
+        server.setHeartBeatInfo(JSONUtils.toJsonString(identity));
         when(registry.getServerList(type)).thenReturn(Collections.singletonList(server));
     }
 
     private void notify(RegistryNodeType type, Event.Type eventType, BaseHeartBeat heartbeat) {
         watches.get(type).notify(Event.builder().type(eventType)
-                .eventData(JSONUtils.toJsonString(ServerRegistration.fromHeartBeat(heartbeat))).build());
+                .eventData(JSONUtils.toJsonString(ServerIdentity.fromHeartBeat(heartbeat))).build());
     }
 
     @Test

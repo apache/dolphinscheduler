@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 
 import lombok.Builder;
@@ -55,9 +55,9 @@ public class WorkerServerMetadata extends BaseServerMetadata {
         return metadataStale ? ServerStatus.BUSY : super.getServerStatus();
     }
 
-    public static WorkerServerMetadata fromRegistration(ServerRegistration registration) {
-        return WorkerServerMetadata.builder().address(registration.getAddress()).processId(registration.getProcessId())
-                .serverStartupTime(registration.getStartupTime())
+    public static WorkerServerMetadata fromIdentity(ServerIdentity identity) {
+        return WorkerServerMetadata.builder().address(identity.getAddress()).processId(identity.getProcessId())
+                .serverStartupTime(identity.getStartupTime())
                 .workerGroup(null).serverStatus(ServerStatus.BUSY).metadataStale(true).build();
     }
 

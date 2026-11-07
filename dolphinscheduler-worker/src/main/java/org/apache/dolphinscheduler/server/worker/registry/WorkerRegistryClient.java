@@ -23,7 +23,7 @@ import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.lifecycle.ServerLifeCycleManager;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -87,11 +87,11 @@ public class WorkerRegistryClient implements AutoCloseable, IWorkerMetadataServi
 
     private void registry() {
         String workerRegistryPath = workerConfig.getWorkerRegistryPath();
-        ServerRegistration registration = ServerRegistration.fromHeartBeat(getServerMetadata());
+        ServerIdentity identity = ServerIdentity.fromHeartBeat(getServerMetadata());
         // remove before persist
         registryClient.remove(workerRegistryPath);
         registryClient.persistEphemeral(workerRegistryPath,
-                JSONUtils.toJsonString(registration));
+                JSONUtils.toJsonString(identity));
         log.info("Worker node: {} registry to registry center {} successfully", workerConfig.getWorkerAddress(),
                 workerRegistryPath);
 
@@ -99,7 +99,7 @@ public class WorkerRegistryClient implements AutoCloseable, IWorkerMetadataServi
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
-        selfFailoverMonitor = new SelfFailoverMonitor(registryClient, registration,
+        selfFailoverMonitor = new SelfFailoverMonitor(registryClient, identity,
                 workerConfig.getMaxHeartbeatInterval());
         selfFailoverMonitor.start();
         log.info("Worker node: {} registry finished", workerConfig.getWorkerAddress());

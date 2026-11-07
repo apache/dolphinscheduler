@@ -17,7 +17,7 @@
 
 package org.apache.dolphinscheduler.registry.api;
 
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 
@@ -39,16 +39,16 @@ public class SelfFailoverMonitor implements AutoCloseable {
     private ScheduledFuture<?> checkFuture;
     private boolean closed;
 
-    public SelfFailoverMonitor(RegistryClient registryClient, ServerRegistration registration, Duration checkInterval) {
-        this(registryClient, registration, checkInterval,
+    public SelfFailoverMonitor(RegistryClient registryClient, ServerIdentity identity, Duration checkInterval) {
+        this(registryClient, identity, checkInterval,
                 ThreadUtils.newSingleDaemonScheduledExecutorService("SelfFailoverMonitor"));
     }
 
-    SelfFailoverMonitor(RegistryClient registryClient, ServerRegistration registration, Duration checkInterval,
+    SelfFailoverMonitor(RegistryClient registryClient, ServerIdentity identity, Duration checkInterval,
                         ScheduledExecutorService executor) {
         this.registryClient = registryClient;
-        this.failoverPath = RegistryUtils.getFailoveredNodePath(registration.getAddress(),
-                registration.getStartupTime(), registration.getProcessId());
+        this.failoverPath = RegistryUtils.getFailoveredNodePath(identity.getAddress(),
+                identity.getStartupTime(), identity.getProcessId());
         this.checkIntervalMillis = checkInterval.toMillis();
         if (checkIntervalMillis <= 0) {
             throw new IllegalArgumentException("Failover check interval must be positive");

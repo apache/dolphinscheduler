@@ -20,7 +20,7 @@ package org.apache.dolphinscheduler.registry.api;
 import org.apache.dolphinscheduler.common.IStoppable;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.model.Server;
-import org.apache.dolphinscheduler.common.model.ServerRegistration;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
@@ -89,11 +89,11 @@ public class RegistryClient {
                 case MASTER:
                 case WORKER:
                 case ALERT_SERVER:
-                    ServerRegistration registration = JSONUtils.parseObject(heartBeatJson, ServerRegistration.class);
-                    server.setCreateTime(new Date(registration.getStartupTime()));
-                    server.setId(registration.getProcessId());
-                    server.setHost(registration.getHost());
-                    server.setPort(registration.getPort());
+                    ServerIdentity identity = JSONUtils.parseObject(heartBeatJson, ServerIdentity.class);
+                    server.setCreateTime(new Date(identity.getStartupTime()));
+                    server.setId(identity.getProcessId());
+                    server.setHost(identity.getHost());
+                    server.setPort(identity.getPort());
                     break;
                 default:
                     log.warn("unknown registry node type: {}", registryNodeType);
