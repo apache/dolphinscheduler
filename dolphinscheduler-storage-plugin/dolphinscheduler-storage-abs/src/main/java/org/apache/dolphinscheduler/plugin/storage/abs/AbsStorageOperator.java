@@ -129,7 +129,16 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
     @SneakyThrows
     @Override
     public void delete(String filePath, boolean recursive) {
-        blobContainerClient.getBlobClient(filePath).deleteIfExists();
+        String absKey = transformAbsolutePathToAbsKey(filePath);
+        if (recursive && getResourceMetaData(filePath).isDirectory()) {
+            // The prefix listing contains the directory marker blob as well
+            ListBlobsOptions options = new ListBlobsOptions().setPrefix(absKey);
+            for (BlobItem blobItem : blobContainerClient.listBlobs(options, null)) {
+                blobContainerClient.getBlobClient(blobItem.getName()).deleteIfExists();
+            }
+            return;
+        }
+        blobContainerClient.getBlobClient(absKey).deleteIfExists();
     }
 
     @Override
