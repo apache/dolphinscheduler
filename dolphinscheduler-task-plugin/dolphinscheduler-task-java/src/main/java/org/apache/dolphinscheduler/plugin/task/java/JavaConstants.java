@@ -48,4 +48,9 @@ public class JavaConstants {
      **/
     public static final String CLASSPATH_CURRENT_DIR = ".";
 
+    /**
+     * This constant represents the use of JShell to run a Java snippet.
+     */
+    public static final String RUN_TYPE_JSHELL = "JSHELL";
+
 }

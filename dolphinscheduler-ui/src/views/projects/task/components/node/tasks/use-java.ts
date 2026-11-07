@@ -52,7 +52,8 @@ export function useJava({
     mainArgs: '',
     jvmArgs: '',
     mainClass: '',
-    programType: 'JAVA'
+    programType: 'JAVA',
+    jshellScript: ''
   } as unknown as INodeData)
 
   let extra: IJsonItem[] = []
