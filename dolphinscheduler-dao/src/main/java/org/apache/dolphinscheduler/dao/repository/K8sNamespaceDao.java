@@ -25,6 +25,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 
 public interface K8sNamespaceDao extends IDao<K8sNamespace> {
 
+    List<K8sNamespace> queryByProject(long projectCode);
+
     IPage<K8sNamespace> queryK8sNamespacePaging(IPage<K8sNamespace> page, String searchVal);
 
     boolean existNamespace(String namespace, Long clusterCode);

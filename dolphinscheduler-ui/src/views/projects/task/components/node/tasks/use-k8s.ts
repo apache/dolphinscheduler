@@ -61,13 +61,13 @@ export function useK8s({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),
-      Fields.useEnvironmentName(model, !data?.id),
+      Fields.useEnvironmentName(model, !data?.id, projectCode),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useDatasource(model),
-      ...Fields.useK8s(model),
+      ...Fields.useDatasource(model, projectCode),
+      ...Fields.useK8s(model, projectCode),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model

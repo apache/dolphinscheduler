@@ -17,8 +17,11 @@
 
 package org.apache.dolphinscheduler.dao.mapper;
 
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.dao.BaseDaoTest;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
+import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
 import java.util.Date;
 import java.util.List;
@@ -36,6 +39,9 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
 
     @Autowired
     K8sNamespaceMapper k8sNamespaceMapper;
+
+    @Autowired
+    ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     /**
      * insert
@@ -128,6 +134,31 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
         k8sNamespaceIPage = k8sNamespaceMapper.queryK8sNamespacePaging(page, "abc");
         k8sNamespaceList = k8sNamespaceIPage.getRecords();
         Assertions.assertEquals(k8sNamespaceList.size(), 0);
+    }
+
+    @Test
+    public void testProjectNamespaceVisibilityUsesExactGrantAndRevocation() {
+        K8sNamespace namespace = insertOne();
+        K8sNamespace otherCluster = new K8sNamespace();
+        otherCluster.setCode(1000L);
+        otherCluster.setNamespace(namespace.getNamespace());
+        otherCluster.setClusterCode(200L);
+        otherCluster.setCreateTime(new Date());
+        otherCluster.setUpdateTime(new Date());
+        k8sNamespaceMapper.insert(otherCluster);
+        ProjectResourceAuthorization grant = new ProjectResourceAuthorization();
+        grant.setProjectCode(100L);
+        grant.setResourceType(ProjectResourceType.K8S_NAMESPACE);
+        grant.setResourceKey(namespace.getId().toString());
+        resourceAuthorizationDao.insert(grant);
+
+        List<K8sNamespace> visible = k8sNamespaceMapper.queryByProject(100L);
+        Assertions.assertEquals(1, visible.size());
+        Assertions.assertEquals(namespace.getId(), visible.get(0).getId());
+        Assertions.assertTrue(k8sNamespaceMapper.queryByProject(200L).isEmpty());
+        resourceAuthorizationDao.revokeAuthorization(100L, ProjectResourceType.K8S_NAMESPACE,
+                namespace.getId().toString());
+        Assertions.assertTrue(k8sNamespaceMapper.queryByProject(100L).isEmpty());
     }
 
 }

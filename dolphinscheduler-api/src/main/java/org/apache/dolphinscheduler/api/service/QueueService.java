@@ -33,6 +33,8 @@ public interface QueueService {
      */
     List<Queue> queryList(User loginUser);
 
+    List<Queue> queryList(User loginUser, Long projectCode);
+
     /**
      * query queue list paging
      *
@@ -81,7 +83,7 @@ public interface QueueService {
      * @param queue     queue
      * @param queueName queue name
      */
-    void verifyQueue(String queue, String queueName);
+    void verifyQueue(User loginUser, String queue, String queueName);
 
     /**
      * Make sure queue with given name exists, and create the queue if not exists

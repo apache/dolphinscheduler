@@ -44,7 +44,7 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
     private static final String QUEUE_CREATE_STRING = "queue1";
 
     @Test
-    public void testQueryListAll() throws Exception {
+    public void testQueryListForMissingProject() throws Exception {
         MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
         paramsMap.add("pageNo", "2");
         paramsMap.add("pageSize", "2");
@@ -57,7 +57,8 @@ public class TaskGroupControllerTest extends AbstractControllerTest {
                 .andReturn();
 
         Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertTrue(result != null && result.isSuccess());
+        Assertions.assertEquals(org.apache.dolphinscheduler.api.enums.Status.PROJECT_NOT_EXIST.getCode(),
+                result.getCode());
         logger.info("query list queue return result:{}", mvcResult.getResponse().getContentAsString());
     }
 

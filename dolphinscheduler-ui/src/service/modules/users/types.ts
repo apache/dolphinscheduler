@@ -42,10 +42,6 @@ interface UserIdReq {
   userId: number
 }
 
-interface GrantDataSourceReq extends UserIdReq {
-  datasourceIds: string
-}
-
 interface GrantResourceReq extends UserIdReq {
   resourceIds: string
 }
@@ -56,10 +52,6 @@ interface GrantProject extends UserIdReq {
 
 interface ProjectCodeReq {
   projectCode: string
-}
-
-interface GrantNamespaceReq {
-  namespaceIds: string
 }
 
 interface ListAllReq extends UserReq {
@@ -105,11 +97,9 @@ export {
   UserReq,
   IdReq,
   UserIdReq,
-  GrantDataSourceReq,
   GrantResourceReq,
   GrantProject,
   ProjectCodeReq,
-  GrantNamespaceReq,
   ListAllReq,
   ListReq,
   RegisterUserReq,

@@ -23,14 +23,17 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -39,7 +42,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -48,6 +50,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -55,6 +58,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Service
 @Slf4j
 public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
+
+    @Autowired
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Autowired
     private QueueDao queueDao;
@@ -117,14 +126,20 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return queue list
      */
     @Override
-    public List<Queue> queryList(User loginUser) {
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
-                loginUser.getId(), log);
-        if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
-            ids = ids.isEmpty() ? new HashSet<>() : ids;
-            ids.add(Constants.DEFAULT_QUEUE_ID);
+    public List<Queue> queryList(User loginUser, Long projectCode) {
+        if (projectCode == null) {
+            return queryList(loginUser);
         }
-        return queueDao.queryByIds(ids);
+        projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
+        return queueDao.queryByProject(projectCode);
+    }
+
+    @Override
+    public List<Queue> queryList(User loginUser) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+        return queueDao.queryAll();
     }
 
     /**
@@ -214,6 +229,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @throws Exception exception
      */
     @Override
+    @Transactional
     public void deleteQueueById(User loginUser, int id) throws Exception {
 
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_DELETE)) {
@@ -241,6 +257,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         if (!queueDao.deleteById(id)) {
             throw new ServiceException(Status.DELETE_QUEUE_BY_ID_ERROR);
         }
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.QUEUE, Integer.toString(id));
 
     }
 
@@ -252,7 +269,10 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue name not exists, otherwise return false
      */
     @Override
-    public void verifyQueue(String queue, String queueName) {
+    public void verifyQueue(User loginUser, String queue, String queueName) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         Queue queueValidator = new Queue(queueName, queue);
         validQueue(queueValidator);
     }

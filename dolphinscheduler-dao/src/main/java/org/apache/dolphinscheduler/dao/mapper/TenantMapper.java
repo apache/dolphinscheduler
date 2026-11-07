@@ -29,6 +29,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface TenantMapper extends BaseMapper<Tenant> {
 
+    List<Tenant> queryByProject(@Param("projectCode") long projectCode);
+
     /**
      * query tenant by id
      *

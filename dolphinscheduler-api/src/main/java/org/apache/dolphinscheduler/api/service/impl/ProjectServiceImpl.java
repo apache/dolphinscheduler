@@ -17,46 +17,42 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_CREATE;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_DELETE;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
-import org.apache.dolphinscheduler.api.service.TaskGroupService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
-import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
+import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
+import org.apache.dolphinscheduler.dao.entity.ProjectUserPermission;
 import org.apache.dolphinscheduler.dao.entity.ProjectWorkflowDefinitionCount;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
-import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectUserPermissionDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
-
-import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,13 +69,16 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
     @Lazy
     @Autowired
-    private TaskGroupService taskGroupService;
-
-    @Autowired
     private ProjectDao projectDao;
 
     @Autowired
-    private ProjectUserDao projectUserDao;
+    private ProjectResourceAuthorizationDao projectResourceAuthorizationDao;
+
+    @Autowired
+    private ProjectUserPermissionDao projectUserPermissionDao;
+
+    @Autowired
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Autowired
     private WorkflowDefinitionDao workflowDefinitionDao;
@@ -130,6 +129,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 .build();
 
         if (projectDao.insert(project) > 0) {
+            for (ProjectPermission permission : ProjectPermission.values()) {
+                ProjectUserPermission grant = new ProjectUserPermission();
+                grant.setProjectCode(project.getCode());
+                grant.setUserId(loginUser.getId());
+                grant.setPermission(permission);
+                grant.setCreateTime(now);
+                projectUserPermissionDao.insert(grant);
+            }
             log.info("Project is created and id is :{}", project.getId());
             result.setData(project);
             putMsg(result, Status.SUCCESS);
@@ -165,7 +172,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result queryByCode(User loginUser, long projectCode) {
         Result result = new Result();
         Project project = projectDao.queryByCode(projectCode);
-        checkProjectAndAuthThrowException(loginUser, project, PROJECT);
+        checkProjectReadPermissionThrowException(loginUser, project);
         result.setData(project);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -174,55 +181,28 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     @Override
     public Project queryByName(User loginUser, String projectName) {
         Project project = projectDao.queryByName(projectName);
-        checkProjectAndAuthThrowException(loginUser, project, PROJECT);
+        checkProjectReadPermissionThrowException(loginUser, project);
         return project;
     }
 
-    @Override
-    public void checkProjectAndAuthThrowException(@NonNull User loginUser, @Nullable Project project,
-                                                  String permission) {
+    private void checkProjectReadPermissionThrowException(User loginUser, Project project) {
         if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_EXIST);
         }
-        if (!canOperatorPermissions(loginUser, new Object[]{project.getId()}, AuthorizationType.PROJECTS, permission)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(),
-                    project.getCode());
-        }
+        projectAuthorizationService.requirePermission(loginUser, project.getCode(), ProjectPermission.VIEW);
     }
 
     @Override
-    public void checkProjectAndAuthThrowException(User loginUser, Long projectCode, String permission) {
-        if (projectCode == null) {
+    public void checkProjectPermission(User loginUser, Project project, ProjectPermission permission) {
+        if (project == null) {
             throw new ServiceException(Status.PROJECT_NOT_EXIST);
         }
-        Project project = projectDao.queryByCode(projectCode);
-        checkProjectAndAuthThrowException(loginUser, project, permission);
+        projectAuthorizationService.requirePermission(loginUser, project.getCode(), permission);
     }
 
     @Override
-    public void checkHasProjectWritePermissionThrowException(User loginUser, long projectCode) {
-        Project project = projectDao.queryByCode(projectCode);
-        checkHasProjectWritePermissionThrowException(loginUser, project);
-    }
-
-    @Override
-    public void checkHasProjectWritePermissionThrowException(User loginUser, Project project) {
-        if (project == null) {
-            throw new ServiceException(Status.PROJECT_NOT_FOUND, null);
-        }
-        // case 1: user is admin
-        if (loginUser.getUserType() == UserType.ADMIN_USER) {
-            return;
-        }
-        // case 2: user is project owner
-        if (project.getUserId().equals(loginUser.getId())) {
-            return;
-        }
-        // case 3: check user permission level
-        ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), loginUser.getId());
-        if (projectUser == null || projectUser.getPerm() != Constants.DEFAULT_ADMIN_PERMISSION) {
-            throw new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM, loginUser.getUserName(), project.getCode());
-        }
+    public void checkProjectPermission(User loginUser, long projectCode, ProjectPermission permission) {
+        projectAuthorizationService.requirePermission(loginUser, projectCode, permission);
     }
 
     /**
@@ -239,22 +219,11 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<Project> page = new Page<>(pageNo, pageSize);
-        Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
-        if (projectIds.isEmpty()) {
-            result.setData(pageInfo);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
-        IPage<Project> projectIPage =
-                projectDao.queryProjectListPaging(page, new ArrayList<>(projectIds), searchVal);
+        IPage<Project> projectIPage = projectDao.queryVisibleProjectListPaging(
+                page, loginUser.getId(), loginUser.getUserType() == UserType.ADMIN_USER, searchVal);
 
+        pageInfo.setTotal((int) projectIPage.getTotal());
         List<Project> projectList = projectIPage.getRecords();
-        if (loginUser.getUserType() != UserType.ADMIN_USER) {
-            for (Project project : projectList) {
-                project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
-            }
-        }
         if (CollectionUtils.isEmpty(projectList)) {
             result.setData(pageInfo);
             putMsg(result, Status.SUCCESS);
@@ -269,11 +238,18 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
                 .stream()
                 .collect(Collectors.toMap(ProjectWorkflowDefinitionCount::getProjectCode,
                         ProjectWorkflowDefinitionCount::getCount));
+        Map<Long, Set<ProjectPermission>> permissions = loginUser.getUserType() == UserType.ADMIN_USER
+                ? Collections.emptyMap()
+                : projectUserPermissionDao.queryByProjectsAndUser(projectCodes, loginUser.getId()).stream()
+                        .collect(Collectors.groupingBy(ProjectUserPermission::getProjectCode,
+                                Collectors.mapping(ProjectUserPermission::getPermission, Collectors.toSet())));
         for (Project project : projectList) {
+            project.setPermissions(loginUser.getUserType() == UserType.ADMIN_USER
+                    ? EnumSet.allOf(ProjectPermission.class)
+                    : permissions.getOrDefault(project.getCode(), Collections.emptySet()));
             project.setUserName(userMap.get(project.getUserId()));
             project.setDefCount(projectWorkflowDefinitionCountMap.getOrDefault(project.getCode(), 0));
         }
-        pageInfo.setTotal((int) projectIPage.getTotal());
         pageInfo.setTotalList(projectList);
         result.setData(pageInfo);
         putMsg(result, Status.SUCCESS);
@@ -296,33 +272,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         Result result = new Result();
         PageInfo<Project> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<Project> page = new Page<>(pageNo, pageSize);
-        Set<Integer> allProjectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
-        Set<Integer> userProjectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, userId, log);
-        if (allProjectIds.isEmpty()) {
-            result.setData(pageInfo);
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
-        IPage<Project> projectIPage =
-                projectDao.queryProjectListPaging(page, new ArrayList<>(allProjectIds), searchVal);
-
+        IPage<Project> projectIPage = projectDao.queryProjectAuthorizationLevelsPaging(page, loginUser.getId(),
+                loginUser.getUserType() == UserType.ADMIN_USER, userId, searchVal);
         List<Project> projectList = projectIPage.getRecords();
-
-        for (Project project : projectList) {
-            if (userProjectIds.contains(project.getId())) {
-                ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), userId);
-                if (projectUser == null) {
-                    // in this case, the user is the project owner, maybe it's better to set it to ALL_PERMISSION.
-                    project.setPerm(Constants.DEFAULT_ADMIN_PERMISSION);
-                } else {
-                    project.setPerm(projectUser.getPerm());
-                }
-            } else {
-                project.setPerm(0);
-            }
-        }
 
         pageInfo.setTotal((int) projectIPage.getTotal());
         pageInfo.setTotalList(projectList);
@@ -339,12 +291,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return delete result code
      */
     @Override
+    @Transactional
     public Result deleteProject(User loginUser, Long projectCode) {
         Result result = new Result();
         Project project = projectDao.queryByCode(projectCode);
 
-        checkHasProjectWritePermissionThrowException(loginUser, project);
-        checkProjectAndAuthThrowException(loginUser, project, PROJECT_DELETE);
+        checkProjectOwnerOrAdministrator(loginUser, project);
 
         List<WorkflowDefinition> workflowDefinitionList =
                 workflowDefinitionDao.queryAllDefinitionList(project.getCode());
@@ -354,11 +306,14 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
             putMsg(result, Status.DELETE_PROJECT_ERROR_DEFINES_NOT_NULL);
             return result;
         }
-        // delete the task group
-        taskGroupService.deleteTaskGroupByProjectCode(project.getCode());
-
         boolean delete = projectDao.deleteById(project.getId());
         if (delete) {
+            ProjectUserPermission memberPermissions = new ProjectUserPermission();
+            memberPermissions.setProjectCode(projectCode);
+            projectUserPermissionDao.deleteByCondition(memberPermissions);
+            ProjectResourceAuthorization resources = new ProjectResourceAuthorization();
+            resources.setProjectCode(projectCode);
+            projectResourceAuthorizationDao.deleteByCondition(resources);
             log.info("Project is deleted and id is :{}.", project.getId());
             result.setData(Boolean.TRUE);
             putMsg(result, Status.SUCCESS);
@@ -388,7 +343,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         }
 
         Project project = projectDao.queryByCode(projectCode);
-        checkHasProjectWritePermissionThrowException(loginUser, project);
+        checkProjectOwnerOrAdministrator(loginUser, project);
         Project tempProject = projectDao.queryByName(projectName);
         if (tempProject != null && tempProject.getCode() != project.getCode()) {
             putMsg(result, Status.PROJECT_ALREADY_EXISTS, projectName);
@@ -403,7 +358,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         project.setName(projectName);
         project.setDescription(desc);
         project.setUpdateTime(new Date());
-        project.setUserId(user.getId());
         boolean update = projectDao.updateById(project);
         if (update) {
             log.info("Project is updated and id is :{}", project.getId());
@@ -416,6 +370,17 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         return result;
     }
 
+    private void checkProjectOwnerOrAdministrator(User loginUser, Project project) {
+        if (project == null) {
+            throw new ServiceException(Status.PROJECT_NOT_EXIST);
+        }
+        if (loginUser.getUserType() != UserType.ADMIN_USER
+                && !Objects.equals(loginUser.getId(), project.getUserId())) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(),
+                    project.getCode());
+        }
+    }
+
     /**
      * query all project with authorized level
      *
@@ -424,38 +389,8 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     @Override
     public Result queryProjectWithAuthorizedLevel(User loginUser, Integer userId) {
-        Result result = new Result();
-
-        Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
-        List<Project> projectList = projectDao.listAuthorizedProjects(
-                loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),
-                new ArrayList<>(projectIds));
-
-        List<Project> unauthorizedProjectsList = new ArrayList<>();
-        List<Project> authedProjectList = new ArrayList<>();
-        Set<Project> projectSet;
-        if (projectList != null && !projectList.isEmpty()) {
-            projectSet = new HashSet<>(projectList);
-            authedProjectList = projectDao.queryAuthedProjectListByUserId(userId);
-            unauthorizedProjectsList = getUnauthorizedProjects(projectSet, authedProjectList);
-        }
-
-        for (int i = 0; i < authedProjectList.size(); i++) {
-            authedProjectList.get(i).setPerm(7);
-        }
-
-        for (int i = 0; i < unauthorizedProjectsList.size(); i++) {
-            unauthorizedProjectsList.get(i).setPerm(0);
-        }
-
-        List<Project> joined = new ArrayList<>();
-        joined.addAll(authedProjectList);
-        joined.addAll(unauthorizedProjectsList);
-
-        result.setData(joined);
-        putMsg(result, Status.SUCCESS);
-        return result;
+        return Result.success(projectDao.queryProjectAuthorizationLevels(loginUser.getId(),
+                loginUser.getUserType() == UserType.ADMIN_USER, userId));
     }
 
     /**
@@ -467,49 +402,9 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     @Override
     public Result queryUnauthorizedProject(User loginUser, Integer userId) {
-        Result result = new Result();
-
-        Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
-        if (projectIds.isEmpty()) {
-            result.setData(Collections.emptyList());
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
-        List<Project> projectList = projectDao.listAuthorizedProjects(
-                loginUser.getUserType().equals(UserType.ADMIN_USER) ? 0 : loginUser.getId(),
-                new ArrayList<>(projectIds));
-
-        List<Project> resultList = new ArrayList<>();
-        Set<Project> projectSet;
-        if (projectList != null && !projectList.isEmpty()) {
-            projectSet = new HashSet<>(projectList);
-
-            List<Project> authedProjectList = projectDao.queryAuthedProjectListByUserId(userId);
-
-            resultList = getUnauthorizedProjects(projectSet, authedProjectList);
-        }
-        result.setData(resultList);
-        putMsg(result, Status.SUCCESS);
-        return result;
-    }
-
-    /**
-     * get unauthorized project
-     *
-     * @param projectSet        project set
-     * @param authedProjectList authed project list
-     * @return project list that unauthorized
-     */
-    private List<Project> getUnauthorizedProjects(Set<Project> projectSet, List<Project> authedProjectList) {
-        List<Project> resultList;
-        Set<Project> authedProjectSet;
-        if (authedProjectList != null && !authedProjectList.isEmpty()) {
-            authedProjectSet = new HashSet<>(authedProjectList);
-            projectSet.removeAll(authedProjectSet);
-        }
-        resultList = new ArrayList<>(projectSet);
-        return resultList;
+        List<Project> projects = projectDao.queryProjectAuthorizationLevels(loginUser.getId(),
+                loginUser.getUserType() == UserType.ADMIN_USER, userId);
+        return Result.success(projects.stream().filter(project -> project.getPerm() == 0).collect(Collectors.toList()));
     }
 
     /**
@@ -521,13 +416,12 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      */
     @Override
     public Result queryAuthorizedProject(User loginUser, Integer userId) {
-        Result result = new Result();
-
-        List<Project> projects = projectDao.queryAuthedProjectListByUserId(userId);
-        result.setData(projects);
-        putMsg(result, Status.SUCCESS);
-
-        return result;
+        if (Objects.equals(loginUser.getId(), userId)) {
+            return Result.success(projectDao.queryVisibleProjects(userId, false));
+        }
+        List<Project> projects = projectDao.queryProjectAuthorizationLevels(loginUser.getId(),
+                loginUser.getUserType() == UserType.ADMIN_USER, userId);
+        return Result.success(projects.stream().filter(project -> project.getPerm() != 0).collect(Collectors.toList()));
     }
 
     /**
@@ -543,7 +437,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
 
         // 1. check read permission
         Project project = this.projectDao.queryByCode(projectCode);
-        this.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
+        this.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
 
         // 2. query authorized user list
         List<User> users = this.userDao.queryAuthedUserListByProjectId(project.getId());
@@ -567,57 +461,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result queryProjectCreatedAndAuthorizedByUser(User loginUser) {
         Result result = new Result();
 
-        Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
-        if (projectIds.isEmpty()) {
-            result.setData(Collections.emptyList());
-            putMsg(result, Status.SUCCESS);
-            return result;
-        }
-        List<Project> projects = projectDao.queryByIds(projectIds);
+        List<Project> projects =
+                projectDao.queryVisibleProjects(loginUser.getId(), loginUser.getUserType() == UserType.ADMIN_USER);
 
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
 
         return result;
-    }
-
-    /**
-     * check whether have read permission
-     *
-     * @param user    user
-     * @param project project
-     * @return true if the user have permission to see the project, otherwise return false
-     */
-    private boolean checkReadPermission(User user, Project project) {
-        int permissionId = queryPermission(user, project);
-        return (permissionId & Constants.READ_PERMISSION) != 0;
-    }
-
-    /**
-     * query permission id
-     *
-     * @param user    user
-     * @param project project
-     * @return permission
-     */
-    private int queryPermission(User user, Project project) {
-        if (user.getUserType() == UserType.ADMIN_USER) {
-            return Constants.READ_PERMISSION;
-        }
-
-        if (Objects.equals(project.getUserId(), user.getId())) {
-            return Constants.ALL_PERMISSIONS;
-        }
-
-        ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), user.getId());
-
-        if (projectUser == null) {
-            return 0;
-        }
-
-        return projectUser.getPerm();
-
     }
 
     /**
@@ -630,7 +480,7 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
     public Result queryAllProjectList(User user) {
         Result result = new Result();
         List<Project> projects =
-                projectDao.queryAllProject(user.getUserType() == UserType.ADMIN_USER ? 0 : user.getId());
+                projectDao.queryVisibleProjects(user.getId(), user.getUserType() == UserType.ADMIN_USER);
 
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
@@ -643,10 +493,13 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
      * @return project list
      */
     @Override
-    public Result queryAllProjectListForDependent() {
+    public Result queryAllProjectListForDependent(User loginUser) {
         Result result = new Result<>();
         List<Project> projects =
-                projectDao.queryAllProjectForDependent();
+                projectDao.queryVisibleProjects(loginUser.getId(), loginUser.getUserType() == UserType.ADMIN_USER)
+                        .stream()
+                        .map(project -> Project.builder().code(project.getCode()).name(project.getName()).build())
+                        .collect(Collectors.toList());
         result.setData(projects);
         putMsg(result, Status.SUCCESS);
         return result;
@@ -657,14 +510,6 @@ public class ProjectServiceImpl extends BaseServiceImpl implements ProjectServic
         if (loginUser == null) {
             throw new IllegalArgumentException("loginUser can not be null");
         }
-        Set<Integer> projectIds = resourcePermissionCheckService
-                .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, loginUser.getId(), log);
-        if (CollectionUtils.isEmpty(projectIds)) {
-            return Collections.emptyList();
-        }
-        return projectDao.queryByIds(projectIds)
-                .stream()
-                .map(Project::getCode)
-                .collect(Collectors.toList());
+        return projectDao.queryVisibleProjectCodes(loginUser.getId(), loginUser.getUserType() == UserType.ADMIN_USER);
     }
 }

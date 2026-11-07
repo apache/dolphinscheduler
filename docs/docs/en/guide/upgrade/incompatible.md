@@ -59,9 +59,24 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.5.0
 
+* **Datasource management is now restricted to system administrators**: ordinary users lose access to datasource creation, global listing, details and sensitive configuration, modification, connection testing and deletion. Historical creator status and personal grants do not preserve these management capabilities. Ordinary users can still use project resource selectors with `projectCode` and project `VIEW` to query granted datasources, and configure or execute tasks within their project operation permissions.
+* Project metadata updates and deletion are restricted to system administrators and project creators. Updating project metadata preserves the original owner; `DEVELOP` does not grant these project-lifecycle operations.
+* Project operation permissions are `VIEW`, `DEVELOP`, `EXECUTE` and `MANAGE_MEMBERS`. Development includes definition publishing; execution includes schedule management. Workflow version switching requires the workflow and schedule to be offline. Global resource-name verification is administrator-only.
+* Authorization now assigns project operation permissions to users and resource-use grants to projects. The upgrade creates `t_ds_project_user_permission` and `t_ds_project_resource_authorization`. Legacy authorization tables and data are retained, but historical permissions are not migrated automatically. Administrators must assign project member permissions and project resource grants before users can query, configure, publish or manually execute project tasks.
+* Resource queries within a project must include `projectCode` and are filtered by the project's `VIEW` permission and resource grants. Global resource catalogs without a project parameter are restricted to administrators. Personal datasource and Kubernetes namespace authorization APIs are removed; grant these resources to projects instead.
+* PostgreSQL upgrades normalize the built-in default tenant's historical `queue_id=0` to the actual default queue ID, preserving an explicitly configured queue. Projects using this tenant for execution or schedule management require grants for both the tenant and its queue.
+* Project resource grants are checked when saving, publishing, manually starting or rerunning workflows. Revoking a resource grant does not recheck existing running or queued instances, scheduled triggers or automatic retries, and does not take existing schedules offline.
 * Internal RPC authentication is disabled by default. Upgrade all services before coordinating `rpc.authentication.enabled=true` with the same `rpc.authentication.secret` in each service's `common.properties`; authenticated and unauthenticated services cannot communicate. Credentials are cached for the process lifetime, so enablement and rotation require restarting services. See [RPC authentication](../security/authentication-type.md#inter-service-rpc-authentication).
-
 * `AlertSender#getAlertData` now explicitly rejects a null `alertType` by throwing `IllegalArgumentException` with an error log, instead of throwing a raw `NullPointerException`. During a rolling upgrade, **the Alert Server must be upgraded before Master/Worker**, otherwise an old Alert Server cannot recognize newly introduced `alert_type` enum values (e.g. `TASK_RESULT`) and alert delivery will fail. See the [upgrade guide](upgrade.md#rolling-upgrade-order) for details.([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
-
 * SQL task-result alert content is size-limited: by default at most 30 rows are kept, string field values longer than 100 characters are truncated with an ellipsis, and the serialized content is bounded to 60000 UTF-8 bytes (below the 65535-byte capacity of the MySQL TEXT column); rows beyond the budget are represented by an omission marker. These defaults are tunable via `sql.task.alert.max.rows`, `sql.task.alert.max.row.value.length` and `sql.task.alert.max.content.bytes` in `common.properties` (worker restart required). ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
+
+### Project authorization model
+
+See [Security (Authorization System)](../security/security.md#granted-permissions) for operation permissions, resource grants, cross-project checks and when revocation takes effect.
+
+The following diagrams compare the legacy authorization model with project-scoped authorization introduced in 3.5.0.
+
+![Legacy authorization model](../../../../img/architecture-design/project-scoped-authorization-before.png)
+
+![Project-scoped authorization model](../../../../img/architecture-design/project-scoped-authorization.png)
 

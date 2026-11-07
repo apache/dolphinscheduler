@@ -38,6 +38,11 @@ public class QueueDaoImpl extends BaseDao<Queue, QueueMapper> implements QueueDa
     }
 
     @Override
+    public List<Queue> queryByProject(long projectCode) {
+        return mybatisMapper.queryByProject(projectCode);
+    }
+
+    @Override
     public IPage<Queue> queryQueuePaging(IPage<Queue> page, List<Integer> ids, String searchVal) {
         return mybatisMapper.queryQueuePaging(page, ids, searchVal);
     }

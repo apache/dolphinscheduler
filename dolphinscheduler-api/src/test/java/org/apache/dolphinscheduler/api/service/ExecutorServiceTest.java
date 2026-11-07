@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.api.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -32,35 +31,49 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.executor.workflow.BackfillWorkflowExecutorDelegate;
 import org.apache.dolphinscheduler.api.executor.workflow.ExecutorClient;
+import org.apache.dolphinscheduler.api.executor.workflow.RecoverFailureTaskInstanceExecutorDelegate.RecoverFailureTaskInstanceOperation;
+import org.apache.dolphinscheduler.api.executor.workflow.RecoverSuspendedWorkflowInstanceExecutorDelegate.RecoverSuspendedWorkflowInstanceOperation;
+import org.apache.dolphinscheduler.api.executor.workflow.StopWorkflowInstanceExecutorDelegate.StopWorkflowInstanceOperation;
 import org.apache.dolphinscheduler.api.executor.workflow.TriggerWorkflowExecutorDelegate;
+import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
+import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ExecutorServiceImpl;
-import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowRequestTransformer;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTO;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowDTOValidator;
 import org.apache.dolphinscheduler.api.validator.workflow.TriggerWorkflowRequestTransformer;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
 import org.apache.dolphinscheduler.dao.entity.TaskGroupQueue;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.mapper.TaskGroupQueueMapper;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.service.process.ProcessService;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -70,7 +83,16 @@ public class ExecutorServiceTest {
     private ExecutorServiceImpl executorService;
 
     @Mock
-    private ProjectServiceImpl projectService;
+    private ProjectAuthorizationService projectAuthorizationService;
+
+    @Mock
+    private TaskResourcePermissionChecker taskResourcePermissionChecker;
+
+    @Mock
+    private TaskSubWorkflowPermissionChecker taskSubWorkflowPermissionChecker;
+
+    @Mock
+    private TaskDefinitionLogDao taskDefinitionLogDao;
 
     @Mock
     private TriggerWorkflowRequestTransformer triggerWorkflowRequestTransformer;
@@ -111,7 +133,7 @@ public class ExecutorServiceTest {
     }
 
     @Test
-    public void testTriggerWorkflowDefinition_userHasNoProjectWritePermission() {
+    public void testTriggerWorkflowDefinition_userHasNoProjectExecutePermission() {
         long projectCode = 100L;
         long workflowDefinitionCode = 200L;
         User loginUser = getLoginUser();
@@ -122,14 +144,14 @@ public class ExecutorServiceTest {
                 .workflowDefinitionCode(workflowDefinitionCode)
                 .build();
 
-        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
                 loginUser.getUserName(), projectCode))
-                        .when(projectService)
-                        .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+                        .when(projectAuthorizationService)
+                        .requirePermission(loginUser, projectCode, ProjectPermission.EXECUTE);
 
         ServiceException ex = assertThrows(ServiceException.class,
                 () -> executorService.triggerWorkflowDefinition(request));
-        assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
+        assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), ex.getCode());
 
         verify(triggerWorkflowRequestTransformer, never()).transform(Mockito.any());
         verify(triggerWorkflowDTOValidator, never()).validate(Mockito.any());
@@ -148,9 +170,6 @@ public class ExecutorServiceTest {
                 .workflowDefinitionCode(workflowDefinitionCode)
                 .build();
 
-        doNothing().when(projectService)
-                .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
-
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(workflowDefinitionCode);
         workflowDefinition.setProjectCode(otherProjectCode);
@@ -168,7 +187,7 @@ public class ExecutorServiceTest {
     }
 
     @Test
-    public void testBackfillWorkflowDefinition_userHasNoProjectWritePermission() {
+    public void testBackfillWorkflowDefinition_userHasNoProjectExecutePermission() {
         long projectCode = 100L;
         long workflowDefinitionCode = 200L;
         User loginUser = getLoginUser();
@@ -179,14 +198,14 @@ public class ExecutorServiceTest {
                 .workflowDefinitionCode(workflowDefinitionCode)
                 .build();
 
-        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM,
                 loginUser.getUserName(), projectCode))
-                        .when(projectService)
-                        .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+                        .when(projectAuthorizationService)
+                        .requirePermission(loginUser, projectCode, ProjectPermission.EXECUTE);
 
         ServiceException ex = assertThrows(ServiceException.class,
                 () -> executorService.backfillWorkflowDefinition(request));
-        assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
+        assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), ex.getCode());
 
         verify(backfillWorkflowRequestTransformer, never()).transform(Mockito.any());
         verify(backfillWorkflowDTOValidator, never()).validate(Mockito.any());
@@ -205,9 +224,6 @@ public class ExecutorServiceTest {
                 .workflowDefinitionCode(workflowDefinitionCode)
                 .build();
 
-        doNothing().when(projectService)
-                .checkHasProjectWritePermissionThrowException(loginUser, projectCode);
-
         WorkflowDefinition workflowDefinition = new WorkflowDefinition();
         workflowDefinition.setCode(workflowDefinitionCode);
         workflowDefinition.setProjectCode(otherProjectCode);
@@ -225,40 +241,40 @@ public class ExecutorServiceTest {
     }
 
     @Test
-    public void testControlWorkflowInstance_userHasNoProjectWritePermission() {
+    public void testControlWorkflowInstance_userHasNoProjectExecutePermission() {
         long projectCode = 100L;
         int workflowInstanceId = 1;
         User loginUser = getLoginUser();
         WorkflowInstance workflowInstance = new WorkflowInstance();
         workflowInstance.setProjectCode(projectCode);
         when(workflowInstanceDao.queryOptionalById(workflowInstanceId)).thenReturn(Optional.of(workflowInstance));
-        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectAuthorizationService).requirePermission(loginUser, projectCode, ProjectPermission.EXECUTE);
 
         ServiceException ex = assertThrows(ServiceException.class,
                 () -> executorService.controlWorkflowInstance(
                         loginUser, workflowInstanceId, ExecuteType.REPEAT_RUNNING));
 
-        assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
+        assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), ex.getCode());
         Mockito.verifyNoInteractions(executorClient);
     }
 
     @Test
-    public void testExecuteTask_userHasNoProjectWritePermission() {
+    public void testExecuteTask_userHasNoProjectExecutePermission() {
         long projectCode = 100L;
         User loginUser = getLoginUser();
-        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectAuthorizationService).requirePermission(loginUser, projectCode, ProjectPermission.EXECUTE);
 
         ServiceException ex = assertThrows(ServiceException.class,
                 () -> executorService.executeTask(loginUser, projectCode, 1, "1", TaskDependType.TASK_POST));
 
-        assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
+        assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), ex.getCode());
         Mockito.verifyNoInteractions(processService);
     }
 
     @Test
-    public void testForceStartTaskInstance_userHasNoProjectWritePermission() {
+    public void testForceStartTaskInstance_userHasNoProjectExecutePermission() {
         long projectCode = 100L;
         int workflowInstanceId = 1;
         int queueId = 2;
@@ -269,13 +285,282 @@ public class ExecutorServiceTest {
         workflowInstance.setProjectCode(projectCode);
         when(taskGroupQueueMapper.selectById(queueId)).thenReturn(taskGroupQueue);
         when(workflowInstanceDao.queryOptionalById(workflowInstanceId)).thenReturn(Optional.of(workflowInstance));
-        doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectAuthorizationService).requirePermission(loginUser, projectCode, ProjectPermission.EXECUTE);
 
         ServiceException ex = assertThrows(ServiceException.class,
                 () -> executorService.forceStartTaskInstance(loginUser, queueId));
 
-        assertEquals(Status.USER_NO_WRITE_PROJECT_PERM.getCode(), ex.getCode());
+        assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), ex.getCode());
         verify(taskGroupQueueMapper, never()).updateById(Mockito.any());
     }
+    @Test
+    public void testExecuteTaskRejectsInstanceFromAnotherProject() {
+        User loginUser = getLoginUser();
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(200L);
+        when(processService.findWorkflowInstanceDetailById(1)).thenReturn(Optional.of(instance));
+
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> executorService.executeTask(loginUser, 100L, 1, "1", TaskDependType.TASK_POST));
+
+        assertEquals(Status.WORKFLOW_INSTANCE_NOT_EXIST.getCode(), exception.getCode());
+        verify(projectAuthorizationService).requirePermission(loginUser, 100L, ProjectPermission.EXECUTE);
+        Mockito.verifyNoInteractions(executorClient);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ExecuteType.class, names = {"REPEAT_RUNNING", "START_FAILURE_TASK_PROCESS",
+            "RECOVER_SUSPENDED_PROCESS"})
+    public void testRerunChecksPinnedTaskVersionBeforeSubmittingCommand(ExecuteType executeType) {
+        User user = getLoginUser();
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        instance.setWorkflowDefinitionCode(200L);
+        instance.setWorkflowDefinitionVersion(3);
+        TaskDefinitionLog task = new TaskDefinitionLog();
+        task.setCode(300L);
+        task.setVersion(2);
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(200L, 3))
+                .thenReturn(Collections.singletonList(task));
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskResourcePermissionChecker).checkPermission(100L, Collections.singletonList(task));
+
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> executorService.controlWorkflowInstance(user, 1, executeType));
+
+        assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Mockito.verifyNoInteractions(executorClient);
+        verify(taskDefinitionLogDao).queryByWorkflowDefinitionCodeAndVersion(200L, 3);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ExecuteType.class, names = {"START_FAILURE_TASK_PROCESS", "RECOVER_SUSPENDED_PROCESS"})
+    public void recoveryRejectsRevokedCurrentSubWorkflowPermission(ExecuteType executeType) {
+        User user = getLoginUser();
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        instance.setWorkflowDefinitionCode(200L);
+        instance.setWorkflowDefinitionVersion(3);
+        instance.setWorkerGroup("original-workers");
+        instance.setTenantCode("original-tenant");
+        instance.setEnvironmentCode(7L);
+        instance.setWarningGroupId(8);
+        TaskDefinitionLog subWorkflowTask = new TaskDefinitionLog();
+        subWorkflowTask.setTaskType("SUB_WORKFLOW");
+        subWorkflowTask.setTaskParams("{\"workflowDefinitionCode\":400}");
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(200L, 3))
+                .thenReturn(Collections.singletonList(subWorkflowTask));
+        // The latest child definition can require different resources from the existing child instance.
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskSubWorkflowPermissionChecker).checkExecutionPermission(user,
+                        Collections.singletonList(subWorkflowTask), "original-workers", 7L, "original-tenant", 8);
+        ServiceException error = assertThrows(ServiceException.class,
+                () -> executorService.controlWorkflowInstance(user, 1, executeType));
+        assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(executorClient);
+        verify(taskDefinitionLogDao).queryByWorkflowDefinitionCodeAndVersion(200L, 3);
+        verify(projectAuthorizationService).requirePermission(user, 100L, ProjectPermission.EXECUTE);
+        verify(taskResourcePermissionChecker).checkExecutionSettings(100L, "original-workers", 7L, "original-tenant",
+                8);
+        verify(taskResourcePermissionChecker).checkPermission(100L, Collections.singletonList(subWorkflowTask));
+        verify(taskSubWorkflowPermissionChecker).checkExecutionPermission(user,
+                Collections.singletonList(subWorkflowTask), "original-workers", 7L, "original-tenant", 8);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ExecuteType.class, names = {"START_FAILURE_TASK_PROCESS", "RECOVER_SUSPENDED_PROCESS"})
+    public void recoverySubmitsAfterCurrentSubWorkflowAuthorization(ExecuteType executeType) {
+        User user = getLoginUser();
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        instance.setWorkflowDefinitionCode(200L);
+        instance.setWorkflowDefinitionVersion(3);
+        instance.setWorkerGroup("original-workers");
+        instance.setTenantCode("original-tenant");
+        instance.setEnvironmentCode(7L);
+        instance.setWarningGroupId(8);
+        TaskDefinitionLog subWorkflowTask = new TaskDefinitionLog();
+        subWorkflowTask.setTaskType("SUB_WORKFLOW");
+        subWorkflowTask.setTaskParams("{\"workflowDefinitionCode\":400}");
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(200L, 3))
+                .thenReturn(Collections.singletonList(subWorkflowTask));
+        if (executeType == ExecuteType.START_FAILURE_TASK_PROCESS) {
+            RecoverFailureTaskInstanceOperation operation = Mockito.mock(RecoverFailureTaskInstanceOperation.class);
+            when(executorClient.recoverFailureTaskInstance()).thenReturn(operation);
+            when(operation.onWorkflowInstance(instance)).thenReturn(operation);
+            when(operation.byUser(user)).thenReturn(operation);
+            executorService.controlWorkflowInstance(user, 1, executeType);
+            verify(operation).execute();
+        } else {
+            RecoverSuspendedWorkflowInstanceOperation operation =
+                    Mockito.mock(RecoverSuspendedWorkflowInstanceOperation.class);
+            when(executorClient.recoverSuspendedWorkflowInstanceOperation()).thenReturn(operation);
+            when(operation.onWorkflowInstance(instance)).thenReturn(operation);
+            when(operation.byUser(user)).thenReturn(operation);
+            executorService.controlWorkflowInstance(user, 1, executeType);
+            verify(operation).execute();
+        }
+        verify(projectAuthorizationService).requirePermission(user, 100L, ProjectPermission.EXECUTE);
+        verify(taskResourcePermissionChecker).checkExecutionSettings(100L, "original-workers", 7L, "original-tenant",
+                8);
+        verify(taskResourcePermissionChecker).checkPermission(100L, Collections.singletonList(subWorkflowTask));
+        verify(taskSubWorkflowPermissionChecker).checkExecutionPermission(user,
+                Collections.singletonList(subWorkflowTask), "original-workers", 7L, "original-tenant", 8);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ExecuteType.class, names = {"START_FAILURE_TASK_PROCESS", "RECOVER_SUSPENDED_PROCESS"})
+    public void recoveryStillRequiresParentProjectExecutePermission(ExecuteType executeType) {
+        User user = getLoginUser();
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectAuthorizationService).requirePermission(user, 100L, ProjectPermission.EXECUTE);
+
+        ServiceException error = assertThrows(ServiceException.class,
+                () -> executorService.controlWorkflowInstance(user, 1, executeType));
+
+        assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(taskResourcePermissionChecker, taskDefinitionLogDao,
+                taskSubWorkflowPermissionChecker, executorClient);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ExecuteType.class, names = {"START_FAILURE_TASK_PROCESS", "RECOVER_SUSPENDED_PROCESS"})
+    public void recoveryStillRejectsRevokedParentExecutionSettings(ExecuteType executeType) {
+        User user = getLoginUser();
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        instance.setWorkerGroup("original-workers");
+        instance.setTenantCode("original-tenant");
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskResourcePermissionChecker).checkExecutionSettings(100L, "original-workers",
+                        instance.getEnvironmentCode(), "original-tenant", instance.getWarningGroupId());
+
+        ServiceException error = assertThrows(ServiceException.class,
+                () -> executorService.controlWorkflowInstance(user, 1, executeType));
+
+        assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(taskDefinitionLogDao, taskSubWorkflowPermissionChecker, executorClient);
+    }
+
+    @Test
+    public void testRerunRejectsRevokedSubWorkflowPermissionBeforeSubmittingCommand() {
+        User user = getLoginUser();
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        instance.setWorkflowDefinitionCode(200L);
+        instance.setWorkflowDefinitionVersion(3);
+        TaskDefinitionLog task = new TaskDefinitionLog();
+        task.setTaskType("SUB_WORKFLOW");
+        task.setTaskParams("{\"workflowDefinitionCode\":400}");
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(200L, 3))
+                .thenReturn(Collections.singletonList(task));
+        doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                .when(taskSubWorkflowPermissionChecker).checkExecutionPermission(user, Collections.singletonList(task),
+                        instance.getWorkerGroup(), instance.getEnvironmentCode(), instance.getTenantCode(),
+                        instance.getWarningGroupId());
+
+        ServiceException exception = assertThrows(ServiceException.class,
+                () -> executorService.controlWorkflowInstance(user, 1, ExecuteType.REPEAT_RUNNING));
+
+        assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
+        Mockito.verifyNoInteractions(executorClient);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"start", "backfill", "rerun", "recoverFailure", "recoverSuspend"})
+    public void executionRejectsOfflineGrandchildBeforeCommandSubmission(String operation) {
+        User user = getLoginUser();
+        WorkflowDefinition parent = new WorkflowDefinition();
+        parent.setCode(200L);
+        parent.setVersion(3);
+        parent.setProjectCode(100L);
+        parent.setReleaseState(ReleaseState.ONLINE);
+        WorkflowDefinition child = new WorkflowDefinition();
+        child.setCode(400L);
+        child.setProjectCode(101L);
+        child.setVersion(4);
+        child.setReleaseState(ReleaseState.ONLINE);
+        WorkflowDefinition grandchild = new WorkflowDefinition();
+        grandchild.setCode(500L);
+        grandchild.setProjectCode(102L);
+        grandchild.setReleaseState(ReleaseState.OFFLINE);
+        TaskDefinitionLog childReference = new TaskDefinitionLog();
+        childReference.setTaskType("SUB_WORKFLOW");
+        childReference.setTaskParams("{\"workflowDefinitionCode\":400}");
+        TaskDefinitionLog grandchildReference = new TaskDefinitionLog();
+        grandchildReference.setTaskType("SUB_WORKFLOW");
+        grandchildReference.setTaskParams("{\"workflowDefinitionCode\":500}");
+        WorkflowDefinitionDao definitions = Mockito.mock(WorkflowDefinitionDao.class);
+        when(definitions.queryByCodes(Collections.singleton(400L))).thenReturn(Collections.singletonList(child));
+        when(definitions.queryByCodes(Collections.singleton(500L))).thenReturn(Collections.singletonList(grandchild));
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(200L, 3))
+                .thenReturn(Collections.singletonList(childReference));
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(400L, 4))
+                .thenReturn(Collections.singletonList(grandchildReference));
+        ReflectionTestUtils.setField(executorService, "taskSubWorkflowPermissionChecker",
+                new TaskSubWorkflowPermissionChecker(definitions, Mockito.mock(ProjectService.class),
+                        taskDefinitionLogDao, taskResourcePermissionChecker));
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        instance.setWorkflowDefinitionCode(200L);
+        instance.setWorkflowDefinitionVersion(3);
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+
+        ServiceException exception = assertThrows(ServiceException.class, () -> {
+            switch (operation) {
+                case "start":
+                    WorkflowTriggerRequest request = WorkflowTriggerRequest.builder()
+                            .loginUser(user).projectCode(100L).workflowDefinitionCode(200L).build();
+                    when(triggerWorkflowRequestTransformer.transform(request)).thenReturn(TriggerWorkflowDTO.builder()
+                            .loginUser(user).workflowDefinition(parent).build());
+                    executorService.triggerWorkflowDefinition(request);
+                    break;
+                case "backfill":
+                    WorkflowBackFillRequest backfill = WorkflowBackFillRequest.builder()
+                            .loginUser(user).projectCode(100L).workflowDefinitionCode(200L).build();
+                    when(backfillWorkflowRequestTransformer.transform(backfill))
+                            .thenReturn(BackfillWorkflowDTO.builder()
+                                    .loginUser(user).workflowDefinition(parent).build());
+                    executorService.backfillWorkflowDefinition(backfill);
+                    break;
+                default:
+                    ExecuteType executeType = "rerun".equals(operation) ? ExecuteType.REPEAT_RUNNING
+                            : "recoverFailure".equals(operation) ? ExecuteType.START_FAILURE_TASK_PROCESS
+                                    : ExecuteType.RECOVER_SUSPENDED_PROCESS;
+                    executorService.controlWorkflowInstance(user, 1, executeType);
+            }
+        });
+
+        assertEquals(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE.getCode(), exception.getCode());
+        Mockito.verifyNoInteractions(executorClient);
+        verify(taskDefinitionLogDao, never()).queryByWorkflowDefinitionCodeAndVersion(500L, 0);
+    }
+
+    @Test
+    public void testStopDoesNotRequireResourceGrants() {
+        User user = getLoginUser();
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+        StopWorkflowInstanceOperation operation =
+                Mockito.mock(StopWorkflowInstanceOperation.class, Mockito.RETURNS_SELF);
+        when(executorClient.stopWorkflowInstance()).thenReturn(operation);
+
+        executorService.controlWorkflowInstance(user, 1, ExecuteType.STOP);
+
+        verify(projectAuthorizationService).requirePermission(user, 100L, ProjectPermission.EXECUTE);
+        verify(operation).execute();
+        Mockito.verifyNoInteractions(taskDefinitionLogDao, taskResourcePermissionChecker,
+                taskSubWorkflowPermissionChecker);
+    }
+
 }

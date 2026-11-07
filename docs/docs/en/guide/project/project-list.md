@@ -13,7 +13,7 @@ This page describes details regarding Project screen in Apache DolphinScheduler.
 
 ## Project List
 
-On the project screen, list of all the existing projects along with details like name, owner, workflow definition, process instance, create and update time. This page also facilitates operations like create, edit, and delete project.
+The project screen lists projects visible through `VIEW` (all projects for system administrators), along with details like name, owner, workflow definition, process instance, create and update time. This page also facilitates operations like create, edit, and delete project.
 
 ![project-list](../../../../img/new_ui/dev/project/project-list.png)
 
@@ -23,17 +23,22 @@ On the project screen, list of all the existing projects along with details like
 
 ![project-list](../../../../img/new_ui/dev/project/project-create.png)
 
-## Project Worker Group Authorization
+## Project Member Permissions and Resource Grants
 
-- On the project management page, click the `Worker Group Authorization` button to enter the worker group authorization page, as shown in the figure below, select the worker group, click `WorkerGroup`, after successful authorization, the project can access the worker group.
-  ![project-worker-group](../../../../img/new_ui/dev/project/project-worker-group-auth.png)
+In Project Management, use member permissions to assign users' project operations and resource authorization to grant shared resources to the project. System administrators or users with `MANAGE_MEMBERS` can manage member permissions; only system administrators can grant or revoke project resources.
+
+Worker groups are one of the eight supported resource types. The default `default` group also requires an explicit project grant. Workflow operations require the corresponding user project permission and, when resources are used, the project's resource grants. See [Security (Authorization System)](../security/security.md#granted-permissions) for the full rules, execution checks and revocation boundaries.
+
+The following screenshot shows the legacy separate worker-group authorization screen for upgrade comparison only. From 3.5.0, use the unified project resource-authorization action.
+
+![project-worker-group](../../../../img/new_ui/dev/project/project-worker-group-auth.png)
 
 ## Project Overview
 
 - Click the project name link on the project management page to enter the project home page, as shown in the figure below, the project home page contains the task status statistics, process status statistics, and workflow definition statistics of the project. The introduction for those metrics:
 - Task status statistics: Within the specified time range, count the number of task instances status as successful submission, running, ready to pause, pause, ready to stop, stop, failure, success, need fault tolerance, kill and waiting threads
 - Process status statistics: Within the specified time range, count the number of workflow instances status as submission success, running, ready to pause, pause, ready to stop, stop, failure, success, need fault tolerance, kill and waiting threads
-- Workflow definition statistics: Count the workflow definitions created by this user and granted by the administrator
+- Workflow definition statistics: Count workflow definitions in the current project; viewing the project requires `VIEW`
 
 ![project-overview](../../../../img/new_ui/dev/project/project-overview.png)
 

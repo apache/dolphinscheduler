@@ -65,7 +65,7 @@ export function useFlinkStream({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),
-      Fields.useEnvironmentName(model, !data?.id),
+      Fields.useEnvironmentName(model, !data?.id, projectCode),
       Fields.useDelayTime(model),
       ...Fields.useFlink(model),
       Fields.usePreTasks()

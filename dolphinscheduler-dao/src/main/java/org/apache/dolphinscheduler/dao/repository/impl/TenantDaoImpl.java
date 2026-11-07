@@ -39,6 +39,11 @@ public class TenantDaoImpl extends BaseDao<Tenant, TenantMapper> implements Tena
     }
 
     @Override
+    public List<Tenant> queryByProject(long projectCode) {
+        return mybatisMapper.queryByProject(projectCode);
+    }
+
+    @Override
     public Optional<Tenant> queryByCode(String tenantCode) {
         return Optional.ofNullable(mybatisMapper.queryByTenantCode(tenantCode));
     }

@@ -69,7 +69,7 @@ public class ProjectsResourcePermissionCheckTest {
         ids.add(project.getId());
         List<Project> projects = Arrays.asList(project);
 
-        Mockito.when(projectDao.listAuthorizedProjects(user.getId(), null)).thenReturn(projects);
+        Mockito.when(projectDao.queryVisibleProjects(user.getId(), false)).thenReturn(projects);
 
         Assertions.assertEquals(ids, projectsResourcePermissionCheck.listAuthorizedResourceIds(user.getId(), logger));
     }

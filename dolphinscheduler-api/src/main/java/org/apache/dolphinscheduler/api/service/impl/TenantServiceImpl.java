@@ -24,18 +24,22 @@ import static org.apache.dolphinscheduler.common.constants.Constants.TENANT_FULL
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.service.TenantService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.RegexUtils;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -45,7 +49,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -62,6 +65,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Service
 @Slf4j
 public class TenantServiceImpl extends BaseServiceImpl implements TenantService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
+
+    @Autowired
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Autowired
     private TenantDao tenantDao;
@@ -243,6 +252,7 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
         if (!tenantDao.deleteById(id)) {
             throw new ServiceException(Status.DELETE_TENANT_BY_ID_ERROR);
         }
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.TENANT, Integer.toString(id));
 
         workflowInstanceDao.updateWorkflowInstanceByTenantCode(tenant.getTenantCode(), Constants.DEFAULT);
     }
@@ -260,14 +270,20 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return tenant list
      */
     @Override
-    public List<Tenant> queryTenantList(User loginUser) {
-
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.TENANT,
-                loginUser.getId(), log);
-        if (CollectionUtils.isEmpty(ids)) {
-            return Collections.emptyList();
+    public List<Tenant> queryTenantList(User loginUser, Long projectCode) {
+        if (projectCode == null) {
+            return queryTenantList(loginUser);
         }
-        return tenantDao.queryByIds(ids);
+        projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
+        return tenantDao.queryByProject(projectCode);
+    }
+
+    @Override
+    public List<Tenant> queryTenantList(User loginUser) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
+        return tenantDao.queryAll();
     }
 
     /**
@@ -277,7 +293,10 @@ public class TenantServiceImpl extends BaseServiceImpl implements TenantService 
      * @return true if tenant code can use, otherwise return false
      */
     @Override
-    public void verifyTenantCode(String tenantCode) {
+    public void verifyTenantCode(User loginUser, String tenantCode) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         if (checkTenantExists(tenantCode)) {
             throw new ServiceException(Status.OS_TENANT_CODE_EXIST, tenantCode);
         }

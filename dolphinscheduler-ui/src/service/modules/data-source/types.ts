@@ -110,11 +110,8 @@ interface ListReq {
   searchVal?: string
 }
 
-interface UserIdReq {
-  userId: number
-}
-
 interface TypeReq {
+  projectCode: number
   type: IDataBase
 }
 
@@ -124,4 +121,4 @@ interface NameReq {
 
 type IdReq = number
 
-export { ListReq, IDataBase, IDataSource, UserIdReq, TypeReq, NameReq, IdReq }
+export { ListReq, IDataBase, IDataSource, TypeReq, NameReq, IdReq }

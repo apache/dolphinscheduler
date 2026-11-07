@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.api.test.pages.workflow.ExecutorPage;
 import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowDefinitionPage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -104,6 +105,13 @@ public class ExecutorAPITest {
             Assertions.assertTrue(queryAllProjectListResponse.getBody().getSuccess());
             projectCode = (long) ((LinkedHashMap<String, Object>) ((List<LinkedHashMap>) queryAllProjectListResponse
                     .getBody().getData()).get(0)).get("code");
+
+            Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.WORKER_GROUP, "default")
+                    .getBody().getSuccess());
+            Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.TENANT, "-1")
+                    .getBody().getSuccess());
+            Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.QUEUE, "1")
+                    .getBody().getSuccess());
 
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();

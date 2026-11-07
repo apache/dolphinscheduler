@@ -85,13 +85,15 @@ public interface TenantService {
      */
     List<Tenant> queryTenantList(User loginUser);
 
+    List<Tenant> queryTenantList(User loginUser, Long projectCode);
+
     /**
      * verify tenant code
      *
      * @param tenantCode tenant code
      * @return true if tenant code can user, otherwise return false
      */
-    void verifyTenantCode(String tenantCode);
+    void verifyTenantCode(User loginUser, String tenantCode);
 
     /**
      * query tenant by tenant code

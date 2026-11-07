@@ -33,6 +33,8 @@ public interface AlertGroupService {
      */
     List<AlertGroup> queryAllAlertGroup(User loginUser);
 
+    List<AlertGroup> queryAllAlertGroup(User loginUser, Long projectCode);
+
     /**
      * query alert group by id
      *
@@ -91,5 +93,5 @@ public interface AlertGroupService {
      * @param groupName group name
      * @return check result code
      */
-    boolean existGroupName(String groupName);
+    boolean existGroupName(User loginUser, String groupName);
 }

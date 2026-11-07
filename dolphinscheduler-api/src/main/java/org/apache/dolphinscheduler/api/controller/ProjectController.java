@@ -333,6 +333,6 @@ public class ProjectController extends BaseController {
     @ResponseStatus(HttpStatus.OK)
     @ApiException(LOGIN_USER_QUERY_PROJECT_LIST_PAGING_ERROR)
     public Result queryAllProjectListForDependent(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        return projectService.queryAllProjectListForDependent();
+        return projectService.queryAllProjectListForDependent(loginUser);
     }
 }

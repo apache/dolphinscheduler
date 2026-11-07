@@ -70,7 +70,7 @@ public class ResourcePermissionCheckServiceTest {
                 user.getId(), logger));
 
         List<Project> projects = Arrays.asList(getProject(1), getProject(2), getProject(3));
-        Mockito.when(projectDao.listAuthorizedProjects(user.getId(), null)).thenReturn(projects);
+        Mockito.when(projectDao.queryVisibleProjects(user.getId(), false)).thenReturn(projects);
 
         Assertions.assertTrue(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.PROJECTS,
                 new Object[]{}, user.getId(), logger));
@@ -107,14 +107,14 @@ public class ResourcePermissionCheckServiceTest {
         // GENERAL_USER
         List<Project> projects = Arrays.asList(getProject(1), getProject(2), getProject(3));
         Mockito.when(userDao.queryById(generalUser.getId())).thenReturn(generalUser);
-        Mockito.when(projectDao.listAuthorizedProjects(generalUser.getId(), null)).thenReturn(projects);
+        Mockito.when(projectDao.queryVisibleProjects(generalUser.getId(), false)).thenReturn(projects);
         Assertions.assertEquals(3, resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, generalUser.getId(), logger).size());
 
         // ADMIN_USER
         User adminUser = getAdminUser();
         Mockito.when(userDao.queryById(adminUser.getId())).thenReturn(adminUser);
-        Mockito.when(projectDao.listAuthorizedProjects(0, null)).thenReturn(projects);
+        Mockito.when(projectDao.queryVisibleProjects(0, true)).thenReturn(projects);
         Assertions.assertEquals(3, resourcePermissionCheckService
                 .userOwnedResourceIdsAcquisition(AuthorizationType.PROJECTS, adminUser.getId(), logger).size());
     }
@@ -144,4 +144,18 @@ public class ResourcePermissionCheckServiceTest {
         project.setName("projectName");
         return project;
     }
+    @Test
+    public void sharedResourcesHaveNoIndividualAuthorizationScope() {
+        User user = getGeneralUser();
+        Mockito.when(userDao.queryById(user.getId())).thenReturn(user);
+        for (AuthorizationType type : java.util.Arrays.asList(AuthorizationType.DATASOURCE,
+                AuthorizationType.WORKER_GROUP, AuthorizationType.TENANT, AuthorizationType.QUEUE,
+                AuthorizationType.ENVIRONMENT, AuthorizationType.ALERT_GROUP,
+                AuthorizationType.K8S_NAMESPACE, AuthorizationType.TASK_GROUP)) {
+            Assertions.assertTrue(resourcePermissionCheckService
+                    .userOwnedResourceIdsAcquisition(type, user.getId(), logger).isEmpty());
+        }
+        Mockito.verifyNoInteractions(projectDao);
+    }
+
 }

@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectParameterService;
@@ -26,6 +24,7 @@ import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
@@ -73,7 +72,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         // check if user have write perm for project
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
 
         // check if project parameter name exists
         ProjectParameter projectParameter = projectParameterMapper.selectOne(new QueryWrapper<ProjectParameter>()
@@ -120,7 +119,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         // check if user have write perm for project
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
 
         ProjectParameter projectParameter = projectParameterMapper.queryByCode(code);
         // check project parameter exists
@@ -166,7 +165,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
 
         // check if user have write perm for project
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
 
         ProjectParameter projectParameter = projectParameterMapper.queryByCode(code);
         // check project parameter exists
@@ -228,7 +227,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         Result result = new Result();
 
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
 
         PageInfo<ProjectParameter> pageInfo = new PageInfo<>(pageNo, pageSize);
         Page<ProjectParameter> page = new Page<>(pageNo, pageSize);
@@ -251,7 +250,7 @@ public class ProjectParameterServiceImpl extends BaseServiceImpl implements Proj
         Result result = new Result();
 
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
 
         ProjectParameter projectParameter = projectParameterMapper.queryByCode(code);
         if (projectParameter == null || projectCode != projectParameter.getProjectCode()) {

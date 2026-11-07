@@ -23,11 +23,14 @@ import {
 import type { IJsonItem } from '../types'
 import { useI18n } from 'vue-i18n'
 
-export function useK8s(model: { [field: string]: any }): IJsonItem[] {
+export function useK8s(
+  model: { [field: string]: any },
+  projectCode: number
+): IJsonItem[] {
   const { t } = useI18n()
 
   return [
-    useNamespace(),
+    useNamespace(projectCode),
     {
       type: 'input-number',
       field: 'minCpuCores',

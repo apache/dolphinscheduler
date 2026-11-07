@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowDefinitionPag
 import org.apache.dolphinscheduler.api.test.pages.workflow.WorkflowInstancePage;
 import org.apache.dolphinscheduler.api.test.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WarningType;
@@ -120,6 +121,13 @@ public class DependentTaskAPITest {
             }
         }
         Assertions.assertNotEquals(0, projectCode, "project should be found by name");
+
+        Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.WORKER_GROUP, "default")
+                .getBody().getSuccess());
+        Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.TENANT, "-1")
+                .getBody().getSuccess());
+        Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.QUEUE, "1")
+                .getBody().getSuccess());
         log.info("project code: {}", projectCode);
 
         // create upstream workflow definition (shell task: echo hello)
