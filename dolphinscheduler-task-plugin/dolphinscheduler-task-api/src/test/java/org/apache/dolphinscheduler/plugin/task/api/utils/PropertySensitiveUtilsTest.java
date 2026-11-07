@@ -145,6 +145,27 @@ class PropertySensitiveUtilsTest {
         Assertions.assertEquals("abc", parsed.get(0).getValue());
     }
 
+    @Test
+    void transformSensitiveValuesAppliesTransformer() {
+        Property original = sensitive("pwd", "Secret123");
+        List<Property> transformed = PropertySensitiveUtils.transformSensitiveValues(
+                Collections.singletonList(original), value -> "enc:" + value);
+
+        Assertions.assertEquals("enc:Secret123", transformed.get(0).getValue());
+        Assertions.assertEquals("Secret123", original.getValue());
+    }
+
+    @Test
+    void transformLocalParamsInTaskParamsDecryptsSensitive() {
+        String taskParams = "{\"localParams\":[{\"prop\":\"token\",\"direct\":\"IN\",\"type\":\"VARCHAR\","
+                + "\"value\":\"cipher\",\"sensitive\":true}],\"rawScript\":\"echo 1\"}";
+        String decoded = PropertySensitiveUtils.transformLocalParamsInTaskParams(taskParams,
+                props -> PropertySensitiveUtils.transformSensitiveValues(props, value -> "plain"));
+        Assertions.assertTrue(decoded.contains("\"plain\""));
+        Assertions.assertTrue(decoded.contains("rawScript"));
+        Assertions.assertTrue(taskParams.contains("cipher"));
+    }
+
     private static Property sensitive(String prop, String value) {
         return Property.builder()
                 .prop(prop)
