@@ -97,6 +97,11 @@ public class SqlParameters extends AbstractParameters {
     private int groupId;
     private String title;
 
+    /**
+     * max rows fetched for query sql
+     * takes precedence over the sql.task.query.max.rows property when positive, otherwise falls back to it
+     * configurable in the SQL task definition UI; leave blank to use the global default
+     */
     private int limit;
 
     @Override
