@@ -35,13 +35,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -70,8 +68,9 @@ public class MasterClusters
     private final List<IClustersChangeListener<MasterServerMetadata>> masterClusterChangeListeners =
             new CopyOnWriteArrayList<>();
 
-    private final Set<String> fetching = ConcurrentHashMap.newKeySet();
-    private boolean closed;
+    private final Map<String, ServerIdentity> registeredServers = new ConcurrentHashMap<>();
+    private final List<Consumer<ServerIdentity>> serverRemovedListeners = new CopyOnWriteArrayList<>();
+    private volatile boolean closed;
 
     @Lazy
     @Autowired
@@ -82,8 +81,6 @@ public class MasterClusters
 
     private final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1,
             ThreadUtils.newDaemonThreadFactory("MasterHeartbeatTimer-%d"));
-    private final ExecutorService executor = Executors.newFixedThreadPool(8,
-            ThreadUtils.newDaemonThreadFactory("MasterHeartbeatFetch-%d"));
 
     @PostConstruct
     public void start() {
@@ -94,6 +91,43 @@ public class MasterClusters
     @Override
     public List<MasterServerMetadata> getServers() {
         return UnmodifiableList.unmodifiableList(new ArrayList<>(masterServerMap.values()));
+    }
+
+    @Override
+    public List<String> getServerAddresses() {
+        return new ArrayList<>(registeredServers.keySet());
+    }
+
+    @Override
+    public Optional<ServerIdentity> getServerIdentity(String address) {
+        return Optional.ofNullable(registeredServers.get(address));
+    }
+
+    @Override
+    public void registerServerRemovedListener(Consumer<ServerIdentity> listener) {
+        serverRemovedListeners.add(listener);
+    }
+
+    public synchronized void onServerRegistered(ServerIdentity identity) {
+        if (closed || identity.equals(registeredServers.get(identity.getAddress()))) {
+            return;
+        }
+        ServerIdentity previous = registeredServers.get(identity.getAddress());
+        if (previous != null) {
+            onServerUnregistered(previous);
+        }
+        registeredServers.put(identity.getAddress(), identity);
+    }
+
+    public synchronized void onServerUnregistered(ServerIdentity identity) {
+        if (closed || !registeredServers.remove(identity.getAddress(), identity)) {
+            return;
+        }
+        MasterServerMetadata metadata = masterServerMap.get(identity.getAddress());
+        if (metadata != null) {
+            onServerRemove(metadata);
+        }
+        serverRemovedListeners.forEach(listener -> listener.accept(identity));
     }
 
     @Override
@@ -169,11 +203,10 @@ public class MasterClusters
             log.error("Invalid registration event: {}", event);
             return;
         }
-        MasterServerMetadata server = MasterServerMetadata.fromIdentity(identity);
         if (event.getType() == Event.Type.ADD) {
-            onServerAdded(server);
+            onServerRegistered(identity);
         } else if (event.getType() == Event.Type.REMOVE) {
-            onServerRemove(server);
+            onServerUnregistered(identity);
         }
     }
 
@@ -182,33 +215,32 @@ public class MasterClusters
                 : Clients.withService(IMasterMetadataService.class).withHost(address).getServerMetadata();
     }
 
-    public synchronized void refreshHeartbeats() {
-        if (closed) {
-            return;
-        }
-        for (String address : getServerAddresses()) {
-            MasterServerMetadata expected = masterServerMap.get(address);
-            if (expected != null && fetching.add(address)) {
-                executor.execute(() -> {
-                    try {
-                        synchronized (this) {
-                            if (closed || masterServerMap.get(address) != expected) {
-                                return;
-                            }
-                        }
-                        MasterHeartBeat heartbeat = fetchHeartbeat(address);
-                        synchronized (this) {
-                            if (!closed && masterServerMap.get(address) == expected
-                                    && expected.toIdentity().matches(heartbeat)) {
-                                onServerUpdate(MasterServerMetadata.parseFromHeartBeat(heartbeat));
-                            }
-                        }
-                    } catch (Exception ex) {
-                        log.debug("Failed to fetch Master heartbeat from {}", address, ex);
-                    } finally {
-                        fetching.remove(address);
+    public void refreshHeartbeats() {
+        for (ServerIdentity expected : new ArrayList<>(registeredServers.values())) {
+            if (closed) {
+                return;
+            }
+            MasterHeartBeat heartbeat = null;
+            try {
+                heartbeat = fetchHeartbeat(expected.getAddress());
+            } catch (Exception ex) {
+                log.debug("Failed to fetch Master heartbeat from {}", expected.getAddress(), ex);
+            }
+            synchronized (this) {
+                if (closed || registeredServers.get(expected.getAddress()) != expected) {
+                    continue;
+                }
+                MasterServerMetadata previous = masterServerMap.get(expected.getAddress());
+                if (expected.matches(heartbeat)) {
+                    MasterServerMetadata updated = MasterServerMetadata.parseFromHeartBeat(heartbeat);
+                    if (previous == null) {
+                        onServerAdded(updated);
+                    } else {
+                        onServerUpdate(updated);
                     }
-                });
+                } else if (previous != null) {
+                    onServerRemove(previous);
+                }
             }
         }
     }
@@ -218,8 +250,7 @@ public class MasterClusters
     public synchronized void close() {
         closed = true;
         timer.shutdownNow();
-        executor.shutdownNow();
         masterServerMap.clear();
-        fetching.clear();
+        registeredServers.clear();
     }
 }

@@ -49,15 +49,13 @@ public class ClusterManager {
         masterClusters.registerListener(new MasterSlotChangeListenerAdaptor(masterSlotManager, masterClusters));
         synchronized (masterClusters) {
             registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), masterClusters);
-            registryClient.getServerList(RegistryNodeType.MASTER).forEach(server -> masterClusters.onServerAdded(
-                    MasterServerMetadata.fromIdentity(
-                            JSONUtils.parseObject(server.getHeartBeatInfo(), ServerIdentity.class))));
+            registryClient.getServerList(RegistryNodeType.MASTER).forEach(server -> masterClusters.onServerRegistered(
+                    JSONUtils.parseObject(server.getHeartBeatInfo(), ServerIdentity.class)));
         }
         synchronized (workerClusters) {
             registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), workerClusters);
-            registryClient.getServerList(RegistryNodeType.WORKER).forEach(server -> workerClusters.onServerAdded(
-                    WorkerServerMetadata.fromIdentity(
-                            JSONUtils.parseObject(server.getHeartBeatInfo(), ServerIdentity.class))));
+            registryClient.getServerList(RegistryNodeType.WORKER).forEach(server -> workerClusters.onServerRegistered(
+                    JSONUtils.parseObject(server.getHeartBeatInfo(), ServerIdentity.class)));
         }
         workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerClusters);
         workerGroupChangeNotifier.start();
