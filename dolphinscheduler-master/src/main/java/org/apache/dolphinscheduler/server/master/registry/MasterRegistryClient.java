@@ -31,9 +31,9 @@ import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.extract.master.IMasterMetadataService;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
-import org.apache.dolphinscheduler.registry.api.FailoverMarkChecker;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
+import org.apache.dolphinscheduler.registry.api.SelfFailoverMonitor;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.config.MasterServerLoadProtection;
@@ -70,7 +70,7 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
 
     private final int processId = OSUtils.getProcessID();
 
-    private FailoverMarkChecker failoverMarkChecker;
+    private SelfFailoverMonitor selfFailoverMonitor;
 
     public void start() {
         try {
@@ -89,8 +89,8 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
     @Override
     public void close() {
         // TODO unsubscribe MasterRegistryDataListener
-        if (failoverMarkChecker != null) {
-            failoverMarkChecker.close();
+        if (selfFailoverMonitor != null) {
+            selfFailoverMonitor.close();
         }
         if (registryClient.isConnected()) {
             deregister();
@@ -116,9 +116,9 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
             ThreadUtils.sleep(SLEEP_TIME_MILLIS);
         }
 
-        failoverMarkChecker = new FailoverMarkChecker(registryClient, registration,
+        selfFailoverMonitor = new SelfFailoverMonitor(registryClient, registration,
                 masterConfig.getMaxHeartbeatInterval());
-        failoverMarkChecker.start();
+        selfFailoverMonitor.start();
         log.info("Master node : {} registered to registry center successfully", masterConfig.getMasterAddress());
 
     }
@@ -127,8 +127,8 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
         try {
             registryClient.remove(masterConfig.getMasterRegistryPath());
             log.info("Master node : {} unRegistry to register center.", masterConfig.getMasterAddress());
-            if (failoverMarkChecker != null) {
-                failoverMarkChecker.close();
+            if (selfFailoverMonitor != null) {
+                selfFailoverMonitor.close();
             }
             registryClient.close();
         } catch (Exception e) {

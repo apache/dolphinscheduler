@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /** Stops this process if another server has completed its failover. */
 @Slf4j
-public class FailoverMarkChecker implements AutoCloseable {
+public class SelfFailoverMonitor implements AutoCloseable {
 
     private final RegistryClient registryClient;
     private final String failoverPath;
@@ -39,12 +39,12 @@ public class FailoverMarkChecker implements AutoCloseable {
     private ScheduledFuture<?> checkFuture;
     private boolean closed;
 
-    public FailoverMarkChecker(RegistryClient registryClient, ServerRegistration registration, Duration checkInterval) {
+    public SelfFailoverMonitor(RegistryClient registryClient, ServerRegistration registration, Duration checkInterval) {
         this(registryClient, registration, checkInterval,
-                ThreadUtils.newSingleDaemonScheduledExecutorService("FailoverMarkChecker"));
+                ThreadUtils.newSingleDaemonScheduledExecutorService("SelfFailoverMonitor"));
     }
 
-    FailoverMarkChecker(RegistryClient registryClient, ServerRegistration registration, Duration checkInterval,
+    SelfFailoverMonitor(RegistryClient registryClient, ServerRegistration registration, Duration checkInterval,
                         ScheduledExecutorService executor) {
         this.registryClient = registryClient;
         this.failoverPath = RegistryUtils.getFailoveredNodePath(registration.getAddress(),
