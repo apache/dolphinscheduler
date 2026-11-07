@@ -105,6 +105,23 @@ public interface DataSourceService {
     void checkConnection(DbType type, ConnectionParam connectionParam);
 
     /**
+     * test the connectivity with the datasource params submitted by the frontend
+     * <p>
+     * When the request targets an existing datasource (id present) and echoes the mask value
+     * returned by the query APIs back, i.e. the user did not change the password, the
+     * connectivity is verified against the credentials already stored for that datasource
+     * instead of connecting with the mask value.
+     *
+     * @param loginUser       the current logged-in user, required for the permission check when
+     *                        resolving the stored password
+     * @param dataSourceParam the datasource params submitted by the frontend
+     * @param connectionParam the connection parameters built from dataSourceParam
+     * @throws ServiceException if permission denied, the datasource does not exist,
+     *                          or the connection test fails
+     */
+    void checkConnection(User loginUser, BaseDataSourceParamDTO dataSourceParam, ConnectionParam connectionParam);
+
+    /**
      * test the connectivity of a specific data source
      *
      * @param loginUser the current logged-in user (required for permission check)
