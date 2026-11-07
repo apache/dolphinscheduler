@@ -149,13 +149,13 @@ class WorkerClustersTest {
         WorkerClusters clusters = new WorkerClusters();
         WorkerServerMetadata registration = WorkerServerMetadata.builder().address("localhost:1234")
                 .workerGroup(null).serverStartupTime(1).processId(10).build();
-        clusters.onServerAdded(registration);
+        clusters.onServerRegistered(registration.toIdentity());
         assertThat(clusters.getNormalWorkerServerAddressByGroup("default")).isEmpty();
         WorkerServerMetadata metadata = WorkerServerMetadata.builder().address("localhost:1234")
                 .workerGroup("analytics").serverStartupTime(1).processId(10).serverStatus(ServerStatus.NORMAL).build();
-        clusters.onServerUpdate(metadata);
+        clusters.onServerAdded(metadata);
         assertThat(clusters.getNormalWorkerServerAddressByGroup("analytics")).containsExactly("localhost:1234");
-        clusters.onServerRemove(registration);
+        clusters.onServerUnregistered(registration.toIdentity());
         assertThat(clusters.getServers()).isEmpty();
         assertThat(clusters.getConfigWorkerServerAddressByGroup("analytics")).isEmpty();
     }

@@ -43,6 +43,9 @@ public abstract class BaseServerMetadata implements IClusters.IServerMetadata {
 
     private final ServerStatus serverStatus;
 
+    // Local time in milliseconds when the heartbeat was received.
+    private final long heartbeatReceivedTime;
+
     public ServerIdentity toIdentity() {
         Host host = Host.of(address);
         ServerIdentity identity = new ServerIdentity();
