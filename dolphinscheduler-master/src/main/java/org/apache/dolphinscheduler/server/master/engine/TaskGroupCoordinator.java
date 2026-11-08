@@ -96,11 +96,8 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
 
     public synchronized void start() {
         log.info("TaskGroupCoordinator starting...");
-        if (flag) {
-            throw new IllegalStateException("TaskGroupCoordinator is already started");
-        }
         if (internalThread != null) {
-            throw new IllegalStateException("InternalThread is already started");
+            throw new IllegalStateException("TaskGroupCoordinator is already started");
         }
         flag = true;
         internalThread = new BaseDaemonThread(this::doStart) {

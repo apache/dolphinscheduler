@@ -50,6 +50,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.collect.Lists;
 
@@ -71,6 +72,9 @@ class TaskGroupCoordinatorTest {
 
     @Mock
     private WorkflowInstanceDao workflowInstanceDao;
+
+    @Mock
+    private TransactionTemplate transactionTemplate;
 
     @Test
     void start() {
@@ -175,6 +179,33 @@ class TaskGroupCoordinatorTest {
         verify(taskGroupQueueDao, Mockito.times(1)).deleteById(taskGroupQueue);
 
     }
+    @Test
+    void stopDuringForceStartFetchSkipsReturnedPage() throws Exception {
+        AtomicReference<Thread> worker = new AtomicReference<>();
+        CountDownLatch stopping = new CountDownLatch(1);
+        TaskGroupQueue queue = new TaskGroupQueue();
+        queue.setId(1);
+        queue.setTaskId(1);
+        when(taskGroupQueueDao.queryWaitNotifyForceStartTaskGroupQueue(Mockito.anyInt(), Mockito.anyInt()))
+                .thenAnswer(invocation -> {
+                    worker.set(Thread.currentThread());
+                    // Deliver the stop while the query is still in progress.
+                    taskGroupCoordinator.requestStop();
+                    stopping.countDown();
+                    return Collections.singletonList(queue);
+                });
+        try {
+            taskGroupCoordinator.start();
+            assertTrue(stopping.await(5, TimeUnit.SECONDS));
+            worker.get().join(5000);
+            assertFalse(worker.get().isAlive());
+            Mockito.verifyNoInteractions(transactionTemplate);
+            verify(taskGroupDao, Mockito.never()).queryAvailableTaskGroups();
+        } finally {
+            taskGroupCoordinator.close();
+        }
+    }
+
     @Test
     void closeShouldWaitForPreviousFetchBeforeRestart() throws Exception {
         verifyCloseDuringFetch(false);

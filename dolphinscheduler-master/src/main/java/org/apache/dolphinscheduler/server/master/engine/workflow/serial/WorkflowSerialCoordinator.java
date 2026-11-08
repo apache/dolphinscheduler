@@ -76,11 +76,8 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
     @Override
     public synchronized void start() {
         log.info("WorkflowSerialCoordinator starting...");
-        if (flag) {
-            throw new IllegalStateException("WorkflowSerialCoordinator is already started");
-        }
         if (internalThread != null) {
-            throw new IllegalStateException("InternalThread is already started");
+            throw new IllegalStateException("WorkflowSerialCoordinator is already started");
         }
         flag = true;
         internalThread = new BaseDaemonThread(this::doStart) {

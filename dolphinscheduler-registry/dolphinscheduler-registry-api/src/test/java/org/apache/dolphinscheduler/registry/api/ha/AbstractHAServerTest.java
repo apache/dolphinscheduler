@@ -27,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -67,6 +68,8 @@ class AbstractHAServerTest {
     private final List<AbstractHAServer> servers = new ArrayList<>();
     private final List<ScheduledThreadPoolExecutor> electionExecutors = new ArrayList<>();
     private final AtomicReference<Runnable> retryAction = new AtomicReference<>(() -> {
+    });
+    private final AtomicReference<Runnable> beforeRecovery = new AtomicReference<>(() -> {
     });
     private ScheduledThreadPoolExecutor electionExecutor;
     private long recoveryDelayMillis = TimeUnit.DAYS.toMillis(1);
@@ -227,6 +230,447 @@ class AbstractHAServerTest {
     }
 
     @Test
+    void testOwnRemovalDemotesWhileEarlierElectionIsBlocked() throws Exception {
+        enableMasterDemotion();
+        server.start();
+
+        CountDownLatch oldResultReady = new CountDownLatch(1);
+        CountDownLatch releaseOldElection = new CountDownLatch(1);
+        CountDownLatch demoted = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            demoted.countDown();
+            return null;
+        }).when(statusListener).changeToStandBy();
+        when(registry.releaseLock(ELECTION_LOCK)).thenAnswer(invocation -> {
+            // Hold the earlier check after it has already read this instance as the owner.
+            oldResultReady.countDown();
+            await(releaseOldElection);
+            return true;
+        });
+        try {
+            notifyRemove("earlier-peer");
+            assertTrue(oldResultReady.await(5, TimeUnit.SECONDS));
+            String removedOwner = owner.getAndSet("master-1:5678#peer-instance");
+            notifyRemove(removedOwner);
+
+            assertTrue(demoted.await(5, TimeUnit.SECONDS));
+            assertFalse(server.isActive());
+
+            releaseOldElection.countDown();
+            drain();
+            assertFalse(server.isActive());
+            verify(statusListener, times(1)).changeToActive();
+            verify(statusListener, times(1)).changeToStandBy();
+        } finally {
+            releaseOldElection.countDown();
+        }
+    }
+
+    @Test
+    void testOwnRemovalDefersElectionUntilOldWorkersExit() throws Exception {
+        enableMasterDemotion();
+        recoveryDelayMillis = 0;
+        server.start();
+        CountDownLatch stopping = new CountDownLatch(1);
+        CountDownLatch allowStop = new CountDownLatch(1);
+        CountDownLatch checkedPeer = new CountDownLatch(1);
+        server.addServerStatusChangeListener((origin, target) -> {
+            if (origin == HAServer.ServerStatus.ACTIVE && target == HAServer.ServerStatus.STAND_BY) {
+                stopping.countDown();
+                await(allowStop);
+            } else if (origin == HAServer.ServerStatus.STAND_BY && target == HAServer.ServerStatus.STAND_BY) {
+                checkedPeer.countDown();
+            }
+        });
+        try {
+            notifyRemove(owner.getAndSet(null));
+            assertTrue(stopping.await(5, TimeUnit.SECONDS));
+            // Drain the election queue while the demotion listener is still waiting for an old worker.
+            drain();
+            verify(registry, times(1)).acquireLock(ELECTION_LOCK);
+            verify(registry, times(1)).put(eq(SELECTOR_PATH), anyString(), eq(true));
+
+            // A peer can take the empty selector. No further REMOVE is needed to discover it after drain.
+            owner.set("master-1:5678#peer-instance");
+            allowStop.countDown();
+            assertTrue(checkedPeer.await(5, TimeUnit.SECONDS));
+            drain();
+            assertFalse(server.isActive());
+            verify(statusListener, times(1)).changeToActive();
+            assertTrue(electionExecutor.getQueue().isEmpty());
+        } finally {
+            allowStop.countDown();
+        }
+    }
+
+    @Test
+    void testRemovalDuringMissingSelectorReadPreventsNewClaim() throws Exception {
+        enableMasterDemotion();
+        server.start();
+        String previousOwner = owner.getAndSet(null);
+        CountDownLatch readMissing = new CountDownLatch(1);
+        CountDownLatch returnRead = new CountDownLatch(1);
+        CountDownLatch stopping = new CountDownLatch(1);
+        CountDownLatch allowStop = new CountDownLatch(1);
+        CountDownLatch releasedLock = new CountDownLatch(1);
+        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
+            readMissing.countDown();
+            await(returnRead);
+            return false;
+        });
+        when(registry.releaseLock(ELECTION_LOCK)).thenAnswer(invocation -> {
+            releasedLock.countDown();
+            return true;
+        });
+        doAnswer(invocation -> {
+            stopping.countDown();
+            await(allowStop);
+            return null;
+        }).when(statusListener).changeToStandBy();
+        try {
+            notifyRemove("earlier-peer");
+            assertTrue(readMissing.await(5, TimeUnit.SECONDS));
+            notifyRemove(previousOwner);
+            assertTrue(stopping.await(5, TimeUnit.SECONDS));
+            returnRead.countDown();
+            assertTrue(releasedLock.await(5, TimeUnit.SECONDS));
+            verify(registry, times(1)).put(eq(SELECTOR_PATH), anyString(), eq(true));
+            owner.set("master-1:5678#peer-instance");
+            when(registry.exists(SELECTOR_PATH)).thenReturn(true);
+            allowStop.countDown();
+            drain();
+            assertFalse(server.isActive());
+            verify(statusListener, times(1)).changeToActive();
+        } finally {
+            returnRead.countDown();
+            allowStop.countDown();
+        }
+    }
+
+    @Test
+    void testQueuedOwnRemovalDoesNotDemoteRestoredLeaderAgain() throws Exception {
+        enableMasterDemotion();
+        server.start();
+        CountDownLatch releaseElection = new CountDownLatch(1);
+        CountDownLatch demoted = new CountDownLatch(1);
+        AtomicInteger reads = new AtomicInteger();
+        electionExecutor.execute(() -> await(releaseElection));
+        doAnswer(invocation -> {
+            demoted.countDown();
+            return null;
+        }).when(statusListener).changeToStandBy();
+        when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> {
+            if (reads.incrementAndGet() == 2) {
+                throw new IllegalStateException("temporary failure in the queued own REMOVE check");
+            }
+            return owner.get();
+        });
+        retryAction.set(() -> verify(statusListener, times(1)).changeToStandBy());
+        try {
+            // An earlier queued check will restore A before this own REMOVE's check encounters its read failure.
+            notifyRemove("earlier-peer");
+            notifyRemove(owner.get());
+            assertTrue(demoted.await(5, TimeUnit.SECONDS));
+            synchronized (server) {
+                // The demotion listener and its recovery scheduling must both finish before the queue is released.
+            }
+            releaseElection.countDown();
+            drain();
+            assertTrue(server.isActive());
+            verify(statusListener, times(1)).changeToStandBy();
+            verify(statusListener, times(2)).changeToActive();
+            assertTrue(electionExecutor.getQueue().isEmpty());
+        } finally {
+            releaseElection.countDown();
+        }
+    }
+
+    @Test
+    void testCloseWhileIndependentDemotionIsQueued() throws Exception {
+        enableMasterDemotion();
+        server.start();
+        String previousOwner = owner.get();
+        synchronized (server) {
+            // Hold the publication monitor so the independent demotion remains queued until close finishes.
+            notifyRemove(previousOwner);
+            server.close();
+        }
+        assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
+        notifyRemove(previousOwner);
+        verify(statusListener, times(1)).changeToActive();
+        verify(statusListener, never()).changeToStandBy();
+        assertTrue(electionExecutor.getQueue().isEmpty());
+    }
+
+    @Test
+    void testCloseWaitsForIndependentDemotionListener() throws Exception {
+        enableMasterDemotion();
+        recoveryDelayMillis = 0;
+        server.start();
+        CountDownLatch stopping = new CountDownLatch(1);
+        CountDownLatch allowStop = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            stopping.countDown();
+            await(allowStop);
+            return null;
+        }).when(statusListener).changeToStandBy();
+        ExecutorService caller = Executors.newSingleThreadExecutor();
+        try {
+            notifyRemove(owner.get());
+            assertTrue(stopping.await(5, TimeUnit.SECONDS));
+            Future<?> close = caller.submit(server::close);
+            // The election worker can exit, but close still waits for the independently running listener.
+            assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
+            assertFalse(close.isDone());
+            allowStop.countDown();
+            close.get(5, TimeUnit.SECONDS);
+            notifyRemove(owner.get());
+            assertFalse(server.isActive());
+            verify(statusListener, times(1)).changeToActive();
+            verify(statusListener, times(1)).changeToStandBy();
+            assertTrue(electionExecutor.getQueue().isEmpty());
+        } finally {
+            allowStop.countDown();
+            caller.shutdownNow();
+            assertTrue(caller.awaitTermination(5, TimeUnit.SECONDS));
+        }
+    }
+
+    @Test
+    void testConfirmedOwnershipLossSurvivesLaterRemovalAndReadFailures() throws Exception {
+        recoveryDelayMillis = 0;
+        server.start();
+        String previousOwner = owner.getAndSet("master-1:5678#peer-instance");
+        CountDownLatch peerObserved = new CountDownLatch(1);
+        CountDownLatch returnPeerResult = new CountDownLatch(1);
+        CountDownLatch recoveryStarted = new CountDownLatch(1);
+        CountDownLatch allowRecovery = new CountDownLatch(1);
+        AtomicBoolean firstRelease = new AtomicBoolean(true);
+        AtomicInteger remainingFailures = new AtomicInteger();
+        when(registry.releaseLock(ELECTION_LOCK)).thenAnswer(invocation -> {
+            if (firstRelease.compareAndSet(true, false)) {
+                peerObserved.countDown();
+                await(returnPeerResult);
+            }
+            return true;
+        });
+        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
+            if (remainingFailures.getAndUpdate(value -> Math.max(0, value - 1)) > 0) {
+                throw new IllegalStateException("reads fail after a confirmed peer owner");
+            }
+            return owner.get() != null;
+        });
+        beforeRecovery.set(() -> {
+            recoveryStarted.countDown();
+            await(allowRecovery);
+        });
+        try {
+            notifyRemove(previousOwner);
+            assertTrue(peerObserved.await(5, TimeUnit.SECONDS));
+            // A second REMOVE makes the peer result old, but A has not acquired ownership since that read.
+            notifyRemove(owner.getAndSet(null));
+            remainingFailures.set(20);
+            returnPeerResult.countDown();
+            assertTrue(recoveryStarted.await(5, TimeUnit.SECONDS));
+            assertEquals(0, remainingFailures.get());
+            assertFalse(server.isActive(), "confirmed loss must be published despite the later REMOVE");
+            verify(statusListener, times(1)).changeToStandBy();
+
+            // Keep the recovery associated with the later REMOVE, even though the loss was published.
+            allowRecovery.countDown();
+            drain();
+            assertTrue(server.isActive());
+            verify(statusListener, times(2)).changeToActive();
+            assertTrue(electionExecutor.getQueue().isEmpty());
+        } finally {
+            returnPeerResult.countDown();
+            allowRecovery.countDown();
+        }
+    }
+
+    @Test
+    void testIndependentDemotionKeepsRunningRecoveryTracked() throws Exception {
+        enableMasterDemotion();
+        recoveryDelayMillis = 0;
+        server.start();
+        CountDownLatch oldResultReady = new CountDownLatch(1);
+        CountDownLatch returnOldResult = new CountDownLatch(1);
+        CountDownLatch recoveryStarted = new CountDownLatch(1);
+        CountDownLatch allowRecovery = new CountDownLatch(1);
+        CountDownLatch demoted = new CountDownLatch(1);
+        AtomicBoolean firstRelease = new AtomicBoolean(true);
+        AtomicInteger remainingFailures = new AtomicInteger();
+        when(registry.releaseLock(ELECTION_LOCK)).thenAnswer(invocation -> {
+            if (firstRelease.compareAndSet(true, false)) {
+                oldResultReady.countDown();
+                await(returnOldResult);
+            }
+            return true;
+        });
+        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
+            if (remainingFailures.getAndUpdate(value -> Math.max(0, value - 1)) > 0) {
+                throw new IllegalStateException("queued check cannot verify ownership");
+            }
+            return true;
+        });
+        beforeRecovery.set(() -> {
+            // The Future is already running. A successor, if incorrectly scheduled, stays visible in the queue.
+            recoveryDelayMillis = TimeUnit.DAYS.toMillis(1);
+            recoveryStarted.countDown();
+            await(allowRecovery);
+        });
+        doAnswer(invocation -> {
+            demoted.countDown();
+            return null;
+        }).when(statusListener).changeToStandBy();
+        try {
+            notifyRemove("earlier-peer");
+            assertTrue(oldResultReady.await(5, TimeUnit.SECONDS));
+            notifyRemove("later-peer");
+            remainingFailures.set(20);
+            returnOldResult.countDown();
+            assertTrue(recoveryStarted.await(5, TimeUnit.SECONDS));
+            assertTrue(server.isActive());
+
+            notifyRemove(owner.get());
+            assertTrue(demoted.await(5, TimeUnit.SECONDS));
+            synchronized (server) {
+                // Wait until the independent demotion has also finished its recovery scheduling.
+            }
+            allowRecovery.countDown();
+            drain();
+            assertTrue(server.isActive());
+            verify(statusListener, times(1)).changeToStandBy();
+            verify(statusListener, times(2)).changeToActive();
+            assertTrue(electionExecutor.getQueue().isEmpty(), "no untracked successor recovery remains");
+            server.close();
+            assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
+        } finally {
+            returnOldResult.countDown();
+            allowRecovery.countDown();
+        }
+    }
+
+    @Test
+    void testOwnRemovalAbortedBeforeReadDoesNotCloseCurrentOwner() throws Exception {
+        server.start();
+        CountDownLatch acquiringLock = new CountDownLatch(1);
+        CountDownLatch allowLock = new CountDownLatch(1);
+        AtomicBoolean firstAcquire = new AtomicBoolean(true);
+        when(registry.acquireLock(ELECTION_LOCK)).thenAnswer(invocation -> {
+            if (firstAcquire.compareAndSet(true, false)) {
+                acquiringLock.countDown();
+                await(allowLock);
+            }
+            return true;
+        });
+        doAnswer(invocation -> {
+            server.close();
+            return null;
+        }).when(statusListener).changeToStandBy();
+        try {
+            // The selector still belongs to A when notifications from older ownership periods arrive.
+            notifyRemove(owner.get());
+            assertTrue(acquiringLock.await(5, TimeUnit.SECONDS));
+            notifyRemove("earlier-peer");
+            Future<?> drained = electionExecutor.submit(() -> {
+            });
+            allowLock.countDown();
+            drained.get(5, TimeUnit.SECONDS);
+            assertTrue(server.isActive());
+            assertFalse(electionExecutor.isShutdown());
+            verify(statusListener, never()).changeToStandBy();
+            verify(statusListener, times(1)).changeToActive();
+            assertTrue(electionExecutor.getQueue().isEmpty());
+        } finally {
+            allowLock.countDown();
+        }
+    }
+
+    @Test
+    void testMissingSelectorDemotesBeforeFailedPeerCheck() throws Exception {
+        recoveryDelayMillis = 0;
+        server.start();
+        String previousOwner = owner.getAndSet(null);
+        CountDownLatch readMissing = new CountDownLatch(1);
+        CountDownLatch returnRead = new CountDownLatch(1);
+        CountDownLatch recoveryStarted = new CountDownLatch(1);
+        CountDownLatch allowRecovery = new CountDownLatch(1);
+        AtomicBoolean firstRead = new AtomicBoolean(true);
+        AtomicInteger remainingFailures = new AtomicInteger();
+        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
+            if (firstRead.compareAndSet(true, false)) {
+                readMissing.countDown();
+                await(returnRead);
+                return false;
+            }
+            if (remainingFailures.getAndUpdate(value -> Math.max(0, value - 1)) > 0) {
+                throw new IllegalStateException("peer check cannot verify ownership");
+            }
+            return owner.get() != null;
+        });
+        beforeRecovery.set(() -> {
+            recoveryStarted.countDown();
+            await(allowRecovery);
+        });
+        try {
+            notifyRemove(previousOwner);
+            assertTrue(readMissing.await(5, TimeUnit.SECONDS));
+            // A newer REMOVE aborts the own-removal check before it can claim the missing selector.
+            notifyRemove("earlier-peer");
+            remainingFailures.set(20);
+            returnRead.countDown();
+            assertTrue(recoveryStarted.await(5, TimeUnit.SECONDS));
+            assertEquals(0, remainingFailures.get());
+            assertFalse(server.isActive(), "a missing selector must still stop the former leader");
+            verify(statusListener, times(1)).changeToStandBy();
+            verify(registry, times(1)).put(eq(SELECTOR_PATH), anyString(), eq(true));
+
+            // Retain the existing recovery; no additional Registry event is needed after reads recover.
+            allowRecovery.countDown();
+            drain();
+            assertTrue(server.isActive());
+            verify(statusListener, times(2)).changeToActive();
+            assertTrue(electionExecutor.getQueue().isEmpty());
+        } finally {
+            returnRead.countDown();
+            allowRecovery.countDown();
+        }
+    }
+
+    @Test
+    void testCloseAfterMissingSelectorCancelsRecovery() throws Exception {
+        server.start();
+        String previousOwner = owner.getAndSet(null);
+        CountDownLatch readMissing = new CountDownLatch(1);
+        CountDownLatch returnRead = new CountDownLatch(1);
+        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
+            readMissing.countDown();
+            await(returnRead);
+            return false;
+        });
+        doAnswer(invocation -> {
+            // Alert closes its HA server from the standby listener.
+            server.close();
+            return null;
+        }).when(statusListener).changeToStandBy();
+        try {
+            notifyRemove(previousOwner);
+            assertTrue(readMissing.await(5, TimeUnit.SECONDS));
+            notifyRemove("earlier-peer");
+            returnRead.countDown();
+            assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
+            assertFalse(server.isActive());
+            verify(statusListener, times(1)).changeToStandBy();
+            verify(statusListener, times(1)).changeToActive();
+            verify(registry, times(1)).put(eq(SELECTOR_PATH), anyString(), eq(true));
+            assertTrue(electionExecutor.getQueue().isEmpty());
+        } finally {
+            returnRead.countDown();
+        }
+    }
+
+    @Test
     void testOwnRemovalDemotesBeforeRetryingFailedOwnershipRead() {
         server.start();
         String removedOwner = owner.get();
@@ -342,6 +786,16 @@ class AbstractHAServerTest {
 
     @Test
     void testOwnRemovalDemotionRecoversWithoutAnotherRemove() throws Exception {
+        verifyOwnRemovalDemotionRecovers();
+    }
+
+    @Test
+    void testIndependentDemotionRecoversWithoutAnotherRemove() throws Exception {
+        enableMasterDemotion();
+        verifyOwnRemovalDemotionRecovers();
+    }
+
+    private void verifyOwnRemovalDemotionRecovers() throws Exception {
         recoveryDelayMillis = 0;
         server.start();
         String currentOwner = owner.get();
@@ -367,8 +821,35 @@ class AbstractHAServerTest {
         assertTrue(server.isActive());
         verify(statusListener).changeToStandBy();
         verify(statusListener, times(2)).changeToActive();
-        verify(registry, times(22)).exists(SELECTOR_PATH);
+        // Independent demotion may defer a check. Assert recovery after all injected failures, not its scheduling
+        // order.
+        assertEquals(0, remainingFailures.get());
+        verify(registry, atLeast(22)).exists(SELECTOR_PATH);
         assertTrue(electionExecutor.getQueue().isEmpty());
+    }
+
+    @Test
+    void testIndependentDemotionRechecksAfterLateOwnRemoval() throws Exception {
+        enableMasterDemotion();
+        recoveryDelayMillis = 0;
+        server.start();
+
+        String currentOwner = owner.get();
+        CountDownLatch reactivated = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            reactivated.countDown();
+            return null;
+        }).when(statusListener).changeToActive();
+
+        // The current selector was reacquired by this instance before the old event arrived.
+        notifyRemove(currentOwner);
+
+        assertTrue(reactivated.await(5, TimeUnit.SECONDS));
+        drain();
+        assertTrue(server.isActive());
+        assertEquals(currentOwner, owner.get());
+        verify(statusListener, times(1)).changeToStandBy();
+        verify(statusListener, times(2)).changeToActive();
     }
 
     @Test
@@ -653,7 +1134,17 @@ class AbstractHAServerTest {
         return newServer(ADDRESS);
     }
 
+    private void enableMasterDemotion() {
+        server = newServer(ADDRESS, true);
+        electionExecutor = electionExecutors.get(electionExecutors.size() - 1);
+        server.addServerStatusChangeListener(statusListener);
+    }
+
     private AbstractHAServer newServer(String address) {
+        return newServer(address, false);
+    }
+
+    private AbstractHAServer newServer(String address, boolean masterDemotion) {
         ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, runnable -> {
             Thread thread = new Thread(() -> {
                 // Static mocks are thread-local, so install the retry delay stub on the election worker.
@@ -676,13 +1167,16 @@ class AbstractHAServerTest {
             public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
                 if (delay > 0) {
                     // Control the timer without sleeps or wall-clock assumptions in the tests.
-                    return super.schedule(command, recoveryDelayMillis, TimeUnit.MILLISECONDS);
+                    return super.schedule(() -> {
+                        beforeRecovery.get().run();
+                        command.run();
+                    }, recoveryDelayMillis, TimeUnit.MILLISECONDS);
                 }
                 return super.schedule(command, delay, unit);
             }
         };
         electionExecutors.add(executor);
-        AbstractHAServer result = new AbstractHAServer(registry, SELECTOR_PATH, address, executor) {
+        AbstractHAServer result = new AbstractHAServer(registry, SELECTOR_PATH, address, executor, masterDemotion) {
         };
         servers.add(result);
         return result;

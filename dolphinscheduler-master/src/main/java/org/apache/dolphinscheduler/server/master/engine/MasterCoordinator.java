@@ -51,7 +51,8 @@ public class MasterCoordinator extends AbstractHAServer {
         super(
                 registry,
                 RegistryNodeType.MASTER_COORDINATOR.getRegistryPath(),
-                masterConfig.getMasterAddress());
+                masterConfig.getMasterAddress(),
+                true);
         this.masterCoordinatorListener =
                 new MasterCoordinatorListener(taskGroupCoordinator, failoverCoordinator, workflowSerialCoordinator);
         addServerStatusChangeListener(masterCoordinatorListener);

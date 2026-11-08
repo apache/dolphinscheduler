@@ -27,6 +27,8 @@ import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -50,10 +52,15 @@ public abstract class AbstractHAServer implements HAServer {
 
     private final ScheduledThreadPoolExecutor electionExecutor;
 
+    private final ExecutorService demotionExecutor;
+
     private final Object electionStateLock = new Object();
 
     // Guarded by electionStateLock. Only the election worker clears it before checking ownership.
     private boolean removeReceived;
+
+    // Guarded by electionStateLock. Prevents promotion before the queued demotion completes.
+    private boolean demotionPending;
 
     // Guarded by electionStateLock.
     private ScheduledFuture<?> promotionRecovery;
@@ -65,14 +72,23 @@ public abstract class AbstractHAServer implements HAServer {
     private static final int DEFAULT_MAX_RETRY_TIMES = 20;
 
     public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
+        this(registry, selectorPath, serverIdentify, false);
+    }
+
+    protected AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify,
+                               final boolean demoteOnOwnRemoval) {
         this(registry, selectorPath, serverIdentify,
-                new ScheduledThreadPoolExecutor(1, ThreadUtils.newDaemonThreadFactory("HA-Election-%d")));
+                new ScheduledThreadPoolExecutor(1, ThreadUtils.newDaemonThreadFactory("HA-Election-%d")),
+                demoteOnOwnRemoval);
     }
 
     @VisibleForTesting
     AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify,
-                     final ScheduledThreadPoolExecutor electionExecutor) {
+                     final ScheduledThreadPoolExecutor electionExecutor, final boolean demoteOnOwnRemoval) {
         this.electionExecutor = electionExecutor;
+        demotionExecutor = demoteOnOwnRemoval
+                ? Executors.newSingleThreadExecutor(ThreadUtils.newDaemonThreadFactory("HA-Demotion-%d"))
+                : null;
         electionExecutor.setRemoveOnCancelPolicy(true);
         this.registry = registry;
         this.selectorPath = checkNotNull(selectorPath);
@@ -119,7 +135,16 @@ public abstract class AbstractHAServer implements HAServer {
 
     private void enqueueElection(boolean ownSelectorRemoved) {
         synchronized (electionStateLock) {
+            if (electionExecutor.isShutdown()) {
+                return;
+            }
             removeReceived = true;
+            if (ownSelectorRemoved && demotionExecutor != null && serverStatus == ServerStatus.ACTIVE
+                    && !demotionPending) {
+                // Stop without waiting for an earlier Registry call or blocking the watch callback.
+                demotionExecutor.execute(this::demoteAfterOwnRemoval);
+                demotionPending = true;
+            }
         }
         try {
             electionExecutor.execute(() -> {
@@ -137,13 +162,38 @@ public abstract class AbstractHAServer implements HAServer {
         }
     }
 
+    private synchronized void demoteAfterOwnRemoval() {
+        try {
+            if (isActive()) {
+                statusChange(ServerStatus.STAND_BY, false);
+            }
+        } finally {
+            synchronized (electionStateLock) {
+                demotionPending = false;
+                // A fresh result may have been deferred while the demotion was queued.
+                schedulePromotionRecovery();
+            }
+        }
+    }
+
     private void reconcileElection(boolean ownSelectorRemoved, int maxAttempts) {
         // A fresh ownership check accounts for REMOVE events already received.
         synchronized (electionStateLock) {
+            if (demotionPending || electionExecutor.isShutdown()) {
+                return;
+            }
             removeReceived = false;
         }
-        boolean elected = participateElection(ownSelectorRemoved, maxAttempts);
-        statusChange(elected ? ServerStatus.ACTIVE : ServerStatus.STAND_BY);
+        ElectionResult result = participateElection(ownSelectorRemoved, maxAttempts);
+        if (result == ElectionResult.ABORTED) {
+            synchronized (electionStateLock) {
+                if (!demotionPending) {
+                    schedulePromotionRecovery();
+                }
+            }
+            return;
+        }
+        statusChange(result == ElectionResult.ELECTED ? ServerStatus.ACTIVE : ServerStatus.STAND_BY, true);
     }
 
     // Called under electionStateLock so close() can cancel the only pending recovery.
@@ -182,6 +232,9 @@ public abstract class AbstractHAServer implements HAServer {
         synchronized (electionStateLock) {
             // Cancel delayed recovery, but let queued startup futures finish as no-ops.
             electionExecutor.shutdown();
+            if (demotionExecutor != null) {
+                demotionExecutor.shutdown();
+            }
             cancelPromotionRecovery();
         }
         synchronized (this) {
@@ -197,33 +250,41 @@ public abstract class AbstractHAServer implements HAServer {
 
     @Override
     public boolean participateElection() {
-        return participateElection(false, DEFAULT_MAX_RETRY_TIMES);
+        return participateElection(false, DEFAULT_MAX_RETRY_TIMES) == ElectionResult.ELECTED;
     }
 
-    private boolean participateElection(boolean ownSelectorRemoved, int maxAttempts) {
+    private ElectionResult participateElection(boolean ownSelectorRemoved, int maxAttempts) {
         final String electionLock = selectorPath + "-lock";
         int failedAttempts = 0;
-        while (!electionExecutor.isShutdown()) {
+        while (canParticipateElection()) {
             try {
                 if (!registry.acquireLock(electionLock)) {
                     throw new RegistryException("Could not acquire election lock " + electionLock);
                 }
                 try {
-                    if (electionExecutor.isShutdown()) {
-                        return false;
+                    if (!canParticipateElection()) {
+                        return ElectionResult.ABORTED;
                     }
                     if (registry.exists(selectorPath)) {
-                        return serverIdentify.equals(registry.get(selectorPath));
+                        if (serverIdentify.equals(registry.get(selectorPath))) {
+                            return ElectionResult.ELECTED;
+                        }
+                        return ElectionResult.NOT_ELECTED;
+                    }
+                    // A missing selector confirms ownership loss even if a newer REMOVE prevents a claim.
+                    if (!canParticipateElection()) {
+                        return ElectionResult.NOT_ELECTED;
                     }
                     registry.put(selectorPath, serverIdentify, true);
-                    return true;
+                    return ElectionResult.ELECTED;
                 } finally {
                     registry.releaseLock(electionLock);
                 }
             } catch (Exception e) {
-                // If we cannot verify ownership after our selector was deleted, stop before retrying.
-                if (ownSelectorRemoved && isActive()) {
-                    statusChange(ServerStatus.STAND_BY);
+                if (ownSelectorRemoved && (demotionExecutor != null || isActive())) {
+                    if (demotionExecutor == null && isActive()) {
+                        statusChange(ServerStatus.STAND_BY, false);
+                    }
                     synchronized (electionStateLock) {
                         // A delayed own REMOVE can leave our current selector in place.
                         schedulePromotionRecovery();
@@ -240,7 +301,13 @@ public abstract class AbstractHAServer implements HAServer {
                 }
             }
         }
-        return false;
+        return ElectionResult.ABORTED;
+    }
+
+    private boolean canParticipateElection() {
+        synchronized (electionStateLock) {
+            return !electionExecutor.isShutdown() && !removeReceived && !demotionPending;
+        }
     }
 
     @Override
@@ -254,22 +321,30 @@ public abstract class AbstractHAServer implements HAServer {
     }
 
     // Use the same monitor as external close() so it waits for ongoing status updates and listener calls.
-    private synchronized void statusChange(ServerStatus targetStatus) {
-        if (electionExecutor.isShutdown()) {
-            return;
-        }
+    private synchronized void statusChange(ServerStatus targetStatus, boolean fromElection) {
         final ServerStatus originStatus;
         synchronized (electionStateLock) {
-            if (targetStatus == ServerStatus.ACTIVE && removeReceived) {
-                if (serverStatus == ServerStatus.STAND_BY) {
-                    // Keep a fallback until a recheck can publish a definite result.
+            if (electionExecutor.isShutdown()) {
+                return;
+            }
+            // A later REMOVE invalidates a positive result, but cannot restore ownership already lost.
+            if (fromElection && (demotionPending || (targetStatus == ServerStatus.ACTIVE && removeReceived))) {
+                if (!demotionPending) {
+                    // The demotion worker schedules its own recheck after the old workers exit.
                     schedulePromotionRecovery();
                 }
                 return;
             }
             originStatus = serverStatus;
             serverStatus = targetStatus;
-            cancelPromotionRecovery();
+            // Direct demotion keeps an existing recheck tracked until that task clears its own handle.
+            if (fromElection) {
+                if (removeReceived) {
+                    schedulePromotionRecovery();
+                } else {
+                    cancelPromotionRecovery();
+                }
+            }
         }
         try {
             serverStatusChangeListeners.forEach(listener -> {
@@ -281,5 +356,12 @@ public abstract class AbstractHAServer implements HAServer {
         } catch (Exception ex) {
             log.error("Trigger ServerStatusChangeListener from {} -> {} error", originStatus, targetStatus, ex);
         }
+    }
+
+    // An aborted check contains no ownership decision to publish.
+    private enum ElectionResult {
+        ELECTED,
+        NOT_ELECTED,
+        ABORTED
     }
 }
