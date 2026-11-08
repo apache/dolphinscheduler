@@ -19,7 +19,6 @@ package org.apache.dolphinscheduler.server.master.engine.workflow.serial;
 
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
 import org.apache.dolphinscheduler.dao.repository.CommandDao;
@@ -34,8 +33,6 @@ import org.apache.dolphinscheduler.server.master.metrics.WorkflowInstanceMetrics
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 @Slf4j
@@ -59,40 +56,44 @@ public abstract class AbstractSerialCommandHandler implements ISerialCommandHand
     @Autowired
     protected SerialCommandDao serialCommandDao;
 
-    protected void launchSerialCommand(SerialCommandDto serialCommand) {
-        transactionTemplate.execute(new TransactionCallback<Object>() {
-
-            @Override
-            public Void doInTransaction(TransactionStatus status) {
-                final Command command = serialCommand.getCommand();
-                commandDao.insert(command);
-
-                serialCommand.setState(SerialCommandDto.State.LAUNCHED);
-                serialCommandDao.updateById(serialCommand.toEntity());
-                return null;
+    protected boolean launchSerialCommand(SerialCommandDto serialCommand) {
+        final boolean launched = Boolean.TRUE.equals(transactionTemplate.execute(status -> {
+            // Claim before inserting so two WAITING snapshots cannot create two Commands.
+            if (!serialCommandDao.acquireSerialCommand(serialCommand.getId(), DateUtils.getCurrentDate())) {
+                return false;
             }
-        });
+            if (commandDao.insert(serialCommand.getCommand()) != 1) {
+                throw new IllegalStateException("Failed to insert Command for SerialCommand: " + serialCommand.getId());
+            }
+            return true;
+        }));
+        if (launched) {
+            // Keep the snapshot unchanged if the transaction rolls back.
+            serialCommand.setState(SerialCommandDto.State.LAUNCHED);
+        }
+        return launched;
     }
 
-    protected void discardSerialCommandAndStopWorkflowInstanceInDB(SerialCommandDto serialCommand) {
-        transactionTemplate.execute(new TransactionCallback<Object>() {
-
-            @Override
-            public Void doInTransaction(TransactionStatus status) {
-                serialCommandDao.deleteById(serialCommand.getId());
-
-                // todo: call api to stop the workflow instance
-                final Integer workflowInstanceId = serialCommand.getWorkflowInstanceId();
-                final WorkflowInstance workflowInstance = workflowInstanceDao.queryById(workflowInstanceId);
-                workflowInstance.setEndTime(DateUtils.getCurrentDate());
-                workflowInstance.setState(WorkflowExecutionStatus.STOP);
-                workflowInstanceDao.upsertWorkflowInstance(workflowInstance);
-                WorkflowInstanceMetrics.recordWorkflowInstanceFinish(
-                        WorkflowExecutionStatus.STOP,
-                        workflowInstance.getWorkflowDefinitionCode());
-                return null;
+    protected boolean discardSerialCommandAndStopWorkflowInstanceInDB(SerialCommandDto serialCommand) {
+        return Boolean.TRUE.equals(transactionTemplate.execute(status -> {
+            // A stale WAITING snapshot must not discard a Command another coordinator has launched.
+            if (!serialCommandDao.deleteByIdAndState(serialCommand.getId(), SerialCommandDto.State.WAITING)) {
+                return false;
             }
-        });
+
+            // todo: call api to stop the workflow instance
+            final Integer workflowInstanceId = serialCommand.getWorkflowInstanceId();
+            final WorkflowInstance workflowInstance = workflowInstanceDao.queryById(workflowInstanceId);
+            workflowInstance.setEndTime(DateUtils.getCurrentDate());
+            workflowInstance.setState(WorkflowExecutionStatus.STOP);
+            if (!workflowInstanceDao.updateById(workflowInstance)) {
+                throw new IllegalStateException("Failed to stop WorkflowInstance: " + workflowInstanceId);
+            }
+            WorkflowInstanceMetrics.recordWorkflowInstanceFinish(
+                    WorkflowExecutionStatus.STOP,
+                    workflowInstance.getWorkflowDefinitionCode());
+            return true;
+        }));
     }
 
     protected void stopWorkflowInstanceInMaster(SerialCommandDto serialCommand) {

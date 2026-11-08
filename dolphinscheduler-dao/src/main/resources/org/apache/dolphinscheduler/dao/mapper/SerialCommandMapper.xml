@@ -33,4 +33,13 @@
         delete from t_ds_serial_command where workflow_instance_id = #{workflowInstanceId}
     </delete>
     
+    <update id="acquireSerialCommand">
+        update t_ds_serial_command
+        set state = #{targetState}, update_time = #{updateTime}
+        where id = #{id} and state = #{originState}
+    </update>
+
+    <delete id="deleteByIdAndState">
+        delete from t_ds_serial_command where id = #{id} and state = #{state}
+    </delete>
 </mapper>
