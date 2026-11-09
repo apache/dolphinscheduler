@@ -73,6 +73,10 @@ public class HttpTask extends AbstractTask {
 
     @Override
     public void handle(TaskCallBack taskCallBack) throws TaskException {
+        // Resolve ${...} / $[...] placeholders in the URL with the same parameter map used for
+        // headers, query parameters and body; otherwise the raw template is used as the host.
+        httpParameters.setUrl(ParameterUtils.convertParameterPlaceholders(httpParameters.getUrl(),
+                ParameterUtils.convert(taskExecutionContext.getPrepareParamsMap())));
 
         OkHttpResponse httpResponse = sendRequest();
 

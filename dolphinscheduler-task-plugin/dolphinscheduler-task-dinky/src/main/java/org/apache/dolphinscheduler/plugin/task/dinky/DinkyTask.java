@@ -135,7 +135,9 @@ public class DinkyTask extends AbstractRemoteTask {
                 }
             }
         } catch (Exception ex) {
-            Thread.currentThread().interrupt();
+            // The exception is an HTTP / JSON failure, not an InterruptedException, so the interrupt
+            // flag must not be restored here. A stray flag makes the worker thread's next
+            // Condition.await() throw immediately and permanently terminates that worker.
             log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
@@ -166,7 +168,9 @@ public class DinkyTask extends AbstractRemoteTask {
                         DinkyTaskConstants.SUBMIT_FAILED_MSG + result.get(DinkyTaskConstants.API_RESULT_MSG));
             }
         } catch (Exception ex) {
-            Thread.currentThread().interrupt();
+            // The exception is an HTTP / JSON failure, not an InterruptedException, so the interrupt
+            // flag must not be restored here. A stray flag makes the worker thread's next
+            // Condition.await() throw immediately and permanently terminates that worker.
             log.error(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
             setExitStatusCode(EXIT_CODE_FAILURE);
             throw new TaskException(DinkyTaskConstants.SUBMIT_FAILED_MSG, ex);
