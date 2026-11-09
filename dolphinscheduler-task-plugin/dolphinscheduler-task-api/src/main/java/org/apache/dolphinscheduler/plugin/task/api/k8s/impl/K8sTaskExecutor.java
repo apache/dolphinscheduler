@@ -314,9 +314,13 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                     log.error("Handle pod log error", e);
                 }
             }
-        } catch (Exception e) {
+        } catch (InterruptedException e) {
             cancelApplication(k8sParameterStr);
             Thread.currentThread().interrupt();
+            result.setExitStatusCode(EXIT_CODE_FAILURE);
+            throw e;
+        } catch (Exception e) {
+            cancelApplication(k8sParameterStr);
             result.setExitStatusCode(EXIT_CODE_FAILURE);
             throw e;
         } finally {

@@ -17,19 +17,24 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.impl.K8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
+import org.apache.dolphinscheduler.plugin.task.api.utils.K8sUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +111,37 @@ public class K8sTaskExecutorTest {
         List<String> actualCommands =
                 k8sTaskExecutor.getJob().getSpec().getTemplate().getSpec().getContainers().get(0).getCommand();
         Assertions.assertEquals(expectedCommands, actualCommands);
+    }
+
+    @Test
+    public void testRunFailureDoesNotInterruptWorkerThread() throws Exception {
+        TaskExecutionContext taskRequest = new TaskExecutionContext();
+        taskRequest.setTaskInstanceId(taskInstanceId);
+        taskRequest.setTaskAppId("task-app-id");
+        taskRequest.setK8sTaskExecutionContext(new K8sTaskExecutionContext("config", namespace));
+
+        K8sTaskExecutor executor = new K8sTaskExecutor(taskRequest);
+        K8sUtils k8sUtils = Mockito.mock(K8sUtils.class);
+        Mockito.doThrow(new RuntimeException("k8s unavailable")).when(k8sUtils).buildClient(Mockito.anyString());
+        executor.k8sUtils = k8sUtils;
+
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        AtomicBoolean interrupted = new AtomicBoolean();
+        Thread workerThread = new Thread(() -> {
+            try {
+                executor.run("params");
+            } catch (Throwable t) {
+                failure.set(t);
+            } finally {
+                interrupted.set(Thread.currentThread().isInterrupted());
+            }
+        }, "k8s-task-executor-test-worker");
+        workerThread.start();
+        workerThread.join(10000);
+
+        Assertions.assertTrue(failure.get() instanceof RuntimeException);
+        Assertions.assertFalse(interrupted.get(),
+                "a failed k8s task must not leave the worker thread interrupted");
     }
 
 }
