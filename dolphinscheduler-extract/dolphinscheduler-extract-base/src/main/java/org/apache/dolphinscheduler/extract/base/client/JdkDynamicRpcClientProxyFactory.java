@@ -40,7 +40,7 @@ class JdkDynamicRpcClientProxyFactory implements IRpcClientProxyFactory {
 
     private final NettyRemotingClient nettyRemotingClient;
 
-    private static final LoadingCache<String, Map<String, Object>> proxyClientCache = CacheBuilder.newBuilder()
+    private final LoadingCache<String, Map<String, Object>> proxyClientCache = CacheBuilder.newBuilder()
             // expire here to remove dead host which is never used
             // It's safe to remove dead host here because the client will be recreated when needed
             // and the client is only a proxy client, it will not hold any resource
