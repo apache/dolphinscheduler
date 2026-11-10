@@ -42,8 +42,8 @@ class SerialCommandDaoImplTest extends BaseDaoTest {
     void testWaitingCommandCanOnlyBeAcquiredOnce() {
         SerialCommand command = insertWaitingCommand();
         Date updateTime = new Date(System.currentTimeMillis() + 1000);
-        assertTrue(serialCommandDao.acquireSerialCommand(command.getId(), updateTime));
-        assertFalse(serialCommandDao.acquireSerialCommand(command.getId(), new Date()));
+        assertTrue(serialCommandDao.launchSerialCommand(command.getId(), updateTime));
+        assertFalse(serialCommandDao.launchSerialCommand(command.getId(), new Date()));
         SerialCommand acquired = serialCommandDao.queryById(command.getId());
         assertEquals(SerialCommandDto.State.LAUNCHED.getValue(), acquired.getState());
         assertEquals(updateTime, acquired.getUpdateTime());
@@ -52,7 +52,7 @@ class SerialCommandDaoImplTest extends BaseDaoTest {
     @Test
     void testStaleWaitingSnapshotCannotDeleteLaunchedCommand() {
         SerialCommand command = insertWaitingCommand();
-        assertTrue(serialCommandDao.acquireSerialCommand(command.getId(), new Date()));
+        assertTrue(serialCommandDao.launchSerialCommand(command.getId(), new Date()));
         assertFalse(serialCommandDao.deleteByIdAndState(command.getId(), SerialCommandDto.State.WAITING));
         assertNotNull(serialCommandDao.queryById(command.getId()));
     }
@@ -69,7 +69,7 @@ class SerialCommandDaoImplTest extends BaseDaoTest {
     void testDiscardedCommandCannotBeAcquired() {
         SerialCommand command = insertWaitingCommand();
         assertTrue(serialCommandDao.deleteByIdAndState(command.getId(), SerialCommandDto.State.WAITING));
-        assertFalse(serialCommandDao.acquireSerialCommand(command.getId(), new Date()));
+        assertFalse(serialCommandDao.launchSerialCommand(command.getId(), new Date()));
     }
 
     private SerialCommand insertWaitingCommand() {

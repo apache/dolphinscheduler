@@ -29,7 +29,7 @@ public interface SerialCommandDao extends IDao<SerialCommand> {
 
     int deleteByWorkflowInstanceId(Integer workflowInstanceId);
 
-    boolean acquireSerialCommand(Integer id, Date updateTime);
+    boolean launchSerialCommand(Integer id, Date updateTime);
 
     boolean deleteByIdAndState(Integer id, SerialCommandDto.State state);
 

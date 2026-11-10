@@ -32,10 +32,10 @@ public interface SerialCommandMapper extends BaseMapper<SerialCommand> {
 
     int deleteByWorkflowInstanceId(@Param("workflowInstanceId") int workflowInstanceId);
 
-    int acquireSerialCommand(@Param("id") Integer id,
-                             @Param("originState") int originState,
-                             @Param("targetState") int targetState,
-                             @Param("updateTime") Date updateTime);
+    int launchSerialCommand(@Param("id") Integer id,
+                            @Param("originState") int originState,
+                            @Param("targetState") int targetState,
+                            @Param("updateTime") Date updateTime);
 
     int deleteByIdAndState(@Param("id") Integer id, @Param("state") int state);
 

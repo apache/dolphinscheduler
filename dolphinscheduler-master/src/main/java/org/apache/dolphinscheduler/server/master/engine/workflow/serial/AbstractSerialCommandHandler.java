@@ -59,7 +59,8 @@ public abstract class AbstractSerialCommandHandler implements ISerialCommandHand
     protected boolean launchSerialCommand(SerialCommandDto serialCommand) {
         final boolean launched = Boolean.TRUE.equals(transactionTemplate.execute(status -> {
             // Claim before inserting so two WAITING snapshots cannot create two Commands.
-            if (!serialCommandDao.acquireSerialCommand(serialCommand.getId(), DateUtils.getCurrentDate())) {
+            if (!serialCommandDao.launchSerialCommand(serialCommand.getId(), DateUtils.getCurrentDate())) {
+                log.info("Skip launching SerialCommand: {}, it is no longer in WAITING state", serialCommand.getId());
                 return false;
             }
             if (commandDao.insert(serialCommand.getCommand()) != 1) {
@@ -78,6 +79,7 @@ public abstract class AbstractSerialCommandHandler implements ISerialCommandHand
         return Boolean.TRUE.equals(transactionTemplate.execute(status -> {
             // A stale WAITING snapshot must not discard a Command another coordinator has launched.
             if (!serialCommandDao.deleteByIdAndState(serialCommand.getId(), SerialCommandDto.State.WAITING)) {
+                log.info("Skip discarding SerialCommand: {}, it is no longer in WAITING state", serialCommand.getId());
                 return false;
             }
 

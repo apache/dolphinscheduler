@@ -83,7 +83,7 @@ class SerialCommandHandlerTest {
     @Test
     void testWaitLaunchesClaimedCommand() {
         SerialCommandDto command = command(1, SerialCommandDto.State.WAITING);
-        when(serialCommandDao.acquireSerialCommand(eq(1), any(Date.class))).thenReturn(true);
+        when(serialCommandDao.launchSerialCommand(eq(1), any(Date.class))).thenReturn(true);
         when(commandDao.insert(command.getCommand())).thenReturn(1);
         waitHandler.handle(group(command));
         assertEquals(SerialCommandDto.State.LAUNCHED, command.getState());
@@ -94,7 +94,7 @@ class SerialCommandHandlerTest {
     @Test
     void testWaitDoesNotInsertFromStaleWaitingSnapshot() {
         SerialCommandDto command = command(1, SerialCommandDto.State.WAITING);
-        when(serialCommandDao.acquireSerialCommand(eq(1), any(Date.class))).thenReturn(false);
+        when(serialCommandDao.launchSerialCommand(eq(1), any(Date.class))).thenReturn(false);
         waitHandler.handle(group(command));
         verify(commandDao, never()).insert(any());
         assertEquals(SerialCommandDto.State.WAITING, command.getState());
@@ -103,7 +103,7 @@ class SerialCommandHandlerTest {
     @Test
     void testInsertReturningZeroRollsBackClaim() {
         SerialCommandDto command = command(1, SerialCommandDto.State.WAITING);
-        when(serialCommandDao.acquireSerialCommand(eq(1), any(Date.class))).thenReturn(true);
+        when(serialCommandDao.launchSerialCommand(eq(1), any(Date.class))).thenReturn(true);
         when(commandDao.insert(command.getCommand())).thenReturn(0);
         assertThrows(IllegalStateException.class, () -> waitHandler.handle(group(command)));
         verify(transactionManager).rollback(transactionStatus);
@@ -114,7 +114,7 @@ class SerialCommandHandlerTest {
     @Test
     void testInsertExceptionDoesNotChangeSnapshotState() {
         SerialCommandDto command = command(1, SerialCommandDto.State.WAITING);
-        when(serialCommandDao.acquireSerialCommand(eq(1), any(Date.class))).thenReturn(true);
+        when(serialCommandDao.launchSerialCommand(eq(1), any(Date.class))).thenReturn(true);
         when(commandDao.insert(command.getCommand())).thenThrow(new IllegalStateException("insert failed"));
         assertThrows(IllegalStateException.class, () -> waitHandler.handle(group(command)));
         verify(transactionManager).rollback(transactionStatus);
@@ -151,7 +151,7 @@ class SerialCommandHandlerTest {
     void testDiscardDoesNotContinueAfterLosingHeadClaim() {
         SerialCommandDto head = command(1, SerialCommandDto.State.WAITING);
         SerialCommandDto remaining = command(2, SerialCommandDto.State.WAITING);
-        when(serialCommandDao.acquireSerialCommand(eq(1), any(Date.class))).thenReturn(false);
+        when(serialCommandDao.launchSerialCommand(eq(1), any(Date.class))).thenReturn(false);
         discardHandler.handle(group(head, remaining));
         verify(serialCommandDao, never()).deleteByIdAndState(anyInt(), any());
         verify(commandDao, never()).insert(any());
@@ -175,7 +175,7 @@ class SerialCommandHandlerTest {
         SerialCommandDto newest = command(2, SerialCommandDto.State.WAITING);
         when(serialCommandDao.deleteByIdAndState(1, SerialCommandDto.State.WAITING)).thenReturn(false);
         priorityHandler.handle(group(previous, newest));
-        verify(serialCommandDao, never()).acquireSerialCommand(anyInt(), any());
+        verify(serialCommandDao, never()).launchSerialCommand(anyInt(), any());
         verify(workflowInstanceDao, never()).queryById(anyInt());
         verify(commandDao, never()).insert(any());
     }
@@ -193,7 +193,7 @@ class SerialCommandHandlerTest {
         WorkflowInstance instance = instance(launched);
         when(workflowInstanceDao.queryById(launched.getWorkflowInstanceId())).thenReturn(instance);
         when(masterConfig.getMasterAddress()).thenReturn("local-master");
-        when(serialCommandDao.acquireSerialCommand(eq(2), any(Date.class))).thenReturn(true);
+        when(serialCommandDao.launchSerialCommand(eq(2), any(Date.class))).thenReturn(true);
         when(commandDao.insert(newest.getCommand())).thenReturn(1);
         priorityHandler.handle(group(launched, newest));
         verify(workflowControlClient).stopWorkflowInstance(any());
@@ -209,7 +209,7 @@ class SerialCommandHandlerTest {
         when(serialCommandDao.deleteByIdAndState(1, SerialCommandDto.State.WAITING)).thenReturn(true);
         when(workflowInstanceDao.queryById(previous.getWorkflowInstanceId())).thenReturn(instance);
         when(workflowInstanceDao.updateById(instance)).thenReturn(true);
-        when(serialCommandDao.acquireSerialCommand(eq(2), any(Date.class))).thenReturn(true);
+        when(serialCommandDao.launchSerialCommand(eq(2), any(Date.class))).thenReturn(true);
         when(commandDao.insert(newest.getCommand())).thenReturn(1);
         priorityHandler.handle(group(previous, newest));
         assertEquals(WorkflowExecutionStatus.STOP, instance.getState());

@@ -49,8 +49,8 @@ public class SerialCommandDaoImpl extends BaseDao<SerialCommand, SerialCommandMa
         return mybatisMapper.deleteByWorkflowInstanceId(workflowInstanceId);
     }
     @Override
-    public boolean acquireSerialCommand(Integer id, Date updateTime) {
-        return mybatisMapper.acquireSerialCommand(id,
+    public boolean launchSerialCommand(Integer id, Date updateTime) {
+        return mybatisMapper.launchSerialCommand(id,
                 SerialCommandDto.State.WAITING.getValue(),
                 SerialCommandDto.State.LAUNCHED.getValue(),
                 updateTime) > 0;
