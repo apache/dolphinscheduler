@@ -27,24 +27,24 @@ PostgreSQL and H2.
 
 Table `t_ds_workflow_definition`:
 
-|      Column      |     Type     |                                        Description                                         |
-|------------------|--------------|--------------------------------------------------------------------------------------------|
-| id               | int(11)      | Primary key                                                                                |
-| code             | bigint(20)   | Workflow definition code, globally unique                                                  |
-| name             | varchar(255) | Workflow definition name, unique within a project                                          |
-| version          | int(11)      | Workflow definition version                                                                |
-| description      | text         | Description                                                                                |
-| project_code     | bigint(20)   | Code of the project the workflow belongs to                                                |
-| release_state    | tinyint(4)   | Release state: 0 offline, 1 online                                                         |
-| user_id          | int(11)      | Creator id                                                                                 |
-| global_params    | text         | Global parameters, a JSON array of [parameters](#common-fields)                            |
-| flag             | tinyint(4)   | Whether the workflow is available: 0 no, 1 yes                                             |
-| locations        | text         | Node coordinates on the canvas, e.g. `[{"taskCode":123,"x":59,"y":61}]`                    |
-| warning_group_id | int(11)      | Alert group copied from the last created or updated schedule; not cleared if it is deleted |
-| timeout          | int(11)      | Timeout, in minutes                                                                        |
-| execution_type   | tinyint(4)   | Execution type: 0 parallel, 1 serial wait, 2 serial discard, 3 serial priority             |
-| create_time      | datetime     | Create time                                                                                |
-| update_time      | datetime     | Update time                                                                                |
+|      Column      |     Type     |                                                       Description                                                        |
+|------------------|--------------|--------------------------------------------------------------------------------------------------------------------------|
+| id               | int(11)      | Primary key                                                                                                              |
+| code             | bigint(20)   | Workflow definition code, globally unique                                                                                |
+| name             | varchar(255) | Workflow definition name, unique within a project                                                                        |
+| version          | int(11)      | Workflow definition version                                                                                              |
+| description      | text         | Description                                                                                                              |
+| project_code     | bigint(20)   | Code of the project the workflow belongs to                                                                              |
+| release_state    | tinyint(4)   | Release state: 0 offline, 1 online                                                                                       |
+| user_id          | int(11)      | Creator id                                                                                                               |
+| global_params    | text         | Global parameters, a JSON array of [parameters](#common-fields)                                                          |
+| flag             | tinyint(4)   | Whether the workflow is available: 0 no, 1 yes                                                                           |
+| locations        | text         | Node coordinates on the canvas, e.g. `[{"taskCode":123,"x":59,"y":61}]`                                                  |
+| warning_group_id | int(11)      | Legacy column, not written by the current code (the schedule alert group is stored in `t_ds_schedules.warning_group_id`) |
+| timeout          | int(11)      | Timeout, in minutes                                                                                                      |
+| execution_type   | tinyint(4)   | Execution type: 0 parallel, 1 serial wait, 2 serial discard, 3 serial priority                                           |
+| create_time      | datetime     | Create time                                                                                                              |
+| update_time      | datetime     | Update time                                                                                                              |
 
 The tenant is not part of the workflow definition. It is chosen when the workflow is started or scheduled, and is stored
 in `t_ds_schedules.tenant_code` and `t_ds_workflow_instance.tenant_code`.

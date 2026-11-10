@@ -20,24 +20,24 @@
 
 表 `t_ds_workflow_definition`：
 
-|        字段        |      类型      |                       描述                        |
-|------------------|--------------|-------------------------------------------------|
-| id               | int(11)      | 主键                                              |
-| code             | bigint(20)   | 工作流定义 code，全局唯一                                 |
-| name             | varchar(255) | 工作流定义名称，项目内唯一                                   |
-| version          | int(11)      | 工作流定义版本                                         |
-| description      | text         | 描述                                              |
-| project_code     | bigint(20)   | 所属项目 code                                       |
-| release_state    | tinyint(4)   | 发布状态：0 下线，1 上线                                  |
-| user_id          | int(11)      | 创建用户 id                                         |
-| global_params    | text         | 全局参数，结构为[参数](#公共字段)组成的 JSON 数组                  |
-| flag             | tinyint(4)   | 工作流是否可用：0 不可用，1 可用                              |
-| locations        | text         | 节点在画布上的坐标，例如 `[{"taskCode":123,"x":59,"y":61}]` |
-| warning_group_id | int(11)      | 最近一次创建或更新定时时复制的告警组，删除定时不清空                      |
-| timeout          | int(11)      | 超时时间，单位分钟                                       |
-| execution_type   | tinyint(4)   | 执行策略：0 并行，1 串行等待，2 串行抛弃，3 串行优先                  |
-| create_time      | datetime     | 创建时间                                            |
-| update_time      | datetime     | 更新时间                                            |
+|        字段        |      类型      |                             描述                             |
+|------------------|--------------|------------------------------------------------------------|
+| id               | int(11)      | 主键                                                         |
+| code             | bigint(20)   | 工作流定义 code，全局唯一                                            |
+| name             | varchar(255) | 工作流定义名称，项目内唯一                                              |
+| version          | int(11)      | 工作流定义版本                                                    |
+| description      | text         | 描述                                                         |
+| project_code     | bigint(20)   | 所属项目 code                                                  |
+| release_state    | tinyint(4)   | 发布状态：0 下线，1 上线                                             |
+| user_id          | int(11)      | 创建用户 id                                                    |
+| global_params    | text         | 全局参数，结构为[参数](#公共字段)组成的 JSON 数组                             |
+| flag             | tinyint(4)   | 工作流是否可用：0 不可用，1 可用                                         |
+| locations        | text         | 节点在画布上的坐标，例如 `[{"taskCode":123,"x":59,"y":61}]`            |
+| warning_group_id | int(11)      | 历史遗留字段，当前代码不写入（定时的告警组存于 `t_ds_schedules.warning_group_id`） |
+| timeout          | int(11)      | 超时时间，单位分钟                                                  |
+| execution_type   | tinyint(4)   | 执行策略：0 并行，1 串行等待，2 串行抛弃，3 串行优先                             |
+| create_time      | datetime     | 创建时间                                                       |
+| update_time      | datetime     | 更新时间                                                       |
 
 租户不属于工作流定义，而是在启动或定时调度工作流时选择，保存在 `t_ds_schedules.tenant_code` 和 `t_ds_workflow_instance.tenant_code` 中。
 
