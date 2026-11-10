@@ -21,11 +21,6 @@ public interface IWorkflowSerialCoordinator extends AutoCloseable {
 
     void start();
 
-    /**
-     * Request the worker to stop without joining the worker. Call {@link #close()} to wait before restarting.
-     */
-    void requestStop();
-
     @Override
     void close();
 

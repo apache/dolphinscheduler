@@ -173,22 +173,14 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
     }
 
     @Override
-    public synchronized void requestStop() {
-        flag = false;
-        if (internalThread != null) {
-            internalThread.interrupt();
-        }
-    }
-
-    @Override
     public synchronized void close() {
         if (Thread.currentThread() == internalThread) {
             throw new IllegalStateException("WorkflowSerialCoordinator cannot close its own worker thread");
         }
-        // A prior stop request does not mean the worker has finished.
-        requestStop();
+        flag = false;
         boolean interrupted = false;
         if (internalThread != null) {
+            internalThread.interrupt();
             // Keep start() waiting until the old worker has finished, including any in-flight JDBC call.
             while (internalThread.isAlive()) {
                 try {

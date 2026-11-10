@@ -17,23 +17,30 @@
 
 package org.apache.dolphinscheduler.server.master.engine.workflow.serial;
 
+import static com.google.common.util.concurrent.Uninterruptibles.awaitUninterruptibly;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
 import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionLogDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.extract.master.IWorkflowControlClient;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 import org.apache.dolphinscheduler.registry.api.ha.AbstractHAServer;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.ITaskGroupCoordinator;
 import org.apache.dolphinscheduler.server.master.engine.MasterCoordinator;
 import org.apache.dolphinscheduler.server.master.failover.IFailoverCoordinator;
 import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,6 +48,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -50,6 +58,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -335,6 +344,94 @@ class WorkflowSerialCoordinatorTest {
             server.close();
             // Also cancel the listener's scheduled failover task, including when an assertion fails.
             listener.changeToStandBy();
+        }
+    }
+
+    @RepeatedTest(value = 3)
+    void closeDuringPriorityRpcShouldSkipRemainingGroups() throws Exception {
+        CountDownLatch rpcStarted = new CountDownLatch(1);
+        CountDownLatch stopReceived = new CountDownLatch(1);
+        CountDownLatch releaseRpc = new CountDownLatch(1);
+        AtomicReference<Thread> worker = new AtomicReference<>();
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        IWorkflowControlClient controlClient = Mockito.mock(IWorkflowControlClient.class);
+        WorkflowInstanceDao instanceDao = Mockito.mock(WorkflowInstanceDao.class);
+        MasterConfig config = new MasterConfig();
+        config.setMasterAddress("master-0:5678");
+        Mockito.when(instanceDao.queryById(Mockito.anyInt())).thenAnswer(invocation -> {
+            WorkflowInstance instance = new WorkflowInstance();
+            instance.setId(invocation.getArgument(0));
+            instance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
+            instance.setHost(config.getMasterAddress());
+            return instance;
+        });
+        Mockito.doAnswer(invocation -> {
+            worker.set(Thread.currentThread());
+            rpcStarted.countDown();
+            try {
+                try {
+                    Assertions.assertTrue(releaseRpc.await(10, TimeUnit.SECONDS));
+                } catch (InterruptedException expected) {
+                    stopReceived.countDown();
+                    // An admitted RPC may finish after interruption; close must still wait for it.
+                    Assertions.assertTrue(awaitUninterruptibly(releaseRpc, 10, TimeUnit.SECONDS));
+                    Thread.currentThread().interrupt();
+                }
+            } catch (Throwable ex) {
+                failure.compareAndSet(null, ex);
+                throw ex;
+            }
+            return null;
+        }).when(controlClient).stopWorkflowInstance(Mockito.any());
+        SerialCommandPriorityHandler priorityHandler = Mockito.spy(new SerialCommandPriorityHandler());
+        ReflectionTestUtils.setField(priorityHandler, "workflowInstanceDao", instanceDao);
+        ReflectionTestUtils.setField(priorityHandler, "workflowControlClient", controlClient);
+        ReflectionTestUtils.setField(priorityHandler, "masterConfig", config);
+        ReflectionTestUtils.setField(workflowSerialCoordinator, "serialCommandPriorityHandler", priorityHandler);
+        // A PRIORITY poll can still see a running predecessor after the newest instance was launched.
+        Mockito.when(serialCommandDao.fetchSerialCommands(Mockito.anyInt())).thenReturn(Arrays.asList(
+                SerialCommandDto.builder().workflowDefinitionCode(1L).workflowDefinitionVersion(1)
+                        .workflowInstanceId(101).state(SerialCommandDto.State.LAUNCHED).build(),
+                SerialCommandDto.builder().workflowDefinitionCode(1L).workflowDefinitionVersion(1)
+                        .workflowInstanceId(102).state(SerialCommandDto.State.LAUNCHED).build(),
+                SerialCommandDto.builder().workflowDefinitionCode(2L).workflowDefinitionVersion(1)
+                        .workflowInstanceId(201).state(SerialCommandDto.State.LAUNCHED).build(),
+                SerialCommandDto.builder().workflowDefinitionCode(2L).workflowDefinitionVersion(1)
+                        .workflowInstanceId(202).state(SerialCommandDto.State.LAUNCHED).build()));
+        WorkflowDefinitionLog definition = new WorkflowDefinitionLog();
+        definition.setExecutionType(WorkflowExecutionTypeEnum.SERIAL_PRIORITY);
+        Mockito.when(workflowDefinitionLogDao.queryByDefinitionCodeAndVersion(Mockito.anyLong(), Mockito.eq(1)))
+                .thenReturn(definition);
+        Thread closer = new Thread(() -> {
+            try {
+                workflowSerialCoordinator.close();
+            } catch (Throwable ex) {
+                failure.compareAndSet(null, ex);
+            }
+        });
+        closer.setDaemon(true);
+        try {
+            workflowSerialCoordinator.start();
+            Assertions.assertTrue(rpcStarted.await(5, TimeUnit.SECONDS));
+            closer.start();
+            Assertions.assertTrue(stopReceived.await(5, TimeUnit.SECONDS));
+            Assertions.assertTrue(closer.isAlive(), "close must wait for the admitted RPC");
+            Assertions.assertTrue(worker.get().isAlive());
+            releaseRpc.countDown();
+            closer.join(5000);
+            Assertions.assertFalse(closer.isAlive());
+            Assertions.assertFalse(worker.get().isAlive());
+            Assertions.assertNull(failure.get());
+            // Regardless of group iteration order, only the first group may have entered its Handler.
+            Mockito.verify(priorityHandler, Mockito.times(1)).handle(Mockito.any());
+            Mockito.verify(controlClient, Mockito.times(1)).stopWorkflowInstance(Mockito.any());
+            Mockito.verify(serialCommandDao, Mockito.times(1)).fetchSerialCommands(Mockito.anyInt());
+            Mockito.verifyNoInteractions(serialCommandWaitHandler, serialCommandDiscardHandler);
+        } finally {
+            releaseRpc.countDown();
+            closer.join(5000);
+            workflowSerialCoordinator.close();
+            Assertions.assertFalse(closer.isAlive());
         }
     }
 

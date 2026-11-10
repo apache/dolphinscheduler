@@ -182,6 +182,7 @@ class TaskGroupCoordinatorTest {
     @Test
     void stopDuringForceStartFetchSkipsReturnedPage() throws Exception {
         AtomicReference<Thread> worker = new AtomicReference<>();
+        CountDownLatch fetching = new CountDownLatch(1);
         CountDownLatch stopping = new CountDownLatch(1);
         TaskGroupQueue queue = new TaskGroupQueue();
         queue.setId(1);
@@ -189,20 +190,32 @@ class TaskGroupCoordinatorTest {
         when(taskGroupQueueDao.queryWaitNotifyForceStartTaskGroupQueue(Mockito.anyInt(), Mockito.anyInt()))
                 .thenAnswer(invocation -> {
                     worker.set(Thread.currentThread());
-                    // Deliver the stop while the query is still in progress.
-                    taskGroupCoordinator.requestStop();
-                    stopping.countDown();
+                    fetching.countDown();
+                    try {
+                        // close() must signal the worker while this query is still in progress.
+                        new CountDownLatch(1).await(5, TimeUnit.SECONDS);
+                        throw new AssertionError("close did not interrupt the pending query");
+                    } catch (InterruptedException expected) {
+                        stopping.countDown();
+                        Thread.currentThread().interrupt();
+                    }
                     return Collections.singletonList(queue);
                 });
+        Thread closer = new Thread(taskGroupCoordinator::close);
         try {
             taskGroupCoordinator.start();
+            assertTrue(fetching.await(5, TimeUnit.SECONDS));
+            closer.start();
             assertTrue(stopping.await(5, TimeUnit.SECONDS));
+            closer.join(5000);
             worker.get().join(5000);
+            assertFalse(closer.isAlive());
             assertFalse(worker.get().isAlive());
             Mockito.verifyNoInteractions(transactionTemplate);
             verify(taskGroupDao, Mockito.never()).queryAvailableTaskGroups();
         } finally {
             taskGroupCoordinator.close();
+            closer.join(5000);
         }
     }
 

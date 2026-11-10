@@ -104,9 +104,6 @@ public class MasterCoordinator extends AbstractHAServer {
 
         @Override
         public void changeToStandBy() {
-            // Stop both workers before waiting: either may be blocked in a database call.
-            taskGroupCoordinator.requestStop();
-            workflowSerialCoordinator.requestStop();
             if (failoverCoordinatorFuture != null) {
                 failoverCoordinatorFuture.cancel(true);
             }
