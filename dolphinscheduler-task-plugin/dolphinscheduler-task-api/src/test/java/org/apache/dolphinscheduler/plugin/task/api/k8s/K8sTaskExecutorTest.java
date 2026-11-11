@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.k8s;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
@@ -142,6 +143,50 @@ public class K8sTaskExecutorTest {
         Assertions.assertTrue(failure.get() instanceof RuntimeException);
         Assertions.assertFalse(interrupted.get(),
                 "a failed k8s task must not leave the worker thread interrupted");
+    }
+
+    @Test
+    public void testRunRestoresInterruptWhenCancellationFails() throws Exception {
+        TaskExecutionContext taskRequest = new TaskExecutionContext();
+        taskRequest.setTaskInstanceId(taskInstanceId);
+        taskRequest.setTaskName(taskName);
+        taskRequest.setTaskAppId("task-app-id");
+        taskRequest.setK8sTaskExecutionContext(new K8sTaskExecutionContext("config", namespace));
+
+        K8sTaskExecutor executor = new K8sTaskExecutor(taskRequest);
+        // cancelApplication only stops the job when it was already submitted
+        executor.buildK8sJob(k8sTaskMainParameters);
+
+        K8sUtils k8sUtils = Mockito.mock(K8sUtils.class);
+        Mockito.doAnswer(invocation -> {
+            throw new InterruptedException("worker is shutting down");
+        }).when(k8sUtils).buildClient(Mockito.anyString());
+        // make the cancellation itself fail while stopping the job
+        Mockito.when(k8sUtils.jobExist(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        Mockito.doThrow(new RuntimeException("k8s delete failed"))
+                .when(k8sUtils).deleteJob(Mockito.anyString(), Mockito.anyString());
+        executor.k8sUtils = k8sUtils;
+
+        AtomicReference<Throwable> failure = new AtomicReference<>();
+        AtomicBoolean interrupted = new AtomicBoolean();
+        Thread workerThread = new Thread(() -> {
+            try {
+                executor.run(JSONUtils.toJsonString(k8sTaskMainParameters));
+            } catch (Throwable t) {
+                failure.set(t);
+            } finally {
+                interrupted.set(Thread.currentThread().isInterrupted());
+            }
+        }, "k8s-task-executor-cancel-failure-test");
+        workerThread.start();
+        workerThread.join(10000);
+
+        Assertions.assertTrue(failure.get() instanceof InterruptedException,
+                "the original InterruptedException must stay the primary exception");
+        Assertions.assertTrue(interrupted.get(),
+                "the interrupt flag must be restored even when cancellation fails");
+        Assertions.assertEquals(1, failure.get().getSuppressed().length,
+                "the cancellation failure must be attached as a suppressed exception");
     }
 
 }
