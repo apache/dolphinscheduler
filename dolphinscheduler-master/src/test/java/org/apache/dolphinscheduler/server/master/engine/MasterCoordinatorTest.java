@@ -56,7 +56,6 @@ import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
 import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
@@ -298,8 +297,6 @@ class MasterCoordinatorTest {
         }).when(registry).subscribe(eq(selectorPath), any());
         ScheduledThreadPoolExecutor elections =
                 (ScheduledThreadPoolExecutor) ReflectionTestUtils.getField(coordinator, "electionExecutor");
-        ExecutorService demotions =
-                (ExecutorService) ReflectionTestUtils.getField(coordinator, "demotionExecutor");
         Thread closer = new Thread(coordinator::close);
         closer.setDaemon(true);
         closer.setUncaughtExceptionHandler((thread, ex) -> failure.compareAndSet(null, ex));
@@ -318,13 +315,16 @@ class MasterCoordinatorTest {
             // Ownership becomes available while demotion still drains the old TaskGroup.
             owner.set(null);
             subscriber.get().notify(new Event(selectorPath, selectorPath, "", Event.Type.REMOVE));
-            // Wait until the queued REMOVE check has observed the pending demotion.
-            elections.submit(() -> {
-            }).get(5, TimeUnit.SECONDS);
-            assertEquals(Boolean.TRUE, ReflectionTestUtils.getField(coordinator, "demotionPending"));
+            // The single role worker cannot check ownership until the current stop callback finishes.
+            assertFalse(elections.getQueue().isEmpty());
             closer.start();
-            // HA close shuts down elections before waiting for the in-progress demotion listener.
-            assertTrue(elections.awaitTermination(5, TimeUnit.SECONDS));
+            // Close cancels queued work before waiting for the same worker's in-progress callback.
+            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+            while (!elections.isShutdown() && System.nanoTime() < deadline) {
+                Thread.yield();
+            }
+            assertTrue(elections.isShutdown());
+            assertFalse(elections.isTerminated());
             assertTrue(taskGroupWorker.get().isAlive());
             assertTrue(serialWorker.get().isAlive());
             assertTrue(closer.isAlive());
@@ -334,11 +334,11 @@ class MasterCoordinatorTest {
             releaseSerialFetch.countDown();
             closer.join(5000);
             assertFalse(closer.isAlive());
-            assertTrue(demotions.awaitTermination(5, TimeUnit.SECONDS));
+            assertTrue(elections.awaitTermination(5, TimeUnit.SECONDS));
             assertFalse(taskGroupWorker.get().isAlive());
             assertFalse(serialWorker.get().isAlive());
             assertFalse(coordinator.isActive());
-            assertNull(ReflectionTestUtils.getField(coordinator, "promotionRecovery"));
+            assertNull(ReflectionTestUtils.getField(coordinator, "ownershipRecheck"));
             assertSame(failoverFuture, ReflectionTestUtils.getField(listener, "failoverCoordinatorFuture"));
             assertTrue(failoverFuture.isCancelled());
             // A late Registry notification after close cannot reopen election or worker scheduling.

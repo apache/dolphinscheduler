@@ -25,7 +25,11 @@ import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.RegistryException;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -43,32 +47,33 @@ import com.google.common.collect.Lists;
 public abstract class AbstractHAServer implements HAServer {
 
     private final Registry registry;
-
     private final String selectorPath;
-
     private final String serverIdentify;
-
-    private volatile ServerStatus serverStatus;
-
+    private final boolean demoteOnOwnRemoval;
+    private volatile ServerStatus serverStatus = ServerStatus.STAND_BY;
+    private volatile LifecycleState lifecycle = LifecycleState.CREATED;
     private final ScheduledThreadPoolExecutor electionExecutor;
-
-    private final ExecutorService demotionExecutor;
-
+    private final ExecutorService registryExecutor;
+    private final CompletableFuture<Void> startupResult = new CompletableFuture<>();
     private final Object electionStateLock = new Object();
 
-    // Guarded by electionStateLock. Only the election worker clears it before checking ownership.
-    private boolean removeReceived;
+    // Guarded by electionStateLock. REMOVE registration and ACTIVE admission share this lock.
+    private long removalVersion;
+    private long coveredRemovalVersion = -1;
+    private long lastOwnRemovalVersion = -1;
+    private ScheduledFuture<?> ownershipRecheck;
+    // Remains present while recovery is scheduled, queued, or running in the Registry worker.
+    private ElectionRequest ownershipRecovery;
 
-    // Guarded by electionStateLock. Prevents promotion before the queued demotion completes.
-    private boolean demotionPending;
+    // Owned by the role worker. A completed check keeps its slot until its result is consumed.
+    private final Deque<ElectionRequest> pendingElections = new ArrayDeque<>();
+    private OwnershipCheck inFlightCheck;
 
-    // Guarded by electionStateLock.
-    private ScheduledFuture<?> promotionRecovery;
-
+    // Guarded by this monitor. A listener can close this server from the role worker.
+    private boolean notifyingListeners;
     private final List<ServerStatusChangeListener> serverStatusChangeListeners;
 
     private static final long DEFAULT_RETRY_INTERVAL = 5_000;
-
     private static final int DEFAULT_MAX_RETRY_TIMES = 20;
 
     public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
@@ -84,17 +89,22 @@ public abstract class AbstractHAServer implements HAServer {
 
     @VisibleForTesting
     AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify,
+                     final ScheduledThreadPoolExecutor electionExecutor) {
+        this(registry, selectorPath, serverIdentify, electionExecutor, false);
+    }
+
+    @VisibleForTesting
+    AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify,
                      final ScheduledThreadPoolExecutor electionExecutor, final boolean demoteOnOwnRemoval) {
         this.electionExecutor = electionExecutor;
-        demotionExecutor = demoteOnOwnRemoval
-                ? Executors.newSingleThreadExecutor(ThreadUtils.newDaemonThreadFactory("HA-Demotion-%d"))
-                : null;
+        this.registryExecutor = Executors.newSingleThreadExecutor(ThreadUtils.newDaemonThreadFactory("HA-Registry-%d"));
+        this.demoteOnOwnRemoval = demoteOnOwnRemoval;
         electionExecutor.setRemoveOnCancelPolicy(true);
+        electionExecutor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false);
         this.registry = registry;
         this.selectorPath = checkNotNull(selectorPath);
         // Include the creation time to distinguish restarts at the same address.
         this.serverIdentify = checkNotNull(serverIdentify) + "#" + System.currentTimeMillis();
-        this.serverStatus = ServerStatus.STAND_BY;
         this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());
     }
 
@@ -106,7 +116,19 @@ public abstract class AbstractHAServer implements HAServer {
                 @Override
                 public void notify(Event event) {
                     if (Event.Type.REMOVE.equals(event.getType())) {
-                        enqueueElection(serverIdentify.equals(event.getEventData()));
+                        synchronized (electionStateLock) {
+                            if (lifecycle == LifecycleState.CLOSED) {
+                                return;
+                            }
+                            long version = ++removalVersion;
+                            RoleChangeEventType type = RoleChangeEventType.OTHER_SELECTOR_REMOVED;
+                            if (serverIdentify.equals(event.getEventData())) {
+                                lastOwnRemovalVersion = version;
+                                type = RoleChangeEventType.OWN_SELECTOR_REMOVED;
+                            }
+                            ElectionRequest request = new ElectionRequest(type, version);
+                            electionExecutor.execute(() -> processRoleChange(request));
+                        }
                     }
                 }
 
@@ -115,8 +137,15 @@ public abstract class AbstractHAServer implements HAServer {
                     return SubscribeScope.PATH_ONLY;
                 }
             });
-            // Preserve startup completion and failure semantics; callbacks only enqueue work.
-            electionExecutor.submit(() -> reconcileElection(false, DEFAULT_MAX_RETRY_TIMES)).get();
+            synchronized (electionStateLock) {
+                if (lifecycle == LifecycleState.CLOSED) {
+                    throw new RejectedExecutionException("HA server was closed before startup was admitted");
+                }
+                ElectionRequest initial = new ElectionRequest(RoleChangeEventType.INITIAL_ELECTION, removalVersion);
+                electionExecutor.execute(() -> processRoleChange(initial));
+                lifecycle = LifecycleState.STARTED;
+            }
+            startupResult.get();
         } catch (InterruptedException e) {
             close();
             Thread.currentThread().interrupt();
@@ -133,180 +162,279 @@ public abstract class AbstractHAServer implements HAServer {
         }
     }
 
-    private void enqueueElection(boolean ownSelectorRemoved) {
-        synchronized (electionStateLock) {
-            if (electionExecutor.isShutdown()) {
+    private void processRoleChange(ElectionRequest request) {
+        try {
+            if (isObsolete(request)) {
                 return;
             }
-            removeReceived = true;
-            if (ownSelectorRemoved && demotionExecutor != null && serverStatus == ServerStatus.ACTIVE
-                    && !demotionPending) {
-                // Stop without waiting for an earlier Registry call or blocking the watch callback.
-                demotionExecutor.execute(this::demoteAfterOwnRemoval);
-                demotionPending = true;
+            if (demoteOnOwnRemoval && request.type == RoleChangeEventType.OWN_SELECTOR_REMOVED && isActive()) {
+                statusChange(ServerStatus.STAND_BY, request.version);
+                scheduleOwnershipRecheck();
             }
-        }
-        try {
-            electionExecutor.execute(() -> {
-                try {
-                    reconcileElection(ownSelectorRemoved, DEFAULT_MAX_RETRY_TIMES);
-                } catch (Exception e) {
-                    log.error("Failed to reconcile HA ownership for {}", serverIdentify, e);
-                }
-            });
-        } catch (RejectedExecutionException e) {
-            // The Registry can deliver callbacks concurrently with close().
-            if (!electionExecutor.isShutdown()) {
-                throw e;
+            // A demotion listener may close this server before its request is queued.
+            if (lifecycle == LifecycleState.STARTED) {
+                pendingElections.addLast(request);
             }
-        }
-    }
-
-    private synchronized void demoteAfterOwnRemoval() {
-        try {
-            if (isActive()) {
-                statusChange(ServerStatus.STAND_BY, false);
-            }
+            startNextCheck();
+        } catch (Throwable e) {
+            failRoleChange(e);
         } finally {
-            synchronized (electionStateLock) {
-                demotionPending = false;
-                // A fresh result may have been deferred while the demotion was queued.
-                schedulePromotionRecovery();
+            if (lifecycle == LifecycleState.CLOSED) {
+                startupResult.complete(null);
             }
         }
     }
 
-    private void reconcileElection(boolean ownSelectorRemoved, int maxAttempts) {
-        // A fresh ownership check accounts for REMOVE events already received.
+    private boolean isObsolete(ElectionRequest request) {
         synchronized (electionStateLock) {
-            if (demotionPending || electionExecutor.isShutdown()) {
-                return;
-            }
-            removeReceived = false;
+            return lifecycle != LifecycleState.STARTED || request.version <= coveredRemovalVersion
+                    || (request.type == RoleChangeEventType.INITIAL_ELECTION && startupResult.isDone())
+                    || (request.type == RoleChangeEventType.OWNERSHIP_RECHECK && request != ownershipRecovery);
         }
-        ElectionResult result = participateElection(ownSelectorRemoved, maxAttempts);
-        if (result == ElectionResult.ABORTED) {
+    }
+
+    private void startNextCheck() {
+        while (inFlightCheck == null && !pendingElections.isEmpty() && lifecycle == LifecycleState.STARTED) {
+            ElectionRequest request = pendingElections.removeFirst();
+            if (isObsolete(request)) {
+                continue;
+            }
+            final OwnershipCheck check;
             synchronized (electionStateLock) {
-                if (!demotionPending) {
-                    schedulePromotionRecovery();
+                if (lifecycle != LifecycleState.STARTED) {
+                    return;
+                }
+                check = new OwnershipCheck(request, removalVersion, lastOwnRemovalVersion);
+                inFlightCheck = check;
+            }
+            try {
+                // The whole lock scope, including finally release, stays on the same Registry thread.
+                CompletableFuture.supplyAsync(() -> checkOwnership(check.version), registryExecutor)
+                        .whenComplete((result, failure) -> {
+                            synchronized (electionStateLock) {
+                                if (lifecycle != LifecycleState.CLOSED) {
+                                    electionExecutor.execute(() -> completeCheck(check, result, failure));
+                                }
+                            }
+                        });
+            } catch (RejectedExecutionException e) {
+                inFlightCheck = null;
+                if (lifecycle != LifecycleState.CLOSED) {
+                    throw e;
                 }
             }
+        }
+    }
+
+    private void completeCheck(OwnershipCheck check, ElectionResult result, Throwable failure) {
+        if (inFlightCheck != check) {
             return;
         }
-        statusChange(result == ElectionResult.ELECTED ? ServerStatus.ACTIVE : ServerStatus.STAND_BY, true);
-    }
-
-    // Called under electionStateLock so close() can cancel the only pending recovery.
-    private void schedulePromotionRecovery() {
-        if (promotionRecovery == null && !electionExecutor.isShutdown()) {
-            promotionRecovery = electionExecutor.schedule(this::recoverPromotion,
-                    DEFAULT_RETRY_INTERVAL, TimeUnit.MILLISECONDS);
-        }
-    }
-
-    private void recoverPromotion() {
-        synchronized (electionStateLock) {
-            promotionRecovery = null;
-        }
+        // A stale result must also release its slot; cancellation alone never releases a running check.
+        inFlightCheck = null;
         try {
-            // One attempt per scheduled run leaves the worker free for watch callbacks between retries.
-            reconcileElection(false, 1);
-        } catch (Exception e) {
-            log.warn("Failed to recheck deferred HA promotion for {}, retrying in {}ms",
-                    serverIdentify, DEFAULT_RETRY_INTERVAL, e);
-            synchronized (electionStateLock) {
-                schedulePromotionRecovery();
+            if (isObsolete(check.request)) {
+                return;
+            }
+            if (failure != null) {
+                Throwable cause = failure instanceof CompletionException ? failure.getCause() : failure;
+                if (!(cause instanceof Exception)) {
+                    failRoleChange(cause);
+                    return;
+                }
+                retryRoleChange(check, cause);
+                return;
+            }
+            boolean accepted = false;
+            if (result != ElectionResult.ABORTED) {
+                accepted = statusChange(result == ElectionResult.ELECTED ? ServerStatus.ACTIVE : ServerStatus.STAND_BY,
+                        check.version);
+            }
+            if (accepted) {
+                synchronized (electionStateLock) {
+                    // A REMOVE during the listener is newer work, not a reason to undo this admitted decision.
+                    coveredRemovalVersion = Math.max(coveredRemovalVersion, check.version);
+                    if (removalVersion <= coveredRemovalVersion) {
+                        cancelOwnershipRecheck();
+                    } else {
+                        scheduleOwnershipRecheck();
+                    }
+                }
+                // Any admitted ownership decision may supersede the original startup retry.
+                startupResult.complete(null);
+            } else {
+                scheduleOwnershipRecheck();
+                if (check.request.type == RoleChangeEventType.INITIAL_ELECTION) {
+                    // The logical startup hands unfinished reconciliation to the persistent recovery.
+                    startupResult.complete(null);
+                }
+            }
+        } catch (Throwable e) {
+            failRoleChange(e);
+        } finally {
+            if (lifecycle == LifecycleState.CLOSED) {
+                startupResult.complete(null);
+            } else {
+                startNextCheck();
             }
         }
     }
 
-    private void cancelPromotionRecovery() {
-        if (promotionRecovery != null) {
-            promotionRecovery.cancel(false);
-            promotionRecovery = null;
+    private void retryRoleChange(OwnershipCheck check, Throwable cause) {
+        ElectionRequest request = check.request;
+        final boolean unresolvedOwn;
+        synchronized (electionStateLock) {
+            unresolvedOwn = coveredRemovalVersion < check.ownVersion;
         }
+        if (unresolvedOwn && isActive()) {
+            // Retain OWN responsibility even when an aborted OWN check handed work to RECHECK.
+            statusChange(ServerStatus.STAND_BY, check.version);
+            scheduleOwnershipRecheck();
+        } else if (request.type == RoleChangeEventType.OWNERSHIP_RECHECK) {
+            scheduleOwnershipRecheck();
+        } else {
+            synchronized (electionStateLock) {
+                if (request.type == RoleChangeEventType.OWN_SELECTOR_REMOVED && ownershipRecovery != null) {
+                    return;
+                }
+            }
+            if (++request.failedAttempts >= DEFAULT_MAX_RETRY_TIMES) {
+                IllegalStateException failure = new IllegalStateException("Could not complete HA election after "
+                        + DEFAULT_MAX_RETRY_TIMES + " attempt(s)", cause);
+                if (request.type == RoleChangeEventType.INITIAL_ELECTION) {
+                    startupResult.completeExceptionally(failure);
+                    close();
+                } else {
+                    log.error("Failed to reconcile HA ownership for {}", serverIdentify, failure);
+                }
+                return;
+            }
+            synchronized (electionStateLock) {
+                if (lifecycle == LifecycleState.STARTED) {
+                    electionExecutor.schedule(() -> processRoleChange(request), DEFAULT_RETRY_INTERVAL,
+                            TimeUnit.MILLISECONDS);
+                }
+            }
+        }
+        if (lifecycle == LifecycleState.STARTED) {
+            log.warn("Failed to check HA ownership for {}, retrying in {}ms",
+                    serverIdentify, DEFAULT_RETRY_INTERVAL, cause);
+        }
+    }
+
+    private void scheduleOwnershipRecheck() {
+        synchronized (electionStateLock) {
+            if (lifecycle != LifecycleState.STARTED || removalVersion <= coveredRemovalVersion) {
+                return;
+            }
+            if (ownershipRecovery == null || ownershipRecovery.version <= coveredRemovalVersion) {
+                cancelOwnershipRecheck();
+                ownershipRecovery = new ElectionRequest(RoleChangeEventType.OWNERSHIP_RECHECK, removalVersion);
+            }
+            ElectionRequest recovery = ownershipRecovery;
+            if (ownershipRecheck == null && !pendingElections.contains(recovery)
+                    && (inFlightCheck == null || inFlightCheck.request != recovery)) {
+                ownershipRecheck = electionExecutor.schedule(() -> {
+                    synchronized (electionStateLock) {
+                        if (ownershipRecovery != recovery) {
+                            return;
+                        }
+                        ownershipRecheck = null;
+                    }
+                    processRoleChange(recovery);
+                }, DEFAULT_RETRY_INTERVAL, TimeUnit.MILLISECONDS);
+            }
+        }
+    }
+
+    // Called under electionStateLock. An old queued timer cannot clear a newer recovery's handle.
+    private void cancelOwnershipRecheck() {
+        if (ownershipRecheck != null) {
+            ownershipRecheck.cancel(false);
+            ownershipRecheck = null;
+        }
+        ownershipRecovery = null;
+    }
+
+    private void failRoleChange(Throwable cause) {
+        log.error("Failed to process HA role change for {}", serverIdentify, cause);
+        startupResult.completeExceptionally(cause);
+        close();
     }
 
     @Override
     public void close() {
         synchronized (electionStateLock) {
-            // Cancel delayed recovery, but let queued startup futures finish as no-ops.
+            lifecycle = LifecycleState.CLOSED;
             electionExecutor.shutdown();
-            if (demotionExecutor != null) {
-                demotionExecutor.shutdown();
-            }
-            cancelPromotionRecovery();
+            registryExecutor.shutdown();
+            cancelOwnershipRecheck();
         }
         synchronized (this) {
-            // Wait for any publication already in progress, without joining the event worker:
-            // an Alert listener can close this server from that worker itself.
+            // External close waits for admitted listeners. Self-close lets the current callback finish the receipt.
+            if (!notifyingListeners) {
+                startupResult.complete(null);
+            }
         }
     }
 
     @Override
     public boolean isActive() {
-        return ServerStatus.ACTIVE.equals(getServerStatus());
+        return lifecycle == LifecycleState.STARTED && ServerStatus.ACTIVE.equals(getServerStatus());
     }
 
     @Override
     public boolean participateElection() {
-        return participateElection(false, DEFAULT_MAX_RETRY_TIMES) == ElectionResult.ELECTED;
-    }
-
-    private ElectionResult participateElection(boolean ownSelectorRemoved, int maxAttempts) {
-        final String electionLock = selectorPath + "-lock";
+        // Preserve the synchronous API, including calls from a role listener; never wait on our own event queue.
         int failedAttempts = 0;
-        while (canParticipateElection()) {
+        while (lifecycle != LifecycleState.CLOSED) {
+            final long checkedVersion;
+            synchronized (electionStateLock) {
+                checkedVersion = removalVersion;
+            }
             try {
-                if (!registry.acquireLock(electionLock)) {
-                    throw new RegistryException("Could not acquire election lock " + electionLock);
-                }
-                try {
-                    if (!canParticipateElection()) {
-                        return ElectionResult.ABORTED;
-                    }
-                    if (registry.exists(selectorPath)) {
-                        if (serverIdentify.equals(registry.get(selectorPath))) {
-                            return ElectionResult.ELECTED;
-                        }
-                        return ElectionResult.NOT_ELECTED;
-                    }
-                    // A missing selector confirms ownership loss even if a newer REMOVE prevents a claim.
-                    if (!canParticipateElection()) {
-                        return ElectionResult.NOT_ELECTED;
-                    }
-                    registry.put(selectorPath, serverIdentify, true);
-                    return ElectionResult.ELECTED;
-                } finally {
-                    registry.releaseLock(electionLock);
-                }
+                return checkOwnership(checkedVersion) == ElectionResult.ELECTED;
             } catch (Exception e) {
-                if (ownSelectorRemoved && (demotionExecutor != null || isActive())) {
-                    if (demotionExecutor == null && isActive()) {
-                        statusChange(ServerStatus.STAND_BY, false);
-                    }
-                    synchronized (electionStateLock) {
-                        // A delayed own REMOVE can leave our current selector in place.
-                        schedulePromotionRecovery();
-                    }
-                }
-                if (++failedAttempts == maxAttempts) {
-                    throw new IllegalStateException("Could not complete HA election after " + maxAttempts
+                if (++failedAttempts == DEFAULT_MAX_RETRY_TIMES) {
+                    throw new IllegalStateException("Could not complete HA election after " + DEFAULT_MAX_RETRY_TIMES
                             + " attempt(s)", e);
                 }
-                if (!electionExecutor.isShutdown()) {
-                    log.warn("Failed to check HA ownership for {}, retrying in {}ms",
-                            serverIdentify, DEFAULT_RETRY_INTERVAL, e);
-                    ThreadUtils.sleep(DEFAULT_RETRY_INTERVAL);
-                }
+                ThreadUtils.sleep(DEFAULT_RETRY_INTERVAL);
             }
         }
-        return ElectionResult.ABORTED;
+        return false;
     }
 
-    private boolean canParticipateElection() {
+    private ElectionResult checkOwnership(long checkedVersion) {
+        if (!canCheckOwnership(checkedVersion)) {
+            return ElectionResult.ABORTED;
+        }
+        final String electionLock = selectorPath + "-lock";
+        if (!registry.acquireLock(electionLock)) {
+            throw new RegistryException("Could not acquire election lock " + electionLock);
+        }
+        try {
+            if (!canCheckOwnership(checkedVersion)) {
+                return ElectionResult.ABORTED;
+            }
+            if (registry.exists(selectorPath)) {
+                return serverIdentify.equals(registry.get(selectorPath))
+                        ? ElectionResult.ELECTED
+                        : ElectionResult.NOT_ELECTED;
+            }
+            if (!canCheckOwnership(checkedVersion)) {
+                return ElectionResult.NOT_ELECTED;
+            }
+            registry.put(selectorPath, serverIdentify, true);
+            return ElectionResult.ELECTED;
+        } finally {
+            registry.releaseLock(electionLock);
+        }
+    }
+
+    private boolean canCheckOwnership(long checkedVersion) {
         synchronized (electionStateLock) {
-            return !electionExecutor.isShutdown() && !removeReceived && !demotionPending;
+            return lifecycle != LifecycleState.CLOSED && checkedVersion == removalVersion;
         }
     }
 
@@ -320,48 +448,72 @@ public abstract class AbstractHAServer implements HAServer {
         return serverStatus;
     }
 
-    // Use the same monitor as external close() so it waits for ongoing status updates and listener calls.
-    private synchronized void statusChange(ServerStatus targetStatus, boolean fromElection) {
+    private synchronized boolean statusChange(ServerStatus targetStatus, long checkedVersion) {
         final ServerStatus originStatus;
         synchronized (electionStateLock) {
-            if (electionExecutor.isShutdown()) {
-                return;
-            }
-            // A later REMOVE invalidates a positive result, but cannot restore ownership already lost.
-            if (fromElection && (demotionPending || (targetStatus == ServerStatus.ACTIVE && removeReceived))) {
-                if (!demotionPending) {
-                    // The demotion worker schedules its own recheck after the old workers exit.
-                    schedulePromotionRecovery();
-                }
-                return;
+            if (lifecycle != LifecycleState.STARTED
+                    || (targetStatus == ServerStatus.ACTIVE && checkedVersion != removalVersion)) {
+                return false;
             }
             originStatus = serverStatus;
             serverStatus = targetStatus;
-            // Direct demotion keeps an existing recheck tracked until that task clears its own handle.
-            if (fromElection) {
-                if (removeReceived) {
-                    schedulePromotionRecovery();
-                } else {
-                    cancelPromotionRecovery();
-                }
-            }
         }
+        notifyingListeners = true;
         try {
             serverStatusChangeListeners.forEach(listener -> {
-                // A listener may close this server; do not invoke subsequent listeners after that.
-                if (!electionExecutor.isShutdown()) {
+                if (lifecycle != LifecycleState.CLOSED) {
                     listener.change(originStatus, targetStatus);
                 }
             });
         } catch (Exception ex) {
             log.error("Trigger ServerStatusChangeListener from {} -> {} error", originStatus, targetStatus, ex);
+        } finally {
+            notifyingListeners = false;
         }
+        return true;
     }
 
-    // An aborted check contains no ownership decision to publish.
+    private enum LifecycleState {
+        CREATED,
+        STARTED,
+        CLOSED
+    }
+
+    private enum RoleChangeEventType {
+        INITIAL_ELECTION,
+        OWN_SELECTOR_REMOVED,
+        OTHER_SELECTOR_REMOVED,
+        OWNERSHIP_RECHECK
+    }
+
     private enum ElectionResult {
         ELECTED,
         NOT_ELECTED,
         ABORTED
+    }
+
+    private static final class ElectionRequest {
+
+        private final RoleChangeEventType type;
+        private final long version;
+        private int failedAttempts;
+
+        private ElectionRequest(RoleChangeEventType type, long version) {
+            this.type = type;
+            this.version = version;
+        }
+    }
+
+    private static final class OwnershipCheck {
+
+        private final ElectionRequest request;
+        private final long version;
+        private final long ownVersion;
+
+        private OwnershipCheck(ElectionRequest request, long version, long ownVersion) {
+            this.request = request;
+            this.version = version;
+            this.ownVersion = ownVersion;
+        }
     }
 }
