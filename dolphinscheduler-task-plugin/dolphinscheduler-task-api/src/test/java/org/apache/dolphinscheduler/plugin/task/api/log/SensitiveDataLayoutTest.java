@@ -20,10 +20,13 @@ package org.apache.dolphinscheduler.plugin.task.api.log;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
+import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -107,6 +110,31 @@ class SensitiveDataLayoutTest {
         String rendered = layout.doLayout(event);
         assertFalse(rendered.contains(escaped));
         assertFalse(rendered.contains(secret));
+        assertTrue(rendered.contains(TaskConstants.SENSITIVE_DATA_MASK));
+    }
+
+    @Test
+    void layoutOfRedactedContextJsonHidesDoubleEscapedSecret() {
+        String secret = "quote\"and\\slash\nline";
+        String oneLevel = SensitiveDataConverter.jsonEscape(secret);
+        String doubleEscaped = SensitiveDataConverter.jsonEscape(oneLevel);
+
+        TaskExecutionContext source = new TaskExecutionContext();
+        source.setTaskInstanceId(TASK_ID);
+        source.setGlobalParams(GlobalParameterUtils.serializeGlobalParameter(
+                Collections.singletonList(sensitive("token", secret))));
+        source.setPrepareParamsMap(Collections.singletonMap("token", sensitive("token", secret)));
+        source.setTaskParams(JSONUtils.toJsonString(Collections.singletonMap(
+                "localParams", Collections.singletonList(sensitive("token", secret)))));
+        SensitiveDataConverter.registerTaskSensitiveValues(source);
+
+        String redactedJson =
+                JSONUtils.toPrettyJsonString(TaskExecutionContextLogRedactor.redactForLog(source));
+        String rendered = layout.doLayout(baseEvent("Initialized taskContext " + redactedJson));
+
+        assertFalse(rendered.contains(secret));
+        assertFalse(rendered.contains(oneLevel));
+        assertFalse(rendered.contains(doubleEscaped));
         assertTrue(rendered.contains(TaskConstants.SENSITIVE_DATA_MASK));
     }
 

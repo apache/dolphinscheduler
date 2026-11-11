@@ -140,6 +140,35 @@ class TaskExecutionContextLogRedactorTest {
         assertFalse(JSONUtils.toPrettyJsonString(redacted).contains(secret));
     }
 
+    @Test
+    void prettyJsonOfRedactedContextHidesDoubleEscapedSecret() {
+        String secret = "quote\"and\\slash\nline";
+        String oneLevel = SensitiveDataConverter.jsonEscape(secret);
+        String doubleEscaped = SensitiveDataConverter.jsonEscape(oneLevel);
+
+        TaskExecutionContext source = new TaskExecutionContext();
+        source.setTaskInstanceId(11);
+        source.setGlobalParams(GlobalParameterUtils.serializeGlobalParameter(
+                Collections.singletonList(sensitive("token", secret))));
+        Map<String, Property> prepare = new HashMap<>();
+        prepare.put("token", sensitive("token", secret));
+        source.setPrepareParamsMap(prepare);
+        source.setTaskParams(JSONUtils.toJsonString(Collections.singletonMap(
+                "localParams", Collections.singletonList(sensitive("token", secret)))));
+
+        String raw = JSONUtils.toPrettyJsonString(source);
+        assertTrue(raw.contains(doubleEscaped));
+
+        String redactedJson =
+                JSONUtils.toPrettyJsonString(TaskExecutionContextLogRedactor.redactForLog(source));
+        assertFalse(redactedJson.contains(secret));
+        assertFalse(redactedJson.contains(oneLevel));
+        assertFalse(redactedJson.contains(doubleEscaped));
+        assertTrue(redactedJson.contains(TaskConstants.SENSITIVE_DATA_MASK));
+        assertEquals(secret, source.getPrepareParamsMap().get("token").getValue());
+        assertTrue(source.getGlobalParams().contains(oneLevel));
+    }
+
     private static Property sensitive(String prop, String value) {
         return Property.builder()
                 .prop(prop)
