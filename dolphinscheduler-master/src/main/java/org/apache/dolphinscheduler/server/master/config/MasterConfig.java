@@ -58,7 +58,7 @@ public class MasterConfig implements Validator {
     /**
      * Interval for fetching heartbeat data from other services over RPC.
      */
-    private Duration heartbeatFetchInterval = Duration.ofSeconds(1);
+    private Duration heartbeatFetchInterval = Duration.ofSeconds(3);
 
     /**
      * Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.

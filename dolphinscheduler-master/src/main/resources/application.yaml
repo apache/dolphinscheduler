@@ -101,7 +101,7 @@ master:
   # Interval between failover-mark checks; heartbeat data is built on RPC requests.
   max-heartbeat-interval: 10s
   # Interval for fetching heartbeat data from other services over RPC.
-  heartbeat-fetch-interval: 1s
+  heartbeat-fetch-interval: 3s
   # Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.
   kill-application-when-task-failover: true
   server-load-protection:

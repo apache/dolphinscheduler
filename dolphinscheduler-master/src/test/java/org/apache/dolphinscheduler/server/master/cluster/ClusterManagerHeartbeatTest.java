@@ -471,9 +471,9 @@ class ClusterManagerHeartbeatTest {
         masterClusters.start();
         workerClusters.start();
         verify(masterTimer).scheduleWithFixedDelay(any(Runnable.class), org.mockito.ArgumentMatchers.eq(0L),
-                org.mockito.ArgumentMatchers.eq(1000L), org.mockito.ArgumentMatchers.eq(TimeUnit.MILLISECONDS));
+                org.mockito.ArgumentMatchers.eq(3000L), org.mockito.ArgumentMatchers.eq(TimeUnit.MILLISECONDS));
         verify(workerTimer).scheduleWithFixedDelay(any(Runnable.class), org.mockito.ArgumentMatchers.eq(0L),
-                org.mockito.ArgumentMatchers.eq(1000L), org.mockito.ArgumentMatchers.eq(TimeUnit.MILLISECONDS));
+                org.mockito.ArgumentMatchers.eq(3000L), org.mockito.ArgumentMatchers.eq(TimeUnit.MILLISECONDS));
         WorkerHeartBeat heartbeat = worker(1);
         register(RegistryNodeType.WORKER, heartbeat);
         query = (type, address) -> heartbeat;
