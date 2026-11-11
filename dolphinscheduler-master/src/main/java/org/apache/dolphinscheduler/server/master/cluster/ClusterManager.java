@@ -46,20 +46,32 @@ public class ClusterManager {
     private RegistryClient registryClient;
 
     public void start() {
+        initializeMasterClusters();
+        initializeWorkerClusters();
+        log.info("ClusterManager started...");
+    }
+
+    private void initializeMasterClusters() {
         masterClusters.registerListener(new MasterSlotChangeListenerAdaptor(masterSlotManager, masterClusters));
         synchronized (masterClusters) {
+            // Apply the initial snapshot before processing membership events.
             registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), masterClusters);
-            registryClient.getServerList(RegistryNodeType.MASTER).forEach(server -> masterClusters.onServerRegistered(
+            registryClient.getServerList(RegistryNodeType.MASTER).forEach(server -> masterClusters.onServerAdded(
                     JSONUtils.parseObject(server.getHeartBeatInfo(), ServerIdentity.class)));
         }
+        log.info("Initialized MasterClusters: {}", masterClusters.getServerAddresses());
+    }
+
+    private void initializeWorkerClusters() {
         synchronized (workerClusters) {
+            // Apply the initial snapshot before processing membership events.
             registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), workerClusters);
-            registryClient.getServerList(RegistryNodeType.WORKER).forEach(server -> workerClusters.onServerRegistered(
+            registryClient.getServerList(RegistryNodeType.WORKER).forEach(server -> workerClusters.onServerAdded(
                     JSONUtils.parseObject(server.getHeartBeatInfo(), ServerIdentity.class)));
         }
+        log.info("Initialized WorkerClusters: {}", workerClusters.getServerAddresses());
         workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerClusters);
         workerGroupChangeNotifier.start();
-        log.info("ClusterManager started...");
     }
 
 }

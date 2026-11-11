@@ -712,7 +712,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 .build();
 
         // first start workflow to simulate the normal parent workflow
-        systemEventBus.publish(MasterFailoverEvent.of(masterServerMain.toIdentity(), new Date(), 0));
+        systemEventBus.publish(MasterFailoverEvent.of(masterServerMain.getServerIdentity(), new Date(), 0));
 
         final String mainMasterFailoverNodePath = RegistryUtils.getFailoveredNodePath(
                 masterServerMain.getAddress(),
@@ -755,7 +755,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 });
 
         // failover sub-workflow
-        systemEventBus.publish(MasterFailoverEvent.of(masterServerSub.toIdentity(), new Date(), 0));
+        systemEventBus.publish(MasterFailoverEvent.of(masterServerSub.getServerIdentity(), new Date(), 0));
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -833,7 +833,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 .build();
 
         // first start sub-workflow to simulate the normal child workflow
-        systemEventBus.publish(MasterFailoverEvent.of(masterServerSub.toIdentity(), new Date(), 0));
+        systemEventBus.publish(MasterFailoverEvent.of(masterServerSub.getServerIdentity(), new Date(), 0));
 
         final String subMasterFailoverNodePath = RegistryUtils.getFailoveredNodePath(
                 masterServerSub.getAddress(),
@@ -848,7 +848,7 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 });
 
         // failover main-workflow
-        systemEventBus.publish(MasterFailoverEvent.of(masterServerMain.toIdentity(), new Date(), 0));
+        systemEventBus.publish(MasterFailoverEvent.of(masterServerMain.getServerIdentity(), new Date(), 0));
 
         await()
                 .atMost(Duration.ofMinutes(1))
@@ -996,8 +996,8 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 .address(submittedSubWorkflowInstance.getHost())
                 .build();
 
-        systemEventBus.publish(MasterFailoverEvent.of(masterServerMain.toIdentity(), new Date(), 0));
-        systemEventBus.publish(MasterFailoverEvent.of(masterServerSub.toIdentity(), new Date(), 0));
+        systemEventBus.publish(MasterFailoverEvent.of(masterServerMain.getServerIdentity(), new Date(), 0));
+        systemEventBus.publish(MasterFailoverEvent.of(masterServerSub.getServerIdentity(), new Date(), 0));
 
         final String mainMasterFailoverNodePath = RegistryUtils.getFailoveredNodePath(
                 masterServerMain.getAddress(),
@@ -1083,8 +1083,8 @@ public class WorkflowInstanceFailoverTestCase extends AbstractMasterIntegrationT
                 .address(submittedSubWorkflowInstance.getHost())
                 .build();
 
-        systemEventBus.publish(MasterFailoverEvent.of(masterServerMain.toIdentity(), new Date(), 0));
-        systemEventBus.publish(MasterFailoverEvent.of(masterServerSub.toIdentity(), new Date(), 0));
+        systemEventBus.publish(MasterFailoverEvent.of(masterServerMain.getServerIdentity(), new Date(), 0));
+        systemEventBus.publish(MasterFailoverEvent.of(masterServerSub.getServerIdentity(), new Date(), 0));
 
         final String mainMasterFailoverNodePath = RegistryUtils.getFailoveredNodePath(
                 masterServerMain.getAddress(),

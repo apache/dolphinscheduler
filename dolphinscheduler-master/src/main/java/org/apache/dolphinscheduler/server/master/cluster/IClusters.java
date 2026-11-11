@@ -22,7 +22,6 @@ import org.apache.dolphinscheduler.common.model.ServerIdentity;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 public interface IClusters<S extends IClusters.IServerMetadata> {
 
@@ -34,13 +33,13 @@ public interface IClusters<S extends IClusters.IServerMetadata> {
 
     Optional<ServerIdentity> getServerIdentity(String address);
 
-    void registerServerRemovedListener(Consumer<ServerIdentity> listener);
-
     Optional<S> getServer(final String address);
 
     void registerListener(IClustersChangeListener<S> listener);
 
     interface IServerMetadata {
+
+        ServerIdentity getServerIdentity();
 
         String getAddress();
 
@@ -50,42 +49,28 @@ public interface IClusters<S extends IClusters.IServerMetadata> {
 
     interface IClustersChangeListener<S extends IServerMetadata> {
 
-        void onServerAdded(S server);
+        default void onServerAdded(ServerIdentity server) {
+        }
 
-        void onServerRemove(S server);
+        default void onServerRemove(ServerIdentity server) {
+        }
 
-        void onServerUpdate(S server);
+        default void onServerUpdate(S server) {
+        }
 
     }
 
     interface ServerAddedListener<S extends IServerMetadata> extends IClustersChangeListener<S> {
 
         @Override
-        default void onServerRemove(S server) {
-            // only care about server added
-        }
-
-        @Override
-        default void onServerUpdate(S server) {
-            // only care about server added
-        }
+        void onServerAdded(ServerIdentity server);
 
     }
 
     interface ServerRemovedListener<S extends IServerMetadata> extends IClustersChangeListener<S> {
 
         @Override
-        default void onServerAdded(S server) {
-            // only care about server removed
-        }
-
-        @Override
-        void onServerRemove(S server);
-
-        @Override
-        default void onServerUpdate(S server) {
-            // only care about server added
-        }
+        void onServerRemove(ServerIdentity server);
 
     }
 

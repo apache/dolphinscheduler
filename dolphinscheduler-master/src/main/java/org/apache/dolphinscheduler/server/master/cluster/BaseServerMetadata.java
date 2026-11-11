@@ -46,7 +46,8 @@ public abstract class BaseServerMetadata implements IClusters.IServerMetadata {
     // Local time in milliseconds when the heartbeat was received.
     private final long heartbeatReceivedTime;
 
-    public ServerIdentity toIdentity() {
+    @Override
+    public ServerIdentity getServerIdentity() {
         Host host = Host.of(address);
         ServerIdentity identity = new ServerIdentity();
         identity.setHost(host.getIp());

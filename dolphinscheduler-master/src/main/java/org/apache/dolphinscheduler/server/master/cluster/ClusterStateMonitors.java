@@ -41,9 +41,9 @@ public class ClusterStateMonitors {
 
     public void start() {
         clusterManager.getMasterClusters()
-                .registerServerRemovedListener(this::masterRemoved);
+                .registerListener((IClusters.ServerRemovedListener<MasterServerMetadata>) this::masterRemoved);
         clusterManager.getWorkerClusters()
-                .registerServerRemovedListener(this::workerRemoved);
+                .registerListener((IClusters.ServerRemovedListener<WorkerServerMetadata>) this::workerRemoved);
         log.info("ClusterStateMonitors started...");
     }
 

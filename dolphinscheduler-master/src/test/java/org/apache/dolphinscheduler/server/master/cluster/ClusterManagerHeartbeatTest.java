@@ -23,11 +23,13 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
@@ -64,11 +66,13 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
-import java.util.function.Consumer;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -182,6 +186,10 @@ class ClusterManagerHeartbeatTest {
         assertFalse(workerClusters.getServer("localhost:1234").isPresent());
         assertEquals(Collections.singletonList("localhost:1234"), workerClusters.getServerAddresses());
         assertTrue(owner.getWorkerClusters().getNormalWorkerServerAddressByGroup("analytics").isEmpty());
+        query = (type, address) -> null;
+        poll();
+        assertTrue(workerClusters.getServers().isEmpty());
+        query = (type, address) -> heartbeat;
         poll();
         assertEquals(ServerStatus.NORMAL, workerView().getServerStatus());
         assertEquals(Collections.singletonList("localhost:1234"),
@@ -189,31 +197,45 @@ class ClusterManagerHeartbeatTest {
         verify(registry, never()).persistEphemeral(anyString(), anyString());
     }
 
-    @Test
-    void failedHeartbeatClearsMetadataButKeepsRegistration() {
+    @ParameterizedTest
+    @ValueSource(strings = {"exception", "empty", "foreign"})
+    void failedHeartbeatKeepsMetadataTimeAndSchedulingEligibility(String failure) {
         WorkerHeartBeat heartbeat = worker(1);
         register(RegistryNodeType.WORKER, heartbeat);
+        IClusters.IClustersChangeListener<WorkerServerMetadata> listener =
+                mock(IClusters.IClustersChangeListener.class);
+        workerClusters.registerListener(listener);
         query = (type, address) -> heartbeat;
         owner.start();
+        verify(listener).onServerAdded(ServerIdentity.fromHeartBeat(heartbeat));
+        verify(listener, never()).onServerUpdate(any());
         poll();
-        long receivedTime = workerView().getHeartbeatReceivedTime();
-        assertTrue(receivedTime > 0);
-        poll();
-        assertEquals(ServerStatus.NORMAL, workerView().getServerStatus());
-        assertTrue(workerView().getHeartbeatReceivedTime() >= receivedTime);
+        WorkerServerMetadata snapshot = workerView();
+        verify(listener).onServerUpdate(snapshot);
+        assertTrue(snapshot.getHeartbeatReceivedTime() > 0);
+        clearInvocations(listener);
         query = (type, address) -> {
-            throw new IllegalStateException("unreachable");
+            switch (failure) {
+                case "empty":
+                    return null;
+                case "foreign":
+                    return worker(2);
+                default:
+                    throw new IllegalStateException("unreachable");
+            }
         };
         poll();
-        assertFalse(workerClusters.getServer("localhost:1234").isPresent());
+        assertSame(snapshot, workerView());
+        assertEquals(snapshot.getHeartbeatReceivedTime(), workerView().getHeartbeatReceivedTime());
         assertTrue(workerClusters.getServerIdentity("localhost:1234").isPresent());
-        assertEquals(Collections.singletonList("localhost:1234"), workerClusters.getServerAddresses());
-        assertTrue(workerClusters.getNormalWorkerServerAddressByGroup("analytics").isEmpty());
+        assertEquals(Collections.singletonList("localhost:1234"),
+                workerClusters.getNormalWorkerServerAddressByGroup("analytics"));
+        verifyNoInteractions(listener);
         query = (type, address) -> heartbeat;
         poll();
         assertEquals(ServerStatus.NORMAL, workerView().getServerStatus());
-        assertEquals(Collections.singletonList("localhost:1234"),
-                workerClusters.getNormalWorkerServerAddressByGroup("analytics"));
+        assertTrue(workerView().getHeartbeatReceivedTime() >= snapshot.getHeartbeatReceivedTime());
+        verify(listener).onServerUpdate(workerView());
     }
 
     @Test
@@ -261,20 +283,24 @@ class ClusterManagerHeartbeatTest {
         assertTrue(owner.getWorkerClusters().getNormalWorkerServerAddressByGroup("analytics").isEmpty());
     }
 
-    @Test
-    void removalDuringInitialListingIsAppliedAfterSnapshot() throws InterruptedException {
-        WorkerHeartBeat heartbeat = worker(1);
-        register(RegistryNodeType.WORKER, heartbeat);
-        java.util.List<Server> snapshot = registry.getServerList(RegistryNodeType.WORKER);
+    @ParameterizedTest
+    @EnumSource(value = RegistryNodeType.class, names = {"MASTER", "WORKER"})
+    void removalDuringInitialListingIsAppliedAfterSnapshot(RegistryNodeType type) throws InterruptedException {
+        BaseHeartBeat heartbeat = type == RegistryNodeType.MASTER
+                ? MasterHeartBeat.builder().host("localhost").port(5678).processId(10).startupTime(1).build()
+                : worker(1);
+        register(type, heartbeat);
+        java.util.List<Server> snapshot = registry.getServerList(type);
         Thread[] removal = new Thread[1];
-        when(registry.getServerList(RegistryNodeType.WORKER)).thenAnswer(invocation -> {
-            removal[0] = new Thread(() -> notify(RegistryNodeType.WORKER, Event.Type.REMOVE, heartbeat));
+        when(registry.getServerList(type)).thenAnswer(invocation -> {
+            removal[0] = new Thread(() -> notify(type, Event.Type.REMOVE, heartbeat));
             removal[0].start();
             return snapshot;
         });
         owner.start();
         removal[0].join(3000);
-        assertTrue(owner.getWorkerClusters().getServers().isEmpty());
+        assertFalse(removal[0].isAlive());
+        assertTrue((type == RegistryNodeType.MASTER ? masterClusters : workerClusters).getServerAddresses().isEmpty());
     }
 
     @Test
@@ -334,11 +360,13 @@ class ClusterManagerHeartbeatTest {
         assertEquals(Collections.singletonList("localhost:5678"), masterClusters.getServerAddresses());
         poll();
         assertEquals(1, masterClusters.getNormalServers().size());
+        MasterServerMetadata snapshot = masterClusters.getServer("localhost:5678").get();
         query = (type, address) -> {
             throw new IllegalStateException("unreachable");
         };
         poll();
-        assertTrue(masterClusters.getServers().isEmpty());
+        assertSame(snapshot, masterClusters.getServer("localhost:5678").get());
+        assertEquals(1, masterClusters.getNormalServers().size());
         assertTrue(masterClusters.getServerIdentity("localhost:5678").isPresent());
     }
 
@@ -377,19 +405,24 @@ class ClusterManagerHeartbeatTest {
     void nullHeartbeatDoesNotPublishRegistryRemoval() {
         WorkerHeartBeat heartbeat = worker(1);
         register(RegistryNodeType.WORKER, heartbeat);
-        Consumer<ServerIdentity> removed = mock(Consumer.class);
-        workerClusters.registerServerRemovedListener(removed);
+        IClusters.IClustersChangeListener<WorkerServerMetadata> listener =
+                mock(IClusters.IClustersChangeListener.class);
+        workerClusters.registerListener(listener);
         owner.start();
         query = (type, address) -> heartbeat;
         poll();
+        WorkerServerMetadata snapshot = workerView();
+        clearInvocations(listener);
         query = (type, address) -> null;
         poll();
-        assertTrue(workerClusters.getServers().isEmpty());
+        assertSame(snapshot, workerView());
         assertTrue(workerClusters.getServerIdentity("localhost:1234").isPresent());
-        verify(removed, never()).accept(any());
+        verifyNoInteractions(listener);
         notify(RegistryNodeType.WORKER, Event.Type.REMOVE, heartbeat);
-        verify(removed).accept(ServerIdentity.fromHeartBeat(heartbeat));
+        verify(listener).onServerRemove(ServerIdentity.fromHeartBeat(heartbeat));
         assertTrue(workerClusters.getServerAddresses().isEmpty());
+        assertTrue(workerClusters.getServers().isEmpty());
+        assertTrue(workerClusters.getConfigWorkerServerAddressByGroup("analytics").isEmpty());
     }
 
     @Test
@@ -397,12 +430,14 @@ class ClusterManagerHeartbeatTest {
         MasterHeartBeat heartbeat = MasterHeartBeat.builder().host("localhost").port(5678).processId(10)
                 .startupTime(1).build();
         register(RegistryNodeType.MASTER, heartbeat);
-        Consumer<ServerIdentity> removed = mock(Consumer.class);
-        masterClusters.registerServerRemovedListener(removed);
+        IClusters.IClustersChangeListener<MasterServerMetadata> listener =
+                mock(IClusters.IClustersChangeListener.class);
+        masterClusters.registerListener(listener);
         owner.start();
         assertTrue(masterClusters.getServers().isEmpty());
         notify(RegistryNodeType.MASTER, Event.Type.REMOVE, heartbeat);
-        verify(removed).accept(ServerIdentity.fromHeartBeat(heartbeat));
+        verify(listener).onServerRemove(ServerIdentity.fromHeartBeat(heartbeat));
+        verify(listener, never()).onServerUpdate(any());
         assertTrue(masterClusters.getServerAddresses().isEmpty());
     }
 

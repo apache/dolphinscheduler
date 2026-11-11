@@ -42,7 +42,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -76,7 +75,6 @@ public class WorkerClusters
             new CopyOnWriteArrayList<>();
 
     private final Map<String, ServerIdentity> registeredServers = new ConcurrentHashMap<>();
-    private final List<Consumer<ServerIdentity>> serverRemovedListeners = new CopyOnWriteArrayList<>();
     private volatile boolean closed;
 
     @Autowired
@@ -107,30 +105,41 @@ public class WorkerClusters
     }
 
     @Override
-    public void registerServerRemovedListener(Consumer<ServerIdentity> listener) {
-        serverRemovedListeners.add(listener);
-    }
-
-    public synchronized void onServerRegistered(ServerIdentity identity) {
+    public synchronized void onServerAdded(ServerIdentity identity) {
         if (closed || identity.equals(registeredServers.get(identity.getAddress()))) {
             return;
         }
         ServerIdentity previous = registeredServers.get(identity.getAddress());
         if (previous != null) {
-            onServerUnregistered(previous);
+            onServerRemove(previous);
         }
         registeredServers.put(identity.getAddress(), identity);
+        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
+            listener.onServerAdded(identity);
+        }
     }
 
-    public synchronized void onServerUnregistered(ServerIdentity identity) {
+    @Override
+    public synchronized void onServerRemove(ServerIdentity identity) {
         if (closed || !registeredServers.remove(identity.getAddress(), identity)) {
             return;
         }
-        WorkerServerMetadata metadata = workerMapping.get(identity.getAddress());
-        if (metadata != null) {
-            onServerRemove(metadata);
+        WorkerServerMetadata workerServer = workerMapping.remove(identity.getAddress());
+        if (workerServer != null && workerServer.getWorkerGroup() != null) {
+            synchronized (configWorkerGroupMapping) {
+                List<String> removeWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
+                if (removeWorkerGroupAddrList != null
+                        && removeWorkerGroupAddrList.contains(workerServer.getAddress())) {
+                    removeWorkerGroupAddrList.remove(workerServer.getAddress());
+                    if (removeWorkerGroupAddrList.isEmpty()) {
+                        configWorkerGroupMapping.remove(workerServer.getWorkerGroup());
+                    }
+                }
+            }
         }
-        serverRemovedListeners.forEach(listener -> listener.accept(identity));
+        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
+            listener.onServerRemove(identity);
+        }
     }
 
     @Override
@@ -210,63 +219,6 @@ public class WorkerClusters
     }
 
     @Override
-    public synchronized void onServerAdded(WorkerServerMetadata workerServer) {
-        if (closed) {
-            return;
-        }
-        WorkerServerMetadata current = workerMapping.get(workerServer.getAddress());
-        if (current != null) {
-            if (current.getProcessId() == workerServer.getProcessId()
-                    && current.getServerStartupTime() == workerServer.getServerStartupTime()) {
-                return;
-            }
-            onServerRemove(current);
-        }
-        workerMapping.put(workerServer.getAddress(), workerServer);
-        if (workerServer.getWorkerGroup() != null) {
-            synchronized (configWorkerGroupMapping) {
-                List<String> addWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
-                if (addWorkerGroupAddrList == null) {
-                    List<String> newWorkerGroupAddrList = new ArrayList<>();
-                    newWorkerGroupAddrList.add(workerServer.getAddress());
-                    configWorkerGroupMapping.put(workerServer.getWorkerGroup(), newWorkerGroupAddrList);
-                } else if (!addWorkerGroupAddrList.contains(workerServer.getAddress())) {
-                    addWorkerGroupAddrList.add(workerServer.getAddress());
-                    configWorkerGroupMapping.put(workerServer.getWorkerGroup(), addWorkerGroupAddrList);
-                }
-            }
-        }
-        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
-            listener.onServerAdded(workerServer);
-        }
-    }
-
-    @Override
-    public synchronized void onServerRemove(WorkerServerMetadata removedServer) {
-        WorkerServerMetadata workerServer = workerMapping.get(removedServer.getAddress());
-        if (closed || workerServer == null || workerServer.getProcessId() != removedServer.getProcessId()
-                || workerServer.getServerStartupTime() != removedServer.getServerStartupTime()
-                || !workerMapping.remove(workerServer.getAddress(), workerServer)) {
-            return;
-        }
-        if (workerServer.getWorkerGroup() != null) {
-            synchronized (configWorkerGroupMapping) {
-                List<String> removeWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
-                if (removeWorkerGroupAddrList != null
-                        && removeWorkerGroupAddrList.contains(workerServer.getAddress())) {
-                    removeWorkerGroupAddrList.remove(workerServer.getAddress());
-                    if (removeWorkerGroupAddrList.isEmpty()) {
-                        configWorkerGroupMapping.remove(workerServer.getWorkerGroup());
-                    }
-                }
-            }
-        }
-        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
-            listener.onServerRemove(workerServer);
-        }
-    }
-
-    @Override
     public synchronized void onServerUpdate(WorkerServerMetadata workerServer) {
         if (closed) {
             return;
@@ -309,9 +261,9 @@ public class WorkerClusters
             return;
         }
         if (event.getType() == Event.Type.ADD) {
-            onServerRegistered(identity);
+            onServerAdded(identity);
         } else if (event.getType() == Event.Type.REMOVE) {
-            onServerUnregistered(identity);
+            onServerRemove(identity);
         }
     }
 
@@ -324,27 +276,16 @@ public class WorkerClusters
             if (closed) {
                 return;
             }
-            WorkerHeartBeat heartbeat = null;
             try {
-                heartbeat = fetchHeartbeat(expected.getAddress());
+                WorkerHeartBeat heartbeat = fetchHeartbeat(expected.getAddress());
+                synchronized (this) {
+                    if (!closed && registeredServers.get(expected.getAddress()) == expected
+                            && expected.matches(heartbeat)) {
+                        onServerUpdate(WorkerServerMetadata.parseFromHeartBeat(heartbeat));
+                    }
+                }
             } catch (Exception ex) {
                 log.debug("Failed to fetch Worker heartbeat from {}", expected.getAddress(), ex);
-            }
-            synchronized (this) {
-                if (closed || registeredServers.get(expected.getAddress()) != expected) {
-                    continue;
-                }
-                WorkerServerMetadata previous = workerMapping.get(expected.getAddress());
-                if (expected.matches(heartbeat)) {
-                    WorkerServerMetadata updated = WorkerServerMetadata.parseFromHeartBeat(heartbeat);
-                    if (previous == null) {
-                        onServerAdded(updated);
-                    } else {
-                        onServerUpdate(updated);
-                    }
-                } else if (previous != null) {
-                    onServerRemove(previous);
-                }
             }
         }
     }

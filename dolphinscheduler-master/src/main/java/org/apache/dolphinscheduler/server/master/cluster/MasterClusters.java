@@ -39,7 +39,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -69,7 +68,6 @@ public class MasterClusters
             new CopyOnWriteArrayList<>();
 
     private final Map<String, ServerIdentity> registeredServers = new ConcurrentHashMap<>();
-    private final List<Consumer<ServerIdentity>> serverRemovedListeners = new CopyOnWriteArrayList<>();
     private volatile boolean closed;
 
     @Lazy
@@ -104,30 +102,29 @@ public class MasterClusters
     }
 
     @Override
-    public void registerServerRemovedListener(Consumer<ServerIdentity> listener) {
-        serverRemovedListeners.add(listener);
-    }
-
-    public synchronized void onServerRegistered(ServerIdentity identity) {
+    public synchronized void onServerAdded(ServerIdentity identity) {
         if (closed || identity.equals(registeredServers.get(identity.getAddress()))) {
             return;
         }
         ServerIdentity previous = registeredServers.get(identity.getAddress());
         if (previous != null) {
-            onServerUnregistered(previous);
+            onServerRemove(previous);
         }
         registeredServers.put(identity.getAddress(), identity);
+        for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
+            listener.onServerAdded(identity);
+        }
     }
 
-    public synchronized void onServerUnregistered(ServerIdentity identity) {
+    @Override
+    public synchronized void onServerRemove(ServerIdentity identity) {
         if (closed || !registeredServers.remove(identity.getAddress(), identity)) {
             return;
         }
-        MasterServerMetadata metadata = masterServerMap.get(identity.getAddress());
-        if (metadata != null) {
-            onServerRemove(metadata);
+        masterServerMap.remove(identity.getAddress());
+        for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
+            listener.onServerRemove(identity);
         }
-        serverRemovedListeners.forEach(listener -> listener.accept(identity));
     }
 
     @Override
@@ -146,38 +143,6 @@ public class MasterClusters
     @Override
     public void registerListener(final IClustersChangeListener<MasterServerMetadata> listener) {
         masterClusterChangeListeners.add(listener);
-    }
-
-    @Override
-    public synchronized void onServerAdded(final MasterServerMetadata masterServer) {
-        if (closed) {
-            return;
-        }
-        MasterServerMetadata current = masterServerMap.get(masterServer.getAddress());
-        if (current != null) {
-            if (current.getProcessId() == masterServer.getProcessId()
-                    && current.getServerStartupTime() == masterServer.getServerStartupTime()) {
-                return;
-            }
-            onServerRemove(current);
-        }
-        masterServerMap.put(masterServer.getAddress(), masterServer);
-        for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
-            listener.onServerAdded(masterServer);
-        }
-    }
-
-    @Override
-    public synchronized void onServerRemove(final MasterServerMetadata masterServer) {
-        MasterServerMetadata current = masterServerMap.get(masterServer.getAddress());
-        if (closed || current == null || current.getProcessId() != masterServer.getProcessId()
-                || current.getServerStartupTime() != masterServer.getServerStartupTime()
-                || !masterServerMap.remove(masterServer.getAddress(), current)) {
-            return;
-        }
-        for (IClustersChangeListener<MasterServerMetadata> listener : masterClusterChangeListeners) {
-            listener.onServerRemove(current);
-        }
     }
 
     @Override
@@ -204,9 +169,9 @@ public class MasterClusters
             return;
         }
         if (event.getType() == Event.Type.ADD) {
-            onServerRegistered(identity);
+            onServerAdded(identity);
         } else if (event.getType() == Event.Type.REMOVE) {
-            onServerUnregistered(identity);
+            onServerRemove(identity);
         }
     }
 
@@ -220,27 +185,16 @@ public class MasterClusters
             if (closed) {
                 return;
             }
-            MasterHeartBeat heartbeat = null;
             try {
-                heartbeat = fetchHeartbeat(expected.getAddress());
+                MasterHeartBeat heartbeat = fetchHeartbeat(expected.getAddress());
+                synchronized (this) {
+                    if (!closed && registeredServers.get(expected.getAddress()) == expected
+                            && expected.matches(heartbeat)) {
+                        onServerUpdate(MasterServerMetadata.parseFromHeartBeat(heartbeat));
+                    }
+                }
             } catch (Exception ex) {
                 log.debug("Failed to fetch Master heartbeat from {}", expected.getAddress(), ex);
-            }
-            synchronized (this) {
-                if (closed || registeredServers.get(expected.getAddress()) != expected) {
-                    continue;
-                }
-                MasterServerMetadata previous = masterServerMap.get(expected.getAddress());
-                if (expected.matches(heartbeat)) {
-                    MasterServerMetadata updated = MasterServerMetadata.parseFromHeartBeat(heartbeat);
-                    if (previous == null) {
-                        onServerAdded(updated);
-                    } else {
-                        onServerUpdate(updated);
-                    }
-                } else if (previous != null) {
-                    onServerRemove(previous);
-                }
             }
         }
     }

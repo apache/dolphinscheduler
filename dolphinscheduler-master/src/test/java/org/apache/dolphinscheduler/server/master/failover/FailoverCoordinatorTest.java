@@ -95,7 +95,7 @@ class FailoverCoordinatorTest {
                 .serverStartupTime(System.currentTimeMillis())
                 .address(masterAddress)
                 .build();
-        final MasterFailoverEvent event = MasterFailoverEvent.of(metadata.toIdentity(), new Date(), 0L);
+        final MasterFailoverEvent event = MasterFailoverEvent.of(metadata.getServerIdentity(), new Date(), 0L);
 
         when(clusterManager.getMasterClusters()).thenReturn(masterClusters);
         when(masterClusters.getServerIdentity(masterAddress)).thenReturn(Optional.empty());
@@ -116,8 +116,8 @@ class FailoverCoordinatorTest {
     void registeredMasterWithoutHeartbeatSkipsFailover() {
         try (MasterClusters clusters = new MasterClusters()) {
             ServerIdentity identity = MasterServerMetadata.builder().address("localhost:5678")
-                    .processId(10).serverStartupTime(1000).build().toIdentity();
-            clusters.onServerRegistered(identity);
+                    .processId(10).serverStartupTime(1000).build().getServerIdentity();
+            clusters.onServerAdded(identity);
             assertThat(clusters.getServer(identity.getAddress())).isEmpty();
             when(clusterManager.getMasterClusters()).thenReturn(clusters);
 
@@ -131,8 +131,8 @@ class FailoverCoordinatorTest {
     void registeredWorkerWithoutHeartbeatSkipsFailover() {
         try (WorkerClusters clusters = new WorkerClusters()) {
             ServerIdentity identity = MasterServerMetadata.builder().address("localhost:1234")
-                    .processId(10).serverStartupTime(1000).build().toIdentity();
-            clusters.onServerRegistered(identity);
+                    .processId(10).serverStartupTime(1000).build().getServerIdentity();
+            clusters.onServerAdded(identity);
             assertThat(clusters.getServer(identity.getAddress())).isEmpty();
             when(clusterManager.getWorkerClusters()).thenReturn(clusters);
 
@@ -146,8 +146,8 @@ class FailoverCoordinatorTest {
     void globalFailoverUsesRegisteredStartupTimeWithoutHeartbeat() {
         try (MasterClusters clusters = new MasterClusters()) {
             ServerIdentity identity = MasterServerMetadata.builder().address("localhost:5678")
-                    .processId(10).serverStartupTime(1000).build().toIdentity();
-            clusters.onServerRegistered(identity);
+                    .processId(10).serverStartupTime(1000).build().getServerIdentity();
+            clusters.onServerAdded(identity);
             when(clusterManager.getMasterClusters()).thenReturn(clusters);
             when(workflowInstanceDao.queryNeedFailoverMasters())
                     .thenReturn(Collections.singletonList(identity.getAddress()));
