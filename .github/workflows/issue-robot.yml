@@ -39,10 +39,13 @@ jobs:
           translate-body: true
 
       - name: "Comment in issue"
-        uses: ./.github/actions/comment-on-issue
-        with:
-          message: |
-            Thank you for your feedback, we have received your issue, Please wait patiently for a reply.
-            * In order for us to understand your request as soon as possible, please provide detailed information, version or pictures.
-            * If you haven't received a reply for a long time, you can [join our slack](https://s.apache.org/dolphinscheduler-slack) and send your question to channel `#troubleshooting`
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --body-file - <<'EOF'
+          Thank you for your feedback, we have received your issue, Please wait patiently for a reply.
+          * In order for us to understand your request as soon as possible, please provide detailed information, version or pictures.
+          * If you haven't received a reply for a long time, you can [join our slack](https://s.apache.org/dolphinscheduler-slack) and send your question to channel `#troubleshooting`
+          EOF
