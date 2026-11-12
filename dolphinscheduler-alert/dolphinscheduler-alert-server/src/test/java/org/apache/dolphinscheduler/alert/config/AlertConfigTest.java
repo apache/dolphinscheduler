@@ -19,10 +19,13 @@ package org.apache.dolphinscheduler.alert.config;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import org.apache.dolphinscheduler.extract.base.utils.Host;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.validation.BeanPropertyBindingResult;
 
 @AutoConfigureMockMvc
 @SpringBootTest(classes = AlertConfig.class)
@@ -35,6 +38,37 @@ class AlertConfigTest {
     void testValidate() {
         assertThat(alertConfig.getWaitTimeout()).isEqualTo(10);
         assertThat(alertConfig.getSenderParallelism()).isEqualTo(101);
+    }
+
+    @Test
+    void defaultAddressUsesRpcPort() {
+        AlertConfig config = new AlertConfig();
+        config.setPort(50052);
+        BeanPropertyBindingResult errors = new BeanPropertyBindingResult(config, "alertConfig");
+        config.validate(config, errors);
+        assertThat(errors.hasErrors()).isFalse();
+        assertThat(Host.of(config.getAlertServerAddress()).getPort()).isEqualTo(50052);
+    }
+
+    @Test
+    void acceptsAdvertisedHostWithRpcPort() {
+        AlertConfig config = new AlertConfig();
+        config.setPort(50052);
+        config.setAlertServerAddress("advertised.example:50052");
+        BeanPropertyBindingResult errors = new BeanPropertyBindingResult(config, "alertConfig");
+        config.validate(config, errors);
+        assertThat(errors.hasErrors()).isFalse();
+        assertThat(config.getAlertServerAddress()).isEqualTo("advertised.example:50052");
+    }
+
+    @Test
+    void rejectsAdvertisedPortDifferentFromRpcPort() {
+        AlertConfig config = new AlertConfig();
+        config.setPort(50052);
+        config.setAlertServerAddress("advertised.example:50053");
+        BeanPropertyBindingResult errors = new BeanPropertyBindingResult(config, "alertConfig");
+        config.validate(config, errors);
+        assertThat(errors.hasFieldErrors("alertServerAddress")).isTrue();
     }
 
 }

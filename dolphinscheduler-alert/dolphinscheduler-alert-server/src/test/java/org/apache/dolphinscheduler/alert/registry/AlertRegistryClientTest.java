@@ -84,6 +84,20 @@ class AlertRegistryClientTest {
     }
 
     @Test
+    void registrationAndHeartbeatUseRpcPortAndAdvertisedHost() {
+        AlertConfig config = (AlertConfig) ReflectionTestUtils.getField(client, "alertConfig");
+        config.setAlertServerAddress("advertised.example:50053");
+        client.start();
+        ArgumentCaptor<String> path = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<String> json = ArgumentCaptor.forClass(String.class);
+        verify(registry).persistEphemeral(path.capture(), json.capture());
+        assertEquals("/nodes/alert-server/advertised.example:50052", path.getValue());
+        ServerIdentity identity = JSONUtils.parseObject(json.getValue(), ServerIdentity.class);
+        assertEquals(50052, identity.getPort());
+        assertTrue(identity.matches(client.getServerMetadata()));
+    }
+
+    @Test
     void reconnectRestoresSameRegistrationAndClosePreventsReregistration() {
         client.start();
         ArgumentCaptor<ConnectionListener> listener = ArgumentCaptor.forClass(ConnectionListener.class);

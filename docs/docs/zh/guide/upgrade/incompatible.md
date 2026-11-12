@@ -64,6 +64,10 @@
 
 * Master、Worker 和 Alert Server 的注册节点改为只保存稳定的进程身份。Master 的两个 Cluster 各自使用单线程同步拉取对应角色的心跳，每轮结束后等待配置间隔再执行下一轮；注册信息与心跳元数据分别维护。拉取失败、返回为空或进程身份不匹配时，保留最后成功获取的元数据及其 `heartbeatReceivedTime`，不发布更新事件。Worker 继续按缓存状态参与调度，直到后续有效心跳更新状态或注册节点被移除；尚未成功获取过心跳的 Worker 不参与分配。RPC 拉取失败不会移除注册信息或触发 failover；API 在每次请求时直接查询 Master/Worker/Alert 心跳，不维护心跳缓存。Master、Worker、Alert 和 API 必须协调升级，不支持新旧版本混合滚动升级。Master 的服务间心跳数据拉取间隔通过 `master.heartbeat-fetch-interval`（默认 `3s`）配置；`max-heartbeat-interval` 改为控制 failover 标记检查间隔，不再控制心跳数据写入。节点心跳查询失败时，监控响应的 `heartBeatInfo` 和 `lastHeartbeatTime` 可能为 null，新增 `metadataStale` 表示心跳数据不可用。([#18768](https://github.com/apache/dolphinscheduler/issues/18768))
 
+* Alert 注册信息和心跳身份统一使用 `alert.port` 配置的 RPC 端口。显式配置 `alert.alert-server-address` 时，其端口必须与 `alert.port` 一致，否则启动校验失败。
+
+* 查询配置型 Worker Group 时，只要任一已注册 Worker 的心跳不可用，接口就明确返回查询失败并列出受影响的 Worker 地址；分组选项与分页接口均遵循这一行为。监控查询仍返回已注册节点，并明确标记不可用的心跳数据。
+
 * `AlertSender#getAlertData` 对 null `alertType` 增加了显式拒绝（抛 `IllegalArgumentException` 并记录错误日志），而非直接抛 `NullPointerException`。滚动升级时**必须先升级 Alert Server，再升级 Master/Worker**，否则旧 Alert Server 无法识别新增的 `alert_type` 枚举值（如 `TASK_RESULT`），会导致告警投递失败。详见[升级文档](upgrade.md#滚动升降级顺序)。([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 
 * SQL 任务结果告警内容有大小限制：默认最多保留 30 行，超过 100 字符的字符串字段值会被截断并以省略号标记；序列化后内容总大小限制在 60000 UTF-8 字节以内（兼容 MySQL TEXT 列 65535 字节容量），超出预算的行以省略标记对象表示。以上默认值可通过 `common.properties` 中的 `sql.task.alert.max.rows`、`sql.task.alert.max.row.value.length`、`sql.task.alert.max.content.bytes` 配置调整，修改后需重启 Worker 生效。 ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))

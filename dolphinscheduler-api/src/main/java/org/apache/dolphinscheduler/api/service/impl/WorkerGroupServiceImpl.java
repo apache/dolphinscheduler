@@ -382,10 +382,17 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     @Override
     public List<WorkerGroupPageDetail> getConfigWorkerGroupPageDetail() {
         List<WorkerGroupPageDetail> workerGroupPageDetails = new ArrayList<>();
-        monitorService.listServer(RegistryNodeType.WORKER).forEach(server -> {
-            if (server.getHeartBeatInfo() == null) {
-                return;
-            }
+        List<Server> servers = monitorService.listServer(RegistryNodeType.WORKER);
+        List<String> unavailableAddresses = servers.stream()
+                .filter(server -> server.getHeartBeatInfo() == null)
+                .map(server -> server.getHost() + Constants.COLON + server.getPort())
+                .collect(Collectors.toList());
+        if (!unavailableAddresses.isEmpty()) {
+            throw new ServiceException(Status.QUERY_WORKER_GROUP_FAIL.getCode(),
+                    Status.QUERY_WORKER_GROUP_FAIL.getMsg() + ": heartbeat metadata unavailable for workers "
+                            + String.join(", ", unavailableAddresses));
+        }
+        servers.forEach(server -> {
             WorkerGroupPageDetail workerGroupPageDetail = new WorkerGroupPageDetail();
             WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(server.getHeartBeatInfo(), WorkerHeartBeat.class);
             workerGroupPageDetail.setName(workerHeartBeat.getWorkerGroup());

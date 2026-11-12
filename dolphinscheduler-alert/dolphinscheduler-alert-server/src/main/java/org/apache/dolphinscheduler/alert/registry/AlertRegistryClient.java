@@ -73,7 +73,7 @@ public class AlertRegistryClient implements AutoCloseable, IAlertMetadataService
         if (closed) {
             return;
         }
-        Host host = Host.of(alertConfig.getAlertServerAddress());
+        Host host = new Host(Host.of(alertConfig.getAlertServerAddress()).getIp(), alertConfig.getPort());
         ServerIdentity identity = new ServerIdentity();
         identity.setHost(host.getIp());
         identity.setPort(host.getPort());

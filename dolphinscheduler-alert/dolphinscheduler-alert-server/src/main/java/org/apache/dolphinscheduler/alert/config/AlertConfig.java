@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.alert.config;
 
 import org.apache.dolphinscheduler.common.utils.NetUtils;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,6 +59,8 @@ public final class AlertConfig implements Validator {
 
         if (StringUtils.isEmpty(alertServerAddress)) {
             alertConfig.setAlertServerAddress(NetUtils.getAddr(alertConfig.getPort()));
+        } else if (Host.of(alertServerAddress).getPort() != port) {
+            errors.rejectValue("alertServerAddress", null, "port must match the RPC port configured by alert.port");
         }
 
         printConfig();
