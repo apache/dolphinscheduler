@@ -26,7 +26,7 @@ See the SQL files in `dolphinscheduler-dao/src/main/resources/sql`, which are th
 - User can have multiple projects, user project authorization completes the relationship binding using `project_id` and `user_id` in `t_ds_relation_project_user` table.
 - The `user_id` in the `t_ds_project` table represents the user who create the project, and the `user_id` in the `t_ds_relation_project_user` table represents users who have permission to the project.
 - Resources are kept by the storage plugin. `t_ds_resources` in the diagram is only read by the resource migration tool.
-- Alert groups are stored in `t_ds_alertgroup` and referenced by `warning_group_id` of `t_ds_schedules`, `t_ds_workflow_definition` and `t_ds_workflow_instance`.
+- Alert groups are stored in `t_ds_alertgroup` and referenced by `warning_group_id` of `t_ds_schedules` and `t_ds_workflow_instance`.
 
 ### Project - Tenant - Workflow Definition - Schedule
 
