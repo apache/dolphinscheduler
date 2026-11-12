@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -44,6 +45,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 
@@ -174,6 +176,7 @@ class AbsStorageOperatorTest {
     @Test
     void deleteDirectoryRecursivelyRemovesEveryBlobUnderIt() {
         BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        BlobClient directory = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1");
         BlobClient marker = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1/");
         BlobClient child = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1/b.sql");
         BlobClient nested = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1/sub/c.sql");
@@ -187,6 +190,27 @@ class AbsStorageOperatorTest {
         verify(marker).deleteIfExists();
         verify(child).deleteIfExists();
         verify(nested).deleteIfExists();
+        verify(directory).deleteIfExists();
+    }
+
+    @Test
+    void deleteDirectoryRecursivelyRemovesChildrenBeforeTheirParentDirectories() {
+        // With a hierarchical namespace the directories are blobs without a trailing separator,
+        // and such a directory can only be deleted when it is empty
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        BlobClient directory = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1");
+        BlobClient subDirectory = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1/sub");
+        BlobClient nested = mockBlobClient(containerClient, "dolphinscheduler/default/resources/dir1/sub/c.sql");
+        mockListBlobs(containerClient, "dolphinscheduler/default/resources/dir1/",
+                "dolphinscheduler/default/resources/dir1/sub", "dolphinscheduler/default/resources/dir1/sub/c.sql");
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        storageOperator.delete("dolphinscheduler/default/resources/dir1", true);
+
+        InOrder inOrder = inOrder(nested, subDirectory, directory);
+        inOrder.verify(nested).deleteIfExists();
+        inOrder.verify(subDirectory).deleteIfExists();
+        inOrder.verify(directory).deleteIfExists();
     }
 
     @Test
