@@ -52,6 +52,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.util.concurrent.RateLimiter;
+
 @Slf4j
 @Component
 public class WorkerClusters
@@ -75,6 +77,7 @@ public class WorkerClusters
             new CopyOnWriteArrayList<>();
 
     private final Map<String, ServerIdentity> registeredServers = new ConcurrentHashMap<>();
+    private final RateLimiter heartbeatFailureLogLimiter = RateLimiter.create(1.0 / 60);
     private volatile boolean closed;
 
     @Autowired
@@ -272,6 +275,7 @@ public class WorkerClusters
     }
 
     public void refreshHeartbeats() {
+        List<String> failures = new ArrayList<>();
         for (ServerIdentity expected : new ArrayList<>(registeredServers.values())) {
             if (closed) {
                 return;
@@ -279,15 +283,35 @@ public class WorkerClusters
             try {
                 WorkerHeartBeat heartbeat = fetchHeartbeat(expected.getAddress());
                 synchronized (this) {
-                    if (!closed && registeredServers.get(expected.getAddress()) == expected
-                            && expected.matches(heartbeat)) {
+                    if (closed || registeredServers.get(expected.getAddress()) != expected) {
+                        continue;
+                    }
+                    if (heartbeat == null) {
+                        failures.add(heartbeatFailure(expected.getAddress(), "empty heartbeat"));
+                    } else if (!expected.matches(heartbeat)) {
+                        failures.add(heartbeatFailure(expected.getAddress(),
+                                "unexpected heartbeat identity " + ServerIdentity.fromHeartBeat(heartbeat)));
+                    } else {
                         onServerUpdate(WorkerServerMetadata.parseFromHeartBeat(heartbeat));
                     }
                 }
             } catch (Exception ex) {
                 log.debug("Failed to fetch Worker heartbeat from {}", expected.getAddress(), ex);
+                if (!closed && registeredServers.get(expected.getAddress()) == expected) {
+                    failures.add(heartbeatFailure(expected.getAddress(), "RPC failed: " + ex.getMessage()));
+                }
             }
         }
+        if (!failures.isEmpty() && heartbeatFailureLogLimiter.tryAcquire()) {
+            log.warn("Failed to fetch Worker heartbeats: {}", failures);
+        }
+    }
+
+    private String heartbeatFailure(String address, String reason) {
+        WorkerServerMetadata metadata = workerMapping.get(address);
+        String age = metadata == null ? "never received"
+                : (System.currentTimeMillis() - metadata.getHeartbeatReceivedTime()) + "ms";
+        return address + " [reason=" + reason + ", heartbeatAge=" + age + "]";
     }
 
     @Override

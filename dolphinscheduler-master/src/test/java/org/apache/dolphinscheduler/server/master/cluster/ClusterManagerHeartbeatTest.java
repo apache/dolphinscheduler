@@ -71,10 +71,17 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 
 class ClusterManagerHeartbeatTest {
 
@@ -439,6 +446,79 @@ class ClusterManagerHeartbeatTest {
         verify(listener).onServerRemove(ServerIdentity.fromHeartBeat(heartbeat));
         verify(listener, never()).onServerUpdate(any());
         assertTrue(masterClusters.getServerAddresses().isEmpty());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"MASTER,exception", "MASTER,empty", "MASTER,foreign", "WORKER,exception", "WORKER,empty",
+            "WORKER,foreign"})
+    void failedPollWarnsWithAddressReasonAndAgeAndIsRateLimited(RegistryNodeType type, String failure) {
+        BaseHeartBeat heartbeat = type == RegistryNodeType.MASTER
+                ? MasterHeartBeat.builder().host("localhost").port(5678).processId(10).startupTime(1)
+                        .serverStatus(ServerStatus.NORMAL).build()
+                : worker(1);
+        register(type, heartbeat);
+        query = (role, address) -> heartbeat;
+        owner.start();
+        poll();
+        Class<?> clusterType = type == RegistryNodeType.MASTER ? MasterClusters.class : WorkerClusters.class;
+        Logger logger = (Logger) LoggerFactory.getLogger(clusterType);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        query = (role, address) -> {
+            switch (failure) {
+                case "empty":
+                    return null;
+                case "foreign":
+                    return type == RegistryNodeType.MASTER
+                            ? MasterHeartBeat.builder().host("localhost").port(5678).processId(11).startupTime(2)
+                                    .build()
+                            : worker(2);
+                default:
+                    throw new IllegalStateException("unreachable");
+            }
+        };
+        try {
+            poll();
+            poll();
+            assertEquals(1, appender.list.stream().filter(event -> event.getLevel() == Level.WARN).count());
+            String message = appender.list.stream().filter(event -> event.getLevel() == Level.WARN).findFirst().get()
+                    .getFormattedMessage();
+            assertTrue(message.contains(ServerIdentity.fromHeartBeat(heartbeat).getAddress()));
+            assertTrue(message.contains("heartbeatAge="));
+            assertTrue(message.contains("ms"));
+            assertTrue(message.contains(failure.equals("exception") ? "unreachable"
+                    : failure.equals("empty") ? "empty heartbeat" : "unexpected heartbeat identity"));
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+        }
+    }
+
+    @Test
+    void failedPollSummaryIncludesAllNodesWithoutAnySuccessfulHeartbeat() {
+        WorkerHeartBeat heartbeat = worker(1);
+        WorkerHeartBeat second = worker(1);
+        second.setPort(1235);
+        register(RegistryNodeType.WORKER, heartbeat);
+        owner.start();
+        notify(RegistryNodeType.WORKER, Event.Type.ADD, second);
+        query = (type, address) -> null;
+        Logger logger = (Logger) LoggerFactory.getLogger(WorkerClusters.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        try {
+            poll();
+            String message = appender.list.stream().filter(event -> event.getLevel() == Level.WARN).findFirst().get()
+                    .getFormattedMessage();
+            assertTrue(message.contains("localhost:1234"));
+            assertTrue(message.contains("localhost:1235"));
+            assertTrue(message.contains("heartbeatAge=never received"));
+        } finally {
+            logger.detachAppender(appender);
+            appender.stop();
+        }
     }
 
     @Test
