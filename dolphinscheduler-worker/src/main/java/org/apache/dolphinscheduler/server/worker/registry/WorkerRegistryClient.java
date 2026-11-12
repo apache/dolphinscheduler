@@ -129,9 +129,8 @@ public class WorkerRegistryClient implements AutoCloseable, IWorkerMetadataServi
 
     @Override
     public WorkerHeartBeat getServerMetadata() {
+        WorkerServerMetrics.incWorkerHeartbeatRequestCount();
         SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
-
-        WorkerServerMetrics.incWorkerHeartbeatCount();
         return WorkerHeartBeat.builder()
                 .startupTime(ServerLifeCycleManager.getServerStartupTime())
                 .reportTime(System.currentTimeMillis())

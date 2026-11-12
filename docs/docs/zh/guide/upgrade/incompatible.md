@@ -62,6 +62,16 @@
 
 * Master、Worker 和 Alert Server 现在按 RPC 请求生成心跳快照，并发请求共享一秒刷新间隔的线程安全系统指标缓存。`BaseHeartBeatTask` 及 Master、Worker、Alert 的心跳任务子类已移除，自定义扩展如继承这些类，需要自行管理调度。Alert Server 取消定期写注册心跳，只在启动时注册稳定进程身份，并在重连时恢复注册。`alert.max-heartbeat-interval` 已移除，API 在收到查询请求时直接通过 RPC 获取 Alert 心跳。
 
+* Master、Worker 和 Alert 的心跳指标改名，用于区分心跳数据请求次数与原来的定时注册心跳次数：
+
+  |             旧指标             |                 新指标                 |
+  |-----------------------------|-------------------------------------|
+  | `ds.master.heartbeat.count` | `ds.master.heartbeat.request.count` |
+  | `ds.worker.heartbeat.count` | `ds.worker.heartbeat.request.count` |
+  | `ds.alert.heartbeat.count`  | `ds.alert.heartbeat.request.count`  |
+
+  新计数器统计进入 `getServerMetadata()` 的调用，包括本地读取和快照生成失败的请求；其速率反映轮询和查询量。升级时需更新引用旧指标的仪表盘，并改用服务健康检查判断存活。Prometheus 导出名称也相应变化，例如 `ds_master_heartbeat_count_total` 改为 `ds_master_heartbeat_request_count_total`（Worker、Alert 同理）。
+
 * Master、Worker 和 Alert Server 的注册节点改为只保存稳定的进程身份。Master 的两个 Cluster 各自使用单线程同步拉取对应角色的心跳，每轮结束后等待配置间隔再执行下一轮；注册信息与心跳元数据分别维护。拉取失败、返回为空或进程身份不匹配时，保留最后成功获取的元数据及其 `heartbeatReceivedTime`，不发布更新事件。Worker 继续按缓存状态参与调度，直到后续有效心跳更新状态或注册节点被移除；尚未成功获取过心跳的 Worker 不参与分配。RPC 拉取失败不会移除注册信息或触发 failover；API 在每次请求时直接查询 Master/Worker/Alert 心跳，不维护心跳缓存。Master、Worker、Alert 和 API 必须协调升级，不支持新旧版本混合滚动升级。Master 的服务间心跳数据拉取间隔通过 `master.heartbeat-fetch-interval`（默认 `3s`）配置；`max-heartbeat-interval` 改为控制 failover 标记检查间隔，不再控制心跳数据写入。节点心跳查询失败时，监控响应的 `heartBeatInfo` 和 `lastHeartbeatTime` 可能为 null，新增 `metadataStale` 表示心跳数据不可用。([#18768](https://github.com/apache/dolphinscheduler/issues/18768))
 
 * Alert 注册信息和心跳身份统一使用 `alert.port` 配置的 RPC 端口。显式配置 `alert.alert-server-address` 时，其端口必须与 `alert.port` 一致，否则启动校验失败。

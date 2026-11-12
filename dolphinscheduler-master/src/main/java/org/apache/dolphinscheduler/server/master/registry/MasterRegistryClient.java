@@ -138,8 +138,8 @@ public class MasterRegistryClient implements AutoCloseable, IMasterMetadataServi
 
     @Override
     public MasterHeartBeat getServerMetadata() {
+        MasterServerMetrics.incMasterHeartbeatRequestCount();
         SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
-        MasterServerMetrics.incMasterHeartbeatCount();
         return MasterHeartBeat.builder()
                 .startupTime(ServerLifeCycleManager.getServerStartupTime())
                 .reportTime(System.currentTimeMillis())

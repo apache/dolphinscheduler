@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.server.master.registry;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
@@ -45,6 +47,10 @@ import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.prometheus.PrometheusConfig;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
+
 @ExtendWith(MockitoExtension.class)
 class MasterRegistryClientTest {
 
@@ -63,18 +69,31 @@ class MasterRegistryClientTest {
 
     @Test
     void buildsFreshHeartbeatOnEveryRequestWithoutRegistryWrites() {
-        when(metricsProvider.getSystemMetrics()).thenReturn(
-                SystemMetrics.builder().systemCpuUsagePercentage(0.2).build(),
-                SystemMetrics.builder().systemCpuUsagePercentage(0.8).build());
-        when(masterServerLoadProtection.isOverload(any())).thenReturn(false, true);
-        MasterHeartBeat first = client.getServerMetadata();
-        MasterHeartBeat second = client.getServerMetadata();
-        assertNotSame(first, second);
-        assertEquals(0.2, first.getCpuUsage());
-        assertEquals(0.8, second.getCpuUsage());
-        assertEquals(ServerStatus.NORMAL, first.getServerStatus());
-        assertEquals(ServerStatus.BUSY, second.getServerStatus());
-        verify(registryClient, never()).persistEphemeral(anyString(), anyString());
+        PrometheusMeterRegistry meters = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+        Metrics.addRegistry(meters);
+        try {
+            when(metricsProvider.getSystemMetrics()).thenReturn(
+                    SystemMetrics.builder().systemCpuUsagePercentage(0.2).build(),
+                    SystemMetrics.builder().systemCpuUsagePercentage(0.8).build());
+            when(masterServerLoadProtection.isOverload(any())).thenReturn(false, true);
+            MasterHeartBeat first = client.getServerMetadata();
+            MasterHeartBeat second = client.getServerMetadata();
+            assertNotSame(first, second);
+            assertEquals(0.2, first.getCpuUsage());
+            assertEquals(0.8, second.getCpuUsage());
+            assertEquals(ServerStatus.NORMAL, first.getServerStatus());
+            assertEquals(ServerStatus.BUSY, second.getServerStatus());
+            verify(registryClient, never()).persistEphemeral(anyString(), anyString());
+            assertEquals(2.0, meters.get("ds.master.heartbeat.request.count").counter().count());
+            when(metricsProvider.getSystemMetrics()).thenThrow(new IllegalStateException("metrics unavailable"));
+            assertThrows(IllegalStateException.class, client::getServerMetadata);
+            assertEquals(3.0, meters.get("ds.master.heartbeat.request.count").counter().count());
+            assertTrue(meters.scrape().contains("ds_master_heartbeat_request_count_total"));
+            assertFalse(meters.scrape().contains("ds_master_heartbeat_count_total"));
+        } finally {
+            Metrics.removeRegistry(meters);
+            meters.close();
+        }
     }
 
     @Test

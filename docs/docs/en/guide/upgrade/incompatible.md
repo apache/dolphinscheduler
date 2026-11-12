@@ -63,6 +63,16 @@ This document records the incompatible updates between each version. You need to
 
 * Master, Worker and Alert Server now generate heartbeat snapshots on RPC requests and share a thread-safe system-metrics cache with a one-second refresh interval. `BaseHeartBeatTask` and the Master/Worker/Alert heartbeat task subclasses have been removed; custom integrations that extend them must manage scheduling explicitly. Alert Server no longer schedules registry heartbeat writes. It registers stable process identity at startup and restores registration on reconnect. `alert.max-heartbeat-interval` is removed; API queries Alert heartbeat data directly over RPC when requested.
 
+* Master, Worker and Alert heartbeat metrics are renamed to distinguish heartbeat-data requests from the retired periodic registry heartbeat count:
+
+  |         Old metric          |             New metric              |
+  |-----------------------------|-------------------------------------|
+  | `ds.master.heartbeat.count` | `ds.master.heartbeat.request.count` |
+  | `ds.worker.heartbeat.count` | `ds.worker.heartbeat.request.count` |
+  | `ds.alert.heartbeat.count`  | `ds.alert.heartbeat.request.count`  |
+
+  The new counters count calls entering `getServerMetadata()`, including local reads and requests whose snapshot generation fails. Their rate describes polling/query demand. Update dashboards that reference the retired names, and use service health checks for liveness alerts. Prometheus export names change accordingly, for example `ds_master_heartbeat_count_total` becomes `ds_master_heartbeat_request_count_total` (likewise for Worker and Alert).
+
 * Master, Worker and Alert Server registry nodes now store only stable process identity. Each Master cluster uses one thread to fetch its role's heartbeat data synchronously over RPC, waiting the configured interval after each round. Registration identities and heartbeat metadata are stored separately. Failed, empty or foreign-instance responses keep the last successful metadata and its `heartbeatReceivedTime` unchanged, without publishing an update event. Cached Worker status remains eligible for scheduling until a later valid heartbeat changes it or registry membership is removed; a Worker without a successful heartbeat remains ineligible. RPC failures do not remove membership or trigger failover. API queries Master/Worker/Alert heartbeat data directly on each request, without a heartbeat cache. Upgrade Master, Worker, Alert and API together: mixed-version rolling upgrades are not supported. Configure the Master heartbeat-fetch interval with `master.heartbeat-fetch-interval` (default `3s`); `max-heartbeat-interval` now controls failover-mark checks rather than heartbeat publication. Monitoring responses may contain a null `heartBeatInfo` and `lastHeartbeatTime` when a node heartbeat query fails, and expose `metadataStale` for unavailable heartbeat data. ([#18768](https://github.com/apache/dolphinscheduler/issues/18768))
 
 * Alert registration and heartbeat identity use the RPC port configured by `alert.port`. If `alert.alert-server-address` is explicitly configured, its port must match `alert.port`; startup validation rejects a mismatch.

@@ -85,7 +85,7 @@ public class AlertRegistryClient implements AutoCloseable, IAlertMetadataService
 
     @Override
     public AlertServerHeartBeat getServerMetadata() {
-        AlertServerMetrics.incAlertHeartbeatCount();
+        AlertServerMetrics.incAlertHeartbeatRequestCount();
         SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
         return AlertServerHeartBeat.builder()
                 .processId(processId)

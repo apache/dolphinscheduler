@@ -44,6 +44,10 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.prometheus.PrometheusConfig;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
+
 class AlertRegistryClientTest {
 
     private final AlertRegistryClient client = new AlertRegistryClient();
@@ -65,22 +69,35 @@ class AlertRegistryClientTest {
 
     @Test
     void registersStableIdentityAndDoesNotWriteOnHeartbeatRequests() {
-        client.start();
-        when(ha.isActive()).thenReturn(true);
-        AlertServerHeartBeat heartbeat = client.getServerMetadata();
-        assertTrue(heartbeat.isActive());
-        assertEquals(0.2, heartbeat.getCpuUsage());
-        when(ha.isActive()).thenReturn(false);
-        assertFalse(client.getServerMetadata().isActive());
-        ArgumentCaptor<String> path = ArgumentCaptor.forClass(String.class);
-        ArgumentCaptor<String> json = ArgumentCaptor.forClass(String.class);
-        verify(registry).persistEphemeral(path.capture(), json.capture());
-        assertEquals("/nodes/alert-server/localhost:50052", path.getValue());
-        ServerIdentity identity = JSONUtils.parseObject(json.getValue(), ServerIdentity.class);
-        assertTrue(identity.matches(heartbeat));
-        assertFalse(JSONUtils.parseObject(json.getValue()).has("reportTime"));
-        assertFalse(JSONUtils.parseObject(json.getValue()).has("cpuUsage"));
-        assertFalse(JSONUtils.parseObject(json.getValue()).has("active"));
+        PrometheusMeterRegistry meters = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+        Metrics.addRegistry(meters);
+        try {
+            client.start();
+            when(ha.isActive()).thenReturn(true);
+            AlertServerHeartBeat heartbeat = client.getServerMetadata();
+            assertTrue(heartbeat.isActive());
+            assertEquals(0.2, heartbeat.getCpuUsage());
+            when(ha.isActive()).thenReturn(false);
+            assertFalse(client.getServerMetadata().isActive());
+            ArgumentCaptor<String> path = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<String> json = ArgumentCaptor.forClass(String.class);
+            verify(registry).persistEphemeral(path.capture(), json.capture());
+            assertEquals("/nodes/alert-server/localhost:50052", path.getValue());
+            ServerIdentity identity = JSONUtils.parseObject(json.getValue(), ServerIdentity.class);
+            assertTrue(identity.matches(heartbeat));
+            assertFalse(JSONUtils.parseObject(json.getValue()).has("reportTime"));
+            assertFalse(JSONUtils.parseObject(json.getValue()).has("cpuUsage"));
+            assertFalse(JSONUtils.parseObject(json.getValue()).has("active"));
+            assertEquals(2.0, meters.get("ds.alert.heartbeat.request.count").counter().count());
+            when(metrics.getSystemMetrics()).thenThrow(new IllegalStateException("metrics unavailable"));
+            assertThrows(IllegalStateException.class, client::getServerMetadata);
+            assertEquals(3.0, meters.get("ds.alert.heartbeat.request.count").counter().count());
+            assertTrue(meters.scrape().contains("ds_alert_heartbeat_request_count_total"));
+            assertFalse(meters.scrape().contains("ds_alert_heartbeat_count_total"));
+        } finally {
+            Metrics.removeRegistry(meters);
+            meters.close();
+        }
     }
 
     @Test
