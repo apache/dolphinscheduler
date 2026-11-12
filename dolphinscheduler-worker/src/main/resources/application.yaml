@@ -46,6 +46,9 @@ worker:
   listen-port: 1234
   # worker heartbeat interval
   max-heartbeat-interval: 10s
+  # Stop retrying and discard pending events after this duration from terminal event creation.
+  # Expiration is logged as an error; it does not mean the result was persisted by the master.
+  task-event-report-max-duration: 6h
   # worker host weight to dispatch tasks, default value 100
   host-weight: 100
   # worker group name

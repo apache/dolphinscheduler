@@ -116,6 +116,11 @@ public class TaskExecutorLifecycleEventListener implements ITaskExecutorLifecycl
 
     private void reportTaskExecutorLifecycleEventToMaster(IReportableTaskExecutorLifecycleEvent taskExecutorLifecycleEvent) {
         taskExecutorLifecycleEventReporter.reportTaskExecutorLifecycleEvent(taskExecutorLifecycleEvent);
+        if (taskExecutorLifecycleEvent.getType().isFinished()) {
+            // The reporter owns the pending result; executor resources must not wait for a remote ACK.
+            onTaskExecutorFinalizeLifecycleEvent(
+                    TaskExecutorFinalizeLifecycleEvent.of(getTaskExecutor(taskExecutorLifecycleEvent)));
+        }
     }
 
     private ITaskExecutor getTaskExecutor(final ITaskExecutorLifecycleEvent taskExecutorLifecycleEvent) {
