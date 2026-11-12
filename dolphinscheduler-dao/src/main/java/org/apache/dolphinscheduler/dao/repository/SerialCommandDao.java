@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.dao.repository;
 import org.apache.dolphinscheduler.dao.entity.SerialCommand;
 import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
 
+import java.util.Date;
 import java.util.List;
 
 public interface SerialCommandDao extends IDao<SerialCommand> {
@@ -27,5 +28,9 @@ public interface SerialCommandDao extends IDao<SerialCommand> {
     List<SerialCommandDto> fetchSerialCommands(int fetchSize);
 
     int deleteByWorkflowInstanceId(Integer workflowInstanceId);
+
+    boolean launchSerialCommand(Integer id, Date updateTime);
+
+    boolean deleteByIdAndState(Integer id, SerialCommandDto.State state);
 
 }
