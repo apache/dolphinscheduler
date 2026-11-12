@@ -72,5 +72,5 @@ public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
      * @param namespaceCode namespaceCode
      * @return true if exist else return null
      */
-    K8sNamespace queryByNamespaceCode(@Param("clusterCode") Long namespaceCode);
+    K8sNamespace queryByNamespaceCode(@Param("namespaceCode") Long namespaceCode);
 }
