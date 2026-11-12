@@ -92,7 +92,7 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
         while (runningFlag) {
             try {
                 for (final ReportableTaskExecutorLifecycleEventChannel eventChannel : eventChannels.values()) {
-                    if (expireFinishedTaskEventChannel(eventChannel)) {
+                    if (removeExpiredEventChannel(eventChannel)) {
                         continue;
                     }
                     if (eventChannel.isEmpty()) {
@@ -192,7 +192,7 @@ public class TaskExecutorLifecycleEventRemoteReporter extends BaseDaemonThread
         return eventChannels;
     }
 
-    private boolean expireFinishedTaskEventChannel(final ReportableTaskExecutorLifecycleEventChannel eventChannel) {
+    private boolean removeExpiredEventChannel(final ReportableTaskExecutorLifecycleEventChannel eventChannel) {
         eventChannelsLock.lock();
         try {
             final Optional<IReportableTaskExecutorLifecycleEvent> terminalEvent = eventChannel.getTerminalEvent();
