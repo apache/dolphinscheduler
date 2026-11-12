@@ -53,6 +53,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
  * <p>
  * Task process stdout / pod logs should use {@link TaskLogMarkers#skipTaskParamMask()} so
  * task-parameter literal masking is skipped; only worker-side logs are masked.
+ * <p>
+ * Literal replacement has no minimum length. A short value that also appears in timestamps,
+ * log levels, or ordinary words is replaced everywhere on that rendered Worker log line.
  */
 public class SensitiveDataConverter extends MessageConverter {
 

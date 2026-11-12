@@ -22,6 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.remoteshell.RemoteExecutor
 import org.apache.dolphinscheduler.plugin.datasource.ssh.SSHUtils;
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
@@ -115,7 +116,7 @@ public class RemoteExecutor implements AutoCloseable {
             pid = getTaskPid(taskId);
             String trackCommand = String.format(COMMAND.TRACK_COMMAND, logN + 1, getRemoteShellHome(), taskId);
             int readLines = runRemoteAndProcessLines(trackCommand, line -> {
-                log.info(line);
+                log.info(TaskLogMarkers.skipTaskParamMask(), "{}", line);
                 taskOutputParameterParser.appendParseLog(line);
             });
             if (readLines > 0) {

@@ -272,6 +272,8 @@ In the early schedule design, if there is no priority design and use the fair sc
 </appender>
 ```
 
+- `SensitiveDataLayout` replaces each registered sensitive parameter value literally, after the full log line is rendered. There is no minimum length. A short value, or a value that also appears in a timestamp, a log level, or an ordinary word, is replaced everywhere on that Worker log line, so the line can become hard to read. Process stdout, Kubernetes pod logs, and remote-shell task output are excluded from this literal replacement. Use a sensitive value long enough that it does not collide with normal log text.
+
 ## Sum Up
 
 From the perspective of scheduling, this article preliminarily introduces the architecture principles and implementation ideas of the big data distributed workflow scheduling system: DolphinScheduler. To be continued.
