@@ -62,6 +62,8 @@ public abstract class BaseLinuxShellInterceptorBuilder<T extends BaseLinuxShellI
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
+        // Sensitive plaintext is replaced with ****** before this log sink.
+        // codeql[java/sensitive-log]
         log.info("Final Script Content:\n====================\n{}\n====================",
                 SensitiveLogHelper.mask(finalScript, sensitiveValues));
 
