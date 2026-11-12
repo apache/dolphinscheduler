@@ -35,11 +35,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,7 +46,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.collect.Lists;
 
@@ -59,7 +54,7 @@ import com.google.common.collect.Lists;
 class TaskGroupCoordinatorTest {
 
     @InjectMocks
-    private TaskGroupCoordinator taskGroupCoordinator = new TaskGroupCoordinator(0);
+    private TaskGroupCoordinator taskGroupCoordinator;
 
     @Mock
     private TaskGroupDao taskGroupDao;
@@ -72,9 +67,6 @@ class TaskGroupCoordinatorTest {
 
     @Mock
     private WorkflowInstanceDao workflowInstanceDao;
-
-    @Mock
-    private TransactionTemplate transactionTemplate;
 
     @Test
     void start() {
@@ -179,181 +171,4 @@ class TaskGroupCoordinatorTest {
         verify(taskGroupQueueDao, Mockito.times(1)).deleteById(taskGroupQueue);
 
     }
-    @Test
-    void stopDuringForceStartFetchSkipsReturnedPage() throws Exception {
-        AtomicReference<Thread> worker = new AtomicReference<>();
-        CountDownLatch fetching = new CountDownLatch(1);
-        CountDownLatch stopping = new CountDownLatch(1);
-        TaskGroupQueue queue = new TaskGroupQueue();
-        queue.setId(1);
-        queue.setTaskId(1);
-        when(taskGroupQueueDao.queryWaitNotifyForceStartTaskGroupQueue(Mockito.anyInt(), Mockito.anyInt()))
-                .thenAnswer(invocation -> {
-                    worker.set(Thread.currentThread());
-                    fetching.countDown();
-                    try {
-                        // close() must signal the worker while this query is still in progress.
-                        new CountDownLatch(1).await(5, TimeUnit.SECONDS);
-                        throw new AssertionError("close did not interrupt the pending query");
-                    } catch (InterruptedException expected) {
-                        stopping.countDown();
-                        Thread.currentThread().interrupt();
-                    }
-                    return Collections.singletonList(queue);
-                });
-        Thread closer = new Thread(taskGroupCoordinator::close);
-        try {
-            taskGroupCoordinator.start();
-            assertTrue(fetching.await(5, TimeUnit.SECONDS));
-            closer.start();
-            assertTrue(stopping.await(5, TimeUnit.SECONDS));
-            closer.join(5000);
-            worker.get().join(5000);
-            assertFalse(closer.isAlive());
-            assertFalse(worker.get().isAlive());
-            Mockito.verifyNoInteractions(transactionTemplate);
-            verify(taskGroupDao, Mockito.never()).queryAvailableTaskGroups();
-        } finally {
-            taskGroupCoordinator.close();
-            closer.join(5000);
-        }
-    }
-
-    @Test
-    void closeShouldWaitForPreviousFetchBeforeRestart() throws Exception {
-        verifyCloseDuringFetch(false);
-    }
-
-    @Test
-    void interruptedCloseShouldFinishWaitingAndRestoreInterrupt() throws Exception {
-        verifyCloseDuringFetch(true);
-    }
-
-    private void verifyCloseDuringFetch(boolean interruptCloser) throws Exception {
-        CountDownLatch fetching = new CountDownLatch(1);
-        CountDownLatch canceled = new CountDownLatch(1);
-        CountDownLatch releaseFetch = new CountDownLatch(1);
-        CountDownLatch restarted = new CountDownLatch(1);
-        CountDownLatch closed = new CountDownLatch(1);
-        AtomicReference<Throwable> failure = new AtomicReference<>();
-        AtomicReference<Thread> firstThread = new AtomicReference<>();
-        Mockito.when(taskGroupDao.queryAllTaskGroups()).thenAnswer(invocation -> {
-            if (firstThread.compareAndSet(null, Thread.currentThread())) {
-                fetching.countDown();
-                // Model a JDBC request that returns only after the server responds, despite interruption.
-                long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-                while (releaseFetch.getCount() != 0) {
-                    try {
-                        long remaining = deadline - System.nanoTime();
-                        if (remaining <= 0 || !releaseFetch.await(remaining, TimeUnit.NANOSECONDS)) {
-                            failure.compareAndSet(null, new AssertionError("Blocked DAO was not released"));
-                            return Collections.emptyList();
-                        }
-                    } catch (InterruptedException ignored) {
-                        canceled.countDown();
-                    }
-                }
-                TaskGroup staleGroup = new TaskGroup();
-                staleGroup.setId(1);
-                staleGroup.setUseSize(1);
-                return Collections.singletonList(staleGroup);
-            }
-            if (Thread.currentThread() == firstThread.get()) {
-                failure.compareAndSet(null, new AssertionError("Canceled worker resumed polling"));
-            }
-            restarted.countDown();
-            return Collections.emptyList();
-        });
-        Thread closer = new Thread(() -> {
-            try {
-                taskGroupCoordinator.close();
-                Assertions.assertFalse(firstThread.get().isAlive(), "close must finish the old worker");
-                Assertions.assertEquals(interruptCloser, Thread.currentThread().isInterrupted());
-            } catch (Throwable ex) {
-                failure.compareAndSet(null, ex);
-            } finally {
-                closed.countDown();
-            }
-        });
-        Thread starter = new Thread(() -> {
-            try {
-                taskGroupCoordinator.start();
-            } catch (Throwable ex) {
-                failure.compareAndSet(null, ex);
-            }
-        });
-        closer.setDaemon(true);
-        starter.setDaemon(true);
-        try {
-            taskGroupCoordinator.start();
-            Assertions.assertTrue(fetching.await(5, TimeUnit.SECONDS));
-            closer.start();
-            Assertions.assertTrue(canceled.await(5, TimeUnit.SECONDS));
-            if (interruptCloser) {
-                closer.interrupt();
-            }
-            starter.start();
-            // The start call must wait on the lifecycle monitor while close drains the old request.
-            awaitBlocked(starter);
-            Assertions.assertEquals(1L, closed.getCount());
-            Assertions.assertEquals(1L, restarted.getCount());
-            releaseFetch.countDown();
-            Assertions.assertTrue(closed.await(5, TimeUnit.SECONDS));
-            Assertions.assertTrue(restarted.await(5, TimeUnit.SECONDS));
-            closer.join(5000);
-            starter.join(5000);
-            Assertions.assertFalse(closer.isAlive());
-            Assertions.assertFalse(starter.isAlive());
-            Assertions.assertNull(failure.get());
-            // A nonempty batch fetched before cancellation must not be processed after it returns.
-            Mockito.verify(taskGroupQueueDao, Mockito.never()).countUsingTaskGroupQueueByGroupId(Mockito.anyInt());
-            taskGroupCoordinator.close();
-            taskGroupCoordinator.close();
-            taskGroupCoordinator.start();
-            taskGroupCoordinator.close();
-        } finally {
-            // Release external work before waiting for close; otherwise cleanup itself would deadlock.
-            releaseFetch.countDown();
-            closer.join(5000);
-            starter.join(5000);
-            Assertions.assertFalse(closer.isAlive());
-            Assertions.assertFalse(starter.isAlive());
-            taskGroupCoordinator.close();
-        }
-    }
-
-    @Test
-    void workerShouldNotCloseItself() throws Exception {
-        CountDownLatch checked = new CountDownLatch(1);
-        AtomicReference<Throwable> failure = new AtomicReference<>();
-        Mockito.when(taskGroupDao.queryAllTaskGroups()).thenAnswer(invocation -> {
-            try {
-                Assertions.assertThrows(IllegalStateException.class, () -> taskGroupCoordinator.close());
-            } catch (Throwable ex) {
-                failure.compareAndSet(null, ex);
-            } finally {
-                checked.countDown();
-            }
-            return Collections.emptyList();
-        });
-        try {
-            taskGroupCoordinator.start();
-            Assertions.assertTrue(checked.await(5, TimeUnit.SECONDS));
-            Assertions.assertNull(failure.get());
-            // Rejection must leave lifecycle state unchanged so the owner can still close the worker.
-            Assertions.assertThrows(IllegalStateException.class, () -> taskGroupCoordinator.start());
-        } finally {
-            taskGroupCoordinator.close();
-        }
-    }
-
-    private static void awaitBlocked(Thread thread) {
-        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
-        while (thread.isAlive() && thread.getState() != Thread.State.BLOCKED
-                && System.nanoTime() < deadline) {
-            Thread.yield();
-        }
-        Assertions.assertEquals(Thread.State.BLOCKED, thread.getState());
-    }
-
 }

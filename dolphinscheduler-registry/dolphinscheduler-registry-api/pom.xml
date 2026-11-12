@@ -37,9 +37,5 @@
             <groupId>org.apache.dolphinscheduler</groupId>
             <artifactId>dolphinscheduler-extract-base</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.apache.dolphinscheduler</groupId>
-            <artifactId>dolphinscheduler-eventbus</artifactId>
-        </dependency>
     </dependencies>
 </project>

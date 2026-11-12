@@ -41,7 +41,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class MasterCoordinator extends AbstractHAServer {
 
-    private final MasterCoordinatorListener masterCoordinatorListener;
+    private final ITaskGroupCoordinator taskGroupCoordinator;
+
+    private final IFailoverCoordinator failoverCoordinator;
+
+    private final IWorkflowSerialCoordinator workflowSerialCoordinator;
 
     public MasterCoordinator(final Registry registry,
                              final MasterConfig masterConfig,
@@ -51,11 +55,12 @@ public class MasterCoordinator extends AbstractHAServer {
         super(
                 registry,
                 RegistryNodeType.MASTER_COORDINATOR.getRegistryPath(),
-                masterConfig.getMasterAddress(),
-                true);
-        this.masterCoordinatorListener =
-                new MasterCoordinatorListener(taskGroupCoordinator, failoverCoordinator, workflowSerialCoordinator);
-        addServerStatusChangeListener(masterCoordinatorListener);
+                masterConfig.getMasterAddress());
+        this.taskGroupCoordinator = taskGroupCoordinator;
+        this.failoverCoordinator = failoverCoordinator;
+        this.workflowSerialCoordinator = workflowSerialCoordinator;
+        addServerStatusChangeListener(
+                new MasterCoordinatorListener(taskGroupCoordinator, failoverCoordinator, workflowSerialCoordinator));
     }
 
     @Override
@@ -66,8 +71,7 @@ public class MasterCoordinator extends AbstractHAServer {
 
     @Override
     public void close() {
-        super.close();
-        masterCoordinatorListener.changeToStandBy();
+        taskGroupCoordinator.close();
         log.info("MasterCoordinator shutdown...");
     }
 
@@ -104,11 +108,11 @@ public class MasterCoordinator extends AbstractHAServer {
 
         @Override
         public void changeToStandBy() {
+            taskGroupCoordinator.close();
+            workflowSerialCoordinator.close();
             if (failoverCoordinatorFuture != null) {
                 failoverCoordinatorFuture.cancel(true);
             }
-            taskGroupCoordinator.close();
-            workflowSerialCoordinator.close();
         }
     }
 
