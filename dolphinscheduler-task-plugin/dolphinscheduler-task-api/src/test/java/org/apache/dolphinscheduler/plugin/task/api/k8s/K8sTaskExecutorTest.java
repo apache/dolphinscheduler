@@ -189,4 +189,34 @@ public class K8sTaskExecutorTest {
                 "the cancellation failure must be attached as a suppressed exception");
     }
 
+    @Test
+    public void testRunKeepsOriginalFailureWhenCancellationFails() throws Exception {
+        TaskExecutionContext taskRequest = new TaskExecutionContext();
+        taskRequest.setTaskInstanceId(taskInstanceId);
+        taskRequest.setTaskName(taskName);
+        taskRequest.setTaskAppId("task-app-id");
+        taskRequest.setK8sTaskExecutionContext(new K8sTaskExecutionContext("config", namespace));
+
+        K8sTaskExecutor executor = new K8sTaskExecutor(taskRequest);
+        // cancelApplication only stops the job when it was already submitted
+        executor.buildK8sJob(k8sTaskMainParameters);
+
+        K8sUtils k8sUtils = Mockito.mock(K8sUtils.class);
+        Mockito.doThrow(new RuntimeException("k8s unavailable"))
+                .when(k8sUtils).buildClient(Mockito.anyString());
+        // make the cancellation itself fail while stopping the job
+        Mockito.when(k8sUtils.jobExist(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+        Mockito.doThrow(new RuntimeException("k8s delete failed"))
+                .when(k8sUtils).deleteJob(Mockito.anyString(), Mockito.anyString());
+        executor.k8sUtils = k8sUtils;
+
+        RuntimeException failure = Assertions.assertThrows(RuntimeException.class,
+                () -> executor.run(JSONUtils.toJsonString(k8sTaskMainParameters)));
+
+        Assertions.assertEquals("k8s unavailable", failure.getMessage(),
+                "the original failure must stay the primary exception");
+        Assertions.assertEquals(1, failure.getSuppressed().length,
+                "the cancellation failure must be attached as a suppressed exception");
+    }
+
 }

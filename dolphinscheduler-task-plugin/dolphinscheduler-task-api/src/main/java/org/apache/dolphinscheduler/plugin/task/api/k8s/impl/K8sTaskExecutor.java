@@ -325,7 +325,11 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
             result.setExitStatusCode(EXIT_CODE_FAILURE);
             throw e;
         } catch (Exception e) {
-            cancelApplication(k8sParameterStr);
+            try {
+                cancelApplication(k8sParameterStr);
+            } catch (Exception cancelException) {
+                e.addSuppressed(cancelException);
+            }
             result.setExitStatusCode(EXIT_CODE_FAILURE);
             throw e;
         } finally {
