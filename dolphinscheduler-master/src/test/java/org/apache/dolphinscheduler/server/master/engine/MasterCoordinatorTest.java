@@ -34,6 +34,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,8 +61,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -76,6 +77,57 @@ class MasterCoordinatorTest {
     private final ITaskGroupCoordinator taskGroup = mock(ITaskGroupCoordinator.class);
     private final IWorkflowSerialCoordinator serial = mock(IWorkflowSerialCoordinator.class);
     private final IFailoverCoordinator failover = mock(IFailoverCoordinator.class);
+
+    @Test
+    void ownRemovalDemotesBeforeBlockedRegistryCheckReturns() throws Exception {
+        String path =
+                org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType.MASTER_COORDINATOR.getRegistryPath();
+        Registry registry = mock(Registry.class);
+        AtomicReference<String> owner = new AtomicReference<>();
+        AtomicReference<SubscribeListener> listener = new AtomicReference<>();
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        AtomicBoolean holdFirstRead = new AtomicBoolean(true);
+        when(registry.acquireLock(path + "-lock")).thenReturn(true);
+        when(registry.exists(path)).thenAnswer(invocation -> owner.get() != null);
+        when(registry.get(path)).thenAnswer(invocation -> {
+            String observed = owner.get();
+            if (holdFirstRead.getAndSet(false)) {
+                entered.countDown();
+                awaitUninterruptibly(release);
+            }
+            return observed;
+        });
+        doAnswer(invocation -> {
+            owner.set(invocation.getArgument(1));
+            return null;
+        })
+                .when(registry).put(eq(path), anyString(), eq(true));
+        doAnswer(invocation -> {
+            listener.set(invocation.getArgument(1));
+            return null;
+        })
+                .when(registry).subscribe(eq(path), any());
+        MasterConfig config = new MasterConfig();
+        config.setMasterAddress("master-a");
+        MasterCoordinator coordinator = new MasterCoordinator(registry, config, taskGroup, failover, serial);
+        try {
+            coordinator.start();
+            String identity = owner.get();
+            listener.get().notify(new Event(path, path, "previous-peer", Event.Type.REMOVE));
+            assertTrue(entered.await(5, TimeUnit.SECONDS));
+            owner.set("master-b#peer");
+            listener.get().notify(new Event(path, path, identity, Event.Type.REMOVE));
+            // Withdrawal must not wait for the earlier ownership read to return.
+            verify(taskGroup, timeout(1000)).close();
+            verify(serial, timeout(1000)).close();
+            assertFalse(coordinator.isActive());
+            verify(registry, times(2)).acquireLock(path + "-lock");
+        } finally {
+            release.countDown();
+            coordinator.close();
+        }
+    }
 
     @Test
     void closeClosesBothCoordinators() {
@@ -295,8 +347,8 @@ class MasterCoordinatorTest {
             subscriber.set(invocation.getArgument(1));
             return null;
         }).when(registry).subscribe(eq(selectorPath), any());
-        ScheduledThreadPoolExecutor elections =
-                (ScheduledThreadPoolExecutor) ReflectionTestUtils.getField(coordinator, "electionExecutor");
+        Thread elections =
+                (Thread) ReflectionTestUtils.getField(coordinator, "roleChangeEventWorker");
         Thread closer = new Thread(coordinator::close);
         closer.setDaemon(true);
         closer.setUncaughtExceptionHandler((thread, ex) -> failure.compareAndSet(null, ex));
@@ -316,15 +368,17 @@ class MasterCoordinatorTest {
             owner.set(null);
             subscriber.get().notify(new Event(selectorPath, selectorPath, "", Event.Type.REMOVE));
             // The single role worker cannot check ownership until the current stop callback finishes.
-            assertFalse(elections.getQueue().isEmpty());
+            assertFalse(((org.apache.dolphinscheduler.eventbus.IEventBus<?>) ReflectionTestUtils.getField(coordinator,
+                    "roleChangeEventBus")).isEmpty());
             closer.start();
             // Close cancels queued work before waiting for the same worker's in-progress callback.
             long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
-            while (!elections.isShutdown() && System.nanoTime() < deadline) {
+            while (!"CLOSED".equals(String.valueOf(ReflectionTestUtils.getField(coordinator, "lifecycle")))
+                    && System.nanoTime() < deadline) {
                 Thread.yield();
             }
-            assertTrue(elections.isShutdown());
-            assertFalse(elections.isTerminated());
+            assertEquals("CLOSED", String.valueOf(ReflectionTestUtils.getField(coordinator, "lifecycle")));
+            assertTrue(elections.isAlive());
             assertTrue(taskGroupWorker.get().isAlive());
             assertTrue(serialWorker.get().isAlive());
             assertTrue(closer.isAlive());
@@ -334,11 +388,13 @@ class MasterCoordinatorTest {
             releaseSerialFetch.countDown();
             closer.join(5000);
             assertFalse(closer.isAlive());
-            assertTrue(elections.awaitTermination(5, TimeUnit.SECONDS));
+            elections.join(5000);
+            assertFalse(elections.isAlive());
             assertFalse(taskGroupWorker.get().isAlive());
             assertFalse(serialWorker.get().isAlive());
             assertFalse(coordinator.isActive());
-            assertNull(ReflectionTestUtils.getField(coordinator, "ownershipRecheck"));
+            assertTrue(((org.apache.dolphinscheduler.eventbus.IEventBus<?>) ReflectionTestUtils.getField(coordinator,
+                    "roleChangeEventBus")).isEmpty());
             assertSame(failoverFuture, ReflectionTestUtils.getField(listener, "failoverCoordinatorFuture"));
             assertTrue(failoverFuture.isCancelled());
             // A late Registry notification after close cannot reopen election or worker scheduling.

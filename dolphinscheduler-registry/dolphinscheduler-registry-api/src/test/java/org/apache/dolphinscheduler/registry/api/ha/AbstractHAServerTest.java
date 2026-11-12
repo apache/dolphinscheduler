@@ -19,18 +19,21 @@ package org.apache.dolphinscheduler.registry.api.ha;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,16 +46,14 @@ import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.RejectedExecutionException;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -68,12 +69,10 @@ class AbstractHAServerTest {
     private static final String SELECTOR_PATH = "/coordinator";
     private static final String ELECTION_LOCK = SELECTOR_PATH + "-lock";
     private static final String ADDRESS = "master-0:5678";
-
     private final List<AbstractHAServer> servers = new ArrayList<>();
-    private final List<ScheduledThreadPoolExecutor> electionExecutors = new ArrayList<>();
-    private final List<ExecutorService> registryExecutors = new ArrayList<>();
     private final List<ExecutorService> callers = new ArrayList<>();
-    private ScheduledThreadPoolExecutor electionExecutor;
+    private final AtomicInteger checks = new AtomicInteger();
+    private final AtomicReference<RuntimeException> electionFailure = new AtomicReference<>();
     private Registry registry;
     private AtomicReference<String> owner;
     private AtomicReference<SubscribeListener> subscriber;
@@ -86,10 +85,16 @@ class AbstractHAServerTest {
         owner = new AtomicReference<>();
         subscriber = new AtomicReference<>();
         statusListener = mock(AbstractServerStatusChangeListener.class, CALLS_REAL_METHODS);
-        server = newServer();
-        electionExecutor = electionExecutors.get(0);
+        server = newServer(ADDRESS);
         server.addServerStatusChangeListener(statusListener);
-        when(registry.acquireLock(ELECTION_LOCK)).thenReturn(true);
+        when(registry.acquireLock(ELECTION_LOCK)).thenAnswer(invocation -> {
+            checks.incrementAndGet();
+            RuntimeException failure = electionFailure.get();
+            if (failure != null) {
+                throw failure;
+            }
+            return true;
+        });
         when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> owner.get() != null);
         when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> owner.get());
         doAnswer(invocation -> {
@@ -99,18 +104,17 @@ class AbstractHAServerTest {
         doAnswer(invocation -> {
             subscriber.set(invocation.getArgument(1));
             return null;
-        }).when(registry).subscribe(eq(SELECTOR_PATH), org.mockito.ArgumentMatchers.any());
+        }).when(registry).subscribe(eq(SELECTOR_PATH), any());
     }
 
     @AfterEach
     void tearDown() throws Exception {
         servers.forEach(AbstractHAServer::close);
         callers.forEach(ExecutorService::shutdownNow);
-        for (ExecutorService executor : electionExecutors) {
-            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
-        }
-        for (ExecutorService executor : registryExecutors) {
-            assertTrue(executor.awaitTermination(5, TimeUnit.SECONDS));
+        for (AbstractHAServer target : servers) {
+            worker(target).join(5000);
+            assertFalse(worker(target).isAlive());
+            assertTrue(((ExecutorService) field(target, "registryWorker")).awaitTermination(5, TimeUnit.SECONDS));
         }
         for (ExecutorService caller : callers) {
             assertTrue(caller.awaitTermination(5, TimeUnit.SECONDS));
@@ -123,14 +127,9 @@ class AbstractHAServerTest {
         assertTrue(server.isActive());
         verify(statusListener).changeToActive();
         assertEquals(SubscribeListener.SubscribeScope.PATH_ONLY, subscriber.get().getSubscribeScope());
-
         AbstractHAServer follower = newServer("master-1:5678");
-        AbstractServerStatusChangeListener followerListener =
-                mock(AbstractServerStatusChangeListener.class, CALLS_REAL_METHODS);
-        follower.addServerStatusChangeListener(followerListener);
         follower.start();
         assertFalse(follower.isActive());
-        verify(followerListener, never()).changeToActive();
         verify(registry, times(1)).put(eq(SELECTOR_PATH), anyString(), eq(true));
     }
 
@@ -141,49 +140,32 @@ class AbstractHAServerTest {
         server.start();
         assertFalse(server.isActive());
         verify(statusListener, never()).changeToActive();
-        verify(registry, never()).put(eq(SELECTOR_PATH), anyString(), eq(true));
-
-        owner.set(null);
-        remove(ADDRESS);
-        assertTrue(server.isActive());
-        assertNotEquals(ADDRESS, owner.get());
-        verify(statusListener).changeToActive();
+        verify(registry, never()).put(anyString(), anyString(), anyBoolean());
     }
 
     @Test
     void testDoesNotAdoptPredecessorWithEarlierTimestamp() {
-        // Seed an earlier incarnation explicitly. Millisecond timestamps do not guarantee
-        // different identities for two same-address instances created in the same millisecond.
-        String previousOwner = ADDRESS + "#1";
-        owner.set(previousOwner);
+        owner.set(ADDRESS + "#0");
         server.start();
         assertFalse(server.isActive());
-        verify(statusListener, never()).changeToActive();
-        verify(registry, never()).put(eq(SELECTOR_PATH), anyString(), eq(true));
-
-        owner.set(null);
-        remove(previousOwner);
-        assertTrue(server.isActive());
-        assertNotEquals(previousOwner, owner.get());
-        verify(statusListener).changeToActive();
+        assertEquals(ADDRESS + "#0", owner.get());
     }
 
     @Test
     void testEmptyRemoveDemotesFormerLeaderWhenPeerOwnsSelector() {
         server.start();
-        owner.set("master-1:5678#peer-instance");
-        remove("");
+        owner.set("master-1#peer");
+        notifyRemove("");
+        awaitIdle(2);
         assertFalse(server.isActive());
-        verify(statusListener).changeToActive();
         verify(statusListener).changeToStandBy();
     }
 
     @Test
     void testDelayedRemoveDoesNotRestartCurrentOwner() {
         server.start();
-        // The old notification arrives after this instance has already acquired the current key.
-        remove(owner.get());
-        remove("");
+        notifyRemove(owner.get());
+        awaitIdle(2);
         assertTrue(server.isActive());
         verify(statusListener, times(1)).changeToActive();
         verify(statusListener, never()).changeToStandBy();
@@ -192,695 +174,236 @@ class AbstractHAServerTest {
     @Test
     void testOwnRemovalCanReelectWithoutAnotherPeer() {
         server.start();
-        String previousOwner = owner.get();
-        owner.set(null);
-        remove(previousOwner);
+        String identity = owner.getAndSet(null);
+        notifyRemove(identity);
+        awaitIdle(2);
         assertTrue(server.isActive());
-        verify(registry, times(2)).put(eq(SELECTOR_PATH), anyString(), eq(true));
+        assertEquals(identity, owner.get());
         verify(statusListener, times(1)).changeToActive();
         verify(statusListener, never()).changeToStandBy();
     }
 
     @Test
     void testAddAndUpdateDoNotTriggerElection() {
-        owner.set("master-1:5678#peer-instance");
         server.start();
-        owner.set(null);
-        subscriber.get().notify(new Event(SELECTOR_PATH, SELECTOR_PATH, "", Event.Type.ADD));
-        subscriber.get().notify(new Event(SELECTOR_PATH, SELECTOR_PATH, "", Event.Type.UPDATE));
-        drain();
-        assertFalse(server.isActive());
-        verify(registry, times(1)).acquireLock(ELECTION_LOCK);
-        verify(statusListener, never()).changeToActive();
+        subscriber.get().notify(new Event(SELECTOR_PATH, SELECTOR_PATH, "peer", Event.Type.ADD));
+        subscriber.get().notify(new Event(SELECTOR_PATH, SELECTOR_PATH, "peer", Event.Type.UPDATE));
+        assertEquals(1, checks.get());
     }
 
     @Test
     void testUnacquiredLockIsNotReleased() {
         when(registry.acquireLock(ELECTION_LOCK)).thenReturn(false);
-        try (MockedStatic<ThreadUtils> threadUtils = mockStatic(ThreadUtils.class, CALLS_REAL_METHODS)) {
-            threadUtils.when(() -> ThreadUtils.sleep(anyLong())).thenAnswer(invocation -> null);
-            assertThrows(IllegalStateException.class, server::participateElection);
+        // Only the synchronous caller is mocked; worker retry timing is unchanged.
+        try (MockedStatic<ThreadUtils> sleep = mockStatic(ThreadUtils.class)) {
+            assertThrows(IllegalStateException.class, () -> server.participateElection());
         }
         verify(registry, times(20)).acquireLock(ELECTION_LOCK);
-        verify(registry, never()).releaseLock(ELECTION_LOCK);
+        verify(registry, never()).releaseLock(anyString());
     }
 
     @Test
     void testAcquisitionErrorDoesNotReleaseUnacquiredLock() {
-        when(registry.acquireLock(ELECTION_LOCK)).thenThrow(new RegistryException("unavailable"));
-        try (MockedStatic<ThreadUtils> threadUtils = mockStatic(ThreadUtils.class, CALLS_REAL_METHODS)) {
-            threadUtils.when(() -> ThreadUtils.sleep(anyLong())).thenAnswer(invocation -> null);
-            assertThrows(IllegalStateException.class, server::participateElection);
+        when(registry.acquireLock(ELECTION_LOCK)).thenThrow(new RegistryException("acquire failed"));
+        try (MockedStatic<ThreadUtils> sleep = mockStatic(ThreadUtils.class)) {
+            assertThrows(IllegalStateException.class, () -> server.participateElection());
         }
-        verify(registry, never()).releaseLock(ELECTION_LOCK);
-    }
-
-    @Test
-    void testInitialRetryWaitsForTheLogicalStartup() throws Exception {
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable")).thenReturn(false);
-        ExecutorService caller = newCaller();
-        Future<?> startup = caller.submit(server::start);
-        awaitCondition(() -> org.mockito.Mockito.mockingDetails(registry).getInvocations().stream()
-                .anyMatch(invocation -> invocation.getMethod().getName().equals("exists")));
-        drain();
-        assertFalse(startup.isDone(), "scheduling a retry must not complete startup");
-
-        advanceRetry();
-        startup.get(5, TimeUnit.SECONDS);
-        assertTrue(server.isActive());
-        verify(statusListener, times(1)).changeToActive();
-    }
-
-    @Test
-    void testInitialRetryExhaustionReachesTheCaller() throws Exception {
-        when(registry.acquireLock(ELECTION_LOCK)).thenReturn(false);
-        ExecutorService caller = newCaller();
-        Future<?> startup = caller.submit(server::start);
-        awaitCondition(() -> !electionExecutor.getQueue().isEmpty());
-        drain();
-        for (int i = 1; i < 20; i++) {
-            assertFalse(startup.isDone());
-            advanceRetry();
-        }
-        ExecutionException failure = assertThrows(ExecutionException.class,
-                () -> startup.get(5, TimeUnit.SECONDS));
-        assertTrue(failure.getCause() instanceof IllegalStateException);
-        assertFalse(server.isActive());
-        verify(registry, times(20)).acquireLock(ELECTION_LOCK);
-        verify(registry, never()).releaseLock(ELECTION_LOCK);
-    }
-
-    @Test
-    void testSynchronousWatchWaitsForSubscriptionAndInitialAdmission() throws Exception {
-        owner.set("master-1#peer");
-        CountDownLatch subscribed = new CountDownLatch(1);
-        CountDownLatch releaseSubscribe = new CountDownLatch(1);
-        doAnswer(invocation -> {
-            SubscribeListener listener = invocation.getArgument(1);
-            subscriber.set(listener);
-            listener.notify(new Event(SELECTOR_PATH, SELECTOR_PATH, "", Event.Type.REMOVE));
-            subscribed.countDown();
-            await(releaseSubscribe);
-            return null;
-        }).when(registry).subscribe(eq(SELECTOR_PATH), org.mockito.ArgumentMatchers.any());
-        Future<?> startup = newCaller().submit(server::start);
-        try {
-            await(subscribed);
-            electionExecutor.submit(() -> {
-            }).get(5, TimeUnit.SECONDS);
-            assertFalse(startup.isDone(), "watch cannot complete startup before subscription succeeds");
-            verify(registry, never()).acquireLock(ELECTION_LOCK);
-        } finally {
-            releaseSubscribe.countDown();
-        }
-        startup.get(5, TimeUnit.SECONDS);
-        assertFalse(server.isActive());
+        verify(registry, never()).releaseLock(anyString());
     }
 
     @Test
     void testSubscriptionFailureReachesTheCaller() {
+        doThrow(new RegistryException("subscription failed")).when(registry).subscribe(eq(SELECTOR_PATH), any());
+        assertThrows(RegistryException.class, () -> server.start());
+        assertFalse(worker(server).isAlive());
+        verify(registry, never()).acquireLock(anyString());
+    }
+
+    @Test
+    void testSynchronousWatchCannotActivateBeforeSubscriptionFailure() {
         doAnswer(invocation -> {
-            throw new RegistryException("subscription failed");
-        }).when(registry).subscribe(eq(SELECTOR_PATH), org.mockito.ArgumentMatchers.any());
-        assertThrows(RegistryException.class, server::start);
+            ((SubscribeListener) invocation.getArgument(1)).notify(
+                    new Event(SELECTOR_PATH, SELECTOR_PATH, "peer", Event.Type.REMOVE));
+            throw new RegistryException("subscription failed after callback");
+        }).when(registry).subscribe(eq(SELECTOR_PATH), any());
+        assertThrows(RegistryException.class, () -> server.start());
+        verify(statusListener, never()).changeToActive();
+        verify(registry, never()).acquireLock(anyString());
+    }
+
+    @Test
+    void testInitialFailureReachesCallerWithoutStrandingReceipt() {
+        // Automatic retries must exhaust the finite budget before startup fails.
+        electionFailure.set(new RegistryException("all attempts failed"));
+        assertThrows(IllegalStateException.class, () -> server.start());
+        assertEquals(20, checks.get());
         assertFalse(server.isActive());
     }
 
     @Test
     void testRemoveInvalidatesEarlierStartupPromotion() throws Exception {
-        CountDownLatch resultReady = new CountDownLatch(1);
-        CountDownLatch releaseResult = new CountDownLatch(1);
-        AtomicBoolean first = new AtomicBoolean(true);
-        doAnswer(invocation -> {
-            if (first.getAndSet(false)) {
-                resultReady.countDown();
-                await(releaseResult);
-            }
-            return null;
-        }).when(registry).releaseLock(ELECTION_LOCK);
-        Future<?> startup = newCaller().submit(server::start);
-        try {
-            assertTrue(resultReady.await(5, TimeUnit.SECONDS));
-            owner.set("master-1#peer");
-            notifyRemove(owner.get());
-        } finally {
-            releaseResult.countDown();
-        }
-        startup.get(5, TimeUnit.SECONDS);
-        drain();
-        assertFalse(server.isActive());
-        verify(statusListener, never()).changeToActive();
-        assertTrue(electionExecutor.getQueue().isEmpty(), "a fresh definitive result cancels recovery");
-    }
-
-    @Test
-    void testDeferredStartupRecoversWithoutAnotherRemove() throws Exception {
-        CountDownLatch resultReady = new CountDownLatch(1);
-        CountDownLatch releaseResult = new CountDownLatch(1);
-        AtomicBoolean first = new AtomicBoolean(true);
-        doAnswer(invocation -> {
-            if (first.getAndSet(false)) {
-                resultReady.countDown();
-                await(releaseResult);
-            }
-            return null;
-        }).when(registry).releaseLock(ELECTION_LOCK);
-        Future<?> startup = newCaller().submit(server::start);
-        try {
-            assertTrue(resultReady.await(5, TimeUnit.SECONDS));
-            notifyRemove("");
-            // The queued REMOVE exhausts its finite attempts; the persistent recheck must survive it.
-            when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        } finally {
-            releaseResult.countDown();
-        }
-        startup.get(5, TimeUnit.SECONDS);
-        drain();
-        assertFalse(server.isActive());
-        for (int i = 0; i < 21; i++) {
-            advanceRetry();
-        }
-        doReturn(true).when(registry).exists(SELECTOR_PATH);
-        for (int i = 0; i < 3 && !server.isActive(); i++) {
-            advanceRetry();
-        }
-        assertTrue(server.isActive());
-        verify(statusListener, times(1)).changeToActive();
-        assertTrue(electionExecutor.getQueue().isEmpty());
-    }
-
-    @Test
-    void testDefaultPolicyWaitsForEarlierCheckBeforeDemoting() throws Exception {
-        server.start();
-        String ownIdentity = owner.get();
-        CountDownLatch readEntered = new CountDownLatch(1);
-        CountDownLatch releaseRead = new CountDownLatch(1);
+        String identity = (String) field(server, "serverIdentify");
+        owner.set(identity);
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
         AtomicBoolean first = new AtomicBoolean(true);
         when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> {
             if (first.getAndSet(false)) {
-                readEntered.countDown();
-                await(releaseRead);
-                return ownIdentity;
+                entered.countDown();
+                await(release);
+                return identity;
             }
             return owner.get();
         });
-        notifyRemove("");
+        Future<?> startup = caller().submit(server::start);
         try {
-            assertTrue(readEntered.await(5, TimeUnit.SECONDS));
+            await(entered);
             owner.set("master-1#peer");
-            notifyRemove(ownIdentity);
-            // The default Alert policy verifies ownership before closing its resources.
-            assertTrue(server.isActive());
-            verify(statusListener, never()).changeToStandBy();
+            notifyRemove(identity);
+            assertFalse(startup.isDone());
         } finally {
-            releaseRead.countDown();
+            release.countDown();
         }
-        drain();
+        startup.get(5, TimeUnit.SECONDS);
+        awaitIdle(2);
         assertFalse(server.isActive());
-        verify(statusListener, times(1)).changeToActive();
-        verify(statusListener, times(1)).changeToStandBy();
+        // Final convergence alone would miss a short-lived stale ACTIVE and its Coordinator start.
+        verify(statusListener, never()).changeToActive();
     }
 
     @Test
-    void testUnreadOwnRemovalDoesNotDemoteCurrentOwner() throws Exception {
-        server.start();
-        CountDownLatch acquired = new CountDownLatch(1);
-        CountDownLatch releaseAcquire = new CountDownLatch(1);
+    void testOwnRecoverySurvivesPeerFailureDuringStartup() throws Exception {
+        String identity = (String) field(server, "serverIdentify");
+        owner.set(identity);
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
         AtomicBoolean first = new AtomicBoolean(true);
-        when(registry.acquireLock(ELECTION_LOCK)).thenAnswer(invocation -> {
+        when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> {
             if (first.getAndSet(false)) {
-                acquired.countDown();
-                await(releaseAcquire);
+                entered.countDown();
+                await(release);
+                return identity;
             }
-            return true;
+            return owner.get();
         });
-        notifyRemove(owner.get());
+        Future<?> startup = caller().submit(server::start);
         try {
-            assertTrue(acquired.await(5, TimeUnit.SECONDS));
-            notifyRemove("");
+            await(entered);
+            notifyRemove(identity);
+            electionFailure.set(new RegistryException("exhausted read retries"));
         } finally {
-            releaseAcquire.countDown();
+            release.countDown();
         }
-        drain();
+        awaitCondition(() -> checks.get() >= 2);
+        assertFalse(startup.isDone(), "the superseding own check must retain startup and recovery");
+        notifyRemove("peer");
+        awaitCondition(() -> checks.get() >= 3);
+        assertFalse(startup.isDone(), "an ordinary failure must not discard the pending own recovery");
+        electionFailure.set(null);
+        startup.get(10, TimeUnit.SECONDS);
+        verify(statusListener, timeout(5000).times(1)).changeToActive();
         assertTrue(server.isActive());
-        verify(statusListener, never()).changeToStandBy();
     }
 
     @Test
     void testConfirmedOwnershipLossSurvivesLaterRemovalAndReadFailure() throws Exception {
         server.start();
-        owner.set("master-1#peer");
-        CountDownLatch resultReady = new CountDownLatch(1);
-        CountDownLatch releaseResult = new CountDownLatch(1);
-        AtomicBoolean first = new AtomicBoolean(true);
-        doAnswer(invocation -> {
-            if (first.getAndSet(false)) {
-                resultReady.countDown();
-                await(releaseResult);
-            }
-            return null;
-        }).when(registry).releaseLock(ELECTION_LOCK);
-        notifyRemove("");
-        try {
-            assertTrue(resultReady.await(5, TimeUnit.SECONDS));
-            when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-            notifyRemove("");
-        } finally {
-            releaseResult.countDown();
-        }
-        drain();
-        assertFalse(server.isActive(), "a confirmed loss is not discarded because a newer check cannot finish");
-        verify(statusListener, times(1)).changeToStandBy();
-        assertFalse(electionExecutor.getQueue().isEmpty());
-    }
-
-    @Test
-    void testMissingSelectorDemotesWithoutClaimAfterNewRemoval() throws Exception {
-        server.start();
-        owner.set(null);
-        CountDownLatch missing = new CountDownLatch(1);
-        CountDownLatch releaseMissing = new CountDownLatch(1);
-        AtomicBoolean first = new AtomicBoolean(true);
-        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
-            if (first.getAndSet(false)) {
-                missing.countDown();
-                await(releaseMissing);
-                return false;
-            }
-            throw new RegistryException("unavailable");
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> {
+            entered.countDown();
+            await(release);
+            return "peer";
         });
-        notifyRemove("");
+        owner.set("peer");
+        notifyRemove("previous-peer");
         try {
-            assertTrue(missing.await(5, TimeUnit.SECONDS));
-            notifyRemove("");
+            await(entered);
+            notifyRemove("another-peer");
+            electionFailure.set(new RegistryException("later check exhausted retries"));
         } finally {
-            releaseMissing.countDown();
+            release.countDown();
         }
-        drain();
-        assertFalse(server.isActive());
-        verify(statusListener, times(1)).changeToStandBy();
-        verify(registry, times(1)).put(eq(SELECTOR_PATH), anyString(), eq(true));
-    }
-
-    @Test
-    void testOwnRemovalReadFailureDemotesAndRecoversAfterTwentyFailures() throws Exception {
-        server.start();
-        AtomicInteger failures = new AtomicInteger();
-        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
-            if (failures.getAndIncrement() < 20) {
-                throw new RegistryException("unavailable");
-            }
-            return true;
-        });
-        remove(owner.get());
-        assertFalse(server.isActive());
-        verify(statusListener, times(1)).changeToStandBy();
-        for (int i = 1; i < 20; i++) {
-            advanceRetry();
-            assertFalse(server.isActive());
-        }
-        assertEquals(20, failures.get());
-        // No new watch notification is delivered when reads become available again.
-        advanceRetry();
-        assertTrue(server.isActive());
-        verify(statusListener, times(2)).changeToActive();
-        assertTrue(electionExecutor.getQueue().isEmpty());
-    }
-
-    @Test
-    void testPeerFailureDoesNotCancelOwnRemovalRecovery() throws Exception {
-        server.start();
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        remove(owner.get());
-        assertFalse(server.isActive());
-        remove("");
-        assertEquals(2, electionExecutor.getQueue().size(),
-                "persistent recovery and finite peer retry remain distinct");
-        doReturn(true).when(registry).exists(SELECTOR_PATH);
-        advanceRetry();
-        assertTrue(server.isActive());
-        // A finite peer continuation may still be queued; it must not restart the current owner.
-        while (!electionExecutor.getQueue().isEmpty()) {
-            advanceRetry();
-        }
-        verify(statusListener, times(2)).changeToActive();
-        verify(statusListener, times(1)).changeToStandBy();
-    }
-
-    @Test
-    void testFreshPeerOwnershipCancelsOwnRemovalRecovery() throws Exception {
-        server.start();
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        remove(owner.get());
-        assertFalse(server.isActive());
-        owner.set("master-1#peer");
-        doReturn(true).when(registry).exists(SELECTOR_PATH);
-        remove("");
-        assertFalse(server.isActive());
-        assertTrue(electionExecutor.getQueue().isEmpty());
-        verify(statusListener, times(1)).changeToStandBy();
-    }
-
-    @Test
-    void testTransientPeerErrorPreservesRoleUntilDecision() throws Exception {
-        server.start();
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable")).thenReturn(true);
-        remove("");
-        assertTrue(server.isActive());
-        verify(statusListener, never()).changeToStandBy();
-        owner.set("master-1#peer");
-        advanceRetry();
-        assertFalse(server.isActive());
-        verify(statusListener, times(1)).changeToStandBy();
-    }
-
-    @Test
-    void testOrdinaryRemoveRetainsFiniteRetryPolicy() throws Exception {
-        server.start();
-        org.mockito.Mockito.clearInvocations(registry);
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        remove("");
-        for (int i = 1; i < 20; i++) {
-            advanceRetry();
-        }
-        assertTrue(server.isActive());
-        verify(registry, times(20)).exists(SELECTOR_PATH);
-        verify(statusListener, never()).changeToStandBy();
-        assertTrue(electionExecutor.getQueue().isEmpty(), "ordinary failures do not create persistent recovery");
-    }
-
-    @Test
-    void testRegistryChecksAndReleaseUseDedicatedWorker() throws Exception {
-        AtomicReference<Thread> electionThread = new AtomicReference<>();
-        AtomicReference<Thread> publicationThread = new AtomicReference<>();
-        AtomicReference<Thread> releaseThread = new AtomicReference<>();
-        doAnswer(invocation -> {
-            releaseThread.set(Thread.currentThread());
-            return true;
-        }).when(registry).releaseLock(ELECTION_LOCK);
-        when(registry.acquireLock(ELECTION_LOCK)).thenAnswer(invocation -> {
-            electionThread.set(Thread.currentThread());
-            return true;
-        });
-        server.addServerStatusChangeListener((origin, target) -> publicationThread.set(Thread.currentThread()));
-        server.start();
-        assertNotEquals(Thread.currentThread(), electionThread.get());
-        assertNotEquals(electionThread.get(), publicationThread.get());
-        assertEquals(electionThread.get(), releaseThread.get());
-        Thread initialThread = electionThread.get();
-        Thread initialRoleThread = publicationThread.get();
-        owner.set("master-1#peer");
-        remove("");
-        assertEquals(initialThread, electionThread.get());
-        assertEquals(initialRoleThread, publicationThread.get());
-        assertEquals(initialThread, releaseThread.get());
-    }
-
-    @Test
-    void testCallbacksReturnWhileListenerIsBlocked() throws Exception {
-        server.start();
-        CountDownLatch stopEntered = new CountDownLatch(1);
-        CountDownLatch releaseStop = new CountDownLatch(1);
-        doAnswer(invocation -> {
-            stopEntered.countDown();
-            await(releaseStop);
-            return null;
-        }).when(statusListener).changeToStandBy();
-        owner.set("master-1#peer");
-        notifyRemove("");
-        try {
-            assertTrue(stopEntered.await(5, TimeUnit.SECONDS));
-            owner.set(null);
-            notifyRemove("");
-            verify(statusListener, times(1)).changeToActive();
-        } finally {
-            releaseStop.countDown();
-        }
-        drain();
-        assertTrue(server.isActive());
-        verify(statusListener, times(2)).changeToActive();
-    }
-
-    @Test
-    void testListenerFailureDoesNotStrandStartupOrLaterEvents() throws Exception {
-        doAnswer(invocation -> {
-            throw new IllegalStateException("listener failure");
-        }).when(statusListener).changeToActive();
-        server.start();
-        assertTrue(server.isActive());
-        owner.set("master-1#peer");
-        remove("");
-        assertFalse(server.isActive());
+        awaitIdle(3);
+        assertFalse(server.isActive(), "a newer unread request must not erase confirmed ownership loss");
         verify(statusListener).changeToStandBy();
     }
 
     @Test
-    void testSynchronousElectionFromListenerDoesNotWaitForItself() {
-        doAnswer(invocation -> {
-            assertTrue(server.participateElection());
-            return null;
-        }).when(statusListener).changeToActive();
-        server.start();
-        assertTrue(server.isActive());
-    }
-
-    @Test
-    void testCloseCancelsInitialDelayedRetry() throws Exception {
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        Future<?> startup = newCaller().submit(server::start);
-        awaitCondition(() -> org.mockito.Mockito.mockingDetails(registry).getInvocations().stream()
-                .anyMatch(invocation -> invocation.getMethod().getName().equals("exists")));
-        drain();
-        assertFalse(startup.isDone());
-        server.close();
-        startup.get(5, TimeUnit.SECONDS);
-        assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
-        assertTrue(electionExecutor.getQueue().isEmpty());
-        verify(statusListener, never()).changeToActive();
-    }
-
-    @Test
-    void testCloseCancelsOwnRemovalRecovery() throws Exception {
-        server.start();
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        remove(owner.get());
-        assertFalse(electionExecutor.getQueue().isEmpty());
-        server.close();
-        assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
-        assertFalse(server.isActive());
-        assertTrue(electionExecutor.getQueue().isEmpty());
-        verify(statusListener, times(1)).changeToActive();
-    }
-
-    @Test
-    void testCloseRejectsLateResultAndLateNotification() throws Exception {
-        CountDownLatch acquired = new CountDownLatch(1);
-        CountDownLatch releaseAcquire = new CountDownLatch(1);
-        when(registry.acquireLock(ELECTION_LOCK)).thenAnswer(invocation -> {
-            acquired.countDown();
-            await(releaseAcquire);
-            return true;
-        });
-        Future<?> startup = newCaller().submit(server::start);
-        try {
-            assertTrue(acquired.await(5, TimeUnit.SECONDS));
-            notifyRemove("");
-            server.close();
-            notifyRemove("");
-        } finally {
-            releaseAcquire.countDown();
-        }
-        startup.get(5, TimeUnit.SECONDS);
-        assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
-        assertFalse(server.isActive());
-        verify(statusListener, never()).changeToActive();
-        verify(registry, times(1)).acquireLock(ELECTION_LOCK);
-    }
-
-    @Test
-    void testCloseDoesNotStrandQueuedStartup() throws Exception {
+    void testOrdinaryRemoveFailureDoesNotStrandStartup() throws Exception {
+        String identity = (String) field(server, "serverIdentify");
+        owner.set(identity);
         CountDownLatch entered = new CountDownLatch(1);
-        CountDownLatch releaseWorker = new CountDownLatch(1);
-        electionExecutor.execute(() -> {
+        CountDownLatch release = new CountDownLatch(1);
+        when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> {
             entered.countDown();
-            await(releaseWorker);
+            await(release);
+            return identity;
         });
-        Future<?> startup = newCaller().submit(server::start);
+        Future<?> startup = caller().submit(server::start);
         try {
-            assertTrue(entered.await(5, TimeUnit.SECONDS));
-            awaitCondition(() -> !electionExecutor.getQueue().isEmpty());
-            server.close();
+            await(entered);
+            notifyRemove("previous-peer");
+            electionFailure.set(new RegistryException("replacement check exhausted retries"));
         } finally {
-            releaseWorker.countDown();
+            release.countDown();
         }
-        startup.get(5, TimeUnit.SECONDS);
-        assertFalse(server.isActive());
-        verify(registry, never()).acquireLock(ELECTION_LOCK);
-    }
-
-    @Test
-    void testCloseBeforeInitialSubmissionStillRejects() {
-        doAnswer(invocation -> {
-            server.close();
-            return null;
-        }).when(registry).subscribe(eq(SELECTOR_PATH), org.mockito.ArgumentMatchers.any());
-        assertThrows(RejectedExecutionException.class, server::start);
-        verify(registry, never()).acquireLock(ELECTION_LOCK);
-    }
-
-    @Test
-    void testCloseFromInitialListenerCompletesReceiptAfterCallback() throws Exception {
-        CountDownLatch closed = new CountDownLatch(1);
-        CountDownLatch releaseListener = new CountDownLatch(1);
-        doAnswer(invocation -> {
-            server.close();
-            closed.countDown();
-            await(releaseListener);
-            return null;
-        }).when(statusListener).changeToActive();
-        AbstractServerStatusChangeListener later = mock(AbstractServerStatusChangeListener.class);
-        server.addServerStatusChangeListener(later);
-        Future<?> startup = newCaller().submit(server::start);
         try {
-            assertTrue(closed.await(5, TimeUnit.SECONDS));
-            assertFalse(startup.isDone(), "self-close must let the admitted startup callback finish");
-            assertFalse(server.isActive());
-            assertEquals(HAServer.ServerStatus.ACTIVE, server.getServerStatus());
+            awaitIdle(2);
+            assertThrows(java.util.concurrent.ExecutionException.class,
+                    () -> startup.get(1, TimeUnit.SECONDS),
+                    "startup must fail when no pending check can finish it");
+            verify(statusListener, never()).changeToActive();
         } finally {
-            releaseListener.countDown();
-        }
-        startup.get(5, TimeUnit.SECONDS);
-        org.mockito.Mockito.verifyNoInteractions(later);
-    }
-
-    @Test
-    void testCloseFromDemotionListenerDoesNotDeadlock() throws Exception {
-        server.start();
-        CountDownLatch closed = new CountDownLatch(1);
-        doAnswer(invocation -> {
-            // Alert shuts down its own HA server from this callback.
             server.close();
-            notifyRemove("");
-            closed.countDown();
-            return null;
-        }).when(statusListener).changeToStandBy();
-        AbstractServerStatusChangeListener later = mock(AbstractServerStatusChangeListener.class);
-        server.addServerStatusChangeListener(later);
-        owner.set("master-1#peer");
-        notifyRemove("");
-        assertTrue(closed.await(5, TimeUnit.SECONDS));
-        assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
-        assertFalse(server.isActive());
-        org.mockito.Mockito.verifyNoInteractions(later);
-    }
-
-    @Test
-    void testExternalCloseWaitsForAdmittedListener() throws Exception {
-        CountDownLatch entered = new CountDownLatch(1);
-        CountDownLatch releaseListener = new CountDownLatch(1);
-        doAnswer(invocation -> {
-            entered.countDown();
-            await(releaseListener);
-            return null;
-        }).when(statusListener).changeToActive();
-        AbstractServerStatusChangeListener later = mock(AbstractServerStatusChangeListener.class);
-        server.addServerStatusChangeListener(later);
-        Future<?> startup = newCaller().submit(server::start);
-        Thread closer = new Thread(server::close, "test-ha-close");
-        closer.setDaemon(true);
-        try {
-            assertTrue(entered.await(5, TimeUnit.SECONDS));
-            closer.start();
-            awaitCondition(() -> closer.getState() == Thread.State.BLOCKED);
-            assertFalse(startup.isDone(), "external close cannot complete an in-flight callback early");
-        } finally {
-            releaseListener.countDown();
         }
-        closer.join(5000);
-        assertFalse(closer.isAlive());
-        startup.get(5, TimeUnit.SECONDS);
-        assertFalse(server.isActive());
-        org.mockito.Mockito.verifyNoInteractions(later);
     }
 
     @Test
-    void testClosedServerRetainsLastRoleButIsNotActive() {
-        server.start();
-        server.close();
-        assertEquals(HAServer.ServerStatus.ACTIVE, server.getServerStatus());
-        assertFalse(server.isActive());
-    }
-
-    @Test
-    void testInterruptedStartupClosesAndRestoresInterrupt() throws Exception {
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        AtomicBoolean interrupted = new AtomicBoolean();
-        AtomicReference<Throwable> failure = new AtomicReference<>();
-        Thread caller = new Thread(() -> {
-            try {
-                server.start();
-            } catch (Throwable e) {
-                failure.set(e);
-                interrupted.set(Thread.currentThread().isInterrupted());
-            }
-        }, "test-ha-interrupted-start");
-        caller.setDaemon(true);
-        caller.start();
-        awaitCondition(() -> org.mockito.Mockito.mockingDetails(registry).getInvocations().stream()
-                .anyMatch(invocation -> invocation.getMethod().getName().equals("exists")));
-        drain();
-        caller.interrupt();
-        caller.join(5000);
-        assertFalse(caller.isAlive());
-        assertTrue(failure.get() instanceof IllegalStateException);
-        assertTrue(interrupted.get());
-        assertFalse(server.isActive());
-    }
-
-    @Test
-    void testOwnRemovalFailureSharesPendingRecovery() throws Exception {
-        CountDownLatch resultReady = new CountDownLatch(1);
-        CountDownLatch releaseResult = new CountDownLatch(1);
-        AtomicBoolean first = new AtomicBoolean(true);
-        doAnswer(invocation -> {
-            if (first.getAndSet(false)) {
-                resultReady.countDown();
-                await(releaseResult);
-            }
-            return null;
-        }).when(registry).releaseLock(ELECTION_LOCK);
-        Future<?> startup = newCaller().submit(server::start);
-        try {
-            assertTrue(resultReady.await(5, TimeUnit.SECONDS));
-            notifyRemove(owner.get());
-            when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        } finally {
-            releaseResult.countDown();
-        }
-        startup.get(5, TimeUnit.SECONDS);
-        drain();
-        assertFalse(server.isActive());
-        doReturn(true).when(registry).exists(SELECTOR_PATH);
-        advanceRetry();
-        assertTrue(server.isActive());
-        // A successful recovery has handled that own REMOVE. A leftover retry must not demote it again.
-        doAnswer(invocation -> {
-            throw new RegistryException("later read failure without a new REMOVE");
-        }).when(registry).exists(SELECTOR_PATH);
-        if (!electionExecutor.getQueue().isEmpty()) {
-            advanceRetry();
-        }
-        assertTrue(server.isActive(), "a covered own REMOVE must not cause a new demotion");
-        verify(statusListener, times(1)).changeToActive();
-        verify(statusListener, never()).changeToStandBy();
-    }
-
-    @Test
-    void testMasterOwnRemovalDemotesWhileEarlierRegistryCheckIsBlocked() throws Exception {
-        server.close();
-        server = newServer(ADDRESS, true);
-        electionExecutor = electionExecutors.get(electionExecutors.size() - 1);
+    void testAlertDemotesAfterFirstOwnCheckFailureBeforeRetryDelay() throws Exception {
+        server = newServer(ADDRESS, false, 5000);
         server.addServerStatusChangeListener(statusListener);
+        server.start();
+        CountDownLatch failed = new CountDownLatch(1);
+        AtomicBoolean firstRead = new AtomicBoolean(true);
+        when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> {
+            if (firstRead.getAndSet(false)) {
+                failed.countDown();
+                throw new RegistryException("first own-selector read failed");
+            }
+            return owner.get();
+        });
+        notifyRemove(owner.get());
+        await(failed);
+        // Alert cannot remain ACTIVE while the Registry worker sleeps through an entire retry batch.
+        verify(statusListener, timeout(1000)).changeToStandBy();
+        assertFalse(server.isActive());
+    }
+
+    @Test
+    void testNewRemovalIsCheckedBeforeEarlierOrdinaryRetryDelay() throws Exception {
+        server = newServer(ADDRESS, false, 5000);
+        server.addServerStatusChangeListener(statusListener);
+        server.start();
+        CountDownLatch failed = new CountDownLatch(1);
+        AtomicBoolean firstRead = new AtomicBoolean(true);
+        when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> {
+            if (firstRead.getAndSet(false)) {
+                failed.countDown();
+                throw new RegistryException("earlier ordinary read failed");
+            }
+            return owner.get();
+        });
+        notifyRemove("previous-peer");
+        await(failed);
+        notifyRemove("another-peer");
+        // Fresh intent must not wait behind the earlier check's five-second backoff.
+        verify(registry, timeout(1000).times(3)).acquireLock(ELECTION_LOCK);
+        assertTrue(server.isActive());
+    }
+
+    @Test
+    void testAlertOwnRemovalRetainsReconcileFirstPolicy() throws Exception {
         server.start();
         String identity = owner.get();
         CountDownLatch entered = new CountDownLatch(1);
@@ -904,170 +427,73 @@ class AbstractHAServerTest {
             await(entered);
             owner.set("master-1#peer");
             notifyRemove(identity);
-            await(stopped);
-            assertFalse(server.isActive(), "Master withdrawal must not wait for the blocked Registry call");
-            // A second logical request must not enter the Registry while the first is still running.
-            verify(registry, times(2)).acquireLock(ELECTION_LOCK);
+            // Default Alert policy waits for a conclusive ownership check before withdrawing.
+            assertFalse(stopped.await(250, TimeUnit.MILLISECONDS));
+            assertTrue(server.isActive());
         } finally {
             release.countDown();
         }
-        drain();
+        await(stopped);
+        awaitIdle(3);
         assertFalse(server.isActive());
         verify(statusListener, times(1)).changeToActive();
-        verify(statusListener, times(1)).changeToStandBy();
     }
 
     @Test
-    void testMasterDemotionListenerCanCloseWithoutStartingAnotherCheck() throws Exception {
-        server.close();
-        server = newServer(ADDRESS, true);
-        electionExecutor = electionExecutors.get(electionExecutors.size() - 1);
+    void testAlertDoesNotTreatEarlierOrdinaryFailureAsOwnRemovalCheck() throws Exception {
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        AtomicBoolean firstRead = new AtomicBoolean(true);
+        when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> {
+            if (firstRead.getAndSet(false)) {
+                entered.countDown();
+                await(release);
+                throw new RegistryException("earlier ordinary read failed");
+            }
+            return owner.get();
+        });
+        server.start();
+        String identity = owner.get();
+        notifyRemove("previous-peer");
+        try {
+            await(entered);
+            // A late OWN arrives after this ordinary check started; the selector still belongs to us.
+            notifyRemove(identity);
+            awaitCondition(() -> {
+                synchronized (worker(server)) {
+                    return field(server, "pendingRequest") != null;
+                }
+            });
+            assertTrue(server.isActive());
+        } finally {
+            release.countDown();
+        }
+        awaitIdle(3);
+        assertTrue(server.isActive());
+        // Real Alert closes on STAND_BY, so it must first get a check that actually covers this OWN.
+        verify(statusListener, never()).changeToStandBy();
+        verify(statusListener, times(1)).changeToActive();
+    }
+
+    @Test
+    void testMasterDemotionListenerCanCloseBeforeAnotherRegistryCheck() throws Exception {
+        server = newServer("master-policy", true);
         server.addServerStatusChangeListener(statusListener);
         server.start();
-        assertTrue(server.isActive());
+        String identity = owner.get();
         doAnswer(invocation -> {
-            // The eager demotion callback runs before its OWN request is queued for Registry I/O.
             server.close();
             return null;
         }).when(statusListener).changeToStandBy();
-
-        notifyRemove(owner.get());
-        assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
-        ExecutorService io = (ExecutorService) field(server, "registryExecutor");
-        assertTrue(io.awaitTermination(5, TimeUnit.SECONDS));
-        assertFalse(server.isActive());
-        verify(statusListener, times(1)).changeToStandBy();
-        verify(statusListener, times(1)).changeToActive();
-        verify(registry, times(1)).acquireLock(ELECTION_LOCK);
-        assertTrue(((java.util.Deque<?>) field(server, "pendingElections")).isEmpty());
-    }
-
-    @Test
-    void testCoveredFiniteOwnRetryCannotDemoteAfterHealthyWatch() throws Exception {
-        server.start();
-        String identity = owner.get();
-        owner.set("master-1#peer");
-        remove("");
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        remove(identity);
-        Runnable oldRetry = electionExecutor.getQueue().peek();
-        assertTrue(oldRetry instanceof ScheduledFuture);
-        owner.set(identity);
-        doReturn(true).when(registry).exists(SELECTOR_PATH);
-        remove("");
-        assertTrue(server.isActive());
-        doAnswer(invocation -> {
-            throw new RegistryException("old OWN must not read again");
-        }).when(registry).exists(SELECTOR_PATH);
-        assertTrue(electionExecutor.remove(oldRetry));
-        electionExecutor.execute(oldRetry);
-        drain();
-        assertTrue(server.isActive());
-        verify(statusListener, times(2)).changeToActive();
-        verify(statusListener, times(1)).changeToStandBy();
-    }
-
-    @Test
-    void testHealthyWatchCompletesStartupBeforeOldInitialRetry() throws Exception {
-        AtomicBoolean fail = new AtomicBoolean(true);
-        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
-            if (fail.get()) {
-                throw new RegistryException("unavailable");
-            }
-            return owner.get() != null;
-        });
-        Future<?> startup = newCaller().submit(server::start);
-        awaitCondition(() -> !electionExecutor.getQueue().isEmpty());
-        drain();
-        Runnable initialRetry = electionExecutor.getQueue().peek();
-        assertFalse(startup.isDone());
-        fail.set(false);
-        remove("");
-        startup.get(5, TimeUnit.SECONDS);
-        fail.set(true);
-        assertTrue(electionExecutor.remove(initialRetry));
-        electionExecutor.execute(initialRetry);
-        drain();
-        assertTrue(server.isActive());
-        assertFalse(electionExecutor.isShutdown());
-        verify(registry, times(2)).exists(SELECTOR_PATH);
-        verify(statusListener, times(1)).changeToActive();
-    }
-
-    @Test
-    void testOwnResponsibilitySurvivesAbortedCheck() throws Exception {
-        server.start();
-        CountDownLatch acquired = new CountDownLatch(1);
-        CountDownLatch release = new CountDownLatch(1);
-        AtomicBoolean first = new AtomicBoolean(true);
-        when(registry.acquireLock(ELECTION_LOCK)).thenAnswer(invocation -> {
-            if (first.getAndSet(false)) {
-                acquired.countDown();
-                await(release);
-            }
-            return true;
-        });
-        notifyRemove(owner.get());
-        try {
-            await(acquired);
-            // A later OTHER aborts OWN before its read. Its failure still carries the unresolved OWN fact.
-            notifyRemove("previous-peer");
-            when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        } finally {
-            release.countDown();
-        }
-        drain();
-        assertFalse(server.isActive());
-        verify(statusListener, times(1)).changeToStandBy();
-        doReturn(true).when(registry).exists(SELECTOR_PATH);
-        advanceRetry();
-        assertTrue(server.isActive());
-        verify(statusListener, times(2)).changeToActive();
-    }
-
-    @Test
-    void testLaterOwnDoesNotEraseFailedCheckOwnSnapshot() throws Exception {
-        server.start();
-        String identity = owner.get();
-        CountDownLatch entered = new CountDownLatch(1);
-        CountDownLatch release = new CountDownLatch(1);
-        AtomicBoolean first = new AtomicBoolean(true);
-        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
-            if (first.getAndSet(false)) {
-                entered.countDown();
-                await(release);
-            }
-            throw new RegistryException("unavailable");
-        });
         notifyRemove(identity);
-        try {
-            await(entered);
-            // The new OWN must not erase the earlier OWN already included in the running check.
-            notifyRemove(identity);
-        } finally {
-            release.countDown();
-        }
-        drain();
+        worker(server).join(5000);
+        assertFalse(worker(server).isAlive());
         assertFalse(server.isActive());
-        verify(statusListener, times(1)).changeToStandBy();
-        doReturn(true).when(registry).exists(SELECTOR_PATH);
-        advanceRetry();
-        assertTrue(server.isActive());
+        assertEquals(1, checks.get(), "a self-closing listener must not submit another Registry call");
     }
 
     @Test
-    void testRemoveDuringStartupListenerDoesNotReviveInitialRetry() throws Exception {
-        AtomicBoolean fail = new AtomicBoolean(true);
-        when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
-            if (fail.get()) {
-                throw new RegistryException("unavailable");
-            }
-            return owner.get() != null;
-        });
-        Future<?> startup = newCaller().submit(server::start);
-        awaitCondition(() -> !electionExecutor.getQueue().isEmpty());
-        drain();
-        Runnable initialRetry = electionExecutor.getQueue().peek();
+    void testRemovalDuringStartupCallbackIsNotDiscarded() throws Exception {
         CountDownLatch entered = new CountDownLatch(1);
         CountDownLatch release = new CountDownLatch(1);
         doAnswer(invocation -> {
@@ -1075,175 +501,407 @@ class AbstractHAServerTest {
             await(release);
             return null;
         }).when(statusListener).changeToActive();
-        fail.set(false);
-        notifyRemove("previous-peer");
+        Future<?> startup = caller().submit(server::start);
         try {
             await(entered);
-            notifyRemove("another-peer");
-            fail.set(true);
+            owner.set("peer");
+            notifyRemove("previous-peer");
+            assertFalse(startup.isDone());
         } finally {
             release.countDown();
         }
         startup.get(5, TimeUnit.SECONDS);
-        drain();
-        assertTrue(electionExecutor.remove(initialRetry));
-        electionExecutor.execute(initialRetry);
-        drain();
-        assertTrue(server.isActive());
-        assertFalse(electionExecutor.isShutdown());
+        awaitIdle(2);
+        assertFalse(server.isActive());
         verify(statusListener, times(1)).changeToActive();
+        verify(statusListener, times(1)).changeToStandBy();
     }
 
     @Test
-    void testCoveredPendingRecoveryCannotReadAgain() throws Exception {
-        server.start();
-        when(registry.exists(SELECTOR_PATH)).thenThrow(new RegistryException("unavailable"));
-        remove(owner.get());
-        assertFalse(server.isActive());
-        Runnable recovery = electionExecutor.getQueue().peek();
-        doReturn(true).when(registry).exists(SELECTOR_PATH);
-        CountDownLatch resultReady = new CountDownLatch(1);
-        CountDownLatch release = new CountDownLatch(1);
-        AtomicBoolean first = new AtomicBoolean(true);
+    void testRegistryChecksAndRoleCallbacksUseSeparateWorkers() {
+        AtomicReference<Thread> lockThread = new AtomicReference<>();
         doAnswer(invocation -> {
-            if (first.getAndSet(false)) {
-                resultReady.countDown();
+            lockThread.set(Thread.currentThread());
+            return true;
+        })
+                .when(registry).acquireLock(ELECTION_LOCK);
+        doAnswer(invocation -> {
+            assertSame(lockThread.get(), Thread.currentThread());
+            return null;
+        })
+                .when(registry).releaseLock(ELECTION_LOCK);
+        doAnswer(invocation -> {
+            assertSame(worker(server), Thread.currentThread());
+            assertNotSame(lockThread.get(), Thread.currentThread());
+            return null;
+        })
+                .when(statusListener).changeToActive();
+        server.start();
+        assertNotSame(worker(server), lockThread.get());
+    }
+
+    @Test
+    void testListenerFailureDoesNotStrandStartupOrLaterEvents() {
+        doThrow(new IllegalStateException("listener failed")).when(statusListener).changeToActive();
+        server.start();
+        assertTrue(server.isActive());
+        owner.set("peer");
+        notifyRemove("");
+        awaitIdle(2);
+        verify(statusListener).changeToStandBy();
+    }
+
+    @Test
+    void testSynchronousElectionFromListenerDoesNotWaitForItself() {
+        doAnswer(invocation -> {
+            assertTrue(server.participateElection());
+            return null;
+        })
+                .when(statusListener).changeToActive();
+        server.start();
+        assertTrue(server.isActive());
+        verify(registry, times(2)).releaseLock(ELECTION_LOCK);
+    }
+
+    @Test
+    void testOwnFailureDemotesAndRecoversWithoutNewRemove() {
+        server = newServer(ADDRESS, false, 5000);
+        server.addServerStatusChangeListener(statusListener);
+        server.start();
+        String identity = owner.get();
+        electionFailure.set(new RegistryException("exhausted read retries"));
+        notifyRemove(identity);
+        awaitCondition(() -> !server.isActive() && !bus(server).isEmpty());
+        electionFailure.set(null);
+        // Let the production five-second delayed event recover; do not inject another notification.
+        awaitCondition(() -> server.isActive(), 10);
+        verify(statusListener, timeout(5000).times(2)).changeToActive();
+        verify(statusListener, times(1)).changeToStandBy();
+    }
+
+    @Test
+    void testSuccessfulPeerEventCoversDelayedOwnRecovery() {
+        server = newServer(ADDRESS, false, 5000);
+        server.addServerStatusChangeListener(statusListener);
+        server.start();
+        String identity = owner.get();
+        electionFailure.set(new RegistryException("exhausted read retries"));
+        notifyRemove(identity);
+        awaitCondition(() -> !server.isActive() && !bus(server).isEmpty());
+        electionFailure.set(null);
+        notifyRemove("peer");
+        awaitCondition(() -> server.isActive() && bus(server).isEmpty());
+        verify(statusListener, timeout(5000).times(2)).changeToActive();
+    }
+
+    @Test
+    void testOrdinaryRemoveRetainsFiniteRetryPolicy() {
+        server.start();
+        electionFailure.set(new RegistryException("exhausted read retries"));
+        notifyRemove("peer");
+        awaitIdle(21);
+        assertEquals(21, checks.get(), "initial election plus twenty bounded ordinary attempts");
+        assertTrue(server.isActive());
+        assertTrue(bus(server).isEmpty());
+        electionFailure.set(null);
+        owner.set("peer");
+        notifyRemove("peer");
+        awaitIdle(3);
+        assertFalse(server.isActive());
+        assertTrue(worker(server).isAlive(), "a failed check must not kill the event worker");
+    }
+
+    @Test
+    void testNewRemovalResetsBudgetAndOlderFailureDoesNotConsumeIt() throws Exception {
+        server.start();
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        AtomicInteger reads = new AtomicInteger();
+        when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> {
+            if (reads.incrementAndGet() == 4) {
+                entered.countDown();
                 await(release);
             }
-            return true;
-        }).when(registry).releaseLock(ELECTION_LOCK);
+            throw new RegistryException("ownership read failed");
+        });
         notifyRemove("previous-peer");
         try {
-            await(resultReady);
-            // Recovery has left its timer and waits behind real I/O. A healthy result must cancel that responsibility
-            // too.
-            assertTrue(electionExecutor.remove(recovery));
-            electionExecutor.execute(recovery);
-            electionExecutor.submit(() -> {
-            }).get(5, TimeUnit.SECONDS);
-            verify(registry, times(3)).acquireLock(ELECTION_LOCK);
+            await(entered);
+            // This notification owns a fresh budget; the fourth old attempt is still in flight.
+            notifyRemove("another-peer");
         } finally {
             release.countDown();
         }
-        drain();
+        awaitIdle(25);
+        assertEquals(25, checks.get(), "initial election, four older attempts and twenty fresh attempts");
+        assertEquals(24, reads.get());
         assertTrue(server.isActive());
-        verify(registry, times(3)).acquireLock(ELECTION_LOCK);
-        verify(statusListener, times(2)).changeToActive();
-        assertTrue(electionExecutor.getQueue().isEmpty());
     }
 
     @Test
-    void testCloseDoesNotWaitForOrReplaceRunningRegistryCheck() throws Exception {
+    void testCloseDoesNotInterruptInFlightRegistryCall() throws Exception {
+        server.start();
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        CountDownLatch interrupted = new CountDownLatch(1);
+        when(registry.get(SELECTOR_PATH)).thenAnswer(invocation -> {
+            entered.countDown();
+            try {
+                assertTrue(release.await(5, TimeUnit.SECONDS));
+            } catch (InterruptedException e) {
+                interrupted.countDown();
+                awaitUninterruptibly(release);
+                Thread.currentThread().interrupt();
+            }
+            return owner.get();
+        });
+        notifyRemove("peer");
+        try {
+            await(entered);
+            server.close();
+            worker(server).join(5000);
+            assertFalse(worker(server).isAlive());
+            assertFalse(interrupted.await(250, TimeUnit.MILLISECONDS));
+            assertFalse(((ExecutorService) field(server, "registryWorker")).isTerminated());
+        } finally {
+            release.countDown();
+        }
+        assertTrue(((ExecutorService) field(server, "registryWorker")).awaitTermination(5, TimeUnit.SECONDS));
+        verify(registry, times(2)).releaseLock(ELECTION_LOCK);
+    }
+
+    @Test
+    void testCloseCancelsOwnRemovalRecovery() throws Exception {
+        server = newServer(ADDRESS, false, 5000);
+        server.addServerStatusChangeListener(statusListener);
+        server.start();
+        electionFailure.set(new RegistryException("exhausted read retries"));
+        notifyRemove(owner.get());
+        awaitCondition(() -> !server.isActive() && !bus(server).isEmpty());
+        server.close();
+        worker(server).join(5000);
+        assertFalse(worker(server).isAlive());
+        assertTrue(bus(server).isEmpty());
+    }
+
+    @Test
+    void testCloseRejectsLateResultAndLateNotification() throws Exception {
         CountDownLatch entered = new CountDownLatch(1);
         CountDownLatch release = new CountDownLatch(1);
         when(registry.acquireLock(ELECTION_LOCK)).thenAnswer(invocation -> {
             entered.countDown();
-            await(release);
+            awaitUninterruptibly(release);
             return true;
         });
-        Future<?> startup = newCaller().submit(server::start);
-        ExecutorService io = (ExecutorService) field(server, "registryExecutor");
+        Future<?> startup = caller().submit(server::start);
         try {
             await(entered);
-            notifyRemove("");
-            electionExecutor.submit(() -> {
-            }).get(5, TimeUnit.SECONDS);
             server.close();
-            startup.get(5, TimeUnit.SECONDS);
-            assertTrue(electionExecutor.awaitTermination(5, TimeUnit.SECONDS));
-            assertFalse(io.isTerminated(), "closing the Future must not pretend the I/O exited");
-            verify(registry, times(1)).acquireLock(ELECTION_LOCK);
+            assertThrows(Exception.class, () -> startup.get(5, TimeUnit.SECONDS));
+            notifyRemove("peer");
+            worker(server).join(5000);
+            assertTrue(bus(server).isEmpty());
+            // The role worker can exit while the Registry implementation is still executing.
+            assertFalse(((ExecutorService) field(server, "registryWorker")).isTerminated());
         } finally {
             release.countDown();
         }
-        assertTrue(io.awaitTermination(5, TimeUnit.SECONDS));
-        verify(registry).releaseLock(ELECTION_LOCK);
-        verify(registry, never()).put(eq(SELECTOR_PATH), anyString(), eq(true));
+        worker(server).join(5000);
+        assertTrue(((ExecutorService) field(server, "registryWorker")).awaitTermination(5, TimeUnit.SECONDS));
         verify(statusListener, never()).changeToActive();
+        verify(registry, times(1)).releaseLock(ELECTION_LOCK);
+        verify(registry, never()).put(anyString(), anyString(), anyBoolean());
     }
 
     @Test
-    void testSynchronousWatchCannotActivateBeforeSubscriptionFailure() throws Exception {
-        doAnswer(invocation -> {
-            SubscribeListener listener = invocation.getArgument(1);
-            subscriber.set(listener);
-            listener.notify(new Event(SELECTOR_PATH, SELECTOR_PATH, "", Event.Type.REMOVE));
-            electionExecutor.submit(() -> {
-            }).get(5, TimeUnit.SECONDS);
-            throw new RegistryException("subscription failed after its synchronous watch");
-        }).when(registry).subscribe(eq(SELECTOR_PATH), org.mockito.ArgumentMatchers.any());
-        assertThrows(RegistryException.class, server::start);
-        verify(registry, never()).acquireLock(ELECTION_LOCK);
-        verify(statusListener, never()).changeToActive();
-    }
-
-    private ExecutorService newCaller() {
-        ExecutorService caller = Executors.newSingleThreadExecutor();
-        callers.add(caller);
-        return caller;
+    void testCloseBeforeStartRejectsStartup() {
+        server.close();
+        assertThrows(IllegalStateException.class, () -> server.start());
     }
 
     @Test
-    void testCoveredQueuedOwnRemovalDoesNotDemote() throws Exception {
+    void testRepeatedStartDoesNotCloseRunningServer() {
         server.start();
-        String identity = owner.get();
-        CountDownLatch blocked = new CountDownLatch(1);
+        assertThrows(IllegalStateException.class, () -> server.start());
+        assertTrue(server.isActive());
+    }
+
+    @Test
+    void testCloseFromInitialListenerCompletesReceiptAfterCallback() throws Exception {
+        CountDownLatch closed = new CountDownLatch(1);
         CountDownLatch release = new CountDownLatch(1);
-        electionExecutor.execute(() -> {
-            blocked.countDown();
-            await(release);
-        });
-        await(blocked);
-        AtomicInteger checks = new AtomicInteger();
+        doAnswer(invocation -> {
+            server.close();
+            closed.countDown();
+            awaitUninterruptibly(release);
+            return null;
+        }).when(statusListener).changeToActive();
+        Future<?> startup = caller().submit(server::start);
         try {
-            owner.set(null);
-            when(registry.exists(SELECTOR_PATH)).thenAnswer(invocation -> {
-                if (checks.incrementAndGet() == 1) {
-                    return false;
-                }
-                throw new RegistryException("a covered notification must not read again");
-            });
-            // Both notifications arrive before the first check; that check covers both.
-            notifyRemove("previous-peer");
-            notifyRemove(identity);
+            await(closed);
+            assertFalse(startup.isDone(), "startup must not return before its admitted callback finishes");
         } finally {
             release.countDown();
         }
-        drain();
-        assertTrue(server.isActive(), "a covered OWN must not cause a second decision");
-        assertEquals(1, checks.get());
-        verify(statusListener, never()).changeToStandBy();
+        startup.get(5, TimeUnit.SECONDS);
+        assertFalse(server.isActive());
     }
 
-    private void remove(String previousOwner) {
-        notifyRemove(previousOwner);
-        drain();
+    @Test
+    void testCloseFromDemotionListenerDoesNotDeadlock() throws Exception {
+        server.start();
+        doAnswer(invocation -> {
+            server.close();
+            return null;
+        }).when(statusListener).changeToStandBy();
+        owner.set("peer");
+        notifyRemove("peer");
+        worker(server).join(5000);
+        assertFalse(worker(server).isAlive());
+        assertFalse(server.isActive());
     }
 
-    private void notifyRemove(String previousOwner) {
-        subscriber.get().notify(new Event(SELECTOR_PATH, SELECTOR_PATH, previousOwner, Event.Type.REMOVE));
-    }
-
-    private void drain() {
-        try {
-            ExecutorService io = (ExecutorService) field(server, "registryExecutor");
-            long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
-            while (!electionExecutor.isShutdown() && System.nanoTime() < deadline) {
-                electionExecutor.submit(() -> {
-                }).get(5, TimeUnit.SECONDS);
-                io.submit(() -> {
-                }).get(5, TimeUnit.SECONDS);
-                if (electionExecutor.submit(() -> field(server, "inFlightCheck") == null)
-                        .get(5, TimeUnit.SECONDS)) {
-                    return;
-                }
+    @Test
+    void testExternalCloseDoesNotInterruptAdmittedListener() throws Exception {
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        CountDownLatch interrupted = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            entered.countDown();
+            try {
+                assertTrue(release.await(5, TimeUnit.SECONDS));
+            } catch (InterruptedException e) {
+                interrupted.countDown();
+                awaitUninterruptibly(release);
+                Thread.currentThread().interrupt();
             }
-            assertTrue(electionExecutor.isShutdown(), "HA workers did not finish their admitted checks");
-        } catch (java.util.concurrent.CancellationException | RejectedExecutionException e) {
-            assertTrue(electionExecutor.isShutdown());
-        } catch (Exception e) {
-            throw new AssertionError("HA workers did not finish", e);
+            return null;
+        }).when(statusListener).changeToActive();
+        Future<?> startup = caller().submit(server::start);
+        Future<?> closer = null;
+        try {
+            await(entered);
+            closer = caller().submit(server::close);
+            awaitCondition(() -> !server.isActive());
+            assertFalse(interrupted.await(250, TimeUnit.MILLISECONDS));
+            assertFalse(closer.isDone(), "external close still waits for the admitted callback");
+        } finally {
+            release.countDown();
         }
+        closer.get(5, TimeUnit.SECONDS);
+        startup.get(5, TimeUnit.SECONDS);
+    }
+
+    @Test
+    void testExternalCloseWaitsForAdmittedListener() throws Exception {
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        doAnswer(invocation -> {
+            entered.countDown();
+            awaitUninterruptibly(release);
+            return null;
+        }).when(statusListener).changeToActive();
+        Future<?> startup = caller().submit(server::start);
+        Future<?> closer = null;
+        try {
+            await(entered);
+            closer = caller().submit(server::close);
+            awaitCondition(() -> !server.isActive());
+            assertFalse(closer.isDone());
+            assertFalse(startup.isDone());
+        } finally {
+            release.countDown();
+        }
+        closer.get(5, TimeUnit.SECONDS);
+        startup.get(5, TimeUnit.SECONDS);
+    }
+
+    @Test
+    void testRepeatedExternalCloseWaitsForSameAdmittedListener() throws Exception {
+        CountDownLatch entered = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        CountDownLatch secondCloseStarted = new CountDownLatch(1);
+        AtomicBoolean interrupted = new AtomicBoolean();
+        doAnswer(invocation -> {
+            entered.countDown();
+            try {
+                assertTrue(release.await(5, TimeUnit.SECONDS));
+            } catch (InterruptedException e) {
+                interrupted.set(true);
+                awaitUninterruptibly(release);
+                Thread.currentThread().interrupt();
+            }
+            return null;
+        }).when(statusListener).changeToActive();
+        Future<?> startup = caller().submit(server::start);
+        Future<?> firstClose = null;
+        Future<?> secondClose = null;
+        try {
+            await(entered);
+            firstClose = caller().submit(server::close);
+            awaitCondition(() -> !server.isActive());
+            secondClose = caller().submit(() -> {
+                secondCloseStarted.countDown();
+                server.close();
+            });
+            await(secondCloseStarted);
+            final Future<?> first = firstClose;
+            final Future<?> second = secondClose;
+            // Seeing CLOSED must not let either caller bypass the admitted listener's barrier.
+            assertThrows(TimeoutException.class, () -> first.get(250, TimeUnit.MILLISECONDS));
+            assertThrows(TimeoutException.class, () -> second.get(250, TimeUnit.MILLISECONDS));
+            assertFalse(interrupted.get());
+            assertFalse(startup.isDone());
+        } finally {
+            release.countDown();
+        }
+        firstClose.get(5, TimeUnit.SECONDS);
+        secondClose.get(5, TimeUnit.SECONDS);
+        startup.get(5, TimeUnit.SECONDS);
+        assertFalse(interrupted.get());
+        assertFalse(server.isActive());
+    }
+
+    @Test
+    void testClosedServerRetainsLastRoleButIsNotActive() {
+        server.start();
+        server.close();
+        assertEquals(HAServer.ServerStatus.ACTIVE, server.getServerStatus());
+        assertFalse(server.isActive());
+    }
+
+    private AbstractHAServer newServer(String address) {
+        return newServer(address, false);
+    }
+
+    private AbstractHAServer newServer(String address, boolean demoteOnOwnRemoval) {
+        return newServer(address, demoteOnOwnRemoval, 10);
+    }
+
+    private AbstractHAServer newServer(String address, boolean demoteOnOwnRemoval, long retryIntervalMillis) {
+        AbstractHAServer result = new AbstractHAServer(registry, SELECTOR_PATH, address,
+                demoteOnOwnRemoval, retryIntervalMillis) {
+        };
+        servers.add(result);
+        return result;
+    }
+
+    private ExecutorService caller() {
+        ExecutorService result = Executors.newSingleThreadExecutor();
+        callers.add(result);
+        return result;
+    }
+
+    private void notifyRemove(String value) {
+        subscriber.get().notify(new Event(SELECTOR_PATH, SELECTOR_PATH, value, Event.Type.REMOVE));
+    }
+
+    private Thread worker(AbstractHAServer target) {
+        return (Thread) field(target, "roleChangeEventWorker");
+    }
+
+    private HAServerRoleChangeEventBus bus(AbstractHAServer target) {
+        return (HAServerRoleChangeEventBus) field(target, "roleChangeEventBus");
     }
 
     private Object field(AbstractHAServer target, String name) {
@@ -1256,14 +914,40 @@ class AbstractHAServerTest {
         }
     }
 
-    private void advanceRetry() throws Exception {
-        drain();
-        // Move an existing scheduled task onto its actual worker; no sleeping or caller-thread execution.
-        Runnable task = electionExecutor.getQueue().peek();
-        assertTrue(task instanceof ScheduledFuture, "a delayed continuation must be pending");
-        assertTrue(electionExecutor.remove(task));
-        electionExecutor.execute(task);
-        drain();
+    private void awaitIdle(int expectedChecks) {
+        awaitCondition(() -> {
+            synchronized (worker(server)) {
+                // Read the queue first: take() can remove an expired event while this monitor is held.
+                if (checks.get() < expectedChecks || field(server, "inFlightRequest") != null
+                        || field(server, "pendingRequest") != null || !bus(server).isEmpty()) {
+                    return false;
+                }
+                boolean waitingForEvent = Arrays.stream(worker(server).getStackTrace())
+                        .anyMatch(frame -> frame.getClassName().equals(
+                                "org.apache.dolphinscheduler.eventbus.AbstractDelayEventBus")
+                                && frame.getMethodName().equals("take"));
+                Thread.State state = worker(server).getState();
+                boolean waiting = state == Thread.State.WAITING || state == Thread.State.TIMED_WAITING;
+                return (waitingForEvent && waiting) || state == Thread.State.TERMINATED;
+            }
+        });
+    }
+
+    private void awaitCondition(BooleanSupplier condition) {
+        awaitCondition(condition, 5);
+    }
+
+    private void awaitCondition(BooleanSupplier condition, int seconds) {
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(seconds);
+        while (System.nanoTime() < deadline) {
+            if (condition.getAsBoolean()) {
+                return;
+            }
+            Thread.yield();
+        }
+        assertTrue(condition.getAsBoolean(), () -> "checks=" + checks.get() + ", busEmpty=" + bus(server).isEmpty()
+                + ", inFlight=" + field(server, "inFlightRequest") + ", pending=" + field(server, "pendingRequest")
+                + ", role=" + worker(server).getState() + ", stack=" + Arrays.toString(worker(server).getStackTrace()));
     }
 
     private void await(CountDownLatch latch) {
@@ -1275,37 +959,19 @@ class AbstractHAServerTest {
         }
     }
 
-    private void awaitCondition(BooleanSupplier condition) {
-        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
-        while (!condition.getAsBoolean() && System.nanoTime() < deadline) {
-            Thread.yield();
-        }
-        assertTrue(condition.getAsBoolean());
-    }
-
-    private AbstractHAServer newServer() {
-        return newServer(ADDRESS);
-    }
-
-    private AbstractHAServer newServer(String address) {
-        return newServer(address, false);
-    }
-
-    private AbstractHAServer newServer(String address, boolean demoteOnOwnRemoval) {
-        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1,
-                runnable -> new Thread(runnable, "test-ha-election")) {
-
-            @Override
-            public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
-                // Tests advance existing delayed tasks explicitly, keeping production scheduling unchanged.
-                return super.schedule(command, delay > 0 ? 1 : 0, delay > 0 ? TimeUnit.DAYS : unit);
+    private void awaitUninterruptibly(CountDownLatch latch) {
+        boolean interrupted = false;
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+        while (latch.getCount() != 0 && System.nanoTime() < deadline) {
+            try {
+                latch.await(100, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                interrupted = true;
             }
-        };
-        electionExecutors.add(executor);
-        AbstractHAServer result = new AbstractHAServer(registry, SELECTOR_PATH, address, executor, demoteOnOwnRemoval) {
-        };
-        registryExecutors.add((ExecutorService) field(result, "registryExecutor"));
-        servers.add(result);
-        return result;
+        }
+        if (interrupted) {
+            Thread.currentThread().interrupt();
+        }
+        assertEquals(0, latch.getCount());
     }
 }

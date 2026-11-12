@@ -36,21 +36,25 @@ public interface HAServer extends AutoCloseable {
     boolean isActive();
 
     /**
-     * Participate in the election of active server, this method will block until the server is active.
+     * Synchronously check selector ownership, attempting election when the selector is absent.
+     * This may block on Registry I/O and retries. It does not update the local role or notify listeners.
+     *
+     * @return true if this instance owns the selector, false otherwise.
      */
     boolean participateElection();
 
     /**
-     * Add a listener to listen to the status change of the server.
+     * Register a status-change listener before starting the server.
      *
      * @param listener listener to add.
      */
     void addServerStatusChangeListener(ServerStatusChangeListener listener);
 
     /**
-     * Get the status of the server.
+     * Get the last assigned HA role, which is retained after close.
+     * Use {@link #isActive()} to determine whether the server is currently active.
      *
-     * @return the status of the server.
+     * @return the last assigned role.
      */
     ServerStatus getServerStatus();
 
