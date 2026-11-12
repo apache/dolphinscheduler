@@ -19,13 +19,14 @@
 <configuration scan="true" scanPeriod="120 seconds">
     <property name="log.base" value="logs"/>
 
+    <conversionRule conversionWord="message"
+                    converterClass="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter"/>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataLayout">
-                <pattern>
-[%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - [WorkflowInstance-%X{workflowInstanceId:-0}][TaskInstance-%X{taskInstanceId:-0}] - %message%n
-                </pattern>
-            </layout>
+        <encoder>
+            <pattern>
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - [WorkflowInstance-%X{workflowInstanceId:-0}][TaskInstance-%X{taskInstanceId:-0}] - %message%n
+            </pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>
@@ -39,12 +40,10 @@
         <sift>
             <appender name="FILE-${taskInstanceLogFullPath}" class="ch.qos.logback.core.FileAppender">
                 <file>${taskInstanceLogFullPath}</file>
-                <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-                    <layout class="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataLayout">
-                        <pattern>
-[%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} - %message%n
-                        </pattern>
-                    </layout>
+                <encoder>
+                    <pattern>
+                        [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} - %message%n
+                    </pattern>
                     <charset>UTF-8</charset>
                 </encoder>
                 <append>true</append>
@@ -60,12 +59,10 @@
             <totalSizeCap>50GB</totalSizeCap>
             <cleanHistoryOnStart>true</cleanHistoryOnStart>
         </rollingPolicy>
-        <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-            <layout class="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataLayout">
-                <pattern>
-[%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - [WorkflowInstance-%X{workflowInstanceId:-0}][TaskInstance-%X{taskInstanceId:-0}] - %message%n
-                </pattern>
-            </layout>
+        <encoder>
+            <pattern>
+                [%level] %date{yyyy-MM-dd HH:mm:ss.SSS Z} %logger{96}:[%line] - [WorkflowInstance-%X{workflowInstanceId:-0}][TaskInstance-%X{taskInstanceId:-0}] - %message%n
+            </pattern>
             <charset>UTF-8</charset>
         </encoder>
     </appender>

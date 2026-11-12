@@ -32,9 +32,11 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
+import org.apache.dolphinscheduler.plugin.task.api.utils.PropertySensitiveUtils;
 import org.apache.dolphinscheduler.spi.datasource.ConnectionParam;
 import org.apache.dolphinscheduler.spi.enums.DbType;
 
@@ -69,7 +71,7 @@ public class ProcedureTask extends AbstractTask {
 
         this.procedureParameters =
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), ProcedureParameters.class);
-        log.info("Initialize procedure task params {}", JSONUtils.toPrettyJsonString(procedureParameters));
+        log.info("Initialize procedure task params {}", SensitiveLogHelper.toPrettyJson(procedureParameters));
 
         // check parameters
         if (procedureParameters == null || !procedureParameters.checkParameters()) {
@@ -86,7 +88,7 @@ public class ProcedureTask extends AbstractTask {
                 procedureParameters.getType(),
                 procedureParameters.getDatasource(),
                 procedureParameters.getMethod(),
-                procedureParameters.getLocalParams());
+                PropertySensitiveUtils.maskSensitiveValues(procedureParameters.getLocalParams()));
 
         DbType dbType = DbType.valueOf(procedureParameters.getType());
         DataSourceProcessor dataSourceProcessor = DataSourcePluginManager.getDataSourceProcessor(dbType);

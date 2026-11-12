@@ -49,13 +49,16 @@ public class LogicTaskExecutorOperatorImpl implements ILogicTaskExecutorOperator
         try (
                 final TaskExecutorMDCUtils.MDCAutoClosable ignore =
                         TaskExecutorMDCUtils.logWithMDC(taskExecutionContext.getTaskInstanceId())) {
-            log.info("Receive  {}", taskExecutorDispatchRequest);
+            log.info("Receive TaskExecutorDispatchRequest: taskInstanceId:{}, taskName:{}",
+                    taskExecutionContext.getTaskInstanceId(), taskExecutionContext.getTaskName());
             try {
                 logicTaskEngineDelegator.dispatchLogicTask(taskExecutionContext);
-                log.info("Handle {} success", taskExecutorDispatchRequest);
+                log.info("Handle TaskExecutorDispatchRequest: taskInstanceId:{}, taskName:{} success",
+                        taskExecutionContext.getTaskInstanceId(), taskExecutionContext.getTaskName());
                 return TaskExecutorDispatchResponse.success();
             } catch (Throwable throwable) {
-                log.error("Handle {} failed", taskExecutorDispatchRequest, throwable);
+                log.error("Handle TaskExecutorDispatchRequest: taskInstanceId:{}, taskName:{} failed",
+                        taskExecutionContext.getTaskInstanceId(), taskExecutionContext.getTaskName(), throwable);
                 return TaskExecutorDispatchResponse.failed(ExceptionUtils.getMessage(throwable));
             }
         }

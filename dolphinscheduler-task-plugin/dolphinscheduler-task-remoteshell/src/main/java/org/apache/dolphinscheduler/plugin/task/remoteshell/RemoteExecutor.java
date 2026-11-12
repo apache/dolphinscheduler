@@ -22,7 +22,7 @@ import static org.apache.dolphinscheduler.plugin.task.remoteshell.RemoteExecutor
 import org.apache.dolphinscheduler.plugin.datasource.ssh.SSHUtils;
 import org.apache.dolphinscheduler.plugin.datasource.ssh.param.SSHConnectionParam;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
-import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ProcessUtils;
 
@@ -44,6 +44,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -60,6 +62,7 @@ public class RemoteExecutor implements AutoCloseable {
     static final int TRACK_INTERVAL = 5000;
 
     protected Map<String, String> taskOutputParams = new HashMap<>();
+    private Collection<String> sensitiveValues = Collections.emptyList();
     private SshClient sshClient;
     private ClientSession session;
     private SSHConnectionParam sshConnectionParam;
@@ -68,6 +71,13 @@ public class RemoteExecutor implements AutoCloseable {
 
         this.sshConnectionParam = sshConnectionParam;
         initClient();
+    }
+
+    /**
+     * Values used only when logging the uploaded script. The remote file stays plaintext.
+     */
+    public void setSensitiveValues(Collection<String> sensitiveValues) {
+        this.sensitiveValues = sensitiveValues == null ? Collections.emptyList() : sensitiveValues;
     }
 
     private void initClient() {
@@ -116,7 +126,7 @@ public class RemoteExecutor implements AutoCloseable {
             pid = getTaskPid(taskId);
             String trackCommand = String.format(COMMAND.TRACK_COMMAND, logN + 1, getRemoteShellHome(), taskId);
             int readLines = runRemoteAndProcessLines(trackCommand, line -> {
-                log.info(TaskLogMarkers.skipTaskParamMask(), "{}", line);
+                log.info("{}", line);
                 taskOutputParameterParser.appendParseLog(line);
             });
             if (readLines > 0) {
@@ -214,7 +224,9 @@ public class RemoteExecutor implements AutoCloseable {
         uploadScript(taskId, localFile);
 
         log.info("The final script is: \n{}",
-                runRemote(String.format(COMMAND.CAT_FINAL_SCRIPT, getRemoteShellHome(), taskId)));
+                SensitiveLogHelper.mask(
+                        runRemote(String.format(COMMAND.CAT_FINAL_SCRIPT, getRemoteShellHome(), taskId)),
+                        sensitiveValues));
     }
 
     public void uploadScript(String taskId, String localFile) throws IOException {

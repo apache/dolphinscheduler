@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -70,7 +71,7 @@ public class JavaTask extends AbstractTask {
         if (javaParameters == null || !javaParameters.checkParameters()) {
             throw new TaskException("java task params is not valid");
         }
-        log.info("Initialize java task params {}", JSONUtils.toPrettyJsonString(javaParameters));
+        log.info("Initialize java task params {}", SensitiveLogHelper.toPrettyJson(javaParameters));
     }
 
     /**

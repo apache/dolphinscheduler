@@ -27,12 +27,6 @@ public class TaskLogMarkers {
     private static final Marker TASK_LOGGER_INCLUDE_MARKER = MarkerFactory.getMarker("TASK_LOGGER_INCLUDE");
 
     /**
-     * Marks process stdout / pod log lines so task-parameter literal masking is skipped.
-     * Static regex masks (e.g. datasource password) still apply.
-     */
-    private static final Marker SKIP_TASK_PARAM_MASK_MARKER = MarkerFactory.getMarker("SKIP_TASK_PARAM_MASK");
-
-    /**
      * The marker used to exclude logs from the task instance log file.
      */
     public static Marker excludeInTaskLog() {
@@ -42,13 +36,6 @@ public class TaskLogMarkers {
     public static Marker includeInTaskLog() {
         return TASK_LOGGER_INCLUDE_MARKER;
 
-    }
-
-    /**
-     * Process / pod output should keep plaintext task-parameter values.
-     */
-    public static Marker skipTaskParamMask() {
-        return SKIP_TASK_PARAM_MASK_MARKER;
     }
 
 }

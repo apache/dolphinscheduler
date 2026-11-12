@@ -143,8 +143,8 @@ class TaskExecutionContextLogRedactorTest {
     @Test
     void prettyJsonOfRedactedContextHidesDoubleEscapedSecret() {
         String secret = "quote\"and\\slash\nline";
-        String oneLevel = SensitiveDataConverter.jsonEscape(secret);
-        String doubleEscaped = SensitiveDataConverter.jsonEscape(oneLevel);
+        String oneLevel = jsonEscape(secret);
+        String doubleEscaped = jsonEscape(oneLevel);
 
         TaskExecutionContext source = new TaskExecutionContext();
         source.setTaskInstanceId(11);
@@ -167,6 +167,15 @@ class TaskExecutionContextLogRedactorTest {
         assertTrue(redactedJson.contains(TaskConstants.SENSITIVE_DATA_MASK));
         assertEquals(secret, source.getPrepareParamsMap().get("token").getValue());
         assertTrue(source.getGlobalParams().contains(oneLevel));
+    }
+
+    private static String jsonEscape(String value) {
+        String quoted = JSONUtils.toJsonString(value);
+        if (quoted != null && quoted.length() >= 2 && quoted.charAt(0) == '"'
+                && quoted.charAt(quoted.length() - 1) == '"') {
+            return quoted.substring(1, quoted.length() - 1);
+        }
+        return value;
     }
 
     private static Property sensitive(String prop, String value) {

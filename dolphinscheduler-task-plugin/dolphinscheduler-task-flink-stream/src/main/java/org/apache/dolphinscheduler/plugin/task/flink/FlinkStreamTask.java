@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.stream.StreamTask;
 
@@ -47,7 +48,7 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
     public void init() {
 
         flinkParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), FlinkStreamParameters.class);
-        log.info("Initialize Flink task params {}", JSONUtils.toPrettyJsonString(flinkParameters));
+        log.info("Initialize Flink task params {}", SensitiveLogHelper.toPrettyJson(flinkParameters));
 
         if (flinkParameters == null || !flinkParameters.checkParameters()) {
             throw new RuntimeException("flink task params is not valid");

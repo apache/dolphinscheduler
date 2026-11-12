@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
@@ -66,7 +67,7 @@ public class JupyterTask extends AbstractRemoteTask {
     public void init() {
 
         jupyterParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), JupyterParameters.class);
-        log.info("Initialize jupyter task params {}", JSONUtils.toPrettyJsonString(jupyterParameters));
+        log.info("Initialize jupyter task params {}", SensitiveLogHelper.toPrettyJson(jupyterParameters));
 
         if (null == jupyterParameters) {
             log.error("jupyter params is null");

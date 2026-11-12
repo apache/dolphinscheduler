@@ -41,7 +41,6 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTaskExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
-import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
@@ -276,7 +275,7 @@ public class K8sTaskExecutor extends AbstractK8sTaskExecutor {
                 String line;
                 try (BufferedReader reader = new BufferedReader(new InputStreamReader(watcher.getOutput()))) {
                     while ((line = reader.readLine()) != null) {
-                        log.info(TaskLogMarkers.skipTaskParamMask(), "[K8S-pod-log] {}", line);
+                        log.info("[K8S-pod-log] {}", line);
                         taskOutputParameterParser.appendParseLog(line);
                     }
                 }

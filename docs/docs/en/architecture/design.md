@@ -246,11 +246,7 @@ In the early schedule design, if there is no priority design and use the fair sc
 - For details, please refer to the logback configuration of Master and Worker, as shown in the following example:
 
 ```xml
-<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-    <layout class="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataLayout">
-        <pattern>%message%n</pattern>
-    </layout>
-</encoder>
+<conversionRule conversionWord="message" converterClass="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter"/>
 <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
     <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
     <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
@@ -272,7 +268,7 @@ In the early schedule design, if there is no priority design and use the fair sc
 </appender>
 ```
 
-- `SensitiveDataLayout` replaces each registered sensitive parameter value literally, after the full log line is rendered. There is no minimum length. A short value, or a value that also appears in a timestamp, a log level, or an ordinary word, is replaced everywhere on that Worker log line, so the line can become hard to read. Process stdout, Kubernetes pod logs, and remote-shell task output are excluded from this literal replacement. Use a sensitive value long enough that it does not collide with normal log text.
+- Sensitive parameter values are redacted at the log statement, before the line is written. Task-context dumps and parameter-initialization logs use a logging-only copy whose sensitive property values are replaced with `******`. Script and SQL text is masked only in the logged string: known sensitive values are replaced literally, longer values first. The script file, JDBC binds, remote uploads, and output-parameter parsing keep the original plaintext. Short sensitive values are not scanned across every log line, so they do not rewrite unrelated text. Task process output, Kubernetes pod logs, and remote-shell task output are not rewritten.
 
 ## Sum Up
 

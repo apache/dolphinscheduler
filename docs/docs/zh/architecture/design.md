@@ -195,11 +195,7 @@
 - 详情可参考Master和Worker的logback配置，如下示例：
 
 ```xml
-<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-    <layout class="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataLayout">
-        <pattern>%message%n</pattern>
-    </layout>
-</encoder>
+<conversionRule conversionWord="message" converterClass="org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter"/>
 <appender name="TASKLOGFILE" class="ch.qos.logback.classic.sift.SiftingAppender">
     <filter class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogFilter"/>
     <Discriminator class="org.apache.dolphinscheduler.plugin.task.api.log.TaskLogDiscriminator">
@@ -221,7 +217,7 @@
 </appender>
 ```
 
-- `SensitiveDataLayout` 会在整行日志渲染完成后，把当前任务已登记的敏感参数值按字面量替换为 `******`。这里没有最短长度限制。敏感值如果很短，或与时间戳、日志级别、普通单词相同，该 Worker 日志行里所有出现该字面量的位置都会被替换，日志可能难以阅读。进程标准输出、Kubernetes Pod 日志和远程 Shell 的任务输出不参与这层字面量替换。敏感参数应使用足够长、不易与普通日志文本重合的值。
+- 敏感参数值在写日志的语句处脱敏，而不是扫描每一行已经渲染好的日志。任务上下文和参数初始化日志使用仅用于日志的副本，把敏感 Property 的值换成 `******`。脚本和 SQL 只在打印出来的字符串里按字面量替换已知敏感值，较长的值先替换。写到磁盘的脚本、JDBC 绑定、远程上传和输出参数解析仍使用原始明文。较短的敏感值不会被全局扫描，因此不会改写无关日志行。任务进程输出、Kubernetes Pod 日志和远程 Shell 的任务输出不会被改写。
 
 ## 总结
 
