@@ -50,8 +50,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-import com.google.common.util.concurrent.RateLimiter;
-
 @Slf4j
 @Component
 public class MasterClusters
@@ -70,7 +68,6 @@ public class MasterClusters
             new CopyOnWriteArrayList<>();
 
     private final Map<String, ServerIdentity> registeredServers = new ConcurrentHashMap<>();
-    private final RateLimiter heartbeatFailureLogLimiter = RateLimiter.create(1.0 / 60);
     private volatile boolean closed;
 
     @Lazy
@@ -184,7 +181,6 @@ public class MasterClusters
     }
 
     public void refreshHeartbeats() {
-        List<String> failures = new ArrayList<>();
         for (ServerIdentity expected : new ArrayList<>(registeredServers.values())) {
             if (closed) {
                 return;
@@ -196,10 +192,10 @@ public class MasterClusters
                         continue;
                     }
                     if (heartbeat == null) {
-                        failures.add(heartbeatFailure(expected.getAddress(), "empty heartbeat"));
+                        logHeartbeatFailure(expected.getAddress(), "empty heartbeat");
                     } else if (!expected.matches(heartbeat)) {
-                        failures.add(heartbeatFailure(expected.getAddress(),
-                                "unexpected heartbeat identity " + ServerIdentity.fromHeartBeat(heartbeat)));
+                        logHeartbeatFailure(expected.getAddress(),
+                                "unexpected heartbeat identity " + ServerIdentity.fromHeartBeat(heartbeat));
                     } else {
                         onServerUpdate(MasterServerMetadata.parseFromHeartBeat(heartbeat));
                     }
@@ -207,20 +203,17 @@ public class MasterClusters
             } catch (Exception ex) {
                 log.debug("Failed to fetch Master heartbeat from {}", expected.getAddress(), ex);
                 if (!closed && registeredServers.get(expected.getAddress()) == expected) {
-                    failures.add(heartbeatFailure(expected.getAddress(), "RPC failed: " + ex.getMessage()));
+                    logHeartbeatFailure(expected.getAddress(), "RPC failed: " + ex.getMessage());
                 }
             }
         }
-        if (!failures.isEmpty() && heartbeatFailureLogLimiter.tryAcquire()) {
-            log.warn("Failed to fetch Master heartbeats: {}", failures);
-        }
     }
 
-    private String heartbeatFailure(String address, String reason) {
+    private void logHeartbeatFailure(String address, String reason) {
         MasterServerMetadata metadata = masterServerMap.get(address);
         String age = metadata == null ? "never received"
                 : (System.currentTimeMillis() - metadata.getHeartbeatReceivedTime()) + "ms";
-        return address + " [reason=" + reason + ", heartbeatAge=" + age + "]";
+        log.warn("Failed to fetch Master heartbeat from {}: reason={}, heartbeatAge={}", address, reason, age);
     }
 
     @Override

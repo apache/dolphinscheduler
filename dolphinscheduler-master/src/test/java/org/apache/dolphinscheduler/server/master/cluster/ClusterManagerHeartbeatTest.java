@@ -66,6 +66,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -451,7 +452,7 @@ class ClusterManagerHeartbeatTest {
     @ParameterizedTest
     @CsvSource({"MASTER,exception", "MASTER,empty", "MASTER,foreign", "WORKER,exception", "WORKER,empty",
             "WORKER,foreign"})
-    void failedPollWarnsWithAddressReasonAndAgeAndIsRateLimited(RegistryNodeType type, String failure) {
+    void everyFailedPollWarnsWithAddressReasonAndAge(RegistryNodeType type, String failure) {
         BaseHeartBeat heartbeat = type == RegistryNodeType.MASTER
                 ? MasterHeartBeat.builder().host("localhost").port(5678).processId(10).startupTime(1)
                         .serverStatus(ServerStatus.NORMAL).build()
@@ -481,7 +482,7 @@ class ClusterManagerHeartbeatTest {
         try {
             poll();
             poll();
-            assertEquals(1, appender.list.stream().filter(event -> event.getLevel() == Level.WARN).count());
+            assertEquals(2, appender.list.stream().filter(event -> event.getLevel() == Level.WARN).count());
             String message = appender.list.stream().filter(event -> event.getLevel() == Level.WARN).findFirst().get()
                     .getFormattedMessage();
             assertTrue(message.contains(ServerIdentity.fromHeartBeat(heartbeat).getAddress()));
@@ -496,22 +497,29 @@ class ClusterManagerHeartbeatTest {
     }
 
     @Test
-    void failedPollSummaryIncludesAllNodesWithoutAnySuccessfulHeartbeat() {
+    void failedPollWarnsImmediatelyForEachNodeWithoutAnySuccessfulHeartbeat() {
         WorkerHeartBeat heartbeat = worker(1);
         WorkerHeartBeat second = worker(1);
         second.setPort(1235);
         register(RegistryNodeType.WORKER, heartbeat);
         owner.start();
         notify(RegistryNodeType.WORKER, Event.Type.ADD, second);
-        query = (type, address) -> null;
         Logger logger = (Logger) LoggerFactory.getLogger(WorkerClusters.class);
         ListAppender<ILoggingEvent> appender = new ListAppender<>();
         appender.start();
         logger.addAppender(appender);
+        AtomicInteger requests = new AtomicInteger();
+        query = (type, address) -> {
+            if (requests.getAndIncrement() > 0) {
+                assertEquals(1, appender.list.stream().filter(event -> event.getLevel() == Level.WARN).count());
+            }
+            return null;
+        };
         try {
             poll();
-            String message = appender.list.stream().filter(event -> event.getLevel() == Level.WARN).findFirst().get()
-                    .getFormattedMessage();
+            assertEquals(2, appender.list.stream().filter(event -> event.getLevel() == Level.WARN).count());
+            String message = appender.list.stream().filter(event -> event.getLevel() == Level.WARN)
+                    .map(ILoggingEvent::getFormattedMessage).collect(Collectors.joining("\n"));
             assertTrue(message.contains("localhost:1234"));
             assertTrue(message.contains("localhost:1235"));
             assertTrue(message.contains("heartbeatAge=never received"));
