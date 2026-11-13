@@ -17,8 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
-import org.apache.dolphinscheduler.common.model.MasterHeartBeat;
-import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
@@ -34,24 +33,17 @@ import org.springframework.stereotype.Component;
 public class ClusterManager {
 
     @Getter
+    @Autowired
     private MasterClusters masterClusters;
-
     @Getter
+    @Autowired
     private WorkerClusters workerClusters;
-
     @Autowired
     private MasterSlotManager masterSlotManager;
-
     @Autowired
     private WorkerGroupChangeNotifier workerGroupChangeNotifier;
-
     @Autowired
     private RegistryClient registryClient;
-
-    public ClusterManager() {
-        this.masterClusters = new MasterClusters();
-        this.workerClusters = new WorkerClusters();
-    }
 
     public void start() {
         initializeMasterClusters();
@@ -59,43 +51,27 @@ public class ClusterManager {
         log.info("ClusterManager started...");
     }
 
-    /**
-     * Initialize the master clusters.
-     * <p> 1. Register master slot listener once master clusters changed.
-     * <p> 2. Fetch master nodes from registry.
-     * <p> 3. Subscribe the master change event.
-     */
     private void initializeMasterClusters() {
-        this.masterClusters.registerListener(new MasterSlotChangeListenerAdaptor(masterSlotManager, masterClusters));
-
-        registryClient.getServerList(RegistryNodeType.MASTER).forEach(server -> {
-            final MasterHeartBeat masterHeartBeat =
-                    JSONUtils.parseObject(server.getHeartBeatInfo(), MasterHeartBeat.class);
-            masterClusters.onServerAdded(MasterServerMetadata.parseFromHeartBeat(masterHeartBeat));
-        });
-        log.info("Initialized MasterClusters: {}", JSONUtils.toPrettyJsonString(masterClusters.getServers()));
-
-        this.registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), masterClusters);
+        masterClusters.registerListener(new MasterSlotChangeListenerAdaptor(masterSlotManager, masterClusters));
+        synchronized (masterClusters) {
+            // Apply the initial snapshot before processing membership events.
+            registryClient.subscribe(RegistryNodeType.MASTER.getRegistryPath(), masterClusters);
+            registryClient.getServerList(RegistryNodeType.MASTER).forEach(server -> masterClusters.onServerAdded(
+                    JSONUtils.parseObject(server.getHeartBeatInfo(), ServerIdentity.class)));
+        }
+        log.info("Initialized MasterClusters: {}", masterClusters.getServerAddresses());
     }
 
-    /**
-     * Initialize the worker clusters.
-     * <p> 1. Fetch worker nodes from registry.
-     * <p> 2. Register worker group change notifier once worker clusters changed.
-     * <p> 3. Subscribe the worker change event.
-     */
     private void initializeWorkerClusters() {
-        registryClient.getServerList(RegistryNodeType.WORKER).forEach(server -> {
-            final WorkerHeartBeat workerHeartBeat =
-                    JSONUtils.parseObject(server.getHeartBeatInfo(), WorkerHeartBeat.class);
-            workerClusters.onServerAdded(WorkerServerMetadata.parseFromHeartBeat(workerHeartBeat));
-        });
-        log.info("Initialized WorkerClusters: {}", JSONUtils.toPrettyJsonString(workerClusters.getServers()));
-
-        this.registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), workerClusters);
-
-        this.workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerClusters);
-        this.workerGroupChangeNotifier.start();
+        synchronized (workerClusters) {
+            // Apply the initial snapshot before processing membership events.
+            registryClient.subscribe(RegistryNodeType.WORKER.getRegistryPath(), workerClusters);
+            registryClient.getServerList(RegistryNodeType.WORKER).forEach(server -> workerClusters.onServerAdded(
+                    JSONUtils.parseObject(server.getHeartBeatInfo(), ServerIdentity.class)));
+        }
+        log.info("Initialized WorkerClusters: {}", workerClusters.getServerAddresses());
+        workerGroupChangeNotifier.subscribeWorkerGroupsChange(workerClusters);
+        workerGroupChangeNotifier.start();
     }
 
 }
