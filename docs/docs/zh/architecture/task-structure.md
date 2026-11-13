@@ -546,7 +546,7 @@
 | batchSize      | Integer | 写入端批量大小，大于 0 时才写入 DataX writer；仅 `customConfig` 为 `0` 时存在。当前 UI 表单不会保存该字段                 |
 | json           | String  | DataX 作业 JSON；仅 `customConfig` 为 `1` 时存在。为空或 `{}` 时从 `resourceList` 中唯一的 `.json` 文件读取作业定义 |
 | xms            | Integer | JVM 最小内存，单位 GB，小于 1 时按 1 处理                                                               |
-| xmx            | Integer | JVM 最大内存，单位 GB                                                                            |
+| xmx            | Integer | JVM 最大内存，单位 GB，小于 1 时按 1 处理                                                               |
 
 自定义配置（`customConfig` 为 `1`）的示例：
 
@@ -861,15 +861,15 @@ Master 还会在运行时把 `conditionResult.conditionSuccess` 写入任务实�
 
 SWITCH 任务按顺序计算条件，执行第一个为真的条件对应的分支，`task_params` 由 `SwitchParameters` 定义。
 
-|        字段         |   类型   |                                               描述                                                |
-|-------------------|--------|-------------------------------------------------------------------------------------------------|
-| localParams       | Array  | 本地参数，见[公共字段](#公共字段)                                                                             |
-| resourceList      | Array  | 该任务类型不使用，为空数组                                                                                   |
-| switchResult      | Object | 分支配置，必填                                                                                         |
-| -- dependTaskList | Array  | 条件列表，按顺序计算，第一个为真的生效                                                                             |
-| ---- condition    | String | JavaScript 表达式，在 Nashorn 沙箱中执行，结果为 `true` 才算真；`${name}` 用全局/启动参数和 varPool 替换，字符串值会自动加引号。执行出错视为假 |
-| ---- nextNode     | Number | 条件为真时执行的下游任务 code                                                                               |
-| -- nextNode       | Number | 默认下游任务 code，所有条件都不满足时执行；未设置且无条件为真时任务失败                                                          |
+|        字段         |   类型   |                                                                                                    描述                                                                                                     |
+|-------------------|--------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams       | Array  | 本地参数，见[公共字段](#公共字段)                                                                                                                                                                                       |
+| resourceList      | Array  | 该任务类型不使用，为空数组                                                                                                                                                                                             |
+| switchResult      | Object | 分支配置，必填                                                                                                                                                                                                   |
+| -- dependTaskList | Array  | 条件列表，按顺序计算，第一个为真的生效                                                                                                                                                                                       |
+| ---- condition    | String | JavaScript 表达式，在 Nashorn 沙箱中执行，结果为 `true` 才算真；`${name}` 用任务运行时准备的参数替换：内置参数、项目参数、工作流全局参数、任务本地参数、启动/补数参数、varPool，以及 `${datetime}` 等业务参数（同名时的优先级见[参数优先级](../guide/parameter/priority.md)），字符串值会自动加引号。执行出错视为假 |
+| ---- nextNode     | Number | 条件为真时执行的下游任务 code                                                                                                                                                                                         |
+| -- nextNode       | Number | 默认下游任务 code，所有条件都不满足时执行；未设置且无条件为真时任务失败                                                                                                                                                                    |
 
 **示例：**
 
