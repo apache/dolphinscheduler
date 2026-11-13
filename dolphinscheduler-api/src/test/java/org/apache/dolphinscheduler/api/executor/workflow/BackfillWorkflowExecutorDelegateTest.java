@@ -20,8 +20,16 @@ package org.apache.dolphinscheduler.api.executor.workflow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
@@ -48,6 +56,9 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -65,6 +76,9 @@ public class BackfillWorkflowExecutorDelegateTest {
 
     @Mock
     private RegistryClient registryClient;
+
+    @Mock
+    private ProjectService projectService;
 
     // No need to mock WorkerGroupService, not used in actual implementation
 
@@ -343,6 +357,75 @@ public class BackfillWorkflowExecutorDelegateTest {
         Assertions.assertEquals(2, countA);
         Assertions.assertEquals(3, bBackfillDates.size());
         Assertions.assertEquals(3, cBackfillDates.size());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "RUN_MODE_SERIAL, false",
+            "RUN_MODE_SERIAL, true",
+            "RUN_MODE_PARALLEL, false",
+            "RUN_MODE_PARALLEL, true"
+    })
+    public void testDeniedDownstreamPermissionPreventsAllSubmissions(RunMode runMode, boolean allLevelDependent) {
+        BackfillWorkflowDTO dto = createBackfillDTO(runMode, allLevelDependent);
+        WorkflowDefinition firstDownstream = WorkflowDefinition.builder().code(2L).projectCode(200L).build();
+        WorkflowDefinition secondDownstream = WorkflowDefinition.builder().code(3L).projectCode(300L).build();
+        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(1L, allLevelDependent, true))
+                .thenReturn(Arrays.asList(firstDownstream, secondDownstream));
+        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(dto.getLoginUser(), 200L);
+        ServiceException denied = new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM);
+        doThrow(denied).when(projectService).checkHasProjectWritePermissionThrowException(dto.getLoginUser(), 300L);
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> backfillWorkflowExecutorDelegate.execute(dto));
+
+        Assertions.assertSame(denied, exception);
+        verifyNoInteractions(registryClient);
+        verify(backfillWorkflowExecutorDelegate, never()).triggerBackfillWorkflow(any(), any());
+    }
+
+    @ParameterizedTest
+    @EnumSource(RunMode.class)
+    public void testAllDownstreamPermissionsCheckedBeforeFirstSubmission(RunMode runMode) {
+        BackfillWorkflowDTO dto = createBackfillDTO(runMode, true);
+        WorkflowDefinition firstDownstream = WorkflowDefinition.builder().code(2L).projectCode(200L).build();
+        WorkflowDefinition secondDownstream = WorkflowDefinition.builder().code(3L).projectCode(300L).build();
+        when(workflowLineageService.resolveDownstreamWorkflowDefinitionCodes(1L, true, true))
+                .thenReturn(Arrays.asList(firstDownstream, secondDownstream));
+        Server masterServer = new Server();
+        when(registryClient.getRandomServer(RegistryNodeType.MASTER)).thenReturn(Optional.of(masterServer));
+        List<WorkflowBackfillTriggerRequest> requests = new ArrayList<>();
+        doAnswer(invocation -> {
+            if (requests.isEmpty()) {
+                verify(projectService).checkHasProjectWritePermissionThrowException(dto.getLoginUser(), 200L);
+                verify(projectService).checkHasProjectWritePermissionThrowException(dto.getLoginUser(), 300L);
+            }
+            requests.add(invocation.getArgument(0));
+            return WorkflowBackfillTriggerResponse.success(requests.size());
+        }).when(backfillWorkflowExecutorDelegate).triggerBackfillWorkflow(any(), any());
+
+        List<Integer> instanceIds = backfillWorkflowExecutorDelegate.execute(dto);
+
+        Assertions.assertEquals(Arrays.asList(1, 2, 3), instanceIds);
+        Assertions.assertEquals(Arrays.asList(1L, 2L, 3L), requests.stream()
+                .map(WorkflowBackfillTriggerRequest::getWorkflowCode).collect(Collectors.toList()));
+    }
+
+    private BackfillWorkflowDTO createBackfillDTO(RunMode runMode, boolean allLevelDependent) {
+        User loginUser = new User();
+        loginUser.setId(1);
+        return BackfillWorkflowDTO.builder()
+                .loginUser(loginUser)
+                .workflowDefinition(WorkflowDefinition.builder().code(1L).projectCode(100L).build())
+                .backfillParams(BackfillWorkflowDTO.BackfillParamsDTO.builder()
+                        .runMode(runMode)
+                        .backfillDateList(new ArrayList<>(Collections.singletonList(
+                                ZonedDateTime.parse("2026-02-01T00:00:00Z"))))
+                        .backfillDependentMode(ComplementDependentMode.ALL_DEPENDENT)
+                        .allLevelDependent(allLevelDependent)
+                        .executionOrder(ExecutionOrder.ASC_ORDER)
+                        .build())
+                .build();
     }
 
     @Test

@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.api.executor.workflow;
 
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.service.WorkflowLineageService;
 import org.apache.dolphinscheduler.api.validator.workflow.BackfillWorkflowDTO;
 import org.apache.dolphinscheduler.common.enums.ComplementDependentMode;
@@ -56,6 +57,9 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
     @Autowired
     private RegistryClient registryClient;
 
+    @Autowired
+    private ProjectService projectService;
+
     @Override
     public List<Integer> execute(final BackfillWorkflowDTO backfillWorkflowDTO) {
         return executeWithDependentExpansion(backfillWorkflowDTO);
@@ -84,6 +88,11 @@ public class BackfillWorkflowExecutorDelegate implements IExecutorDelegate<Backf
                 log.info("No downstream dependent workflows found for workflow code {}",
                         backfillWorkflowDTO.getWorkflowDefinition().getCode());
             } else {
+                // Check every downstream before submitting any workflow, including the root.
+                for (WorkflowDefinition downstreamWorkflow : downstreamWorkflowList) {
+                    projectService.checkHasProjectWritePermissionThrowException(backfillWorkflowDTO.getLoginUser(),
+                            downstreamWorkflow.getProjectCode());
+                }
                 dependentBackfillDtos.addAll(buildResolvedDownstreamBackfillDtos(backfillWorkflowDTO,
                         backfillWorkflowDTO.getBackfillParams().getBackfillDateList(),
                         downstreamWorkflowList));
