@@ -57,6 +57,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.Uninterruptibles;
 
 @Slf4j
 @Component
@@ -77,24 +78,38 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private boolean flag = false;
+    private volatile boolean flag = false;
 
     private Thread internalThread;
 
+    @VisibleForTesting
+    long initialDelayMillis = TimeUnit.MINUTES.toMillis(1);
+
     private static final int DEFAULT_LIMIT = 1000;
 
+    /**
+     * Starts a new worker after the previous worker has exited. A blocked operation in the
+     * previous worker can delay this method even after close() has requested it to stop.
+     */
     public synchronized void start() {
         log.info("TaskGroupCoordinator starting...");
         if (flag) {
             throw new IllegalStateException("TaskGroupCoordinator is already started");
         }
         if (internalThread != null) {
-            throw new IllegalStateException("InternalThread is already started");
+            if (internalThread == Thread.currentThread()) {
+                throw new IllegalStateException("Cannot restart coordinator from its own worker");
+            }
+            if (internalThread.isAlive()) {
+                log.info("Waiting for previous {} to exit", internalThread.getName());
+            }
+            // Setting flag to true before the old worker exits would let it continue alongside the new worker.
+            Uninterruptibles.joinUninterruptibly(internalThread);
         }
-        flag = true;
         internalThread = new BaseDaemonThread(this::doStart) {
         };
         internalThread.setName("TaskGroupCoordinator-Thread");
+        flag = true;
         internalThread.start();
         log.info("TaskGroupCoordinator started...");
     }
@@ -107,7 +122,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     private void doStart() {
         // Sleep 1 minutes here to make sure the previous task group slot has been released.
         // This step is not necessary, since the wakeup operation is idempotent, but we can avoid confusion warning.
-        ThreadUtils.sleep(TimeUnit.MINUTES.toMillis(1));
+        ThreadUtils.sleep(initialDelayMillis);
 
         while (flag) {
             try {
@@ -123,8 +138,10 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
             } catch (Throwable e) {
                 log.error("TaskGroupCoordinator error", e);
             } finally {
-                // sleep 5s
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5);
+                if (flag) {
+                    // sleep 5s
+                    ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5);
+                }
             }
         }
     }
@@ -516,6 +533,9 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         log.debug("TaskGroupQueue has already been released: {}", taskGroupQueue.getId());
     }
 
+    /**
+     * Requests the worker to stop. Its current iteration may still finish after this method returns.
+     */
     @Override
     public synchronized void close() {
         if (!flag) {
@@ -530,7 +550,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         } catch (Exception ex) {
             log.error("Close internalThread failed", ex);
         }
-        internalThread = null;
+        // Keep the thread reference so start() can wait for this worker to exit.
         log.info("TaskGroupCoordinator closed");
     }
 }

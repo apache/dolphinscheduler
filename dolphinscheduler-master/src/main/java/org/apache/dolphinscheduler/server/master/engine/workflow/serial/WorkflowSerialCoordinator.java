@@ -41,6 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.util.concurrent.Uninterruptibles;
+
 /**
  * Used to coordinate the serial execution of workflows.
  * <p> Once a workflow instance is submitted with serial wait strategy, it will be added to the serial queue.
@@ -73,6 +75,10 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
 
     private static final int DEFAULT_FETCH_INTERVAL_SECONDS = 5;
 
+    /**
+     * Starts a new worker after the previous worker has exited. A blocked operation in the
+     * previous worker can delay this method even after close() has requested it to stop.
+     */
     @Override
     public synchronized void start() {
         log.info("WorkflowSerialCoordinator starting...");
@@ -80,12 +86,19 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
             throw new IllegalStateException("WorkflowSerialCoordinator is already started");
         }
         if (internalThread != null) {
-            throw new IllegalStateException("InternalThread is already started");
+            if (internalThread == Thread.currentThread()) {
+                throw new IllegalStateException("Cannot restart coordinator from its own worker");
+            }
+            if (internalThread.isAlive()) {
+                log.info("Waiting for previous {} to exit", internalThread.getName());
+            }
+            // Setting flag to true before the old worker exits would let it continue alongside the new worker.
+            Uninterruptibles.joinUninterruptibly(internalThread);
         }
-        flag = true;
         internalThread = new BaseDaemonThread(this::doStart) {
         };
         internalThread.setName("WorkflowSerialCoordinator-Thread");
+        flag = true;
         internalThread.start();
         log.info("WorkflowSerialCoordinator started...");
     }
@@ -102,8 +115,10 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
             } catch (Throwable e) {
                 log.error("WorkflowSerialCoordinator error", e);
             } finally {
-                // sleep 5s
-                ThreadUtils.sleep(TimeUnit.SECONDS.toMillis(DEFAULT_FETCH_INTERVAL_SECONDS));
+                if (flag) {
+                    // sleep 5s
+                    ThreadUtils.sleep(TimeUnit.SECONDS.toMillis(DEFAULT_FETCH_INTERVAL_SECONDS));
+                }
             }
         }
     }
@@ -168,6 +183,9 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
                 .build();
     }
 
+    /**
+     * Requests the worker to stop. Its current iteration may still finish after this method returns.
+     */
     @Override
     public synchronized void close() {
         if (!flag) {
@@ -182,7 +200,7 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
         } catch (Exception ex) {
             log.error("Close internalThread failed", ex);
         }
-        internalThread = null;
+        // Keep the thread reference so start() can wait for this worker to exit.
         log.info("WorkflowSerialCoordinator closed");
     }
 }
