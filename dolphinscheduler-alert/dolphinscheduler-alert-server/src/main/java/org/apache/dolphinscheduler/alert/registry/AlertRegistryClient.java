@@ -18,9 +18,20 @@
 package org.apache.dolphinscheduler.alert.registry;
 
 import org.apache.dolphinscheduler.alert.config.AlertConfig;
+import org.apache.dolphinscheduler.alert.metrics.AlertServerMetrics;
 import org.apache.dolphinscheduler.alert.service.AlertHAServer;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.model.AlertServerHeartBeat;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.extract.alert.IAlertMetadataService;
+import org.apache.dolphinscheduler.extract.base.utils.Host;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
+import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
+import org.apache.dolphinscheduler.registry.api.ConnectionState;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
+import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +40,7 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class AlertRegistryClient implements AutoCloseable {
+public class AlertRegistryClient implements AutoCloseable, IAlertMetadataService {
 
     @Autowired
     private RegistryClient registryClient;
@@ -40,23 +51,65 @@ public class AlertRegistryClient implements AutoCloseable {
     @Autowired
     private MetricsProvider metricsProvider;
 
-    private AlertHeartbeatTask alertHeartbeatTask;
+    private final int processId = OSUtils.getProcessID();
+    private final long startupTime = System.currentTimeMillis();
+    private boolean closed;
 
     @Autowired
     private AlertHAServer alertHAServer;
 
-    public void start() {
+    public synchronized void start() {
         log.info("AlertRegistryClient starting...");
-        alertHeartbeatTask = new AlertHeartbeatTask(alertConfig, metricsProvider, registryClient, alertHAServer);
-        alertHeartbeatTask.start();
-        // start heartbeat task
+        registryClient.addConnectionStateListener(state -> {
+            if (state == ConnectionState.RECONNECTED) {
+                register();
+            }
+        });
+        register();
         log.info("AlertRegistryClient started...");
     }
 
+    private synchronized void register() {
+        if (closed) {
+            return;
+        }
+        Host host = new Host(Host.of(alertConfig.getAlertServerAddress()).getIp(), alertConfig.getPort());
+        ServerIdentity identity = new ServerIdentity();
+        identity.setHost(host.getIp());
+        identity.setPort(host.getPort());
+        identity.setProcessId(processId);
+        identity.setStartupTime(startupTime);
+        registryClient.persistEphemeral(RegistryNodeType.ALERT_SERVER.getRegistryPath() + "/" + host.getAddress(),
+                JSONUtils.toJsonString(identity));
+    }
+
     @Override
-    public void close() {
+    public AlertServerHeartBeat getServerMetadata() {
+        AlertServerMetrics.incAlertHeartbeatRequestCount();
+        SystemMetrics systemMetrics = metricsProvider.getSystemMetrics();
+        return AlertServerHeartBeat.builder()
+                .processId(processId)
+                .startupTime(startupTime)
+                .reportTime(System.currentTimeMillis())
+                .jvmCpuUsage(systemMetrics.getJvmCpuUsagePercentage())
+                .cpuUsage(systemMetrics.getSystemCpuUsagePercentage())
+                .memoryUsage(systemMetrics.getSystemMemoryUsedPercentage())
+                .jvmMemoryUsage(systemMetrics.getJvmMemoryUsedPercentage())
+                .diskUsage(systemMetrics.getDiskUsedPercentage())
+                .serverStatus(ServerStatus.NORMAL)
+                .isActive(alertHAServer.isActive())
+                .host(Host.of(alertConfig.getAlertServerAddress()).getIp())
+                .port(alertConfig.getPort())
+                .build();
+    }
+
+    @Override
+    public synchronized void close() {
+        if (closed) {
+            return;
+        }
         log.info("AlertRegistryClient closing...");
-        alertHeartbeatTask.shutdown();
+        closed = true;
         log.info("AlertRegistryClient closed...");
     }
 

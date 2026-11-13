@@ -32,9 +32,10 @@ interface ServerNode {
   host: string
   port: number
   serverDirectory: string
-  heartBeatInfo: string
+  heartBeatInfo: string | null
+  metadataStale?: boolean
   createTime: string
-  lastHeartbeatTime: string
+  lastHeartbeatTime: string | null
 }
 
 interface MasterNode extends ServerNode {
@@ -47,7 +48,7 @@ interface WorkerNode extends ServerNode {
   threadPoolUsage?: number
 }
 
-interface AlertNode extends MasterNode {}
+type AlertNode = MasterNode
 
 interface WorkflowExecutor {
   id: number

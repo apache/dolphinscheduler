@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.engine.system.event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.server.master.cluster.WorkerServerMetadata;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 
 import java.util.Date;
 
@@ -28,23 +28,23 @@ import lombok.Getter;
 @Getter
 public class WorkerFailoverEvent extends AbstractSystemEvent {
 
-    private final WorkerServerMetadata workerServerMetadata;
+    private final ServerIdentity serverIdentity;
     private final Date eventTime;
 
-    private WorkerFailoverEvent(final WorkerServerMetadata workerServerMetadata,
+    private WorkerFailoverEvent(final ServerIdentity serverIdentity,
                                 final Date eventTime,
                                 final long delayTime) {
         super(delayTime);
-        this.workerServerMetadata = workerServerMetadata;
+        this.serverIdentity = serverIdentity;
         this.eventTime = eventTime;
     }
 
-    public static WorkerFailoverEvent of(final WorkerServerMetadata workerServerMetadata,
+    public static WorkerFailoverEvent of(final ServerIdentity serverIdentity,
                                          final Date eventTime,
                                          final long delayTime) {
-        checkNotNull(workerServerMetadata);
+        checkNotNull(serverIdentity);
         checkNotNull(eventTime);
-        return new WorkerFailoverEvent(workerServerMetadata, eventTime, delayTime);
+        return new WorkerFailoverEvent(serverIdentity, eventTime, delayTime);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class WorkerFailoverEvent extends AbstractSystemEvent {
     @Override
     public String toString() {
         return "WorkerFailoverEvent{" +
-                "workerServerMetadata='" + workerServerMetadata + '\'' +
+                "serverIdentity='" + serverIdentity + '\'' +
                 ", eventTime=" + eventTime +
                 ", delayTime=" + delayTime +
                 '}';
