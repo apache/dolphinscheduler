@@ -52,8 +52,7 @@ import TaskModal from '@/views/projects/task/components/node/detail-modal'
 import StartModal from '@/views/projects/workflow/definition/components/start-modal'
 import LogModal from '@/components/log-modal'
 import './x6-style.scss'
-import { queryLog } from '@/service/modules/log'
-import { useAsyncState } from '@vueuse/core'
+import { loadLogPages } from '@/service/modules/log/load-pages'
 import utils from '@/utils'
 import { executeTask } from '@/service/modules/executors'
 import DependenciesModal from '@/views/projects/components/dependencies/dependencies-modal'
@@ -241,35 +240,38 @@ export default defineComponent({
       taskModalVisible.value = false
       viewLog(taskId, taskType)
 
-      getLogs()
+      void getLogs()
     }
 
-    const getLogs = () => {
-      const { state } = useAsyncState(
-        queryLog({
-          taskInstanceId: nodeVariables.logTaskId,
-          limit: nodeVariables.limit,
-          skipLineNum: nodeVariables.skipLineNum
-        }).then((res: any) => {
-          nodeVariables.logRef += res.message || ''
-          if (res && res.message !== '') {
-            nodeVariables.skipLineNum += res.lineNum
-            getLogs()
-          } else {
-            nodeVariables.logLoadingRef = false
+    let logGeneration = 0
+    const getLogs = async () => {
+      const request = ++logGeneration
+      nodeVariables.logLoadingRef = true
+      try {
+        await loadLogPages(
+          nodeVariables.logTaskId,
+          (message, nextLine) => {
+            nodeVariables.logRef += message
+            nodeVariables.skipLineNum = nextLine
+          },
+          {
+            limit: nodeVariables.limit,
+            isCurrent: () => request === logGeneration
           }
-        }),
-        {}
-      )
-
-      return state
+        )
+      } catch {
+        if (request === logGeneration)
+          nodeVariables.logRef += `\n${t('project.workflow.gantt_log_error')}`
+      } finally {
+        if (request === logGeneration) nodeVariables.logLoadingRef = false
+      }
     }
 
     const refreshLogs = () => {
       nodeVariables.logRef = ''
       nodeVariables.limit = 1000
       nodeVariables.skipLineNum = 0
-      getLogs()
+      void getLogs()
     }
 
     const handleExecuteTask = (
@@ -332,6 +334,7 @@ export default defineComponent({
       () => nodeVariables.showModalRef,
       () => {
         if (!nodeVariables.showModalRef) {
+          logGeneration++
           nodeVariables.row = {}
           nodeVariables.logRef = ''
           nodeVariables.logLoadingRef = true
@@ -341,7 +344,10 @@ export default defineComponent({
       }
     )
 
-    onBeforeUnmount(() => clearInterval(statusTimerRef.value))
+    onBeforeUnmount(() => {
+      logGeneration++
+      clearInterval(statusTimerRef.value)
+    })
 
     return () => (
       <div
