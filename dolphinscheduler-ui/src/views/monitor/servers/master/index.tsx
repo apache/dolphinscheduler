@@ -113,6 +113,9 @@ const master = defineComponent({
     } = this
 
     const renderNodeServerStatusTag = (item: MasterNode) => {
+      if (item.metadataStale || !item.heartBeatInfo) {
+        return <NTag type='warning'>{t('monitor.metadata_unavailable')}</NTag>
+      }
       const serverStatus = JSON.parse(item.heartBeatInfo)?.serverStatus
 
       if (!serverStatus) return ''
@@ -178,7 +181,7 @@ const master = defineComponent({
                         item ? item.createTime : ' - '
                       }`}</span>
                       <span>{`${t('monitor.master.last_heartbeat_time')}: ${
-                        item ? item.lastHeartbeatTime : ' - '
+                        item.lastHeartbeatTime || ' - '
                       }`}</span>
                     </NSpace>
                   </NSpace>
@@ -187,7 +190,7 @@ const master = defineComponent({
                   <NGi>
                     <Card title={t('monitor.master.cpu_usage')}>
                       <div class={styles.card}>
-                        {item && (
+                        {!item.metadataStale && item.heartBeatInfo && (
                           <Gauge
                             data={(
                               JSON.parse(item.heartBeatInfo).cpuUsage * 100
@@ -200,7 +203,7 @@ const master = defineComponent({
                   <NGi>
                     <Card title={t('monitor.master.memory_usage')}>
                       <div class={styles.card}>
-                        {item && (
+                        {!item.metadataStale && item.heartBeatInfo && (
                           <Gauge
                             data={(
                               JSON.parse(item.heartBeatInfo).memoryUsage * 100
@@ -213,7 +216,7 @@ const master = defineComponent({
                   <NGi>
                     <Card title={t('monitor.master.disk_usage')}>
                       <div class={[styles.card]}>
-                        {item && (
+                        {!item.metadataStale && item.heartBeatInfo && (
                           <Gauge
                             data={(
                               JSON.parse(item.heartBeatInfo).diskUsage * 100

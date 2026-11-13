@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.server.master.failover;
 
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
@@ -26,8 +27,6 @@ import org.apache.dolphinscheduler.registry.api.RegistryLock;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.registry.api.utils.RegistryUtils;
 import org.apache.dolphinscheduler.server.master.cluster.ClusterManager;
-import org.apache.dolphinscheduler.server.master.cluster.MasterServerMetadata;
-import org.apache.dolphinscheduler.server.master.cluster.WorkerServerMetadata;
 import org.apache.dolphinscheduler.server.master.engine.IWorkflowRepository;
 import org.apache.dolphinscheduler.server.master.engine.system.event.GlobalMasterFailoverEvent;
 import org.apache.dolphinscheduler.server.master.engine.system.event.MasterFailoverEvent;
@@ -79,15 +78,15 @@ public class FailoverCoordinator implements IFailoverCoordinator {
         final List<String> masterAddressWhichContainsUnFinishedWorkflow =
                 workflowInstanceDao.queryNeedFailoverMasters();
         for (final String masterAddress : masterAddressWhichContainsUnFinishedWorkflow) {
-            final Optional<MasterServerMetadata> aliveMasterOptional =
-                    clusterManager.getMasterClusters().getServer(masterAddress);
+            final Optional<ServerIdentity> aliveMasterOptional =
+                    clusterManager.getMasterClusters().getServerIdentity(masterAddress);
             if (aliveMasterOptional.isPresent()) {
                 // If the master is alive, then we use the alive master's startup time as the failover deadline.
-                final MasterServerMetadata aliveMasterServerMetadata = aliveMasterOptional.get();
-                log.info("The master[{}] is alive, do global master failover on it", aliveMasterServerMetadata);
+                final ServerIdentity aliveServerIdentity = aliveMasterOptional.get();
+                log.info("The master[{}] is alive, do global master failover on it", aliveServerIdentity);
                 doMasterFailover(
                         masterAddress,
-                        aliveMasterServerMetadata.getServerStartupTime(),
+                        aliveServerIdentity.getStartupTime(),
                         RegistryUtils.getGlobalMasterFailoverNodePath(
                                 masterAddress));
             } else {
@@ -106,26 +105,26 @@ public class FailoverCoordinator implements IFailoverCoordinator {
 
     @Override
     public void failoverMaster(final MasterFailoverEvent masterFailoverEvent) {
-        final MasterServerMetadata masterServerMetadata = masterFailoverEvent.getMasterServerMetadata();
-        log.info("Master[{}] failover starting", masterServerMetadata);
-        final String masterAddress = masterServerMetadata.getAddress();
+        final ServerIdentity masterIdentity = masterFailoverEvent.getServerIdentity();
+        log.info("Master[{}] failover starting", masterIdentity);
+        final String masterAddress = masterIdentity.getAddress();
 
-        final Optional<MasterServerMetadata> aliveMasterOptional =
-                clusterManager.getMasterClusters().getServer(masterAddress);
+        final Optional<ServerIdentity> aliveMasterOptional =
+                clusterManager.getMasterClusters().getServerIdentity(masterAddress);
         if (aliveMasterOptional.isPresent()) {
-            final MasterServerMetadata aliveMasterServerMetadata = aliveMasterOptional.get();
-            if (aliveMasterServerMetadata.getServerStartupTime() == masterServerMetadata.getServerStartupTime()) {
-                log.info("The master[{}] is alive, maybe it reconnect to registry skip failover", masterServerMetadata);
+            final ServerIdentity aliveServerIdentity = aliveMasterOptional.get();
+            if (aliveServerIdentity.getStartupTime() == masterIdentity.getStartupTime()) {
+                log.info("The master[{}] is alive, maybe it reconnect to registry skip failover", masterIdentity);
                 return;
             }
         }
         doMasterFailover(
-                masterServerMetadata.getAddress(),
+                masterIdentity.getAddress(),
                 masterFailoverEvent.getEventTime().getTime(),
                 RegistryUtils.getFailoveredNodePath(
-                        masterServerMetadata.getAddress(),
-                        masterServerMetadata.getServerStartupTime(),
-                        masterServerMetadata.getProcessId()));
+                        masterIdentity.getAddress(),
+                        masterIdentity.getStartupTime(),
+                        masterIdentity.getProcessId()));
     }
 
     /**
@@ -190,25 +189,25 @@ public class FailoverCoordinator implements IFailoverCoordinator {
 
     @Override
     public void failoverWorker(final WorkerFailoverEvent workerFailoverEvent) {
-        final WorkerServerMetadata workerServerMetadata = workerFailoverEvent.getWorkerServerMetadata();
-        log.info("Worker[{}] failover starting", workerServerMetadata);
+        final ServerIdentity workerIdentity = workerFailoverEvent.getServerIdentity();
+        log.info("Worker[{}] failover starting", workerIdentity);
 
-        final Optional<WorkerServerMetadata> aliveWorkerOptional =
-                clusterManager.getWorkerClusters().getServer(workerServerMetadata.getAddress());
+        final Optional<ServerIdentity> aliveWorkerOptional =
+                clusterManager.getWorkerClusters().getServerIdentity(workerIdentity.getAddress());
         if (aliveWorkerOptional.isPresent()) {
-            final WorkerServerMetadata aliveWorkerServerMetadata = aliveWorkerOptional.get();
-            if (aliveWorkerServerMetadata.getServerStartupTime() == workerServerMetadata.getServerStartupTime()) {
-                log.info("The worker[{}] is alive, maybe it reconnect to registry skip failover", workerServerMetadata);
+            final ServerIdentity aliveServerIdentity = aliveWorkerOptional.get();
+            if (aliveServerIdentity.getStartupTime() == workerIdentity.getStartupTime()) {
+                log.info("The worker[{}] is alive, maybe it reconnect to registry skip failover", workerIdentity);
                 return;
             }
         }
         doWorkerFailover(
-                workerServerMetadata.getAddress(),
+                workerIdentity.getAddress(),
                 System.currentTimeMillis(),
                 RegistryUtils.getFailoveredNodePath(
-                        workerServerMetadata.getAddress(),
-                        workerServerMetadata.getServerStartupTime(),
-                        workerServerMetadata.getProcessId()));
+                        workerIdentity.getAddress(),
+                        workerIdentity.getStartupTime(),
+                        workerIdentity.getProcessId()));
     }
 
     @Override
