@@ -32,6 +32,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -128,6 +129,12 @@ public class TaskExecutionContext implements Serializable {
     private Integer memoryMax;
 
     private int dispatchFailTimes;
+
+    /**
+     * Master-local state: an earlier RPC may have reached the worker identified by host.
+     */
+    @JsonIgnore
+    private boolean dispatchResultUnknown;
 
     private final long firstDispatchTime = System.currentTimeMillis();
 

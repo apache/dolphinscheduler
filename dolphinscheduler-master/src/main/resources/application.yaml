@@ -124,6 +124,7 @@ master:
   worker-group-refresh-interval: 5m
   # Task dispatch timeout check (currently disabled).
   # When enabled, tasks not dispatched within this duration are marked as failed.
+  # Unconfirmed RPC results keep retrying the original worker instead of being marked as failed.
   task-dispatch-policy:
     dispatch-timeout-enabled: false
     max-task-dispatch-duration: 1h
