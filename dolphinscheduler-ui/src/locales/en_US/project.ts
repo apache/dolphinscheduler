@@ -38,7 +38,6 @@ export default {
       DATASOURCE: 'Datasource',
       WORKER_GROUP: 'Worker Group',
       TENANT: 'Tenant',
-      QUEUE: 'Queue',
       ENVIRONMENT: 'Environment',
       ALERT_GROUP: 'Alert Group',
       K8S_NAMESPACE: 'Kubernetes Namespace',

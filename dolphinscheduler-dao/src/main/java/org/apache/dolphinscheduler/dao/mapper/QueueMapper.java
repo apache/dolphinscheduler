@@ -28,8 +28,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 
 public interface QueueMapper extends BaseMapper<Queue> {
 
-    List<Queue> queryByProject(@Param("projectCode") long projectCode);
-
     /**
      * queue page
      * @param page page

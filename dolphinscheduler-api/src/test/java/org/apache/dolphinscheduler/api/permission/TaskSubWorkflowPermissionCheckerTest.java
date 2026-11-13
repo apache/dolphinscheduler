@@ -272,7 +272,7 @@ public class TaskSubWorkflowPermissionCheckerTest {
 
     @ParameterizedTest
     @EnumSource(value = ProjectResourceType.class, names = {
-            "WORKER_GROUP", "ENVIRONMENT", "TENANT", "QUEUE", "ALERT_GROUP"})
+            "WORKER_GROUP", "ENVIRONMENT", "TENANT", "ALERT_GROUP"})
     public void executionRejectsInheritedResourceMissingFromChildProject(
                                                                          ProjectResourceType missingType) {
         ProjectResourceAuthorizationDao grants = Mockito.mock(
@@ -303,9 +303,6 @@ public class TaskSubWorkflowPermissionCheckerTest {
                 break;
             case TENANT:
                 missingKey = "5";
-                break;
-            case QUEUE:
-                missingKey = "6";
                 break;
             default:
                 missingKey = "20";

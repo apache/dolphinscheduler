@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
-import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -44,7 +43,6 @@ import org.apache.dolphinscheduler.dao.repository.IEnvironmentDao;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
-import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
@@ -84,8 +82,6 @@ class ProjectResourceAuthorizationServiceTest {
     @Mock
     private TenantDao tenantDao;
     @Mock
-    private QueueDao queueDao;
-    @Mock
     private IEnvironmentDao environmentDao;
     @Mock
     private AlertGroupDao alertGroupDao;
@@ -117,9 +113,6 @@ class ProjectResourceAuthorizationServiceTest {
                 break;
             case TENANT:
                 Mockito.when(tenantDao.queryById(42)).thenReturn(new Tenant());
-                break;
-            case QUEUE:
-                Mockito.when(queueDao.queryById(42)).thenReturn(new Queue());
                 break;
             case ENVIRONMENT:
                 Mockito.when(environmentDao.queryById(42)).thenReturn(new Environment());

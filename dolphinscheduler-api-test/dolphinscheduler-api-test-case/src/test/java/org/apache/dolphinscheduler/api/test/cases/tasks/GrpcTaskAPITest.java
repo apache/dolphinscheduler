@@ -108,8 +108,6 @@ public class GrpcTaskAPITest {
                     .getBody().getSuccess());
             Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.TENANT, "-1")
                     .getBody().getSuccess());
-            Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.QUEUE, "1")
-                    .getBody().getSuccess());
 
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();
@@ -164,8 +162,6 @@ public class GrpcTaskAPITest {
             Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.WORKER_GROUP, "default")
                     .getBody().getSuccess());
             Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.TENANT, "-1")
-                    .getBody().getSuccess());
-            Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.QUEUE, "1")
                     .getBody().getSuccess());
 
             // upload test workflow definition json

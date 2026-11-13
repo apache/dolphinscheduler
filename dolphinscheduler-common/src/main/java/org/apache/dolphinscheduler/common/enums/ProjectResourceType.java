@@ -21,7 +21,6 @@ public enum ProjectResourceType {
     DATASOURCE,
     WORKER_GROUP,
     TENANT,
-    QUEUE,
     ENVIRONMENT,
     ALERT_GROUP,
     K8S_NAMESPACE,

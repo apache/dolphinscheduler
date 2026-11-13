@@ -104,8 +104,6 @@ public class SchedulerAPITest {
                 .getBody().getSuccess());
         Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.TENANT, "-1")
                 .getBody().getSuccess());
-        Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.QUEUE, "1")
-                .getBody().getSuccess());
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(classLoader.getResource("workflow-json/test.json").getFile());
         workflowDefinitionPage.createWorkflowDefinition(loginUser, projectCode, file, workflowDefinitionName);

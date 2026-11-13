@@ -25,8 +25,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 
 public interface QueueDao extends IDao<Queue> {
 
-    List<Queue> queryByProject(long projectCode);
-
     IPage<Queue> queryQueuePaging(IPage<Queue> page, List<Integer> ids, String searchVal);
 
     boolean existQueue(String queue, String queueName);

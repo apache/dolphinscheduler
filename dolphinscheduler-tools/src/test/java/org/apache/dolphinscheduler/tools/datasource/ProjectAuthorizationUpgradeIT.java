@@ -34,6 +34,7 @@ import org.apache.ibatis.session.SqlSession;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -87,6 +88,10 @@ class ProjectAuthorizationUpgradeIT {
                 jdbc.update("update t_ds_queue set id = 42, queue_name = 'Default Queue' where queue = 'default'");
                 jdbc.update("update t_ds_tenant set queue_id = 0 where id = -1");
             }
+            List<Map<String, Object>> legacyQueues = jdbc.queryForList(
+                    "select id, queue, queue_name from t_ds_queue order by id");
+            List<Map<String, Object>> legacyTenantQueues = jdbc.queryForList(
+                    "select id, queue_id from t_ds_tenant order by id");
             jdbc.update(
                     "insert into t_ds_relation_project_user (id, user_id, project_id, perm) values (900, 100, 200, 7)");
             jdbc.update(
@@ -115,16 +120,10 @@ class ProjectAuthorizationUpgradeIT {
                 manager.upgradeDolphinScheduler();
 
                 Assertions.assertEquals("3.5.0", jdbc.queryForObject("select version from t_ds_version", String.class));
-                if (dbType == DbType.POSTGRE_SQL) {
-                    Assertions.assertEquals(42, jdbc.queryForObject(
-                            "select queue_id from t_ds_tenant where id = -1", Integer.class));
-                    // Reapplying the migration must preserve an explicitly configured queue.
-                    jdbc.update("update t_ds_tenant set queue_id = 99 where id = -1");
-                    new SqlScriptRunner(dataSource,
-                            "sql/upgrade/3.5.0_schema/postgresql/dolphinscheduler_dml.sql").execute();
-                    Assertions.assertEquals(99, jdbc.queryForObject(
-                            "select queue_id from t_ds_tenant where id = -1", Integer.class));
-                }
+                Assertions.assertEquals(legacyQueues, jdbc.queryForList(
+                        "select id, queue, queue_name from t_ds_queue order by id"));
+                Assertions.assertEquals(legacyTenantQueues, jdbc.queryForList(
+                        "select id, queue_id from t_ds_tenant order by id"));
                 Assertions.assertEquals(0,
                         jdbc.queryForObject("select count(*) from t_ds_project_user_permission", Integer.class));
                 Assertions.assertEquals(0,

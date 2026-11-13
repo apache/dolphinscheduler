@@ -126,8 +126,6 @@ public class DependentTaskAPITest {
                 .getBody().getSuccess());
         Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.TENANT, "-1")
                 .getBody().getSuccess());
-        Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.QUEUE, "1")
-                .getBody().getSuccess());
         log.info("project code: {}", projectCode);
 
         // create upstream workflow definition (shell task: echo hello)

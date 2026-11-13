@@ -33,8 +33,6 @@ public interface QueueService {
      */
     List<Queue> queryList(User loginUser);
 
-    List<Queue> queryList(User loginUser, Long projectCode);
-
     /**
      * query queue list paging
      *

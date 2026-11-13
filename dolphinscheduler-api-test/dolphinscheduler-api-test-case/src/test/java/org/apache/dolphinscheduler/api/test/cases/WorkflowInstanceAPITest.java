@@ -121,8 +121,6 @@ public class WorkflowInstanceAPITest {
                     .getBody().getSuccess());
             Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.TENANT, "-1")
                     .getBody().getSuccess());
-            Assertions.assertTrue(projectPage.grantResource(projectCode, ProjectResourceType.QUEUE, "1")
-                    .getBody().getSuccess());
 
             // upload test workflow definition json
             ClassLoader classLoader = getClass().getClassLoader();

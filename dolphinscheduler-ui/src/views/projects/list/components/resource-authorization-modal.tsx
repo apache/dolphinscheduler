@@ -32,7 +32,6 @@ import type {
 import { queryDataSourceListPaging } from '@/service/modules/data-source'
 import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
 import { queryTenantList } from '@/service/modules/tenants'
-import { queryList } from '@/service/modules/queues'
 import { queryAllEnvironmentList } from '@/service/modules/environment'
 import { listAlertGroupById } from '@/service/modules/alert-group'
 import { queryNamespaceListPaging } from '@/service/modules/k8s-namespace'
@@ -84,13 +83,6 @@ export default defineComponent({
           return (await queryTenantList()).map(
             (item: { id: number; tenantCode: string }) => ({
               label: item.tenantCode,
-              value: String(item.id)
-            })
-          )
-        case 'QUEUE':
-          return (await queryList()).map(
-            (item: { id: number; queueName: string }) => ({
-              label: item.queueName,
               value: String(item.id)
             })
           )

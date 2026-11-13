@@ -15,10 +15,4 @@
  * limitations under the License.
 */
 
--- Normalize the default tenant created with queue_id = 0 by the PostgreSQL 3.2.0 upgrade.
-UPDATE t_ds_tenant
-SET queue_id = (SELECT id FROM t_ds_queue WHERE queue = 'default')
-WHERE id = -1 AND tenant_code = 'default' AND queue_id = 0
-  AND EXISTS (SELECT 1 FROM t_ds_queue WHERE queue = 'default');
-
 -- Historical permissions are retained in the legacy tables without migration.

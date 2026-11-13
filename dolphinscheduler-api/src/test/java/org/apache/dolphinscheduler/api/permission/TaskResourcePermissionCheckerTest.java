@@ -276,8 +276,36 @@ class TaskResourcePermissionCheckerTest {
         Mockito.verify(resourceAuthorizationDao).isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "workers");
         Mockito.verifyNoMoreInteractions(resourceAuthorizationDao);
     }
+    @ParameterizedTest
+    @CsvSource(value = {
+            "SPARK|--queue external-override",
+            "MR|-Dmapreduce.job.queuename=external-override",
+            "FLINK|-yqu external-override",
+            "FLINK_STREAM|-Dyarn.application.queue=external-override"
+    }, delimiter = '|')
+    void yarnQueueParametersAreOutsideProjectResourceAuthorization(String taskType, String others) {
+        task.setTaskType(taskType);
+        task.setTaskParams("{\"yarnQueue\":\"external-queue\",\"others\":\"" + others + "\"}");
+        Tenant tenant = new Tenant();
+        tenant.setId(3);
+        tenant.setQueueId(42);
+        Mockito.when(tenantDao.queryByCode("tenant")).thenReturn(Optional.of(tenant));
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "workers"))
+                .thenReturn(true);
+        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.TENANT, "3"))
+                .thenReturn(true);
+
+        checker.checkExecutionSettings(100L, "workers", null, "tenant", null);
+        checker.checkPermission(100L, Collections.singletonList(task));
+
+        Mockito.verify(resourceAuthorizationDao, Mockito.times(2))
+                .isAuthorized(100L, ProjectResourceType.WORKER_GROUP, "workers");
+        Mockito.verify(resourceAuthorizationDao).isAuthorized(100L, ProjectResourceType.TENANT, "3");
+        Mockito.verifyNoMoreInteractions(resourceAuthorizationDao);
+    }
+
     @Test
-    void executionSettingsRequireTenantQueueAndAlertGrants() {
+    void executionSettingsRequireTenantAndAlertGrants() {
         Tenant tenant = new Tenant();
         tenant.setId(3);
         tenant.setQueueId(4);
@@ -287,10 +315,6 @@ class TaskResourcePermissionCheckerTest {
         Assertions.assertThrows(ServiceException.class,
                 () -> checker.checkExecutionSettings(100L, "workers", null, "tenant", 5));
         Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.TENANT, "3"))
-                .thenReturn(true);
-        Assertions.assertThrows(ServiceException.class,
-                () -> checker.checkExecutionSettings(100L, "workers", null, "tenant", 5));
-        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.QUEUE, "4"))
                 .thenReturn(true);
         Assertions.assertThrows(ServiceException.class,
                 () -> checker.checkExecutionSettings(100L, "workers", null, "tenant", 5));
@@ -309,7 +333,7 @@ class TaskResourcePermissionCheckerTest {
     }
 
     @Test
-    void defaultTenantExecutionStillRequiresTenantAndQueueGrants() {
+    void defaultTenantExecutionStillRequiresTenantGrant() {
         Tenant tenant = new Tenant();
         tenant.setId(-1);
         tenant.setTenantCode("default");
@@ -321,10 +345,6 @@ class TaskResourcePermissionCheckerTest {
         Assertions.assertThrows(ServiceException.class,
                 () -> checker.checkExecutionSettings(100L, "default", null, "default", null));
         Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.TENANT, "-1"))
-                .thenReturn(true);
-        Assertions.assertThrows(ServiceException.class,
-                () -> checker.checkExecutionSettings(100L, "default", null, "default", null));
-        Mockito.when(resourceAuthorizationDao.isAuthorized(100L, ProjectResourceType.QUEUE, "42"))
                 .thenReturn(true);
 
         Assertions.assertDoesNotThrow(

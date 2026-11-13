@@ -133,9 +133,6 @@ public class TaskResourcePermissionChecker {
         Tenant tenant = tenantDao.queryByCode(tenantCode)
                 .orElseThrow(() -> new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION));
         requireGrant(projectCode, ProjectResourceType.TENANT, tenant.getId().toString());
-        if (tenant.getQueueId() > 0) {
-            requireGrant(projectCode, ProjectResourceType.QUEUE, Integer.toString(tenant.getQueueId()));
-        }
         if (warningGroupId != null && warningGroupId > 0) {
             requireGrant(projectCode, ProjectResourceType.ALERT_GROUP, warningGroupId.toString());
         }

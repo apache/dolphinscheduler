@@ -31,11 +31,9 @@ import org.apache.dolphinscheduler.api.service.impl.QueueServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -74,9 +72,6 @@ public class QueueServiceTest {
 
     @InjectMocks
     private QueueServiceImpl queueService;
-
-    @Mock
-    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Mock
     private TenantDao tenantDao;
@@ -155,7 +150,7 @@ public class QueueServiceTest {
     }
 
     @Test
-    public void deleteQueueRevokesProjectGrants() throws Exception {
+    public void deleteQueuePreservesLegacyManagement() throws Exception {
         User user = getLoginUser();
         user.setUserType(UserType.ADMIN_USER);
         when(resourcePermissionCheckService.operationPermissionCheck(Mockito.any(), Mockito.anyInt(),
@@ -167,7 +162,7 @@ public class QueueServiceTest {
 
         queueService.deleteQueueById(user, 1);
 
-        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.QUEUE, "1");
+        Mockito.verify(queueDao).deleteById(1);
     }
 
     @Test

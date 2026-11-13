@@ -63,7 +63,7 @@
 * 项目操作权限为 `VIEW`、`DEVELOP`、`EXECUTE`、`MANAGE_MEMBERS` 四项：开发权限包含定义发布，执行权限包含定时调度管理。切换工作流版本需工作流与定时均已下线。全局资源名称校验限制为系统管理员。
 * 权限模型改为“用户拥有项目操作权限，项目获得资源使用授权”。升级程序新增 `t_ds_project_user_permission` 和 `t_ds_project_resource_authorization` 两张表，保留旧授权表及数据，但不自动迁移历史权限。管理员需要重新分配项目成员权限及项目资源授权，用户才能继续查询、配置、发布或人工执行项目任务。
 * 项目内的资源查询需要传入 `projectCode`，按项目 `VIEW` 权限及资源授权过滤；不带项目参数的全局资源目录仅管理员可查询。移除数据源和命名空间的个人授权接口，改为向项目授权。
-* PostgreSQL 升级会将历史内置默认租户的 `queue_id=0` 修正为实际默认队列 ID，保留已有的有效队列配置。使用默认租户执行或配置定时调度时，项目需要同时获得租户和队列的授权。
+* 队列不纳入项目资源使用授权，保留旧队列管理、租户关联及原有队列数据，不进行队列数据修正。任务参数 `yarnQueue` 及 `others` 中的队列选项不校验项目授权。旧队列管理的废弃工作由 [#18784](https://github.com/apache/dolphinscheduler/issues/18784) 跟踪。
 * 保存、发布和人工启动、重跑时检查项目资源授权。撤销资源授权不重新鉴权既有运行或排队实例、后台定时触发和自动重试，也不会自动下线已有定时。
 * 内部 RPC 认证默认关闭。升级全部服务后，再协调所有服务在各自的 `common.properties` 中开启 `rpc.authentication.enabled=true` 并配置相同的 `rpc.authentication.secret`，认证开启与关闭的服务不能互通。凭据在进程内缓存，启用认证和轮换密钥需要重启服务。参见 [RPC 认证](../security/authentication-type.md#服务间-rpc-认证)。
 * `AlertSender#getAlertData` 对 null `alertType` 增加了显式拒绝（抛 `IllegalArgumentException` 并记录错误日志），而非直接抛 `NullPointerException`。滚动升级时**必须先升级 Alert Server，再升级 Master/Worker**，否则旧 Alert Server 无法识别新增的 `alert_type` 枚举值（如 `TASK_RESULT`），会导致告警投递失败。详见[升级文档](upgrade.md#滚动升降级顺序)。([#18549](https://github.com/apache/dolphinscheduler/pull/18549))

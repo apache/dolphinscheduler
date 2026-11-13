@@ -38,7 +38,6 @@ export default {
       DATASOURCE: '数据源',
       WORKER_GROUP: 'Worker Group',
       TENANT: '租户',
-      QUEUE: '队列',
       ENVIRONMENT: '环境',
       ALERT_GROUP: '告警组',
       K8S_NAMESPACE: 'Kubernetes Namespace',

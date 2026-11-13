@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
-import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.TaskGroup;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
@@ -45,8 +44,6 @@ class ProjectResourceQueryMapperTest extends BaseDaoTest {
     private EnvironmentMapper environmentMapper;
     @Autowired
     private TenantMapper tenantMapper;
-    @Autowired
-    private QueueMapper queueMapper;
     @Autowired
     private AlertGroupMapper alertGroupMapper;
     @Autowired
@@ -117,20 +114,6 @@ class ProjectResourceQueryMapperTest extends BaseDaoTest {
         Assertions.assertTrue(tenantMapper.queryByProject(200L).isEmpty());
         resourceAuthorizationDao.revokeAuthorization(100L, ProjectResourceType.TENANT, resource.getId().toString());
         Assertions.assertTrue(tenantMapper.queryByProject(100L).isEmpty());
-    }
-
-    @Test
-    void queueQueryUsesExactProjectGrant() {
-        Queue resource = new Queue();
-        resource.setQueueName("queue");
-        queueMapper.insert(resource);
-        Assertions.assertTrue(queueMapper.queryByProject(100L).isEmpty());
-        grant(ProjectResourceType.QUEUE, resource.getId(), 100L);
-        Assertions.assertEquals(resource.getId(), queueMapper.queryByProject(100L).get(0).getId());
-        Assertions.assertEquals(1, queueMapper.queryByProject(100L).size());
-        Assertions.assertTrue(queueMapper.queryByProject(200L).isEmpty());
-        resourceAuthorizationDao.revokeAuthorization(100L, ProjectResourceType.QUEUE, resource.getId().toString());
-        Assertions.assertTrue(queueMapper.queryByProject(100L).isEmpty());
     }
 
     @Test

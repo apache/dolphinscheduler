@@ -27,7 +27,7 @@ The project screen lists projects visible through `VIEW` (all projects for syste
 
 In Project Management, use member permissions to assign users' project operations and resource authorization to grant shared resources to the project. System administrators or users with `MANAGE_MEMBERS` can manage member permissions; only system administrators can grant or revoke project resources.
 
-Worker groups are one of the eight supported resource types. The default `default` group also requires an explicit project grant. Workflow operations require the corresponding user project permission and, when resources are used, the project's resource grants. See [Security (Authorization System)](../security/security.md#granted-permissions) for the full rules, execution checks and revocation boundaries.
+Worker groups are one of the seven supported resource types. The default `default` group also requires an explicit project grant. Workflow operations require the corresponding user project permission and, when resources are used, the project's resource grants. See [Security (Authorization System)](../security/security.md#granted-permissions) for the full rules, execution checks and revocation boundaries.
 
 The following screenshot shows the legacy separate worker-group authorization screen for upgrade comparison only. From 3.5.0, use the unified project resource-authorization action.
 

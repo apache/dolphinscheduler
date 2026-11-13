@@ -42,7 +42,6 @@ import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
-import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
@@ -104,7 +103,7 @@ class ProjectResourceQueryServiceTest {
         for (Executable query : Arrays.<Executable>asList(
                 () -> dataSourceService.queryDataSourceList(user, DbType.MYSQL.getCode(), null),
                 () -> tenantService.queryTenantList(user, null),
-                () -> queueService.queryList(user, null),
+                () -> queueService.queryList(user),
                 () -> alertGroupService.queryAllAlertGroup(user, null),
                 () -> environmentService.queryAllEnvironmentList(user, null))) {
             ServiceException error = assertThrows(ServiceException.class, query);
@@ -121,7 +120,6 @@ class ProjectResourceQueryServiceTest {
         for (Executable query : Arrays.<Executable>asList(
                 () -> dataSourceService.queryDataSourceList(user, DbType.MYSQL.getCode(), 100L),
                 () -> tenantService.queryTenantList(user, 100L),
-                () -> queueService.queryList(user, 100L),
                 () -> alertGroupService.queryAllAlertGroup(user, 100L),
                 () -> environmentService.queryAllEnvironmentList(user, 100L))) {
             assertThrows(ServiceException.class, query);
@@ -147,15 +145,12 @@ class ProjectResourceQueryServiceTest {
     void projectListsUseGrantedResourceQueries() {
         User user = user(UserType.GENERAL_USER);
         Tenant tenant = new Tenant();
-        Queue queue = new Queue();
         AlertGroup alert = new AlertGroup();
         when(tenantDao.queryByProject(100L)).thenReturn(Collections.singletonList(tenant));
-        when(queueDao.queryByProject(100L)).thenReturn(Collections.singletonList(queue));
         when(alertGroupDao.queryByProject(100L)).thenReturn(Collections.singletonList(alert));
         assertEquals(Collections.singletonList(tenant), tenantService.queryTenantList(user, 100L));
-        assertEquals(Collections.singletonList(queue), queueService.queryList(user, 100L));
         assertEquals(Collections.singletonList(alert), alertGroupService.queryAllAlertGroup(user, 100L));
-        verify(authorization, times(3)).requirePermission(user, 100L, ProjectPermission.VIEW);
+        verify(authorization, times(2)).requirePermission(user, 100L, ProjectPermission.VIEW);
     }
 
     @Test

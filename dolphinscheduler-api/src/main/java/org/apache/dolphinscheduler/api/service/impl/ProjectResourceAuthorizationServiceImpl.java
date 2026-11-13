@@ -38,7 +38,6 @@ import org.apache.dolphinscheduler.dao.repository.IEnvironmentDao;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
-import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
@@ -66,7 +65,6 @@ public class ProjectResourceAuthorizationServiceImpl implements ProjectResourceA
     private final WorkerGroupDao workerGroupDao;
     private final WorkerGroupService workerGroupService;
     private final TenantDao tenantDao;
-    private final QueueDao queueDao;
     private final IEnvironmentDao environmentDao;
     private final AlertGroupDao alertGroupDao;
     private final K8sNamespaceDao namespaceDao;
@@ -164,8 +162,6 @@ public class ProjectResourceAuthorizationServiceImpl implements ProjectResourceA
                 return dataSourceDao.queryById(resourceId) != null;
             case TENANT:
                 return tenantDao.queryById(resourceId) != null;
-            case QUEUE:
-                return queueDao.queryById(resourceId) != null;
             case ENVIRONMENT:
                 return environmentDao.queryById(resourceId) != null;
             case ALERT_GROUP:

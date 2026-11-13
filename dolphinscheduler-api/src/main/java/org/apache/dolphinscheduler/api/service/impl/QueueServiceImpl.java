@@ -23,17 +23,13 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.ProjectPermission;
-import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
-import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.QueueDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.UserDao;
@@ -58,12 +54,6 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 @Service
 @Slf4j
 public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
-
-    @Autowired
-    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
-
-    @Autowired
-    private ProjectAuthorizationService projectAuthorizationService;
 
     @Autowired
     private QueueDao queueDao;
@@ -125,14 +115,6 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param loginUser login user
      * @return queue list
      */
-    @Override
-    public List<Queue> queryList(User loginUser, Long projectCode) {
-        if (projectCode == null) {
-            return queryList(loginUser);
-        }
-        projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
-        return queueDao.queryByProject(projectCode);
-    }
 
     @Override
     public List<Queue> queryList(User loginUser) {
@@ -257,7 +239,6 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
         if (!queueDao.deleteById(id)) {
             throw new ServiceException(Status.DELETE_QUEUE_BY_ID_ERROR);
         }
-        resourceAuthorizationDao.revokeByResource(ProjectResourceType.QUEUE, Integer.toString(id));
 
     }
 
