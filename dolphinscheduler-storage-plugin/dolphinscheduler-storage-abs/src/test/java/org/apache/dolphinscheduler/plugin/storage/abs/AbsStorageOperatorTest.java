@@ -237,6 +237,53 @@ class AbsStorageOperatorTest {
         verify(containerClient, never()).listBlobs(any(ListBlobsOptions.class), any());
     }
 
+    @Test
+    void existsRecognisesTheDirectoryMarker() {
+        // A directory is stored as the marker blob "<path>/", the resource center asks for "<path>"
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/dir1", false);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/dir1/", true);
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        assertTrue(storageOperator.exists("dolphinscheduler/default/resources/dir1"));
+    }
+
+    @Test
+    void existsRecognisesTheDirectoryObjectOfAHierarchicalNamespace() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/dir1", true);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/dir1/", false);
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        assertTrue(storageOperator.exists("dolphinscheduler/default/resources/dir1"));
+    }
+
+    @Test
+    void existsOfAFileChecksTheFileOnly() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/a.sh", true);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/missing.sh", false);
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        assertTrue(storageOperator.exists("dolphinscheduler/default/resources/a.sh"));
+        assertFalse(storageOperator.exists("dolphinscheduler/default/resources/missing.sh"));
+    }
+
+    @Test
+    void existsOfAMissingDirectoryIsFalse() {
+        BlobContainerClient containerClient = mock(BlobContainerClient.class);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/dir2", false);
+        mockBlobExists(containerClient, "dolphinscheduler/default/resources/dir2/", false);
+        AbsStorageOperator storageOperator = createStorageOperator("/dolphinscheduler", containerClient);
+
+        assertFalse(storageOperator.exists("dolphinscheduler/default/resources/dir2"));
+    }
+
+    private void mockBlobExists(BlobContainerClient containerClient, String name, boolean exists) {
+        BlobClient blobClient = mockBlobClient(containerClient, name);
+        when(blobClient.exists()).thenReturn(exists);
+    }
+
     private BlobClient mockBlobClient(BlobContainerClient containerClient, String name) {
         BlobClient blobClient = mock(BlobClient.class);
         when(containerClient.getBlobClient(name)).thenReturn(blobClient);

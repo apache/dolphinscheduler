@@ -120,7 +120,9 @@ public class AbsStorageOperator extends AbstractStorageOperator implements Close
 
     @Override
     public boolean exists(String fullName) {
-        return isObjectExists(fullName);
+        // A directory is the marker blob "<path>/" in a flat namespace and the blob "<path>" in a hierarchical one
+        String absKey = transformAbsolutePathToAbsKey(fullName);
+        return isObjectExists(absKey) || (!absKey.equals(fullName) && isObjectExists(fullName));
     }
 
     protected boolean isObjectExists(String objectName) {
