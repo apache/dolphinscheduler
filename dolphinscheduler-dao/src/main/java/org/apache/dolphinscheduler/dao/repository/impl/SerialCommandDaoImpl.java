@@ -23,6 +23,7 @@ import org.apache.dolphinscheduler.dao.model.SerialCommandDto;
 import org.apache.dolphinscheduler.dao.repository.BaseDao;
 import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,5 +47,17 @@ public class SerialCommandDaoImpl extends BaseDao<SerialCommand, SerialCommandMa
     @Override
     public int deleteByWorkflowInstanceId(Integer workflowInstanceId) {
         return mybatisMapper.deleteByWorkflowInstanceId(workflowInstanceId);
+    }
+    @Override
+    public boolean launchSerialCommand(Integer id, Date updateTime) {
+        return mybatisMapper.launchSerialCommand(id,
+                SerialCommandDto.State.WAITING.getValue(),
+                SerialCommandDto.State.LAUNCHED.getValue(),
+                updateTime) > 0;
+    }
+
+    @Override
+    public boolean deleteByIdAndState(Integer id, SerialCommandDto.State state) {
+        return mybatisMapper.deleteByIdAndState(id, state.getValue()) > 0;
     }
 }
