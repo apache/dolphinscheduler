@@ -74,6 +74,8 @@
 
 * Master、Worker 和 Alert Server 的注册节点改为只保存稳定的进程身份。Master 的两个 Cluster 各自使用单线程同步拉取对应角色的心跳，每轮结束后等待配置间隔再执行下一轮；注册信息与心跳元数据分别维护。拉取失败、返回为空或进程身份不匹配时，保留最后成功获取的元数据及其 `heartbeatReceivedTime`，不发布更新事件。Worker 继续按缓存状态参与调度，直到后续有效心跳更新状态或注册节点被移除；尚未成功获取过心跳的 Worker 不参与分配。RPC 拉取失败不会移除注册信息或触发 failover；API 在每次请求时直接查询 Master/Worker/Alert 心跳，不维护心跳缓存。Master、Worker、Alert 和 API 必须协调升级，不支持新旧版本混合滚动升级。Master 的服务间心跳数据拉取间隔通过 `master.heartbeat-fetch-interval`（默认 `3s`）配置；`max-heartbeat-interval` 改为控制 failover 标记检查间隔，不再控制心跳数据写入。节点心跳查询失败时，监控响应的 `heartBeatInfo` 和 `lastHeartbeatTime` 可能为 null，新增 `metadataStale` 表示心跳数据不可用。([#18768](https://github.com/apache/dolphinscheduler/issues/18768))
 
+* API 心跳 RPC 查询共享 8 个线程和最多 64 个任务的队列。每次查询最多保留 8 个待完成的节点请求，在注册发现完成后共享 5 秒的总超时，排队时间也计入其中。被拒绝、过期和未完成的节点保留注册信息，心跳数据为 null，并标记 `metadataStale=true`；任意 Worker 不可用时，Worker Group 查询明确报错。查询结束时移除尚未执行的任务。运行中的 RPC 继续受原有传输超时控制，晚到结果不会修改已返回的响应。
+
 * Alert 注册信息和心跳身份统一使用 `alert.port` 配置的 RPC 端口。显式配置 `alert.alert-server-address` 时，其端口必须与 `alert.port` 一致，否则启动校验失败。
 
 * 查询配置型 Worker Group 时，只要任一已注册 Worker 的心跳不可用，接口就明确返回查询失败并列出受影响的 Worker 地址；分组选项与分页接口均遵循这一行为。监控查询仍返回已注册节点，并明确标记不可用的心跳数据。

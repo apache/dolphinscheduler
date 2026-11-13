@@ -44,11 +44,18 @@ import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.FutureTask;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PreDestroy;
 
@@ -63,14 +70,19 @@ import com.google.common.collect.Lists;
 @Slf4j
 public class MonitorServiceImpl extends BaseServiceImpl implements MonitorService, AutoCloseable {
 
+    private static final int HEARTBEAT_QUERY_CONCURRENCY = 8;
+    private static final long HEARTBEAT_QUERY_TIMEOUT_NANOS = TimeUnit.SECONDS.toNanos(5);
+
     @Autowired
     private DatabaseMonitor databaseMonitor;
 
     @Autowired
     private RegistryClient registryClient;
 
-    private final ExecutorService heartbeatQueryExecutor = Executors.newFixedThreadPool(8,
-            ThreadUtils.newDaemonThreadFactory("ApiHeartbeatQuery-%d"));
+    private final ThreadPoolExecutor heartbeatQueryExecutor = new ThreadPoolExecutor(
+            HEARTBEAT_QUERY_CONCURRENCY, HEARTBEAT_QUERY_CONCURRENCY, 0L, TimeUnit.MILLISECONDS,
+            new ArrayBlockingQueue<>(64), ThreadUtils.newDaemonThreadFactory("ApiHeartbeatQuery-%d"),
+            new ThreadPoolExecutor.AbortPolicy());
 
     /**
      * query database state
@@ -90,32 +102,78 @@ public class MonitorServiceImpl extends BaseServiceImpl implements MonitorServic
                 && nodeType != RegistryNodeType.ALERT_SERVER) {
             return servers;
         }
-        List<CompletableFuture<Server>> queries = servers.stream()
-                .map(server -> CompletableFuture.supplyAsync(() -> queryHeartbeat(nodeType, server),
-                        heartbeatQueryExecutor))
-                .collect(Collectors.toList());
-        return queries.stream().map(CompletableFuture::join).collect(Collectors.toList());
+        long deadline = System.nanoTime() + HEARTBEAT_QUERY_TIMEOUT_NANOS;
+        servers.forEach(server -> {
+            server.setHeartBeatInfo(null);
+            server.setLastHeartbeatTime(null);
+            server.setMetadataStale(true);
+        });
+        Iterator<Server> pending = servers.iterator();
+        Map<FutureTask<BaseHeartBeat>, Server> queries = new HashMap<>();
+        BlockingQueue<FutureTask<BaseHeartBeat>> completed = new ArrayBlockingQueue<>(HEARTBEAT_QUERY_CONCURRENCY);
+        try {
+            while (pending.hasNext() || !queries.isEmpty()) {
+                while (pending.hasNext() && queries.size() < HEARTBEAT_QUERY_CONCURRENCY
+                        && deadline - System.nanoTime() > 0) {
+                    Server server = pending.next();
+                    FutureTask<BaseHeartBeat> query = new FutureTask<BaseHeartBeat>(
+                            () -> deadline - System.nanoTime() <= 0 ? null : queryHeartbeat(nodeType, server)) {
+
+                        @Override
+                        protected void done() {
+                            completed.add(this);
+                        }
+                    };
+                    queries.put(query, server);
+                    try {
+                        heartbeatQueryExecutor.execute(query);
+                    } catch (RejectedExecutionException ex) {
+                        query.cancel(false);
+                        log.debug("Heartbeat query capacity exceeded for {}:{}", server.getHost(), server.getPort());
+                    }
+                }
+                if (queries.isEmpty()) {
+                    break;
+                }
+                FutureTask<BaseHeartBeat> query = completed.poll(Math.max(0, deadline - System.nanoTime()),
+                        TimeUnit.NANOSECONDS);
+                if (query == null) {
+                    break;
+                }
+                Server server = queries.remove(query);
+                try {
+                    BaseHeartBeat heartbeat = query.get();
+                    if (heartbeat != null) {
+                        server.setHeartBeatInfo(JSONUtils.toJsonString(heartbeat));
+                        server.setLastHeartbeatTime(new Date(heartbeat.getReportTime()));
+                        server.setMetadataStale(false);
+                    }
+                } catch (CancellationException | ExecutionException ex) {
+                    log.debug("Failed to query {} heartbeat from {}:{}", nodeType, server.getHost(), server.getPort(),
+                            ex);
+                }
+            }
+        } catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        } finally {
+            for (FutureTask<BaseHeartBeat> query : queries.keySet()) {
+                // Running RPCs retain their transport timeout; only the request thread updates response data.
+                query.cancel(false);
+                heartbeatQueryExecutor.remove(query);
+            }
+        }
+        return servers;
     }
 
-    private Server queryHeartbeat(RegistryNodeType type, Server server) {
-        server.setHeartBeatInfo(null);
-        server.setLastHeartbeatTime(null);
-        server.setMetadataStale(true);
+    private BaseHeartBeat queryHeartbeat(RegistryNodeType type, Server server) {
         String address = server.getHost() + ":" + server.getPort();
-        try {
-            BaseHeartBeat heartbeat = fetchHeartbeat(type, address);
-            if (heartbeat == null || heartbeat.getProcessId() != server.getId()
-                    || heartbeat.getStartupTime() != server.getCreateTime().getTime()
-                    || !address.equals(heartbeat.getHost() + ":" + heartbeat.getPort())) {
-                throw new IllegalStateException("Heartbeat does not match the registered instance");
-            }
-            server.setHeartBeatInfo(JSONUtils.toJsonString(heartbeat));
-            server.setLastHeartbeatTime(new Date(heartbeat.getReportTime()));
-            server.setMetadataStale(false);
-        } catch (Exception ex) {
-            log.debug("Failed to query {} heartbeat from {}", type, address, ex);
+        BaseHeartBeat heartbeat = fetchHeartbeat(type, address);
+        if (heartbeat == null || heartbeat.getProcessId() != server.getId()
+                || heartbeat.getStartupTime() != server.getCreateTime().getTime()
+                || !address.equals(heartbeat.getHost() + ":" + heartbeat.getPort())) {
+            throw new IllegalStateException("Heartbeat does not match the registered instance");
         }
-        return server;
+        return heartbeat;
     }
 
     BaseHeartBeat fetchHeartbeat(RegistryNodeType type, String address) {
