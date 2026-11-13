@@ -14,11 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { queryResourceList } from '@/service/modules/resources'
-import { useTaskNodeStore } from '@/store/project/task-node'
-import utils from '@/utils'
 import {
   useCustomParams,
   useDeployMode,
@@ -32,25 +29,10 @@ import {
   useResources,
   useYarnQueue
 } from '.'
-import type { IJsonItem, IResource } from '../types'
+import type { IJsonItem, IJsonItemParams } from '../types'
 
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
-  const taskStore = useTaskNodeStore()
-  const resourcesOptions = ref<IResource[]>([])
-  const getResources = async () => {
-    if (taskStore.resources.length) {
-      resourcesOptions.value = taskStore.resources
-      return
-    }
-    const res = await queryResourceList({ type: 'FILE', fullName: '' })
-    utils.removeUselessChildren(res)
-    resourcesOptions.value = res || []
-    taskStore.updateResource(res)
-  }
-  onMounted(() => {
-    getResources()
-  })
   const mainClassSpan = computed(() =>
     model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
   )
@@ -72,6 +54,12 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const resourcesLimit = computed(() =>
     model.programType === 'SQL' && model.sqlExecutionType === 'FILE' ? 1 : -1
   )
+
+  const resourcesField = useResources(
+    24,
+    resourcesRequired,
+    resourcesLimit
+  ) as IJsonItemParams
 
   const sqlExecutionTypeSpan = computed(() =>
     model.programType === 'SQL' ? 12 : 0
@@ -212,7 +200,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       field: 'pyFiles',
       span: pyFilesSpan,
       name: t('project.node.py_files'),
-      options: resourcesOptions,
+      options: resourcesField.options,
       props: {
         multiple: true,
         checkable: true,
@@ -231,7 +219,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       field: 'archives',
       span: 24,
       name: t('project.node.archives'),
-      options: resourcesOptions,
+      options: resourcesField.options,
       props: {
         multiple: true,
         checkable: true,
@@ -267,7 +255,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       field: 'keytab',
       span: 24,
       name: t('project.node.keytab'),
-      options: resourcesOptions,
+      options: resourcesField.options,
       props: {
         checkable: true,
         cascade: true,
@@ -287,7 +275,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         }
       }
     },
-    useResources(24, resourcesRequired, resourcesLimit),
+    resourcesField,
     ...useCustomParams({
       model,
       field: 'localParams',
