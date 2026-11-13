@@ -96,6 +96,9 @@ const worker = defineComponent({
     } = this
 
     const renderNodeServerStatusTag = (item: WorkerNode) => {
+      if (item.metadataStale || !item.heartBeatInfo) {
+        return <NTag type='warning'>{t('monitor.metadata_unavailable')}</NTag>
+      }
       const serverStatus = JSON.parse(item.heartBeatInfo)?.serverStatus
 
       if (!serverStatus) return ''
@@ -153,7 +156,7 @@ const worker = defineComponent({
                         item ? item.createTime : ' - '
                       }`}</span>
                       <span>{`${t('monitor.worker.last_heartbeat_time')}: ${
-                        item ? item.lastHeartbeatTime : ' - '
+                        item.lastHeartbeatTime || ' - '
                       }`}</span>
                     </NSpace>
                   </NSpace>
@@ -162,7 +165,7 @@ const worker = defineComponent({
                   <NGi>
                     <Card title={t('monitor.worker.cpu_usage')}>
                       <div class={styles.card}>
-                        {item && (
+                        {!item.metadataStale && item.heartBeatInfo && (
                           <Gauge
                             data={(
                               JSON.parse(item.heartBeatInfo).cpuUsage * 100
@@ -175,7 +178,7 @@ const worker = defineComponent({
                   <NGi>
                     <Card title={t('monitor.worker.memory_usage')}>
                       <div class={styles.card}>
-                        {item && (
+                        {!item.metadataStale && item.heartBeatInfo && (
                           <Gauge
                             data={(
                               JSON.parse(item.heartBeatInfo).memoryUsage * 100
@@ -188,7 +191,7 @@ const worker = defineComponent({
                   <NGi>
                     <Card title={t('monitor.worker.disk_usage')}>
                       <div class={[styles.card]}>
-                        {item && (
+                        {!item.metadataStale && item.heartBeatInfo && (
                           <Gauge
                             data={(
                               JSON.parse(item.heartBeatInfo).diskUsage * 100
@@ -201,7 +204,7 @@ const worker = defineComponent({
                   <NGi>
                     <Card title={t('monitor.worker.thread_pool_usage')}>
                       <div class={[styles.card]}>
-                        {item && (
+                        {!item.metadataStale && item.heartBeatInfo && (
                           <Gauge
                             data={(
                               JSON.parse(item.heartBeatInfo).threadPoolUsage *

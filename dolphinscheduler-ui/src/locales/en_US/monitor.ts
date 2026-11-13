@@ -16,6 +16,7 @@
  */
 
 export default {
+  metadata_unavailable: 'Metadata unavailable or stale',
   master: {
     cpu_usage: 'CPU Usage',
     memory_usage: 'Memory Usage',
