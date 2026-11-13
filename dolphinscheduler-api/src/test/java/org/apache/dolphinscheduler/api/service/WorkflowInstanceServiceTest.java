@@ -609,23 +609,21 @@ public class WorkflowInstanceServiceTest {
         // task not sub process
         TaskInstance taskInstance = getTaskInstance();
         taskInstance.setTaskType("HTTP");
+        taskInstance.setProjectCode(projectCode);
         taskInstance.setWorkflowInstanceId(1);
         when(taskInstanceDao.queryById(1)).thenReturn(taskInstance);
-        TaskDefinition taskDefinition = new TaskDefinition();
-        taskDefinition.setProjectCode(projectCode);
-        when(taskDefinitionDao.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
         assertThrowsServiceException(Status.TASK_INSTANCE_NOT_SUB_WORKFLOW_INSTANCE,
                 () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
 
-        taskDefinition.setProjectCode(0L);
+        taskInstance.setProjectCode(0L);
         assertThrowsServiceException(Status.TASK_INSTANCE_NOT_EXISTS,
                 () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1));
 
-        taskDefinition.setProjectCode(projectCode);
-        when(taskDefinitionDao.queryByCode(taskInstance.getTaskCode())).thenReturn(taskDefinition);
+        taskInstance.setProjectCode(projectCode);
         // sub process not exist
         TaskInstance subTask = getTaskInstance();
         subTask.setTaskType("SUB_WORKFLOW");
+        subTask.setProjectCode(projectCode);
         subTask.setWorkflowInstanceId(1);
         when(taskInstanceDao.queryById(subTask.getId())).thenReturn(subTask);
         when(processService.findSubWorkflowInstance(subTask.getWorkflowInstanceId(), subTask.getId())).thenReturn(null);
@@ -636,10 +634,143 @@ public class WorkflowInstanceServiceTest {
         WorkflowInstance workflowInstance = getProcessInstance();
         when(processService.findSubWorkflowInstance(taskInstance.getWorkflowInstanceId(), taskInstance.getId()))
                 .thenReturn(workflowInstance);
-        Map<String, Integer> subprocessExistRes =
+        Map<String, Object> subprocessExistRes =
                 workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, 1);
         Assertions.assertEquals(workflowInstance.getId(),
                 subprocessExistRes.get(Constants.SUBWORKFLOW_INSTANCE_ID));
+    }
+
+    @Test
+    void subWorkflowNavigationUsesPersistedProjectsAfterDefinitionMoves() {
+        User loginUser = getAdminUser();
+        TaskInstance task = getTaskInstance();
+        task.setProjectCode(1L);
+        task.setTaskType("SUB_WORKFLOW");
+        task.setWorkflowInstanceId(1);
+        WorkflowInstance child = getProcessInstance();
+        child.setProjectCode(4294967296L);
+        when(taskInstanceDao.queryById(task.getId())).thenReturn(task);
+        when(processService.findSubWorkflowInstance(task.getWorkflowInstanceId(), task.getId())).thenReturn(child);
+        TaskDefinition movedDefinition = new TaskDefinition();
+        movedDefinition.setProjectCode(2L);
+        when(taskDefinitionDao.queryByCode(task.getTaskCode())).thenReturn(movedDefinition);
+
+        Map<String, ?> response = workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, 1L, task.getId());
+
+        Assertions.assertEquals(child.getId(), response.get(Constants.SUBWORKFLOW_INSTANCE_ID));
+        Assertions.assertEquals(child.getProjectCode(), response.get("projectCode"));
+        verify(projectService).checkProjectPermission(loginUser, child.getProjectCode(), ProjectPermission.VIEW);
+        verify(taskDefinitionDao, never()).queryByCode(Mockito.anyLong());
+    }
+
+    @Test
+    void subWorkflowNavigationRejectsTaskOutsideRequestedProjectWithoutCurrentDefinition() {
+        User loginUser = getAdminUser();
+        TaskInstance task = getTaskInstance();
+        task.setProjectCode(2L);
+        task.setTaskType("SUB_WORKFLOW");
+        task.setWorkflowInstanceId(1);
+        when(taskInstanceDao.queryById(task.getId())).thenReturn(task);
+
+        assertThrowsServiceException(Status.TASK_INSTANCE_NOT_EXISTS,
+                () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, 1L, task.getId()));
+
+        verify(processService, never()).findSubWorkflowInstance(Mockito.anyInt(), Mockito.anyInt());
+    }
+
+    @Test
+    void subWorkflowNavigationRequiresViewOnChildProject() {
+        User loginUser = getAdminUser();
+        TaskInstance task = getTaskInstance();
+        task.setProjectCode(1L);
+        task.setTaskType("SUB_WORKFLOW");
+        task.setWorkflowInstanceId(1);
+        WorkflowInstance child = getProcessInstance();
+        child.setProjectCode(2L);
+        when(taskInstanceDao.queryById(task.getId())).thenReturn(task);
+        when(processService.findSubWorkflowInstance(task.getWorkflowInstanceId(), task.getId())).thenReturn(child);
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                .checkProjectPermission(loginUser, 2L, ProjectPermission.VIEW);
+
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, 1L, task.getId()));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"permission", "resource", "historical-resource"})
+    void synchronizingHistoricalInstanceRequiresCurrentDefinitionProjectAuthorization(String deniedCheck) {
+        User loginUser = getAdminUser();
+        WorkflowInstance instance = getProcessInstance();
+        instance.setProjectCode(1L);
+        instance.setState(WorkflowExecutionStatus.SUCCESS);
+        WorkflowDefinition definition = getProcessDefinition();
+        definition.setProjectCode(2L);
+        when(processService.findWorkflowInstanceDetailById(instance.getId())).thenReturn(Optional.of(instance));
+        when(workflowDefinitionDao.queryByCode(instance.getWorkflowDefinitionCode()))
+                .thenReturn(Optional.of(definition));
+        when(processService.saveWorkflowDefine(eq(loginUser), any(), eq(true), eq(false))).thenReturn(2);
+        when(workflowInstanceDao.updateById(instance)).thenReturn(true);
+        if ("permission".equals(deniedCheck)) {
+            doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION)).when(projectService)
+                    .checkProjectPermission(loginUser, 2L, ProjectPermission.DEVELOP);
+        } else {
+            doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
+                    .when(taskResourcePermissionChecker)
+                    .checkPermission(eq("resource".equals(deniedCheck) ? 2L : 1L), Mockito.anyList());
+        }
+
+        try (MockedStatic<TaskPluginManager> plugins = Mockito.mockStatic(TaskPluginManager.class)) {
+            plugins.when(() -> TaskPluginManager.checkTaskParameters(any(), any())).thenReturn(true);
+            assertThrowsServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION,
+                    () -> workflowInstanceService.updateWorkflowInstance(loginUser, 1L, instance.getId(),
+                            taskRelationJson, taskDefinitionJson, null, true, "", "", 0));
+        }
+
+        verify(processService, never()).saveTaskDefine(any(), Mockito.anyLong(), Mockito.anyList(), any());
+        verify(processService, never()).saveWorkflowDefine(any(), any(), any(), any());
+        verify(workflowInstanceDao, never()).updateById(any());
+        Assertions.assertEquals(2L, definition.getProjectCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void editingHistoricalInstancePreservesDefinitionAndInstanceProjectBoundaries(boolean syncDefine) {
+        User loginUser = getAdminUser();
+        WorkflowInstance instance = getProcessInstance();
+        instance.setProjectCode(1L);
+        instance.setState(WorkflowExecutionStatus.SUCCESS);
+        WorkflowDefinition definition = getProcessDefinition();
+        definition.setProjectCode(2L);
+        when(processService.findWorkflowInstanceDetailById(instance.getId())).thenReturn(Optional.of(instance));
+        when(workflowDefinitionDao.queryByCode(instance.getWorkflowDefinitionCode()))
+                .thenReturn(Optional.of(definition));
+        when(processService.saveWorkflowDefine(eq(loginUser), any(), eq(syncDefine), eq(false))).thenReturn(2);
+        when(workflowInstanceDao.updateById(instance)).thenReturn(true);
+
+        try (MockedStatic<TaskPluginManager> plugins = Mockito.mockStatic(TaskPluginManager.class)) {
+            plugins.when(() -> TaskPluginManager.checkTaskParameters(any(), any())).thenReturn(true);
+            workflowInstanceService.updateWorkflowInstance(loginUser, 1L, instance.getId(),
+                    taskRelationJson, taskDefinitionJson, null, syncDefine, "", "", 0);
+        }
+
+        long savedProject = syncDefine ? 2L : 1L;
+        Assertions.assertEquals(savedProject, definition.getProjectCode());
+        Assertions.assertEquals(1L, instance.getProjectCode());
+        verify(processService).saveTaskDefine(eq(loginUser), eq(savedProject), Mockito.anyList(), eq(syncDefine));
+        verify(processService).saveTaskRelation(eq(loginUser), eq(savedProject), eq(definition.getCode()), eq(2),
+                Mockito.anyList(), Mockito.anyList(), eq(syncDefine));
+        verify(taskResourcePermissionChecker).checkPermission(eq(1L), Mockito.anyList());
+        if (syncDefine) {
+            verify(projectService).checkProjectPermission(loginUser, 2L, ProjectPermission.DEVELOP);
+            verify(taskResourcePermissionChecker).checkPermission(eq(2L), Mockito.anyList());
+            verify(workflowDefinitionService).saveWorkflowLineage(eq(2L), eq(definition.getCode()), eq(2),
+                    Mockito.anyList());
+        } else {
+            verify(projectService, never()).checkProjectPermission(loginUser, 2L, ProjectPermission.DEVELOP);
+            verify(taskResourcePermissionChecker, never()).checkPermission(eq(2L), Mockito.anyList());
+            verify(workflowDefinitionService, never()).saveWorkflowLineage(Mockito.anyLong(), Mockito.anyLong(),
+                    Mockito.anyInt(), Mockito.anyList());
+        }
     }
 
     @Test

@@ -118,6 +118,8 @@ The following rules apply to project authorization introduced in 3.5.0. Authoriz
 
 Permissions are independent. For example, `DEVELOP` does not include `EXECUTE`. Granting an operation permission does not automatically add `VIEW`; using the project through the UI generally also requires an explicit `VIEW` grant.
 
+Taking a workflow definition offline also requires `EXECUTE` when it disables an online schedule. Deleting a workflow definition also requires `EXECUTE` when it deletes an associated offline schedule. When no schedule is changed, these definition operations require only `DEVELOP`.
+
 These four capabilities are operation permissions assigned directly to project members, not separate roles. This change does not introduce role entities or custom role management.
 
 A project creator receives all four explicit permissions at project creation, and these can subsequently be revoked. Ordinary users cannot bypass project operation checks through creator status, legacy authorization records or resource ownership. **Project metadata updates and project deletion are separate lifecycle operations restricted to system administrators or the recorded project creator**, subject to business constraints such as whether the project can be deleted. Neither `DEVELOP` nor `MANAGE_MEMBERS` grants these operations. Revoking a creator's member permissions does not change the recorded creator, and editing project metadata does not transfer ownership.
@@ -157,6 +159,8 @@ Execution settings include the worker group, tenant, and selected environment an
 **The executing user does not need `DEVELOP` or personal grants for the workflow's resources of the seven types above, including datasources. Their project `EXECUTE` permission cannot replace the project's resource grants.** For example, an administrator grants datasource R to project P. Developer A, with P's `VIEW` and `DEVELOP`, can save a workflow using R. Operator B, with P's `VIEW` and `EXECUTE`, can manually execute it without a personal grant for R. This does not allow B to edit the workflow or modify R.
 
 ### Cross-project operations and subworkflows
+
+Editing a historical instance requires `DEVELOP` and resource grants in the instance's project. If `syncDefine=true` also updates a current definition that has moved to another project, the user additionally needs `DEVELOP` and the referenced resource grants in that project. Synchronization preserves the current definition's project; the historical instance remains in its original project. Instance-only editing does not require permission on the current definition's project.
 
 Definition and instance checks use their actual owning project; resource-use checks use the grants of the project performing the operation. Permission on another project in the request path cannot replace these checks. Batch workflow-task queries only return workflows in projects where an ordinary user has `VIEW`. Legacy association records do not restore visibility. Cross-project parent/child instance detail queries also require `VIEW` on the corresponding projects.
 

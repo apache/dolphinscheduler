@@ -935,6 +935,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         Schedule scheduleObj = scheduleDao.queryByWorkflowDefinitionCode(code);
         if (scheduleObj != null) {
             if (scheduleObj.getReleaseState() == ReleaseState.OFFLINE) {
+                projectService.checkProjectPermission(loginUser, project, ProjectPermission.EXECUTE);
                 boolean delete = scheduleDao.deleteById(scheduleObj.getId());
                 if (!delete) {
                     throw new ServiceException(Status.DELETE_SCHEDULE_BY_ID_ERROR);
@@ -1899,10 +1900,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             return;
         }
 
+        schedulerService.offlineSchedulerByWorkflowCode(loginUser, projectCode, workflowDefinitionCode);
+
         workflowDefinition.setReleaseState(ReleaseState.OFFLINE);
         workflowDefinitionDao.updateById(workflowDefinition);
-
-        schedulerService.offlineSchedulerByWorkflowCode(workflowDefinitionCode);
     }
 
     /**

@@ -740,7 +740,49 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
                 .deleteWorkflowDefinitionByCode(user, workflowDefinition.getCode()));
 
         Mockito.verify(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
+        Mockito.verify(projectService, Mockito.never()).checkProjectPermission(user, project,
+                ProjectPermission.EXECUTE);
         Mockito.verify(workflowDefinitionDao).deleteByWorkflowDefinitionCode(workflowDefinition.getCode());
+    }
+
+    @Test
+    public void offliningDefinitionRequiresScheduleAuthorizationBeforeChangingDefinition() {
+        WorkflowDefinition definition = getWorkflowDefinition();
+        definition.setReleaseState(ReleaseState.ONLINE);
+        when(workflowDefinitionDao.queryByCode(definition.getCode())).thenReturn(Optional.of(definition));
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(schedulerService)
+                .offlineSchedulerByWorkflowCode(user, projectCode, definition.getCode());
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.offlineWorkflowDefinition(user, projectCode, definition.getCode()));
+
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), error.getCode());
+        Assertions.assertEquals(ReleaseState.ONLINE, definition.getReleaseState());
+        verify(workflowDefinitionDao, Mockito.never()).updateById(Mockito.any());
+    }
+
+    @Test
+    public void deletingDefinitionRequiresExecuteBeforeDeletingItsOfflineSchedule() {
+        WorkflowDefinition definition = getWorkflowDefinition();
+        definition.setReleaseState(ReleaseState.OFFLINE);
+        Project project = getProject(projectCode);
+        Schedule schedule = getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        when(workflowDefinitionDao.queryByCode(definition.getCode())).thenReturn(Optional.of(definition));
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        when(workflowLineageService.taskDependentMsg(user, projectCode, definition.getCode(), 0))
+                .thenReturn(Optional.empty());
+        when(scheduleDao.queryByWorkflowDefinitionCode(definition.getCode())).thenReturn(schedule);
+        doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                .checkProjectPermission(user, project, ProjectPermission.EXECUTE);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.deleteWorkflowDefinitionByCode(user, definition.getCode()));
+
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), error.getCode());
+        verify(scheduleDao, Mockito.never()).deleteById(Mockito.anyInt());
+        verify(workflowDefinitionDao, Mockito.never()).deleteByWorkflowDefinitionCode(Mockito.anyLong());
     }
 
     @Test
@@ -1420,7 +1462,8 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
         workflowDefinitionService.switchWorkflowDefinitionVersion(user, projectCode, processDefinitionCode, 1);
 
-        verify(schedulerService, Mockito.never()).offlineSchedulerByWorkflowCode(processDefinitionCode);
+        verify(schedulerService, Mockito.never()).offlineSchedulerByWorkflowCode(user, projectCode,
+                processDefinitionCode);
     }
 
     @Test

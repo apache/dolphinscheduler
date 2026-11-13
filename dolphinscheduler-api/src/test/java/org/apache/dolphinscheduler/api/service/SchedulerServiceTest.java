@@ -744,4 +744,72 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
         Mockito.verifyNoInteractions(taskResourcePermissionChecker, taskDefinitionLogDao);
     }
 
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void cascadingScheduleOfflineDoesNotRequireExecuteWhenNothingChanges(boolean scheduleExists) {
+        if (scheduleExists) {
+            Schedule schedule = getSchedule();
+            schedule.setReleaseState(ReleaseState.OFFLINE);
+            Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(schedule);
+        }
+
+        schedulerService.offlineSchedulerByWorkflowCode(user, projectCode, processDefinitionCode);
+
+        Mockito.verifyNoInteractions(projectService, schedulerApi);
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any());
+    }
+
+    @Test
+    void cascadingScheduleOfflineRequiresExecuteBeforeChangingOnlineSchedule() {
+        Schedule schedule = getSchedule();
+        schedule.setReleaseState(ReleaseState.ONLINE);
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(schedule);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                .checkProjectPermission(user, projectCode, ProjectPermission.EXECUTE);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.offlineSchedulerByWorkflowCode(user, projectCode, processDefinitionCode));
+
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PERM.getCode(), error.getCode());
+        Assertions.assertEquals(ReleaseState.ONLINE, schedule.getReleaseState());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any());
+        Mockito.verifyNoInteractions(schedulerApi);
+    }
+
+    @Test
+    void cascadingScheduleOfflineWithExecuteRemovesTriggerWithoutCheckingResourceGrants() {
+        Schedule schedule = getSchedule();
+        schedule.setReleaseState(ReleaseState.ONLINE);
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode))
+                .thenReturn(Optional.of(getProcessDefinition()));
+        Project project = getProject();
+        Mockito.when(projectDao.queryByCode(projectCode)).thenReturn(project);
+
+        schedulerService.offlineSchedulerByWorkflowCode(user, projectCode, processDefinitionCode);
+
+        Assertions.assertEquals(ReleaseState.OFFLINE, schedule.getReleaseState());
+        Mockito.verify(projectService).checkProjectPermission(user, projectCode, ProjectPermission.EXECUTE);
+        Mockito.verify(scheduleDao).updateById(schedule);
+        Mockito.verify(schedulerApi).deleteScheduleTask(project.getId(), schedule.getId());
+        Mockito.verifyNoInteractions(taskResourcePermissionChecker, taskDefinitionLogDao);
+    }
+
+    @Test
+    void cascadingScheduleOfflineRejectsScheduleFromAnotherProject() {
+        Schedule schedule = getSchedule();
+        schedule.setReleaseState(ReleaseState.ONLINE);
+        WorkflowDefinition definition = getProcessDefinition();
+        definition.setProjectCode(projectCode + 1);
+        Mockito.when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.offlineSchedulerByWorkflowCode(user, projectCode, processDefinitionCode));
+
+        Assertions.assertEquals(Status.SCHEDULE_NOT_EXISTS.getCode(), error.getCode());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any());
+        Mockito.verifyNoInteractions(schedulerApi);
+    }
+
 }

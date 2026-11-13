@@ -511,8 +511,13 @@ public class SchedulerServiceImpl extends BaseServiceImpl implements SchedulerSe
 
     @Transactional
     @Override
-    public void offlineSchedulerByWorkflowCode(Long workflowDefinitionCode) {
+    public void offlineSchedulerByWorkflowCode(User loginUser, Long projectCode, Long workflowDefinitionCode) {
         Schedule schedule = scheduleDao.queryByWorkflowDefinitionCode(workflowDefinitionCode);
+        if (schedule == null || ReleaseState.OFFLINE.equals(schedule.getReleaseState())) {
+            return;
+        }
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.EXECUTE);
+        checkScheduleBelongsToProject(schedule, projectCode);
         doOfflineScheduler(schedule);
     }
 
