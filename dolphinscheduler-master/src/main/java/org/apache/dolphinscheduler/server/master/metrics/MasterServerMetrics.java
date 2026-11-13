@@ -43,9 +43,9 @@ public class MasterServerMetrics {
                     .description("Master server consume command count")
                     .register(Metrics.globalRegistry);
 
-    private final Counter masterHeartBeatCounter =
-            Counter.builder("ds.master.heartbeat.count")
-                    .description("master heartbeat count")
+    private final Counter masterHeartbeatRequestCounter =
+            Counter.builder("ds.master.heartbeat.request.count")
+                    .description("master heartbeat data request count")
                     .register(Metrics.globalRegistry);
 
     public void registerMasterMemoryAvailableGauge(Supplier<Number> supplier) {
@@ -80,7 +80,7 @@ public class MasterServerMetrics {
         masterConsumeCommandCounter.increment(commandCount);
     }
 
-    public void incMasterHeartbeatCount() {
-        masterHeartBeatCounter.increment();
+    public void incMasterHeartbeatRequestCount() {
+        masterHeartbeatRequestCounter.increment();
     }
 }

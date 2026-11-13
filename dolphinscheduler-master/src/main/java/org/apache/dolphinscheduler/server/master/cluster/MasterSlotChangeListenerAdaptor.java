@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.server.master.cluster;
 
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
+
 import java.util.List;
 
 public class MasterSlotChangeListenerAdaptor
@@ -40,12 +42,12 @@ public class MasterSlotChangeListenerAdaptor
     }
 
     @Override
-    public void onServerAdded(MasterServerMetadata server) {
+    public void onServerAdded(ServerIdentity server) {
         onMasterSlotChanged(masterClusters.getNormalServers());
     }
 
     @Override
-    public void onServerRemove(MasterServerMetadata server) {
+    public void onServerRemove(ServerIdentity server) {
         onMasterSlotChanged(masterClusters.getNormalServers());
     }
 

@@ -67,10 +67,14 @@ class MasterSlotManagerTest {
                 .address("127.0.0.4:5679")
                 .build();
         this.masterClusters.registerListener(new MasterSlotChangeListenerAdaptor(masterSlotManager, masterClusters));
-        masterClusters.onServerAdded(master1);
-        masterClusters.onServerAdded(master2);
-        masterClusters.onServerAdded(master3);
-        masterClusters.onServerAdded(master4);
+        masterClusters.onServerAdded(master1.getServerIdentity());
+        masterClusters.onServerUpdate(master1);
+        masterClusters.onServerAdded(master2.getServerIdentity());
+        masterClusters.onServerUpdate(master2);
+        masterClusters.onServerAdded(master3.getServerIdentity());
+        masterClusters.onServerUpdate(master3);
+        masterClusters.onServerAdded(master4.getServerIdentity());
+        masterClusters.onServerUpdate(master4);
     }
 
     @Test
@@ -102,8 +106,8 @@ class MasterSlotManagerTest {
                 .serverStatus(ServerStatus.BUSY)
                 .address("127.0.0.4:5679")
                 .build();
-        masterClusters.onServerRemove(master2);
-        masterClusters.onServerRemove(master3);
+        masterClusters.onServerRemove(master2.getServerIdentity());
+        masterClusters.onServerRemove(master3.getServerIdentity());
         // After doReBalance, the total master slots should be 2
         assertThat(masterSlotManager.getTotalMasterSlots()).isEqualTo(2);
     }

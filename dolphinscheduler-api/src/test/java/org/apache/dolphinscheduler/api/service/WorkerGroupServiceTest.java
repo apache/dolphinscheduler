@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.ResourcePermissionCheckService;
 import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
@@ -33,6 +34,9 @@ import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
+import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
@@ -98,6 +102,9 @@ public class WorkerGroupServiceTest {
     private RegistryClient registryClient;
 
     @Mock
+    private MonitorService monitorService;
+
+    @Mock
     private ResourcePermissionCheckService resourcePermissionCheckService;
 
     @Mock
@@ -110,6 +117,57 @@ public class WorkerGroupServiceTest {
     private ScheduleDao scheduleDao;
 
     private final String GROUP_NAME = "testWorkerGroup";
+
+    @Test
+    void testConfiguredGroupsUseCurrentWorkerMetadata() {
+        Server available = new Server();
+        available.setHeartBeatInfo(JSONUtils.toJsonString(WorkerHeartBeat.builder().host("localhost").port(1234)
+                .startupTime(1).reportTime(100).workerGroup("analytics").build()));
+        when(monitorService.listServer(RegistryNodeType.WORKER))
+                .thenReturn(java.util.Collections.singletonList(available));
+        Assertions.assertEquals(1, workerGroupService.getConfigWorkerGroupPageDetail().size());
+        Assertions.assertEquals("analytics", workerGroupService.getConfigWorkerGroupPageDetail().get(0).getName());
+    }
+
+    @Test
+    void testConfiguredGroupsFailWithAllUnavailableAddresses() {
+        Server pending = new Server();
+        pending.setHost("pending");
+        pending.setPort(1234);
+        Server another = new Server();
+        another.setHost("another");
+        another.setPort(1235);
+        Server available = new Server();
+        available.setHeartBeatInfo(JSONUtils.toJsonString(WorkerHeartBeat.builder().host("localhost").port(1234)
+                .startupTime(1).reportTime(100).workerGroup("analytics").build()));
+        when(monitorService.listServer(RegistryNodeType.WORKER))
+                .thenReturn(java.util.Arrays.asList(pending, available, another));
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                workerGroupService::getConfigWorkerGroupPageDetail);
+        Assertions.assertEquals(Status.QUERY_WORKER_GROUP_FAIL.getCode(), error.getCode());
+        Assertions.assertTrue(error.getMessage().contains("pending:1234"));
+        Assertions.assertTrue(error.getMessage().contains("another:1235"));
+    }
+
+    @Test
+    void testGroupOptionsAndPagingFailInsteadOfReturningPartialGroups() {
+        Server pending = new Server();
+        pending.setHost("pending");
+        pending.setPort(1234);
+        when(monitorService.listServer(RegistryNodeType.WORKER))
+                .thenReturn(java.util.Collections.singletonList(pending));
+        when(workerGroupDao.queryAllWorkerGroup()).thenReturn(java.util.Collections.emptyList());
+        User admin = new User();
+        admin.setUserType(UserType.ADMIN_USER);
+        ServiceException optionsError = Assertions.assertThrows(ServiceException.class,
+                () -> workerGroupService.queryAllGroup(admin));
+        Assertions.assertEquals(Status.QUERY_WORKER_GROUP_FAIL.getCode(), optionsError.getCode());
+        Assertions.assertTrue(optionsError.getMessage().contains("pending:1234"));
+        ServiceException pagingError = Assertions.assertThrows(ServiceException.class,
+                () -> workerGroupService.queryAllGroupPaging(admin, 1, 10, null));
+        Assertions.assertEquals(Status.QUERY_WORKER_GROUP_FAIL.getCode(), pagingError.getCode());
+        Assertions.assertTrue(pagingError.getMessage().contains("pending:1234"));
+    }
 
     private User getLoginUser() {
         User loginUser = new User();
