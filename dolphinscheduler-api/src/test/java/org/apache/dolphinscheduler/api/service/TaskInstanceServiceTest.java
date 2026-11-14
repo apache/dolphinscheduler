@@ -42,8 +42,11 @@ import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.worker.IPhysicalTaskExecutorOperator;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.service.process.ProcessService;
+import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillResponse;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -58,6 +61,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
@@ -415,6 +419,36 @@ public class TaskInstanceServiceTest {
         assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
                 () -> taskInstanceService.stopTask(user, projectCode, 1));
         Mockito.verifyNoInteractions(taskInstanceDao);
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testStopTaskReportsTheTaskWhichCouldNotBeStopped() {
+        // the kill waits on the worker until the task is stopped, so a task which could not be
+        // cancelled is reported to the caller instead of a stop which looks successful
+        long projectCode = 1L;
+        User user = getAdminUser();
+        Project project = getProject(projectCode);
+        TaskInstance taskInstance = getTaskInstance();
+        taskInstance.setHost("127.0.0.1:1234");
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        when(taskInstanceDao.queryById(taskInstance.getId())).thenReturn(taskInstance);
+        IPhysicalTaskExecutorOperator taskExecutorOperator = Mockito.mock(IPhysicalTaskExecutorOperator.class);
+        when(taskExecutorOperator.killTask(any()))
+                .thenReturn(TaskExecutorKillResponse.fail("Failed to cancel the flink jobs"));
+        Clients.JdkDynamicRpcClientProxyBuilder<IPhysicalTaskExecutorOperator> clientBuilder =
+                Mockito.mock(Clients.JdkDynamicRpcClientProxyBuilder.class);
+        when(clientBuilder.withHost(any())).thenReturn(taskExecutorOperator);
+
+        try (MockedStatic<Clients> clients = Mockito.mockStatic(Clients.class)) {
+            clients.when(() -> Clients.withService(IPhysicalTaskExecutorOperator.class)).thenReturn(clientBuilder);
+
+            Result result = taskInstanceService.stopTask(user, projectCode, taskInstance.getId());
+
+            Assertions.assertEquals(Status.INTERNAL_SERVER_ERROR_ARGS.getCode(), result.getCode());
+            Assertions.assertTrue(result.getMsg().contains("Failed to cancel the flink jobs"),
+                    "the reason of the failure must be reported, message: " + result.getMsg());
+        }
     }
 
     @Test

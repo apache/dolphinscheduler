@@ -28,6 +28,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TaskExecutorKillRequest implements Serializable {
 
+    /**
+     * The timeout of the kill RPC, in milliseconds.
+     *
+     * <p>The caller of the kill waits until the task is stopped, which is not a single call: the task
+     * is cancelled through its client and, when the client is an orchestrator such as the flink SQL
+     * client, every job the task submitted is cancelled with its own command. A job is cancelled with
+     * a command which has a 30s timeout of its own, so the default RPC timeout of 10s would make the
+     * caller give up while the cancellation still runs and hide its result.
+     */
+    public static final long KILL_TIMEOUT_MILLIS = 5 * 60 * 1000L;
+
     private Integer taskInstanceId;
 
     public static TaskExecutorKillRequest of(Integer taskInstanceId) {

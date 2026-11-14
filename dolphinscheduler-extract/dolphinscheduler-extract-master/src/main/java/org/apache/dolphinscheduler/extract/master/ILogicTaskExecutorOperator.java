@@ -33,7 +33,13 @@ public interface ILogicTaskExecutorOperator {
     @RpcMethod
     TaskExecutorDispatchResponse dispatchTask(final TaskExecutorDispatchRequest taskExecutorDispatchRequest);
 
-    @RpcMethod
+    /**
+     * Kill the task and wait until it is stopped.
+     *
+     * <p>The kill of a task executor waits for the cancellation of the task, so the wait is longer
+     * than the default RPC timeout, see {@link TaskExecutorKillRequest#KILL_TIMEOUT_MILLIS}.
+     */
+    @RpcMethod(timeout = TaskExecutorKillRequest.KILL_TIMEOUT_MILLIS)
     TaskExecutorKillResponse killTask(final TaskExecutorKillRequest taskExecutorKillRequest);
 
     @RpcMethod

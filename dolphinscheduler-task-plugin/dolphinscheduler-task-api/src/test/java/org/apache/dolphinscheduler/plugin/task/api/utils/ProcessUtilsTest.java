@@ -18,17 +18,24 @@
 package org.apache.dolphinscheduler.plugin.task.api.utils;
 
 import org.apache.dolphinscheduler.common.utils.OSUtils;
+import org.apache.dolphinscheduler.plugin.task.api.K8sTaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
+import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.am.ApplicationManager;
+import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceManagerType;
 
 import org.apache.commons.lang3.SystemUtils;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -262,5 +269,90 @@ public class ProcessUtilsTest {
 
         // Assert
         Assertions.assertTrue(result);
+    }
+
+    @Test
+    void testCancelApplicationPropagatesTheResourceManagerFailure() throws Exception {
+        // a stop which reports success while the application still runs leaves a detached job behind,
+        // so the resource manager failure reaches the caller
+        TaskExecutionContext taskRequest = new TaskExecutionContext();
+        taskRequest.setTaskInstanceId(16789);
+        taskRequest.setTaskAppId("16789");
+        taskRequest.setExecutePath("/tmp");
+        taskRequest.setTenantCode("");
+        taskRequest.setAppIds("application_1700000000000_0001");
+
+        ApplicationManager<?> applicationManager = Mockito.mock(ApplicationManager.class);
+        Mockito.when(applicationManager.killApplication(Mockito.any()))
+                .thenThrow(new TaskException("Kill yarn application failed"));
+
+        Map<ResourceManagerType, ApplicationManager> applicationManagerMap = applicationManagerMap();
+        ApplicationManager previousManager = applicationManagerMap.put(ResourceManagerType.YARN, applicationManager);
+        try {
+            TaskException exception = Assertions.assertThrows(TaskException.class,
+                    () -> ProcessUtils.cancelApplication(taskRequest));
+
+            Assertions.assertTrue(exception.getMessage().contains("Kill yarn application failed"),
+                    "the resource manager failure must be propagated, message: " + exception.getMessage());
+        } finally {
+            if (previousManager == null) {
+                applicationManagerMap.remove(ResourceManagerType.YARN);
+            } else {
+                applicationManagerMap.put(ResourceManagerType.YARN, previousManager);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<ResourceManagerType, ApplicationManager> applicationManagerMap() throws Exception {
+        Field field = ProcessUtils.class.getDeclaredField("applicationManagerMap");
+        field.setAccessible(true);
+        return (Map<ResourceManagerType, ApplicationManager>) field.get(null);
+    }
+
+    @Test
+    void testCancelApplicationPropagatesTheKubernetesCancellationFailure() throws Exception {
+        // the kubernetes application manager can fail as well, and a stop which reports success while
+        // the driver pod still runs leaves a detached job behind
+        TaskExecutionContext taskRequest = new TaskExecutionContext();
+        taskRequest.setTaskInstanceId(16789);
+        taskRequest.setTaskAppId("16789");
+        taskRequest.setTaskType("SHELL");
+        taskRequest.setK8sTaskExecutionContext(K8sTaskExecutionContext.builder()
+                .namespace("default")
+                .configYaml("")
+                .build());
+
+        ApplicationManager<?> applicationManager = Mockito.mock(ApplicationManager.class);
+        Mockito.when(applicationManager.killApplication(Mockito.any()))
+                .thenThrow(new TaskException("Kill kubernetes application failed"));
+
+        Map<ResourceManagerType, ApplicationManager> applicationManagerMap = applicationManagerMap();
+        ApplicationManager previousManager =
+                applicationManagerMap.put(ResourceManagerType.KUBERNETES, applicationManager);
+        try {
+            TaskException exception = Assertions.assertThrows(TaskException.class,
+                    () -> ProcessUtils.cancelApplication(taskRequest));
+
+            Assertions.assertTrue(exception.getMessage().contains("Kill kubernetes application failed"),
+                    "the resource manager failure must be propagated, message: " + exception.getMessage());
+        } finally {
+            if (previousManager == null) {
+                applicationManagerMap.remove(ResourceManagerType.KUBERNETES);
+            } else {
+                applicationManagerMap.put(ResourceManagerType.KUBERNETES, previousManager);
+            }
+        }
+    }
+
+    @Test
+    void testGetProcessIdReturnsThePidOfARunningProcess() throws Exception {
+        Assumptions.assumeFalse(SystemUtils.IS_OS_WINDOWS, "the test starts a unix sleep process");
+        Process process = new ProcessBuilder("sleep", "5").start();
+        try {
+            Assertions.assertTrue(ProcessUtils.getProcessId(process) > 0);
+        } finally {
+            process.destroyForcibly();
+        }
     }
 }
