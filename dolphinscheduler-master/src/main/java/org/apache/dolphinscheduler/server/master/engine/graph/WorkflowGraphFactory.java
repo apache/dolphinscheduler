@@ -47,6 +47,8 @@ public class WorkflowGraphFactory {
                 workflowDefinition.getCode(),
                 workflowDefinition.getVersion());
 
+        // Keep taskParams ciphertext here: AbstractTaskInstanceFactory copies them into task_instance.
+        // Decrypt only when building TaskExecutionContext for the worker.
         List<TaskDefinition> taskDefinitions = taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations)
                 .stream()
                 .map(TaskDefinition.class::cast)

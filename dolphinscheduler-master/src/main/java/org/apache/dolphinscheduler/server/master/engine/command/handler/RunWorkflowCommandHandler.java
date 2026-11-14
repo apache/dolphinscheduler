@@ -124,6 +124,7 @@ public class RunWorkflowCommandHandler extends AbstractCommandHandler {
                 Optional.ofNullable(JSONUtils.parseObject(command.getCommandParam(), ICommandParam.class))
                         .map(ICommandParam::getCommandParams)
                         .orElse(null);
+        // Definition globals already decrypted at load boundary (assembleWorkflowDefinition).
         final List<Property> globalParamsList =
                 GlobalParameterUtils.deserializeGlobalParameter(workflowDefinition.getGlobalParams());
         Map<String, Property> finalParams = new HashMap<>();
