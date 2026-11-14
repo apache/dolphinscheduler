@@ -31,32 +31,39 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkerGroupServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
+import org.apache.dolphinscheduler.dao.entity.EnvironmentWorkerGroupRelation;
+import org.apache.dolphinscheduler.dao.entity.Schedule;
+import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
+import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.RegistryClient;
 import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -66,6 +73,7 @@ import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -77,6 +85,12 @@ public class WorkerGroupServiceTest {
 
     @InjectMocks
     private WorkerGroupServiceImpl workerGroupService;
+
+    @Mock
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
+
+    @Mock
+    private WorkflowDefinitionDao workflowDefinitionDao;
 
     @Mock
     private WorkerGroupDao workerGroupDao;
@@ -235,25 +249,82 @@ public class WorkerGroupServiceTest {
         serverMaps.put("localhost:0000", "");
         when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
         when(workerGroupDao.insert(any())).thenReturn(1);
-        assertDoesNotThrow(() -> {
+        TransactionSynchronizationManager.initSynchronization();
+        try {
             workerGroupService.saveWorkerGroup(loginUser, 0, GROUP_NAME, "localhost:0000", "test group");
-        });
+            Mockito.verify(registryClient, Mockito.never()).getServerList(RegistryNodeType.MASTER);
+            Assertions.assertEquals(1, TransactionSynchronizationManager.getSynchronizations().size());
+            TransactionSynchronizationManager.getSynchronizations().get(0).afterCommit();
+            Mockito.verify(registryClient).getServerList(RegistryNodeType.MASTER);
+        } finally {
+            TransactionSynchronizationManager.clearSynchronization();
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"task", "schedule", "environment"})
+    public void renamingReferencedWorkerGroupIsRejected(String reference) {
+        User operator = getLoginUser();
+        when(resourcePermissionCheckService.operationPermissionCheck(Mockito.any(), Mockito.anyInt(),
+                Mockito.anyString(), Mockito.any())).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(Mockito.any(), Mockito.any(),
+                Mockito.anyInt(), Mockito.any())).thenReturn(true);
+        WorkerGroup group = getWorkerGroup(1);
+        when(workerGroupDao.queryById(1)).thenReturn(group);
+        Status expected;
+        if ("task".equals(reference)) {
+            TaskDefinition task = new TaskDefinition();
+            task.setName("using old workers");
+            when(taskDefinitionDao.queryByWorkerGroup(group.getName()))
+                    .thenReturn(java.util.Collections.singletonList(task));
+            expected = Status.WORKER_GROUP_DEPENDENT_TASK_EXISTS;
+        } else if ("schedule".equals(reference)) {
+            Schedule schedule = new Schedule();
+            schedule.setWorkflowDefinitionCode(100L);
+            when(scheduleDao.queryScheduleByWorkerGroup(group.getName()))
+                    .thenReturn(java.util.Collections.singletonList(schedule));
+            WorkflowDefinition definition = new WorkflowDefinition();
+            definition.setName("scheduled workflow");
+            when(workflowDefinitionDao.queryByCode(100L)).thenReturn(java.util.Optional.of(definition));
+            expected = Status.WORKER_GROUP_DEPENDENT_SCHEDULER_EXISTS;
+        } else {
+            when(environmentWorkerGroupRelationMapper.selectList(Mockito.any()))
+                    .thenReturn(java.util.Collections.singletonList(new EnvironmentWorkerGroupRelation()));
+            expected = Status.WORKER_GROUP_DEPENDENT_ENVIRONMENT_EXISTS;
+        }
+        assertThrowsServiceException(expected,
+                () -> workerGroupService.saveWorkerGroup(operator, 1, "new-name", "", ""));
+        Mockito.verify(workerGroupDao, Mockito.never()).updateById(Mockito.any(WorkerGroup.class));
+        Mockito.verifyNoInteractions(resourceAuthorizationDao);
+    }
+
+    @Test
+    public void renamingWorkerGroupRevokesOldNameGrants() {
+        User user = getLoginUser();
+        when(resourcePermissionCheckService.operationPermissionCheck(Mockito.any(), Mockito.anyInt(),
+                Mockito.anyString(), Mockito.any())).thenReturn(true);
+        when(resourcePermissionCheckService.resourcePermissionCheck(Mockito.any(), Mockito.any(),
+                Mockito.anyInt(), Mockito.any())).thenReturn(true);
+        WorkerGroup group = getWorkerGroup(1);
+        String oldName = group.getName();
+        when(workerGroupDao.queryById(1)).thenReturn(group);
+        Map<String, String> serverMaps = new HashMap<>();
+        serverMaps.put("localhost:0000", "");
+        when(registryClient.getServerMaps(RegistryNodeType.WORKER)).thenReturn(serverMaps);
+
+        workerGroupService.saveWorkerGroup(user, 1, "renamed-workers", "localhost:0000", "");
+
+        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.WORKER_GROUP, oldName);
+        Mockito.clearInvocations(resourceAuthorizationDao);
+        workerGroupService.saveWorkerGroup(user, 1, "renamed-workers", "localhost:0000", "updated description");
+        Mockito.verifyNoInteractions(resourceAuthorizationDao);
     }
 
     @Test
     public void giveValidParams_whenQueryAllGroupPaging_expectSuccess() {
         User loginUser = getLoginUser();
-        Set<Integer> ids = new HashSet<>();
-        ids.add(1);
-        List<WorkerGroup> workerGroups = new ArrayList<>();
-        workerGroups.add(getWorkerGroup(1));
-        when(resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP,
-                loginUser.getId(), serviceLogger)).thenReturn(ids);
-        when(workerGroupDao.queryByIds(ids)).thenReturn(workerGroups);
-        Set<String> activeWorkerNodes = new HashSet<>();
-        activeWorkerNodes.add("localhost:12345");
-        activeWorkerNodes.add("localhost:23456");
-        when(registryClient.getServerNodeSet(RegistryNodeType.WORKER)).thenReturn(activeWorkerNodes);
+        loginUser.setUserType(UserType.ADMIN_USER);
+        when(workerGroupDao.queryAllWorkerGroup()).thenReturn(java.util.Collections.singletonList(getWorkerGroup(1)));
 
         Result result = workerGroupService.queryAllGroupPaging(loginUser, 1, 1, null);
         Assertions.assertEquals(result.getCode(), Status.SUCCESS.getCode());
@@ -261,8 +332,9 @@ public class WorkerGroupServiceTest {
 
     @Test
     public void testQueryAllGroup() {
-        List<String> workerGroups = workerGroupService.queryAllGroup(getLoginUser());
-        Assertions.assertEquals(0, workerGroups.size());
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> workerGroupService.queryAllGroup(getLoginUser()));
+        Mockito.verifyNoInteractions(workerGroupDao, registryClient, resourcePermissionCheckService);
     }
 
     @Test
@@ -316,12 +388,25 @@ public class WorkerGroupServiceTest {
         when(scheduleDao.queryScheduleByWorkerGroup(Mockito.any())).thenReturn(null);
 
         assertDoesNotThrow(() -> workerGroupService.deleteWorkerGroupById(loginUser, 1));
+        Mockito.verify(resourceAuthorizationDao).revokeByResource(ProjectResourceType.WORKER_GROUP,
+                workerGroup.getName());
     }
 
     @Test
-    public void testQueryAllGroupWithDefault() {
-        List<String> workerGroups = workerGroupService.queryAllGroup(getLoginUser());
-        Assertions.assertEquals(0, workerGroups.size());
+    public void administratorCanQueryWorkerGroupCatalog() {
+        User user = getLoginUser();
+        user.setUserType(UserType.ADMIN_USER);
+        when(workerGroupDao.queryAllWorkerGroup()).thenReturn(java.util.Collections.singletonList(getWorkerGroup(1)));
+        Assertions.assertEquals(java.util.Collections.singletonList(GROUP_NAME),
+                workerGroupService.queryAllGroup(user));
+        Mockito.verifyNoInteractions(resourcePermissionCheckService);
+    }
+
+    @Test
+    public void workerGroupCatalogPagingRequiresAdministratorBeforeQueryingRegistry() {
+        assertThrowsServiceException(Status.USER_NO_OPERATION_PERM,
+                () -> workerGroupService.queryAllGroupPaging(getLoginUser(), 1, 10, null));
+        Mockito.verifyNoInteractions(workerGroupDao, registryClient, resourcePermissionCheckService);
     }
 
     /**

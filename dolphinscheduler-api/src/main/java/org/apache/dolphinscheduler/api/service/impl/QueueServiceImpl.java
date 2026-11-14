@@ -27,7 +27,6 @@ import org.apache.dolphinscheduler.api.service.QueueService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Queue;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -39,7 +38,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -48,6 +46,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -116,15 +115,13 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @param loginUser login user
      * @return queue list
      */
+
     @Override
     public List<Queue> queryList(User loginUser) {
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.QUEUE,
-                loginUser.getId(), log);
-        if (loginUser.getUserType().equals(UserType.GENERAL_USER)) {
-            ids = ids.isEmpty() ? new HashSet<>() : ids;
-            ids.add(Constants.DEFAULT_QUEUE_ID);
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        return queueDao.queryByIds(ids);
+        return queueDao.queryAll();
     }
 
     /**
@@ -214,6 +211,7 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @throws Exception exception
      */
     @Override
+    @Transactional
     public void deleteQueueById(User loginUser, int id) throws Exception {
 
         if (!canOperatorPermissions(loginUser, null, AuthorizationType.TENANT, TENANT_DELETE)) {
@@ -252,7 +250,10 @@ public class QueueServiceImpl extends BaseServiceImpl implements QueueService {
      * @return true if the queue name not exists, otherwise return false
      */
     @Override
-    public void verifyQueue(String queue, String queueName) {
+    public void verifyQueue(User loginUser, String queue, String queueName) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         Queue queueValidator = new Queue(queueName, queue);
         validQueue(queueValidator);
     }

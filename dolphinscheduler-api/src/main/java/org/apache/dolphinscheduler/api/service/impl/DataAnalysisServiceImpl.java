@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT_OVERVIEW;
-
 import org.apache.dolphinscheduler.api.dto.CommandStateCount;
 import org.apache.dolphinscheduler.api.service.DataAnalysisService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -28,6 +26,7 @@ import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCountVO;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceCountVO;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.CommandType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.Command;
 import org.apache.dolphinscheduler.dao.entity.CommandCount;
@@ -95,7 +94,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                                                                   Long projectCode,
                                                                   String startDate,
                                                                   String endDate) {
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
         List<TaskInstanceStatusCountDto> taskInstanceStatusCounts =
@@ -123,7 +122,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
                                                                           Long projectCode,
                                                                           String startDate,
                                                                           String endDate) {
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         Date start = startDate == null ? null : transformDate(startDate);
         Date end = endDate == null ? null : transformDate(endDate);
         List<WorkflowInstanceStatusCountDto> workflowInstanceStatusCountDtos = workflowInstanceDao
@@ -149,7 +148,7 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
 
     @Override
     public WorkflowDefinitionCountVO getWorkflowDefinitionCountByProject(User loginUser, Long projectCode) {
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, PROJECT_OVERVIEW);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         List<WorkflowDefinitionCountDto> workflowDefinitionCounts =
                 workflowDefinitionDao.countDefinitionByProjectCodes(Lists.newArrayList(projectCode));
         return WorkflowDefinitionCountVO.of(workflowDefinitionCounts);
@@ -168,6 +167,11 @@ public class DataAnalysisServiceImpl extends BaseServiceImpl implements DataAnal
     public List<CommandStateCount> countCommandState(User loginUser) {
 
         List<Long> projectCodes = projectService.getAuthorizedProjectCodes(loginUser);
+        if (CollectionUtils.isEmpty(projectCodes)) {
+            return Arrays.stream(CommandType.values())
+                    .map(commandType -> new CommandStateCount(0, 0, commandType))
+                    .collect(Collectors.toList());
+        }
 
         // count normal command state
         Map<CommandType, Integer> normalCountCommandCounts =

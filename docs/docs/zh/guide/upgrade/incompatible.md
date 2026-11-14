@@ -58,10 +58,15 @@
 
 ## 3.5.0
 
+* **数据源管理收敛为系统管理员专属操作**：普通用户不再具有数据源创建、全局列表查询、详情与敏感配置访问、修改、连接测试和删除权限，历史创建者身份及个人授权不会保留这些管理能力。普通用户仍可通过带 `projectCode` 的项目资源选择接口，凭项目 `VIEW` 查询已授权数据源，并按项目操作权限配置或执行任务。
+* 仅系统管理员或项目创建者可以修改项目信息、删除项目。修改项目信息保留原所有者，`DEVELOP` 不包含这些项目生命周期操作。
+* 项目操作权限为 `VIEW`、`DEVELOP`、`EXECUTE`、`MANAGE_MEMBERS` 四项：开发权限包含定义发布，执行权限包含定时调度管理。切换工作流版本需工作流与定时均已下线。全局资源名称校验限制为系统管理员。
+* 权限模型改为“用户拥有项目操作权限，项目获得资源使用授权”。升级程序新增 `t_ds_project_user_permission` 和 `t_ds_project_resource_authorization` 两张表，保留旧授权表及数据，但不自动迁移历史权限。管理员需要重新分配项目成员权限及项目资源授权，用户才能继续查询、配置、发布或人工执行项目任务。
+* 项目内的资源查询需要传入 `projectCode`，按项目 `VIEW` 权限及资源授权过滤；不带项目参数的全局资源目录仅管理员可查询。移除数据源和命名空间的个人授权接口，改为向项目授权。
+* 队列不纳入项目资源使用授权，保留旧队列管理、租户关联及原有队列数据，不进行队列数据修正。任务参数 `yarnQueue` 及 `others` 中的队列选项不校验项目授权。旧队列管理的废弃工作由 [#18784](https://github.com/apache/dolphinscheduler/issues/18784) 跟踪。
+* 保存、发布和人工启动、重跑时检查项目资源授权。撤销资源授权不重新鉴权既有运行或排队实例、后台定时触发和自动重试，也不会自动下线已有定时。
 * 内部 RPC 认证默认关闭。升级全部服务后，再协调所有服务在各自的 `common.properties` 中开启 `rpc.authentication.enabled=true` 并配置相同的 `rpc.authentication.secret`，认证开启与关闭的服务不能互通。凭据在进程内缓存，启用认证和轮换密钥需要重启服务。参见 [RPC 认证](../security/authentication-type.md#服务间-rpc-认证)。
-
 * Master、Worker 和 Alert Server 现在按 RPC 请求生成心跳快照，并发请求共享一秒刷新间隔的线程安全系统指标缓存。`BaseHeartBeatTask` 及 Master、Worker、Alert 的心跳任务子类已移除，自定义扩展如继承这些类，需要自行管理调度。Alert Server 取消定期写注册心跳，只在启动时注册稳定进程身份，并在重连时恢复注册。`alert.max-heartbeat-interval` 已移除，API 在收到查询请求时直接通过 RPC 获取 Alert 心跳。
-
 * Master、Worker 和 Alert 的心跳指标改名，用于区分心跳数据请求次数与原来的定时注册心跳次数：
 
   |             旧指标             |                 新指标                 |
@@ -83,4 +88,14 @@
 * `AlertSender#getAlertData` 对 null `alertType` 增加了显式拒绝（抛 `IllegalArgumentException` 并记录错误日志），而非直接抛 `NullPointerException`。滚动升级时**必须先升级 Alert Server，再升级 Master/Worker**，否则旧 Alert Server 无法识别新增的 `alert_type` 枚举值（如 `TASK_RESULT`），会导致告警投递失败。详见[升级文档](upgrade.md#滚动升降级顺序)。([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
 
 * SQL 任务结果告警内容有大小限制：默认最多保留 30 行，超过 100 字符的字符串字段值会被截断并以省略号标记；序列化后内容总大小限制在 60000 UTF-8 字节以内（兼容 MySQL TEXT 列 65535 字节容量），超出预算的行以省略标记对象表示。以上默认值可通过 `common.properties` 中的 `sql.task.alert.max.rows`、`sql.task.alert.max.row.value.length`、`sql.task.alert.max.content.bytes` 配置调整，修改后需重启 Worker 生效。 ([#18549](https://github.com/apache/dolphinscheduler/pull/18549))
+
+### 项目权限模型
+
+完整的操作权限、项目资源授权、跨项目校验及撤权生效边界见[安全中心（权限系统）](../security/security.md#授予权限)。
+
+以下架构图对比旧权限模型与 3.5.0 引入的项目权限模型。
+
+![旧权限模型](../../../../img/architecture-design/project-scoped-authorization-before.png)
+
+![项目权限模型](../../../../img/architecture-design/project-scoped-authorization.png)
 

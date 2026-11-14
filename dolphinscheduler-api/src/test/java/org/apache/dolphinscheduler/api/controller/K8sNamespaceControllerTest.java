@@ -135,36 +135,13 @@ public class K8sNamespaceControllerTest extends AbstractControllerTest {
 
     @Test
     public void testQueryUnauthorizedNamespace() throws Exception {
-
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "1");
-
-        MvcResult mvcResult = mockMvc.perform(get("/k8s-namespace/unauth-namespace")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        mockMvc.perform(get("/k8s-namespace/unauth-namespace").header(SESSION_ID, sessionId).param("userId", "2"))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     public void testQueryAuthorizedNamespace() throws Exception {
-        MultiValueMap<String, String> paramsMap = new LinkedMultiValueMap<>();
-        paramsMap.add("userId", "1");
-
-        MvcResult mvcResult = mockMvc.perform(get("/k8s-namespace/authed-namespace")
-                .header(SESSION_ID, sessionId)
-                .params(paramsMap))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andReturn();
-
-        Result result = JSONUtils.parseObject(mvcResult.getResponse().getContentAsString(), Result.class);
-        Assertions.assertEquals(Status.SUCCESS.getCode(), result.getCode().intValue());
-        logger.info(mvcResult.getResponse().getContentAsString());
+        mockMvc.perform(get("/k8s-namespace/authed-namespace").header(SESSION_ID, sessionId).param("userId", "2"))
+                .andExpect(status().isNotFound());
     }
 }

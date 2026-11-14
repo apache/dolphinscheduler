@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowLineageServiceImpl;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
@@ -115,7 +116,7 @@ public class WorkflowTaskLineageServiceTest {
         when(projectDao.queryByCode(1L)).thenReturn(project);
         Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM, loginUser.getUserName(),
                 project.getCode())).when(projectService)
-                .checkProjectAndAuthThrowException(Mockito.eq(loginUser), Mockito.eq(project), Mockito.anyString());
+                .checkProjectPermission(Mockito.eq(loginUser), Mockito.eq(project), Mockito.eq(ProjectPermission.VIEW));
         ServiceException exception = Assertions.assertThrows(ServiceException.class,
                 () -> workflowLineageService.queryWorkFlowLineageByName(loginUser, 1L, "test"));
         Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), exception.getCode());

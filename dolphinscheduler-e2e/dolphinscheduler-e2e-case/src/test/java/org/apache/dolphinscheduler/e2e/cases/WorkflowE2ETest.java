@@ -80,7 +80,9 @@ class WorkflowE2ETest {
 
         userPage.update(user, user, email, phone, tenant)
                 .goToNav(ProjectPage.class)
-                .create(project);
+                .createProjectUntilSuccess(project)
+                .assignResource(project, "Tenant", tenant)
+                .assignResource(project, "Queue", "default");
     }
 
     @AfterAll
@@ -161,6 +163,22 @@ class WorkflowE2ETest {
     }
 
     @Test
+    @Order(20)
+    void testCreateAndUpdateScheduleWithAuthorizedTenant() {
+        WorkflowDefinitionTab definitionTab = new ProjectPage(browser)
+                .goToNav(ProjectPage.class)
+                .goTo(project)
+                .goToTab(WorkflowDefinitionTab.class);
+
+        definitionTab.timing(workflow).tenant(tenant).submit();
+        // Reload so the second dialog edits the persisted schedule instead of creating a new one.
+        browser.navigate().refresh();
+        WorkflowDefinitionTab refreshedTab = new WorkflowDefinitionTab(browser);
+        Awaitility.await().untilAsserted(() -> assertThat(refreshedTab.workflowList()).isNotEmpty());
+        refreshedTab.timing(workflow).tenant(tenant).submit();
+    }
+
+    @Test
     @Order(30)
     void testRunWorkflow() {
         final ProjectDetailPage projectPage =
@@ -174,6 +192,7 @@ class WorkflowE2ETest {
         projectPage
                 .goToTab(WorkflowDefinitionTab.class)
                 .run(workflow)
+                .tenant(tenant)
                 .submit();
 
         Awaitility.await().untilAsserted(() -> {

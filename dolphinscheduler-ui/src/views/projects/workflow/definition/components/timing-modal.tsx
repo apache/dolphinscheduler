@@ -275,7 +275,6 @@ export default defineComponent({
 
     onMounted(() => {
       getWorkerGroups()
-      getTenantList()
       getAlertGroups()
       getEnvironmentList()
       initProjectPreferences(projectCode)
@@ -283,8 +282,9 @@ export default defineComponent({
 
     watch(
       () => props.row,
-      () => {
+      async () => {
         if (!props.row.crontab) {
+          await getTenantList()
           restructureTimingForm(timingState.timingForm)
           return
         }
@@ -305,7 +305,9 @@ export default defineComponent({
         timingState.timingForm.tenantCode = props.row.tenantCode
         initWarningGroup()
         initEnvironment()
-      }
+        await getTenantList()
+      },
+      { immediate: true }
     )
 
     return {
@@ -332,6 +334,7 @@ export default defineComponent({
 
     return (
       <Modal
+        class='dialog-timing-workflow'
         show={this.show}
         title={t('project.workflow.set_parameters_before_timing')}
         onCancel={this.hideModal}
@@ -341,6 +344,7 @@ export default defineComponent({
       >
         <NForm
           ref='timingFormRef'
+          model={this.timingForm}
           rules={this.rules}
           disabled={this.$props.state === 'ONLINE'}
         >
@@ -514,6 +518,7 @@ export default defineComponent({
             path='tenantCode'
           >
             <NSelect
+              class='select-tenant'
               options={this.tenantList}
               v-model:value={this.timingForm.tenantCode}
               filterable

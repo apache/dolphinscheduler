@@ -24,7 +24,8 @@ import type { IJsonItem, IOption, ModelType } from '../types'
 
 export function useSourceType(
   model: { [field: string]: any },
-  unCustomSpan: Ref<number>
+  unCustomSpan: Ref<number>,
+  projectCode: number
 ): IJsonItem[] {
   const { t } = useI18n()
   const rdbmsSpan = ref(24)
@@ -156,6 +157,7 @@ export function useSourceType(
     },
     ...useDatasource(
       model,
+      projectCode,
       datasourceSpan,
       'sourceMysqlType',
       'sourceMysqlDatasource'

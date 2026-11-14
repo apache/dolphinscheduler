@@ -32,6 +32,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
  */
 public interface AlertGroupMapper extends BaseMapper<AlertGroup> {
 
+    List<AlertGroup> queryByProject(@Param("projectCode") long projectCode);
+
     /**
      * alertgroup page
      * @param page page

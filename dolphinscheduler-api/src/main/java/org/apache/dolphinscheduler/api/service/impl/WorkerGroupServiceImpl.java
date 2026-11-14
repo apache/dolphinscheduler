@@ -28,7 +28,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.WorkerGroupSource;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
 import org.apache.dolphinscheduler.common.model.Server;
@@ -43,6 +43,7 @@ import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroupPageDetail;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
@@ -57,7 +58,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -70,6 +70,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.google.common.base.Strings;
@@ -77,6 +79,9 @@ import com.google.common.base.Strings;
 @Service
 @Slf4j
 public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGroupService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
     @Autowired
     private WorkerGroupDao workerGroupDao;
@@ -112,6 +117,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      * @return create or update result code
      */
     @Override
+    @Transactional
     public WorkerGroup saveWorkerGroup(User loginUser,
                                        int id,
                                        String name,
@@ -142,11 +148,18 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
                 if (workerGroup == null) {
                     throw new ServiceException(Status.WORKER_GROUP_NOT_EXIST, id);
                 }
+                String previousName = workerGroup.getName();
+                if (!name.equals(previousName)) {
+                    checkWorkerGroupDependencies(workerGroup);
+                }
                 workerGroup.setName(name);
                 workerGroup.setAddrList(addrList);
                 workerGroup.setUpdateTime(now);
                 workerGroup.setDescription(description);
                 workerGroupDao.updateById(workerGroup);
+                if (!name.equals(previousName)) {
+                    resourceAuthorizationDao.revokeByResource(ProjectResourceType.WORKER_GROUP, previousName);
+                }
                 log.info("Update worker group: {} success .", workerGroup);
             }
             boardCastToMasterThatWorkerGroupChanged();
@@ -217,21 +230,16 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     @Override
     public Result queryAllGroupPaging(User loginUser, Integer pageNo, Integer pageSize, String searchVal) {
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         // list from index
         int fromIndex = (pageNo - 1) * pageSize;
         // list to index
         int toIndex = (pageNo - 1) * pageSize + pageSize;
 
         Result result = new Result();
-        List<WorkerGroupPageDetail> workerGroupPageDetails;
-        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroupPageDetails = getUiWorkerGroupPageDetails(null);
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), log);
-            workerGroupPageDetails =
-                    getUiWorkerGroupPageDetails(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
-        }
+        List<WorkerGroupPageDetail> workerGroupPageDetails = getUiWorkerGroupPageDetails();
         List<WorkerGroupPageDetail> resultDataList = new ArrayList<>();
         int total = 0;
 
@@ -275,14 +283,10 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
      */
     @Override
     public List<String> queryAllGroup(User loginUser) {
-        List<WorkerGroupPageDetail> workerGroups;
-        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            workerGroups = getUiWorkerGroupPageDetails(null);
-        } else {
-            Set<Integer> ids = resourcePermissionCheckService
-                    .userOwnedResourceIdsAcquisition(AuthorizationType.WORKER_GROUP, loginUser.getId(), log);
-            workerGroups = getUiWorkerGroupPageDetails(ids.isEmpty() ? Collections.emptyList() : new ArrayList<>(ids));
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
+        List<WorkerGroupPageDetail> workerGroups = getUiWorkerGroupPageDetails();
         List<String> configWorkerGroupNames = getConfigWorkerGroupPageDetail().stream()
                 .map(WorkerGroupPageDetail::getName)
                 .collect(Collectors.toList());
@@ -293,13 +297,8 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         return availableWorkerGroupList.stream().distinct().collect(Collectors.toList());
     }
 
-    private List<WorkerGroupPageDetail> getUiWorkerGroupPageDetails(List<Integer> ids) {
-        List<WorkerGroup> workerGroups;
-        if (ids != null) {
-            workerGroups = ids.isEmpty() ? new ArrayList<>() : workerGroupDao.queryByIds(ids);
-        } else {
-            workerGroups = workerGroupDao.queryAllWorkerGroup();
-        }
+    private List<WorkerGroupPageDetail> getUiWorkerGroupPageDetails() {
+        List<WorkerGroup> workerGroups = workerGroupDao.queryAllWorkerGroup();
         return workerGroups.stream()
                 .map(workerGroup -> {
                     WorkerGroupPageDetail workerGroupPageDetail = new WorkerGroupPageDetail(workerGroup);
@@ -340,6 +339,7 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
         checkWorkerGroupDependencies(workerGroup);
 
         workerGroupDao.deleteById(id);
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.WORKER_GROUP, workerGroup.getName());
         boardCastToMasterThatWorkerGroupChanged();
 
         log.info("Delete worker group complete, workerGroupName:{}.", workerGroup.getName());
@@ -364,6 +364,20 @@ public class WorkerGroupServiceImpl extends BaseServiceImpl implements WorkerGro
     }
 
     private void boardCastToMasterThatWorkerGroupChanged() {
+        if (TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+                @Override
+                public void afterCommit() {
+                    refreshMasterWorkerGroups();
+                }
+            });
+        } else {
+            refreshMasterWorkerGroups();
+        }
+    }
+
+    private void refreshMasterWorkerGroups() {
         final List<Server> masters = registryClient.getServerList(RegistryNodeType.MASTER);
         if (CollectionUtils.isEmpty(masters)) {
             return;

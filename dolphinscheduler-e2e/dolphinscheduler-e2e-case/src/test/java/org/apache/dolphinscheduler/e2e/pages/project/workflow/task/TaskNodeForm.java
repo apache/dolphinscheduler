@@ -129,20 +129,14 @@ public abstract class TaskNodeForm {
     }
 
     public TaskNodeForm selectEnv(String envName) {
-        ((JavascriptExecutor) parent().driver()).executeScript("arguments[0].click();", selectEnv);
-
-        final By optionsLocator = By.className("n-base-selection-input__content");
-
-        WebDriverWaitFactory.createWebDriverWait(parent().driver())
-                .until(ExpectedConditions.visibilityOfElementLocated(optionsLocator));
-
-        List<WebElement> webElements = parent.driver().findElements(optionsLocator);
-
-        webElements.stream()
-                .filter(it -> it.getText().contains(envName))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No such envName: " + envName))
-                .click();
+        UiInteraction.click(parent.driver(), ".env-select .n-base-selection");
+        WebElement option = WebDriverWaitFactory.createWebDriverWait(parent.driver()).until(ignored -> parent.driver()
+                .findElements(By.cssSelector(".n-base-select-option")).stream()
+                .filter(WebElement::isDisplayed).filter(it -> it.getText().equals(envName))
+                .findFirst().orElse(null));
+        option.click();
+        WebDriverWaitFactory.createWebDriverWait(parent.driver())
+                .until(ignored -> selectEnv.getText().equals(envName));
 
         return this;
     }

@@ -19,10 +19,10 @@ package org.apache.dolphinscheduler.api.permission;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.common.enums.AuthorizationType;
-import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
+import org.apache.dolphinscheduler.dao.entity.ProjectResourceAuthorization;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
-import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.plugin.task.api.TaskPluginManager;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,13 +43,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskDatasourcePermissionChecker {
 
-    private final ResourcePermissionCheckService resourcePermissionCheckService;
+    private final ProjectResourceAuthorizationDao resourceAuthorizationDao;
 
-    public TaskDatasourcePermissionChecker(ResourcePermissionCheckService resourcePermissionCheckService) {
-        this.resourcePermissionCheckService = resourcePermissionCheckService;
+    public TaskDatasourcePermissionChecker(ProjectResourceAuthorizationDao resourceAuthorizationDao) {
+        this.resourceAuthorizationDao = resourceAuthorizationDao;
     }
 
-    public void checkPermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions) {
+    public void checkPermission(long projectCode, Collection<? extends TaskDefinition> taskDefinitions) {
         if (taskDefinitions == null || taskDefinitions.isEmpty()) {
             return;
         }
@@ -75,13 +76,15 @@ public class TaskDatasourcePermissionChecker {
             return;
         }
 
-        int userId = loginUser.getUserType() == UserType.ADMIN_USER ? 0 : loginUser.getId();
-        Integer[] datasourceIdArray = datasourceIds.toArray(new Integer[0]);
-        if (!resourcePermissionCheckService.resourcePermissionCheck(
-                AuthorizationType.DATASOURCE, datasourceIdArray, userId, log)) {
-            log.warn("User does not have permission to use datasource referenced by task, userId:{}.",
-                    loginUser.getId());
-            throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+        Set<String> authorizedDatasourceIds = resourceAuthorizationDao
+                .queryByProjectAndType(projectCode, ProjectResourceType.DATASOURCE).stream()
+                .map(ProjectResourceAuthorization::getResourceKey).collect(Collectors.toSet());
+        for (Integer datasourceId : datasourceIds) {
+            if (!authorizedDatasourceIds.contains(datasourceId.toString())) {
+                log.warn("Project is not authorized to use datasource, projectCode:{}, datasourceId:{}.",
+                        projectCode, datasourceId);
+                throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+            }
         }
     }
 }

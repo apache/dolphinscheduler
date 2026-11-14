@@ -40,6 +40,7 @@ public class SchedulerPage {
         params.put("projectCode", projectCode);
         params.put("workflowDefinitionCode", workflowDefinitionCode);
         params.put("schedule", schedule);
+        params.put("warningGroupId", 0);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 
@@ -86,6 +87,7 @@ public class SchedulerPage {
         Map<String, Object> params = new HashMap<>();
         params.put("loginUser", loginUser);
         params.put("schedule", schedule);
+        params.put("warningGroupId", 0);
         Map<String, String> headers = new HashMap<>();
         headers.put(Constants.SESSION_ID_KEY, sessionId);
 

@@ -18,7 +18,6 @@
 package org.apache.dolphinscheduler.api.service;
 
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -31,6 +30,7 @@ import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.TaskInstanceServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.enums.WorkflowExecutionStatus;
@@ -99,8 +99,8 @@ public class TaskInstanceServiceTest {
         putMsg(result, Status.PROJECT_NOT_FOUND, projectCode);
 
         // project auth fail
-        doThrow(new ServiceException()).when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode,
-                TASK_INSTANCE);
+        doThrow(new ServiceException()).when(projectService).checkProjectPermission(loginUser, projectCode,
+                ProjectPermission.VIEW);
         Assertions.assertThrows(ServiceException.class, () -> taskInstanceService.queryTaskListPaging(loginUser,
                 projectCode,
                 0,
@@ -120,7 +120,7 @@ public class TaskInstanceServiceTest {
 
         // data parameter check
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
-        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, TASK_INSTANCE);
+        doNothing().when(projectService).checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         Assertions.assertThrows(ServiceException.class, () -> taskInstanceService.queryTaskListPaging(loginUser,
                 projectCode,
                 1,
@@ -148,7 +148,7 @@ public class TaskInstanceServiceTest {
         Page<TaskInstance> pageReturn = new Page<>(1, 10);
         taskInstanceList.add(taskInstance);
         pageReturn.setRecords(taskInstanceList);
-        doNothing().when(projectService).checkProjectAndAuthThrowException(loginUser, projectCode, TASK_INSTANCE);
+        doNothing().when(projectService).checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         when(usersService.queryUser(loginUser.getId())).thenReturn(loginUser);
         when(usersService.getUserIdByName(loginUser.getUserName())).thenReturn(loginUser.getId());
         when(taskInstanceDao.queryTaskInstanceListPaging(
@@ -336,7 +336,7 @@ public class TaskInstanceServiceTest {
         User user = getAdminUser();
         TaskInstance task = getTaskInstance();
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM)).when(projectService)
-                .checkHasProjectWritePermissionThrowException(user, task.getProjectCode());
+                .checkProjectPermission(user, task.getProjectCode(), ProjectPermission.EXECUTE);
         assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
                 () -> taskInstanceService.forceTaskSuccess(user, task.getProjectCode(), task.getId()));
         Mockito.verifyNoInteractions(taskInstanceDao);
@@ -347,7 +347,7 @@ public class TaskInstanceServiceTest {
         User user = getAdminUser();
         TaskInstance task = getTaskInstance();
         doNothing().when(projectService)
-                .checkHasProjectWritePermissionThrowException(user, task.getProjectCode());
+                .checkProjectPermission(user, task.getProjectCode(), ProjectPermission.EXECUTE);
         when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.empty());
         assertThrowsServiceException(Status.TASK_INSTANCE_NOT_FOUND,
                 () -> taskInstanceService.forceTaskSuccess(user, task.getProjectCode(), task.getId()));
@@ -358,7 +358,7 @@ public class TaskInstanceServiceTest {
         User user = getAdminUser();
         TaskInstance task = getTaskInstance();
         doNothing().when(projectService)
-                .checkHasProjectWritePermissionThrowException(user, task.getProjectCode());
+                .checkProjectPermission(user, task.getProjectCode(), ProjectPermission.EXECUTE);
         when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
         when(workflowInstanceDao.queryOptionalById(task.getWorkflowInstanceId())).thenReturn(Optional.empty());
 
@@ -373,7 +373,7 @@ public class TaskInstanceServiceTest {
         TaskInstance task = getTaskInstance();
         WorkflowInstance workflowInstance = getProcessInstance();
         workflowInstance.setState(WorkflowExecutionStatus.RUNNING_EXECUTION);
-        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, projectCode);
+        doNothing().when(projectService).checkProjectPermission(user, projectCode, ProjectPermission.EXECUTE);
         when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
         when(workflowInstanceDao.queryOptionalById(task.getWorkflowInstanceId()))
                 .thenReturn(Optional.of(workflowInstance));
@@ -391,7 +391,7 @@ public class TaskInstanceServiceTest {
         WorkflowInstance workflowInstance = getProcessInstance();
         workflowInstance.setState(WorkflowExecutionStatus.FAILURE);
         doNothing().when(projectService)
-                .checkHasProjectWritePermissionThrowException(user, task.getProjectCode());
+                .checkProjectPermission(user, task.getProjectCode(), ProjectPermission.EXECUTE);
         when(taskInstanceDao.queryOptionalById(task.getId())).thenReturn(Optional.of(task));
         when(workflowInstanceDao.queryOptionalById(task.getWorkflowInstanceId()))
                 .thenReturn(Optional.of(workflowInstance));
@@ -408,7 +408,7 @@ public class TaskInstanceServiceTest {
         Project project = getProject(projectCode);
         when(projectDao.queryByCode(projectCode)).thenReturn(project);
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkHasProjectWritePermissionThrowException(user, project);
+                .when(projectService).checkProjectPermission(user, project, ProjectPermission.EXECUTE);
 
         assertThrowsServiceException(Status.USER_NO_WRITE_PROJECT_PERM,
                 () -> taskInstanceService.taskSavePoint(user, projectCode, 1));

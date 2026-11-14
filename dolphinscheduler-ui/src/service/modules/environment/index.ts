@@ -56,10 +56,11 @@ export function queryEnvironmentByCode(params: EnvironmentCodeReq): any {
   })
 }
 
-export function queryAllEnvironmentList(): any {
+export function queryAllEnvironmentList(projectCode?: number): any {
   return axios({
     url: '/environment/query-environment-list',
-    method: 'get'
+    method: 'get',
+    params: { projectCode }
   })
 }
 

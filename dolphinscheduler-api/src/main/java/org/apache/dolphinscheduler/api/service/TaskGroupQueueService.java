@@ -42,7 +42,7 @@ public interface TaskGroupQueueService {
 
     void deleteByWorkflowInstanceId(Integer workflowInstanceId);
 
-    void modifyPriority(Integer queueId, Integer priority);
+    void modifyPriority(User loginUser, Integer queueId, Integer priority);
 
     void deleteByTaskGroupIds(List<Integer> taskGroupIds);
 }

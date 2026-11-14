@@ -130,8 +130,9 @@ public class TenantController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_TENANT_LIST_ERROR)
-    public Result<List<Tenant>> queryTenantList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
-        List<Tenant> tenants = tenantService.queryTenantList(loginUser);
+    public Result<List<Tenant>> queryTenantList(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                @RequestParam(value = "projectCode", required = false) Long projectCode) {
+        List<Tenant> tenants = tenantService.queryTenantList(loginUser, projectCode);
         return Result.success(tenants);
     }
 
@@ -203,7 +204,7 @@ public class TenantController extends BaseController {
     @ApiException(VERIFY_OS_TENANT_CODE_ERROR)
     public Result<Boolean> verifyTenantCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                             @RequestParam(value = "tenantCode") String tenantCode) {
-        tenantService.verifyTenantCode(tenantCode);
+        tenantService.verifyTenantCode(loginUser, tenantCode);
         return Result.success(true);
     }
 

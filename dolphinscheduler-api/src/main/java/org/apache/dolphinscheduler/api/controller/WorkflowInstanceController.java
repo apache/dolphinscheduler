@@ -295,10 +295,10 @@ public class WorkflowInstanceController extends BaseController {
     @GetMapping(value = "/query-sub-by-parent")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(Status.QUERY_SUB_WORKFLOW_INSTANCE_DETAIL_INFO_BY_TASK_ID_ERROR)
-    public Result<Map<String, Integer>> querySubWorkflowInstanceByTaskId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                                                         @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
-                                                                         @RequestParam("taskId") Integer taskId) {
-        Map<String, Integer> data =
+    public Result<Map<String, Object>> querySubWorkflowInstanceByTaskId(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                                                        @Parameter(name = "projectCode", description = "PROJECT_CODE", required = true) @PathVariable long projectCode,
+                                                                        @RequestParam("taskId") Integer taskId) {
+        Map<String, Object> data =
                 workflowInstanceService.querySubWorkflowInstanceByTaskId(loginUser, projectCode, taskId);
         return Result.success(data);
     }

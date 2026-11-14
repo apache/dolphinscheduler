@@ -36,6 +36,7 @@ import org.apache.dolphinscheduler.common.enums.CommandType;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.enums.Priority;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.TaskDependType;
 import org.apache.dolphinscheduler.common.enums.UserType;
@@ -44,7 +45,6 @@ import org.apache.dolphinscheduler.common.enums.WorkflowExecutionTypeEnum;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.DataSource;
 import org.apache.dolphinscheduler.dao.entity.Project;
-import org.apache.dolphinscheduler.dao.entity.ProjectUser;
 import org.apache.dolphinscheduler.dao.entity.Schedule;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.Tenant;
@@ -52,7 +52,6 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.repository.DataSourceDao;
 import org.apache.dolphinscheduler.dao.repository.ProjectDao;
-import org.apache.dolphinscheduler.dao.repository.ProjectUserDao;
 import org.apache.dolphinscheduler.dao.repository.ScheduleDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
@@ -68,7 +67,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -136,9 +134,6 @@ public class PythonGateway {
 
     @Autowired
     private ApiConfig apiConfig;
-
-    @Autowired
-    private ProjectUserDao projectUserDao;
 
     // TODO replace this user to build in admin user if we make sure build in one could not be change
     private final User dummyAdminUser = new User() {
@@ -378,25 +373,8 @@ public class PythonGateway {
         executorService.triggerWorkflowDefinition(workflowTriggerRequest);
     }
 
-    // side object
     /*
-     * Grant project's permission to user. Use when project's created user not current but Python API use it to change
-     * workflow.
-     */
-    private Integer grantProjectToUser(Project project, User user) {
-        Date now = new Date();
-        ProjectUser projectUser = new ProjectUser();
-        projectUser.setUserId(user.getId());
-        projectUser.setProjectId(project.getId());
-        projectUser.setPerm(Constants.AUTHORIZE_WRITABLE_PERM);
-        projectUser.setCreateTime(now);
-        projectUser.setUpdateTime(now);
-        return projectUserDao.insert(projectUser);
-    }
-
-    /*
-     * Grant or create project. Create a new project if project do not exists, and grant the project permission to user
-     * if project exists but without permission to this user.
+     * Create a project, or require development permission on an existing project.
      */
     public void createOrGrantProject(String userName, String name, String desc) {
         User user = usersService.queryUser(userName);
@@ -405,11 +383,8 @@ public class PythonGateway {
         project = projectDao.queryByName(name);
         if (project == null) {
             projectService.createProject(user, name, desc);
-        } else if (project.getUserId() != user.getId()) {
-            ProjectUser projectUser = projectUserDao.queryProjectRelation(project.getId(), user.getId());
-            if (projectUser == null) {
-                grantProjectToUser(project, user);
-            }
+        } else {
+            projectService.checkProjectPermission(user, project, ProjectPermission.DEVELOP);
         }
     }
 

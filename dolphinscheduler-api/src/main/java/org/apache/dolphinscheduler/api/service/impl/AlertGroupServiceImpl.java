@@ -25,17 +25,20 @@ import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationCon
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.AlertGroupService;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.dao.entity.AlertGroup;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.AlertGroupDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +60,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroupService {
 
     @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
+
+    @Autowired
+    private ProjectAuthorizationService projectAuthorizationService;
+
+    @Autowired
     private AlertGroupDao alertGroupDao;
 
     /**
@@ -66,16 +75,20 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return alert group list
      */
     @Override
+    public List<AlertGroup> queryAllAlertGroup(User loginUser, Long projectCode) {
+        if (projectCode == null) {
+            return queryAllAlertGroup(loginUser);
+        }
+        projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
+        return alertGroupDao.queryByProject(projectCode);
+    }
+
+    @Override
     public List<AlertGroup> queryAllAlertGroup(User loginUser) {
-        if (loginUser.getUserType().equals(UserType.ADMIN_USER)) {
-            return alertGroupDao.queryAllGroupList();
+        if (isNotAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
         }
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ALERT_GROUP,
-                loginUser.getId(), log);
-        if (ids.isEmpty()) {
-            return Collections.emptyList();
-        }
-        return alertGroupDao.queryByIds(ids);
+        return alertGroupDao.queryAllGroupList();
     }
 
     /**
@@ -226,6 +239,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return delete result code
      */
     @Override
+    @Transactional
     public void deleteAlertGroupById(User loginUser, int id) {
 
         // only admin can operate
@@ -246,6 +260,7 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
         }
 
         alertGroupDao.deleteById(id);
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.ALERT_GROUP, Integer.toString(id));
         log.info("Delete alert group complete, groupId:{}", id);
     }
 
@@ -256,7 +271,10 @@ public class AlertGroupServiceImpl extends BaseServiceImpl implements AlertGroup
      * @return check result code
      */
     @Override
-    public boolean existGroupName(String groupName) {
+    public boolean existGroupName(User loginUser, String groupName) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         return alertGroupDao.existGroupName(groupName);
     }
 }

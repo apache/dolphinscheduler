@@ -17,7 +17,10 @@
 
 package org.apache.dolphinscheduler.dao.entity;
 
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+
 import java.util.Date;
+import java.util.Set;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -69,6 +72,9 @@ public class Project {
      */
     @TableField(exist = false)
     private int perm;
+
+    @TableField(exist = false)
+    private Set<ProjectPermission> permissions;
 
     /**
      * process define count

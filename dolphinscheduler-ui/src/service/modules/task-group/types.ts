@@ -27,7 +27,7 @@ interface TaskGroupIdReq {
 
 interface TaskGroupReq {
   name: string
-  projectCode: string
+  projectCode?: string
   groupSize: string
   status: number
   description: string
@@ -62,7 +62,7 @@ interface TaskGroupQueue {
   taskId: number
   taskName: string
   projectName: string
-  projectCode: string
+  projectCode?: string
   workflowInstanceName: string
   groupId: number
   workflowInstanceId: number

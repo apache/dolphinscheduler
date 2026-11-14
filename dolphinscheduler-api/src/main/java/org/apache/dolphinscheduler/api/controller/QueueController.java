@@ -196,7 +196,7 @@ public class QueueController extends BaseController {
     public Result<Boolean> verifyQueue(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                        @RequestParam(value = "queue") String queue,
                                        @RequestParam(value = "queueName") String queueName) {
-        queueService.verifyQueue(queue, queueName);
+        queueService.verifyQueue(loginUser, queue, queueName);
         return Result.success(true);
     }
 }

@@ -17,12 +17,11 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.PROJECT;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.service.ProjectPreferenceService;
 import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectPreference;
@@ -61,7 +60,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
 
         // check if the user has the writing permission for project
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
 
         ProjectPreference projectPreference = projectPreferenceMapper
                 .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
@@ -107,7 +106,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
         Result result = new Result();
 
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkProjectAndAuthThrowException(loginUser, project, PROJECT);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.VIEW);
 
         ProjectPreference projectPreference = projectPreferenceMapper
                 .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
@@ -125,7 +124,7 @@ public class ProjectPreferenceServiceImpl extends BaseServiceImpl
 
         // check if the user has the writing permission for project
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.DEVELOP);
 
         ProjectPreference projectPreference = projectPreferenceMapper
                 .selectOne(new QueryWrapper<ProjectPreference>().lambda().eq(ProjectPreference::getProjectCode,
