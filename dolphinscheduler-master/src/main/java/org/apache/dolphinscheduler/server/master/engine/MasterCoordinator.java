@@ -41,11 +41,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MasterCoordinator extends AbstractHAServer {
 
-    private final ITaskGroupCoordinator taskGroupCoordinator;
-
-    private final IFailoverCoordinator failoverCoordinator;
-
-    private final IWorkflowSerialCoordinator workflowSerialCoordinator;
+    private final MasterCoordinatorListener masterCoordinatorListener;
 
     public MasterCoordinator(final Registry registry,
                              final MasterConfig masterConfig,
@@ -56,11 +52,9 @@ public class MasterCoordinator extends AbstractHAServer {
                 registry,
                 RegistryNodeType.MASTER_COORDINATOR.getRegistryPath(),
                 masterConfig.getMasterAddress());
-        this.taskGroupCoordinator = taskGroupCoordinator;
-        this.failoverCoordinator = failoverCoordinator;
-        this.workflowSerialCoordinator = workflowSerialCoordinator;
-        addServerStatusChangeListener(
-                new MasterCoordinatorListener(taskGroupCoordinator, failoverCoordinator, workflowSerialCoordinator));
+        this.masterCoordinatorListener =
+                new MasterCoordinatorListener(taskGroupCoordinator, failoverCoordinator, workflowSerialCoordinator);
+        addServerStatusChangeListener(masterCoordinatorListener);
     }
 
     @Override
@@ -70,8 +64,9 @@ public class MasterCoordinator extends AbstractHAServer {
     }
 
     @Override
-    public void close() {
-        taskGroupCoordinator.close();
+    public synchronized void close() {
+        // Serialize shutdown with HA callbacks and cancel pending restarts in both coordinators.
+        masterCoordinatorListener.changeToStandBy();
         log.info("MasterCoordinator shutdown...");
     }
 
