@@ -263,6 +263,7 @@ Location: `api-server/conf/application.yaml`
 | casdoor.organization-name                             |                                      | organization name in Casdoor                                                                   |
 | casdoor.application-name                              |                                      | application name in Casdoor                                                                    |
 | casdoor.redirect-url                                  |                                      | doplhinscheduler login url                                                                     |
+| api.datasource-connection-check-enabled               | false                                | whether to test datasource connectivity with the effective credentials before saving           |
 | api.session-timeout                                   | 2h                                   | login session lifetime measured from login time; accepts a Duration (e.g. 30m, 12h, 1d)        |
 | api.traffic.control.global.switch                     | false                                | traffic control global switch                                                                  |
 | api.traffic.control.max-global-qps-rate               | 300                                  | global max request number per second                                                           |
