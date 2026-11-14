@@ -71,29 +71,51 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
 
     private Thread internalThread;
 
+    // Guarded by this monitor. A single waiter serves the latest restart request.
+    private boolean restartRequested;
+
+    private Thread restartThread;
+
     private static final int DEFAULT_FETCH_SIZE = 1000;
 
     private static final int DEFAULT_FETCH_INTERVAL_SECONDS = 5;
 
     /**
-     * Starts a new worker after the previous worker has exited. A blocked operation in the
-     * previous worker can delay this method even after close() has requested it to stop.
+     * Starts a worker, or requests a restart after the previous worker exits.
+     * Waiting is asynchronous so a later standby callback can cancel the request.
      */
     @Override
     public synchronized void start() {
         log.info("WorkflowSerialCoordinator starting...");
-        if (flag) {
+        if (flag || restartRequested) {
             throw new IllegalStateException("WorkflowSerialCoordinator is already started");
         }
-        if (internalThread != null) {
-            if (internalThread == Thread.currentThread()) {
-                throw new IllegalStateException("Cannot restart coordinator from its own worker");
+        if (internalThread == Thread.currentThread()) {
+            throw new IllegalStateException("Cannot restart coordinator from its own worker");
+        }
+        if (restartThread != null || (internalThread != null && internalThread.isAlive())) {
+            if (restartThread == null) {
+                final Thread previousThread = internalThread;
+                final Thread waiter = new BaseDaemonThread(() -> {
+                    log.info("Waiting for previous {} to exit", previousThread.getName());
+                    Uninterruptibles.joinUninterruptibly(previousThread);
+                    synchronized (WorkflowSerialCoordinator.this) {
+                        restartThread = null;
+                        if (restartRequested) {
+                            restartRequested = false;
+                            // close() can cancel the request while the predecessor is exiting.
+                            start();
+                        }
+                    }
+                }) {
+                };
+                waiter.setName("WorkflowSerialCoordinator-Restart");
+                waiter.start();
+                restartThread = waiter;
             }
-            if (internalThread.isAlive()) {
-                log.info("Waiting for previous {} to exit", internalThread.getName());
-            }
-            // Setting flag to true before the old worker exits would let it continue alongside the new worker.
-            Uninterruptibles.joinUninterruptibly(internalThread);
+            // The waiter takes this monitor before consuming the request.
+            restartRequested = true;
+            return;
         }
         internalThread = new BaseDaemonThread(this::doStart) {
         };
@@ -184,23 +206,26 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
     }
 
     /**
-     * Requests the worker to stop. Its current iteration may still finish after this method returns.
+     * Requests the worker to stop and cancels a pending restart.
+     * Its current iteration may still finish after this method returns.
      */
     @Override
     public synchronized void close() {
-        if (!flag) {
+        if (!flag && !restartRequested) {
             log.warn("WorkflowSerialCoordinator is already closed");
             return;
         }
+        final boolean wasRunning = flag;
+        restartRequested = false;
         flag = false;
         try {
-            if (internalThread != null) {
+            if (wasRunning && internalThread != null) {
                 internalThread.interrupt();
             }
         } catch (Exception ex) {
             log.error("Close internalThread failed", ex);
         }
-        // Keep the thread reference so start() can wait for this worker to exit.
+        // Keep the thread reference so a restart waits for this worker to exit.
         log.info("WorkflowSerialCoordinator closed");
     }
 }
