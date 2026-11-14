@@ -155,6 +155,12 @@ export default defineComponent({
       }
     })
 
+    const copyDisplay = computed(
+      () =>
+        menuDisplay.value ||
+        (route.name === 'workflow-definition-create' && !props.readonly)
+    )
+
     const taskInstance = computed(() => {
       if (nodeVariables.menuCell) {
         const taskCode = Number(nodeVariables.menuCell!.id)
@@ -401,6 +407,7 @@ export default defineComponent({
           startDisplay={startDisplay.value}
           executeTaskDisplay={executeTaskDisplay.value}
           menuDisplay={menuDisplay.value}
+          copyDisplay={copyDisplay.value}
           taskInstance={taskInstance.value}
           cell={nodeVariables.menuCell as Cell}
           visible={nodeVariables.menuVisible}
