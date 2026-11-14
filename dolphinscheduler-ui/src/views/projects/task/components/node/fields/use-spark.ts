@@ -29,7 +29,7 @@ import {
   useResources,
   useYarnQueue
 } from '.'
-import type { IJsonItem } from '../types'
+import type { IJsonItem, IJsonItemParams } from '../types'
 
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   const { t } = useI18n()
@@ -49,9 +49,17 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     model.programType === 'SQL' && model.sqlExecutionType === 'FILE'
   )
 
+  const pyFilesSpan = computed(() => (model.programType === 'PYTHON' ? 24 : 0))
+
   const resourcesLimit = computed(() =>
     model.programType === 'SQL' && model.sqlExecutionType === 'FILE' ? 1 : -1
   )
+
+  const resourcesField = useResources(
+    24,
+    resourcesRequired,
+    resourcesLimit
+  ) as IJsonItemParams
 
   const sqlExecutionTypeSpan = computed(() =>
     model.programType === 'SQL' ? 12 : 0
@@ -87,6 +95,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         'on-update:value': () => {
           model.mainJar = null
           model.mainClass = ''
+          model.pyFiles = []
         }
       }
     },
@@ -186,7 +195,87 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.option_parameters_tips')
       }
     },
-    useResources(24, resourcesRequired, resourcesLimit),
+    {
+      type: 'tree-select',
+      field: 'pyFiles',
+      span: pyFilesSpan,
+      name: t('project.node.py_files'),
+      options: resourcesField.options,
+      props: {
+        multiple: true,
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        filterable: true,
+        clearFilterAfterSelect: false,
+        checkStrategy: 'child',
+        placeholder: t('project.node.py_files_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      }
+    },
+    {
+      type: 'tree-select',
+      field: 'archives',
+      span: 24,
+      name: t('project.node.archives'),
+      options: resourcesField.options,
+      props: {
+        multiple: true,
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        filterable: true,
+        clearFilterAfterSelect: false,
+        checkStrategy: 'child',
+        placeholder: t('project.node.archives_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      }
+    },
+    {
+      type: 'input',
+      field: 'principal',
+      span: 24,
+      name: t('project.node.principal'),
+      props: {
+        placeholder: t('project.node.principal_tips')
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        validator(validate: any, value: string) {
+          if (value && !model.keytab) {
+            return new Error(t('project.node.principal_keytab_pair_tips'))
+          }
+        }
+      }
+    },
+    {
+      type: 'tree-select',
+      field: 'keytab',
+      span: 24,
+      name: t('project.node.keytab'),
+      options: resourcesField.options,
+      props: {
+        checkable: true,
+        cascade: true,
+        showPath: true,
+        filterable: true,
+        checkStrategy: 'child',
+        placeholder: t('project.node.keytab_tips'),
+        keyField: 'fullName',
+        labelField: 'name'
+      },
+      validate: {
+        trigger: ['blur'],
+        validator(validate: any, value: string) {
+          if (value && !model.principal) {
+            return new Error(t('project.node.principal_keytab_pair_tips'))
+          }
+        }
+      }
+    },
+    resourcesField,
     ...useCustomParams({
       model,
       field: 'localParams',

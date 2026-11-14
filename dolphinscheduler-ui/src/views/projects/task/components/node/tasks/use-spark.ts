@@ -54,7 +54,11 @@ export function useSpark({
     executorCores: 2,
     yarnQueue: '',
     timeoutNotifyStrategy: ['WARN'],
-    sqlExecutionType: 'SCRIPT'
+    sqlExecutionType: 'SCRIPT',
+    pyFiles: [],
+    archives: [],
+    principal: '',
+    keytab: null
   } as INodeData)
 
   return {
