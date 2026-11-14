@@ -26,6 +26,7 @@ import static org.apache.dolphinscheduler.plugin.task.api.TaskConstants.EXIT_COD
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.OSUtils;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parser.TaskOutputParameterParser;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptor;
@@ -96,6 +97,9 @@ public abstract class AbstractCommandExecutor {
         if (taskRequest.getMemoryMax() != null) {
             iShellInterceptorBuilder.memoryQuota(taskRequest.getMemoryMax());
         }
+        // Mask only the logged script. The file written by the builder stays plaintext.
+        iShellInterceptorBuilder.sensitiveValues(
+                SensitiveLogHelper.sensitiveValues(taskRequest.getPrepareParamsMap()));
 
         IShellInterceptor iShellInterceptor = iShellInterceptorBuilder.build();
         process = iShellInterceptor.execute();

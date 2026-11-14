@@ -145,6 +145,17 @@ class PropertySensitiveUtilsTest {
         Assertions.assertEquals("abc", parsed.get(0).getValue());
     }
 
+    @Test
+    void findPlaceholderPropReturnsEmptyPropWhenPlaceholderPropertyHasNoProp() {
+        Property noProp = Property.builder()
+                .value(TaskConstants.SENSITIVE_DATA_MASK)
+                .sensitive(true)
+                .build();
+
+        Assertions.assertEquals("", PropertySensitiveUtils.findPlaceholderProp(
+                Collections.singletonList(noProp)));
+    }
+
     private static Property sensitive(String prop, String value) {
         return Property.builder()
                 .prop(prop)

@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -148,7 +149,7 @@ public class HiveCliTask extends AbstractRemoteTask {
 
         final Map<String, Property> paramsMap = taskRequest.getPrepareParamsMap();
         sqlContent = ParameterUtils.convertParameterPlaceholders(sqlContent, ParameterUtils.convert(paramsMap));
-        log.info("HiveCli sql content: {}", sqlContent);
+        log.info("HiveCli sql content: {}", SensitiveLogHelper.mask(sqlContent, paramsMap));
         String sqlFilePath = generateSqlScriptFile(sqlContent);
 
         args.add(HiveCliConstants.HIVE_CLI_EXECUTE_FILE);

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.task.executor;
 import org.apache.dolphinscheduler.common.enums.Flag;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.TaskExecutionContextLogRedactor;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskInstanceLogHeader;
 import org.apache.dolphinscheduler.plugin.task.api.log.TaskLogMarkers;
 import org.apache.dolphinscheduler.task.executor.eventbus.TaskExecutorEventBus;
@@ -127,8 +128,10 @@ public abstract class AbstractTaskExecutor implements ITaskExecutor {
 
     protected void initializeTaskContext() {
         taskExecutionContext.setStartTime(System.currentTimeMillis());
+        // Log a redacted copy. globalParams/taskParams are JSON strings; serializing the live
+        // context escapes them a second time, and one-level literal masks miss that form.
         log.info(TaskLogMarkers.excludeInTaskLog(), "Initialized taskContext {}",
-                JSONUtils.toPrettyJsonString(taskExecutionContext));
+                JSONUtils.toPrettyJsonString(TaskExecutionContextLogRedactor.redactForLog(taskExecutionContext)));
     }
 
     private void publishTaskRunningEvent() {

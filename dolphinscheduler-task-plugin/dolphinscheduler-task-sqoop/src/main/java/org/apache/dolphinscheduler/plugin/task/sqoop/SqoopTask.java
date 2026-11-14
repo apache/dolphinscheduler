@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.sqoop.generator.SqoopJobGenerator;
 import org.apache.dolphinscheduler.plugin.task.sqoop.parameter.SqoopParameters;
@@ -49,7 +50,7 @@ public class SqoopTask extends AbstractYarnTask {
     public void init() {
         sqoopParameters =
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), SqoopParameters.class);
-        log.info("Initialize sqoop task params {}", JSONUtils.toPrettyJsonString(sqoopParameters));
+        log.info("Initialize sqoop task params {}", SensitiveLogHelper.toPrettyJson(sqoopParameters));
         if (null == sqoopParameters) {
             throw new TaskException("Sqoop Task params is null");
         }

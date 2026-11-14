@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
 import org.apache.dolphinscheduler.common.utils.FileUtils;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -59,7 +60,9 @@ public abstract class BaseWindowsShellInterceptorBuilder<T extends BaseWindowsSh
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
-        log.info("Final Shell file is : \n{}", finalScript);
+        // Sensitive plaintext is replaced with ****** before this log sink.
+        // codeql[java/sensitive-log]
+        log.info("Final Shell file is : \n{}", SensitiveLogHelper.mask(finalScript, sensitiveValues));
     }
 
     private String shellBody() {

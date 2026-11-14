@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.common.utils.PropertyUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import java.util.Map;
@@ -79,7 +80,7 @@ public abstract class AbstractEmrTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         emrParameters = JSONUtils.parseObject(taskParams, EmrParameters.class);
-        log.info("Initialize emr task params:{}", JSONUtils.toPrettyJsonString(taskParams));
+        log.info("Initialize emr task params:{}", SensitiveLogHelper.toPrettyJson(taskParams));
         if (emrParameters == null || !emrParameters.checkParameters()) {
             throw new EmrTaskException("emr task params is not valid");
         }

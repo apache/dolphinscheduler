@@ -268,6 +268,8 @@ In the early schedule design, if there is no priority design and use the fair sc
 </appender>
 ```
 
+- Sensitive parameter values are redacted at the log statement, before the line is written. Task-context dumps and parameter-initialization logs use a logging-only copy whose sensitive property values are replaced with `******`. Script and SQL text is masked only in the logged string: known sensitive values are replaced literally, longer values first. The script file, JDBC binds, remote uploads, and output-parameter parsing keep the original plaintext. Short sensitive values are not scanned across every log line, so they do not rewrite unrelated text. Task process output, Kubernetes pod logs, and remote-shell task output are not rewritten.
+
 ## Sum Up
 
 From the perspective of scheduling, this article preliminarily introduces the architecture principles and implementation ideas of the big data distributed workflow scheduling system: DolphinScheduler. To be continued.

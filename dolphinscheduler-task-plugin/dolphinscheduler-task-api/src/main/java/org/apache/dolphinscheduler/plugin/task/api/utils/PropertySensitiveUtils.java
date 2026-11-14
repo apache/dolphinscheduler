@@ -98,17 +98,31 @@ public class PropertySensitiveUtils {
                 .collect(Collectors.toList());
     }
 
-    /** Create: {@code ******} is never a real value. */
+    /**
+     * Create: {@code ******} is never a real value.
+     *
+     * @return the prop name of the first placeholder property ({@code ""} when the offending
+     *         property has no prop), or {@code null} when there is none.
+     */
     public String findPlaceholderProp(List<Property> properties) {
         if (CollectionUtils.isEmpty(properties)) {
             return null;
         }
         for (Property property : properties) {
             if (property != null && isSensitiveValuePlaceholder(property.getValue())) {
-                return property.getProp();
+                return propOrEmpty(property);
             }
         }
         return null;
+    }
+
+    /**
+     * The offending prop name, or {@code ""} when the offending property has no prop.
+     * Never returns {@code null}, so callers can rely on {@code != null} to detect a
+     * violation: a malformed property with a null prop must not silently pass validation.
+     */
+    private String propOrEmpty(final Property property) {
+        return property.getProp() == null ? "" : property.getProp();
     }
 
     /**
@@ -128,12 +142,12 @@ public class PropertySensitiveUtils {
             Property existing = existingPropertyMap.get(submitted.getProp());
             if (!isSensitive(submitted)) {
                 if (existing != null && existing.isSensitive()) {
-                    return submitted.getProp();
+                    return propOrEmpty(submitted);
                 }
                 continue;
             }
             if (existing == null) {
-                return submitted.getProp();
+                return propOrEmpty(submitted);
             }
         }
         return null;
