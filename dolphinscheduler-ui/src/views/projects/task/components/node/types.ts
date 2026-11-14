@@ -480,6 +480,7 @@ interface ITaskParams {
   yarnQueue?: string
   awsRegion?: string
   kubeConfig?: string
+  jshellScript?: string
 }
 
 interface INodeData
