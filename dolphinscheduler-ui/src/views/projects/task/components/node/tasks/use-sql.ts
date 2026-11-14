@@ -46,6 +46,7 @@ export function useSql({
     timeout: 30,
     type: 'MYSQL',
     displayRows: 10,
+    limit: undefined,
     sql: '',
     sqlSource: 'SCRIPT',
     sqlResource: '',

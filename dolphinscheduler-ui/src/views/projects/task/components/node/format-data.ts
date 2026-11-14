@@ -213,6 +213,9 @@ export function formatParams(data: INodeData): {
     taskParams.postStatements = data.postStatements
     taskParams.sendEmail = data.sendEmail
     taskParams.displayRows = data.displayRows
+    if (data.limit) {
+      taskParams.limit = Number(data.limit)
+    }
     if (data.sqlType === '0' && data.sendEmail) {
       taskParams.title = data.title
       taskParams.groupId = data.groupId
