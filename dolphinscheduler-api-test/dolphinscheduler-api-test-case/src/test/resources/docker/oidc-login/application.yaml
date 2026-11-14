@@ -155,7 +155,6 @@ worker:
 alert:
   port: 50052
   wait-timeout: 0
-  max-heartbeat-interval: 60s
   sender-parallelism: 5
 
 api:
