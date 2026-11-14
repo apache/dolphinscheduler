@@ -24,7 +24,6 @@ import org.apache.dolphinscheduler.task.executor.container.ITaskExecutorContaine
 import org.apache.dolphinscheduler.task.executor.dto.TaskExecutorDTO;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorEventBusCoordinator;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorDispatchedLifecycleEvent;
-import org.apache.dolphinscheduler.task.executor.events.TaskExecutorKillLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.events.TaskExecutorPauseLifecycleEvent;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorNotFoundException;
 import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorRuntimeException;
@@ -82,7 +81,10 @@ public class TaskEngine implements ITaskEngine {
     public void killTask(final int taskExecutorId) throws TaskExecutorNotFoundException {
         final ITaskExecutor taskExecutor = getTaskExecutor(taskExecutorId);
         try (final TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskExecutor)) {
-            taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorKillLifecycleEvent.of(taskExecutor));
+            // the kill is not queued: the caller, for example the API which stopped a streaming task,
+            // has to know whether the task is really stopped, and the failure of a task which could not
+            // be cancelled has to reach it
+            taskExecutorEventBusCoordinator.fireTaskExecutorKillEvent(taskExecutor);
         }
     }
 

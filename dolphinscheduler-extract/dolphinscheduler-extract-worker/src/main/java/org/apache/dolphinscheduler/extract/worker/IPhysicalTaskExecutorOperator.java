@@ -35,7 +35,14 @@ public interface IPhysicalTaskExecutorOperator {
     @RpcMethod
     TaskExecutorDispatchResponse dispatchTask(final TaskExecutorDispatchRequest taskExecutorDispatchRequest);
 
-    @RpcMethod
+    /**
+     * Kill the task and wait until it is stopped.
+     *
+     * <p>The response tells the caller whether the task was really stopped, so a task which could not
+     * be cancelled is not reported as stopped. The wait is longer than the default RPC timeout, see
+     * {@link TaskExecutorKillRequest#KILL_TIMEOUT_MILLIS}.
+     */
+    @RpcMethod(timeout = TaskExecutorKillRequest.KILL_TIMEOUT_MILLIS)
     TaskExecutorKillResponse killTask(final TaskExecutorKillRequest taskExecutorKillRequest);
 
     @RpcMethod
