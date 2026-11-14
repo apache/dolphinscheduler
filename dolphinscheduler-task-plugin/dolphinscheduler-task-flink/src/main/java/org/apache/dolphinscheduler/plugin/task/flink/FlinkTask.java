@@ -270,54 +270,64 @@ public class FlinkTask extends AbstractYarnTask {
     /**
      * Cancel the flink jobs through the flink CLI.
      *
-     * <p>Tasks submitted to YARN are not handled here: their application id is known and cancelling
-     * the application through the resource manager is the reliable way. The flink CLI cannot address
-     * such a job either, {@code flink cancel} accepts no {@code -yid}, so a failure of the resource
-     * manager is not retried here but reported by the caller. A Kubernetes cluster is
-     * identified by a cluster id rather than by an application id, so a job submitted to Kubernetes
-     * is cancelled through the CLI, with the cluster connection options of the submission.
+     * <p>A job which runs in a YARN application of the task is not handled here: its application id is
+     * known, and cancelling the application through the resource manager is the reliable way, which the
+     * caller has done before this method runs. The flink CLI cannot address such a job either,
+     * {@code flink cancel} accepts no {@code -yid}, so a failure of the resource manager is not retried
+     * here but reported by the caller.
      *
-     * <p>Every collected JobID is attempted. A job which is already in a terminal state cannot be
-     * cancelled any more, which is not a failure, so it is not reported as one.
+     * <p>The other jobs are cancelled here with the cluster connection options of their own
+     * submission, so a task which submits a job to YARN and a following one to another cluster
+     * cancels each of them on the cluster which runs it. A Kubernetes cluster is identified by a
+     * cluster id rather than by an application id, so a job submitted to Kubernetes is cancelled
+     * through the CLI as well.
+     *
+     * <p>Every job which is not cancelled with its application is attempted. A job which is already in
+     * a terminal state cannot be cancelled any more, which is not a failure, so it is not reported as
+     * one.
      *
      * @throws TaskException if at least one job which is not in a terminal state could not be
      *         cancelled
      */
     protected void cancelFlinkJob() throws TaskException {
-        try {
-            if (CollectionUtils.isNotEmpty(getApplicationIds())) {
-                return;
-            }
-        } catch (Exception e) {
-            log.warn("Get application ids failed, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
-        }
-        List<String> jobIds = getFlinkJobIds();
+        List<FlinkJobSubmission> submissions = getFlinkJobSubmissions();
         // a submission which reported no JobID and no completion can still be running, and the client
         // prints no id for a synchronous submission, so it cannot be cancelled through the flink CLI
         int unreportedSubmissions = countUnreportedSubmissions();
-        if (CollectionUtils.isEmpty(jobIds) && unreportedSubmissions == 0) {
+        if (CollectionUtils.isEmpty(submissions) && unreportedSubmissions == 0) {
             log.info("Cannot find flink JobID from the task log, taskInstanceId: {}",
                     taskExecutionContext.getTaskInstanceId());
             return;
         }
         List<List<String>> clusterConnectionOptionsPerJob = getClusterConnectionOptionsPerJob();
-        if (!clusterConnectionOptionsPerJob.isEmpty() && clusterConnectionOptionsPerJob.size() != jobIds.size()) {
+        if (!clusterConnectionOptionsPerJob.isEmpty() && clusterConnectionOptionsPerJob.size() != submissions.size()) {
             // the scanner and the observed JobIDs disagree, so at least one job is handled with the
             // last configuration instead of the one it was submitted with
             log.warn("The SQL scripts describe {} job(s) but {} JobID(s) were collected, the jobs which are not "
                     + "described use the last connection options, taskInstanceId: {}",
-                    clusterConnectionOptionsPerJob.size(), jobIds.size(), taskExecutionContext.getTaskInstanceId());
+                    clusterConnectionOptionsPerJob.size(), submissions.size(),
+                    taskExecutionContext.getTaskInstanceId());
         }
         // a job which the scripts do not describe, for example one submitted from another file, uses
         // the last configuration of the submission
         List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
         List<String> failedJobIds = new ArrayList<>();
         List<String> notCancelledJobIds = new ArrayList<>();
-        for (int i = 0; i < jobIds.size(); i++) {
-            String jobId = jobIds.get(i);
+        List<String> cancelledJobIds = new ArrayList<>();
+        for (int i = 0; i < submissions.size(); i++) {
+            FlinkJobSubmission submission = submissions.get(i);
+            String jobId = submission.getJobId();
+            if (submission.getYarnApplicationId() != null || submission.isYarnApplicationUnresolved()) {
+                // the job runs in an application of the task, so it is the application which has to be
+                // cancelled, and the resource manager is the only one which can address it
+                log.info("Flink job {} is submitted into a YARN application of the task, it is cancelled with "
+                        + "the application instead of the flink CLI", jobId);
+                continue;
+            }
             List<String> clusterConnectionOptions = i < clusterConnectionOptionsPerJob.size()
                     ? clusterConnectionOptionsPerJob.get(i)
                     : lastClusterConnectionOptions;
+            cancelledJobIds.add(jobId);
             List<String> args = FlinkArgsUtils.buildCancelCommandLine(jobId, clusterConnectionOptions);
             FlinkArgsUtils.FlinkCommandResult result = executeFlinkCancelCommand(args);
             if (result.isSuccess()) {
@@ -372,7 +382,7 @@ public class FlinkTask extends AbstractYarnTask {
             log.error(message);
             throw new TaskException(message);
         }
-        log.info("Successfully cancelled flink jobs: {}", jobIds);
+        log.info("Successfully cancelled flink jobs: {}", cancelledJobIds);
     }
 
     /**
@@ -482,9 +492,10 @@ public class FlinkTask extends AbstractYarnTask {
 
     /**
      * The jobs the task submitted, in the order they appear in the task log. Each job keeps its Flink
-     * JobID and the YARN application which runs it, because the SQL Client with {@code yarn-per-job}
-     * submits every job into its own application, so a savepoint has to target the application of
-     * its own job.
+     * JobID, the YARN application which runs it and whether it is submitted into a YARN application at
+     * all, because the SQL Client with {@code yarn-per-job} submits every job into its own application,
+     * so a savepoint has to target the application of its own job, and a job which the same task
+     * submits to another cluster is neither cancelled nor checkpointed with an application id.
      */
     protected List<FlinkJobSubmission> getFlinkJobSubmissions() {
         String logPath = taskExecutionContext.getLogPath();
@@ -492,25 +503,50 @@ public class FlinkTask extends AbstractYarnTask {
         if (logFile == null || !logFile.isFile()) {
             return Collections.emptyList();
         }
+        List<List<String>> clusterConnectionOptionsPerJob = getClusterConnectionOptionsPerJob();
+        List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
+        FlinkDeployMode deployMode = getDeployMode();
         List<FlinkJobSubmission> submissions = new ArrayList<>();
         List<String> applicationIds = new ArrayList<>();
         Set<String> jobIds = new HashSet<>();
         try (Stream<String> lines = Files.lines(logFile.toPath())) {
             Iterator<String> iterator = lines.iterator();
+            // the application which runs the jobs of the current submission block
             String yarnApplicationId = null;
+            // the application the client printed for the submission which follows, it is null when the
+            // submission prints no application, which is the case for a job of another cluster and for
+            // the following jobs of a session application
+            String printedApplicationId = null;
             while (iterator.hasNext()) {
                 String line = iterator.next();
                 String applicationId = findYarnApplicationId(line);
                 if (applicationId != null) {
                     // the client prints the application before it submits the job into it
-                    yarnApplicationId = applicationId;
+                    printedApplicationId = applicationId;
                     if (!applicationIds.contains(applicationId)) {
                         applicationIds.add(applicationId);
                     }
                 }
                 String jobId = findFlinkJobId(line);
                 if (jobId != null && jobIds.add(jobId)) {
-                    submissions.add(new FlinkJobSubmission(jobId, yarnApplicationId));
+                    List<String> clusterConnectionOptions = submissions.size() < clusterConnectionOptionsPerJob.size()
+                            ? clusterConnectionOptionsPerJob.get(submissions.size())
+                            : lastClusterConnectionOptions;
+                    boolean yarnTarget;
+                    if (printedApplicationId != null) {
+                        // the client printed the application of this submission, it runs the job
+                        yarnApplicationId = printedApplicationId;
+                        yarnTarget = true;
+                    } else {
+                        yarnTarget = FlinkArgsUtils.isYarnTarget(clusterConnectionOptions, deployMode);
+                    }
+                    printedApplicationId = null;
+                    if (!yarnTarget) {
+                        // the job is submitted to another cluster than the application of the preceding
+                        // submission, which therefore does not run this job
+                        yarnApplicationId = null;
+                    }
+                    submissions.add(new FlinkJobSubmission(jobId, yarnApplicationId, yarnTarget));
                 }
             }
         } catch (Exception e) {
@@ -538,8 +574,8 @@ public class FlinkTask extends AbstractYarnTask {
      * associated is reported explicitly instead of targeting a guessed cluster.
      */
     private void associateApplications(List<FlinkJobSubmission> submissions, List<String> logApplicationIds) {
-        boolean applicationIdMissing =
-                submissions.stream().anyMatch(submission -> submission.getYarnApplicationId() == null);
+        boolean applicationIdMissing = submissions.stream()
+                .anyMatch(submission -> submission.isYarnTarget() && submission.getYarnApplicationId() == null);
         if (!applicationIdMissing) {
             return;
         }
@@ -557,10 +593,11 @@ public class FlinkTask extends AbstractYarnTask {
             log.warn("Get application ids failed, taskInstanceId: {}", taskExecutionContext.getTaskInstanceId(), e);
         }
         if (applicationIds.size() == 1) {
-            // a task which belongs to a single application: every job of the log runs in it
+            // a task which belongs to a single application: every YARN job of the log runs in it, a job
+            // which the same task submits to another cluster does not
             String onlyApplicationId = applicationIds.get(0);
-            submissions.replaceAll(submission -> submission.getYarnApplicationId() == null
-                    ? new FlinkJobSubmission(submission.getJobId(), onlyApplicationId)
+            submissions.replaceAll(submission -> submission.isYarnTarget() && submission.getYarnApplicationId() == null
+                    ? new FlinkJobSubmission(submission.getJobId(), onlyApplicationId, true)
                     : submission);
             return;
         }
@@ -568,23 +605,27 @@ public class FlinkTask extends AbstractYarnTask {
             log.error("Cannot associate the jobs {} with the applications {} of taskInstanceId: {}, "
                     + "they are not triggered with a -yid",
                     submissions.stream()
+                            .filter(submission -> submission.isYarnTarget()
+                                    && submission.getYarnApplicationId() == null)
                             .map(FlinkJobSubmission::getJobId)
                             .collect(Collectors.toList()),
                     applicationIds, taskExecutionContext.getTaskInstanceId());
-            submissions.replaceAll(submission -> submission.getYarnApplicationId() == null
-                    ? new FlinkJobSubmission(submission.getJobId(), null, true)
+            submissions.replaceAll(submission -> submission.isYarnTarget() && submission.getYarnApplicationId() == null
+                    ? new FlinkJobSubmission(submission.getJobId(), null, true, true)
                     : submission);
         }
     }
 
     /**
-     * The Flink JobIDs of the submitted jobs, in the order they appear in the task log. It is the id
-     * which `flink cancel` accepts, it is not the YARN/K8s application id.
+     * The deploy mode of the task, or null when the parameters are not available, for example when the
+     * task has not been started.
      */
-    protected List<String> getFlinkJobIds() {
-        return getFlinkJobSubmissions().stream()
-                .map(FlinkJobSubmission::getJobId)
-                .collect(Collectors.toList());
+    private FlinkDeployMode getDeployMode() {
+        AbstractParameters parameters = getParameters();
+        if (!(parameters instanceof FlinkParameters)) {
+            return null;
+        }
+        return ((FlinkParameters) parameters).getDeployMode();
     }
 
     /**
@@ -646,10 +687,11 @@ public class FlinkTask extends AbstractYarnTask {
     }
 
     /**
-     * A job submitted by the task: its Flink JobID, which identifies the job, and the YARN
-     * application which runs it, which is only used to target the cluster. The application is null
-     * when the job was not submitted to YARN, or when the task runs in several applications and the
-     * log does not tell which one runs this job.
+     * A job submitted by the task: its Flink JobID, which identifies the job, the YARN application
+     * which runs it, which is only used to target the cluster, and whether the submission is
+     * submitted into a YARN application at all. The application is null when the job was not
+     * submitted to YARN, or when the task runs in several applications and the log does not tell
+     * which one runs this job.
      */
     @Getter
     protected static class FlinkJobSubmission {
@@ -659,18 +701,26 @@ public class FlinkTask extends AbstractYarnTask {
         private final String yarnApplicationId;
 
         /**
+         * true when the job is submitted into a YARN application, which the resource manager cancels
+         * with the application of the task instead of the flink CLI.
+         */
+        private final boolean yarnTarget;
+
+        /**
          * true when the task runs in several YARN applications and this job could not be associated
          * with the application which runs it.
          */
         private final boolean yarnApplicationUnresolved;
 
-        FlinkJobSubmission(String jobId, String yarnApplicationId) {
-            this(jobId, yarnApplicationId, false);
+        FlinkJobSubmission(String jobId, String yarnApplicationId, boolean yarnTarget) {
+            this(jobId, yarnApplicationId, yarnTarget, false);
         }
 
-        FlinkJobSubmission(String jobId, String yarnApplicationId, boolean yarnApplicationUnresolved) {
+        FlinkJobSubmission(String jobId, String yarnApplicationId, boolean yarnTarget,
+                           boolean yarnApplicationUnresolved) {
             this.jobId = jobId;
             this.yarnApplicationId = yarnApplicationId;
+            this.yarnTarget = yarnTarget;
             this.yarnApplicationUnresolved = yarnApplicationUnresolved;
         }
     }

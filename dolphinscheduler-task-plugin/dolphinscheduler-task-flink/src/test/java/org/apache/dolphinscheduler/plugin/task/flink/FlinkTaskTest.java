@@ -697,6 +697,73 @@ public class FlinkTaskTest {
     }
 
     @Test
+    public void testCancelApplicationCancelsOnlyTheJobsWhichTheResourceManagerDoesNotRun() throws Exception {
+        // the task submits the first job to YARN and then switches the target for the second one: the
+        // first job is cancelled with its application by the resource manager, the second one has to be
+        // cancelled through the CLI on its own cluster, and it must not reuse the application of the
+        // first submission
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Submitted application application_1700000000000_0001\n"
+                        + "Job ID: 11111111111111111111111111111111\n"
+                        + "Job ID: 22222222222222222222222222222222");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.CLUSTER);
+        parameters.setRawScript("SET 'execution.target' = 'yarn-per-job';\n"
+                + "INSERT INTO t SELECT * FROM s;\n"
+                + "SET 'execution.target' = 'remote';\n"
+                + "SET 'rest.address' = 'cluster-b';\n"
+                + "INSERT INTO u SELECT * FROM v;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+
+        List<List<String>> executedCommands = stubCancelCommands(task, cancelSucceeded());
+
+        task.cancelApplication();
+
+        // only the job of the other cluster is cancelled through the flink CLI, with the connection
+        // options of its own submission
+        Assertions.assertEquals(1, executedCommands.size());
+        Assertions.assertEquals(
+                "${FLINK_HOME}/bin/flink cancel 22222222222222222222222222222222 "
+                        + "-Dexecution.target=remote -Drest.address=cluster-b",
+                String.join(" ", executedCommands.get(0)));
+    }
+
+    @Test
+    public void testFlinkJobSubmissionsKeepTheOwnershipOfEachJob() throws Exception {
+        // yarn-per-job submits every job into its own application, and a job which the task submits to
+        // another cluster after it does not belong to any application of the task
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Submitted application application_1700000000000_0001\n"
+                        + "Job ID: 11111111111111111111111111111111\n"
+                        + "Job ID: 22222222222222222222222222222222");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.CLUSTER);
+        parameters.setRawScript("SET 'execution.target' = 'yarn-per-job';\n"
+                + "INSERT INTO t SELECT * FROM s;\n"
+                + "SET 'execution.target' = 'remote';\n"
+                + "INSERT INTO u SELECT * FROM v;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = new FlinkTask(context);
+        task.init();
+
+        List<FlinkTask.FlinkJobSubmission> submissions = task.getFlinkJobSubmissions();
+
+        Assertions.assertEquals(2, submissions.size());
+        Assertions.assertEquals("application_1700000000000_0001", submissions.get(0).getYarnApplicationId());
+        Assertions.assertTrue(submissions.get(0).isYarnTarget());
+        Assertions.assertNull(submissions.get(1).getYarnApplicationId());
+        Assertions.assertFalse(submissions.get(1).isYarnTarget());
+    }
+
+    @Test
     public void testCancelApplicationSkipCliWhenSubmittedToYarn() throws Exception {
         TaskExecutionContext context = buildTaskExecutionContext(
                 "Submitted application application_1700000000000_0001");

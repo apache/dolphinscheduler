@@ -83,6 +83,19 @@ public class FlinkArgsUtils {
             "-t", "--target");
 
     /**
+     * The long form of {@link FlinkConstants#FLINK_EXECUTION_TARGET} and the configuration key which
+     * selects the same target as a {@code -D} option.
+     */
+    private static final String EXECUTION_TARGET_LONG_OPTION = "--target";
+    private static final String EXECUTION_TARGET_CONFIG_KEY = "execution.target";
+
+    /**
+     * The prefix of every execution target which submits a job into a YARN application, which is
+     * {@code yarn-per-job}, {@code yarn-application} and {@code yarn-session}.
+     */
+    private static final String YARN_EXECUTION_TARGET_PREFIX = "yarn";
+
+    /**
      * The configuration keys which identify the cluster a job was submitted to. They may be given as
      * {@code -D<key>=<value>}. The other {@code -D} options configure the submission only and are
      * not repeated on the cancel / savepoint command.
@@ -226,6 +239,61 @@ public class FlinkArgsUtils {
             default:
                 return buildRunCommandLineForOthers(taskExecutionContext, param);
         }
+    }
+
+    /**
+     * The execution target which the cluster connection options select, or null when they do not
+     * select one and the submission uses the target of the flink configuration.
+     *
+     * @param clusterConnectionOptions the cluster connection options of the submission, may be empty
+     * @return the execution target, for example {@code yarn-per-job}, or null
+     */
+    public static String executionTargetOf(List<String> clusterConnectionOptions) {
+        for (int i = 0; i < clusterConnectionOptions.size(); i++) {
+            String option = unquoteToken(clusterConnectionOptions.get(i));
+            if (FlinkConstants.FLINK_EXECUTION_TARGET.equals(option) || EXECUTION_TARGET_LONG_OPTION.equals(option)) {
+                // the target may be given as a separate argument, "-t yarn-per-job"
+                return i + 1 < clusterConnectionOptions.size()
+                        ? unquoteToken(clusterConnectionOptions.get(i + 1))
+                        : null;
+            }
+            int separator = option.indexOf('=');
+            if (separator < 0) {
+                continue;
+            }
+            String optionName = option.substring(0, separator);
+            if (FlinkConstants.FLINK_EXECUTION_TARGET.equals(optionName)
+                    || EXECUTION_TARGET_LONG_OPTION.equals(optionName)
+                    || optionName.equals(DYNAMIC_PROPERTY_OPTION + EXECUTION_TARGET_CONFIG_KEY)) {
+                return unquoteToken(option.substring(separator + 1));
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Whether the job which these cluster connection options describe is submitted into a YARN
+     * application.
+     *
+     * <p>A submission which selects a target with {@code -t}/{@code --target} or with
+     * {@code -Dexecution.target} submits to YARN when that target is a {@code yarn} one, and to
+     * another cluster when it is not, whatever the deploy mode of the task is. A submission which
+     * does not select a target runs on the cluster of the deploy mode.
+     *
+     * <p>The options of a job which nothing describes are treated as YARN as well: a job which is
+     * submitted into an application prints its application id in the task log, so it is an
+     * application job unless the options say otherwise.
+     *
+     * @param clusterConnectionOptions the cluster connection options of the submission, may be empty
+     * @param deployMode the deploy mode of the task, may be null when the parameters are unknown
+     * @return whether the job is submitted into a YARN application
+     */
+    public static boolean isYarnTarget(List<String> clusterConnectionOptions, FlinkDeployMode deployMode) {
+        String target = executionTargetOf(clusterConnectionOptions);
+        if (target != null) {
+            return target.startsWith(YARN_EXECUTION_TARGET_PREFIX);
+        }
+        return deployMode == null || deployMode == FlinkDeployMode.CLUSTER || deployMode == FlinkDeployMode.APPLICATION;
     }
 
     /**

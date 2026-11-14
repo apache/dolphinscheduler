@@ -180,6 +180,49 @@ public class FlinkArgsUtilsTest {
     }
 
     @Test
+    public void testIsYarnTargetReadsTheExecutionTarget() {
+        // the target selects the cluster of the job, whatever the deploy mode of the task is
+        Assertions.assertTrue(FlinkArgsUtils.isYarnTarget(
+                Arrays.asList("--target", "yarn-per-job"), FlinkDeployMode.STANDALONE));
+        Assertions.assertTrue(FlinkArgsUtils.isYarnTarget(
+                Collections.singletonList("-Dexecution.target=yarn-application"), FlinkDeployMode.LOCAL));
+        Assertions.assertTrue(FlinkArgsUtils.isYarnTarget(
+                Collections.singletonList("-Dexecution.target='yarn-session'"), FlinkDeployMode.LOCAL));
+        Assertions.assertTrue(FlinkArgsUtils.isYarnTarget(
+                Collections.singletonList("-t=yarn-per-job"), FlinkDeployMode.STANDALONE));
+        Assertions.assertFalse(FlinkArgsUtils.isYarnTarget(
+                Arrays.asList("-t", "remote"), FlinkDeployMode.CLUSTER));
+        Assertions.assertFalse(FlinkArgsUtils.isYarnTarget(
+                Collections.singletonList("-Dexecution.target=remote"), FlinkDeployMode.CLUSTER));
+    }
+
+    @Test
+    public void testIsYarnTargetFallsBackToTheDeployMode() {
+        // a submission which selects no target runs on the cluster of the deploy mode
+        Assertions.assertTrue(FlinkArgsUtils.isYarnTarget(
+                Collections.singletonList("-Drest.address=remote-jm"), FlinkDeployMode.CLUSTER));
+        Assertions.assertTrue(FlinkArgsUtils.isYarnTarget(Collections.emptyList(), FlinkDeployMode.APPLICATION));
+        Assertions.assertFalse(FlinkArgsUtils.isYarnTarget(Collections.emptyList(), FlinkDeployMode.LOCAL));
+        Assertions.assertFalse(FlinkArgsUtils.isYarnTarget(Collections.emptyList(), FlinkDeployMode.STANDALONE));
+    }
+
+    @Test
+    public void testIsYarnTargetOfAJobWhichNothingDescribes() {
+        // the options of the job are unknown: the application id the client prints is the evidence
+        Assertions.assertTrue(FlinkArgsUtils.isYarnTarget(Collections.emptyList(), null));
+    }
+
+    @Test
+    public void testExecutionTargetOfTheSubmission() {
+        Assertions.assertEquals("yarn-per-job",
+                FlinkArgsUtils.executionTargetOf(Arrays.asList("-t", "yarn-per-job")));
+        Assertions.assertEquals("remote",
+                FlinkArgsUtils.executionTargetOf(Collections.singletonList("-Dexecution.target=remote")));
+        Assertions.assertNull(FlinkArgsUtils.executionTargetOf(Collections.singletonList("-Drest.address=remote-jm")));
+        Assertions.assertNull(FlinkArgsUtils.executionTargetOf(Collections.emptyList()));
+    }
+
+    @Test
     public void testBuildSavePointCommandLine() {
         // the Flink JobID is passed explicitly, the YARN/K8s application id is not used here
         List<String> commandLine = FlinkArgsUtils.buildSavePointCommandLine("1234567890abcdef1234567890abcdef",
