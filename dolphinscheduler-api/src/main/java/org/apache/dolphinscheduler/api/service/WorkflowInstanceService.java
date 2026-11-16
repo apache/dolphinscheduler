@@ -218,8 +218,6 @@ public interface WorkflowInstanceService {
      */
     List<WorkflowInstanceSummaryVO> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode);
 
-    void deleteWorkflowInstanceByWorkflowDefinitionCode(long workflowDefinitionCode);
-
-    void deleteWorkflowInstanceById(int workflowInstanceId);
+    void deleteWorkflowInstanceByWorkflowDefinitionCode(User loginUser, long workflowDefinitionCode);
 
 }

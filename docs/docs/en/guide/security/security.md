@@ -109,12 +109,12 @@ The following rules apply to project authorization introduced in 3.5.0. Authoriz
 
 ### User permissions within a project
 
-|    Permission    |                                                          Operations                                                           |
-|------------------|-------------------------------------------------------------------------------------------------------------------------------|
-| `VIEW`           | View projects, definitions, instances, logs and authorized project resource selectors                                         |
-| `DEVELOP`        | Create, edit, delete, import, copy or move definitions, switch versions, and take workflow/task definitions online or offline |
-| `EXECUTE`        | Manually run, backfill, rerun, recover, pause or stop instances, and create, update, enable, disable or delete schedules      |
-| `MANAGE_MEMBERS` | Assign or revoke the above permissions within the project                                                                     |
+|    Permission    |                                                        Operations                                                        |
+|------------------|--------------------------------------------------------------------------------------------------------------------------|
+| `VIEW`           | View projects, definitions, instances, logs and authorized project resource selectors                                    |
+| `DEVELOP`        | Create, edit, delete, import, copy definitions, switch versions, and take workflow/task definitions online or offline    |
+| `EXECUTE`        | Manually run, backfill, rerun, recover, pause or stop instances, and create, update, enable, disable or delete schedules |
+| `MANAGE_MEMBERS` | Assign or revoke the above permissions within the project                                                                |
 
 Permissions are independent. For example, `DEVELOP` does not include `EXECUTE`. Granting an operation permission does not automatically add `VIEW`; using the project through the UI generally also requires an explicit `VIEW` grant.
 
@@ -142,19 +142,19 @@ Queues are outside project resource-use authorization. Legacy queue management a
 
 ### Checks for each operation
 
-|                             Operation                             |                              User project permission                              |                                                         Project resource checks                                                         |
-|-------------------------------------------------------------------|-----------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
-| Create, update or import workflow/task definitions                | `DEVELOP`                                                                         | Check resources referenced by the tasks being saved                                                                                     |
-| Copy or move workflows to another project                         | Source `VIEW` for copy; source `DEVELOP` for move; destination `DEVELOP` for both | Check task resources against the destination project; source grants do not move with the definition                                     |
-| Take a workflow or task definition online                         | `DEVELOP`                                                                         | Check resources referenced by tasks in that version                                                                                     |
-| Manually start, backfill, rerun or execute tasks within instances | `EXECUTE`                                                                         | Check the executed task version, execution settings and new subworkflow resources                                                       |
-| Recover failed or suspended instances                             | `EXECUTE`                                                                         | Check the parent instance's historical task version and original execution settings, and recursively validate current child definitions |
-| Create, update or enable schedules                                | `EXECUTE`                                                                         | Check task resources and resources used by the schedule's execution settings                                                            |
-| Take a workflow or task definition offline                        | `DEVELOP`                                                                         | Does not require restoring revoked resource grants                                                                                      |
-| Disable or delete schedules                                       | `EXECUTE`                                                                         | Does not require restoring revoked resource grants                                                                                      |
-| Pause or stop existing instances                                  | `EXECUTE`                                                                         | Does not require restoring revoked resource grants                                                                                      |
+|                             Operation                             |                 User project permission                 |                                                         Project resource checks                                                         |
+|-------------------------------------------------------------------|---------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------|
+| Create, update or import workflow/task definitions                | `DEVELOP`                                               | Check resources referenced by the tasks being saved                                                                                     |
+| Copy a workflow to another project                                | Source project `VIEW` and destination project `DEVELOP` | Task resources are checked against destination project grants                                                                           |
+| Take a workflow or task definition online                         | `DEVELOP`                                               | Check resources referenced by tasks in that version                                                                                     |
+| Manually start, backfill, rerun or execute tasks within instances | `EXECUTE`                                               | Check the executed task version, execution settings and new subworkflow resources                                                       |
+| Recover failed or suspended instances                             | `EXECUTE`                                               | Check the parent instance's historical task version and original execution settings, and recursively validate current child definitions |
+| Create, update or enable schedules                                | `EXECUTE`                                               | Check task resources and resources used by the schedule's execution settings                                                            |
+| Take a workflow or task definition offline                        | `DEVELOP`                                               | Does not require restoring revoked resource grants                                                                                      |
+| Disable or delete schedules                                       | `EXECUTE`                                               | Does not require restoring revoked resource grants                                                                                      |
+| Pause or stop existing instances                                  | `EXECUTE`                                               | Does not require restoring revoked resource grants                                                                                      |
 
-Execution settings include the worker group, tenant, and selected environment and alert group. Rerunning or recovering an existing instance checks the parent instance's recorded workflow version and execution settings. Rerunning and failed/suspended recovery recursively validate each referenced subworkflow using its current definition version and owning project, including EXECUTE permission, resource grants and inherited execution settings. This API authorization policy does not change the versions of bound child instances at runtime. Changes to child definitions, project moves or revoked grants can therefore reject recovery of historical instances.
+Execution settings include the worker group, tenant, and selected environment and alert group. Rerunning or recovering an existing instance checks the parent instance's recorded workflow version and execution settings. Rerunning and failed/suspended recovery recursively validate each referenced subworkflow using its current definition version and owning project, including EXECUTE permission, resource grants and inherited execution settings. This API authorization policy does not change the versions of bound child instances at runtime. Changes to child definitions or revoked grants can therefore reject recovery of historical instances.
 
 **The executing user does not need `DEVELOP` or personal grants for the workflow's resources of the seven types above, including datasources. Their project `EXECUTE` permission cannot replace the project's resource grants.** For example, an administrator grants datasource R to project P. Developer A, with P's `VIEW` and `DEVELOP`, can save a workflow using R. Operator B, with P's `VIEW` and `EXECUTE`, can manually execute it without a personal grant for R. This does not allow B to edit the workflow or modify R.
 
@@ -162,7 +162,7 @@ Execution settings include the worker group, tenant, and selected environment an
 
 `DEPENDENT` tasks require `VIEW` on each target workflow's actual project, including dependencies inside referenced subworkflows. The submitted project and workflow codes must match, and a positive task code must belong to that workflow's current version and project. Task code `0` denotes the workflow and `-1` denotes all tasks. Dependencies read execution status and may pass `OUT` variables; they do not require target-project `EXECUTE`, resource grants or an online target definition. These references are checked during definition mutations and publishing, manual execution/recovery and schedule configuration/enabling. Revoking target-project `VIEW` blocks subsequent manual operations, while existing background schedule triggers and automatic retries retain the revocation behavior described below.
 
-Editing a historical instance requires `DEVELOP` and resource grants in the instance's project. If `syncDefine=true` also updates a current definition that has moved to another project, the user additionally needs `DEVELOP` and the referenced resource grants in that project. Synchronization preserves the current definition's project; the historical instance remains in its original project. Instance-only editing does not require permission on the current definition's project.
+Editing an instance requires `DEVELOP` and resource grants in its persisted project. The instance, current workflow definition and recorded definition version must belong to the same project, including when `syncDefine=false`. Definition edits and version switches reject tasks, relations or historical versions belonging to another project before writing changes. Request payloads cannot override persisted task ownership.
 
 Definition and instance checks use their actual owning project; resource-use checks use the grants of the project performing the operation. Permission on another project in the request path cannot replace these checks. Batch workflow-task queries only return workflows in projects where an ordinary user has `VIEW`. Legacy association records do not restore visibility. Cross-project parent/child instance detail queries also require `VIEW` on the corresponding projects.
 
@@ -172,9 +172,11 @@ Saving or taking a definition online when it references a subworkflow additional
 
 Manual starts, backfills, reruns, failed/suspended recovery and schedule enabling additionally require every recursively referenced current child definition to be `ONLINE`. Offline schedule creation and updates still check child-project permissions, resource grants and inherited execution settings recursively, but may reference offline child definitions.
 
-Switching a workflow version requires both the workflow and its schedule to be offline and does not implicitly change the schedule state. Historical instances are authorized through their persisted project; moving a definition does not transfer ownership of its existing instances.
+Switching a workflow version requires both the workflow and its schedule to be offline and does not implicitly change the schedule state. Instance access is authorized through its persisted project; a mismatched recorded definition project is rejected.
 
-Moving a workflow requires both the workflow and its schedule to be offline. Task resources must still be granted to the destination project. Taking the moved workflow and schedule online checks permissions and resource grants against the destination project again.
+Cross-project workflow moves are rejected by the backend. Use cross-project copying to create a new definition and new task codes in the destination project; the source definition and its instances remain unchanged. Existing data from earlier moves is not migrated; operations reject inconsistent project ownership.
+
+Deleting a workflow instance or a definition that cascades to instances requires `DEVELOP` in every affected instance project, including cross-project subworkflow instances. All instances must be terminal. The complete instance tree is checked before any instance is deleted; a missing permission rejects the entire cascade.
 
 Deleting a user removes that user's explicit permissions from all projects in the same transaction.
 

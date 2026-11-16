@@ -29,6 +29,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.ProjectCodeValidator;
 import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -108,6 +109,9 @@ public class TaskDefinitionServiceImplTest {
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
 
     @Mock
+    private ProjectCodeValidator projectCodeValidator;
+
+    @Mock
     private TaskResourcePermissionChecker taskResourcePermissionChecker;
 
     @Mock
@@ -137,6 +141,12 @@ public class TaskDefinitionServiceImplTest {
     private static final int RESOURCE_RATE = -1;
     protected User user;
     protected Exception exception;
+
+    private TaskDefinitionLog taskLogInProject(long projectCode) {
+        TaskDefinitionLog log = new TaskDefinitionLog();
+        log.setProjectCode(projectCode);
+        return log;
+    }
 
     @BeforeEach
     public void before() {
@@ -172,7 +182,7 @@ public class TaskDefinitionServiceImplTest {
         Mockito.doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
 
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
-                .thenReturn(new TaskDefinitionLog());
+                .thenReturn(taskLogInProject(PROJECT_CODE));
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
         when(taskDefinitionDao.queryByCode(TASK_CODE))
@@ -181,6 +191,33 @@ public class TaskDefinitionServiceImplTest {
 
         Assertions.assertDoesNotThrow(
                 () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
+    }
+
+    @Test
+    void deletingTaskVersionRejectsDifferentProjectBeforeDeleting() {
+        TaskDefinition current = new TaskDefinition();
+        current.setProjectCode(PROJECT_CODE);
+        current.setVersion(VERSION + 1);
+        when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(current);
+        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
+                .thenReturn(taskLogInProject(PROJECT_CODE + 1));
+        assertThrowsServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH,
+                () -> taskDefinitionService.deleteByCodeAndVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
+        Mockito.verify(taskDefinitionLogMapper, Mockito.never()).deleteByCodeAndVersion(Mockito.anyLong(),
+                Mockito.anyInt());
+    }
+
+    @Test
+    void taskVersionSwitchRejectsHistoricalProjectBeforeSaving() {
+        TaskDefinition current = new TaskDefinition();
+        current.setProjectCode(PROJECT_CODE);
+        when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(current);
+        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
+                .thenReturn(taskLogInProject(PROJECT_CODE + 1));
+        assertThrowsServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH,
+                () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
+        Mockito.verify(taskDefinitionDao, Mockito.never()).updateById(any(TaskDefinition.class));
+        Mockito.verify(processService, Mockito.never()).saveWorkflowDefine(any(), any(), any(), any());
     }
 
     @Test
@@ -193,7 +230,7 @@ public class TaskDefinitionServiceImplTest {
         taskDefinition.setProjectCode(PROJECT_CODE);
         when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
-                .thenReturn(new TaskDefinitionLog());
+                .thenReturn(taskLogInProject(PROJECT_CODE));
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
                 .when(taskResourcePermissionChecker).checkPermission(Mockito.anyLong(), anyList());
 
@@ -213,7 +250,7 @@ public class TaskDefinitionServiceImplTest {
         taskDefinition.setProjectCode(PROJECT_CODE);
         when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
-                .thenReturn(new TaskDefinitionLog());
+                .thenReturn(taskLogInProject(PROJECT_CODE));
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
                 .when(taskSubWorkflowPermissionChecker).checkPermission(eq(user), anyList());
 

@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.service.impl;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.permission.PermissionCheck;
+import org.apache.dolphinscheduler.api.permission.ProjectCodeValidator;
 import org.apache.dolphinscheduler.api.permission.TaskResourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -99,6 +100,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
     private ProcessService processService;
 
     @Autowired
+    private ProjectCodeValidator projectCodeValidator;
+
+    @Autowired
     private TaskResourcePermissionChecker taskResourcePermissionChecker;
 
     @Autowired
@@ -136,6 +140,9 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             log.error("workflow definition does not exist, workflowDefinitionCode:{}.", workflowDefinitionCode);
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST);
         }
+        projectCodeValidator.validateTasks(workflowDefinition.getProjectCode(), taskDefinitionLogs);
+        projectCodeValidator.validateRelations(workflowDefinition.getProjectCode(), workflowDefinitionCode,
+                workflowTaskRelationList);
         int insertVersion =
                 processService.saveWorkflowDefine(loginUser, workflowDefinition, Boolean.TRUE, Boolean.TRUE);
         if (insertVersion <= 0) {
@@ -208,8 +215,24 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
         }
         TaskDefinitionLog taskDefinitionUpdate =
                 taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
+        if (taskDefinitionUpdate == null) {
+            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, String.valueOf(taskCode));
+        }
+        ProjectCodeValidator.requireProject(projectCode, taskDefinitionUpdate.getProjectCode());
+        projectCodeValidator.validateTasks(projectCode, Collections.singletonList(taskDefinitionUpdate));
         taskResourcePermissionChecker.checkPermission(projectCode, Collections.singletonList(taskDefinitionUpdate));
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, Collections.singletonList(taskDefinitionUpdate));
+        List<WorkflowTaskRelation> taskRelationList =
+                workflowTaskRelationDao.queryUpstreamByCode(projectCode, taskCode);
+        for (WorkflowTaskRelation relation : taskRelationList) {
+            ProjectCodeValidator.requireProject(projectCode, relation.getProjectCode());
+            WorkflowDefinition workflow = workflowDefinitionDao.queryByCode(relation.getWorkflowDefinitionCode())
+                    .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
+                            relation.getWorkflowDefinitionCode()));
+            ProjectCodeValidator.requireProject(projectCode, workflow.getProjectCode());
+            projectCodeValidator.validateRelations(projectCode, workflow.getCode(),
+                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflow.getCode()));
+        }
         taskDefinitionUpdate.setUserId(loginUser.getId());
         taskDefinitionUpdate.setUpdateTime(new Date());
         taskDefinitionUpdate.setId(taskDefinition.getId());
@@ -218,8 +241,6 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
             log.error("Task definition version switch error, taskDefinitionCode:{}.", taskCode);
             throw new ServiceException(Status.SWITCH_TASK_DEFINITION_VERSION_ERROR);
         }
-        List<WorkflowTaskRelation> taskRelationList =
-                workflowTaskRelationDao.queryUpstreamByCode(projectCode, taskCode);
         if (CollectionUtils.isNotEmpty(taskRelationList)) {
             log.info(
                     "Task definition has upstream tasks, start handle them after switch task, taskDefinitionCode:{}.",
@@ -276,6 +297,10 @@ public class TaskDefinitionServiceImpl extends BaseServiceImpl implements TaskDe
                     "Task definition can not be deleted due to version is being used, projectCode:{}, taskDefinitionCode:{}, version:{}.",
                     projectCode, taskCode, version);
             throw new ServiceException(Status.MAIN_TABLE_USING_VERSION);
+        }
+        TaskDefinitionLog versionToDelete = taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(taskCode, version);
+        if (versionToDelete != null) {
+            ProjectCodeValidator.requireProject(projectCode, versionToDelete.getProjectCode());
         }
         int delete = taskDefinitionLogMapper.deleteByCodeAndVersion(taskCode, version);
         if (delete <= 0) {
