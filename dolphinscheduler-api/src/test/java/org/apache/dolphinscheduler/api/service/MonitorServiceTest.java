@@ -26,7 +26,6 @@ import org.apache.dolphinscheduler.api.service.impl.BaseServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.MonitorServiceImpl;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
-import org.apache.dolphinscheduler.common.model.Server;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMetrics;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
@@ -35,8 +34,6 @@ import org.apache.dolphinscheduler.registry.api.enums.RegistryNodeType;
 
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.junit.jupiter.api.Assertions;
@@ -67,10 +64,10 @@ public class MonitorServiceTest {
     private DatabaseMonitor databaseMonitor;
 
     @Mock
-    private ResourcePermissionCheckService resourcePermissionCheckService;
+    private RegistryClient registryClient;
 
     @Mock
-    private RegistryClient registryClient;
+    private ResourcePermissionCheckService resourcePermissionCheckService;
 
     private User user;
 
@@ -94,13 +91,11 @@ public class MonitorServiceTest {
     @Test
     public void testQueryMaster() {
         mockPermissionCheck(ApiFuncIdentificationConstant.MONITOR_MASTER_VIEW, true);
-        Mockito.when(registryClient.getServerList(RegistryNodeType.MASTER)).thenReturn(getServerList());
         assertDoesNotThrow(() -> monitorService.listServer(RegistryNodeType.MASTER));
     }
 
     @Test
     public void testQueryWorker() {
-        Mockito.when(registryClient.getServerList(RegistryNodeType.WORKER)).thenReturn(getServerList());
         AssertionsHelper.assertDoesNotThrow(() -> monitorService.listServer(RegistryNodeType.WORKER));
     }
 
@@ -122,20 +117,6 @@ public class MonitorServiceTest {
         DatabaseMetrics monitorRecord = new DatabaseMetrics();
         monitorRecord.setDbType(DbType.MYSQL);
         return monitorRecord;
-    }
-
-    private List<Server> getServerList() {
-        Server server = new Server();
-        server.setId(1);
-        server.setHost("127.0.0.1");
-        server.setServerDirectory("ws/server");
-        server.setPort(123);
-        server.setCreateTime(new Date());
-        server.setLastHeartbeatTime(new Date());
-
-        List<Server> servers = new ArrayList<>();
-        servers.add(server);
-        return servers;
     }
 
 }
