@@ -122,6 +122,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.collect.Lists;
@@ -1296,6 +1297,40 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(Status.WORKFLOW_DAG_IS_INVALID.getCode(), exception.getCode());
         Mockito.verify(processService, Mockito.never())
                 .saveTaskDefine(eq(user), eq(projectCode), anyList(), eq(Boolean.TRUE));
+    }
+
+    @Test
+    public void savingWorkflowRejectsUnauthorizedDependentTargetBeforePersistingDefinitions() {
+        Project project = getProject(projectCode);
+        when(projectDao.queryByCode(projectCode)).thenReturn(project);
+        doNothing().when(projectService).checkProjectPermission(user, project, ProjectPermission.DEVELOP);
+        when(workflowDefinitionDao.verifyByDefineName(projectCode, name)).thenReturn(null);
+        when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
+        WorkflowDefinition target = getWorkflowDefinition();
+        target.setCode(42L);
+        target.setProjectCode(99L);
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(42L)))
+                .thenReturn(Collections.singletonList(target));
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                .checkProjectPermission(user, 99L, ProjectPermission.VIEW);
+        List<TaskDefinitionLog> tasks = JSONUtils.toList(taskDefinitionJson, TaskDefinitionLog.class);
+        tasks.get(0).setTaskType("DEPENDENT");
+        tasks.get(0).setTaskParams("{\"dependence\":{\"dependTaskList\":[{\"dependItemList\":["
+                + "{\"projectCode\":99,\"definitionCode\":42,\"depTaskCode\":0,\"parameterPassing\":true}]}]}}");
+        ReflectionTestUtils.setField(workflowDefinitionService, "taskSubWorkflowPermissionChecker",
+                new TaskSubWorkflowPermissionChecker(workflowDefinitionDao, projectService, taskDefinitionLogDao,
+                        taskResourcePermissionChecker));
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> workflowDefinitionService.createWorkflowDefinition(user, projectCode, name, description,
+                        "[]", "[]", timeout, taskRelationJson, JSONUtils.toJsonString(tasks), null,
+                        WorkflowExecutionTypeEnum.PARALLEL));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        verify(processService, Mockito.never()).saveTaskDefine(Mockito.any(), Mockito.anyLong(), anyList(),
+                Mockito.anyBoolean());
+        verify(processService, Mockito.never()).saveWorkflowDefine(Mockito.any(), Mockito.any(), Mockito.anyBoolean(),
+                Mockito.anyBoolean());
     }
 
     @Test

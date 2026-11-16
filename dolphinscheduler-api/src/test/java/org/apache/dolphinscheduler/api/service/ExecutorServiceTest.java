@@ -546,6 +546,40 @@ public class ExecutorServiceTest {
     }
 
     @Test
+    public void revokedDependentTargetViewBlocksManualRecoveryBeforeDispatch() {
+        User user = getLoginUser();
+        WorkflowInstance instance = new WorkflowInstance();
+        instance.setProjectCode(100L);
+        instance.setWorkflowDefinitionCode(200L);
+        instance.setWorkflowDefinitionVersion(3);
+        when(workflowInstanceDao.queryOptionalById(1)).thenReturn(Optional.of(instance));
+        TaskDefinitionLog task = new TaskDefinitionLog();
+        task.setTaskType("DEPENDENT");
+        task.setTaskParams("{\"dependence\":{\"dependTaskList\":[{\"dependItemList\":["
+                + "{\"projectCode\":99,\"definitionCode\":42,\"depTaskCode\":0,\"parameterPassing\":true}]}]}}");
+        when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(200L, 3))
+                .thenReturn(Collections.singletonList(task));
+        WorkflowDefinition target = new WorkflowDefinition();
+        target.setCode(42L);
+        target.setProjectCode(99L);
+        WorkflowDefinitionDao definitions = Mockito.mock(WorkflowDefinitionDao.class);
+        when(definitions.queryByCodes(Collections.singleton(42L))).thenReturn(Collections.singletonList(target));
+        ProjectService projects = Mockito.mock(ProjectService.class);
+        TaskSubWorkflowPermissionChecker references = new TaskSubWorkflowPermissionChecker(definitions, projects,
+                taskDefinitionLogDao, taskResourcePermissionChecker);
+        references.checkPermission(user, Collections.singletonList(task));
+        doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projects)
+                .checkProjectPermission(user, 99L, ProjectPermission.VIEW);
+        ReflectionTestUtils.setField(executorService, "taskSubWorkflowPermissionChecker", references);
+
+        ServiceException error = assertThrows(ServiceException.class,
+                () -> executorService.controlWorkflowInstance(user, 1, ExecuteType.START_FAILURE_TASK_PROCESS));
+
+        assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(executorClient);
+    }
+
+    @Test
     public void testStopDoesNotRequireResourceGrants() {
         User user = getLoginUser();
         WorkflowInstance instance = new WorkflowInstance();

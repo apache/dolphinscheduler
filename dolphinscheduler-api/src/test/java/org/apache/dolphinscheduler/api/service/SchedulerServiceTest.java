@@ -547,6 +547,42 @@ public class SchedulerServiceTest extends BaseServiceTestTool {
     }
 
     @Test
+    public void enablingScheduleRejectsDependentTargetWithoutViewBeforeRegisteringTrigger() {
+        Schedule schedule = getSchedule();
+        schedule.setReleaseState(ReleaseState.OFFLINE);
+        WorkflowDefinition definition = getProcessDefinition();
+        definition.setReleaseState(ReleaseState.ONLINE);
+        Mockito.when(scheduleDao.queryById(scheduleId)).thenReturn(schedule);
+        Mockito.when(workflowDefinitionDao.queryByCode(processDefinitionCode)).thenReturn(Optional.of(definition));
+        Mockito.when(executorService.checkSubWorkflowDefinitionValid(definition)).thenReturn(true);
+        TaskDefinitionLog task = new TaskDefinitionLog();
+        task.setTaskType("DEPENDENT");
+        task.setTaskParams("{\"dependence\":{\"dependTaskList\":[{\"dependItemList\":["
+                + "{\"projectCode\":99,\"definitionCode\":42,\"depTaskCode\":0,\"parameterPassing\":true}]}]}}");
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(processDefinitionCode,
+                processDefinitionVersion)).thenReturn(Collections.singletonList(task));
+        WorkflowDefinition target = new WorkflowDefinition();
+        target.setCode(42L);
+        target.setProjectCode(99L);
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(42L)))
+                .thenReturn(Collections.singletonList(target));
+        Mockito.doNothing().when(projectService).checkProjectPermission(user, projectCode, ProjectPermission.EXECUTE);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                .checkProjectPermission(user, 99L, ProjectPermission.VIEW);
+        ReflectionTestUtils.setField(schedulerService, "taskSubWorkflowPermissionChecker",
+                new TaskSubWorkflowPermissionChecker(workflowDefinitionDao, projectService, taskDefinitionLogDao,
+                        taskResourcePermissionChecker));
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> schedulerService.onlineScheduler(user, projectCode, scheduleId));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        Assertions.assertEquals(ReleaseState.OFFLINE, schedule.getReleaseState());
+        Mockito.verify(scheduleDao, Mockito.never()).updateById(Mockito.any());
+        Mockito.verifyNoInteractions(schedulerApi);
+    }
+
+    @Test
     public void testOnlineScheduleRejectsRevokedResourcesBeforeRegisteringTrigger() {
         Schedule schedule = getSchedule();
         schedule.setReleaseState(ReleaseState.OFFLINE);

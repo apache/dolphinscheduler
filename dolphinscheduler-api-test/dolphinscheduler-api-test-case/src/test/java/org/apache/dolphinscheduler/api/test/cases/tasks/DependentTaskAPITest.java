@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.api.test.cases.tasks;
 
+import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.test.core.DolphinScheduler;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.entity.LoginResponseData;
@@ -78,8 +79,6 @@ public class DependentTaskAPITest {
     private static long upstreamWorkflowDefinitionCode;
 
     private static long dependentWorkflowDefinitionCode;
-
-    private static long failedDependentWorkflowDefinitionCode;
 
     @BeforeAll
     public static void setup() {
@@ -274,86 +273,27 @@ public class DependentTaskAPITest {
 
     @Test
     @Order(20)
-    public void testDependentFailedWorkflowInstance() throws Exception {
-        // read dependent failed workflow json template and replace placeholders
-        // this workflow depends on a non-existent definition code, so the dependent task should fail
+    public void testRejectDependentWorkflowWithMissingTarget() throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
         File file = new File(
                 classLoader.getResource("workflow-json/task-dependent/dependentFailedWorkflow.json").getFile());
         String jsonContent = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
         jsonContent = jsonContent.replace("${projectCode}", String.valueOf(projectCode));
 
-        String dependentWorkflowName = "dependent_failed_" + System.currentTimeMillis();
+        String dependentWorkflowName = "dependent_missing_target_" + System.currentTimeMillis();
         HttpResponse createResponse = workflowDefinitionPage
                 .createWorkflowDefinition(loginUser, projectCode, jsonContent, dependentWorkflowName);
-        Assertions.assertTrue(createResponse.getBody().getSuccess());
 
-        // get failed dependent workflow definition code from create response
-        LinkedHashMap<String, Object> createData =
-                (LinkedHashMap<String, Object>) createResponse.getBody().getData();
-        failedDependentWorkflowDefinitionCode = ((Number) createData.get("code")).longValue();
-        log.info("failed dependent workflow definition code: {}", failedDependentWorkflowDefinitionCode);
-
-        // release failed dependent workflow
-        HttpResponse releaseResponse = workflowDefinitionPage.releaseWorkflowDefinition(loginUser,
-                projectCode, failedDependentWorkflowDefinitionCode, ReleaseState.ONLINE);
-        Assertions.assertTrue(releaseResponse.getBody().getSuccess());
-
-        // trigger failed dependent workflow instance
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Date date = new Date();
-        String scheduleTime = String.format("%s,%s", formatter.format(date), formatter.format(date));
-        log.info("use current time {} as scheduleTime", scheduleTime);
-        HttpResponse startWorkflowResponse = executorPage.startWorkflowInstance(loginUser, projectCode,
-                failedDependentWorkflowDefinitionCode, scheduleTime, FailureStrategy.END, WarningType.NONE);
-        Assertions.assertTrue(startWorkflowResponse.getBody().getSuccess());
-
-        List<Integer> workflowInstanceIds = (List<Integer>) startWorkflowResponse.getBody().getData();
-        Assertions.assertFalse(workflowInstanceIds.isEmpty());
-        log.info("failed dependent workflow instance ids: {}", workflowInstanceIds);
-
-        // wait for dependent workflow to fail
-        int workflowInstanceId = workflowInstanceIds.get(0);
-        boolean failed = false;
-        for (int i = 0; i < 60; i++) {
-            Thread.sleep(2000);
-            HttpResponse queryResponse = workflowInstancePage.queryWorkflowInstanceById(loginUser,
-                    projectCode, workflowInstanceId);
-            if (queryResponse.getBody().getSuccess() && queryResponse.getBody().getData() != null) {
-                LinkedHashMap<String, Object> instanceData =
-                        (LinkedHashMap<String, Object>) queryResponse.getBody().getData();
-                String state = (String) instanceData.get("state");
-                log.info("failed dependent workflow instance state: {}", state);
-                if ("FAILURE".equals(state)) {
-                    failed = true;
-                    break;
-                } else if ("SUCCESS".equals(state)) {
-                    Assertions.fail("dependent workflow instance should not succeed");
-                }
-            }
-        }
-        Assertions.assertTrue(failed, "dependent workflow referencing non-existent definition should fail");
-
-        // query task instances and verify DEPENDENT task type with FAILURE state
-        HttpResponse queryTaskListResponse = workflowInstancePage.queryTaskListByWorkflowInstanceId(loginUser,
-                projectCode, workflowInstanceId);
-        Assertions.assertTrue(queryTaskListResponse.getBody().getSuccess());
-
-        List<LinkedHashMap<String, Object>> failedTaskList;
-        Object failedTaskData = queryTaskListResponse.getBody().getData();
-        if (failedTaskData instanceof List) {
-            failedTaskList = (List<LinkedHashMap<String, Object>>) failedTaskData;
-        } else {
-            LinkedHashMap<String, Object> pageData = (LinkedHashMap<String, Object>) failedTaskData;
-            failedTaskList = (List<LinkedHashMap<String, Object>>) pageData.get("taskList");
-        }
-        Assertions.assertNotNull(failedTaskList);
-        Assertions.assertFalse(failedTaskList.isEmpty());
-
-        LinkedHashMap<String, Object> dependentTask = failedTaskList.get(0);
-        Assertions.assertEquals("DEPENDENT", dependentTask.get("taskType"));
-        Assertions.assertEquals("FAILURE", dependentTask.get("state"));
-        log.info("failed dependent task instance verified: taskType={}, state={}",
-                dependentTask.get("taskType"), dependentTask.get("state"));
+        Assertions.assertFalse(createResponse.getBody().getSuccess());
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(),
+                createResponse.getBody().getCode());
+        HttpResponse definitionsResponse =
+                workflowDefinitionPage.queryAllWorkflowDefinitionByProjectCode(loginUser, projectCode);
+        Assertions.assertTrue(definitionsResponse.getBody().getSuccess());
+        List<LinkedHashMap<String, Object>> definitions =
+                (List<LinkedHashMap<String, Object>>) definitionsResponse.getBody().getData();
+        Assertions.assertTrue(definitions.stream().noneMatch(definition -> dependentWorkflowName.equals(
+                ((LinkedHashMap<String, Object>) definition.get("workflowDefinition")).get("name"))));
     }
+
 }

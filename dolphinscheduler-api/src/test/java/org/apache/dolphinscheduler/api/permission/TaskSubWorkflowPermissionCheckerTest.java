@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.enums.UserType;
+import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.Environment;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinitionLog;
@@ -36,6 +37,7 @@ import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDa
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.TenantDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,7 +48,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -329,6 +333,256 @@ public class TaskSubWorkflowPermissionCheckerTest {
 
         Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), exception.getCode());
         Mockito.verify(grants).isAuthorized(SUB_WORKFLOW_PROJECT_CODE, missingType, missingKey);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"save", "execute", "schedule"})
+    void dependentReferencesRequireTargetProjectView(String operation) {
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(getWorkflowDefinition(SUB_WORKFLOW_CODE)));
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                .checkProjectPermission(loginUser, SUB_WORKFLOW_PROJECT_CODE, ProjectPermission.VIEW);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> checkReferences(operation, getDependentTaskDefinition(SUB_WORKFLOW_PROJECT_CODE,
+                        SUB_WORKFLOW_CODE, 0)));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(taskResourcePermissionChecker, taskDefinitionLogDao);
+    }
+
+    @ParameterizedTest
+    @ValueSource(longs = {0, -1, 7})
+    void dependentReferencesNeedOnlyViewAndCanReadOfflineWorkflow(long taskCode) {
+        WorkflowDefinition target = getWorkflowDefinition(SUB_WORKFLOW_CODE);
+        target.setReleaseState(ReleaseState.OFFLINE);
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(target));
+        if (taskCode > 0) {
+            TaskDefinitionLog member = new TaskDefinitionLog();
+            member.setCode(taskCode);
+            member.setProjectCode(SUB_WORKFLOW_PROJECT_CODE);
+            Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(SUB_WORKFLOW_CODE, 0))
+                    .thenReturn(Collections.singletonList(member));
+        }
+
+        for (String operation : Arrays.asList("save", "execute", "schedule")) {
+            checkReferences(operation, getDependentTaskDefinition(SUB_WORKFLOW_PROJECT_CODE,
+                    SUB_WORKFLOW_CODE, taskCode));
+        }
+
+        Mockito.verify(projectService, Mockito.times(3))
+                .checkProjectPermission(loginUser, SUB_WORKFLOW_PROJECT_CODE, ProjectPermission.VIEW);
+        Mockito.verifyNoMoreInteractions(projectService);
+        Mockito.verifyNoInteractions(taskResourcePermissionChecker);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"98,42,0", "99,43,0", "99,42,88", "99,42,-2"})
+    void dependentReferencesRejectMismatchedProjectWorkflowOrTask(long projectCode, long workflowCode,
+                                                                  long taskCode) {
+        if (taskCode >= -1) {
+            Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(workflowCode)))
+                    .thenReturn(workflowCode == SUB_WORKFLOW_CODE
+                            ? Collections.singletonList(getWorkflowDefinition(SUB_WORKFLOW_CODE))
+                            : Collections.emptyList());
+        }
+        if (taskCode > 0) {
+            TaskDefinitionLog differentTask = new TaskDefinitionLog();
+            differentTask.setCode(7L);
+            differentTask.setProjectCode(SUB_WORKFLOW_PROJECT_CODE);
+            Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(SUB_WORKFLOW_CODE, 0))
+                    .thenReturn(Collections.singletonList(differentTask));
+        }
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> checkReferences("save", getDependentTaskDefinition(projectCode, workflowCode, taskCode)));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+    }
+
+    @Test
+    void dependentTaskMustBelongToTheTargetsActualProject() {
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(getWorkflowDefinition(SUB_WORKFLOW_CODE)));
+        TaskDefinitionLog misplaced = new TaskDefinitionLog();
+        misplaced.setCode(7L);
+        misplaced.setProjectCode(100L);
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(SUB_WORKFLOW_CODE, 0))
+                .thenReturn(Collections.singletonList(misplaced));
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> checkReferences("save", getDependentTaskDefinition(SUB_WORKFLOW_PROJECT_CODE,
+                        SUB_WORKFLOW_CODE, 7L)));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"{}", "not-json", "{\"dependence\":{\"dependTaskList\":[]}}",
+            "{\"dependence\":{\"dependTaskList\":[{\"dependItemList\":[]}]}}",
+            "{\"dependence\":{\"dependTaskList\":[{\"dependItemList\":[null]}]}}"})
+    void dependentReferencesRejectInvalidDependencyStructure(String parameters) {
+        TaskDefinition task = new TaskDefinition();
+        task.setTaskType("DEPENDENT");
+        task.setTaskParams(parameters);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> checkReferences("save", task));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        Mockito.verifyNoInteractions(workflowDefinitionDao, projectService, taskDefinitionLogDao);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"save", "execute", "schedule"})
+    void nestedDependentReferencesAreCheckedWithoutBroadeningSaveSubworkflowPermissions(String operation) {
+        WorkflowDefinition child = getWorkflowDefinition(SUB_WORKFLOW_CODE);
+        WorkflowDefinition grandchild = getWorkflowDefinition(ANOTHER_SUB_WORKFLOW_CODE);
+        grandchild.setProjectCode(100L);
+        WorkflowDefinition dependency = getWorkflowDefinition(44L);
+        dependency.setProjectCode(101L);
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(child));
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(ANOTHER_SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(grandchild));
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(44L)))
+                .thenReturn(Collections.singletonList(dependency));
+        TaskDefinitionLog childReference = new TaskDefinitionLog();
+        childReference.setTaskType("SUB_WORKFLOW");
+        childReference.setTaskParams("{\"workflowDefinitionCode\":43}");
+        TaskDefinitionLog dependentReference = new TaskDefinitionLog();
+        dependentReference.setTaskType("DEPENDENT");
+        dependentReference.setTaskParams(getDependentTaskDefinition(101L, 44L, 0).getTaskParams());
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(SUB_WORKFLOW_CODE, 0))
+                .thenReturn(Collections.singletonList(childReference));
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(ANOTHER_SUB_WORKFLOW_CODE, 0))
+                .thenReturn(Collections.singletonList(dependentReference));
+        Mockito.doNothing().when(projectService)
+                .checkProjectPermission(loginUser, SUB_WORKFLOW_PROJECT_CODE, ProjectPermission.EXECUTE);
+        if (!"save".equals(operation)) {
+            Mockito.doNothing().when(projectService)
+                    .checkProjectPermission(loginUser, 100L, ProjectPermission.EXECUTE);
+        }
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                .checkProjectPermission(loginUser, 101L, ProjectPermission.VIEW);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> checkReferences(operation, getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE)));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        if ("save".equals(operation)) {
+            Mockito.verify(projectService, Mockito.never())
+                    .checkProjectPermission(loginUser, 100L, ProjectPermission.EXECUTE);
+        }
+        Mockito.verify(projectService, Mockito.never())
+                .checkProjectPermission(loginUser, 101L, ProjectPermission.EXECUTE);
+    }
+
+    @Test
+    void dependentPermissionRevocationBlocksManualExecutionAfterSave() {
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(getWorkflowDefinition(SUB_WORKFLOW_CODE)));
+        TaskDefinition dependency = getDependentTaskDefinition(SUB_WORKFLOW_PROJECT_CODE, SUB_WORKFLOW_CODE, 0);
+        checkReferences("save", dependency);
+        Mockito.doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM)).when(projectService)
+                .checkProjectPermission(loginUser, SUB_WORKFLOW_PROJECT_CODE, ProjectPermission.VIEW);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> checkReferences("execute", dependency));
+
+        Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void dependentReferencesValidateEveryModelAndBatchTargetLookups(boolean secondTargetExists) {
+        TaskDefinition task = getDependentTaskDefinition(SUB_WORKFLOW_PROJECT_CODE, SUB_WORKFLOW_CODE, 0);
+        DependentParameters parameters = JSONUtils.parseObject(task.getTaskParams(), DependentParameters.class);
+        DependentParameters second = JSONUtils.parseObject(getDependentTaskDefinition(SUB_WORKFLOW_PROJECT_CODE,
+                ANOTHER_SUB_WORKFLOW_CODE, 0).getTaskParams(), DependentParameters.class);
+        parameters.getDependence().getDependTaskList().addAll(second.getDependence().getDependTaskList());
+        task.setTaskParams(JSONUtils.toJsonString(parameters));
+        java.util.Set<Long> targets =
+                new java.util.HashSet<>(Arrays.asList(SUB_WORKFLOW_CODE, ANOTHER_SUB_WORKFLOW_CODE));
+        Mockito.when(workflowDefinitionDao.queryByCodes(targets)).thenReturn(secondTargetExists
+                ? Arrays.asList(getWorkflowDefinition(SUB_WORKFLOW_CODE),
+                        getWorkflowDefinition(ANOTHER_SUB_WORKFLOW_CODE))
+                : Collections.singletonList(getWorkflowDefinition(SUB_WORKFLOW_CODE)));
+
+        if (secondTargetExists) {
+            checkReferences("save", task);
+            Mockito.verify(projectService).checkProjectPermission(loginUser, SUB_WORKFLOW_PROJECT_CODE,
+                    ProjectPermission.VIEW);
+            Mockito.verifyNoMoreInteractions(projectService);
+        } else {
+            ServiceException error =
+                    Assertions.assertThrows(ServiceException.class, () -> checkReferences("save", task));
+            Assertions.assertEquals(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION.getCode(), error.getCode());
+        }
+        Mockito.verify(workflowDefinitionDao).queryByCodes(targets);
+        Mockito.verifyNoMoreInteractions(workflowDefinitionDao);
+    }
+
+    @Test
+    void savingCyclicSubworkflowsChecksNestedDependenciesAndTerminates() {
+        WorkflowDefinition child = getWorkflowDefinition(SUB_WORKFLOW_CODE);
+        child.setReleaseState(ReleaseState.OFFLINE);
+        WorkflowDefinition grandchild = getWorkflowDefinition(ANOTHER_SUB_WORKFLOW_CODE);
+        grandchild.setProjectCode(100L);
+        WorkflowDefinition dependency = getWorkflowDefinition(44L);
+        dependency.setProjectCode(101L);
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(child));
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(ANOTHER_SUB_WORKFLOW_CODE)))
+                .thenReturn(Collections.singletonList(grandchild));
+        Mockito.when(workflowDefinitionDao.queryByCodes(Collections.singleton(44L)))
+                .thenReturn(Collections.singletonList(dependency));
+        TaskDefinitionLog next = new TaskDefinitionLog();
+        next.setTaskType("SUB_WORKFLOW");
+        next.setTaskParams("{\"workflowDefinitionCode\":43}");
+        TaskDefinitionLog dependent = new TaskDefinitionLog();
+        dependent.setTaskType("DEPENDENT");
+        dependent.setTaskParams(getDependentTaskDefinition(101L, 44L, 0).getTaskParams());
+        TaskDefinitionLog cycle = new TaskDefinitionLog();
+        cycle.setTaskType("SUB_WORKFLOW");
+        cycle.setTaskParams("{\"workflowDefinitionCode\":42}");
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(SUB_WORKFLOW_CODE, 0))
+                .thenReturn(Arrays.asList(next, dependent));
+        Mockito.when(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(ANOTHER_SUB_WORKFLOW_CODE, 0))
+                .thenReturn(Collections.singletonList(cycle));
+
+        checkReferences("save", getSubWorkflowTaskDefinition(SUB_WORKFLOW_CODE));
+
+        Mockito.verify(taskDefinitionLogDao).queryByWorkflowDefinitionCodeAndVersion(SUB_WORKFLOW_CODE, 0);
+        Mockito.verify(taskDefinitionLogDao).queryByWorkflowDefinitionCodeAndVersion(ANOTHER_SUB_WORKFLOW_CODE, 0);
+        Mockito.verifyNoMoreInteractions(taskDefinitionLogDao);
+        Mockito.verify(projectService).checkProjectPermission(loginUser, 101L, ProjectPermission.VIEW);
+        Mockito.verify(projectService).checkProjectPermission(loginUser, SUB_WORKFLOW_PROJECT_CODE,
+                ProjectPermission.EXECUTE);
+        Mockito.verifyNoMoreInteractions(projectService);
+        Mockito.verifyNoInteractions(taskResourcePermissionChecker);
+    }
+
+    private void checkReferences(String operation, TaskDefinition task) {
+        if ("save".equals(operation)) {
+            taskSubWorkflowPermissionChecker.checkPermission(loginUser, Collections.singletonList(task));
+        } else if ("execute".equals(operation)) {
+            taskSubWorkflowPermissionChecker.checkExecutionPermission(loginUser, Collections.singletonList(task),
+                    "parent-workers", 10L, "parent-tenant", 20);
+        } else {
+            taskSubWorkflowPermissionChecker.checkResourcePermission(loginUser, Collections.singletonList(task),
+                    "parent-workers", 10L, "parent-tenant", 20);
+        }
+    }
+
+    private TaskDefinition getDependentTaskDefinition(long projectCode, long workflowCode, long taskCode) {
+        TaskDefinition task = new TaskDefinition();
+        task.setTaskType("DEPENDENT");
+        task.setTaskParams("{\"dependence\":{\"dependTaskList\":[{\"dependItemList\":[{\"projectCode\":"
+                + projectCode + ",\"definitionCode\":" + workflowCode + ",\"depTaskCode\":" + taskCode
+                + ",\"parameterPassing\":true}]}]}}");
+        return task;
     }
 
     private TaskDefinition getSubWorkflowTaskDefinition(long workflowDefinitionCode) {
