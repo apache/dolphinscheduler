@@ -19,6 +19,7 @@ package org.apache.dolphinscheduler.server.worker.rpc;
 
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskEngineDelegator;
+import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorNotFoundException;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillRequest;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillResponse;
 
@@ -63,5 +64,18 @@ public class PhysicalTaskExecutorOperatorImplTest {
 
         Assertions.assertTrue(killResponse.isSuccess());
         Mockito.verify(physicalTaskEngineDelegator).killLogicTask(TASK_INSTANCE_ID);
+    }
+
+    @Test
+    public void testKillTaskReportsAStoppedTaskWhenItIsNotFound() {
+        // the task executor is removed after the task is finalized: a task which is not running any
+        // more does not have to be stopped, so the stop is not reported as a failure
+        Mockito.doThrow(new TaskExecutorNotFoundException(TASK_INSTANCE_ID))
+                .when(physicalTaskEngineDelegator).killLogicTask(TASK_INSTANCE_ID);
+
+        TaskExecutorKillResponse killResponse =
+                physicalTaskExecutorOperator.killTask(TaskExecutorKillRequest.of(TASK_INSTANCE_ID));
+
+        Assertions.assertTrue(killResponse.isSuccess());
     }
 }

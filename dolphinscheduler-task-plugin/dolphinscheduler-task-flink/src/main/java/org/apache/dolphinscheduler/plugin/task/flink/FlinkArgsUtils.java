@@ -282,7 +282,8 @@ public class FlinkArgsUtils {
      *
      * <p>The options of a job which nothing describes are treated as YARN as well: a job which is
      * submitted into an application prints its application id in the task log, so it is an
-     * application job unless the options say otherwise.
+     * application job unless the options say otherwise. A deploy mode which is unknown, for example
+     * because the task has not been started, keeps that default.
      *
      * @param clusterConnectionOptions the cluster connection options of the submission, may be empty
      * @param deployMode the deploy mode of the task, may be null when the parameters are unknown

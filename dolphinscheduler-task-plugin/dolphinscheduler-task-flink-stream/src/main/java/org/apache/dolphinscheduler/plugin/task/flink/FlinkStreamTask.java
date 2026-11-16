@@ -111,12 +111,12 @@ public class FlinkStreamTask extends FlinkTask implements StreamTask {
                 List<String> clusterConnectionOptions = i < clusterConnectionOptionsPerJob.size()
                         ? clusterConnectionOptionsPerJob.get(i)
                         : lastClusterConnectionOptions;
-                if (submission.isYarnApplicationUnresolved() && CollectionUtils.isEmpty(clusterConnectionOptions)) {
-                    // the job runs in one of several applications and nothing else selects the cluster it
-                    // runs in, so a savepoint would be triggered against an arbitrary one
+                if (submission.isYarnApplicationUnresolved()) {
+                    // the job runs in a YARN application which the task cannot identify, so a savepoint
+                    // would be triggered against an arbitrary one
                     failures.add(String.format(
-                            "Cannot determine the YARN application which runs flink job %s, the task submitted it "
-                                    + "to one of several applications and the task log does not say which one",
+                            "Cannot determine the YARN application which runs flink job %s, no savepoint can be "
+                                    + "triggered for it",
                             submission.getJobId()));
                     continue;
                 }

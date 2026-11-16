@@ -35,9 +35,11 @@ public class TaskExecutorKillRequest implements Serializable {
      * is cancelled through its client and, when the client is an orchestrator such as the flink SQL
      * client, every job the task submitted is cancelled with its own command. A job is cancelled with
      * a command which has a 30s timeout of its own, so the default RPC timeout of 10s would make the
-     * caller give up while the cancellation still runs and hide its result.
+     * caller give up while the cancellation still runs and hide its result. The worker waits at most
+     * 90s for the cancellation and reports the task as not confirmed after that, so the timeout only
+     * has to cover that wait.
      */
-    public static final long KILL_TIMEOUT_MILLIS = 5 * 60 * 1000L;
+    public static final long KILL_TIMEOUT_MILLIS = 2 * 60 * 1000L;
 
     private Integer taskInstanceId;
 

@@ -969,4 +969,29 @@ public class FlinkTaskTest {
                 "the failure must name the unreported submissions, message: " + exception.getMessage());
         Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
     }
+
+    @Test
+    public void testCancelApplicationFailsWhenTheApplicationOfAYarnJobIsUnknown() throws Exception {
+        // the job is submitted to YARN but no application id was collected: the CLI without a -yid
+        // would target the default cluster, so the job is reported instead of being cancelled with a
+        // guess
+        TaskExecutionContext context = buildTaskExecutionContext(
+                "Job ID: 1234567890abcdef1234567890abcdef");
+
+        FlinkParameters parameters = new FlinkParameters();
+        parameters.setProgramType(ProgramType.SQL);
+        parameters.setDeployMode(FlinkDeployMode.CLUSTER);
+        parameters.setRawScript("INSERT INTO t SELECT * FROM s;");
+        context.setTaskParams(JSONUtils.toJsonString(parameters));
+
+        FlinkTask task = Mockito.spy(new FlinkTask(context));
+        task.init();
+        stubCancelCommands(task, cancelSucceeded());
+
+        TaskException exception = Assertions.assertThrows(TaskException.class, task::cancelApplication);
+
+        Assertions.assertTrue(exception.getMessage().contains("could not be determined"),
+                "the failure must name the unknown application, message: " + exception.getMessage());
+        Mockito.verify(task, Mockito.never()).executeFlinkCancelCommand(Mockito.anyList());
+    }
 }

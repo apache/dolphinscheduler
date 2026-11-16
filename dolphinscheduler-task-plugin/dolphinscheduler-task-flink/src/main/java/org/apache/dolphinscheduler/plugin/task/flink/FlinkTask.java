@@ -313,11 +313,19 @@ public class FlinkTask extends AbstractYarnTask {
         List<String> lastClusterConnectionOptions = getClusterConnectionOptions();
         List<String> failedJobIds = new ArrayList<>();
         List<String> notCancelledJobIds = new ArrayList<>();
+        List<String> unresolvedJobIds = new ArrayList<>();
         List<String> cancelledJobIds = new ArrayList<>();
         for (int i = 0; i < submissions.size(); i++) {
             FlinkJobSubmission submission = submissions.get(i);
             String jobId = submission.getJobId();
-            if (submission.getYarnApplicationId() != null || submission.isYarnApplicationUnresolved()) {
+            if (submission.isYarnApplicationUnresolved()) {
+                // the job runs in a YARN application which the task cannot identify, so it cannot be
+                // addressed: the CLI without -yid would target the default cluster instead
+                log.error("Cannot determine the YARN application which runs flink job {}, it may still run", jobId);
+                unresolvedJobIds.add(jobId);
+                continue;
+            }
+            if (submission.getYarnApplicationId() != null) {
                 // the job runs in an application of the task, so it is the application which has to be
                 // cancelled, and the resource manager is the only one which can address it
                 log.info("Flink job {} is submitted into a YARN application of the task, it is cancelled with "
@@ -367,6 +375,11 @@ public class FlinkTask extends AbstractYarnTask {
                     "the jobs %s could not be found on the cluster they were targeted at, they may still run on "
                             + "another endpoint",
                     notCancelledJobIds));
+        }
+        if (CollectionUtils.isNotEmpty(unresolvedJobIds)) {
+            failures.add(String.format(
+                    "the YARN application of the jobs %s could not be determined, they may still be running",
+                    unresolvedJobIds));
         }
         if (unreportedSubmissions > 0) {
             failures.add(String.format(
@@ -476,6 +489,19 @@ public class FlinkTask extends AbstractYarnTask {
      */
     private boolean isJobNotFound(String output) {
         return StringUtils.contains(output, JOB_NOT_FOUND_MESSAGE);
+    }
+
+    /**
+     * The Flink JobIDs of the submitted jobs, in the order they appear in the task log.
+     *
+     * @deprecated use {@link #getFlinkJobSubmissions()}, it also keeps the application and the target
+     *             of every job.
+     */
+    @Deprecated
+    protected List<String> getFlinkJobIds() {
+        return getFlinkJobSubmissions().stream()
+                .map(FlinkJobSubmission::getJobId)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -614,6 +640,26 @@ public class FlinkTask extends AbstractYarnTask {
                     ? new FlinkJobSubmission(submission.getJobId(), null, true, true)
                     : submission);
         }
+        if (!isSqlProgram()) {
+            // only the SQL client submits several jobs into applications which the submission does not
+            // print: a `flink run` job prints its own application, so a missing one is not a guess
+            return;
+        }
+        // a job which runs in a YARN application but has none of the task is not addressable: without a
+        // -yid the CLI targets the default cluster, so the job is reported instead of being guessed
+        submissions.replaceAll(submission -> submission.isYarnTarget() && submission.getYarnApplicationId() == null
+                ? new FlinkJobSubmission(submission.getJobId(), null, true, true)
+                : submission);
+    }
+
+    /**
+     * Whether the task submits its jobs through the SQL client, which can send several jobs into
+     * applications that are only visible in the task log.
+     */
+    private boolean isSqlProgram() {
+        AbstractParameters parameters = getParameters();
+        return parameters instanceof FlinkParameters
+                && ((FlinkParameters) parameters).getProgramType() == ProgramType.SQL;
     }
 
     /**
