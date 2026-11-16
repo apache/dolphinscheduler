@@ -81,8 +81,7 @@ public class WorkflowHttpTaskE2ETest {
         userPage.update(user, user, email, phone, tenant)
                 .goToNav(ProjectPage.class)
                 .createProjectUntilSuccess(project)
-                .assignResource(project, "Tenant", tenant)
-                .assignResource(project, "Queue", "default");
+                .assignResource(project, "Tenant", tenant);
     }
 
     @AfterAll

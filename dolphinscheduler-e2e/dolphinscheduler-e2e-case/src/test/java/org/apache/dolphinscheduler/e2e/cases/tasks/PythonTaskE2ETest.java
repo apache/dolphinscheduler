@@ -78,7 +78,6 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .goToNav(ProjectPage.class)
                 .createProjectUntilSuccess(projectName)
                 .assignResource(projectName, "Tenant", adminUser.getTenant())
-                .assignResource(projectName, "Queue", "default")
                 .assignResource(projectName, "Environment", pythonEnvironment.getEnvironmentName());
     }
 
