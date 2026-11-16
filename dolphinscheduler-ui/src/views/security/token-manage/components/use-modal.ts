@@ -99,13 +99,8 @@ export function useModal(
   }
 
   const getToken = () => {
-    const data = {
-      userId: (userStore.getUserInfo as UserInfoRes).id,
-      expireTime: format(variables.model.expireTime!, 'yyyy-MM-dd HH:mm:ss')
-    }
-
     useAsyncState(
-      generateToken(data).then((res: string) => {
+      generateToken().then((res: string) => {
         variables.model.token = res
       }),
       {}

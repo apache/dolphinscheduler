@@ -121,7 +121,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         // 3. generate access token if absent
         if (StringUtils.isBlank(token)) {
-            token = generateToken(loginUser, userId, expireTime);
+            token = generateToken();
         }
 
         // 4. persist to the database
@@ -143,13 +143,10 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
     /**
      * generate token
      *
-     * @param loginUser
-     * @param userId     token for user
-     * @param expireTime token expire time
      * @return token string
      */
     @Override
-    public String generateToken(User loginUser, int userId, String expireTime) {
+    public String generateToken() {
         byte[] bytes = new byte[16];
         SECURE_RANDOM.nextBytes(bytes);
         return Hex.encodeHexString(bytes);
@@ -205,7 +202,7 @@ public class AccessTokenServiceImpl extends BaseServiceImpl implements AccessTok
 
         // 3. generate access token if absent
         if (StringUtils.isBlank(token)) {
-            token = generateToken(loginUser, userId, expireTime);
+            token = generateToken();
         }
 
         // 4. persist to the database

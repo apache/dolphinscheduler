@@ -58,10 +58,9 @@ export function deleteToken(id: number): any {
   })
 }
 
-export function generateToken(data: TokenReq): any {
+export function generateToken(): any {
   return axios({
     url: '/access-tokens/generate',
-    method: 'post',
-    data
+    method: 'post'
   })
 }
