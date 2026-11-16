@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
-import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
@@ -154,18 +153,10 @@ public class AccessTokenServiceTest {
 
     @Test
     public void testGenerateToken() {
-        User user = new User();
-        user.setId(1);
-        user.setUserType(UserType.ADMIN_USER);
-        String expireTime = getDate();
-        long startTime = System.currentTimeMillis();
-        String token = accessTokenService.generateToken(user, user.getId(), expireTime);
-        long endTime = System.currentTimeMillis();
+        String token = accessTokenService.generateToken();
         assertNotNull(token);
         assertTrue(token.matches("[0-9a-f]{32}"));
-        for (long timestamp = startTime; timestamp <= endTime; timestamp++) {
-            assertNotEquals(EncryptionUtils.getMd5(user.getId() + expireTime + timestamp), token);
-        }
+        assertNotEquals(token, accessTokenService.generateToken());
     }
 
     @Test

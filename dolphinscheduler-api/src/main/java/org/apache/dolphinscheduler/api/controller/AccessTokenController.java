@@ -95,19 +95,13 @@ public class AccessTokenController extends BaseController {
     /**
      * generate token string
      *
-     * @param loginUser login user
-     * @param userId token for user
-     * @param expireTime expire time
      * @return token string
      */
-    @Parameter(hidden = true)
     @PostMapping(value = "/generate")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiException(GENERATE_TOKEN_ERROR)
-    public Result<String> generateToken(@RequestAttribute(value = Constants.SESSION_USER) User loginUser,
-                                        @RequestParam(value = "userId") int userId,
-                                        @RequestParam(value = "expireTime") String expireTime) {
-        String token = accessTokenService.generateToken(loginUser, userId, expireTime);
+    public Result<String> generateToken() {
+        String token = accessTokenService.generateToken();
         return Result.success(token);
     }
 
