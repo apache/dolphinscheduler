@@ -21,6 +21,7 @@ import static org.apache.dolphinscheduler.api.AssertionsHelper.assertDoesNotThro
 import static org.apache.dolphinscheduler.api.AssertionsHelper.assertThrowsServiceException;
 import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.ACCESS_TOKEN_DELETE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -35,6 +36,7 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
+import org.apache.dolphinscheduler.common.utils.EncryptionUtils;
 import org.apache.dolphinscheduler.dao.entity.AccessToken;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.AccessTokenDao;
@@ -126,12 +128,13 @@ public class AccessTokenServiceTest {
         // Given Token
         when(accessTokenDao.insert(any(AccessToken.class))).thenReturn(2);
         assertDoesNotThrow(() -> {
-            accessTokenService.createToken(user, 1, getDate(), "AccessTokenServiceTest");
+            AccessToken accessToken = accessTokenService.createToken(user, 1, getDate(), "AccessTokenServiceTest");
+            assertEquals("AccessTokenServiceTest", accessToken.getToken());
         });
 
         // Token is absent
-        assertDoesNotThrow(
-                () -> accessTokenService.createToken(user, 1, getDate(), null));
+        AccessToken accessToken = accessTokenService.createToken(user, 1, getDate(), null);
+        assertTrue(accessToken.getToken().matches("[0-9a-f]{32}"));
 
         // Throw Service Exception when insert failed
         when(accessTokenDao.insert(any(AccessToken.class))).thenReturn(0);
@@ -154,8 +157,15 @@ public class AccessTokenServiceTest {
         User user = new User();
         user.setId(1);
         user.setUserType(UserType.ADMIN_USER);
-        String token = accessTokenService.generateToken(getLoginUser(), Integer.MAX_VALUE, getDate());
+        String expireTime = getDate();
+        long startTime = System.currentTimeMillis();
+        String token = accessTokenService.generateToken(user, user.getId(), expireTime);
+        long endTime = System.currentTimeMillis();
         assertNotNull(token);
+        assertTrue(token.matches("[0-9a-f]{32}"));
+        for (long timestamp = startTime; timestamp <= endTime; timestamp++) {
+            assertNotEquals(EncryptionUtils.getMd5(user.getId() + expireTime + timestamp), token);
+        }
     }
 
     @Test
@@ -205,7 +215,7 @@ public class AccessTokenServiceTest {
 
         // Token is absent
         accessToken = accessTokenService.updateToken(getLoginUser(), 1, Integer.MAX_VALUE, getDate(), null);
-        assertNotNull(accessToken.getToken());
+        assertTrue(accessToken.getToken().matches("[0-9a-f]{32}"));
 
         // ACCESS_TOKEN_NOT_EXIST
         when(resourcePermissionCheckService.resourcePermissionCheck(AuthorizationType.ACCESS_TOKEN, null, 0,
