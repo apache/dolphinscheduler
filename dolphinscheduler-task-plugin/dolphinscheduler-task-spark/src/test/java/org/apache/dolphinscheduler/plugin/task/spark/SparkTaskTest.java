@@ -156,7 +156,7 @@ public class SparkTaskTest {
         mainJar.setResourceName("/main.py");
         sparkParameters.setMainJar(mainJar);
         ResourceInfo pyFile1 = new ResourceInfo();
-        pyFile1.setResourceName("/a.py");
+        pyFile1.setResourceName("/python libs/dep.py");
         ResourceInfo pyFile2 = new ResourceInfo();
         pyFile2.setResourceName("/b.zip");
         sparkParameters.setPyFiles(new ArrayList<>(Arrays.asList(pyFile1, pyFile2)));
@@ -165,7 +165,7 @@ public class SparkTaskTest {
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         ResourceContext resourceContext = new ResourceContext();
         addResourceItem(resourceContext, "/main.py");
-        addResourceItem(resourceContext, "/a.py");
+        addResourceItem(resourceContext, "/python libs/dep.py");
         addResourceItem(resourceContext, "/b.zip");
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
         Mockito.when(taskExecutionContext.getResourceContext()).thenReturn(resourceContext);
@@ -181,7 +181,7 @@ public class SparkTaskTest {
                         "--conf spark.executor.cores=2 " +
                         "--conf spark.executor.memory=1G " +
                         "--name spark " +
-                        "--py-files /a.py,/b.zip " +
+                        "--py-files /python\\ libs/dep.py,/b.zip " +
                         "/main.py",
                 sparkTask.getScript());
     }
@@ -204,14 +204,14 @@ public class SparkTaskTest {
         mainJar.setResourceName("/lib/dolphinscheduler-task-spark.jar");
         sparkParameters.setMainJar(mainJar);
         ResourceInfo archive = new ResourceInfo();
-        archive.setResourceName("/c.tar.gz");
+        archive.setResourceName("/opt archives/c.tar.gz");
         sparkParameters.setArchives(new ArrayList<>(Arrays.asList(archive)));
         String parameters = JSONUtils.toJsonString(sparkParameters);
 
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         ResourceContext resourceContext = new ResourceContext();
         addResourceItem(resourceContext, "/lib/dolphinscheduler-task-spark.jar");
-        addResourceItem(resourceContext, "/c.tar.gz");
+        addResourceItem(resourceContext, "/opt archives/c.tar.gz");
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
         Mockito.when(taskExecutionContext.getResourceContext()).thenReturn(resourceContext);
         SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
@@ -227,7 +227,7 @@ public class SparkTaskTest {
                         "--conf spark.executor.cores=2 " +
                         "--conf spark.executor.memory=1G " +
                         "--name spark " +
-                        "--archives /c.tar.gz " +
+                        "--archives /opt\\ archives/c.tar.gz " +
                         "/lib/dolphinscheduler-task-spark.jar",
                 sparkTask.getScript());
     }
@@ -251,14 +251,14 @@ public class SparkTaskTest {
         sparkParameters.setMainJar(mainJar);
         sparkParameters.setPrincipal("user@REALM");
         ResourceInfo keytab = new ResourceInfo();
-        keytab.setResourceName("/user.keytab");
+        keytab.setResourceName("/kerberos keytabs/user.keytab");
         sparkParameters.setKeytab(keytab);
         String parameters = JSONUtils.toJsonString(sparkParameters);
 
         TaskExecutionContext taskExecutionContext = Mockito.mock(TaskExecutionContext.class);
         ResourceContext resourceContext = new ResourceContext();
         addResourceItem(resourceContext, "/lib/dolphinscheduler-task-spark.jar");
-        addResourceItem(resourceContext, "/user.keytab");
+        addResourceItem(resourceContext, "/kerberos keytabs/user.keytab");
         Mockito.when(taskExecutionContext.getTaskParams()).thenReturn(parameters);
         Mockito.when(taskExecutionContext.getResourceContext()).thenReturn(resourceContext);
         SparkTask sparkTask = Mockito.spy(new SparkTask(taskExecutionContext));
@@ -275,7 +275,7 @@ public class SparkTaskTest {
                         "--conf spark.executor.memory=1G " +
                         "--name spark " +
                         "--principal user@REALM " +
-                        "--keytab /user.keytab " +
+                        "--keytab /kerberos\\ keytabs/user.keytab " +
                         "/lib/dolphinscheduler-task-spark.jar",
                 sparkTask.getScript());
     }

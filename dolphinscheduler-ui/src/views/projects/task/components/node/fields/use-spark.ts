@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, Ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   useCustomParams,
@@ -29,6 +29,12 @@ import {
   useResources,
   useYarnQueue
 } from '.'
+import {
+  getResourceDirAfter,
+  spliceUselessResources,
+  validateResourceExist
+} from './use-resources'
+import type { ResourceOption } from './use-resources'
 import type { IJsonItem, IJsonItemParams } from '../types'
 
 export function useSpark(model: { [field: string]: any }): IJsonItem[] {
@@ -60,6 +66,8 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
     resourcesRequired,
     resourcesLimit
   ) as IJsonItemParams
+
+  const resourcesOptions = resourcesField.options as Ref<ResourceOption[]>
 
   const sqlExecutionTypeSpan = computed(() =>
     model.programType === 'SQL' ? 12 : 0
@@ -212,6 +220,22 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.py_files_tips'),
         keyField: 'fullName',
         labelField: 'name'
+      },
+      validate: {
+        trigger: ['blur'],
+        validator(validate: any, value: string[]) {
+          if (value) {
+            const errorName = spliceUselessResources(
+              value,
+              resourcesOptions.value
+            )
+            if (errorName) {
+              return new Error(
+                t('project.node.useless_resources_tips') + errorName
+              )
+            }
+          }
+        }
       }
     },
     {
@@ -231,6 +255,22 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         placeholder: t('project.node.archives_tips'),
         keyField: 'fullName',
         labelField: 'name'
+      },
+      validate: {
+        trigger: ['blur'],
+        validator(validate: any, value: string[]) {
+          if (value) {
+            const errorName = spliceUselessResources(
+              value,
+              resourcesOptions.value
+            )
+            if (errorName) {
+              return new Error(
+                t('project.node.useless_resources_tips') + errorName
+              )
+            }
+          }
+        }
       }
     },
     {
@@ -269,8 +309,19 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       validate: {
         trigger: ['blur'],
         validator(validate: any, value: string) {
-          if (value && !model.principal) {
-            return new Error(t('project.node.principal_keytab_pair_tips'))
+          if (value) {
+            if (!validateResourceExist(value, [], resourcesOptions.value)) {
+              model.keytab = null
+              return new Error(
+                t('project.node.useless_resources_tips') +
+                  ': ' +
+                  getResourceDirAfter(value, []) +
+                  ';'
+              )
+            }
+            if (!model.principal) {
+              return new Error(t('project.node.principal_keytab_pair_tips'))
+            }
           }
         }
       }

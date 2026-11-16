@@ -179,9 +179,9 @@ public class SparkTask extends AbstractYarnTask {
         List<ResourceInfo> pyFiles = sparkParameters.getPyFiles();
         if (pyFiles != null && !pyFiles.isEmpty()) {
             String pyFilesPath = pyFiles.stream()
-                    .map(pyFile -> taskExecutionContext.getResourceContext()
+                    .map(pyFile -> ArgsUtils.escape(taskExecutionContext.getResourceContext()
                             .getResourceItem(pyFile.getResourceName())
-                            .getResourceAbsolutePathInLocal())
+                            .getResourceAbsolutePathInLocal()))
                     .collect(Collectors.joining(","));
             args.add(SparkConstants.PY_FILES);
             args.add(pyFilesPath);
@@ -191,9 +191,9 @@ public class SparkTask extends AbstractYarnTask {
         List<ResourceInfo> archives = sparkParameters.getArchives();
         if (archives != null && !archives.isEmpty()) {
             String archivesPath = archives.stream()
-                    .map(archive -> taskExecutionContext.getResourceContext()
+                    .map(archive -> ArgsUtils.escape(taskExecutionContext.getResourceContext()
                             .getResourceItem(archive.getResourceName())
-                            .getResourceAbsolutePathInLocal())
+                            .getResourceAbsolutePathInLocal()))
                     .collect(Collectors.joining(","));
             args.add(SparkConstants.ARCHIVES);
             args.add(archivesPath);
@@ -208,9 +208,9 @@ public class SparkTask extends AbstractYarnTask {
         ResourceInfo keytab = sparkParameters.getKeytab();
         if (keytab != null && StringUtils.isNotEmpty(keytab.getResourceName())) {
             args.add(SparkConstants.KEYTAB);
-            args.add(taskExecutionContext.getResourceContext()
+            args.add(ArgsUtils.escape(taskExecutionContext.getResourceContext()
                     .getResourceItem(keytab.getResourceName())
-                    .getResourceAbsolutePathInLocal());
+                    .getResourceAbsolutePathInLocal()));
         }
 
         // add driver label for spark on native kubernetes
