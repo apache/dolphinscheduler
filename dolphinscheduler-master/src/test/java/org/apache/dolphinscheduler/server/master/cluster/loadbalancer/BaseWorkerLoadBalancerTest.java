@@ -75,7 +75,10 @@ public class BaseWorkerLoadBalancerTest {
 
         WorkerClusters workerClusters = new WorkerClusters();
         workerClusters.onWorkerGroupAdd(workerGroups);
-        workerServers.forEach(workerClusters::onServerAdded);
+        workerServers.forEach(server -> {
+            workerClusters.onServerAdded(server.getServerIdentity());
+            workerClusters.onServerUpdate(server);
+        });
         return workerClusters;
     }
 

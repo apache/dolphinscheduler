@@ -223,6 +223,26 @@ public class HttpTaskTest {
     }
 
     @Test
+    public void testHandleWithPlaceholderInUrl() throws Exception {
+        String httpResponse = "{\"status\": \"success\"}";
+        withMockWebServer(DEFAULT_MOCK_PATH, HttpStatus.SC_OK, httpResponse);
+        MockWebServer server = getLatestMockWebServer();
+        String baseUrl = "http://" + server.getHostName() + ":" + server.getPort();
+
+        Map<String, String> prepareParamsMap = new HashMap<>();
+        prepareParamsMap.put("base_url", baseUrl);
+
+        HttpTask httpTask = generateHttpTask("${base_url}" + DEFAULT_MOCK_PATH, HttpRequestMethod.GET, "",
+                new ArrayList<>(), prepareParamsMap, HttpCheckCondition.STATUS_CODE_DEFAULT, "");
+        httpTask.handle(null);
+
+        RecordedRequest request = server.takeRequest(1, TimeUnit.SECONDS);
+        Assertions.assertNotNull(request);
+        Assertions.assertEquals(DEFAULT_MOCK_PATH, request.getPath());
+        Assertions.assertEquals(EXIT_CODE_SUCCESS, httpTask.getExitStatusCode());
+    }
+
+    @Test
     public void testHandleWithComplexHttpBody() throws Exception {
         String httpBody = "{\"name\":\"tom\",\"scores\":[100,98],\"metadata\":{\"grade\":\"A\"}}";
         String httpResponse = "{\"status\": \"success\"}";

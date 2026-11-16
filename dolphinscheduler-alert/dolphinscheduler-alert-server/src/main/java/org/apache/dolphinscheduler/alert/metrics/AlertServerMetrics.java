@@ -39,9 +39,9 @@ public class AlertServerMetrics {
                     .description("Alert failure count")
                     .register(Metrics.globalRegistry);
 
-    private final Counter alertHeartBeatCounter =
-            Counter.builder("ds.alert.heartbeat.count")
-                    .description("alert heartbeat count")
+    private final Counter alertHeartbeatRequestCounter =
+            Counter.builder("ds.alert.heartbeat.request.count")
+                    .description("alert heartbeat data request count")
                     .register(Metrics.globalRegistry);
 
     public void registerPendingAlertGauge(final Supplier<Number> supplier) {
@@ -64,7 +64,7 @@ public class AlertServerMetrics {
         alertFailCounter.increment();
     }
 
-    public void incAlertHeartbeatCount() {
-        alertHeartBeatCounter.increment();
+    public void incAlertHeartbeatRequestCount() {
+        alertHeartbeatRequestCounter.increment();
     }
 }

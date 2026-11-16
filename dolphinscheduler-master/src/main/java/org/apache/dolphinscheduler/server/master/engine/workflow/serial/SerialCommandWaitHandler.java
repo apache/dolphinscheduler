@@ -42,8 +42,7 @@ public class SerialCommandWaitHandler extends AbstractSerialCommandHandler {
             return;
         }
         final SerialCommandDto serialCommand = serialCommands.get(0);
-        if (serialCommand.getState() == SerialCommandDto.State.WAITING) {
-            launchSerialCommand(serialCommand);
+        if (serialCommand.getState() == SerialCommandDto.State.WAITING && launchSerialCommand(serialCommand)) {
             log.info("Launched SerialCommand: {}", serialCommand);
         }
     }
