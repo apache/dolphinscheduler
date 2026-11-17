@@ -39,6 +39,7 @@ public class SensitiveDataConverter extends MessageConverter {
 
     static {
         addMaskPattern(TaskConstants.DATASOURCE_PASSWORD_REGEX);
+        addMaskPattern(TaskConstants.STORAGE_ACCESS_KEY_REGEX);
     }
 
     @Override

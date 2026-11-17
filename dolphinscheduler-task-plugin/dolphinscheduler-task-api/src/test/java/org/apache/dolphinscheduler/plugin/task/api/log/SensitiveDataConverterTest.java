@@ -81,6 +81,104 @@ class SensitiveDataConverterTest {
         }
     }
 
+    /**
+     * mask sensitive logMsg - S3/OSS access-key and secret-key, see issue #17398.
+     * Covers the key names used in the codebase: "access-key", "secret-key",
+     * "accessKey", "secretKey", "accessKeyId", "accessKeySecret",
+     * "access.key.id", "access.key.secret" and "secret.access.key".
+     */
+    @Test
+    void testS3OssAccessKeyLogMsgConverter() {
+        HashMap<String, String> tcs = new HashMap<>();
+        // JSON-like, compact: {"access-key":"...","secret-key":"..."}
+        tcs.put("{\"access-key\":\"AKIAIOSFODNN7EXAMPLE\","
+                + "\"secret-key\":\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"}",
+                "{\"access-key\":\"******\","
+                        + "\"secret-key\":\"******\"}");
+        // JSON-like, compact: accessKey / secretKey, other fields are kept
+        tcs.put("{\"accessKey\":\"AKIAIOSFODNN7EXAMPLE\","
+                + "\"secretKey\":\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\","
+                + "\"bucket\":\"my-bucket\"}",
+                "{\"accessKey\":\"******\","
+                        + "\"secretKey\":\"******\","
+                        + "\"bucket\":\"my-bucket\"}");
+        // JSON-like, compact: accessKeyId / accessKeySecret
+        tcs.put("{\"accessKeyId\":\"AKIAIOSFODNN7EXAMPLE\","
+                + "\"accessKeySecret\":\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"}",
+                "{\"accessKeyId\":\"******\","
+                        + "\"accessKeySecret\":\"******\"}");
+        // JSON-like, compact: dotted keys used by AWS/S3 configuration
+        tcs.put("{\"access.key.id\":\"AKIAIOSFODNN7EXAMPLE\","
+                + "\"access.key.secret\":\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"}",
+                "{\"access.key.id\":\"******\","
+                        + "\"access.key.secret\":\"******\"}");
+        // JSON-like, compact: secret.access.key used by AwsConfigurationKeys
+        tcs.put("{\"secret.access.key\":\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"}",
+                "{\"secret.access.key\":\"******\"}");
+        // JSON-like, compact: key names are matched case-insensitively
+        tcs.put("{\"ACCESS-KEY\":\"AKIAIOSFODNN7EXAMPLE\",\"Secret-Key\":\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"}",
+                "{\"ACCESS-KEY\":\"******\",\"Secret-Key\":\"******\"}");
+        // JSON-like, pretty printed, as logged by DinkyTask
+        tcs.put("Initialize dinky task params: {\n"
+                + "  \"address\" : \"http://localhost:8888\",\n"
+                + "  \"access-key\" : \"AKIAIOSFODNN7EXAMPLE\",\n"
+                + "  \"secret-key\" : \"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\"\n"
+                + "}",
+                "Initialize dinky task params: {\n"
+                        + "  \"address\" : \"http://localhost:8888\",\n"
+                        + "  \"access-key\" : \"******\",\n"
+                        + "  \"secret-key\" : \"******\"\n"
+                        + "}");
+        // JSON-like, escaped nested JSON, as in connectionParams
+        tcs.put("End initialize task {\n"
+                + "  \"connectionParams\" : \"{\\\"accessKeyId\\\":\\\"AKIAIOSFODNN7EXAMPLE\\\",\\\"accessKeySecret\\\":\\\"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\\\"}\",\n"
+                + "  \"type\" : \"DINKY\"\n"
+                + "}",
+                "End initialize task {\n"
+                        + "  \"connectionParams\" : \"{\\\"accessKeyId\\\":\\\"******\\\",\\\"accessKeySecret\\\":\\\"******\\\"}\",\n"
+                        + "  \"type\" : \"DINKY\"\n"
+                        + "}");
+        // Java toString() style with quoted values
+        tcs.put("S3ConnectionParam{accessKey='AKIAIOSFODNN7EXAMPLE', secretKey='wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY'}",
+                "S3ConnectionParam{accessKey='******', secretKey='******'}");
+        // Java toString() style without quotes, e.g. Lombok @Data OssConnection;
+        // the endpoint must NOT be masked
+        tcs.put("OssConnection(accessKeyId=AKIAIOSFODNN7EXAMPLE, accessKeySecret=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY, endPoint=http://oss-cn-hangzhou.aliyuncs.com)",
+                "OssConnection(accessKeyId=******, accessKeySecret=******, endPoint=http://oss-cn-hangzhou.aliyuncs.com)");
+        // Java toString() style without quotes, sensitive key is the last field
+        // before the closing parenthesis
+        tcs.put("OssConnection(accessKeyId=AKIAIOSFODNN7EXAMPLE, accessKeySecret=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY)",
+                "OssConnection(accessKeyId=******, accessKeySecret=******)");
+        // key=value / properties-like output, e.g. MinIO configuration
+        tcs.put("access.key.id=AKIAIOSFODNN7EXAMPLE\n"
+                + "secret.access.key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY\n"
+                + "endpoint=http://localhost:9000",
+                "access.key.id=******\n"
+                        + "secret.access.key=******\n"
+                        + "endpoint=http://localhost:9000");
+        // key=value with dotted prefixes, e.g. remote logging OSS configuration
+        tcs.put("remote.logging.oss.access.key.id=AKIAIOSFODNN7EXAMPLE\n"
+                + "remote.logging.oss.access.key.secret=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+                "remote.logging.oss.access.key.id=******\n"
+                        + "remote.logging.oss.access.key.secret=******");
+        // key=value, access.key.secret used by the S3 storage plugin
+        tcs.put("access.key.secret=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY",
+                "access.key.secret=******");
+        // empty values are masked as well, like an empty password
+        tcs.put("accessKeyId=, accessKeySecret=",
+                "accessKeyId=******, accessKeySecret=******");
+        // no key/value separator after the key name, nothing is masked
+        tcs.put("failed to load access-key from config, check endpoint=http://localhost:9000",
+                "failed to load access-key from config, check endpoint=http://localhost:9000");
+        tcs.put("endpoint=http://oss-cn-hangzhou.aliyuncs.com, bucket=my-bucket",
+                "endpoint=http://oss-cn-hangzhou.aliyuncs.com, bucket=my-bucket");
+
+        for (String logMsg : tcs.keySet()) {
+            String maskedLog = SensitiveDataConverter.maskSensitiveData(logMsg);
+            assertEquals(tcs.get(logMsg), maskedLog);
+        }
+    }
+
     @Test
     void testPostJdbcInfoLogMsgConverter() {
         String POST_JDBC_INFO_REGEX = "(?<=(post jdbc info:)).*(?=)";
