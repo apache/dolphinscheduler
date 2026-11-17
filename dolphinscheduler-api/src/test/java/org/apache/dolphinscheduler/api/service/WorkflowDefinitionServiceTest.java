@@ -117,6 +117,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -125,6 +127,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
 
 @ExtendWith(MockitoExtension.class)
@@ -516,6 +519,79 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         Assertions.assertEquals(1, copyResponses.size());
         Assertions.assertEquals(projectCode, copyResponses.get(0).getProjectCode());
         Assertions.assertEquals(definition.getCode(), copyResponses.get(0).getWorkflowDefinitionCode());
+    }
+
+    @ParameterizedTest
+    @CsvSource({"1,101", "1,0", "1,-1", "2,101", "2,0", "2,-1"})
+    public void testBatchCopyWorkflowDefinitionRemapsSelfDependencies(long targetProjectCode, long depTaskCode) {
+        when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
+        if (targetProjectCode != projectCode) {
+            when(projectDao.queryByCode(targetProjectCode)).thenReturn(getProject(targetProjectCode));
+        }
+        WorkflowDefinition definition = getWorkflowDefinition();
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(definition));
+        when(processService.saveWorkflowDefine(eq(user), any(), eq(true), eq(true))).thenReturn(1);
+
+        TaskDefinitionLog shellTask = new TaskDefinitionLog();
+        shellTask.setCode(101L);
+        shellTask.setTaskType("SHELL");
+        shellTask.setTaskParams("{\"rawScript\":\"echo test\"}");
+        TaskDefinitionLog dependentTask = new TaskDefinitionLog();
+        dependentTask.setCode(102L);
+        dependentTask.setTaskType("DEPENDENT");
+        String taskParams = String.format(
+                "{\"localParams\":[{\"prop\":\"runDate\",\"direct\":\"IN\",\"type\":\"VARCHAR\",\"value\":\"${bizdate}\"}],"
+                        + "\"dependence\":{\"relation\":\"AND\",\"checkInterval\":15,"
+                        + "\"failurePolicy\":\"DEPENDENT_FAILURE_WAITING\",\"failureWaitingTime\":30,"
+                        + "\"dependTaskList\":[{\"relation\":\"AND\",\"dependItemList\":["
+                        + "{\"projectCode\":1,\"definitionCode\":11,\"depTaskCode\":%d,"
+                        + "\"cycle\":\"day\",\"dateValue\":\"last1\",\"parameterPassing\":true}]},"
+                        + "{\"relation\":\"OR\",\"dependItemList\":["
+                        + "{\"projectCode\":1,\"definitionCode\":99,\"depTaskCode\":101,\"cycle\":\"day\",\"dateValue\":\"today\"},"
+                        + "{\"projectCode\":3,\"definitionCode\":98,\"depTaskCode\":999,\"cycle\":\"day\",\"dateValue\":\"last1\"},"
+                        + "{\"projectCode\":3,\"definitionCode\":11,\"depTaskCode\":101,\"cycle\":\"day\",\"dateValue\":\"last1\"},"
+                        + "{\"projectCode\":1,\"definitionCode\":11,\"depTaskCode\":102,\"cycle\":\"day\",\"dateValue\":\"last2\"}]}]}}",
+                depTaskCode);
+        dependentTask.setTaskParams(taskParams);
+        List<TaskDefinitionLog> tasks = Arrays.asList(shellTask, dependentTask);
+        WorkflowTaskRelation relation = new WorkflowTaskRelation();
+        relation.setPreTaskCode(102L);
+        relation.setPostTaskCode(101L);
+        List<WorkflowTaskRelation> relations = Collections.singletonList(relation);
+        when(workflowTaskRelationDao.queryByWorkflowDefinitionCode(processDefinitionCode)).thenReturn(relations);
+        when(taskDefinitionLogDao.queryTaskDefineLogList(relations)).thenReturn(tasks);
+
+        List<WorkflowDefinitionCopyVO> copies = workflowDefinitionService.batchCopyWorkflowDefinition(
+                user, projectCode, String.valueOf(processDefinitionCode), targetProjectCode);
+
+        Assertions.assertEquals(1, copies.size());
+        long copiedWorkflowCode = copies.get(0).getWorkflowDefinitionCode();
+        Assertions.assertNotEquals(processDefinitionCode, copiedWorkflowCode);
+        ArgumentCaptor<List<TaskDefinitionLog>> tasksCaptor = ArgumentCaptor.forClass(List.class);
+        verify(processService).saveTaskDefine(eq(user), eq(targetProjectCode), tasksCaptor.capture(), eq(true));
+        List<TaskDefinitionLog> copiedTasks = tasksCaptor.getValue();
+        TaskDefinitionLog copiedShell = copiedTasks.stream().filter(task -> "SHELL".equals(task.getTaskType()))
+                .findFirst().get();
+        TaskDefinitionLog copiedDependent = copiedTasks.stream().filter(task -> "DEPENDENT".equals(task.getTaskType()))
+                .findFirst().get();
+        Assertions.assertNotEquals(101L, copiedShell.getCode());
+        Assertions.assertNotEquals(102L, copiedDependent.getCode());
+        Assertions.assertEquals(targetProjectCode, copiedDependent.getProjectCode());
+        Assertions.assertEquals("{\"rawScript\":\"echo test\"}", copiedShell.getTaskParams());
+        ObjectNode expectedParams = JSONUtils.parseObject(taskParams, ObjectNode.class);
+        ObjectNode selfDependency = (ObjectNode) expectedParams.path("dependence").path("dependTaskList")
+                .get(0).path("dependItemList").get(0);
+        selfDependency.put("projectCode", targetProjectCode);
+        selfDependency.put("definitionCode", copiedWorkflowCode);
+        selfDependency.put("depTaskCode", depTaskCode > 0 ? copiedShell.getCode() : depTaskCode);
+        ObjectNode otherSelfDependency = (ObjectNode) expectedParams.path("dependence").path("dependTaskList")
+                .get(1).path("dependItemList").get(3);
+        otherSelfDependency.put("projectCode", targetProjectCode);
+        otherSelfDependency.put("definitionCode", copiedWorkflowCode);
+        otherSelfDependency.put("depTaskCode", copiedDependent.getCode());
+        Assertions.assertEquals(JSONUtils.parseObject(JSONUtils.toJsonString(expectedParams), ObjectNode.class),
+                JSONUtils.parseObject(copiedDependent.getTaskParams(), ObjectNode.class));
     }
 
     @Test
