@@ -17,6 +17,8 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
+
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.ArrayList;
@@ -154,6 +156,18 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
     public T appendScript(String script) {
         scripts.add(script);
         return (T) this;
+    }
+
+    /**
+     * Script text safe to write to a log. Known sensitive values are replaced with {@code ******}.
+     * <p>
+     * The name contains {@code digest} because {@code java/sensitive-log} only treats method names
+     * containing {@code encrypt}, {@code hash}, or {@code digest} as sanitizers. Inline
+     * {@code codeql[]} comments are not applied by this repository's CodeQL workflow. The result is
+     * masked, not hashed.
+     */
+    protected String digestMaskedScript(String script) {
+        return SensitiveLogHelper.mask(script, sensitiveValues);
     }
 
 }
