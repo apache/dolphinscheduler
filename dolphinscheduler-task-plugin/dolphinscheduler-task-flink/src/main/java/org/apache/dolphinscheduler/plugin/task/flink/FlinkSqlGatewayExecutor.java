@@ -47,14 +47,23 @@ import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Submits Flink SQL to a remote SQL Gateway over JDBC.
- * Kept off {@link org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask#handle}
+ * Submits Flink SQL to a remote SQL Gateway.
+ *
+ * <p>Primary transport is JDBC ({@code flink-sql-jdbc-driver-bundle}, scope provided). The Java 8
+ * driver negotiates the gateway REST version on connect and aborts when the gateway advertises a
+ * version its enum does not know (e.g. a Flink 2.3 gateway listing V4). In that case this executor
+ * falls back to speaking gateway REST v1 directly (see {@link FlinkSqlGatewayRestClient}), whose
+ * wire contract has been stable from Flink 1.18 through the 2.x line.
+ *
+ * <p>Kept off {@link org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask#handle}
  * so the sql-client.sh path is not involved.
  */
 @Slf4j
 public class FlinkSqlGatewayExecutor {
 
     static final String DML_SYNC_SQL = "SET 'table.dml-sync'='true'";
+
+    private static final long REST_STATUS_POLL_INTERVAL_MILLIS = 500;
 
     private final TaskExecutionContext taskExecutionContext;
     private final FlinkParameters parameters;
@@ -64,6 +73,12 @@ public class FlinkSqlGatewayExecutor {
     private volatile boolean killed;
     private volatile Connection connection;
     private volatile Statement statement;
+
+    // REST fallback state (active only when the JDBC driver cannot negotiate the gateway versions)
+    private volatile boolean restMode;
+    private volatile FlinkSqlGatewayRestClient restClient;
+    private volatile String restSessionHandle;
+    private volatile String restOperationHandle;
 
     public FlinkSqlGatewayExecutor(TaskExecutionContext taskExecutionContext,
                                    FlinkParameters parameters,
@@ -80,16 +95,30 @@ public class FlinkSqlGatewayExecutor {
             }
             String jdbcUrl = resolvePlaceholderParams(parameters.getFlinkJdbcUrl());
             Properties props = parameters.toJdbcProperties();
-            log.info("Connecting flink sql gateway with jdbcUrl: {}", jdbcUrl);
-            Connection opened = DriverManager.getConnection(jdbcUrl, props);
-            synchronized (lock) {
-                if (killed) {
-                    closeQuietly(opened);
-                    task.setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
-                    return;
+            if (!restMode) {
+                log.info("Connecting flink sql gateway with jdbcUrl: {}", jdbcUrl);
+                try {
+                    Connection opened = DriverManager.getConnection(jdbcUrl, props);
+                    synchronized (lock) {
+                        if (killed) {
+                            closeQuietly(opened);
+                            task.setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
+                            return;
+                        }
+                        connection = opened;
+                        statement = connection.createStatement();
+                    }
+                } catch (Exception e) {
+                    if (!isRestVersionNegotiationFailure(e)) {
+                        throw e;
+                    }
+                    log.info(
+                            "JDBC driver cannot negotiate the gateway REST version list (gateway advertises a version the Java 8 driver enum does not know), falling back to gateway REST v1 transport");
+                    restMode = true;
                 }
-                connection = opened;
-                statement = connection.createStatement();
+            }
+            if (restMode) {
+                openRestSessionIfNeeded();
             }
 
             executeAndInterpret(DML_SYNC_SQL, "sync");
@@ -111,12 +140,32 @@ public class FlinkSqlGatewayExecutor {
             task.setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
             throw new TaskException("Execute flink sql gateway task failed", e);
         } finally {
+            if (restMode && killed) {
+                cancelRestOperationQuietly();
+            }
+            closeRestSessionQuietly();
             closeQuietly(statement);
             closeQuietly(connection);
         }
     }
 
     public void cancel() throws TaskException {
+        if (restMode) {
+            String toCancel;
+            synchronized (lock) {
+                killed = true;
+                task.setExitStatusCode(TaskConstants.EXIT_CODE_KILL);
+                toCancel = restOperationHandle;
+            }
+            try {
+                if (restClient != null && restSessionHandle != null && toCancel != null) {
+                    restClient.cancelOperation(restSessionHandle, toCancel);
+                }
+            } catch (Exception e) {
+                throw new TaskException("Cancel flink sql gateway task failed", e);
+            }
+            return;
+        }
         Statement toCancel;
         Connection toClose;
         synchronized (lock) {
@@ -237,6 +286,10 @@ public class FlinkSqlGatewayExecutor {
         if (stopIfKilled()) {
             return;
         }
+        if (restMode) {
+            restExecuteAndInterpret(sql, tag);
+            return;
+        }
         boolean hasResultSet = statement.execute(sql);
         SubmitOutcome outcome = readOutcome(hasResultSet);
         if (outcome == SubmitOutcome.FAILURE) {
@@ -244,6 +297,141 @@ public class FlinkSqlGatewayExecutor {
         }
         if (outcome == SubmitOutcome.NOT_FINISHED) {
             throw new TaskException("Flink job was submitted but did not reach a terminal success state, tag=" + tag);
+        }
+    }
+
+    private void restExecuteAndInterpret(String sql, String tag) throws Exception {
+        String operationHandle = restClient.executeStatement(restSessionHandle, sql);
+        synchronized (lock) {
+            restOperationHandle = operationHandle;
+        }
+        log.info("[{}] submitted gateway operation: {}", tag, operationHandle);
+        String status = awaitRestTerminalStatus(operationHandle);
+        if (status == null) {
+            return;
+        }
+        if ("FAILED".equals(status) || "CANCELED".equals(status)) {
+            throw new TaskException("Flink sql gateway operation finished with status " + status + ", tag=" + tag);
+        }
+        FlinkSqlGatewayRestClient.ResultPages results = restClient.fetchAllResults(restSessionHandle, operationHandle);
+        SubmitOutcome outcome = interpretRestResult(results.getColumns(), results.getRows());
+        if (outcome == SubmitOutcome.FAILURE) {
+            throw new TaskException("Flink job failed after submission, tag=" + tag);
+        }
+        if (outcome == SubmitOutcome.NOT_FINISHED) {
+            throw new TaskException("Flink job was submitted but did not reach a terminal success state, tag=" + tag);
+        }
+    }
+
+    /**
+     * Polls the gateway operation status until a terminal state. Returns the terminal status, or
+     * {@code null} when the task was killed while waiting.
+     */
+    private String awaitRestTerminalStatus(String operationHandle) throws Exception {
+        while (true) {
+            if (stopIfKilled()) {
+                return null;
+            }
+            String status = restClient.getOperationStatus(restSessionHandle, operationHandle);
+            if ("FINISHED".equals(status) || "FAILED".equals(status) || "CANCELED".equals(status)) {
+                return status;
+            }
+            Thread.sleep(REST_STATUS_POLL_INTERVAL_MILLIS);
+        }
+    }
+
+    /**
+     * REST fallback detection: the Java 8 driver aborts inside {@code ExecutorImpl} when the
+     * gateway REST version list contains a version its enum does not know
+     * ({@code IllegalArgumentException: No enum constant ...SqlGatewayRestAPIVersion.V4}).
+     */
+    static boolean isRestVersionNegotiationFailure(Throwable t) {
+        Throwable current = t;
+        while (current != null) {
+            String message = current.getMessage();
+            if (current instanceof IllegalArgumentException && message != null
+                    && message.startsWith("No enum constant")
+                    && message.contains("SqlGatewayRestAPIVersion")) {
+                return true;
+            }
+            current = current.getCause();
+        }
+        return false;
+    }
+
+    /**
+     * Interprets the terminal REST result pages with the same semantics as the JDBC result
+     * reading: a status column decides via {@link #interpretStatusSequence}, a lone job-id column
+     * is a finished success only in dml-sync mode, and a statement without result columns reached
+     * its terminal state.
+     */
+    static SubmitOutcome interpretRestResult(List<String> columns, List<List<String>> rows) {
+        if (columns == null || columns.isEmpty()) {
+            return SubmitOutcome.SUCCESS;
+        }
+        int statusIndex = columnIndex(columns, "status");
+        int jobIdIndex = columnIndex(columns, "job id", "job_id", "jobid");
+        List<String> statuses = new ArrayList<>();
+        boolean sawJobId = false;
+        if (rows != null) {
+            for (List<String> row : rows) {
+                if (jobIdIndex > 0 && jobIdIndex <= row.size() && StringUtils.isNotBlank(row.get(jobIdIndex - 1))) {
+                    sawJobId = true;
+                }
+                if (statusIndex > 0 && statusIndex <= row.size()) {
+                    statuses.add(row.get(statusIndex - 1));
+                }
+            }
+        }
+        boolean jobIdOnly = sawJobId && statusIndex <= 0 && columns.size() == 1;
+        return interpretSubmitResult(true, jobIdOnly, statusIndex > 0, statuses, true);
+    }
+
+    private void openRestSessionIfNeeded() throws Exception {
+        if (restClient != null && restSessionHandle != null) {
+            return;
+        }
+        FlinkSqlGatewayRestClient client = new FlinkSqlGatewayRestClient(
+                resolvePlaceholderParams(parameters.getFlinkJdbcUrl()));
+        String sessionHandle = client.openSession();
+        log.info("Opened gateway REST v1 session: {}", sessionHandle);
+        synchronized (lock) {
+            if (killed) {
+                closeRestSessionQuietly(client, sessionHandle);
+                return;
+            }
+            restClient = client;
+            restSessionHandle = sessionHandle;
+        }
+    }
+
+    private void cancelRestOperationQuietly() {
+        try {
+            if (restClient != null && restSessionHandle != null && restOperationHandle != null) {
+                restClient.cancelOperation(restSessionHandle, restOperationHandle);
+            }
+        } catch (Exception e) {
+            log.warn("Cancel gateway REST operation failed (ignored): {}", e.getMessage());
+        }
+    }
+
+    private void closeRestSessionQuietly() {
+        String sessionHandle;
+        synchronized (lock) {
+            sessionHandle = restSessionHandle;
+            restSessionHandle = null;
+            restOperationHandle = null;
+        }
+        if (restClient != null && sessionHandle != null) {
+            closeRestSessionQuietly(restClient, sessionHandle);
+        }
+    }
+
+    private void closeRestSessionQuietly(FlinkSqlGatewayRestClient client, String sessionHandle) {
+        try {
+            client.closeSession(sessionHandle);
+        } catch (Exception e) {
+            log.warn("Close gateway REST session failed (ignored): {}", e.getMessage());
         }
     }
 
@@ -292,6 +480,22 @@ public class FlinkSqlGatewayExecutor {
             for (String name : names) {
                 if (name.equals(normalized)) {
                     return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    private static int columnIndex(List<String> labels, String... names) {
+        for (int i = 0; i < labels.size(); i++) {
+            String label = labels.get(i);
+            if (label == null) {
+                continue;
+            }
+            String normalized = label.trim().toLowerCase(Locale.ROOT);
+            for (String name : names) {
+                if (name.equals(normalized)) {
+                    return i + 1;
                 }
             }
         }
