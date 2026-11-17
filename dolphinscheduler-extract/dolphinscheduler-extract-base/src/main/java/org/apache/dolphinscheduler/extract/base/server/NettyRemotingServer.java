@@ -18,6 +18,7 @@
 package org.apache.dolphinscheduler.extract.base.server;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
+import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationHandler;
 import org.apache.dolphinscheduler.extract.base.config.NettyServerConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.protocal.TransporterDecoder;
@@ -132,6 +133,10 @@ class NettyRemotingServer {
      * @param ch socket channel
      */
     private void initNettyChannel(SocketChannel ch) {
+        if (serverConfig.getAuthentication().isEnabled()) {
+            ch.pipeline().addLast("authentication",
+                    new RpcAuthenticationHandler(serverConfig.getAuthentication(), true));
+        }
         ch.pipeline()
                 .addLast("encoder", new TransporterEncoder())
                 .addLast("decoder", new TransporterDecoder())

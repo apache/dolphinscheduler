@@ -18,19 +18,28 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface IClusters<S extends IClusters.IServerMetadata> {
 
+    // Runtime metadata exists only after a valid heartbeat has been received.
     List<S> getServers();
+
+    // Registration is independent of heartbeat availability.
+    List<String> getServerAddresses();
+
+    Optional<ServerIdentity> getServerIdentity(String address);
 
     Optional<S> getServer(final String address);
 
     void registerListener(IClustersChangeListener<S> listener);
 
     interface IServerMetadata {
+
+        ServerIdentity getServerIdentity();
 
         String getAddress();
 
@@ -40,42 +49,28 @@ public interface IClusters<S extends IClusters.IServerMetadata> {
 
     interface IClustersChangeListener<S extends IServerMetadata> {
 
-        void onServerAdded(S server);
+        default void onServerAdded(ServerIdentity server) {
+        }
 
-        void onServerRemove(S server);
+        default void onServerRemove(ServerIdentity server) {
+        }
 
-        void onServerUpdate(S server);
+        default void onServerUpdate(S server) {
+        }
 
     }
 
     interface ServerAddedListener<S extends IServerMetadata> extends IClustersChangeListener<S> {
 
         @Override
-        default void onServerRemove(S server) {
-            // only care about server added
-        }
-
-        @Override
-        default void onServerUpdate(S server) {
-            // only care about server added
-        }
+        void onServerAdded(ServerIdentity server);
 
     }
 
     interface ServerRemovedListener<S extends IServerMetadata> extends IClustersChangeListener<S> {
 
         @Override
-        default void onServerAdded(S server) {
-            // only care about server removed
-        }
-
-        @Override
-        void onServerRemove(S server);
-
-        @Override
-        default void onServerUpdate(S server) {
-            // only care about server added
-        }
+        void onServerRemove(ServerIdentity server);
 
     }
 

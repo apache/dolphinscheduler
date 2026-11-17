@@ -34,6 +34,8 @@ public class Server {
 
     private String heartBeatInfo;
 
+    private boolean metadataStale;
+
     private Date createTime;
 
     private Date lastHeartbeatTime;
