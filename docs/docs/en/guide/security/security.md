@@ -176,6 +176,8 @@ Switching a workflow version requires both the workflow and its schedule to be o
 
 Cross-project workflow moves are rejected by the backend. Use cross-project copying to create a new definition and new task codes in the destination project; the source definition and its instances remain unchanged. Existing data from earlier moves is not migrated; operations reject inconsistent project ownership.
 
+Workflow copying, within or across projects, copies definitions and tasks without schedules. Create schedules separately with the destination project's `EXECUTE` permission and the required resource grants.
+
 Deleting a workflow instance or a definition that cascades to instances requires `DEVELOP` in every affected instance project, including cross-project subworkflow instances. All instances must be terminal. The complete instance tree is checked before any instance is deleted; a missing permission rejects the entire cascade.
 
 Deleting a user removes that user's explicit permissions from all projects in the same transaction.

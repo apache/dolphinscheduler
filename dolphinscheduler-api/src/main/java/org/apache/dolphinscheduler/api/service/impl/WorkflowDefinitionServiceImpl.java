@@ -1487,21 +1487,6 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 }
                 workflowDefinition.setLocations(JSONUtils.toJsonString(jsonNodes));
             }
-            // copy timing configuration
-            Schedule scheduleObj = scheduleDao.queryByWorkflowDefinitionCode(oldWorkflowDefinitionCode);
-            if (scheduleObj != null) {
-                scheduleObj.setId(null);
-                scheduleObj.setUserId(loginUser.getId());
-                scheduleObj.setWorkflowDefinitionCode(workflowDefinition.getCode());
-                scheduleObj.setReleaseState(ReleaseState.OFFLINE);
-                scheduleObj.setCreateTime(date);
-                scheduleObj.setUpdateTime(date);
-                int insertResult = scheduleDao.insert(scheduleObj);
-                if (insertResult != 1) {
-                    log.error("Schedule create error, workflowDefinitionCode:{}.", workflowDefinition.getCode());
-                    throw new ServiceException(Status.CREATE_SCHEDULE_ERROR);
-                }
-            }
             try {
                 createDagDefine(loginUser, taskRelationList, workflowDefinition, taskDefinitionLogs);
                 copyResponses.add(WorkflowDefinitionCopyVO.builder()

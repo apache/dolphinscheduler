@@ -117,6 +117,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -467,6 +469,51 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
         when(processService.genDagData(any())).thenReturn(new DagData(getWorkflowDefinition(), null, null));
         DagData successRes = workflowDefinitionService.queryWorkflowDefinitionByName(user, projectCode, "test");
         Assertions.assertNotNull(successRes);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {false, true})
+    void copyingWorkflowOmitsScheduleWithoutRequiringExecute(boolean crossProject) {
+        long destinationCode = crossProject ? projectCodeOther : projectCode;
+        Project source = getProject(projectCode);
+        Project destination = crossProject ? getProject(destinationCode) : source;
+        when(projectDao.queryByCode(projectCode)).thenReturn(source);
+        if (crossProject) {
+            when(projectDao.queryByCode(destinationCode)).thenReturn(destination);
+        }
+        Mockito.lenient().doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM))
+                .when(projectService).checkProjectPermission(user, destination, ProjectPermission.EXECUTE);
+        Mockito.lenient().doThrow(new ServiceException(Status.USER_NO_OPERATION_PERM))
+                .when(projectService).checkProjectPermission(user, destinationCode, ProjectPermission.EXECUTE);
+        WorkflowDefinition definition = getWorkflowDefinition();
+        when(workflowDefinitionDao.queryByCodes(Collections.singleton(processDefinitionCode)))
+                .thenReturn(Collections.singletonList(definition));
+        when(processService.saveWorkflowDefine(eq(user), any(WorkflowDefinition.class), eq(true), eq(true)))
+                .thenReturn(1);
+        Schedule sourceSchedule = new Schedule();
+        sourceSchedule.setId(42);
+        sourceSchedule.setWorkflowDefinitionCode(processDefinitionCode);
+        sourceSchedule.setReleaseState(ReleaseState.ONLINE);
+        sourceSchedule.setTenantCode("source-only-tenant");
+        sourceSchedule.setWorkerGroup("source-only-workers");
+        sourceSchedule.setEnvironmentCode(99L);
+        sourceSchedule.setWarningGroupId(23);
+        Mockito.lenient().when(scheduleDao.queryByWorkflowDefinitionCode(processDefinitionCode))
+                .thenReturn(sourceSchedule);
+        Mockito.lenient().when(scheduleDao.insert(any(Schedule.class))).thenReturn(1);
+
+        List<WorkflowDefinitionCopyVO> copies = workflowDefinitionService.batchCopyWorkflowDefinition(
+                user, projectCode, String.valueOf(processDefinitionCode), destinationCode);
+
+        Assertions.assertEquals(1, copies.size());
+        Assertions.assertEquals(destinationCode, copies.get(0).getProjectCode());
+        Assertions.assertNotEquals(processDefinitionCode, copies.get(0).getWorkflowDefinitionCode());
+        Mockito.verifyNoInteractions(scheduleDao);
+        verify(projectService).checkProjectPermission(user, source, ProjectPermission.VIEW);
+        verify(projectService).checkProjectPermission(user, destination, ProjectPermission.DEVELOP);
+        Assertions.assertEquals(42, sourceSchedule.getId());
+        Assertions.assertEquals(processDefinitionCode, sourceSchedule.getWorkflowDefinitionCode());
+        Assertions.assertEquals(ReleaseState.ONLINE, sourceSchedule.getReleaseState());
     }
 
     @Test
