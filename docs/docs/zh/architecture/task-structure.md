@@ -224,23 +224,24 @@
 
 对数据源执行 SQL 语句，`task_params` 由 `dolphinscheduler-task-api` 模块的 `SqlParameters` 定义。
 
-|       字段       |   类型    |                                  描述                                   |
-|----------------|---------|-----------------------------------------------------------------------|
-| localParams    | Array   | 本地参数，替换 SQL 中的 `${variable}`，见 [公共字段](#公共字段)                          |
-| resourceList   | Array   | 前端对所有任务类型都会附带，本任务不使用；`sqlSource` 为 `FILE` 时的 SQL 文件由 `sqlResource` 指定 |
-| type           | String  | 数据源类型，如 `MYSQL`、`POSTGRESQL`、`HIVE`                                   |
-| datasource     | Integer | 数据源 id                                                                |
-| sql            | String  | SQL 语句；不为空时执行，优先于 `sqlResource`                                       |
-| sqlSource      | String  | UI 中选择的 SQL 来源：`SCRIPT` 内联脚本，`FILE` 资源中心文件；Worker 不读取                 |
-| sqlResource    | String  | 资源中心文件路径，仅在 `sql` 为空时读取                                               |
-| sqlType        | Integer | SQL 类型：`0` 查询，`1` 非查询；前端以字符串 `"0"`/`"1"` 提交，两种写法都可接受                  |
-| preStatements  | Array   | 在主 SQL 之前执行的 SQL 语句                                                   |
-| postStatements | Array   | 在主 SQL 之后执行的 SQL 语句                                                   |
-| sendEmail      | Boolean | 是否通过告警发送查询结果，仅查询类型                                                    |
-| displayRows    | Integer | 日志中展示查询结果的最大行数，仅查询类型                                                  |
-| title          | String  | 告警标题，仅 `sendEmail` 为 true 时保存                                         |
-| groupId        | Integer | 告警组 id，仅 `sendEmail` 为 true 时保存                                       |
-| limit          | Integer | 查询最多获取的行数，小于等于 0 时使用默认值                                               |
+|       字段       |   类型    |                                            描述                                            |
+|----------------|---------|------------------------------------------------------------------------------------------|
+| localParams    | Array   | 本地参数，替换 SQL 中的 `${variable}`，见 [公共字段](#公共字段)                                             |
+| resourceList   | Array   | 前端对所有任务类型都会附带，本任务不使用；`sqlSource` 为 `FILE` 时的 SQL 文件由 `sqlResource` 指定                    |
+| type           | String  | 数据源类型，如 `MYSQL`、`POSTGRESQL`、`HIVE`                                                      |
+| datasource     | Integer | 数据源 id                                                                                   |
+| connParams     | String  | 连接参数，格式为 `key1=value1;key2=value2`，UI 仅在 `HIVE` 时显示。目前 UI 不会保存该值，即使通过 API 传入，Worker 也会忽略 |
+| sql            | String  | SQL 语句；不为空时执行，优先于 `sqlResource`                                                          |
+| sqlSource      | String  | UI 中选择的 SQL 来源：`SCRIPT` 内联脚本，`FILE` 资源中心文件；Worker 不读取                                    |
+| sqlResource    | String  | 资源中心文件路径，仅在 `sql` 为空时读取                                                                  |
+| sqlType        | Integer | SQL 类型：`0` 查询，`1` 非查询；前端以字符串 `"0"`/`"1"` 提交，两种写法都可接受                                     |
+| preStatements  | Array   | 在主 SQL 之前执行的 SQL 语句                                                                      |
+| postStatements | Array   | 在主 SQL 之后执行的 SQL 语句                                                                      |
+| sendEmail      | Boolean | 是否通过告警发送查询结果，仅查询类型                                                                       |
+| displayRows    | Integer | 日志中展示查询结果的最大行数，仅查询类型                                                                     |
+| title          | String  | 告警标题，仅 `sendEmail` 为 true 时保存                                                            |
+| groupId        | Integer | 告警组 id，仅 `sendEmail` 为 true 时保存                                                          |
+| limit          | Integer | 查询最多获取的行数，小于等于 0 时使用默认值                                                                  |
 
 **示例：**
 

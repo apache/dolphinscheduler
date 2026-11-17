@@ -242,23 +242,24 @@ Runs a Python script on the worker. `task_params` is defined by `PythonParameter
 
 Runs SQL statements against a datasource. `task_params` is defined by `SqlParameters` in `dolphinscheduler-task-api`.
 
-|     Field      |  Type   |                                                       Description                                                       |
-|----------------|---------|-------------------------------------------------------------------------------------------------------------------------|
-| localParams    | Array   | Local parameters, replace `${variable}` in the SQL, see [Common Fields](#common-fields)                                 |
-| resourceList   | Array   | Sent by the UI for every task type, not used by this task. The SQL file of `sqlSource` `FILE` is given by `sqlResource` |
-| type           | String  | Datasource type, e.g. `MYSQL`, `POSTGRESQL`, `HIVE`                                                                     |
-| datasource     | Integer | Datasource id                                                                                                           |
-| sql            | String  | SQL statements; run when not empty, taking precedence over `sqlResource`                                                |
-| sqlSource      | String  | SQL source chosen in the UI: `SCRIPT` inline text, `FILE` resource center file. Not read by the worker                  |
-| sqlResource    | String  | Resource center file path, read only when `sql` is empty                                                                |
-| sqlType        | Integer | SQL type: `0` query, `1` non-query. The UI sends it as the string `"0"` or `"1"`, and both forms are accepted           |
-| preStatements  | Array   | SQL statements executed before the main SQL                                                                             |
-| postStatements | Array   | SQL statements executed after the main SQL                                                                              |
-| sendEmail      | Boolean | Whether to send the query result by alert, query type only                                                              |
-| displayRows    | Integer | Max rows of the query result shown in the log, query type only                                                          |
-| title          | String  | Alert title, only when `sendEmail` is true                                                                              |
-| groupId        | Integer | Alert group id, only when `sendEmail` is true                                                                           |
-| limit          | Integer | Max rows fetched by a query, the default is used when it is less than or equal to 0                                     |
+|     Field      |  Type   |                                                                                         Description                                                                                         |
+|----------------|---------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| localParams    | Array   | Local parameters, replace `${variable}` in the SQL, see [Common Fields](#common-fields)                                                                                                     |
+| resourceList   | Array   | Sent by the UI for every task type, not used by this task. The SQL file of `sqlSource` `FILE` is given by `sqlResource`                                                                     |
+| type           | String  | Datasource type, e.g. `MYSQL`, `POSTGRESQL`, `HIVE`                                                                                                                                         |
+| datasource     | Integer | Datasource id                                                                                                                                                                               |
+| connParams     | String  | Connection parameters in the form `key1=value1;key2=value2`, shown by the UI only for `HIVE`. The UI currently does not save it, and the worker ignores it even if supplied through the API |
+| sql            | String  | SQL statements; run when not empty, taking precedence over `sqlResource`                                                                                                                    |
+| sqlSource      | String  | SQL source chosen in the UI: `SCRIPT` inline text, `FILE` resource center file. Not read by the worker                                                                                      |
+| sqlResource    | String  | Resource center file path, read only when `sql` is empty                                                                                                                                    |
+| sqlType        | Integer | SQL type: `0` query, `1` non-query. The UI sends it as the string `"0"` or `"1"`, and both forms are accepted                                                                               |
+| preStatements  | Array   | SQL statements executed before the main SQL                                                                                                                                                 |
+| postStatements | Array   | SQL statements executed after the main SQL                                                                                                                                                  |
+| sendEmail      | Boolean | Whether to send the query result by alert, query type only                                                                                                                                  |
+| displayRows    | Integer | Max rows of the query result shown in the log, query type only                                                                                                                              |
+| title          | String  | Alert title, only when `sendEmail` is true                                                                                                                                                  |
+| groupId        | Integer | Alert group id, only when `sendEmail` is true                                                                                                                                               |
+| limit          | Integer | Max rows fetched by a query, the default is used when it is less than or equal to 0                                                                                                         |
 
 **Example:**
 
