@@ -237,38 +237,45 @@ public class CosStorageOperator extends AbstractStorageOperator implements Close
 
         String resourceAbsolutePath = path;
 
-        ListObjectsRequest request = new ListObjectsRequest();
-        request.setBucketName(bucketName);
-        request.setPrefix(resourceAbsolutePath);
-        request.setDelimiter(File.separator);
-
-        ObjectListing result = cosClient.listObjects(request);
         List<StorageEntity> storageEntitys = new ArrayList<>();
-        // add directories
-        storageEntitys.addAll(result.getCommonPrefixes()
-                .stream()
-                .filter(x -> !resourceAbsolutePath.equals(x))
-                .map(key -> {
-                    ObjectMetadata metadata = new ObjectMetadata();
-                    COSObject object = new COSObject();
-                    object.setObjectMetadata(metadata);
-                    object.setKey(key);
-                    return transformCOSObjectToStorageEntity(object);
-                }).collect(Collectors.toList()));
-        // add files
-        storageEntitys.addAll(result.getObjectSummaries()
-                .stream()
-                .filter(x -> !x.getKey().endsWith(File.separator))
-                .map((COSObjectSummary summary) -> {
-                    ObjectMetadata metadata = new ObjectMetadata();
-                    metadata.setContentLength(summary.getSize());
-                    metadata.setLastModified(summary.getLastModified());
-                    COSObject object = new COSObject();
-                    object.setObjectMetadata(metadata);
-                    object.setKey(summary.getKey());
-                    return transformCOSObjectToStorageEntity(object);
-                })
-                .collect(Collectors.toList()));
+        String marker = null;
+        ObjectListing result;
+        do {
+            ListObjectsRequest request = new ListObjectsRequest();
+            request.setBucketName(bucketName);
+            request.setPrefix(resourceAbsolutePath);
+            request.setDelimiter(File.separator);
+            request.setMarker(marker);
+
+            result = cosClient.listObjects(request);
+            // add directories
+            storageEntitys.addAll(result.getCommonPrefixes()
+                    .stream()
+                    .filter(x -> !resourceAbsolutePath.equals(x))
+                    .map(key -> {
+                        ObjectMetadata metadata = new ObjectMetadata();
+                        COSObject object = new COSObject();
+                        object.setObjectMetadata(metadata);
+                        object.setKey(key);
+                        return transformCOSObjectToStorageEntity(object);
+                    }).collect(Collectors.toList()));
+            // add files
+            storageEntitys.addAll(result.getObjectSummaries()
+                    .stream()
+                    .filter(x -> !x.getKey().endsWith(File.separator))
+                    .map((COSObjectSummary summary) -> {
+                        ObjectMetadata metadata = new ObjectMetadata();
+                        metadata.setContentLength(summary.getSize());
+                        metadata.setLastModified(summary.getLastModified());
+                        COSObject object = new COSObject();
+                        object.setObjectMetadata(metadata);
+                        object.setKey(summary.getKey());
+                        return transformCOSObjectToStorageEntity(object);
+                    })
+                    .collect(Collectors.toList()));
+
+            marker = result.getNextMarker();
+        } while (result.isTruncated() && marker != null);
         return storageEntitys;
     }
 

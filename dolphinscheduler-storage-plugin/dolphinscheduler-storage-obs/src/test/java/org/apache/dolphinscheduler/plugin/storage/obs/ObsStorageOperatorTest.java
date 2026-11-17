@@ -19,7 +19,10 @@ package org.apache.dolphinscheduler.plugin.storage.obs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.plugin.storage.api.StorageEntity;
@@ -33,6 +36,7 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.MockedConstruction;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -72,6 +76,14 @@ public class ObsStorageOperatorTest {
         ObjectListing objectListing = mock(ObjectListing.class);
         when(objectListing.getObjects()).thenReturn(objects);
         when(objectListing.getCommonPrefixes()).thenReturn(commonPrefixes);
+        return objectListing;
+    }
+
+    private ObjectListing mockObjectListing(List<ObsObject> objects, List<String> commonPrefixes,
+                                            boolean truncated, String nextMarker) {
+        ObjectListing objectListing = mockObjectListing(objects, commonPrefixes);
+        lenient().when(objectListing.isTruncated()).thenReturn(truncated);
+        lenient().when(objectListing.getNextMarker()).thenReturn(nextMarker);
         return objectListing;
     }
 
@@ -168,5 +180,52 @@ public class ObsStorageOperatorTest {
                 obsStorageOperator.listStorageEntity("tmp/dolphinscheduler/default/resources");
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    public void testListStorageEntity_followsNextMarkerAcrossPages() {
+        ObjectListing firstPage = mockObjectListing(
+                Collections.singletonList(
+                        createObsObject("tmp/dolphinscheduler/default/resources/page1.sql", 1L)),
+                Collections.singletonList("tmp/dolphinscheduler/default/resources/dir1/"),
+                true,
+                "marker-1");
+        ObjectListing lastPage = mockObjectListing(
+                Collections.singletonList(
+                        createObsObject("tmp/dolphinscheduler/default/resources/page2.sql", 2L)),
+                Collections.singletonList("tmp/dolphinscheduler/default/resources/dir2/"),
+                false,
+                null);
+
+        when(mockObsClient.listObjects(any(ListObjectsRequest.class))).thenReturn(firstPage, lastPage);
+
+        List<StorageEntity> result =
+                obsStorageOperator.listStorageEntity("tmp/dolphinscheduler/default/resources");
+
+        assertThat(result)
+                .extracting(StorageEntity::getFileName)
+                .containsExactlyInAnyOrder("dir1", "dir2", "page1.sql", "page2.sql");
+
+        ArgumentCaptor<ListObjectsRequest> requests = ArgumentCaptor.forClass(ListObjectsRequest.class);
+        verify(mockObsClient, times(2)).listObjects(requests.capture());
+        assertThat(requests.getAllValues().get(1).getMarker()).isEqualTo("marker-1");
+    }
+
+    @Test
+    public void testListStorageEntity_lastPageOnly_requestsOnce() {
+        ObjectListing onlyPage = mockObjectListing(
+                Collections.singletonList(
+                        createObsObject("tmp/dolphinscheduler/default/resources/page1.sql", 1L)),
+                Collections.emptyList(),
+                false,
+                null);
+
+        when(mockObsClient.listObjects(any(ListObjectsRequest.class))).thenReturn(onlyPage);
+
+        List<StorageEntity> result =
+                obsStorageOperator.listStorageEntity("tmp/dolphinscheduler/default/resources");
+
+        assertThat(result).extracting(StorageEntity::getFileName).containsExactly("page1.sql");
+        verify(mockObsClient, times(1)).listObjects(any(ListObjectsRequest.class));
     }
 }

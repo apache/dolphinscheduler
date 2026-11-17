@@ -19,7 +19,7 @@ package org.apache.dolphinscheduler.server.master.engine.system.event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.apache.dolphinscheduler.server.master.cluster.MasterServerMetadata;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 
 import java.util.Date;
 
@@ -28,24 +28,24 @@ import lombok.Getter;
 @Getter
 public class MasterFailoverEvent extends AbstractSystemEvent {
 
-    private final MasterServerMetadata masterServerMetadata;
+    private final ServerIdentity serverIdentity;
     // The time when the event occurred. This might be different at different nodes.
     private final Date eventTime;
 
-    private MasterFailoverEvent(final MasterServerMetadata masterServerMetadata,
+    private MasterFailoverEvent(final ServerIdentity serverIdentity,
                                 final Date eventTime,
                                 final long delayTime) {
         super(delayTime);
-        this.masterServerMetadata = masterServerMetadata;
+        this.serverIdentity = serverIdentity;
         this.eventTime = eventTime;
     }
 
-    public static MasterFailoverEvent of(final MasterServerMetadata masterServerMetadata,
+    public static MasterFailoverEvent of(final ServerIdentity serverIdentity,
                                          final Date eventTime,
                                          final long delayTime) {
-        checkNotNull(masterServerMetadata);
+        checkNotNull(serverIdentity);
         checkNotNull(eventTime);
-        return new MasterFailoverEvent(masterServerMetadata, eventTime, delayTime);
+        return new MasterFailoverEvent(serverIdentity, eventTime, delayTime);
     }
 
     @Override
@@ -56,7 +56,7 @@ public class MasterFailoverEvent extends AbstractSystemEvent {
     @Override
     public String toString() {
         return "MasterFailoverEvent{" +
-                "masterServerMetadata='" + masterServerMetadata + '\'' +
+                "serverIdentity='" + serverIdentity + '\'' +
                 ", eventTime=" + eventTime +
                 ", delayTime=" + delayTime +
                 '}';

@@ -18,10 +18,17 @@
 package org.apache.dolphinscheduler.server.master.cluster;
 
 import org.apache.dolphinscheduler.common.enums.ServerStatus;
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
+import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.WorkerGroup;
 import org.apache.dolphinscheduler.dao.utils.WorkerGroupUtils;
+import org.apache.dolphinscheduler.extract.base.client.Clients;
+import org.apache.dolphinscheduler.extract.worker.IWorkerMetadataService;
+import org.apache.dolphinscheduler.registry.api.Event;
+import org.apache.dolphinscheduler.registry.api.SubscribeListener;
+import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 
 import org.apache.commons.collections4.list.UnmodifiableList;
 
@@ -33,11 +40,26 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServerMetadata>
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+
+import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+public class WorkerClusters
         implements
             IClusters<WorkerServerMetadata>,
+            IClusters.IClustersChangeListener<WorkerServerMetadata>,
+            SubscribeListener,
+            AutoCloseable,
             WorkerGroupChangeNotifier.WorkerGroupListener {
 
     // WorkerIdentifier(workerAddress) -> worker
@@ -52,9 +74,72 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
     private final List<IClustersChangeListener<WorkerServerMetadata>> workerClusterChangeListeners =
             new CopyOnWriteArrayList<>();
 
+    private final Map<String, ServerIdentity> registeredServers = new ConcurrentHashMap<>();
+    private volatile boolean closed;
+
+    @Autowired
+    private MasterConfig masterConfig;
+
+    private final ScheduledThreadPoolExecutor timer = new ScheduledThreadPoolExecutor(1,
+            ThreadUtils.newDaemonThreadFactory("WorkerHeartbeatTimer-%d"));
+
+    @PostConstruct
+    public void start() {
+        timer.scheduleWithFixedDelay(this::refreshHeartbeats, 0,
+                masterConfig.getHeartbeatFetchInterval().toMillis(), TimeUnit.MILLISECONDS);
+    }
+
     @Override
     public List<WorkerServerMetadata> getServers() {
         return UnmodifiableList.unmodifiableList(new ArrayList<>(workerMapping.values()));
+    }
+
+    @Override
+    public List<String> getServerAddresses() {
+        return new ArrayList<>(registeredServers.keySet());
+    }
+
+    @Override
+    public Optional<ServerIdentity> getServerIdentity(String address) {
+        return Optional.ofNullable(registeredServers.get(address));
+    }
+
+    @Override
+    public synchronized void onServerAdded(ServerIdentity identity) {
+        if (closed || identity.equals(registeredServers.get(identity.getAddress()))) {
+            return;
+        }
+        ServerIdentity previous = registeredServers.get(identity.getAddress());
+        if (previous != null) {
+            onServerRemove(previous);
+        }
+        registeredServers.put(identity.getAddress(), identity);
+        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
+            listener.onServerAdded(identity);
+        }
+    }
+
+    @Override
+    public synchronized void onServerRemove(ServerIdentity identity) {
+        if (closed || !registeredServers.remove(identity.getAddress(), identity)) {
+            return;
+        }
+        WorkerServerMetadata workerServer = workerMapping.remove(identity.getAddress());
+        if (workerServer != null && workerServer.getWorkerGroup() != null) {
+            synchronized (configWorkerGroupMapping) {
+                List<String> removeWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
+                if (removeWorkerGroupAddrList != null
+                        && removeWorkerGroupAddrList.contains(workerServer.getAddress())) {
+                    removeWorkerGroupAddrList.remove(workerServer.getAddress());
+                    if (removeWorkerGroupAddrList.isEmpty()) {
+                        configWorkerGroupMapping.remove(workerServer.getWorkerGroup());
+                    }
+                }
+            }
+        }
+        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
+            listener.onServerRemove(identity);
+        }
     }
 
     @Override
@@ -134,55 +219,100 @@ public class WorkerClusters extends AbstractClusterSubscribeListener<WorkerServe
     }
 
     @Override
-    WorkerServerMetadata parseServerFromHeartbeat(String serverHeartBeatJson) {
-        WorkerHeartBeat workerHeartBeat = JSONUtils.parseObject(serverHeartBeatJson, WorkerHeartBeat.class);
-        if (workerHeartBeat == null) {
-            return null;
+    public synchronized void onServerUpdate(WorkerServerMetadata workerServer) {
+        if (closed) {
+            return;
         }
-        return WorkerServerMetadata.parseFromHeartBeat(workerHeartBeat);
-    }
-
-    @Override
-    public void onServerAdded(WorkerServerMetadata workerServer) {
-        workerMapping.put(workerServer.getAddress(), workerServer);
+        WorkerServerMetadata previous = workerMapping.put(workerServer.getAddress(), workerServer);
         synchronized (configWorkerGroupMapping) {
-            List<String> addWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
-            if (addWorkerGroupAddrList == null) {
-                List<String> newWorkerGroupAddrList = new ArrayList<>();
-                newWorkerGroupAddrList.add(workerServer.getAddress());
-                configWorkerGroupMapping.put(workerServer.getWorkerGroup(), newWorkerGroupAddrList);
-            } else if (!addWorkerGroupAddrList.contains(workerServer.getAddress())) {
-                addWorkerGroupAddrList.add(workerServer.getAddress());
-                configWorkerGroupMapping.put(workerServer.getWorkerGroup(), addWorkerGroupAddrList);
+            if (previous != null && previous.getWorkerGroup() != null
+                    && !Objects.equals(previous.getWorkerGroup(), workerServer.getWorkerGroup())) {
+                List<String> addresses = configWorkerGroupMapping.get(previous.getWorkerGroup());
+                if (addresses != null) {
+                    addresses.remove(workerServer.getAddress());
+                    if (addresses.isEmpty()) {
+                        configWorkerGroupMapping.remove(previous.getWorkerGroup());
+                    }
+                }
             }
-        }
-        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
-            listener.onServerAdded(workerServer);
-        }
-    }
-
-    @Override
-    public void onServerRemove(WorkerServerMetadata workerServer) {
-        workerMapping.remove(workerServer.getAddress(), workerServer);
-        synchronized (configWorkerGroupMapping) {
-            List<String> removeWorkerGroupAddrList = configWorkerGroupMapping.get(workerServer.getWorkerGroup());
-            if (removeWorkerGroupAddrList != null && removeWorkerGroupAddrList.contains(workerServer.getAddress())) {
-                removeWorkerGroupAddrList.remove(workerServer.getAddress());
-                if (removeWorkerGroupAddrList.isEmpty()) {
-                    configWorkerGroupMapping.remove(workerServer.getWorkerGroup());
+            if (workerServer.getWorkerGroup() != null) {
+                List<String> addresses = configWorkerGroupMapping.computeIfAbsent(workerServer.getWorkerGroup(),
+                        group -> new ArrayList<>());
+                if (!addresses.contains(workerServer.getAddress())) {
+                    addresses.add(workerServer.getAddress());
                 }
             }
         }
         for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
-            listener.onServerRemove(workerServer);
+            listener.onServerUpdate(workerServer);
         }
     }
 
     @Override
-    public void onServerUpdate(WorkerServerMetadata workerServer) {
-        workerMapping.put(workerServer.getAddress(), workerServer);
-        for (IClustersChangeListener<WorkerServerMetadata> listener : workerClusterChangeListeners) {
-            listener.onServerUpdate(workerServer);
+    public SubscribeScope getSubscribeScope() {
+        return SubscribeScope.CHILDREN_ONLY;
+    }
+
+    @Override
+    public synchronized void notify(Event event) {
+        ServerIdentity identity = JSONUtils.parseObject(event.getEventData(), ServerIdentity.class);
+        if (identity == null) {
+            log.error("Invalid registration event: {}", event);
+            return;
         }
+        if (event.getType() == Event.Type.ADD) {
+            onServerAdded(identity);
+        } else if (event.getType() == Event.Type.REMOVE) {
+            onServerRemove(identity);
+        }
+    }
+
+    WorkerHeartBeat fetchHeartbeat(String address) {
+        return Clients.withService(IWorkerMetadataService.class).withHost(address).getServerMetadata();
+    }
+
+    public void refreshHeartbeats() {
+        for (ServerIdentity expected : new ArrayList<>(registeredServers.values())) {
+            if (closed) {
+                return;
+            }
+            try {
+                WorkerHeartBeat heartbeat = fetchHeartbeat(expected.getAddress());
+                synchronized (this) {
+                    if (closed || registeredServers.get(expected.getAddress()) != expected) {
+                        continue;
+                    }
+                    if (heartbeat == null) {
+                        logHeartbeatFailure(expected.getAddress(), "empty heartbeat");
+                    } else if (!expected.matches(heartbeat)) {
+                        logHeartbeatFailure(expected.getAddress(),
+                                "unexpected heartbeat identity " + ServerIdentity.fromHeartBeat(heartbeat));
+                    } else {
+                        onServerUpdate(WorkerServerMetadata.parseFromHeartBeat(heartbeat));
+                    }
+                }
+            } catch (Exception ex) {
+                log.debug("Failed to fetch Worker heartbeat from {}", expected.getAddress(), ex);
+                if (!closed && registeredServers.get(expected.getAddress()) == expected) {
+                    logHeartbeatFailure(expected.getAddress(), "RPC failed: " + ex.getMessage());
+                }
+            }
+        }
+    }
+
+    private void logHeartbeatFailure(String address, String reason) {
+        WorkerServerMetadata metadata = workerMapping.get(address);
+        String age = metadata == null ? "never received"
+                : (System.currentTimeMillis() - metadata.getHeartbeatReceivedTime()) + "ms";
+        log.warn("Failed to fetch Worker heartbeat from {}: reason={}, heartbeatAge={}", address, reason, age);
+    }
+
+    @Override
+    @PreDestroy
+    public synchronized void close() {
+        closed = true;
+        timer.shutdownNow();
+        workerMapping.clear();
+        registeredServers.clear();
     }
 }

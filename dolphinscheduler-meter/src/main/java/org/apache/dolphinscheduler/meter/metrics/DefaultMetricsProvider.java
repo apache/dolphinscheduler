@@ -42,7 +42,7 @@ public class DefaultMetricsProvider implements MetricsProvider {
     private static final long SYSTEM_METRICS_REFRESH_INTERVAL = 1_000L;
 
     @Override
-    public SystemMetrics getSystemMetrics() {
+    public synchronized SystemMetrics getSystemMetrics() {
         if (System.currentTimeMillis() - lastRefreshTime < SYSTEM_METRICS_REFRESH_INTERVAL) {
             return systemMetrics;
         }

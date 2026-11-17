@@ -20,7 +20,9 @@ package org.apache.dolphinscheduler.server.worker.registry;
 import static org.mockito.BDDMockito.given;
 
 import org.apache.dolphinscheduler.common.IStoppable;
+import org.apache.dolphinscheduler.common.enums.ServerStatus;
 import org.apache.dolphinscheduler.common.model.Server;
+import org.apache.dolphinscheduler.common.model.WorkerHeartBeat;
 import org.apache.dolphinscheduler.common.utils.NetUtils;
 import org.apache.dolphinscheduler.meter.metrics.MetricsProvider;
 import org.apache.dolphinscheduler.meter.metrics.SystemMetrics;
@@ -45,6 +47,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.google.common.collect.Lists;
+
+import io.micrometer.core.instrument.Metrics;
+import io.micrometer.prometheus.PrometheusConfig;
+import io.micrometer.prometheus.PrometheusMeterRegistry;
 
 /**
  * worker registry test
@@ -84,10 +90,40 @@ public class WorkerRegistryClientTest {
         given(registryClient.checkNodeExists(Mockito.anyString(), Mockito.any(RegistryNodeType.class)))
                 .willReturn(true);
 
-        workerRegistryClient.initWorkRegistry();
-        workerRegistryClient.start();
-
         workerRegistryClient.setRegistryStoppable(stoppable);
+        workerRegistryClient.start();
+        Assertions.assertDoesNotThrow(() -> workerRegistryClient.close());
+    }
+
+    @Test
+    void buildsFreshHeartbeatOnEveryRequestWithoutRegistryWrites() {
+        PrometheusMeterRegistry meters = new PrometheusMeterRegistry(PrometheusConfig.DEFAULT);
+        Metrics.addRegistry(meters);
+        try {
+            ExclusiveThreadTaskExecutorContainer container = Mockito.mock(ExclusiveThreadTaskExecutorContainer.class);
+            given(physicalTaskExecutorContainerDelegator.getExecutorContainer()).willReturn(container);
+            given(container.slotUsage()).willReturn(0.2, 0.8);
+            given(metricsProvider.getSystemMetrics()).willReturn(new SystemMetrics());
+            given(workerServerLoadProtection.isOverload(Mockito.any())).willReturn(false, true);
+            WorkerHeartBeat first = workerRegistryClient.getServerMetadata();
+            WorkerHeartBeat second = workerRegistryClient.getServerMetadata();
+            Assertions.assertNotSame(first, second);
+            Assertions.assertEquals(0.2, first.getThreadPoolUsage());
+            Assertions.assertEquals(0.8, second.getThreadPoolUsage());
+            Assertions.assertEquals(ServerStatus.NORMAL, first.getServerStatus());
+            Assertions.assertEquals(ServerStatus.BUSY, second.getServerStatus());
+            Mockito.verify(registryClient, Mockito.never()).persistEphemeral(Mockito.any(), Mockito.any());
+            Assertions.assertEquals(2.0, meters.get("ds.worker.heartbeat.request.count").counter().count());
+            Mockito.when(metricsProvider.getSystemMetrics())
+                    .thenThrow(new IllegalStateException("metrics unavailable"));
+            Assertions.assertThrows(IllegalStateException.class, workerRegistryClient::getServerMetadata);
+            Assertions.assertEquals(3.0, meters.get("ds.worker.heartbeat.request.count").counter().count());
+            Assertions.assertTrue(meters.scrape().contains("ds_worker_heartbeat_request_count_total"));
+            Assertions.assertFalse(meters.scrape().contains("ds_worker_heartbeat_count_total"));
+        } finally {
+            Metrics.removeRegistry(meters);
+            meters.close();
+        }
     }
 
     @Test

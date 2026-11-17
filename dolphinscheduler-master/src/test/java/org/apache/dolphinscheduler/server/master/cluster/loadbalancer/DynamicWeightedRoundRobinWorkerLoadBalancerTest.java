@@ -112,7 +112,10 @@ class DynamicWeightedRoundRobinWorkerLoadBalancerTest {
                 new DynamicWeightedRoundRobinWorkerLoadBalancer(workerClusters,
                         new WorkerLoadBalancerConfigurationProperties.DynamicWeightConfigProperties());
         workerClusters.onWorkerGroupChange(workerGroups);
-        workerServers.forEach(workerClusters::onServerAdded);
+        workerServers.forEach(server -> {
+            workerClusters.onServerAdded(server.getServerIdentity());
+            workerClusters.onServerUpdate(server);
+        });
 
         return dynamicWeightedRoundRobinWorkerLoadBalancer;
     }
