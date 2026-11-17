@@ -52,9 +52,9 @@ public class WorkerServerMetrics {
                     .description("worker resource download failure count")
                     .register(Metrics.globalRegistry);
 
-    private final Counter workerHeartBeatCounter =
-            Counter.builder("ds.worker.heartbeat.count")
-                    .description("worker heartbeat count")
+    private final Counter workerHeartbeatRequestCounter =
+            Counter.builder("ds.worker.heartbeat.request.count")
+                    .description("worker heartbeat data request count")
                     .register(Metrics.globalRegistry);
 
     private final Timer workerResourceDownloadDurationTimer =
@@ -88,8 +88,8 @@ public class WorkerServerMetrics {
         workerResourceDownloadFailCounter.increment();
     }
 
-    public void incWorkerHeartbeatCount() {
-        workerHeartBeatCounter.increment();
+    public void incWorkerHeartbeatRequestCount() {
+        workerHeartbeatRequestCounter.increment();
     }
 
     public void recordWorkerResourceDownloadTime(final long milliseconds) {

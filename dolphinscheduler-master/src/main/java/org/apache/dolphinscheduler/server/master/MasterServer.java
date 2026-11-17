@@ -126,8 +126,8 @@ public class MasterServer implements IStoppable {
         DataSourcePluginManager.loadDataSourcePlugin();
 
         // self tolerant
-        this.masterRegistryClient.start();
         this.masterRegistryClient.setRegistryStoppable(this);
+        this.masterRegistryClient.start();
 
         this.masterCoordinator.start();
 

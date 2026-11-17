@@ -17,6 +17,7 @@
 
 package org.apache.dolphinscheduler.server.master.cluster.loadbalancer;
 
+import org.apache.dolphinscheduler.common.model.ServerIdentity;
 import org.apache.dolphinscheduler.server.master.cluster.IClusters;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerClusters;
 import org.apache.dolphinscheduler.server.master.cluster.WorkerServerMetadata;
@@ -54,18 +55,18 @@ public class FixedWeightedRoundRobinWorkerLoadBalancer implements IWorkerLoadBal
         this.workerClusters.registerListener(new IClusters.IClustersChangeListener<WorkerServerMetadata>() {
 
             @Override
-            public void onServerAdded(WorkerServerMetadata server) {
-                weightedServerMap.put(server.getAddress(), new WeightedServer<>(server, server.getWorkerWeight()));
-            }
-
-            @Override
-            public void onServerRemove(WorkerServerMetadata server) {
-                weightedServerMap.remove(server.getAddress(), new WeightedServer<>(server, server.getWorkerWeight()));
+            public void onServerRemove(ServerIdentity server) {
+                weightedServerMap.remove(server.getAddress());
             }
 
             @Override
             public void onServerUpdate(WorkerServerMetadata server) {
-                // don't care the update event, since this will not affect the weight
+                weightedServerMap.compute(server.getAddress(), (address, previous) -> {
+                    if (previous == null || previous.getWeight() != server.getWorkerWeight()) {
+                        return new WeightedServer<>(server, server.getWorkerWeight());
+                    }
+                    return previous;
+                });
             }
         });
     }

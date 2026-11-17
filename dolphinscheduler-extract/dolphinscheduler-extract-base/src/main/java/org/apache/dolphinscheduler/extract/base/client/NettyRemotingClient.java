@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.common.thread.ThreadUtils;
 import org.apache.dolphinscheduler.extract.base.IRpcResponse;
 import org.apache.dolphinscheduler.extract.base.RpcMethodRetryStrategy;
 import org.apache.dolphinscheduler.extract.base.SyncRequestDto;
+import org.apache.dolphinscheduler.extract.base.authentication.RpcAuthenticationHandler;
 import org.apache.dolphinscheduler.extract.base.config.NettyClientConfig;
 import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.base.exception.RemoteTimeoutException;
@@ -44,6 +45,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 import lombok.extern.slf4j.Slf4j;
+
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -55,13 +61,16 @@ import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
+import io.netty.util.concurrent.Future;
 
 @Slf4j
 public class NettyRemotingClient implements AutoCloseable {
 
     private final Bootstrap bootstrap = new Bootstrap();
 
-    private final ReentrantLock channelsLock = new ReentrantLock();
+    // A caller keeps its lock alive while using it; unused locks can be collected after nodes leave.
+    private final LoadingCache<Host, ReentrantLock> channelLocks = CacheBuilder.newBuilder().weakValues()
+            .build(CacheLoader.from((Host host) -> new ReentrantLock()));
     private final Map<Host, Channel> channels = new ConcurrentHashMap<>();
 
     private final AtomicBoolean isStarted = new AtomicBoolean(false);
@@ -99,6 +108,10 @@ public class NettyRemotingClient implements AutoCloseable {
 
                     @Override
                     public void initChannel(SocketChannel ch) {
+                        if (clientConfig.getAuthentication().isEnabled()) {
+                            ch.pipeline().addLast("authentication",
+                                    new RpcAuthenticationHandler(clientConfig.getAuthentication(), false));
+                        }
                         ch.pipeline()
                                 .addLast("client-idle-handler",
                                         new IdleStateHandler(
@@ -190,19 +203,45 @@ public class NettyRemotingClient implements AutoCloseable {
 
     Channel getOrCreateChannel(Host host) {
         Channel channel = channels.get(host);
-        if (channel != null && channel.isActive()) {
-            return channel;
-        }
-        try {
-            channelsLock.lock();
-            channel = channels.get(host);
-            if (channel != null && channel.isActive()) {
-                return channel;
+        if (channel == null || !channel.isActive()) {
+            ReentrantLock hostLock = channelLocks.getUnchecked(host);
+            hostLock.lock();
+            try {
+                channel = channels.get(host);
+                if (channel == null || !channel.isActive()) {
+                    if (!isStarted.get()) {
+                        throw new IllegalStateException("RPC client is closed");
+                    }
+                    channel = createChannel(host);
+                    channels.put(host, channel);
+                    if (!isStarted.get()) {
+                        channels.remove(host, channel);
+                        channel.close();
+                        throw new IllegalStateException("RPC client is closed");
+                    }
+                }
+            } finally {
+                hostLock.unlock();
             }
-            channel = createChannel(host);
-            channels.put(host, channel);
-        } finally {
-            channelsLock.unlock();
+        }
+        // Wait outside the connection lock so other callers can reuse the channel.
+        Future<Void> authentication = RpcAuthenticationHandler.authenticationFuture(channel);
+        if (authentication != null) {
+            try {
+                if (!authentication.await(clientConfig.getAuthentication().getTimeoutMillis(), TimeUnit.MILLISECONDS)
+                        || !authentication.isSuccess()) {
+                    throw new RemoteException("RPC authentication failed for " + host);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                channels.remove(host, channel);
+                channel.close();
+                throw new RemoteException("RPC authentication interrupted for " + host, e);
+            } catch (RemoteException e) {
+                channels.remove(host, channel);
+                channel.close();
+                throw e;
+            }
         }
         return channel;
     }
@@ -244,16 +283,14 @@ public class NettyRemotingClient implements AutoCloseable {
     }
 
     private void closeChannels() {
-        try {
-            channelsLock.lock();
-            channels.values().forEach(Channel::close);
-            channels.clear();
-        } finally {
-            channelsLock.unlock();
-        }
+        channels.forEach((host, channel) -> {
+            if (channels.remove(host, channel)) {
+                channel.close();
+            }
+        });
     }
 
-    public void onChannelInactive(final Host host) {
-        channels.remove(host);
+    public void onChannelInactive(final Host host, final Channel channel) {
+        channels.remove(host, channel);
     }
 }

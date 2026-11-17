@@ -41,7 +41,10 @@ public class SerialCommandDiscardHandler extends AbstractSerialCommandHandler {
             SerialCommandDto serialCommand = serialCommands.get(i);
             if (i == 0) {
                 if (serialCommand.getState() == SerialCommandDto.State.WAITING) {
-                    launchSerialCommand(serialCommand);
+                    if (!launchSerialCommand(serialCommand)) {
+                        // Retry this group from a fresh snapshot in the next coordinator round.
+                        return;
+                    }
                     log.info("Launched SerialCommand: {}", serialCommand);
                 }
                 continue;
@@ -51,7 +54,9 @@ public class SerialCommandDiscardHandler extends AbstractSerialCommandHandler {
                 throw new IllegalStateException(
                         "The post SerialCommand except WAITING state but -> " + serialCommand.getState());
             }
-            discardSerialCommandAndStopWorkflowInstanceInDB(serialCommand);
+            if (!discardSerialCommandAndStopWorkflowInstanceInDB(serialCommand)) {
+                return;
+            }
             log.info("Discard SerialCommand: {}", serialCommand);
         }
     }
