@@ -59,6 +59,8 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.5.0
 
+* Remove the workflow move API `POST /projects/{projectCode}/workflow-definition/batch-move`. Existing workflow/task project ownership can no longer be changed by updates, instance synchronization, or version switching. Inconsistent historical ownership is rejected; no automatic migration is performed. Use cross-project copying to create new definitions; copying does not preserve workflow identity or execution history. ([#18806](https://github.com/apache/dolphinscheduler/issues/18806))
+
 * Internal RPC authentication is disabled by default. Upgrade all services before coordinating `rpc.authentication.enabled=true` with the same `rpc.authentication.secret` in each service's `common.properties`; authenticated and unauthenticated services cannot communicate. Credentials are cached for the process lifetime, so enablement and rotation require restarting services. See [RPC authentication](../security/authentication-type.md#inter-service-rpc-authentication).
 
 * Master, Worker and Alert Server now generate heartbeat snapshots on RPC requests and share a thread-safe system-metrics cache with a one-second refresh interval. `BaseHeartBeatTask` and the Master/Worker/Alert heartbeat task subclasses have been removed; custom integrations that extend them must manage scheduling explicitly. Alert Server no longer schedules registry heartbeat writes. It registers stable process identity at startup and restores registration on reconnect. `alert.max-heartbeat-interval` is removed; API queries Alert heartbeat data directly over RPC when requested.
