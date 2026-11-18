@@ -85,25 +85,27 @@ public class WorkflowBackfillTrigger
                 EnvironmentUtils.getEnvironmentCodeOrDefault(backfillTriggerRequest.getEnvironmentCode()));
         workflowInstance.setTimeout(workflowDefinition.getTimeout());
         workflowInstance.setDryRun(backfillTriggerRequest.getDryRun().getCode());
-        return ImmutablePair.of(workflowDefinition, workflowInstance);
-    }
-
-    @Override
-    protected Command constructTriggerCommand(WorkflowBackfillTriggerRequest backfillTriggerRequest,
-                                              WorkflowInstance workflowInstance) {
         final BackfillWorkflowCommandParam backfillWorkflowCommandParam = BackfillWorkflowCommandParam.builder()
                 .commandParams(backfillTriggerRequest.getStartParamList())
                 .startNodes(backfillTriggerRequest.getStartNodes())
                 .timeZone(DateUtils.getTimezone())
                 .backfillTimeList(backfillTriggerRequest.getBackfillTimeList())
                 .build();
+        workflowInstance.setCommandParam(JSONUtils.toJsonString(backfillWorkflowCommandParam));
+        workflowInstance.setGlobalParams(
+                mergeCommandParamsWithWorkflowParams(backfillWorkflowCommandParam, workflowDefinition));
+        return ImmutablePair.of(workflowDefinition, workflowInstance);
+    }
+
+    @Override
+    protected Command constructTriggerCommand(WorkflowBackfillTriggerRequest backfillTriggerRequest,
+                                              WorkflowInstance workflowInstance) {
         return Command.builder()
                 .commandType(CommandType.COMPLEMENT_DATA)
                 .workflowDefinitionCode(backfillTriggerRequest.getWorkflowCode())
                 .workflowDefinitionVersion(backfillTriggerRequest.getWorkflowVersion())
                 .workflowInstanceId(workflowInstance.getId())
                 .workflowInstancePriority(workflowInstance.getWorkflowInstancePriority())
-                .commandParam(JSONUtils.toJsonString(backfillWorkflowCommandParam))
                 .build();
     }
 
