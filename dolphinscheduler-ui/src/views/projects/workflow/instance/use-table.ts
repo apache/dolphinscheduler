@@ -82,7 +82,9 @@ export function useTable() {
       {
         title: '#',
         key: 'id',
-        ...COLUMN_WIDTH_CONFIG['index']
+        width: 120,
+        render: (row: IWorkflowInstance) =>
+          h('span', { style: { whiteSpace: 'nowrap' } }, row.id)
       },
       {
         title: t('project.workflow.workflow_instance_name'),
