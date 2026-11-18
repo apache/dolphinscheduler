@@ -17,12 +17,14 @@
 
 package org.apache.dolphinscheduler.dao;
 
+import org.apache.dolphinscheduler.dao.crypto.SensitiveDefinitionParamInterceptor;
 import org.apache.dolphinscheduler.dao.plugin.api.DaoPluginConfiguration;
 import org.apache.dolphinscheduler.dao.plugin.api.dialect.DatabaseDialect;
 import org.apache.dolphinscheduler.dao.plugin.api.monitor.DatabaseMonitor;
 
 import org.apache.ibatis.mapping.DatabaseIdProvider;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
+import org.apache.ibatis.plugin.Interceptor;
 
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +61,11 @@ public class DaoConfiguration {
         MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
         interceptor.addInnerInterceptor(new PaginationInnerInterceptor(dbType));
         return interceptor;
+    }
+
+    @Bean
+    public Interceptor sensitiveDefinitionParamInterceptor() {
+        return new SensitiveDefinitionParamInterceptor();
     }
 
     @Bean
