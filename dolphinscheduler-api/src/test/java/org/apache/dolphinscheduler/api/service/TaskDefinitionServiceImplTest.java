@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.permission.ProjectCodeValidator;
 import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
@@ -82,6 +83,9 @@ public class TaskDefinitionServiceImplTest {
 
     @InjectMocks
     private TaskDefinitionServiceImpl taskDefinitionService;
+
+    @Mock
+    private ProjectCodeValidator projectCodeValidator;
 
     @Mock
     private TaskDefinitionMapper taskDefinitionMapper;
@@ -171,8 +175,10 @@ public class TaskDefinitionServiceImplTest {
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
         Mockito.doNothing().when(projectService).checkHasProjectWritePermissionThrowException(user, project);
 
+        TaskDefinitionLog version = new TaskDefinitionLog();
+        version.setProjectCode(PROJECT_CODE);
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
-                .thenReturn(new TaskDefinitionLog());
+                .thenReturn(version);
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
         when(taskDefinitionDao.queryByCode(TASK_CODE))
@@ -184,6 +190,26 @@ public class TaskDefinitionServiceImplTest {
     }
 
     @Test
+    public void switchVersionRejectsForeignProject() {
+        TaskDefinition current = new TaskDefinition();
+        current.setProjectCode(PROJECT_CODE);
+        TaskDefinitionLog version = new TaskDefinitionLog();
+        version.setCode(TASK_CODE);
+        version.setVersion(VERSION);
+        version.setProjectCode(PROJECT_CODE + 1);
+        when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(current);
+        when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION)).thenReturn(version);
+
+        when(taskDefinitionDao.updateById(any(TaskDefinitionLog.class))).thenReturn(true);
+
+        ServiceException error = Assertions.assertThrows(ServiceException.class,
+                () -> taskDefinitionService.switchVersion(user, PROJECT_CODE, TASK_CODE, VERSION));
+
+        Assertions.assertEquals(Status.PROJECT_WORKFLOW_NOT_MATCH.getCode(), error.getCode());
+        Mockito.verify(taskDefinitionDao, Mockito.never()).updateById(any());
+    }
+
+    @Test
     public void switchVersionShouldRejectUnauthorizedDatasource() {
         Project project = getProject();
         when(projectDao.queryByCode(PROJECT_CODE)).thenReturn(project);
@@ -192,8 +218,10 @@ public class TaskDefinitionServiceImplTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
         when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        TaskDefinitionLog version = new TaskDefinitionLog();
+        version.setProjectCode(PROJECT_CODE);
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
-                .thenReturn(new TaskDefinitionLog());
+                .thenReturn(version);
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
                 .when(taskDatasourcePermissionChecker).checkPermission(eq(user), anyList());
 
@@ -212,8 +240,10 @@ public class TaskDefinitionServiceImplTest {
         TaskDefinition taskDefinition = new TaskDefinition();
         taskDefinition.setProjectCode(PROJECT_CODE);
         when(taskDefinitionDao.queryByCode(TASK_CODE)).thenReturn(taskDefinition);
+        TaskDefinitionLog version = new TaskDefinitionLog();
+        version.setProjectCode(PROJECT_CODE);
         when(taskDefinitionLogMapper.queryByDefinitionCodeAndVersion(TASK_CODE, VERSION))
-                .thenReturn(new TaskDefinitionLog());
+                .thenReturn(version);
         doThrow(new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION))
                 .when(taskSubWorkflowPermissionChecker).checkPermission(eq(user), anyList());
 
