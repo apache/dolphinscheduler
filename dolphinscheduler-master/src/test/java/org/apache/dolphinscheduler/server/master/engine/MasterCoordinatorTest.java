@@ -17,10 +17,10 @@
 
 package org.apache.dolphinscheduler.server.master.engine;
 
-import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -35,8 +35,6 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.dao.repository.SerialCommandDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupDao;
 import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
-import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
-import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
@@ -49,15 +47,15 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -65,158 +63,139 @@ import com.google.common.util.concurrent.Uninterruptibles;
 
 class MasterCoordinatorTest {
 
-    @ParameterizedTest
-    @CsvSource({"false, false", "false, true", "true, false"})
-    void stopCancelsRestartThroughHaCallbacks(boolean shutdownMaster, boolean sameCallbackThread) throws Exception {
-        TaskGroupCoordinator taskGroupCoordinator = new TaskGroupCoordinator();
-        taskGroupCoordinator.initialDelayMillis = 0;
-        WorkflowSerialCoordinator serialCoordinator = new WorkflowSerialCoordinator();
-        TaskGroupDao taskGroupDao = mock(TaskGroupDao.class);
-        SerialCommandDao serialCommandDao = mock(SerialCommandDao.class);
-        ReflectionTestUtils.setField(taskGroupCoordinator, "taskGroupDao", taskGroupDao);
-        ReflectionTestUtils.setField(taskGroupCoordinator, "taskGroupQueueDao", mock(TaskGroupQueueDao.class));
-        ReflectionTestUtils.setField(taskGroupCoordinator, "taskInstanceDao", mock(TaskInstanceDao.class));
-        ReflectionTestUtils.setField(taskGroupCoordinator, "workflowInstanceDao", mock(WorkflowInstanceDao.class));
-        ReflectionTestUtils.setField(serialCoordinator, "serialCommandDao", serialCommandDao);
+    @Test
+    void roleChangesStopPreviousWorkersAndCancelFailoverCleanup() throws Exception {
+        final TaskGroupCoordinator taskGroup = new TaskGroupCoordinator();
+        taskGroup.initialDelayMillis = 0;
+        final TaskGroupDao taskGroupDao = mock(TaskGroupDao.class);
+        ReflectionTestUtils.setField(taskGroup, "taskGroupDao", taskGroupDao);
+        ReflectionTestUtils.setField(taskGroup, "taskGroupQueueDao", mock(TaskGroupQueueDao.class));
 
-        CountDownLatch enteredDao = new CountDownLatch(2);
-        CountDownLatch releaseDao = new CountDownLatch(1);
-        when(taskGroupDao.queryAllTaskGroups()).thenAnswer(invocation -> {
-            enteredDao.countDown();
-            Uninterruptibles.awaitUninterruptibly(releaseDao, 30, TimeUnit.SECONDS);
-            Thread.interrupted();
-            return Collections.emptyList();
-        });
-        when(serialCommandDao.fetchSerialCommands(1000)).thenAnswer(invocation -> {
-            enteredDao.countDown();
-            Uninterruptibles.awaitUninterruptibly(releaseDao, 30, TimeUnit.SECONDS);
-            Thread.interrupted();
-            return Collections.emptyList();
-        });
+        final WorkflowSerialCoordinator serial = new WorkflowSerialCoordinator();
+        final SerialCommandDao serialCommandDao = mock(SerialCommandDao.class);
+        ReflectionTestUtils.setField(serial, "serialCommandDao", serialCommandDao);
 
-        // Deliver events through the real HA subscription, including its listener monitor.
-        Registry registry = mock(Registry.class);
-        AtomicReference<SubscribeListener> subscription = new AtomicReference<>();
-        AtomicReference<String> selector = new AtomicReference<>();
+        final BlockingQueue<BlockedPoll> taskGroupPolls = new LinkedBlockingQueue<>();
+        final BlockingQueue<BlockedPoll> serialPolls = new LinkedBlockingQueue<>();
+        when(taskGroupDao.queryAllTaskGroups()).thenAnswer(invocation -> blockPoll(taskGroupPolls));
+        when(serialCommandDao.fetchSerialCommands(1000)).thenAnswer(invocation -> blockPoll(serialPolls));
+
+        // Deliver events through the real HA subscription and Master listener.
+        final Registry registry = mock(Registry.class);
+        final AtomicReference<SubscribeListener> subscription = new AtomicReference<>();
+        final AtomicReference<String> selector = new AtomicReference<>();
         doAnswer(invocation -> {
             subscription.set(invocation.getArgument(1));
             return null;
         }).when(registry).subscribe(anyString(), any(SubscribeListener.class));
         when(registry.acquireLock(anyString())).thenReturn(true);
         when(registry.exists(anyString())).thenAnswer(invocation -> selector.get() != null);
-        when(registry.get(anyString())).thenAnswer(invocation -> selector.get());
         doAnswer(invocation -> {
             selector.set(invocation.getArgument(1));
             return null;
         }).when(registry).put(anyString(), anyString(), anyBoolean());
-        MasterConfig masterConfig = mock(MasterConfig.class);
-        when(masterConfig.getMasterAddress()).thenReturn("master-test:5678");
-        MasterCoordinator master = new MasterCoordinator(registry, masterConfig, taskGroupCoordinator,
-                mock(IFailoverCoordinator.class), serialCoordinator);
-        ScheduledExecutorService scheduler = mock(ScheduledExecutorService.class);
-        List<ScheduledFuture<?>> scheduled = new ArrayList<>();
+
+        final MasterConfig config = mock(MasterConfig.class);
+        when(config.getMasterAddress()).thenReturn("master-test:5678");
+        final MasterCoordinator master = new MasterCoordinator(registry, config, taskGroup,
+                mock(IFailoverCoordinator.class), serial);
+
+        final ScheduledExecutorService scheduler = mock(ScheduledExecutorService.class);
+        final List<ScheduledFuture<?>> scheduled = new ArrayList<>();
         when(scheduler.scheduleWithFixedDelay(any(Runnable.class), anyLong(), anyLong(), any(TimeUnit.class)))
                 .thenAnswer(invocation -> {
-                    ScheduledFuture<?> future = mock(ScheduledFuture.class);
+                    final ScheduledFuture<?> future = mock(ScheduledFuture.class);
                     scheduled.add(future);
                     return future;
                 });
-        FutureTask<Void> restart = new FutureTask<>(() -> {
-            withScheduler(scheduler, () -> subscription.get().notify(removeEvent("previous-master")));
-            return null;
-        });
-        FutureTask<Void> stop = new FutureTask<>(() -> {
-            if (shutdownMaster) {
-                master.close();
-            } else {
-                subscription.get().notify(removeEvent(selector.getAndSet(null)));
-            }
-            return null;
-        });
-        Thread starter = new Thread(() -> {
-            restart.run();
-            if (sameCallbackThread) {
-                // Also model a Registry that delivers consecutive watch events on one thread.
-                stop.run();
-            }
-        }, "ha-reactivation-test");
-        Thread closer = new Thread(stop, "ha-stop-test");
-        Thread oldTaskGroup = null;
-        Thread oldSerial = null;
-        Thread taskGroupWaiter = null;
-        Thread serialWaiter = null;
-        try {
-            withScheduler(scheduler, master::start);
-            assertTrue(enteredDao.await(5, TimeUnit.SECONDS));
-            oldTaskGroup = (Thread) ReflectionTestUtils.getField(taskGroupCoordinator, "internalThread");
-            oldSerial = (Thread) ReflectionTestUtils.getField(serialCoordinator, "internalThread");
-            subscription.get().notify(removeEvent(selector.getAndSet(null)));
-            assertFalse(master.isActive());
-            verify(scheduled.get(0)).cancel(true);
 
-            starter.start();
-            await().atMost(Duration.ofSeconds(5))
-                    .until(() -> starter.getState() == Thread.State.WAITING || restart.isDone());
-            if (!sameCallbackThread) {
-                closer.start();
-            }
-            // Both DAO calls are still blocked. Neither standby nor shutdown may wait for them.
-            stop.get(2, TimeUnit.SECONDS);
-            restart.get(2, TimeUnit.SECONDS);
-            assertTrue(oldTaskGroup.isAlive());
-            assertTrue(oldSerial.isAlive());
-            if (!shutdownMaster) {
-                assertFalse(master.isActive());
-            }
-            int schedulesAtStop = scheduled.size();
-            assertEquals(2, schedulesAtStop);
-            verify(scheduled.get(1)).cancel(true);
-            taskGroupWaiter = (Thread) ReflectionTestUtils.getField(taskGroupCoordinator, "restartThread");
-            serialWaiter = (Thread) ReflectionTestUtils.getField(serialCoordinator, "restartThread");
-            releaseDao.countDown();
-            oldTaskGroup.join(3000);
-            oldSerial.join(3000);
-            taskGroupWaiter.join(3000);
-            serialWaiter.join(3000);
-            assertFalse(oldTaskGroup.isAlive());
-            assertFalse(oldSerial.isAlive());
-            assertFalse(taskGroupWaiter.isAlive());
-            assertFalse(serialWaiter.isAlive());
-            assertSame(oldTaskGroup, ReflectionTestUtils.getField(taskGroupCoordinator, "internalThread"));
-            assertSame(oldSerial, ReflectionTestUtils.getField(serialCoordinator, "internalThread"));
-            verify(taskGroupDao).queryAllTaskGroups();
-            verify(serialCommandDao).fetchSerialCommands(1000);
-            assertEquals(schedulesAtStop, scheduled.size(), "DAO completion must not schedule failover again");
-        } finally {
-            releaseDao.countDown();
-            starter.join(5000);
-            closer.join(5000);
-            master.close();
-            // Clean up both workers even when testing the old Master.close() implementation.
-            taskGroupCoordinator.close();
-            serialCoordinator.close();
-            for (Thread thread : new Thread[]{oldTaskGroup, oldSerial, taskGroupWaiter, serialWaiter,
-                    (Thread) ReflectionTestUtils.getField(taskGroupCoordinator, "internalThread"),
-                    (Thread) ReflectionTestUtils.getField(serialCoordinator, "internalThread")}) {
-                if (thread != null) {
-                    thread.join(7000);
-                    assertFalse(thread.isAlive());
+        final List<BlockedPoll> polls = new ArrayList<>();
+        try {
+            runHaCallback(scheduler, master::start);
+            for (int activation = 0; activation < 3; activation++) {
+                final BlockedPoll taskGroupPoll = takePoll(taskGroupPolls);
+                polls.add(taskGroupPoll);
+                final BlockedPoll serialPoll = takePoll(serialPolls);
+                polls.add(serialPoll);
+                assertEquals(activation + 1, scheduled.size());
+                if (activation < 2) {
+                    runHaCallback(scheduler,
+                            () -> subscription.get().notify(removeEvent(selector.getAndSet(null))));
+                    assertFalse(master.isActive());
+                    verify(scheduled.get(activation)).cancel(true);
+                    assertTrue(taskGroupPoll.worker.isAlive() && serialPoll.worker.isAlive(),
+                            "standby should return before the blocked DAO calls do");
+                    runHaCallback(scheduler,
+                            () -> subscription.get().notify(removeEvent("other-master")));
                 }
             }
-            assertFalse(starter.isAlive());
-            assertFalse(closer.isAlive());
+
+            assertEquals(polls.size(), polls.stream().map(poll -> poll.worker).distinct().count(),
+                    "each activation should reach the DAO with two new worker threads");
+
+            // Release the earlier workers while the latest activation is still running.
+            final List<BlockedPoll> previousPolls = polls.subList(0, 4);
+            previousPolls.forEach(poll -> poll.release.countDown());
+            for (BlockedPoll poll : previousPolls) {
+                poll.awaitWorkerExit();
+            }
+            assertTrue(taskGroupPolls.isEmpty() && serialPolls.isEmpty(), "an old worker polled again");
+            assertTrue(master.isActive());
+
+            runHaCallback(scheduler, master::close);
+            verify(scheduled.get(2)).cancel(true);
+            for (BlockedPoll poll : polls.subList(4, 6)) {
+                assertTrue(poll.worker.isAlive(), "Master close should return while the DAO is still blocked");
+                poll.release.countDown();
+                poll.awaitWorkerExit();
+            }
+            assertTrue(taskGroupPolls.isEmpty() && serialPolls.isEmpty());
+            assertEquals(3, scheduled.size(), "returning DAO calls must not schedule any more failover work");
+        } finally {
+            polls.forEach(poll -> poll.release.countDown());
+            taskGroup.close();
+            serial.close();
+            taskGroupPolls.forEach(poll -> poll.release.countDown());
+            serialPolls.forEach(poll -> poll.release.countDown());
         }
+    }
+
+    private static List<?> blockPoll(BlockingQueue<BlockedPoll> polls) {
+        final BlockedPoll poll = new BlockedPoll();
+        polls.add(poll);
+        // Model a DAO that does not return when interrupted.
+        Uninterruptibles.awaitUninterruptibly(poll.release, 30, TimeUnit.SECONDS);
+        Thread.interrupted();
+        return Collections.emptyList();
+    }
+
+    private static BlockedPoll takePoll(BlockingQueue<BlockedPoll> polls) throws InterruptedException {
+        final BlockedPoll poll = polls.poll(5, TimeUnit.SECONDS);
+        assertNotNull(poll, "the new worker should reach the DAO before the previous worker exits");
+        return poll;
     }
 
     private static Event removeEvent(String identity) {
         return new Event("/coordinator", "/coordinator", identity, Event.Type.REMOVE);
     }
 
-    private static void withScheduler(ScheduledExecutorService scheduler, Runnable action) {
-        // Mockito static mocks are thread-local; install this on each actual HA callback thread.
-        try (MockedStatic<MasterThreadFactory> factory = mockStatic(MasterThreadFactory.class)) {
-            factory.when(MasterThreadFactory::getDefaultSchedulerThreadExecutor).thenReturn(scheduler);
-            action.run();
+    private static void runHaCallback(ScheduledExecutorService scheduler, Runnable callback) {
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
+            try (MockedStatic<MasterThreadFactory> factory = mockStatic(MasterThreadFactory.class)) {
+                factory.when(MasterThreadFactory::getDefaultSchedulerThreadExecutor).thenReturn(scheduler);
+                callback.run();
+            }
+        });
+    }
+
+    private static final class BlockedPoll {
+
+        private final Thread worker = Thread.currentThread();
+        private final CountDownLatch release = new CountDownLatch(1);
+
+        private void awaitWorkerExit() throws InterruptedException {
+            worker.join(TimeUnit.SECONDS.toMillis(5));
+            assertFalse(worker.isAlive(), "the stopped worker should exit after its DAO call returns");
         }
     }
 }

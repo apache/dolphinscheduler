@@ -65,7 +65,7 @@ public class MasterCoordinator extends AbstractHAServer {
 
     @Override
     public synchronized void close() {
-        // Serialize shutdown with HA callbacks and cancel pending restarts in both coordinators.
+        // Use the same monitor as HA listener dispatch.
         masterCoordinatorListener.changeToStandBy();
         log.info("MasterCoordinator shutdown...");
     }
