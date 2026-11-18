@@ -30,7 +30,7 @@ public class ArgsUtils {
     }
 
     public static String wrapperSingleQuotes(String value) {
-        return SINGLE_QUOTES + value + SINGLE_QUOTES;
+        return SINGLE_QUOTES + value.replace("'", "'\\''") + SINGLE_QUOTES;
     }
 
 }

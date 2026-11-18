@@ -310,7 +310,11 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['blur'],
         validator(validate: any, value: string) {
           if (value) {
-            if (!validateResourceExist(value, [], resourcesOptions.value)) {
+            // the resource tree may still be loading; do not reset an existing keytab before it is ready
+            if (
+              resourcesOptions.value.length > 0 &&
+              !validateResourceExist(value, [], resourcesOptions.value)
+            ) {
               model.keytab = null
               return new Error(
                 t('project.node.useless_resources_tips') +

@@ -106,6 +106,10 @@ export const spliceUselessResources = (
   value: string[],
   resources: ResourceOption[]
 ): string => {
+  // the resource tree may still be loading; do not treat existing selections as stale before it is ready
+  if (resources.length === 0) {
+    return ''
+  }
   const errorNames: string[] = []
   value.forEach((item) => {
     if (!validateResourceExist(item, [], resources)) {

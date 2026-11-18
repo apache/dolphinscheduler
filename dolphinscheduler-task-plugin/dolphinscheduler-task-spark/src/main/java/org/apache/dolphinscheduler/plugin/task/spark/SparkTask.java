@@ -179,7 +179,7 @@ public class SparkTask extends AbstractYarnTask {
         List<ResourceInfo> pyFiles = sparkParameters.getPyFiles();
         if (pyFiles != null && !pyFiles.isEmpty()) {
             String pyFilesPath = pyFiles.stream()
-                    .map(pyFile -> ArgsUtils.escape(taskExecutionContext.getResourceContext()
+                    .map(pyFile -> ArgsUtils.wrapperSingleQuotes(taskExecutionContext.getResourceContext()
                             .getResourceItem(pyFile.getResourceName())
                             .getResourceAbsolutePathInLocal()))
                     .collect(Collectors.joining(","));
@@ -191,7 +191,7 @@ public class SparkTask extends AbstractYarnTask {
         List<ResourceInfo> archives = sparkParameters.getArchives();
         if (archives != null && !archives.isEmpty()) {
             String archivesPath = archives.stream()
-                    .map(archive -> ArgsUtils.escape(taskExecutionContext.getResourceContext()
+                    .map(archive -> ArgsUtils.wrapperSingleQuotes(taskExecutionContext.getResourceContext()
                             .getResourceItem(archive.getResourceName())
                             .getResourceAbsolutePathInLocal()))
                     .collect(Collectors.joining(","));
@@ -208,7 +208,7 @@ public class SparkTask extends AbstractYarnTask {
         ResourceInfo keytab = sparkParameters.getKeytab();
         if (keytab != null && StringUtils.isNotEmpty(keytab.getResourceName())) {
             args.add(SparkConstants.KEYTAB);
-            args.add(ArgsUtils.escape(taskExecutionContext.getResourceContext()
+            args.add(ArgsUtils.wrapperSingleQuotes(taskExecutionContext.getResourceContext()
                     .getResourceItem(keytab.getResourceName())
                     .getResourceAbsolutePathInLocal()));
         }
