@@ -57,6 +57,20 @@ export function useSeaTunnel(model: { [field: string]: any }): IJsonItem[] {
   return [
     {
       type: 'select',
+      field: 'taskExecuteType',
+      span: 12,
+      name: t('project.node.task_execute_type'),
+      options: [
+        { label: t('project.task.batch_task'), value: 'BATCH' },
+        { label: t('project.task.stream_task'), value: 'STREAM' }
+      ],
+      validate: {
+        trigger: ['input', 'blur'],
+        required: true
+      }
+    },
+    {
+      type: 'select',
       field: 'startupScript',
       span: 15,
       name: t('project.node.startup_script'),
