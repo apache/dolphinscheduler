@@ -38,7 +38,7 @@ import org.mockito.InOrder;
 class MasterCoordinatorTest {
 
     @Test
-    void demotionRequestsAllWorkersToStopBeforeWaiting() {
+    void demotionClosesCoordinatorsInOrder() {
         ITaskGroupCoordinator taskGroup = mock(ITaskGroupCoordinator.class);
         IWorkflowSerialCoordinator serial = mock(IWorkflowSerialCoordinator.class);
         IFailoverCoordinator failover = mock(IFailoverCoordinator.class);
@@ -51,8 +51,6 @@ class MasterCoordinatorTest {
         InOrder order = inOrder(taskGroup, serial);
         order.verify(taskGroup).start();
         order.verify(serial).start();
-        order.verify(taskGroup).requestStop();
-        order.verify(serial).requestStop();
         order.verify(taskGroup).close();
         order.verify(serial).close();
     }

@@ -107,11 +107,6 @@ public class MasterCoordinator extends AbstractHAServer {
 
         @Override
         public void changeToStandBy() {
-            taskGroupCoordinator.requestStop();
-            workflowSerialCoordinator.requestStop();
-            if (failoverCoordinatorExecutor != null) {
-                failoverCoordinatorExecutor.shutdownNow();
-            }
             try {
                 taskGroupCoordinator.close();
             } finally {
@@ -119,6 +114,7 @@ public class MasterCoordinator extends AbstractHAServer {
                     workflowSerialCoordinator.close();
                 } finally {
                     if (failoverCoordinatorExecutor != null) {
+                        failoverCoordinatorExecutor.shutdownNow();
                         Uninterruptibles.awaitTerminationUninterruptibly(failoverCoordinatorExecutor);
                         failoverCoordinatorExecutor = null;
                     }

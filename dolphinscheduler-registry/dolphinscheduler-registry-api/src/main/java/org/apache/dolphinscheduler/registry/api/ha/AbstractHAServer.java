@@ -20,20 +20,15 @@ package org.apache.dolphinscheduler.registry.api.ha;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.apache.dolphinscheduler.common.thread.ThreadUtils;
-import org.apache.dolphinscheduler.eventbus.AbstractDelayEvent;
-import org.apache.dolphinscheduler.eventbus.AbstractDelayEventBus;
 import org.apache.dolphinscheduler.registry.api.Event;
 import org.apache.dolphinscheduler.registry.api.Registry;
 import org.apache.dolphinscheduler.registry.api.SubscribeListener;
 
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 import lombok.extern.slf4j.Slf4j;
 
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.Uninterruptibles;
 
 @Slf4j
 public abstract class AbstractHAServer implements HAServer {
@@ -48,22 +43,11 @@ public abstract class AbstractHAServer implements HAServer {
 
     private final List<ServerStatusChangeListener> serverStatusChangeListeners;
 
-    private final RoleChangeEventBus roleChangeEventBus = new RoleChangeEventBus();
+    private final RoleChangeEventBusWorker roleChangeWorker;
 
-    private final CompletableFuture<Void> initialElection = new CompletableFuture<>();
+    static final long DEFAULT_RETRY_INTERVAL = 5_000;
 
-    private volatile boolean closed;
-
-    private Thread roleChangeThread;
-
-    private RuntimeException shutdownFailure;
-
-    // Only accessed by the role-change thread, including rollback of partial activation.
-    private boolean listenersActive;
-
-    private static final long DEFAULT_RETRY_INTERVAL = 5_000;
-
-    private static final int DEFAULT_MAX_RETRY_TIMES = 20;
+    static final int DEFAULT_MAX_RETRY_TIMES = 20;
 
     public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
         this.registry = registry;
@@ -71,101 +55,47 @@ public abstract class AbstractHAServer implements HAServer {
         this.serverIdentify = checkNotNull(serverIdentify) + "#" + System.currentTimeMillis();
         this.serverStatus = ServerStatus.STAND_BY;
         this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());
+        this.roleChangeWorker = new RoleChangeEventBusWorker(this, new RoleChangeEventBus());
     }
 
     @Override
     public void start() {
-        synchronized (this) {
-            if (closed || roleChangeThread != null) {
-                throw new IllegalStateException("HA server is already started or closed");
+        registry.subscribe(selectorPath, new SubscribeListener() {
+
+            @Override
+            public void notify(Event event) {
+                roleChangeWorker.publish(0);
             }
-            roleChangeThread = ThreadUtils.newDaemonThreadFactory("HA-RoleChange-%d")
-                    .newThread(this::processRoleChanges);
-            roleChangeThread.start();
-        }
-        try {
-            registry.subscribe(selectorPath, new SubscribeListener() {
 
-                @Override
-                public void notify(Event event) {
-                    publishRoleChange(0);
-                }
-
-                @Override
-                public SubscribeScope getSubscribeScope() {
-                    return SubscribeScope.PATH_ONLY;
-                }
-            });
-            publishRoleChange(0);
-            initialElection.get();
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            close();
-            throw new IllegalStateException("Interrupted while starting HA server", ex);
-        } catch (ExecutionException | RuntimeException ex) {
-            close();
-            throw new IllegalStateException("Failed to start HA server", ex);
-        }
+            @Override
+            public SubscribeScope getSubscribeScope() {
+                return SubscribeScope.PATH_ONLY;
+            }
+        });
+        roleChangeWorker.start();
     }
 
-    private void publishRoleChange(long delay) {
-        if (!closed) {
-            roleChangeEventBus.publish(new RoleChangeEvent(delay));
-        }
-    }
-
-    private void processRoleChanges() {
-        int failures = 0;
-        try {
-            while (!closed) {
-                roleChangeEventBus.take();
-                if (closed) {
-                    break;
-                }
-                try {
-                    if (!ownsSelector()) {
-                        // Stop the old run before an election can block on the Registry lock.
-                        statusChange(ServerStatus.STAND_BY);
-                        if (!registry.exists(selectorPath)) {
-                            tryParticipateElection();
-                        }
-                    }
-                    if (closed) {
-                        break;
-                    }
-                    // Notifications only request reconciliation; their payload may already be stale.
-                    boolean active = ownsSelector();
-                    statusChange(active ? ServerStatus.ACTIVE : ServerStatus.STAND_BY);
-                    failures = 0;
-                    initialElection.complete(null);
-                    if (!isActive() && !registry.exists(selectorPath)) {
-                        publishRoleChange(DEFAULT_RETRY_INTERVAL);
-                    }
-                } catch (Exception ex) {
-                    log.error("Reconcile HA role failed, will retry after {}ms", DEFAULT_RETRY_INTERVAL, ex);
-                    try {
-                        statusChange(ServerStatus.STAND_BY);
-                    } catch (Exception stopException) {
-                        log.error("Stop HA listeners failed", stopException);
-                    }
-                    if (++failures >= DEFAULT_MAX_RETRY_TIMES) {
-                        initialElection.completeExceptionally(ex);
-                    }
-                    publishRoleChange(DEFAULT_RETRY_INTERVAL);
-                }
-            }
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        } finally {
-            try {
-                statusChange(ServerStatus.STAND_BY);
-            } catch (RuntimeException ex) {
-                shutdownFailure = ex;
-                log.error("Stop HA listeners during shutdown failed", ex);
-            } finally {
-                initialElection.completeExceptionally(new IllegalStateException("HA server is closed"));
+    /**
+     * Reconcile one event and return whether an unclaimed selector needs a delayed retry.
+     */
+    boolean reconcileRole() {
+        if (!ownsSelector()) {
+            changeToStandBy();
+            if (!registry.exists(selectorPath)) {
+                tryParticipateElection();
             }
         }
+        if (roleChangeWorker.isClosed()) {
+            return false;
+        }
+        if (ownsSelector()) {
+            if (serverStatus != ServerStatus.ACTIVE) {
+                changeToActive();
+            }
+        } else {
+            changeToStandBy();
+        }
+        return !isActive() && !registry.exists(selectorPath);
     }
 
     @Override
@@ -175,7 +105,7 @@ public abstract class AbstractHAServer implements HAServer {
 
     @Override
     public boolean participateElection() {
-        for (int i = 0; i < DEFAULT_MAX_RETRY_TIMES && !closed; i++) {
+        for (int i = 0; i < DEFAULT_MAX_RETRY_TIMES && !roleChangeWorker.isClosed(); i++) {
             try {
                 return tryParticipateElection();
             } catch (Exception ex) {
@@ -192,7 +122,7 @@ public abstract class AbstractHAServer implements HAServer {
             return false;
         }
         try {
-            if (closed) {
+            if (roleChangeWorker.isClosed()) {
                 return false;
             }
             if (!registry.exists(selectorPath)) {
@@ -215,28 +145,36 @@ public abstract class AbstractHAServer implements HAServer {
         return serverStatus;
     }
 
-    private void statusChange(ServerStatus targetStatus) {
-        if (targetStatus == ServerStatus.STAND_BY) {
-            serverStatus = ServerStatus.STAND_BY;
-            if (listenersActive) {
-                notifyListeners(ServerStatus.ACTIVE, ServerStatus.STAND_BY);
-                listenersActive = false;
-            }
-        } else if (serverStatus != ServerStatus.ACTIVE && !closed) {
-            if (listenersActive) {
-                statusChange(ServerStatus.STAND_BY);
-            }
-            listenersActive = true;
+    private void changeToActive() {
+        try {
             notifyListeners(ServerStatus.STAND_BY, ServerStatus.ACTIVE);
-            boolean owner = !closed && ownsSelector();
-            synchronized (this) {
-                if (!closed && owner) {
+            boolean owner = !roleChangeWorker.isClosed() && ownsSelector();
+            synchronized (roleChangeWorker) {
+                if (!roleChangeWorker.isClosed() && owner) {
                     serverStatus = ServerStatus.ACTIVE;
                 }
             }
+        } finally {
             if (serverStatus != ServerStatus.ACTIVE) {
-                statusChange(ServerStatus.STAND_BY);
+                notifyStandBy();
             }
+        }
+    }
+
+    void changeToStandBy() {
+        if (serverStatus == ServerStatus.ACTIVE) {
+            serverStatus = ServerStatus.STAND_BY;
+            notifyStandBy();
+        }
+    }
+
+    private void notifyStandBy() {
+        try {
+            notifyListeners(ServerStatus.ACTIVE, ServerStatus.STAND_BY);
+        } catch (RuntimeException ex) {
+            // Failed cleanup must not be followed by another activation.
+            roleChangeWorker.close();
+            throw ex;
         }
     }
 
@@ -264,30 +202,6 @@ public abstract class AbstractHAServer implements HAServer {
 
     @Override
     public void close() {
-        final Thread thread;
-        synchronized (this) {
-            closed = true;
-            initialElection.completeExceptionally(new IllegalStateException("HA server is closed"));
-            thread = roleChangeThread;
-        }
-        // A listener (notably Alert) can close its own HA server during demotion.
-        if (thread == null || thread == Thread.currentThread()) {
-            return;
-        }
-        thread.interrupt();
-        Uninterruptibles.joinUninterruptibly(thread);
-        if (shutdownFailure != null) {
-            throw new IllegalStateException("Failed to stop HA listeners", shutdownFailure);
-        }
-    }
-
-    private static final class RoleChangeEvent extends AbstractDelayEvent {
-
-        private RoleChangeEvent(long delay) {
-            super(delay);
-        }
-    }
-
-    private static final class RoleChangeEventBus extends AbstractDelayEventBus<RoleChangeEvent> {
+        roleChangeWorker.close();
     }
 }
