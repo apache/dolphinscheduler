@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskTimeoutStrategy;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceParametersHelper;
+import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -67,6 +68,7 @@ public class TaskExecutionContextBuilder {
         taskExecutionContext.setCpuQuota(taskInstance.getCpuQuota());
         taskExecutionContext.setMemoryMax(taskInstance.getMemoryMax());
         taskExecutionContext.setAppIds(taskInstance.getAppLink());
+        taskExecutionContext.setVarPool(VarPoolUtils.deserializeVarPool(taskInstance.getVarPool()));
         return this;
     }
 
