@@ -27,12 +27,14 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.failover.IFailoverCoordinator;
 import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
-import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
+
+import com.google.common.util.concurrent.Uninterruptibles;
 
 /**
  * The MasterCoordinator is singleton at the clusters, which is used to do some control work, e.g manage the {@link ITaskGroupCoordinator}
@@ -40,8 +42,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class MasterCoordinator extends AbstractHAServer {
-
-    private final ITaskGroupCoordinator taskGroupCoordinator;
 
     private final IFailoverCoordinator failoverCoordinator;
 
@@ -56,7 +56,6 @@ public class MasterCoordinator extends AbstractHAServer {
                 registry,
                 RegistryNodeType.MASTER_COORDINATOR.getRegistryPath(),
                 masterConfig.getMasterAddress());
-        this.taskGroupCoordinator = taskGroupCoordinator;
         this.failoverCoordinator = failoverCoordinator;
         this.workflowSerialCoordinator = workflowSerialCoordinator;
         addServerStatusChangeListener(
@@ -71,7 +70,7 @@ public class MasterCoordinator extends AbstractHAServer {
 
     @Override
     public void close() {
-        taskGroupCoordinator.close();
+        super.close();
         log.info("MasterCoordinator shutdown...");
     }
 
@@ -82,7 +81,7 @@ public class MasterCoordinator extends AbstractHAServer {
         private final IFailoverCoordinator failoverCoordinator;
 
         private final IWorkflowSerialCoordinator workflowSerialCoordinator;
-        private Future<?> failoverCoordinatorFuture;
+        private ScheduledExecutorService failoverCoordinatorExecutor;
 
         public MasterCoordinatorListener(ITaskGroupCoordinator taskGroupCoordinator,
                                          IFailoverCoordinator failoverCoordinator,
@@ -96,22 +95,34 @@ public class MasterCoordinator extends AbstractHAServer {
         public void changeToActive() {
             taskGroupCoordinator.start();
             workflowSerialCoordinator.start();
-            failoverCoordinatorFuture =
-                    MasterThreadFactory.getDefaultSchedulerThreadExecutor().scheduleWithFixedDelay(() -> {
-                        try {
-                            failoverCoordinator.cleanHistoryFailoverFinishedMarks();
-                        } catch (Exception e) {
-                            log.error("FailoverCoordinator cleanHistoryFailoverFinishedMarks failed", e);
-                        }
-                    }, 0, 1, TimeUnit.DAYS);
+            failoverCoordinatorExecutor = MasterThreadFactory.getDefaultSchedulerThreadExecutor();
+            failoverCoordinatorExecutor.scheduleWithFixedDelay(() -> {
+                try {
+                    failoverCoordinator.cleanHistoryFailoverFinishedMarks();
+                } catch (Exception e) {
+                    log.error("FailoverCoordinator cleanHistoryFailoverFinishedMarks failed", e);
+                }
+            }, 0, 1, TimeUnit.DAYS);
         }
 
         @Override
         public void changeToStandBy() {
-            taskGroupCoordinator.close();
-            workflowSerialCoordinator.close();
-            if (failoverCoordinatorFuture != null) {
-                failoverCoordinatorFuture.cancel(true);
+            taskGroupCoordinator.requestStop();
+            workflowSerialCoordinator.requestStop();
+            if (failoverCoordinatorExecutor != null) {
+                failoverCoordinatorExecutor.shutdownNow();
+            }
+            try {
+                taskGroupCoordinator.close();
+            } finally {
+                try {
+                    workflowSerialCoordinator.close();
+                } finally {
+                    if (failoverCoordinatorExecutor != null) {
+                        Uninterruptibles.awaitTerminationUninterruptibly(failoverCoordinatorExecutor);
+                        failoverCoordinatorExecutor = null;
+                    }
+                }
             }
         }
     }

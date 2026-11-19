@@ -41,6 +41,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.google.common.util.concurrent.Uninterruptibles;
+
 /**
  * Used to coordinate the serial execution of workflows.
  * <p> Once a workflow instance is submitted with serial wait strategy, it will be added to the serial queue.
@@ -95,7 +97,12 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
             try {
                 final StopWatch workflowSerialCoordinatorRoundCost = StopWatch.createStarted();
                 final List<SerialCommandsGroup> serialCommandsGroups = fetchSerialCommands();
-                serialCommandsGroups.forEach(this::handleSerialCommand);
+                for (SerialCommandsGroup group : serialCommandsGroups) {
+                    if (!flag) {
+                        break;
+                    }
+                    handleSerialCommand(group);
+                }
                 log.debug("WorkflowSerialCoordinator handled SerialCommandsGroup size: {}, cost: {}/ms ",
                         serialCommandsGroups.size(),
                         workflowSerialCoordinatorRoundCost.getDuration().toMillis());
@@ -103,7 +110,9 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
                 log.error("WorkflowSerialCoordinator error", e);
             } finally {
                 // sleep 5s
-                ThreadUtils.sleep(TimeUnit.SECONDS.toMillis(DEFAULT_FETCH_INTERVAL_SECONDS));
+                if (flag) {
+                    ThreadUtils.sleep(TimeUnit.SECONDS.toMillis(DEFAULT_FETCH_INTERVAL_SECONDS));
+                }
             }
         }
     }
@@ -169,20 +178,20 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
     }
 
     @Override
-    public synchronized void close() {
-        if (!flag) {
-            log.warn("WorkflowSerialCoordinator is already closed");
-            return;
-        }
+    public synchronized void requestStop() {
         flag = false;
-        try {
-            if (internalThread != null) {
-                internalThread.interrupt();
-            }
-        } catch (Exception ex) {
-            log.error("Close internalThread failed", ex);
+        if (internalThread != null) {
+            internalThread.interrupt();
         }
-        internalThread = null;
+    }
+
+    @Override
+    public synchronized void close() {
+        requestStop();
+        if (internalThread != null) {
+            Uninterruptibles.joinUninterruptibly(internalThread);
+            internalThread = null;
+        }
         log.info("WorkflowSerialCoordinator closed");
     }
 }
