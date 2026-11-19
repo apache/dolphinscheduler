@@ -97,12 +97,7 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
             try {
                 final StopWatch workflowSerialCoordinatorRoundCost = StopWatch.createStarted();
                 final List<SerialCommandsGroup> serialCommandsGroups = fetchSerialCommands();
-                for (SerialCommandsGroup group : serialCommandsGroups) {
-                    if (!flag) {
-                        break;
-                    }
-                    handleSerialCommand(group);
-                }
+                serialCommandsGroups.forEach(this::handleSerialCommand);
                 log.debug("WorkflowSerialCoordinator handled SerialCommandsGroup size: {}, cost: {}/ms ",
                         serialCommandsGroups.size(),
                         workflowSerialCoordinatorRoundCost.getDuration().toMillis());
@@ -110,9 +105,7 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
                 log.error("WorkflowSerialCoordinator error", e);
             } finally {
                 // sleep 5s
-                if (flag) {
-                    ThreadUtils.sleep(TimeUnit.SECONDS.toMillis(DEFAULT_FETCH_INTERVAL_SECONDS));
-                }
+                ThreadUtils.sleep(TimeUnit.SECONDS.toMillis(DEFAULT_FETCH_INTERVAL_SECONDS));
             }
         }
     }
@@ -178,17 +171,10 @@ public class WorkflowSerialCoordinator implements IWorkflowSerialCoordinator {
     }
 
     @Override
-    public synchronized void requestStop() {
+    public synchronized void close() {
         flag = false;
         if (internalThread != null) {
             internalThread.interrupt();
-        }
-    }
-
-    @Override
-    public synchronized void close() {
-        requestStop();
-        if (internalThread != null) {
             Uninterruptibles.joinUninterruptibly(internalThread);
             internalThread = null;
         }

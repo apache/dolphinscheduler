@@ -433,6 +433,28 @@ class AbstractHAServerTest {
         }
     }
 
+    @Test
+    void testRepeatedStartDoesNotStopTheRunningServer() {
+        AbstractServerStatusChangeListener listener = mock(AbstractServerStatusChangeListener.class,
+                org.mockito.Mockito.CALLS_REAL_METHODS);
+        server.addServerStatusChangeListener(listener);
+        server.start();
+
+        assertThrows(IllegalThreadStateException.class, server::start);
+
+        assertTrue(server.isActive());
+        verify(listener, never()).changeToStandBy();
+    }
+
+    @Test
+    void testCloseBeforeStartIsTerminal() {
+        server.close();
+
+        assertThrows(IllegalStateException.class, server::start);
+        assertFalse(server.isActive());
+        verify(registry, never()).put(eq(SELECTOR_PATH), anyString(), eq(true));
+    }
+
     private static void awaitUninterruptibly(CountDownLatch latch) {
         boolean interrupted = false;
         try {

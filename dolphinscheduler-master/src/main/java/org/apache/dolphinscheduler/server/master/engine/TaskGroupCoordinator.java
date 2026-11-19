@@ -115,17 +115,8 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 final StopWatch taskGroupCoordinatorRoundCost = StopWatch.createStarted();
 
                 amendTaskGroupUseSize();
-                if (!flag) {
-                    break;
-                }
                 amendTaskGroupQueueStatus();
-                if (!flag) {
-                    break;
-                }
                 dealWithForceStartTaskGroupQueue();
-                if (!flag) {
-                    break;
-                }
                 dealWithWaitingTaskGroupQueue();
 
                 taskGroupCoordinatorRoundCost.stop();
@@ -134,9 +125,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 log.error("TaskGroupCoordinator error", e);
             } finally {
                 // sleep 5s
-                if (flag) {
-                    ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5);
-                }
+                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5);
             }
         }
     }
@@ -173,7 +162,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         int minTaskGroupQueueId = -1;
         int limit = DEFAULT_LIMIT;
         StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
-        while (flag) {
+        while (true) {
             List<TaskGroupQueue> taskGroupQueues =
                     taskGroupQueueDao.queryInQueueTaskGroupQueue(minTaskGroupQueueId, limit);
             if (CollectionUtils.isEmpty(taskGroupQueues)) {
@@ -226,7 +215,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         int minTaskGroupQueueId = -1;
         int limit = DEFAULT_LIMIT;
         StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
-        while (flag) {
+        while (true) {
             final List<TaskGroupQueue> taskGroupQueues =
                     taskGroupQueueDao.queryWaitNotifyForceStartTaskGroupQueue(minTaskGroupQueueId, limit);
             if (CollectionUtils.isEmpty(taskGroupQueues)) {
@@ -529,17 +518,10 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     }
 
     @Override
-    public synchronized void requestStop() {
+    public synchronized void close() {
         flag = false;
         if (internalThread != null) {
             internalThread.interrupt();
-        }
-    }
-
-    @Override
-    public synchronized void close() {
-        requestStop();
-        if (internalThread != null) {
             Uninterruptibles.joinUninterruptibly(internalThread);
             internalThread = null;
         }
