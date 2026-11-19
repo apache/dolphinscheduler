@@ -34,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.stereotype.Component;
 
-import com.google.common.util.concurrent.Uninterruptibles;
-
 /**
  * The MasterCoordinator is singleton at the clusters, which is used to do some control work, e.g manage the {@link ITaskGroupCoordinator}
  */
@@ -107,18 +105,35 @@ public class MasterCoordinator extends AbstractHAServer {
 
         @Override
         public void changeToStandBy() {
+            RuntimeException failure = null;
             try {
                 taskGroupCoordinator.close();
-            } finally {
-                try {
-                    workflowSerialCoordinator.close();
-                } finally {
-                    if (failoverCoordinatorExecutor != null) {
-                        failoverCoordinatorExecutor.shutdownNow();
-                        Uninterruptibles.awaitTerminationUninterruptibly(failoverCoordinatorExecutor);
-                        failoverCoordinatorExecutor = null;
-                    }
+            } catch (RuntimeException ex) {
+                failure = ex;
+            }
+            try {
+                workflowSerialCoordinator.close();
+            } catch (RuntimeException ex) {
+                if (failure == null) {
+                    failure = ex;
+                } else if (failure != ex) {
+                    failure.addSuppressed(ex);
                 }
+            }
+            try {
+                if (failoverCoordinatorExecutor != null) {
+                    failoverCoordinatorExecutor.shutdownNow();
+                    failoverCoordinatorExecutor = null;
+                }
+            } catch (RuntimeException ex) {
+                if (failure == null) {
+                    failure = ex;
+                } else if (failure != ex) {
+                    failure.addSuppressed(ex);
+                }
+            }
+            if (failure != null) {
+                throw failure;
             }
         }
     }

@@ -50,14 +50,16 @@ final class RoleChangeEventBusWorker extends BaseDaemonThread implements AutoClo
     }
 
     @Override
-    public void start() {
-        synchronized (this) {
-            if (closed) {
-                throw new IllegalStateException("HA event consumer is closed");
-            }
-            super.start();
+    public synchronized void start() {
+        if (closed) {
+            throw new IllegalStateException("HA event consumer is closed");
         }
-        publish(0);
+        super.start();
+        eventBus.publish(RoleChangeEvent.create());
+    }
+
+    // Role callbacks also acquire the worker monitor, so wait outside synchronized start().
+    void awaitInitialReconciliation() {
         try {
             initialReconciliation.get();
         } catch (InterruptedException ex) {
@@ -67,12 +69,6 @@ final class RoleChangeEventBusWorker extends BaseDaemonThread implements AutoClo
         } catch (ExecutionException ex) {
             close();
             throw new IllegalStateException("Failed to start HA server", ex.getCause());
-        }
-    }
-
-    void publish(long delay) {
-        if (!closed) {
-            eventBus.publish(new RoleChangeEvent(delay));
         }
     }
 
@@ -90,8 +86,9 @@ final class RoleChangeEventBusWorker extends BaseDaemonThread implements AutoClo
                     break;
                 }
                 try {
-                    if (haServer.reconcileRole()) {
-                        publish(AbstractHAServer.DEFAULT_RETRY_INTERVAL);
+                    boolean shouldRetry = haServer.trySwitchRole();
+                    if (shouldRetry && !closed) {
+                        eventBus.publish(new RoleChangeEvent(AbstractHAServer.DEFAULT_RETRY_INTERVAL));
                     }
                     failures = 0;
                     initialReconciliation.complete(null);
@@ -104,7 +101,9 @@ final class RoleChangeEventBusWorker extends BaseDaemonThread implements AutoClo
                     if (++failures >= AbstractHAServer.DEFAULT_MAX_RETRY_TIMES) {
                         initialReconciliation.completeExceptionally(ex);
                     }
-                    publish(AbstractHAServer.DEFAULT_RETRY_INTERVAL);
+                    if (!closed) {
+                        eventBus.publish(new RoleChangeEvent(AbstractHAServer.DEFAULT_RETRY_INTERVAL));
+                    }
                 }
             }
         } catch (InterruptedException ex) {
