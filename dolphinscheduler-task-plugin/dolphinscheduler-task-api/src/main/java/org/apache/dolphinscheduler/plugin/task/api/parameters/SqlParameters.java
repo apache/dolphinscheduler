@@ -30,11 +30,15 @@ import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.ResourceP
 import org.apache.dolphinscheduler.plugin.task.api.utils.VarPoolUtils;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -139,44 +143,96 @@ public class SqlParameters extends AbstractParameters {
                 new TypeReference<List<Map<String, String>>>() {
                 });
         if (CollectionUtils.isEmpty(sqlResult)) {
-            return;
-        }
-        // if sql return more than one line
-        if (sqlResult.size() > 1) {
-            Map<String, List<String>> sqlResultFormat = new HashMap<>();
-            // init sqlResultFormat
-            Set<String> keySet = sqlResult.get(0).keySet();
-            for (String key : keySet) {
-                sqlResultFormat.put(key, new ArrayList<>());
-            }
-            for (Map<String, String> info : sqlResult) {
-                for (String key : info.keySet()) {
-                    sqlResultFormat.get(key).add(String.valueOf(info.get(key)));
-                }
-            }
+            // the query returned zero rows: a LIST OUT parameter keeps an empty JSON array,
+            // while a non-LIST OUT parameter has no row to take the value from, so fail fast
+            // instead of silently passing an artificial value downstream
             for (Property info : outProperty) {
                 if (info.getType() == DataType.LIST) {
-                    info.setValue(JSONUtils.toJsonString(sqlResultFormat.get(info.getProp())));
+                    info.setValue(JSONUtils.toJsonString(new ArrayList<>()));
+                } else {
+                    throw nonListOutParamRowMismatch(info, 0);
                 }
             }
-        } else {
-            // result only one line
-            Map<String, String> firstRow = sqlResult.get(0);
-            for (Property info : outProperty) {
-                String value = String.valueOf(firstRow.get(info.getProp()));
-                if (info.getType() == DataType.LONG) {
-                    try {
-                        value = Long.toString(new BigDecimal(value).longValueExact());
-                    } catch (NumberFormatException | ArithmeticException e) {
-                        throw new TaskException("Invalid SQL OUT parameter '" + info.getProp()
-                                + "' of type LONG: '" + value + "' must be an integer within the LONG range", e);
-                    }
+            varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
+            return;
+        }
+        // collect the values of each column so that the OUT parameter format does not
+        // depend on the result row count, see https://github.com/apache/dolphinscheduler/issues/18750
+        Map<String, List<String>> sqlResultFormat = new HashMap<>();
+        for (Map<String, String> row : sqlResult) {
+            for (String key : row.keySet()) {
+                sqlResultFormat.computeIfAbsent(key, k -> new ArrayList<>()).add(String.valueOf(row.get(key)));
+            }
+        }
+        for (Property info : outProperty) {
+            List<String> columnValues = sqlResultFormat.get(info.getProp());
+            if (columnValues == null) {
+                // the configured OUT parameter name does not match any result column, fail fast
+                // instead of propagating a null / "null" value downstream
+                throw unmatchedOutParamColumn(info, sqlResultFormat.keySet());
+            }
+            if (info.getType() == DataType.LIST) {
+                // LIST OUT parameter always keeps the JSON array format, even if the result only has one row
+                info.setValue(JSONUtils.toJsonString(columnValues));
+            } else {
+                if (columnValues.size() > 1) {
+                    // fail fast instead of silently picking a non-deterministic row: without ORDER BY
+                    // the row order is not guaranteed, so any picked row may be a plausible but
+                    // incorrect value for downstream tasks
+                    throw nonListOutParamRowMismatch(info, columnValues.size());
                 }
-                info.setValue(value);
+                info.setValue(convertOutParamValue(info, columnValues.get(0)));
             }
         }
         varPool = VarPoolUtils.mergeVarPool(Lists.newArrayList(varPool, outProperty));
 
+    }
+
+    /**
+     * Check that every OUT parameter name matches one of the given result column labels.
+     * Needed for zero-row results: the serialized result JSON carries no column
+     * information, so {@link #dealOutParam(String)} alone cannot detect a misspelled OUT
+     * parameter name and would silently succeed as an empty LIST until rows appear.
+     *
+     * @param columnLabels the labels of the query result columns
+     */
+    public void checkOutParamColumns(String[] columnLabels) {
+        List<Property> outProperty = getOutProperty(localParams);
+        if (CollectionUtils.isEmpty(outProperty)) {
+            return;
+        }
+        Set<String> columns = ArrayUtils.isEmpty(columnLabels)
+                ? Collections.emptySet()
+                : new HashSet<>(Arrays.asList(columnLabels));
+        for (Property info : outProperty) {
+            if (!columns.contains(info.getProp())) {
+                throw unmatchedOutParamColumn(info, columns);
+            }
+        }
+    }
+
+    private TaskException unmatchedOutParamColumn(Property info, Set<String> availableColumns) {
+        return new TaskException("Invalid SQL OUT parameter '" + info.getProp() + "': no matching column"
+                + " in the query result(available columns: " + availableColumns
+                + "), please make the OUT parameter name consistent with the result column name");
+    }
+
+    private TaskException nonListOutParamRowMismatch(Property info, int rowCount) {
+        return new TaskException("Invalid SQL OUT parameter '" + info.getProp() + "' of type " + info.getType()
+                + ": the query returned " + rowCount + " rows, please use a LIST parameter or adjust the"
+                + " query so that it returns exactly one row");
+    }
+
+    private String convertOutParamValue(Property info, String value) {
+        if (info.getType() != DataType.LONG) {
+            return value;
+        }
+        try {
+            return Long.toString(new BigDecimal(value).longValueExact());
+        } catch (NumberFormatException | ArithmeticException e) {
+            throw new TaskException("Invalid SQL OUT parameter '" + info.getProp()
+                    + "' of type LONG: '" + value + "' must be an integer within the LONG range", e);
+        }
     }
 
     @Override

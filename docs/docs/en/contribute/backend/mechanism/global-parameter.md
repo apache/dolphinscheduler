@@ -34,8 +34,8 @@ Get the parameter with direction OUT from localParam, and do the following way a
 
 The structure returned by the parameter is List<Map<String,String>>, where the elements of List are each row of data, the key of Map is the column name, and the value is the value corresponding to the column.
 
-* If the SQL statement returns one row of data, match the OUT parameter name based on the OUT parameter name defined by the user when defining the task, or discard it if it does not match.
-* If the SQL statement returns multiple rows of data, the column names are matched based on the OUT parameter names defined by the user when defining the task of type LIST. All rows of the corresponding column are converted to `List<String>` as the value of this parameter. If there is no match, it is discarded.
+* The OUT parameter names defined by the user when defining the task are matched against the result column names: a `LIST` OUT parameter takes the matched column values of all rows converted to `List<String>` and serialized as a JSON array as its value, while a non-`LIST` OUT parameter takes the single row value and requires the query to return exactly one row.
+* If an OUT parameter name matches no result column, or a non-`LIST` OUT parameter is used while the query returns zero or multiple rows, the task fails with a `TaskException` instead of silently discarding or passing a null value.
 
 ### SHELL node
 
