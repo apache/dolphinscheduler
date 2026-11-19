@@ -43,6 +43,8 @@ public abstract class AbstractHAServer implements HAServer {
 
     private final List<ServerStatusChangeListener> serverStatusChangeListeners;
 
+    private final RoleChangeEventBus roleChangeEventBus;
+
     private final RoleChangeEventBusWorker roleChangeWorker;
 
     static final long DEFAULT_RETRY_INTERVAL = 5_000;
@@ -55,7 +57,8 @@ public abstract class AbstractHAServer implements HAServer {
         this.serverIdentify = checkNotNull(serverIdentify) + "#" + System.currentTimeMillis();
         this.serverStatus = ServerStatus.STAND_BY;
         this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());
-        this.roleChangeWorker = new RoleChangeEventBusWorker(this, new RoleChangeEventBus());
+        this.roleChangeEventBus = new RoleChangeEventBus();
+        this.roleChangeWorker = new RoleChangeEventBusWorker(this, roleChangeEventBus);
     }
 
     @Override
@@ -64,7 +67,9 @@ public abstract class AbstractHAServer implements HAServer {
 
             @Override
             public void notify(Event event) {
-                roleChangeWorker.publish(0);
+                if (!roleChangeWorker.isClosed()) {
+                    roleChangeEventBus.publish(RoleChangeEvent.create());
+                }
             }
 
             @Override
@@ -73,12 +78,15 @@ public abstract class AbstractHAServer implements HAServer {
             }
         });
         roleChangeWorker.start();
+        roleChangeWorker.awaitInitialReconciliation();
     }
 
     /**
-     * Reconcile one event and return whether an unclaimed selector needs a delayed retry.
+     * Try to switch the server role based on the current selector ownership, participating in election if needed.
+     *
+     * @return true if the selector remains unclaimed and a delayed retry is needed, not whether a role switch succeeded
      */
-    boolean reconcileRole() {
+    boolean trySwitchRole() {
         if (!ownsSelector()) {
             changeToStandBy();
             if (!registry.exists(selectorPath)) {

@@ -27,4 +27,8 @@ final class RoleChangeEvent extends AbstractDelayEvent {
     RoleChangeEvent(long delay) {
         super(delay);
     }
+
+    static RoleChangeEvent create() {
+        return new RoleChangeEvent(0);
+    }
 }

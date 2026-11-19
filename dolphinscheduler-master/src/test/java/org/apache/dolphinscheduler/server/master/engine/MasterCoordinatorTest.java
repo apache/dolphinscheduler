@@ -17,11 +17,16 @@
 
 package org.apache.dolphinscheduler.server.master.engine;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 import org.apache.dolphinscheduler.server.master.failover.IFailoverCoordinator;
 
@@ -30,7 +35,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
@@ -56,7 +60,7 @@ class MasterCoordinatorTest {
     }
 
     @Test
-    void demotionWaitsForRunningFailoverTask() throws Exception {
+    void demotionDoesNotWaitForRunningFailoverTask() throws Exception {
         ITaskGroupCoordinator taskGroup = mock(ITaskGroupCoordinator.class);
         IWorkflowSerialCoordinator serial = mock(IWorkflowSerialCoordinator.class);
         IFailoverCoordinator failover = mock(IFailoverCoordinator.class);
@@ -82,9 +86,8 @@ class MasterCoordinatorTest {
             listener.changeToActive();
             assertTrue(entered.await(2, TimeUnit.SECONDS));
             stopping = executor.submit(listener::changeToStandBy);
+            stopping.get(2, TimeUnit.SECONDS);
             assertTrue(interrupted.await(2, TimeUnit.SECONDS));
-            Future<?> pendingStop = stopping;
-            assertThrows(TimeoutException.class, () -> pendingStop.get(200, TimeUnit.MILLISECONDS));
         } finally {
             release.countDown();
             if (stopping != null) {
@@ -93,6 +96,32 @@ class MasterCoordinatorTest {
                 listener.changeToStandBy();
             }
             executor.shutdownNow();
+        }
+    }
+
+    @Test
+    void demotionAttemptsAllCleanupAndPreservesFailures() {
+        ITaskGroupCoordinator taskGroup = mock(ITaskGroupCoordinator.class);
+        IWorkflowSerialCoordinator serial = mock(IWorkflowSerialCoordinator.class);
+        IFailoverCoordinator failover = mock(IFailoverCoordinator.class);
+        IllegalStateException taskGroupFailure = new IllegalStateException("Task group close failed");
+        IllegalStateException serialFailure = new IllegalStateException("Serial coordinator close failed");
+        doThrow(taskGroupFailure).when(taskGroup).close();
+        doThrow(serialFailure).when(serial).close();
+        MasterCoordinator.MasterCoordinatorListener listener =
+                new MasterCoordinator.MasterCoordinatorListener(taskGroup, failover, serial);
+        listener.changeToActive();
+        try {
+            RuntimeException failure = assertThrows(RuntimeException.class, listener::changeToStandBy);
+
+            assertSame(taskGroupFailure, failure);
+            assertArrayEquals(new Throwable[]{serialFailure}, failure.getSuppressed());
+            verify(taskGroup).close();
+            verify(serial).close();
+        } finally {
+            doNothing().when(taskGroup).close();
+            doNothing().when(serial).close();
+            listener.changeToStandBy();
         }
     }
 }
