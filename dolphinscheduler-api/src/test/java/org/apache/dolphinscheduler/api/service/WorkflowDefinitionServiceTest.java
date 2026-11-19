@@ -36,13 +36,14 @@ import static org.mockito.Mockito.when;
 
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ProjectCodeValidator;
 import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.WorkflowDefinitionServiceImpl;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
+import org.apache.dolphinscheduler.api.validator.TaskProjectValidator;
+import org.apache.dolphinscheduler.api.validator.WorkflowRelationValidator;
 import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCopyVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.FailureStrategy;
@@ -152,7 +153,10 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     private WorkflowDefinitionServiceImpl workflowDefinitionService;
 
     @Mock
-    private ProjectCodeValidator projectCodeValidator;
+    private TaskProjectValidator taskProjectValidator;
+
+    @Mock
+    private WorkflowRelationValidator workflowRelationValidator;
 
     @Mock
     private WorkflowDefinitionDao workflowDefinitionDao;
@@ -1056,8 +1060,10 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
     @ParameterizedTest
     @ValueSource(longs = {1L, 2L})
     public void testCopyPreservesProjectOwnership(long targetProjectCode) {
-        ReflectionTestUtils.setField(workflowDefinitionService, "projectCodeValidator",
-                new ProjectCodeValidator(taskDefinitionDao, taskDefinitionLogMapper));
+        ReflectionTestUtils.setField(workflowDefinitionService, "taskProjectValidator",
+                new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper));
+        ReflectionTestUtils.setField(workflowDefinitionService, "workflowRelationValidator",
+                new WorkflowRelationValidator(new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper)));
         when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         if (targetProjectCode != projectCode) {
             when(projectDao.queryByCode(targetProjectCode)).thenReturn(getProject(targetProjectCode));
@@ -1095,8 +1101,10 @@ public class WorkflowDefinitionServiceTest extends BaseServiceTestTool {
 
     @Test
     public void testCreateRejectsPersistedForeignTaskBeforeSaving() {
-        ReflectionTestUtils.setField(workflowDefinitionService, "projectCodeValidator",
-                new ProjectCodeValidator(taskDefinitionDao, taskDefinitionLogMapper));
+        ReflectionTestUtils.setField(workflowDefinitionService, "taskProjectValidator",
+                new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper));
+        ReflectionTestUtils.setField(workflowDefinitionService, "workflowRelationValidator",
+                new WorkflowRelationValidator(new TaskProjectValidator(taskDefinitionDao, taskDefinitionLogMapper)));
         when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
         when(processService.transformTask(anyList(), anyList())).thenReturn(getTaskNodeList());
         TaskDefinitionLog foreignTask = new TaskDefinitionLog();

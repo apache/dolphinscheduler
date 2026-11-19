@@ -36,7 +36,6 @@ import org.apache.dolphinscheduler.api.dto.treeview.TreeViewDto;
 import org.apache.dolphinscheduler.api.dto.workflow.WorkflowDefinitionVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ProjectCodeValidator;
 import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -51,6 +50,8 @@ import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
 import org.apache.dolphinscheduler.api.validator.GlobalParamsValidator;
+import org.apache.dolphinscheduler.api.validator.TaskProjectValidator;
+import org.apache.dolphinscheduler.api.validator.WorkflowRelationValidator;
 import org.apache.dolphinscheduler.api.vo.WorkflowDefinitionCopyVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
@@ -212,7 +213,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
     private GlobalParamsValidator globalParamsValidator;
 
     @Autowired
-    private ProjectCodeValidator projectCodeValidator;
+    private TaskProjectValidator taskProjectValidator;
+
+    @Autowired
+    private WorkflowRelationValidator workflowRelationValidator;
 
     @Autowired
     private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
@@ -287,9 +291,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                  List<WorkflowTaskRelationLog> taskRelationList,
                                                  WorkflowDefinition workflowDefinition,
                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
-        projectCodeValidator.validateTasks(workflowDefinition.getProjectCode(), taskDefinitionLogs);
-        projectCodeValidator.validateRelations(workflowDefinition.getProjectCode(), workflowDefinition.getCode(),
-                taskRelationList);
+        taskProjectValidator
+                .validate(new TaskProjectValidator.Context(workflowDefinition.getProjectCode(), taskDefinitionLogs));
+        workflowRelationValidator.validate(
+                new WorkflowRelationValidator.Context(workflowDefinition.getProjectCode(), workflowDefinition.getCode(),
+                        taskRelationList));
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         int saveTaskResult = processService.saveTaskDefine(loginUser, workflowDefinition.getProjectCode(),
@@ -709,7 +715,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         List<TaskDefinitionLog> existingTaskLogs = CollectionUtils.isEmpty(versionKeys)
                 ? Collections.emptyList()
                 : taskDefinitionLogMapper.queryByTaskDefinitions(versionKeys);
-        projectCodeValidator.validateTasks(projectCode, taskDefinitionLogs);
+        taskProjectValidator.validate(new TaskProjectValidator.Context(projectCode, taskDefinitionLogs));
         Map<String, String> existingTaskParamsMap = existingTaskLogs.stream()
                 .collect(Collectors.toMap(
                         log -> log.getCode() + "_" + log.getVersion(),
@@ -767,9 +773,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                  WorkflowDefinition workflowDefinition,
                                                  WorkflowDefinition workflowDefinitionDeepCopy,
                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
-        projectCodeValidator.validateTasks(workflowDefinition.getProjectCode(), taskDefinitionLogs);
-        projectCodeValidator.validateRelations(workflowDefinition.getProjectCode(), workflowDefinition.getCode(),
-                taskRelationList);
+        taskProjectValidator
+                .validate(new TaskProjectValidator.Context(workflowDefinition.getProjectCode(), taskDefinitionLogs));
+        workflowRelationValidator.validate(
+                new WorkflowRelationValidator.Context(workflowDefinition.getProjectCode(), workflowDefinition.getCode(),
+                        taskRelationList));
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogs);
         int saveTaskResult = processService.saveTaskDefine(loginUser, workflowDefinition.getProjectCode(),
@@ -1409,9 +1417,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     workflowTaskRelations.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
             List<TaskDefinitionLog> taskDefinitionLogs =
                     taskDefinitionLogDao.queryTaskDefineLogList(workflowTaskRelations);
-            projectCodeValidator.validateTasks(workflowDefinition.getProjectCode(), taskDefinitionLogs);
-            projectCodeValidator.validateRelations(workflowDefinition.getProjectCode(), workflowDefinition.getCode(),
-                    workflowTaskRelations);
+            taskProjectValidator.validate(
+                    new TaskProjectValidator.Context(workflowDefinition.getProjectCode(), taskDefinitionLogs));
+            workflowRelationValidator.validate(new WorkflowRelationValidator.Context(
+                    workflowDefinition.getProjectCode(), workflowDefinition.getCode(),
+                    workflowTaskRelations));
             workflowDefinition.setProjectCode(targetProjectCode);
             log.info("Copy workflow definition...");
             Map<Long, Long> taskCodeMap = new HashMap<>();
@@ -1655,7 +1665,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     Status.SWITCH_WORKFLOW_DEFINITION_VERSION_NOT_EXIST_WORKFLOW_DEFINITION_VERSION_ERROR,
                     workflowDefinition.getCode(), version);
         }
-        ProjectCodeValidator.requireProject(projectCode, workflowDefinitionLog.getProjectCode());
+        if (projectCode != workflowDefinitionLog.getProjectCode()) {
+            throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+        }
         List<WorkflowTaskRelation> workflowTaskRelationList = workflowTaskRelationLogMapper
                 .queryByWorkflowCodeAndVersion(workflowDefinitionLog.getCode(), workflowDefinitionLog.getVersion())
                 .stream()
@@ -1671,8 +1683,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                             taskDefinitionLog.setVersion(taskCodeVersionDto.getVersion());
                             return Stream.of(taskDefinitionLog);
                         }).collect(Collectors.toList()));
-        projectCodeValidator.validateRelations(projectCode, code, workflowTaskRelationList);
-        projectCodeValidator.validateTasks(projectCode, taskDefinitionLogList);
+        workflowRelationValidator
+                .validate(new WorkflowRelationValidator.Context(projectCode, code, workflowTaskRelationList));
+        taskProjectValidator.validate(new TaskProjectValidator.Context(projectCode, taskDefinitionLogList));
         taskDatasourcePermissionChecker.checkPermission(loginUser, taskDefinitionLogList);
         taskSubWorkflowPermissionChecker.checkPermission(loginUser, taskDefinitionLogList);
 
