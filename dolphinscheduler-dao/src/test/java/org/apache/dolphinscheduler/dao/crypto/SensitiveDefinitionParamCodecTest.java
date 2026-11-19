@@ -35,6 +35,7 @@ import org.apache.dolphinscheduler.plugin.task.api.utils.GlobalParameterUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -167,6 +168,6 @@ class SensitiveDefinitionParamCodecTest {
         return properties.stream()
                 .filter(property -> name.equals(property.getProp()))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new NoSuchElementException());
     }
 }
