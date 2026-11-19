@@ -14,6 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCustomParams, useResources, useJavaTaskMainJar } from '.'
 import type { IJsonItem } from '../types'
@@ -44,7 +45,8 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
       props: {
         type: 'textarea',
         placeholder: t('project.node.main_arguments_tips')
-      }
+      },
+      span: computed(() => (model.runType === 'JSHELL' ? 0 : 24))
     },
     {
       type: 'input',
@@ -53,6 +55,26 @@ export function useJava(model: { [field: string]: any }): IJsonItem[] {
       props: {
         type: 'textarea',
         placeholder: t('project.node.jvm_args_tips')
+      }
+    },
+    {
+      type: 'input',
+      field: 'jshellScript',
+      span: computed(() => (model.runType === 'JSHELL' ? 24 : 0)),
+      name: 'JShell Script',
+      value: model.jshellScript,
+      props: {
+        type: 'textarea',
+        placeholder: 'Enter Java snippets to execute with JShell'
+      },
+      validate: {
+        trigger: ['input', 'blur'],
+        validator(_: any, value: string) {
+          if (model.runType === 'JSHELL' && (!value || !value.trim())) {
+            return new Error('JShell script cannot be empty')
+          }
+          return true
+        }
       }
     },
     useJavaTaskMainJar(model),
@@ -74,5 +96,9 @@ export const RUN_TYPES = [
   {
     label: 'NORMAL_JAR',
     value: 'NORMAL_JAR'
+  },
+  {
+    label: 'JSHELL',
+    value: 'JSHELL'
   }
 ]
