@@ -25,8 +25,8 @@ import org.apache.dolphinscheduler.registry.api.ha.AbstractHAServer;
 import org.apache.dolphinscheduler.registry.api.ha.AbstractServerStatusChangeListener;
 import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.failover.IFailoverCoordinator;
-import org.apache.dolphinscheduler.server.master.utils.MasterThreadFactory;
 
+import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -93,7 +93,7 @@ public class MasterCoordinator extends AbstractHAServer {
         public void changeToActive() {
             taskGroupCoordinator.start();
             workflowSerialCoordinator.start();
-            failoverCoordinatorExecutor = MasterThreadFactory.getDefaultSchedulerThreadExecutor();
+            failoverCoordinatorExecutor = Executors.newSingleThreadScheduledExecutor();
             failoverCoordinatorExecutor.scheduleWithFixedDelay(() -> {
                 try {
                     failoverCoordinator.cleanHistoryFailoverFinishedMarks();
