@@ -145,7 +145,7 @@ public class ProjectControllerTest {
         user.setId(0);
         Result result = new Result();
         putMsg(result, Status.SUCCESS);
-        Mockito.when(projectService.queryAllProjectListForDependent()).thenReturn(result);
+        Mockito.when(projectService.queryAllProjectListForDependent(user)).thenReturn(result);
         Result response = projectController.queryAllProjectListForDependent(user);
         Assertions.assertEquals(Status.SUCCESS.getCode(), response.getCode().intValue());
     }

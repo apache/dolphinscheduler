@@ -76,7 +76,9 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
 
         tenantPage
                 .goToNav(ProjectPage.class)
-                .createProjectUntilSuccess(projectName);
+                .createProjectUntilSuccess(projectName)
+                .assignResource(projectName, "Tenant", adminUser.getTenant())
+                .assignResource(projectName, "Environment", pythonEnvironment.getEnvironmentName());
     }
 
     @Test
@@ -96,6 +98,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .createWorkflow()
                 .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
                 .script(pythonScripts)
+                .selectEnv(pythonEnvironment.getEnvironmentName())
                 .name(taskName)
                 .submit()
 
@@ -138,6 +141,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .createWorkflow()
                 .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
                 .script(pythonScripts)
+                .selectEnv(pythonEnvironment.getEnvironmentName())
                 .name(taskName)
                 .submit()
 
@@ -180,6 +184,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .createWorkflow()
                 .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
                 .script(pythonScripts)
+                .selectEnv(pythonEnvironment.getEnvironmentName())
                 .name(taskName)
                 .addParam("name", "tom")
                 .submit()
@@ -222,6 +227,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .createWorkflow()
                 .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
                 .script(pythonScripts)
+                .selectEnv(pythonEnvironment.getEnvironmentName())
                 .name(taskName)
                 .addParam("name", "tom")
                 .submit()
@@ -278,6 +284,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .createWorkflow()
                 .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
                 .script(pythonScripts)
+                .selectEnv(pythonEnvironment.getEnvironmentName())
                 .name(taskName)
                 .selectResource(testFileName + ".sh")
                 .addParam("file_name", String.format("%s.sh", testFileName))
@@ -317,6 +324,7 @@ public class PythonTaskE2ETest extends BaseWorkflowE2ETest {
                 .createWorkflow()
                 .<PythonTaskForm>addTask(WorkflowForm.TaskType.PYTHON)
                 .script(pythonScripts)
+                .selectEnv(pythonEnvironment.getEnvironmentName())
                 .name(taskName)
                 .submit()
 

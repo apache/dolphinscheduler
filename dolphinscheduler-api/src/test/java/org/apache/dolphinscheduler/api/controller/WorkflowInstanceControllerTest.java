@@ -22,6 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTaskListDTO;
@@ -272,6 +273,21 @@ public class WorkflowInstanceControllerTest extends AbstractControllerTest {
         Assertions.assertFalse(maskedPayload.contains("\"abc\""));
         Assertions.assertTrue(workflowInstance.getGlobalParams().contains("Secret123"));
         Assertions.assertTrue(taskDefinition.getTaskParams().contains("abc"));
+    }
+
+    @Test
+    public void testQuerySubWorkflowInstanceIncludesActualProjectCode() throws Exception {
+        Map<String, Object> child = new LinkedHashMap<>();
+        child.put("subWorkflowInstanceId", 1204);
+        child.put("projectCode", 4294967296L);
+        Mockito.when(workflowInstanceService.querySubWorkflowInstanceByTaskId(Mockito.any(), Mockito.eq(1113L),
+                Mockito.eq(1203))).thenReturn(child);
+
+        mockMvc.perform(get("/projects/1113/workflow-instances/query-sub-by-parent")
+                .header(SESSION_ID, sessionId).param("taskId", "1203"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.subWorkflowInstanceId").value(1204))
+                .andExpect(jsonPath("$.data.projectCode").value(4294967296L));
     }
 
     @Test

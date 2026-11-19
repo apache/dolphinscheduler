@@ -47,6 +47,7 @@ import org.apache.dolphinscheduler.dao.repository.WorkerGroupDao;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -67,6 +68,11 @@ public class ResourcePermissionCheckServiceImpl
         implements
             ResourcePermissionCheckService<Object>,
             ApplicationContextAware {
+
+    private static final Set<AuthorizationType> SHARED_RESOURCE_TYPES = EnumSet.of(
+            AuthorizationType.DATASOURCE, AuthorizationType.WORKER_GROUP, AuthorizationType.TENANT,
+            AuthorizationType.QUEUE, AuthorizationType.ENVIRONMENT, AuthorizationType.ALERT_GROUP,
+            AuthorizationType.K8S_NAMESPACE, AuthorizationType.TASK_GROUP);
 
     @Autowired
     private UserDao userDao;
@@ -117,6 +123,9 @@ public class ResourcePermissionCheckServiceImpl
         User user = userDao.queryById(userId);
         if (user == null) {
             logger.error("User does not exist, userId:{}.", userId);
+            return Collections.emptySet();
+        }
+        if (user.getUserType() != UserType.ADMIN_USER && SHARED_RESOURCE_TYPES.contains(authorizationType)) {
             return Collections.emptySet();
         }
         return (Set<Object>) RESOURCE_LIST_MAP.get(authorizationType).listAuthorizedResourceIds(
@@ -174,7 +183,7 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            return projectDao.listAuthorizedProjects(userId, null).stream().map(Project::getId).collect(toSet());
+            return projectDao.queryVisibleProjects(userId, userId == 0).stream().map(Project::getId).collect(toSet());
         }
     }
 
@@ -225,7 +234,10 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            List<K8sNamespace> k8sNamespaces = k8sNamespaceDao.queryAuthedNamespaceListByUserId(userId);
+            if (userId != 0) {
+                return Collections.emptySet();
+            }
+            List<K8sNamespace> k8sNamespaces = k8sNamespaceDao.queryAll();
             return k8sNamespaces.stream().map(K8sNamespace::getId).collect(Collectors.toSet());
         }
     }
@@ -397,12 +409,15 @@ public class ResourcePermissionCheckServiceImpl
 
         @Override
         public boolean permissionCheck(int userId, String url, Logger logger) {
-            return true;
+            return false;
         }
 
         @Override
         public Set<Integer> listAuthorizedResourceIds(int userId, Logger logger) {
-            return dataSourceDao.listAuthorizedDataSource(userId, null).stream().map(DataSource::getId)
+            if (userId != 0) {
+                return Collections.emptySet();
+            }
+            return dataSourceDao.queryAll().stream().map(DataSource::getId)
                     .collect(toSet());
         }
     }

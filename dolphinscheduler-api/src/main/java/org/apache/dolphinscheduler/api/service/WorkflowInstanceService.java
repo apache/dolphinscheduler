@@ -102,11 +102,11 @@ public interface WorkflowInstanceService {
      * @param loginUser   login user
      * @param projectCode project code
      * @param taskId      task id
-     * @return single-entry map keyed by {@code subWorkflowInstanceId}
+     * @return child instance ID and its actual project code
      */
-    Map<String, Integer> querySubWorkflowInstanceByTaskId(User loginUser,
-                                                          long projectCode,
-                                                          Integer taskId);
+    Map<String, Object> querySubWorkflowInstanceByTaskId(User loginUser,
+                                                         long projectCode,
+                                                         Integer taskId);
 
     /**
      * update workflow instance
@@ -218,8 +218,6 @@ public interface WorkflowInstanceService {
      */
     List<WorkflowInstanceSummaryVO> queryByTriggerCode(User loginUser, long projectCode, Long triggerCode);
 
-    void deleteWorkflowInstanceByWorkflowDefinitionCode(long workflowDefinitionCode);
-
-    void deleteWorkflowInstanceById(int workflowInstanceId);
+    void deleteWorkflowInstanceByWorkflowDefinitionCode(User loginUser, long workflowDefinitionCode);
 
 }

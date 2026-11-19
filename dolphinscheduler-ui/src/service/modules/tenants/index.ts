@@ -34,10 +34,11 @@ export function createTenant(data: TenantReq): any {
   })
 }
 
-export function queryTenantList(): any {
+export function queryTenantList(projectCode?: number): any {
   return axios({
     url: '/tenants/list',
-    method: 'get'
+    method: 'get',
+    params: { projectCode }
   })
 }
 

@@ -22,12 +22,22 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import org.apache.dolphinscheduler.api.enums.Status;
+import org.apache.dolphinscheduler.api.exceptions.ServiceException;
+import org.apache.dolphinscheduler.api.service.ProjectService;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.dao.entity.DependentWorkflowDefinition;
+import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
+import org.apache.dolphinscheduler.dao.entity.User;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowLineage;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowRelation;
+import org.apache.dolphinscheduler.dao.entity.WorkFlowRelationDetail;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
+import org.apache.dolphinscheduler.dao.repository.ProjectDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
@@ -35,12 +45,15 @@ import org.apache.dolphinscheduler.dao.repository.WorkflowTaskLineageDao;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -58,6 +71,61 @@ class WorkflowLineageServiceImplTest {
 
     @Mock
     private TaskDefinitionDao taskDefinitionDao;
+
+    @Mock
+    private ProjectDao projectDao;
+
+    @Mock
+    private ProjectService projectService;
+
+    @Test
+    void lineageQueryChecksActualWorkflowProjectBeforeReadingRelations() {
+        User user = new User();
+        when(projectDao.queryByCode(1L)).thenReturn(new Project());
+        WorkflowDefinition definition = new WorkflowDefinition();
+        definition.setCode(100L);
+        definition.setProjectCode(2L);
+        Mockito.lenient().when(workflowDefinitionDao.queryByCode(100L)).thenReturn(Optional.of(definition));
+        Mockito.lenient().doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectPermission(user, 2L, ProjectPermission.VIEW);
+
+        ServiceException exception = Assertions.assertThrows(ServiceException.class,
+                () -> workflowLineageService.queryWorkFlowLineageByCode(user, 1L, 100L));
+
+        Assertions.assertEquals(Status.USER_NO_OPERATION_PROJECT_PERM.getCode(), exception.getCode());
+        verifyNoInteractions(workflowTaskLineageDao);
+    }
+
+    @Test
+    void lineagePreservesRelatedProjectsWithoutTheirViewPermission() {
+        User user = new User();
+        when(projectDao.queryByCode(1L)).thenReturn(new Project());
+        WorkflowDefinition root = new WorkflowDefinition();
+        root.setCode(100L);
+        root.setProjectCode(1L);
+        when(workflowDefinitionDao.queryByCode(100L)).thenReturn(Optional.of(root));
+        Mockito.lenient().doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
+                .when(projectService).checkProjectPermission(user, 2L, ProjectPermission.VIEW);
+        WorkflowTaskLineage relation = new WorkflowTaskLineage();
+        relation.setWorkflowDefinitionCode(100L);
+        relation.setDeptProjectCode(2L);
+        relation.setDeptWorkflowDefinitionCode(200L);
+        when(workflowTaskLineageDao.queryByWorkflowDefinitionCode(100L))
+                .thenReturn(Collections.singletonList(relation));
+        WorkFlowRelationDetail local = new WorkFlowRelationDetail();
+        local.setWorkFlowCode(100L);
+        WorkFlowRelationDetail related = new WorkFlowRelationDetail();
+        related.setWorkFlowCode(200L);
+        related.setWorkFlowName("related workflow in project B");
+        when(workflowTaskLineageDao.queryWorkFlowLineageByCode(100L)).thenReturn(Collections.singletonList(local));
+        when(workflowTaskLineageDao.queryWorkFlowLineageByCode(200L)).thenReturn(Collections.singletonList(related));
+
+        WorkFlowLineage result = workflowLineageService.queryWorkFlowLineageByCode(user, 1L, 100L);
+
+        assertThat(result.getWorkFlowRelationDetailList()).containsExactly(local, related);
+        assertThat(result.getWorkFlowRelationList()).contains(new WorkFlowRelation(200L, 100L));
+        verify(projectService, Mockito.never()).checkProjectPermission(user, 2L, ProjectPermission.VIEW);
+    }
 
     @BeforeEach
     void setUp() {

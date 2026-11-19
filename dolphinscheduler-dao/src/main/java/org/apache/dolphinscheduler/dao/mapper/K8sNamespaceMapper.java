@@ -31,6 +31,8 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
  */
 public interface K8sNamespaceMapper extends BaseMapper<K8sNamespace> {
 
+    List<K8sNamespace> queryByProject(@Param("projectCode") long projectCode);
+
     /**
      * k8s namespace page
      *

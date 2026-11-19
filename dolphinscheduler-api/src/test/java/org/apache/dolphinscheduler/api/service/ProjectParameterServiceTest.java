@@ -33,6 +33,7 @@ import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.impl.ProjectParameterServiceImpl;
 import org.apache.dolphinscheduler.api.service.impl.ProjectServiceImpl;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
 import org.apache.dolphinscheduler.dao.entity.ProjectParameter;
@@ -79,12 +80,14 @@ public class ProjectParameterServiceTest {
 
         // PERMISSION DENIED
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
+                .when(projectService)
+                .checkProjectPermission(any(), Mockito.<Project>any(), Mockito.eq(ProjectPermission.DEVELOP));
         assertThrows(ServiceException.class,
                 () -> projectParameterService.createProjectParameter(loginUser, projectCode, "key", "value",
                         DataType.VARCHAR.name()));
 
-        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), Mockito.<Project>any(),
+                Mockito.eq(ProjectPermission.DEVELOP));
 
         // CODE GENERATION ERROR
         try (MockedStatic<CodeGenerateUtils> ignored = Mockito.mockStatic(CodeGenerateUtils.class)) {
@@ -125,14 +128,16 @@ public class ProjectParameterServiceTest {
 
         // NO PERMISSION
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
+                .when(projectService)
+                .checkProjectPermission(any(), Mockito.<Project>any(), Mockito.eq(ProjectPermission.DEVELOP));
         assertThrows(ServiceException.class,
                 () -> projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value",
                         DataType.VARCHAR.name()));
 
         // PROJECT_PARAMETER_NOT_EXISTS
         when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), Mockito.<Project>any(),
+                Mockito.eq(ProjectPermission.DEVELOP));
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(null);
         Result result = projectParameterService.updateProjectParameter(loginUser, projectCode, 1, "key", "value",
                 DataType.VARCHAR.name());
@@ -169,13 +174,15 @@ public class ProjectParameterServiceTest {
 
         // NO PERMISSION
         doThrow(new ServiceException(Status.USER_NO_WRITE_PROJECT_PERM))
-                .when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
+                .when(projectService)
+                .checkProjectPermission(any(), Mockito.<Project>any(), Mockito.eq(ProjectPermission.DEVELOP));
         assertThrows(ServiceException.class,
                 () -> projectParameterService.deleteProjectParametersByCode(loginUser, projectCode, 1));
 
         // PROJECT_PARAMETER_NOT_EXISTS
         when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        doNothing().when(projectService).checkHasProjectWritePermissionThrowException(any(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), Mockito.<Project>any(),
+                Mockito.eq(ProjectPermission.DEVELOP));
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(null);
         Result result = projectParameterService.deleteProjectParametersByCode(loginUser, projectCode, 1);
         assertEquals(Status.PROJECT_PARAMETER_NOT_EXISTS.getCode(), result.getCode());
@@ -198,14 +205,16 @@ public class ProjectParameterServiceTest {
 
         // NO PERMISSION
         doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
-                .when(projectService).checkProjectAndAuthThrowException(any(), Mockito.<Project>any(), any());
+                .when(projectService)
+                .checkProjectPermission(any(), Mockito.<Project>any(), Mockito.eq(ProjectPermission.VIEW));
 
         assertThrows(ServiceException.class,
                 () -> projectParameterService.queryProjectParameterByCode(loginUser, projectCode, 1));
 
         // PROJECT_PARAMETER_NOT_EXISTS
         when(projectDao.queryByCode(projectCode)).thenReturn(getProject(projectCode));
-        doNothing().when(projectService).checkProjectAndAuthThrowException(any(), Mockito.<Project>any(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), Mockito.<Project>any(),
+                Mockito.eq(ProjectPermission.VIEW));
         when(projectParameterMapper.queryByCode(Mockito.anyLong())).thenReturn(null);
         Result result = projectParameterService.queryProjectParameterByCode(loginUser, projectCode, 1);
         assertEquals(Status.PROJECT_PARAMETER_NOT_EXISTS.getCode(), result.getCode());
@@ -224,14 +233,16 @@ public class ProjectParameterServiceTest {
 
         // NO PERMISSION
         doThrow(new ServiceException(Status.USER_NO_OPERATION_PROJECT_PERM))
-                .when(projectService).checkProjectAndAuthThrowException(any(), Mockito.<Project>any(), any());
+                .when(projectService)
+                .checkProjectPermission(any(), Mockito.<Project>any(), Mockito.eq(ProjectPermission.VIEW));
 
         assertThrows(ServiceException.class,
                 () -> projectParameterService.queryProjectParameterListPaging(loginUser, projectCode, pageSize, pageNo,
                         null, DataType.VARCHAR.name()));
 
         // SUCCESS
-        doNothing().when(projectService).checkProjectAndAuthThrowException(any(), Mockito.<Project>any(), any());
+        doNothing().when(projectService).checkProjectPermission(any(), Mockito.<Project>any(),
+                Mockito.eq(ProjectPermission.VIEW));
 
         Page<ProjectParameter> page = new Page<>(pageNo, pageSize);
         page.setRecords(Collections.singletonList(getProjectParameter()));

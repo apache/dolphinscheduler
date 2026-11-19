@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.api.test.pages.project;
 import org.apache.dolphinscheduler.api.test.core.Constants;
 import org.apache.dolphinscheduler.api.test.entity.HttpResponse;
 import org.apache.dolphinscheduler.api.test.utils.RequestClient;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.dao.entity.User;
 
 import java.util.HashMap;
@@ -41,6 +42,17 @@ public final class ProjectPage {
 
         RequestClient requestClient = new RequestClient();
         return requestClient.post("/projects", headers, params);
+    }
+
+    public HttpResponse grantResource(long projectCode, ProjectResourceType resourceType, String resourceKey) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("resourceKey", resourceKey);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(Constants.SESSION_ID_KEY, sessionId);
+
+        RequestClient requestClient = new RequestClient();
+        String url = String.format("/projects/%d/resource-authorizations/%s", projectCode, resourceType);
+        return requestClient.put(url, headers, params);
     }
 
     public HttpResponse queryAllProjectList(User loginUser) {

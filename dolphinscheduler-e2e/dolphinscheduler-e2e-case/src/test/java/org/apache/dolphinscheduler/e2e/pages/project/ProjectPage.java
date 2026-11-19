@@ -20,6 +20,8 @@ package org.apache.dolphinscheduler.e2e.pages.project;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
+import org.apache.dolphinscheduler.e2e.core.UiInteraction;
+import org.apache.dolphinscheduler.e2e.core.WebDriverWaitFactory;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage;
 import org.apache.dolphinscheduler.e2e.pages.common.NavBarPage.NavBarItem;
 
@@ -51,13 +53,10 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
 
     private final CreateProjectForm createProjectForm;
 
-    private final AssignWorkerGroupForm assignWorkerGroupForm;
-
     public ProjectPage(RemoteWebDriver driver) {
         super(driver);
 
         this.createProjectForm = new CreateProjectForm();
-        this.assignWorkerGroupForm = new AssignWorkerGroupForm();
 
         PageFactory.initElements(driver, this);
     }
@@ -71,10 +70,10 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
 
     public ProjectPage createProjectUntilSuccess(String project) {
         create(project);
-        assignWorkerGroup(project, "default");
         await().untilAsserted(() -> assertThat(projectList())
                 .as("project list should contain newly-created project")
                 .anyMatch(it -> it.getText().contains(project)));
+        assignWorkerGroup(project, "default");
         return this;
     }
 
@@ -92,87 +91,82 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
     }
 
     public ProjectPage assignWorkerGroup(String project, String workerGroup) {
-        projectList()
-                .stream()
-                .filter(it -> it.getText().contains(project))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can not find project: " + project))
-                .findElement(By.className("assign-worker-group-btn")).click();
+        return assignResource(project, "Worker Group", workerGroup);
+    }
 
-        assignWorkerGroupForm.sourceWorkerGroups()
-                .stream()
-                .filter(it -> it.getText().contains(workerGroup))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can not find source worker group: " + workerGroup))
-                .click();
-
-        assignWorkerGroupForm.buttonSubmit().click();
-
+    public ProjectPage assignResource(String project, String type, String resource) {
+        openResourceAuthorization(project, type);
+        selectAuthorizationOption(".select-project-resource .n-base-selection:not(.n-base-selection--disabled)",
+                resource);
+        UiInteraction.click(driver, ".project-resource-authorization-modal .grant-project-resource");
+        await().untilAsserted(() -> assertThat(grantedResources())
+                .anyMatch(row -> row.findElement(By.tagName("td")).getText().equals(resource)));
+        closeResourceAuthorization();
         return this;
     }
 
     public ProjectPage verifyAssignedWorkerGroup(String project, String workerGroup) {
-        projectList()
-                .stream()
-                .filter(it -> it.getText().contains(project))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can not find project: " + project))
-                .findElement(By.className("assign-worker-group-btn")).click();
-
-        assignWorkerGroupForm.targetWorkerGroups()
-                .stream()
-                .filter(it -> it.getText().contains(workerGroup))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can not find target worker group: " + workerGroup))
-                .click();
-
-        assignWorkerGroupForm.buttonCancel().click();
-
+        openResourceAuthorization(project, "Worker Group");
+        await().untilAsserted(() -> assertThat(grantedResources())
+                .anyMatch(row -> row.findElement(By.tagName("td")).getText().equals(workerGroup)));
+        closeResourceAuthorization();
         return this;
     }
+
     public ProjectPage removeWorkerGroup(String project, String workerGroup) {
-        projectList()
+        openResourceAuthorization(project, "Worker Group");
+        WebElement row = WebDriverWaitFactory.createWebDriverWait(driver).until(ignored -> grantedResources()
                 .stream()
-                .filter(it -> it.getText().contains(project))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can not find project: " + project))
-                .findElement(By.className("assign-worker-group-btn")).click();
-
-        WebElement workerGroupItem = assignWorkerGroupForm.sourceWorkerGroupItems()
-                .stream()
-                .filter(it -> it.findElement(By.className("n-transfer-list-item__label"))
-                        .getText().contains(workerGroup))
-                .filter(it -> {
-                    WebElement checkbox = it.findElement(By.className("n-checkbox"));
-                    return "true".equals(checkbox.getAttribute("aria-checked"));
-                })
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can not find selected source worker group: " + workerGroup));
-
-        workerGroupItem.click();
-        assignWorkerGroupForm.buttonSubmit().click();
+                .filter(it -> it.findElement(By.tagName("td")).getText().equals(workerGroup))
+                .findFirst().orElse(null));
+        row.findElement(By.className("revoke-project-resource")).click();
+        UiInteraction.click(driver, ".n-popconfirm__action .n-button--primary-type");
+        await().untilAsserted(() -> assertThat(grantedResources())
+                .noneMatch(it -> it.findElement(By.tagName("td")).getText().equals(workerGroup)));
+        closeResourceAuthorization();
         return this;
     }
+
     public ProjectPage verifyRemovedWorkerGroup(String project, String workerGroup) {
-        projectList()
-                .stream()
-                .filter(it -> it.getText().contains(project))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Can not find project: " + project))
-                .findElement(By.className("assign-worker-group-btn")).click();
-
-        assignWorkerGroupForm.targetWorkerGroups()
-                .stream()
-                .filter(it -> it.getText().contains(workerGroup))
-                .findFirst()
-                .ifPresent(it -> {
-                    throw new RuntimeException(
-                            "Worker group should have been deleted but still exists: " + workerGroup);
-                });
-        assignWorkerGroupForm.buttonCancel().click();
-
+        openResourceAuthorization(project, "Worker Group");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ignored -> driver
+                .findElements(By.cssSelector(
+                        ".project-resource-authorization-modal .select-project-resource .n-base-selection--disabled"))
+                .isEmpty());
+        assertThat(grantedResources())
+                .noneMatch(it -> it.findElement(By.tagName("td")).getText().equals(workerGroup));
+        closeResourceAuthorization();
         return this;
     }
+
+    private void openResourceAuthorization(String project, String type) {
+        projectList().stream().filter(it -> it.getText().contains(project)).findFirst()
+                .orElseThrow(() -> new RuntimeException("Cannot find project: " + project))
+                .findElement(By.className("assign-project-resource-btn")).click();
+        selectAuthorizationOption(".select-resource-type .n-base-selection:not(.n-base-selection--disabled)", type);
+    }
+
+    private void selectAuthorizationOption(String selector, String label) {
+        UiInteraction.click(driver, ".project-resource-authorization-modal " + selector);
+        WebElement option = WebDriverWaitFactory.createWebDriverWait(driver).until(ignored -> driver
+                .findElements(By.cssSelector(".n-base-select-option")).stream()
+                .filter(WebElement::isDisplayed).filter(it -> it.getText().equals(label))
+                .findFirst().orElse(null));
+        option.click();
+    }
+
+    private List<WebElement> grantedResources() {
+        return driver.findElements(
+                By.cssSelector(".project-resource-authorization-modal .project-resource-grants tbody tr"));
+    }
+
+    private void closeResourceAuthorization() {
+        UiInteraction.click(driver, ".project-resource-authorization-modal .btn-cancel");
+        WebDriverWaitFactory.createWebDriverWait(driver).until(ignored -> driver
+                .findElements(By.className("project-resource-authorization-modal")).stream()
+                .noneMatch(WebElement::isDisplayed));
+    }
+
     public ProjectDetailPage goTo(String project) {
         projectList().stream()
                 .filter(it -> it.getText().contains(project))
@@ -201,44 +195,4 @@ public final class ProjectPage extends NavBarPage implements NavBarItem {
         private WebElement buttonSubmit;
     }
 
-    @Getter
-    public class AssignWorkerGroupForm {
-
-        AssignWorkerGroupForm() {
-            PageFactory.initElements(driver, this);
-        }
-
-        @FindBys({
-                @FindBy(className = "assign-worker-group-modal"),
-                @FindBy(className = "n-transfer-list--source"),
-                @FindBy(className = "n-transfer-list-item__label")
-        })
-        private List<WebElement> sourceWorkerGroups;
-
-        @FindBys({
-                @FindBy(className = "assign-worker-group-modal"),
-                @FindBy(className = "n-transfer-list--target"),
-                @FindBy(className = "n-transfer-list-item__label")
-        })
-        private List<WebElement> targetWorkerGroups;
-
-        @FindBys({
-                @FindBy(className = "assign-worker-group-modal"),
-                @FindBy(className = "n-transfer-list--source"),
-                @FindBy(className = "n-transfer-list-item--source")
-        })
-        private List<WebElement> sourceWorkerGroupItems;
-
-        @FindBys({
-                @FindBy(className = "assign-worker-group-modal"),
-                @FindBy(className = "btn-submit"),
-        })
-        private WebElement buttonSubmit;
-
-        @FindBys({
-                @FindBy(className = "assign-worker-group-modal"),
-                @FindBy(className = "btn-cancel"),
-        })
-        private WebElement buttonCancel;
-    }
 }

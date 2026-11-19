@@ -21,7 +21,6 @@ import {
   NInput,
   NButton,
   NIcon,
-  NTransfer,
   NSpace,
   NDataTable,
   NPagination
@@ -44,7 +43,7 @@ const props = {
   },
   type: {
     type: String as PropType<TAuthType>,
-    default: 'auth_project'
+    default: 'authorize_project'
   }
 }
 export const AuthorizeModal = defineComponent({
@@ -56,7 +55,6 @@ export const AuthorizeModal = defineComponent({
     const {
       state,
       onInit,
-      onSave,
       getProjects,
       revokeProjectByIdRequest,
       grantProjectRequest,
@@ -66,10 +64,6 @@ export const AuthorizeModal = defineComponent({
     } = useAuthorize()
     const onCancel = () => {
       ctx.emit('cancel')
-    }
-    const onConfirm = async () => {
-      const result = await onSave(props.type, props.userId)
-      if (result) onCancel()
     }
 
     const onRevokeProject = () => {
@@ -90,7 +84,7 @@ export const AuthorizeModal = defineComponent({
       () => props.show,
       () => {
         if (props.show) {
-          onInit(props.type, props.userId)
+          onInit(props.userId)
         }
       }
     )
@@ -101,7 +95,6 @@ export const AuthorizeModal = defineComponent({
       rowKey: (row: any) => row.id,
       ...toRefs(state),
       onCancel,
-      onConfirm,
       getProjects,
       handleCheck,
       requestData,
@@ -120,7 +113,7 @@ export const AuthorizeModal = defineComponent({
         title={t(`security.user.${type}`)}
         onCancel={this.onCancel}
         confirmLoading={this.loading}
-        onConfirm={this.onConfirm}
+        confirmShow={false}
         confirmClassName='btn-submit'
         cancelClassName='btn-cancel'
       >
@@ -188,24 +181,6 @@ export const AuthorizeModal = defineComponent({
               />
             </div>
           </NSpace>
-        )}
-        {type === 'authorize_datasource' && (
-          <NTransfer
-            virtualScroll
-            options={this.unauthorizedDatasources}
-            filterable
-            v-model:value={this.authorizedDatasources}
-            class={styles.transfer}
-          />
-        )}
-        {type === 'authorize_namespace' && (
-          <NTransfer
-            virtualScroll
-            options={this.unauthorizedNamespaces}
-            filterable
-            v-model:value={this.authorizedNamespaces}
-            class={styles.transfer}
-          />
         )}
       </Modal>
     )

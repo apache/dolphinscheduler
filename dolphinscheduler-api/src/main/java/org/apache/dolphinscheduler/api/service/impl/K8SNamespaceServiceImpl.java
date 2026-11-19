@@ -21,32 +21,30 @@ import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.k8s.K8sClientService;
 import org.apache.dolphinscheduler.api.service.K8sNamespaceService;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.dao.entity.Cluster;
 import org.apache.dolphinscheduler.dao.entity.K8sNamespace;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.repository.ClusterDao;
 import org.apache.dolphinscheduler.dao.repository.K8sNamespaceDao;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -59,7 +57,13 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNamespaceService {
 
     @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
+
+    @Autowired
     private K8sNamespaceDao k8sNamespaceDao;
+
+    @Autowired
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Autowired
     private K8sClientService k8sClientService;
@@ -168,7 +172,10 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @return true if the k8s and namespace not exists, otherwise return false
      */
     @Override
-    public Result<Object> verifyNamespaceK8s(String namespace, Long clusterCode) {
+    public Result<Object> verifyNamespaceK8s(User loginUser, String namespace, Long clusterCode) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         Result<Object> result = new Result<>();
         if (StringUtils.isEmpty(namespace)) {
             log.warn("Parameter namespace is empty.");
@@ -199,6 +206,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
      * @param id        namespace id
      */
     @Override
+    @Transactional
     public void deleteNamespaceById(User loginUser, int id) {
         if (isNotAdmin(loginUser)) {
             throw new ServiceException(Status.USER_NO_OPERATION_PERM);
@@ -211,6 +219,7 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
         }
 
         k8sNamespaceDao.deleteById(id);
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.K8S_NAMESPACE, Integer.toString(id));
         log.info("K8s namespace delete complete, namespace:{}.", k8sNamespaceObj.getNamespace());
     }
 
@@ -225,102 +234,15 @@ public class K8SNamespaceServiceImpl extends BaseServiceImpl implements K8sNames
     }
 
     /**
-     * query unauthorized namespace
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return the namespaces which user have not permission to see
-     */
-    @Override
-    public List<K8sNamespace> queryUnauthorizedNamespace(User loginUser, Integer userId) {
-        if (loginUser.getId() != userId && isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-        // query all namespace list, this auth does not like project
-        List<K8sNamespace> namespaceList = k8sNamespaceDao.queryAll();
-        if (namespaceList == null || namespaceList.isEmpty()) {
-            return Collections.emptyList();
-        }
-        Set<K8sNamespace> namespaceSet = new HashSet<>(namespaceList);
-        List<K8sNamespace> authedProjectList = k8sNamespaceDao.queryAuthedNamespaceListByUserId(userId);
-        return getUnauthorizedNamespaces(namespaceSet, authedProjectList);
-    }
-
-    /**
-     * query authorized namespace
-     *
-     * @param loginUser login user
-     * @param userId    user id
-     * @return namespaces which the user have permission to see
-     */
-    @Override
-    public List<K8sNamespace> queryAuthorizedNamespace(User loginUser, Integer userId) {
-        if (loginUser.getId() != userId && isNotAdmin(loginUser)) {
-            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
-        }
-        return k8sNamespaceDao.queryAuthedNamespaceListByUserId(userId);
-    }
-
-    /**
      * query namespace can use
      *
      * @param loginUser login user
      * @return namespace list
      */
     @Override
-    public List<K8sNamespace> queryNamespaceAvailable(User loginUser) {
-        List<K8sNamespace> k8sNamespaces;
-        if (isAdmin(loginUser)) {
-            k8sNamespaces = k8sNamespaceDao.queryAll();
-        } else {
-            k8sNamespaces = k8sNamespaceDao.queryAuthedNamespaceListByUserId(loginUser.getId());
-        }
-        setClusterName(k8sNamespaces);
-        return k8sNamespaces;
+    public List<K8sNamespace> queryNamespaceAvailable(User loginUser, long projectCode) {
+        projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
+        return k8sNamespaceDao.queryByProject(projectCode);
     }
 
-    /**
-     * set cluster_name
-     * @param k8sNamespaces source data
-     */
-    private void setClusterName(List<K8sNamespace> k8sNamespaces) {
-        if (CollectionUtils.isNotEmpty(k8sNamespaces)) {
-            List<Cluster> clusters = clusterDao.queryAllClusterList();
-            if (CollectionUtils.isNotEmpty(clusters)) {
-                Map<Long, String> codeNameMap = clusters.stream()
-                        .collect(Collectors.toMap(Cluster::getCode, Cluster::getName, (a, b) -> a));
-                for (K8sNamespace k8sNamespace : k8sNamespaces) {
-                    String clusterName = codeNameMap.get(k8sNamespace.getClusterCode());
-                    k8sNamespace.setClusterName(clusterName);
-                }
-            }
-        }
-    }
-
-    /**
-     * get unauthorized namespace
-     *
-     * @param namespaceSet        namespace set
-     * @param authedNamespaceList authed namespace list
-     * @return namespace list that authorization
-     */
-    private List<K8sNamespace> getUnauthorizedNamespaces(Set<K8sNamespace> namespaceSet,
-                                                         List<K8sNamespace> authedNamespaceList) {
-        List<K8sNamespace> resultList = new ArrayList<>();
-        for (K8sNamespace k8sNamespace : namespaceSet) {
-            boolean existAuth = false;
-            if (authedNamespaceList != null && !authedNamespaceList.isEmpty()) {
-                for (K8sNamespace k8sNamespaceAuth : authedNamespaceList) {
-                    if (k8sNamespace.equals(k8sNamespaceAuth)) {
-                        existAuth = true;
-                    }
-                }
-            }
-
-            if (!existAuth) {
-                resultList.add(k8sNamespace);
-            }
-        }
-        return resultList;
-    }
 }

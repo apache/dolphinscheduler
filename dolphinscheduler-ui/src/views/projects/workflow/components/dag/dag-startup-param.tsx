@@ -16,10 +16,11 @@
  */
 
 import _ from 'lodash'
+import { useRoute } from 'vue-router'
 import { defineComponent, onMounted, PropType, ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { listAlertGroupById } from '@/service/modules/alert-group'
-import { queryAllWorkerGroups } from '@/service/modules/worker-groups'
+import { queryWorkerGroupsByProjectCode } from '@/service/modules/projects-worker-group'
 import { runningType, warningTypeList } from '@/common/common'
 import { IStartupParam } from './types'
 import styles from './startup.module.scss'
@@ -36,20 +37,23 @@ export default defineComponent({
   props,
   setup(props) {
     const { t } = useI18n()
+    const projectCode = Number(useRoute().params.projectCode)
 
     const alertGroupListRef = ref<any>([])
     const workerGroupListRef = ref<any>([])
     const commandParam = JSON.parse(props.startupParam?.commandParam || '{}')
 
     const getAlertGroupList = () => {
-      listAlertGroupById().then((res: any) => {
+      listAlertGroupById(projectCode).then((res: any) => {
         alertGroupListRef.value = res
       })
     }
 
     const getWorkerGroupList = () => {
-      queryAllWorkerGroups().then((res: any) => {
-        workerGroupListRef.value = res
+      queryWorkerGroupsByProjectCode(projectCode).then((res: any) => {
+        workerGroupListRef.value = res.data.map(
+          (item: { workerGroup: string }) => item.workerGroup
+        )
       })
     }
 

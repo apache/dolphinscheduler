@@ -25,9 +25,12 @@ import org.apache.dolphinscheduler.api.dto.EnvironmentDto;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.EnvironmentService;
+import org.apache.dolphinscheduler.api.service.ProjectAuthorizationService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.common.enums.AuthorizationType;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ProjectResourceType;
 import org.apache.dolphinscheduler.common.enums.UserType;
 import org.apache.dolphinscheduler.common.utils.CodeGenerateUtils;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
@@ -37,6 +40,7 @@ import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentMapper;
 import org.apache.dolphinscheduler.dao.mapper.EnvironmentWorkerGroupRelationMapper;
+import org.apache.dolphinscheduler.dao.repository.ProjectResourceAuthorizationDao;
 import org.apache.dolphinscheduler.dao.repository.TaskDefinitionDao;
 
 import org.apache.commons.collections4.CollectionUtils;
@@ -72,6 +76,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 @Service
 @Slf4j
 public class EnvironmentServiceImpl extends BaseServiceImpl implements EnvironmentService {
+
+    @Autowired
+    private ProjectResourceAuthorizationDao resourceAuthorizationDao;
+
+    @Autowired
+    private ProjectAuthorizationService projectAuthorizationService;
 
     @Autowired
     private EnvironmentMapper environmentMapper;
@@ -206,12 +216,21 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      */
     @Override
     public List<EnvironmentDto> queryAllEnvironmentList(User loginUser) {
-        Set<Integer> ids = resourcePermissionCheckService.userOwnedResourceIdsAcquisition(AuthorizationType.ENVIRONMENT,
-                loginUser.getId(), log);
-        if (ids.isEmpty()) {
-            return Collections.emptyList();
+        return queryAllEnvironmentList(loginUser, null);
+    }
+
+    @Override
+    public List<EnvironmentDto> queryAllEnvironmentList(User loginUser, Long projectCode) {
+        final List<Environment> environmentList;
+        if (projectCode == null) {
+            if (isNotAdmin(loginUser)) {
+                throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            }
+            environmentList = environmentMapper.queryAllEnvironmentList();
+        } else {
+            projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
+            environmentList = environmentMapper.queryByProject(projectCode);
         }
-        List<Environment> environmentList = environmentMapper.selectBatchIds(ids);
         if (CollectionUtils.isEmpty(environmentList)) {
             return Collections.emptyList();
         }
@@ -233,10 +252,21 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param code environment code
      */
     @Override
-    public EnvironmentDto queryEnvironmentByCode(Long code) {
+    public EnvironmentDto queryEnvironmentByCode(User loginUser, Long code, Long projectCode) {
+        if (projectCode == null) {
+            if (isNotAdmin(loginUser)) {
+                throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+            }
+        } else {
+            projectAuthorizationService.requirePermission(loginUser, projectCode, ProjectPermission.VIEW);
+        }
         Environment env = environmentMapper.queryByEnvironmentCode(code);
         if (env == null) {
             throw new ServiceException(Status.QUERY_ENVIRONMENT_BY_CODE_ERROR, code);
+        }
+        if (projectCode != null) {
+            projectAuthorizationService.requireResourceUse(loginUser, projectCode, ProjectPermission.VIEW,
+                    ProjectResourceType.ENVIRONMENT, env.getId().toString());
         }
         List<String> workerGroups = relationMapper.queryByEnvironmentCode(env.getCode()).stream()
                 .map(EnvironmentWorkerGroupRelation::getWorkerGroup)
@@ -244,6 +274,9 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
 
         EnvironmentDto dto = new EnvironmentDto();
         BeanUtils.copyProperties(env, dto);
+        if (projectCode != null) {
+            dto.setConfig(null);
+        }
         dto.setWorkerGroups(workerGroups);
         return dto;
     }
@@ -290,11 +323,13 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
             throw new ServiceException(Status.DELETE_ENVIRONMENT_RELATED_TASK_EXISTS);
         }
 
+        Environment environment = environmentMapper.queryByEnvironmentCode(code);
         int delete = environmentMapper.deleteByCode(code);
         if (delete <= 0) {
             log.error("Environment delete error, environmentCode:{}.", code);
             throw new ServiceException(Status.DELETE_ENVIRONMENT_ERROR);
         }
+        resourceAuthorizationDao.revokeByResource(ProjectResourceType.ENVIRONMENT, environment.getId().toString());
         relationMapper.delete(new QueryWrapper<EnvironmentWorkerGroupRelation>()
                 .lambda()
                 .eq(EnvironmentWorkerGroupRelation::getEnvironmentCode, code));
@@ -390,7 +425,10 @@ public class EnvironmentServiceImpl extends BaseServiceImpl implements Environme
      * @param environmentName environment name
      */
     @Override
-    public void verifyEnvironment(String environmentName) {
+    public void verifyEnvironment(User loginUser, String environmentName) {
+        if (!isAdmin(loginUser)) {
+            throw new ServiceException(Status.USER_NO_OPERATION_PERM);
+        }
         if (StringUtils.isEmpty(environmentName)) {
             log.warn("parameter environment name is empty.");
             throw new ServiceException(Status.ENVIRONMENT_NAME_IS_NULL);

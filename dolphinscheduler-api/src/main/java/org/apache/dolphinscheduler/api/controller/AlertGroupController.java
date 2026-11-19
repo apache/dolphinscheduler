@@ -104,9 +104,10 @@ public class AlertGroupController extends BaseController {
     @GetMapping(value = "/list")
     @ResponseStatus(HttpStatus.OK)
     @ApiException(QUERY_ALL_ALERTGROUP_ERROR)
-    public Result<List<AlertGroup>> list(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser) {
+    public Result<List<AlertGroup>> list(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
+                                         @RequestParam(value = "projectCode", required = false) Long projectCode) {
 
-        List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(loginUser);
+        List<AlertGroup> alertGroups = alertGroupService.queryAllAlertGroup(loginUser, projectCode);
         return Result.success(alertGroups);
     }
 
@@ -227,7 +228,7 @@ public class AlertGroupController extends BaseController {
     public Result verifyGroupName(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                   @RequestParam(value = "groupName") String groupName) {
 
-        boolean exist = alertGroupService.existGroupName(groupName);
+        boolean exist = alertGroupService.existGroupName(loginUser, groupName);
         Result result = new Result();
         if (exist) {
             log.error("group {} has exist, can't create again.", groupName);

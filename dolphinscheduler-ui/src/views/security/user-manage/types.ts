@@ -22,10 +22,7 @@ import { UserReq } from '@/service/modules/users/types'
 export type { UserInfoRes } from '@/service/modules/users/types'
 
 type TUserType = 'GENERAL_USER' | ''
-type TAuthType =
-  | 'authorize_project'
-  | 'authorize_datasource'
-  | 'authorize_namespace'
+type TAuthType = 'authorize_project'
 
 interface IRecord {
   id: number

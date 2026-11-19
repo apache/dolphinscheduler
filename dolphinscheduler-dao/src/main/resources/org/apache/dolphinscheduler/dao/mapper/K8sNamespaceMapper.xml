@@ -76,4 +76,21 @@
         from t_ds_k8s_namespace
         where code = #{namespaceCode}
     </select>
+    <select id="queryByProject" resultType="org.apache.dolphinscheduler.dao.entity.K8sNamespace">
+        select
+        <include refid="baseSqlV2">
+            <property name="alias" value="p"/>
+        </include>
+        , c.name as cluster_name
+        from t_ds_k8s_namespace p
+        left join t_ds_cluster c on c.code = p.cluster_code
+        where exists (
+            select 1 from t_ds_project_resource_authorization a
+            where a.project_code = #{projectCode}
+                and a.resource_type = 'K8S_NAMESPACE'
+                and a.resource_key = concat('', p.id)
+        )
+        order by p.id
+    </select>
+
 </mapper>

@@ -273,21 +273,22 @@ export default defineComponent({
 
     onMounted(() => {
       getWorkerGroups()
-      getTenantList()
       getAlertGroups()
       getEnvironmentList()
     })
 
     watch(
       () => props.show,
-      () => {
+      async () => {
         if (props.show) {
           getStartParamsList(props.row.code)
-          restructureForm(startState.startForm)
+          await getTenantList()
+          await restructureForm(startState.startForm)
           if (props.taskCode)
             startState.startForm.startNodeList = props.taskCode
         }
-      }
+      },
+      { immediate: true }
     )
 
     const formModel = computed(() => ({
@@ -418,6 +419,7 @@ export default defineComponent({
             path='tenantCode'
           >
             <NSelect
+              class='select-tenant'
               options={this.tenantList}
               v-model:value={this.startForm.tenantCode}
               filterable

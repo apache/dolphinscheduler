@@ -68,7 +68,7 @@ export function useDatasync({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),
-      Fields.useEnvironmentName(model, !data?.id),
+      Fields.useEnvironmentName(model, !data?.id, projectCode),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       ...Fields.useResourceLimit(),

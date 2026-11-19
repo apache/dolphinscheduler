@@ -20,17 +20,28 @@ package org.apache.dolphinscheduler.api.permission;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
+import org.apache.dolphinscheduler.common.constants.Constants;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
+import org.apache.dolphinscheduler.common.enums.ReleaseState;
 import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.dao.entity.TaskDefinition;
 import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
+import org.apache.dolphinscheduler.dao.repository.TaskDefinitionLogDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentItem;
+import org.apache.dolphinscheduler.plugin.task.api.model.DependentTaskModel;
+import org.apache.dolphinscheduler.plugin.task.api.parameters.DependentParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.SubWorkflowParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.TaskTypeUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -44,16 +55,148 @@ public class TaskSubWorkflowPermissionChecker {
 
     private final WorkflowDefinitionDao workflowDefinitionDao;
     private final ProjectService projectService;
+    private final TaskDefinitionLogDao taskDefinitionLogDao;
+    private final TaskResourcePermissionChecker taskResourcePermissionChecker;
 
     public TaskSubWorkflowPermissionChecker(WorkflowDefinitionDao workflowDefinitionDao,
-                                            ProjectService projectService) {
+                                            ProjectService projectService,
+                                            TaskDefinitionLogDao taskDefinitionLogDao,
+                                            TaskResourcePermissionChecker taskResourcePermissionChecker) {
         this.workflowDefinitionDao = workflowDefinitionDao;
         this.projectService = projectService;
+        this.taskDefinitionLogDao = taskDefinitionLogDao;
+        this.taskResourcePermissionChecker = taskResourcePermissionChecker;
     }
 
     public void checkPermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions) {
-        if (taskDefinitions == null || taskDefinitions.isEmpty()) {
+        Collection<? extends TaskDefinition> pendingTasks = taskDefinitions;
+        Set<Long> visitedWorkflows = new HashSet<>();
+        Set<Long> viewedProjects = new HashSet<>();
+        boolean checkSubWorkflowExecute = true;
+        while (pendingTasks != null && !pendingTasks.isEmpty()) {
+            checkDependentReferences(loginUser, pendingTasks, viewedProjects);
+            List<WorkflowDefinition> subWorkflows =
+                    querySubWorkflows(loginUser, pendingTasks, visitedWorkflows, checkSubWorkflowExecute);
+            List<TaskDefinition> nextTasks = new ArrayList<>();
+            for (WorkflowDefinition workflow : subWorkflows) {
+                nextTasks.addAll(taskDefinitionLogDao.queryByWorkflowDefinitionCodeAndVersion(
+                        workflow.getCode(), workflow.getVersion()));
+            }
+            pendingTasks = nextTasks;
+            // Save checks EXECUTE on direct subworkflows; descend only to validate dependency references.
+            checkSubWorkflowExecute = false;
+        }
+    }
+
+    public void checkExecutionPermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions,
+                                         String workerGroup, Long environmentCode, String tenantCode,
+                                         Integer warningGroupId) {
+        checkResources(loginUser, taskDefinitions, workerGroup, environmentCode, tenantCode, warningGroupId, true);
+    }
+
+    public void checkResourcePermission(User loginUser, Collection<? extends TaskDefinition> taskDefinitions,
+                                        String workerGroup, Long environmentCode, String tenantCode,
+                                        Integer warningGroupId) {
+        checkResources(loginUser, taskDefinitions, workerGroup, environmentCode, tenantCode, warningGroupId, false);
+    }
+
+    private void checkResources(User loginUser, Collection<? extends TaskDefinition> taskDefinitions,
+                                String workerGroup, Long environmentCode, String tenantCode,
+                                Integer warningGroupId, boolean requireOnline) {
+        Collection<? extends TaskDefinition> pendingTasks = taskDefinitions;
+        Set<Long> visitedWorkflows = new HashSet<>();
+        Set<Long> viewedProjects = new HashSet<>();
+        while (pendingTasks != null && !pendingTasks.isEmpty()) {
+            checkDependentReferences(loginUser, pendingTasks, viewedProjects);
+            List<WorkflowDefinition> subWorkflows =
+                    querySubWorkflows(loginUser, pendingTasks, visitedWorkflows, true);
+            List<TaskDefinition> nextTasks = new ArrayList<>();
+            for (WorkflowDefinition workflow : subWorkflows) {
+                if (requireOnline && workflow.getReleaseState() != ReleaseState.ONLINE) {
+                    throw new ServiceException(Status.SUB_WORKFLOW_DEFINITION_NOT_RELEASE);
+                }
+                taskResourcePermissionChecker.checkExecutionSettings(workflow.getProjectCode(), workerGroup,
+                        environmentCode, tenantCode, warningGroupId);
+                List<? extends TaskDefinition> tasks = taskDefinitionLogDao
+                        .queryByWorkflowDefinitionCodeAndVersion(workflow.getCode(), workflow.getVersion());
+                taskResourcePermissionChecker.checkPermission(workflow.getProjectCode(), tasks);
+                nextTasks.addAll(tasks);
+            }
+            pendingTasks = nextTasks;
+        }
+    }
+
+    private void checkDependentReferences(User loginUser, Collection<? extends TaskDefinition> taskDefinitions,
+                                          Set<Long> viewedProjects) {
+        List<DependentItem> items = new ArrayList<>();
+        for (TaskDefinition task : taskDefinitions) {
+            if (!TaskTypeUtils.isDependentTask(task.getTaskType())) {
+                continue;
+            }
+            DependentParameters parameters;
+            try {
+                parameters = JSONUtils.parseObject(task.getTaskParams(), DependentParameters.class);
+            } catch (IllegalArgumentException ex) {
+                throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+            }
+            if (parameters == null || !parameters.checkParameters()) {
+                throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+            }
+            for (DependentTaskModel model : parameters.getDependence().getDependTaskList()) {
+                if (model == null || model.getDependItemList() == null || model.getDependItemList().isEmpty()) {
+                    throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+                }
+                for (DependentItem item : model.getDependItemList()) {
+                    if (item == null || item.getDefinitionCode() <= 0
+                            || (item.getDepTaskCode() <= 0
+                                    && item.getDepTaskCode() != Constants.DEPENDENT_WORKFLOW_CODE
+                                    && item.getDepTaskCode() != Constants.DEPENDENT_ALL_TASK_CODE)) {
+                        throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+                    }
+                    items.add(item);
+                }
+            }
+        }
+        if (items.isEmpty()) {
             return;
+        }
+        Set<Long> workflowCodes = items.stream().map(DependentItem::getDefinitionCode).collect(Collectors.toSet());
+        List<WorkflowDefinition> workflows = workflowDefinitionDao.queryByCodes(workflowCodes);
+        if (workflows == null) {
+            throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+        }
+        Map<Long, WorkflowDefinition> definitions = workflows.stream()
+                .collect(Collectors.toMap(WorkflowDefinition::getCode, workflow -> workflow));
+        Map<Long, Set<Long>> workflowTaskCodes = new HashMap<>();
+        for (DependentItem item : items) {
+            WorkflowDefinition workflow = definitions.get(item.getDefinitionCode());
+            if (workflow == null || workflow.getProjectCode() != item.getProjectCode()) {
+                throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+            }
+            if (viewedProjects.add(workflow.getProjectCode())) {
+                try {
+                    projectService.checkProjectPermission(loginUser, workflow.getProjectCode(), ProjectPermission.VIEW);
+                } catch (ServiceException ex) {
+                    throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+                }
+            }
+            if (item.getDepTaskCode() > 0) {
+                Set<Long> taskCodes = workflowTaskCodes.computeIfAbsent(workflow.getCode(), code -> taskDefinitionLogDao
+                        .queryByWorkflowDefinitionCodeAndVersion(code, workflow.getVersion()).stream()
+                        .filter(task -> task.getProjectCode() == workflow.getProjectCode())
+                        .map(TaskDefinition::getCode).collect(Collectors.toSet()));
+                if (!taskCodes.contains(item.getDepTaskCode())) {
+                    throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
+                }
+            }
+        }
+    }
+
+    private List<WorkflowDefinition> querySubWorkflows(User loginUser,
+                                                       Collection<? extends TaskDefinition> taskDefinitions,
+                                                       Set<Long> visitedWorkflows, boolean checkExecute) {
+        if (taskDefinitions == null || taskDefinitions.isEmpty()) {
+            return Collections.emptyList();
         }
 
         Set<Long> subWorkflowDefinitionCodes = new HashSet<>();
@@ -68,9 +211,12 @@ public class TaskSubWorkflowPermissionChecker {
             }
         }
 
+        subWorkflowDefinitionCodes.removeAll(visitedWorkflows);
+
         if (subWorkflowDefinitionCodes.isEmpty()) {
-            return;
+            return Collections.emptyList();
         }
+        visitedWorkflows.addAll(subWorkflowDefinitionCodes);
 
         List<WorkflowDefinition> subWorkflowDefinitions =
                 workflowDefinitionDao.queryByCodes(subWorkflowDefinitionCodes);
@@ -88,13 +234,16 @@ public class TaskSubWorkflowPermissionChecker {
         Set<Long> subWorkflowProjectCodes = subWorkflowDefinitions.stream()
                 .map(WorkflowDefinition::getProjectCode)
                 .collect(Collectors.toSet());
-        try {
-            for (Long projectCode : subWorkflowProjectCodes) {
-                projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        if (checkExecute) {
+            try {
+                for (Long projectCode : subWorkflowProjectCodes) {
+                    projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.EXECUTE);
+                }
+            } catch (ServiceException ex) {
+                log.warn("Referenced sub workflow is unavailable, userId:{}.", loginUser.getId());
+                throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
             }
-        } catch (ServiceException ex) {
-            log.warn("Referenced sub workflow is unavailable, userId:{}.", loginUser.getId());
-            throw new ServiceException(Status.RESOURCE_NOT_EXIST_OR_NO_PERMISSION);
         }
+        return subWorkflowDefinitions;
     }
 }

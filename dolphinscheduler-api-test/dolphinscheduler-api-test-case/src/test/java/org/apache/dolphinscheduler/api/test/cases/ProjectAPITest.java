@@ -148,9 +148,8 @@ public class ProjectAPITest {
         HttpResponse queryUnauthorizedProjectResponse =
                 projectPage.queryUnauthorizedProject(loginUser, loginUser.getId());
         Assertions.assertTrue(queryUnauthorizedProjectResponse.getBody().getSuccess());
-        // project-new was created by instead of authorized to this user, therefore, it should be in the unauthorized
-        // list
-        Assertions.assertTrue(queryUnauthorizedProjectResponse.getBody().getData().toString().contains("project-new"));
+        // Project creators receive all project permissions when the project is created.
+        Assertions.assertFalse(queryUnauthorizedProjectResponse.getBody().getData().toString().contains("project-new"));
     }
 
     @Test
@@ -158,9 +157,8 @@ public class ProjectAPITest {
     public void testQueryAuthorizedProject() {
         HttpResponse queryAuthorizedProjectResponse = projectPage.queryAuthorizedProject(loginUser, loginUser.getId());
         Assertions.assertTrue(queryAuthorizedProjectResponse.getBody().getSuccess());
-        // project-new was created by instead of authorized to this user, therefore, it should not be in the authorized
-        // list
-        Assertions.assertFalse(queryAuthorizedProjectResponse.getBody().getData().toString().contains("project-new"));
+        // The authorized list includes projects for which the creator received permissions.
+        Assertions.assertTrue(queryAuthorizedProjectResponse.getBody().getData().toString().contains("project-new"));
     }
 
     @Test
@@ -184,8 +182,9 @@ public class ProjectAPITest {
         HttpResponse queryAuthorizedUserResponse = projectPage.queryAuthorizedUser(loginUser, code);
         List<LinkedHashMap> users = (List<LinkedHashMap>) queryAuthorizedUserResponse.getBody().getData();
         Assertions.assertTrue(queryAuthorizedUserResponse.getBody().getSuccess());
-        // admin has not authorized this project to any other users, therefore, the authorized user list should be empty
-        Assertions.assertEquals(users.size(), 0);
+        // The creator is an authorized member even before other users are added.
+        Assertions.assertEquals(1, users.size());
+        Assertions.assertEquals(loginUser.getId(), users.get(0).get("id"));
     }
 
     @Test

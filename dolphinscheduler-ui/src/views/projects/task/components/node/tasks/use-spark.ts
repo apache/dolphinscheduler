@@ -65,12 +65,12 @@ export function useSpark({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),
-      Fields.useEnvironmentName(model, !data?.id),
+      Fields.useEnvironmentName(model, !data?.id, projectCode),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useSpark(model),
+      ...Fields.useSpark(model, projectCode),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model

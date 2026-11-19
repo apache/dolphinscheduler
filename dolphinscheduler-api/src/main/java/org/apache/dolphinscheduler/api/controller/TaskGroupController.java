@@ -63,7 +63,7 @@ public class TaskGroupController extends BaseController {
     @Operation(summary = "create", description = "CREATE_TASK_GROUP_NOTE")
     @Parameters({
             @Parameter(name = "name", description = "NAME", schema = @Schema(implementation = String.class)),
-            @Parameter(name = "projectCode", description = "PROJECT_CODE", schema = @Schema(implementation = long.class)),
+            @Parameter(name = "projectCode", description = "Deprecated: task groups are shared resources", deprecated = true, schema = @Schema(implementation = long.class)),
             @Parameter(name = "description", description = "TASK_GROUP_DESCRIPTION", schema = @Schema(implementation = String.class)),
             @Parameter(name = "groupSize", description = "GROUP_SIZE", schema = @Schema(implementation = int.class)),
 
@@ -148,7 +148,7 @@ public class TaskGroupController extends BaseController {
     @ApiException(QUERY_TASK_GROUP_LIST_ERROR)
     public Result<PageInfo<TaskGroup>> queryTaskGroupByCode(@Parameter(hidden = true) @RequestAttribute(value = Constants.SESSION_USER) User loginUser,
                                                             @RequestParam("pageNo") Integer pageNo,
-                                                            @RequestParam(value = "projectCode", required = false) Long projectCode,
+                                                            @RequestParam(value = "projectCode") Long projectCode,
                                                             @RequestParam("pageSize") Integer pageSize) {
         PageInfo<TaskGroup> pageInfo =
                 taskGroupService.queryTaskGroupByProjectCode(loginUser, pageNo, pageSize, projectCode);

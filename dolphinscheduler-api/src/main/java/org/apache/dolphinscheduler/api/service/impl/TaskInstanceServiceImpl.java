@@ -17,8 +17,6 @@
 
 package org.apache.dolphinscheduler.api.service.impl;
 
-import static org.apache.dolphinscheduler.api.constants.ApiFuncIdentificationConstant.TASK_INSTANCE;
-
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -27,6 +25,7 @@ import org.apache.dolphinscheduler.api.service.TaskInstanceService;
 import org.apache.dolphinscheduler.api.service.UsersService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
+import org.apache.dolphinscheduler.common.enums.ProjectPermission;
 import org.apache.dolphinscheduler.common.enums.TaskExecuteType;
 import org.apache.dolphinscheduler.common.utils.DateUtils;
 import org.apache.dolphinscheduler.dao.entity.Project;
@@ -124,7 +123,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
                                                               Integer pageSize) {
         Result<PageInfo<TaskInstance>> result = new Result<>();
         // check user access for project
-        projectService.checkProjectAndAuthThrowException(loginUser, projectCode, TASK_INSTANCE);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.VIEW);
         int[] statusArray = null;
         if (stateType != null) {
             statusArray = new int[]{stateType.getCode()};
@@ -195,7 +194,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
     @Transactional
     @Override
     public void forceTaskSuccess(User loginUser, long projectCode, Integer taskInstanceId) {
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, projectCode);
+        projectService.checkProjectPermission(loginUser, projectCode, ProjectPermission.EXECUTE);
 
         TaskInstance task = taskInstanceDao.queryOptionalById(taskInstanceId)
                 .orElseThrow(() -> new ServiceException(Status.TASK_INSTANCE_NOT_FOUND));
@@ -233,7 +232,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Result result = new Result();
 
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.EXECUTE);
 
         TaskInstance taskInstance = taskInstanceDao.queryById(taskInstanceId);
         if (taskInstance == null || taskInstance.getProjectCode() != projectCode) {
@@ -256,7 +255,7 @@ public class TaskInstanceServiceImpl extends BaseServiceImpl implements TaskInst
         Result result = new Result();
 
         Project project = projectDao.queryByCode(projectCode);
-        projectService.checkHasProjectWritePermissionThrowException(loginUser, project);
+        projectService.checkProjectPermission(loginUser, project, ProjectPermission.EXECUTE);
 
         TaskInstance taskInstance = taskInstanceDao.queryById(taskInstanceId);
         if (taskInstance == null || taskInstance.getProjectCode() != projectCode) {

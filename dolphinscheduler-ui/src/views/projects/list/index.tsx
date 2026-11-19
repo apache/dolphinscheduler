@@ -29,7 +29,8 @@ import { useTable } from './use-table'
 import Card from '@/components/card'
 import Search from '@/components/input-search'
 import ProjectModal from './components/project-modal'
-import WorkerGroupModal from '@/views/projects/list/components/worker-group-modal'
+import ResourceAuthorizationModal from './components/resource-authorization-modal'
+import MemberAuthorizationModal from './components/member-authorization-modal'
 import totalCount from '@/utils/tableTotalCount'
 
 const list = defineComponent({
@@ -73,13 +74,8 @@ const list = defineComponent({
       requestData()
     }
 
-    const onCancelWorkerGroupModal = () => {
-      variables.showWorkerGroupModalRef = false
-    }
-
-    const onConfirmWorkerGroupModal = () => {
-      variables.showWorkerGroupModalRef = false
-      requestData()
+    const onCancelResourceModal = () => {
+      variables.showResourceModalRef = false
     }
 
     const handleChangePageSize = () => {
@@ -106,8 +102,7 @@ const list = defineComponent({
       handleSearch,
       onCancelModal,
       onConfirmModal,
-      onCancelWorkerGroupModal,
-      onConfirmWorkerGroupModal,
+      onCancelResourceModal,
       onClearSearch,
       handleChangePageSize,
       trim
@@ -174,11 +169,18 @@ const list = defineComponent({
           onCancelModal={this.onCancelModal}
           onConfirmModal={this.onConfirmModal}
         />
-        <WorkerGroupModal
-          showModalRef={this.showWorkerGroupModalRef}
-          row={this.row}
-          onCancelModal={this.onCancelWorkerGroupModal}
-          onConfirmModal={this.onConfirmWorkerGroupModal}
+        <MemberAuthorizationModal
+          showModalRef={this.showMemberModalRef}
+          projectCode={this.row.code}
+          onCancelModal={() => {
+            this.showMemberModalRef = false
+          }}
+          onUpdated={this.requestData}
+        />
+        <ResourceAuthorizationModal
+          showModalRef={this.showResourceModalRef}
+          projectCode={this.row.code}
+          onCancelModal={this.onCancelResourceModal}
         />
       </NSpace>
     )

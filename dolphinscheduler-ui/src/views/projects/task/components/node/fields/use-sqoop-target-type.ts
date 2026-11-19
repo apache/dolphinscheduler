@@ -23,7 +23,8 @@ import type { IJsonItem, IOption, SourceType } from '../types'
 
 export function useTargetType(
   model: { [field: string]: any },
-  unCustomSpan: Ref<number>
+  unCustomSpan: Ref<number>,
+  projectCode: number
 ): IJsonItem[] {
   const { t } = useI18n()
   const hiveSpan = ref(24)
@@ -306,6 +307,7 @@ export function useTargetType(
     },
     ...useDatasource(
       model,
+      projectCode,
       dataSourceSpan,
       'targetMysqlType',
       'targetMysqlDatasource'

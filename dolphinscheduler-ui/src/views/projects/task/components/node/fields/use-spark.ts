@@ -31,7 +31,10 @@ import {
 } from '.'
 import type { IJsonItem } from '../types'
 
-export function useSpark(model: { [field: string]: any }): IJsonItem[] {
+export function useSpark(
+  model: { [field: string]: any },
+  projectCode: number
+): IJsonItem[] {
   const { t } = useI18n()
   const mainClassSpan = computed(() =>
     model.programType === 'PYTHON' || model.programType === 'SQL' ? 0 : 24
@@ -152,7 +155,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
       }
     },
     useDeployMode(24, ref(true), showCluster),
-    useNamespace(),
+    useNamespace(projectCode),
     {
       type: 'input',
       field: 'appName',

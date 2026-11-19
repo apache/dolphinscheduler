@@ -54,12 +54,12 @@ export function useKubeflow({
       Fields.useDescription(),
       Fields.useTaskPriority(),
       Fields.useWorkerGroup(projectCode),
-      Fields.useEnvironmentName(model, !data?.id),
+      Fields.useEnvironmentName(model, !data?.id, projectCode),
       ...Fields.useTaskGroup(model, projectCode),
       ...Fields.useFailed(),
       Fields.useDelayTime(model),
       ...Fields.useTimeoutAlarm(model),
-      ...Fields.useKubeflow(model),
+      ...Fields.useKubeflow(model, projectCode),
       Fields.usePreTasks()
     ] as IJsonItem[],
     model
