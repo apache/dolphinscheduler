@@ -32,7 +32,6 @@ import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceTask
 import org.apache.dolphinscheduler.api.dto.workflowInstance.WorkflowInstanceVariablesDTO;
 import org.apache.dolphinscheduler.api.enums.Status;
 import org.apache.dolphinscheduler.api.exceptions.ServiceException;
-import org.apache.dolphinscheduler.api.permission.ProjectCodeValidator;
 import org.apache.dolphinscheduler.api.permission.TaskDatasourcePermissionChecker;
 import org.apache.dolphinscheduler.api.permission.TaskSubWorkflowPermissionChecker;
 import org.apache.dolphinscheduler.api.service.ProjectService;
@@ -43,6 +42,8 @@ import org.apache.dolphinscheduler.api.service.WorkflowInstanceService;
 import org.apache.dolphinscheduler.api.utils.PageInfo;
 import org.apache.dolphinscheduler.api.utils.Result;
 import org.apache.dolphinscheduler.api.utils.SensitivePropertyUtils;
+import org.apache.dolphinscheduler.api.validator.TaskProjectValidator;
+import org.apache.dolphinscheduler.api.validator.WorkflowRelationValidator;
 import org.apache.dolphinscheduler.api.vo.WorkflowInstanceSummaryVO;
 import org.apache.dolphinscheduler.common.constants.Constants;
 import org.apache.dolphinscheduler.common.enums.ContextType;
@@ -168,7 +169,10 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
     private TaskInstanceContextDao taskInstanceContextDao;
 
     @Autowired
-    private ProjectCodeValidator projectCodeValidator;
+    private TaskProjectValidator taskProjectValidator;
+
+    @Autowired
+    private WorkflowRelationValidator workflowRelationValidator;
 
     @Autowired
     private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
@@ -413,14 +417,18 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 .queryByCode(workflowInstance.getWorkflowDefinitionCode())
                 .orElseThrow(() -> new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
                         workflowInstance.getWorkflowDefinitionCode()));
-        ProjectCodeValidator.requireProject(projectCode, workflowDefinition.getProjectCode());
+        if (projectCode != workflowDefinition.getProjectCode()) {
+            throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+        }
         WorkflowDefinitionLog recordedDefinition = workflowDefinitionLogMapper.queryByDefinitionCodeAndVersion(
                 workflowInstance.getWorkflowDefinitionCode(), workflowInstance.getWorkflowDefinitionVersion());
         if (recordedDefinition == null) {
             throw new ServiceException(Status.WORKFLOW_DEFINITION_NOT_EXIST,
                     workflowInstance.getWorkflowDefinitionCode());
         }
-        ProjectCodeValidator.requireProject(projectCode, recordedDefinition.getProjectCode());
+        if (projectCode != recordedDefinition.getProjectCode()) {
+            throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+        }
 
         String timezoneId;
         final ICommandParam commandParam = parseObject(workflowInstance.getCommandParam(), ICommandParam.class);
@@ -448,10 +456,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
                 throw new ServiceException(Status.WORKFLOW_NODE_S_PARAMETER_INVALID, taskDefinitionLog.getName());
             }
         }
-        projectCodeValidator.validateTasks(projectCode, taskDefinitionLogs);
+        taskProjectValidator.validate(new TaskProjectValidator.Context(projectCode, taskDefinitionLogs));
         List<WorkflowTaskRelationLog> taskRelationList =
                 JSONUtils.toList(taskRelationJson, WorkflowTaskRelationLog.class);
-        projectCodeValidator.validateRelations(projectCode, workflowDefinition.getCode(), taskRelationList);
+        workflowRelationValidator.validate(
+                new WorkflowRelationValidator.Context(projectCode, workflowDefinition.getCode(), taskRelationList));
         List<TaskDefinition> versionKeys = new ArrayList<>();
         for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
             if (taskDefinitionLog.getCode() > 0 && taskDefinitionLog.getVersion() > 0) {
