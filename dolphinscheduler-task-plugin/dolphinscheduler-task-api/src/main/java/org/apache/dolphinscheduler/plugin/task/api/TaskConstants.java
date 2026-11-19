@@ -38,6 +38,22 @@ public class TaskConstants {
     public static final String DATASOURCE_PASSWORD_REGEX =
             "(?<=((?i)password((\" : \")|(\":\")|(\\\\\":\\\\\")|(=')))).*?(?=((\")|(\\\\\")|(')))";
 
+    /**
+     * Regex to mask S3/OSS/COS access keys and secret keys in task instance logs, see issue #17398.
+     * Covers the key names used in the codebase: "access-key", "secret-key", "accessKey",
+     * "secretKey", "accessKeyId", "accessKeySecret", "access.key.id", "access.key.secret"
+     * and "secret.access.key". The value is masked no matter whether the log line is JSON-like
+     * ({@code "access-key":"..."}, {@code "access-key" : "..."} or escaped nested JSON),
+     * Java {@code toString()} style ({@code accessKey='...'}) or key=value / properties-like
+     * output ({@code access.key.id=...}).
+     * <p>
+     * The bare {@code =} separator is guarded by {@code (?!['"])} so that a quoted value such as
+     * {@code accessKeyId='...'} is masked as {@code accessKeyId='******'} instead of matching
+     * an empty value right after {@code =} and leaking the value.
+     */
+    public static final String STORAGE_ACCESS_KEY_REGEX =
+            "(?<=((?i)(access-key|secret-key|accessKeyId|accessKeySecret|accessKey|secretKey|access\\.key\\.id|access\\.key\\.secret|secret\\.access\\.key)((\" : \")|(\":\")|(\": \")|(\\\\\":\\\\\")|(='|=(?!['\"]))))).*?(?=((\")|(\\\\\")|(')|(,)|(\\))|(})|($)))";
+
     public static final int EXIT_CODE_KILL = 137;
     public static final int EXIT_CODE_HARD_KILL = 143;
     public static final int EXIT_CODE_SIGINT_KILL = 130;
