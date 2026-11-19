@@ -57,6 +57,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.util.concurrent.Uninterruptibles;
 
 @Slf4j
 @Component
@@ -77,7 +78,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private boolean flag = false;
+    private volatile boolean flag = false;
 
     private Thread internalThread;
 
@@ -114,8 +115,17 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 final StopWatch taskGroupCoordinatorRoundCost = StopWatch.createStarted();
 
                 amendTaskGroupUseSize();
+                if (!flag) {
+                    break;
+                }
                 amendTaskGroupQueueStatus();
+                if (!flag) {
+                    break;
+                }
                 dealWithForceStartTaskGroupQueue();
+                if (!flag) {
+                    break;
+                }
                 dealWithWaitingTaskGroupQueue();
 
                 taskGroupCoordinatorRoundCost.stop();
@@ -124,7 +134,9 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
                 log.error("TaskGroupCoordinator error", e);
             } finally {
                 // sleep 5s
-                ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5);
+                if (flag) {
+                    ThreadUtils.sleep(Constants.SLEEP_TIME_MILLIS * 5);
+                }
             }
         }
     }
@@ -161,7 +173,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         int minTaskGroupQueueId = -1;
         int limit = DEFAULT_LIMIT;
         StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
-        while (true) {
+        while (flag) {
             List<TaskGroupQueue> taskGroupQueues =
                     taskGroupQueueDao.queryInQueueTaskGroupQueue(minTaskGroupQueueId, limit);
             if (CollectionUtils.isEmpty(taskGroupQueues)) {
@@ -214,7 +226,7 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
         int minTaskGroupQueueId = -1;
         int limit = DEFAULT_LIMIT;
         StopWatch taskGroupCoordinatorRoundTimeCost = StopWatch.createStarted();
-        while (true) {
+        while (flag) {
             final List<TaskGroupQueue> taskGroupQueues =
                     taskGroupQueueDao.queryWaitNotifyForceStartTaskGroupQueue(minTaskGroupQueueId, limit);
             if (CollectionUtils.isEmpty(taskGroupQueues)) {
@@ -517,20 +529,20 @@ public class TaskGroupCoordinator implements ITaskGroupCoordinator, AutoCloseabl
     }
 
     @Override
-    public synchronized void close() {
-        if (!flag) {
-            log.warn("TaskGroupCoordinator is already closed");
-            return;
-        }
+    public synchronized void requestStop() {
         flag = false;
-        try {
-            if (internalThread != null) {
-                internalThread.interrupt();
-            }
-        } catch (Exception ex) {
-            log.error("Close internalThread failed", ex);
+        if (internalThread != null) {
+            internalThread.interrupt();
         }
-        internalThread = null;
+    }
+
+    @Override
+    public synchronized void close() {
+        requestStop();
+        if (internalThread != null) {
+            Uninterruptibles.joinUninterruptibly(internalThread);
+            internalThread = null;
+        }
         log.info("TaskGroupCoordinator closed");
     }
 }

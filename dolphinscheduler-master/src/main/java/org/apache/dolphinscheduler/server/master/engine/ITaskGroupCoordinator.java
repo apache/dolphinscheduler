@@ -53,6 +53,11 @@ public interface ITaskGroupCoordinator extends AutoCloseable {
     void start();
 
     /**
+     * Request the current worker to stop without waiting for it to exit.
+     */
+    void requestStop();
+
+    /**
      * If the {@link TaskInstance#getTaskGroupId()} > 0, and the TaskGroup flag is {@link Flag#YES} then the task instance need to use task group.
      *
      * @param taskInstance task instance

@@ -35,7 +35,15 @@ import org.apache.dolphinscheduler.dao.repository.TaskGroupQueueDao;
 import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,6 +54,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import com.google.common.collect.Lists;
 
@@ -171,4 +180,61 @@ class TaskGroupCoordinatorTest {
         verify(taskGroupQueueDao, Mockito.times(1)).deleteById(taskGroupQueue);
 
     }
+    @Test
+    void closeMustWaitForOldWorkerBeforeRestart() throws Exception {
+        CountDownLatch inDao = new CountDownLatch(1);
+        CountDownLatch interrupted = new CountDownLatch(1);
+        CountDownLatch releaseDao = new CountDownLatch(1);
+        AtomicReference<Thread> oldWorker = new AtomicReference<>();
+        when(taskGroupDao.queryAllTaskGroups()).thenAnswer(invocation -> {
+            if (oldWorker.compareAndSet(null, Thread.currentThread())) {
+                Thread.interrupted();
+                inDao.countDown();
+                boolean wasInterrupted = false;
+                while (releaseDao.getCount() != 0) {
+                    try {
+                        releaseDao.await();
+                    } catch (InterruptedException ex) {
+                        wasInterrupted = true;
+                        interrupted.countDown();
+                    }
+                }
+                if (wasInterrupted) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+            return Collections.emptyList();
+        });
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        Future<?> closing = null;
+        Future<?> restarting = null;
+        try {
+            taskGroupCoordinator.start();
+            // Skip the existing one-minute startup delay, then block in the real worker's DAO path.
+            ((Thread) ReflectionTestUtils.getField(taskGroupCoordinator, "internalThread")).interrupt();
+            assertTrue(inDao.await(2, TimeUnit.SECONDS));
+            closing = executor.submit(taskGroupCoordinator::close);
+            assertTrue(interrupted.await(2, TimeUnit.SECONDS));
+            Future<?> pendingClose = closing;
+            assertThrows(TimeoutException.class, () -> pendingClose.get(200, TimeUnit.MILLISECONDS));
+            restarting = executor.submit(taskGroupCoordinator::start);
+            Future<?> pendingRestart = restarting;
+            assertThrows(TimeoutException.class, () -> pendingRestart.get(200, TimeUnit.MILLISECONDS));
+            releaseDao.countDown();
+            closing.get(2, TimeUnit.SECONDS);
+            restarting.get(2, TimeUnit.SECONDS);
+            assertFalse(oldWorker.get().isAlive());
+        } finally {
+            releaseDao.countDown();
+            if (closing != null) {
+                closing.get(2, TimeUnit.SECONDS);
+            }
+            if (restarting != null) {
+                restarting.get(2, TimeUnit.SECONDS);
+            }
+            taskGroupCoordinator.close();
+            executor.shutdownNow();
+        }
+    }
+
 }
