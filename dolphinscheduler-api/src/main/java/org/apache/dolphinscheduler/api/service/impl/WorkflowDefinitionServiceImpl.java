@@ -1684,7 +1684,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 .stream()
                 .map(WorkflowTaskRelation::new)
                 .collect(Collectors.toList());
-        List<TaskCodeVersionDto> taskDefinitionList = getTaskCodeVersionDtos(workflowTaskRelationList);
+        List<TaskCodeVersionDto> taskDefinitionList = getTaskCodeVersionDtos(workflowTaskRelationList).stream()
+                .distinct()
+                .collect(Collectors.toList());
         List<TaskDefinitionLog> taskDefinitionLogList = CollectionUtils.isEmpty(taskDefinitionList)
                 ? Collections.emptyList()
                 : taskDefinitionLogMapper.queryByTaskDefinitions(taskDefinitionList.stream()
@@ -1694,6 +1696,20 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                             taskDefinitionLog.setVersion(taskCodeVersionDto.getVersion());
                             return Stream.of(taskDefinitionLog);
                         }).collect(Collectors.toList()));
+        Set<TaskCodeVersionDto> missingTaskVersions = new HashSet<>(taskDefinitionList);
+        for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogList) {
+            TaskCodeVersionDto taskVersion = new TaskCodeVersionDto();
+            taskVersion.setCode(taskDefinitionLog.getCode());
+            taskVersion.setVersion(taskDefinitionLog.getVersion());
+            missingTaskVersions.remove(taskVersion);
+        }
+        if (!missingTaskVersions.isEmpty()) {
+            String missingTasks = missingTaskVersions.stream()
+                    .map(task -> task.getCode() + " (version " + task.getVersion() + ")")
+                    .sorted()
+                    .collect(Collectors.joining(", "));
+            throw new ServiceException(Status.TASK_DEFINE_NOT_EXIST, missingTasks);
+        }
         workflowRelationValidator
                 .validate(new WorkflowRelationValidator.Context(projectCode, code, workflowTaskRelationList));
         taskProjectValidator.validate(new TaskProjectValidator.Context(projectCode, taskDefinitionLogList));
