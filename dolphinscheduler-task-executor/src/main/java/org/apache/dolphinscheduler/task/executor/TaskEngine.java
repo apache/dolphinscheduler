@@ -60,13 +60,23 @@ public class TaskEngine implements ITaskEngine {
     }
 
     @Override
-    public void submitTask(final ITaskExecutor taskExecutor) throws TaskExecutorRuntimeException {
+    public synchronized void submitTask(final ITaskExecutor taskExecutor) throws TaskExecutorRuntimeException {
         try (final TaskExecutorMDCUtils.MDCAutoClosable ignore = TaskExecutorMDCUtils.logWithMDC(taskExecutor)) {
+            if (taskExecutorRepository.contains(taskExecutor.getId())) {
+                log.info("TaskExecutor {} has already been accepted, skip duplicate dispatch", taskExecutor.getId());
+                return;
+            }
             final ITaskExecutorContainer executorContainer = taskExecutorContainerDelegator.getExecutorContainer();
             executorContainer.dispatch(taskExecutor);
+            try {
+                taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorDispatchedLifecycleEvent.of(taskExecutor));
+                executorContainer.start(taskExecutor);
+            } catch (RuntimeException ex) {
+                executorContainer.cancelDispatch(taskExecutor);
+                throw ex;
+            }
+            // Expose the event bus only after submission succeeds, so a rejected dispatch cannot reach the master.
             taskExecutorRepository.put(taskExecutor);
-            taskExecutor.getTaskExecutorEventBus().publish(TaskExecutorDispatchedLifecycleEvent.of(taskExecutor));
-            executorContainer.start(taskExecutor);
         }
     }
 

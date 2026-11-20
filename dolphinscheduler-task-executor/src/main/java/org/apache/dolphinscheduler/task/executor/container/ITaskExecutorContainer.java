@@ -37,6 +37,11 @@ public interface ITaskExecutorContainer {
     void start(final ITaskExecutor taskExecutor);
 
     /**
+     * Release the registration of a dispatch that failed before starting the executor.
+     */
+    void cancelDispatch(final ITaskExecutor taskExecutor);
+
+    /**
      * Pause the task executor by the task instance id.
      */
     void pause(final ITaskExecutor taskExecutor);

@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 import org.apache.dolphinscheduler.dao.entity.TaskInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.server.master.config.TaskDispatchPolicy;
 import org.apache.dolphinscheduler.server.master.engine.WorkflowEventBus;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
@@ -41,6 +42,7 @@ import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExec
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.NoAvailableWorkerException;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchResultUnknownException;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerGroupNotFoundException;
 
 import java.time.Duration;
@@ -75,6 +77,7 @@ class WorkerGroupDispatcherTest {
     void dispatchTask() {
         ITaskExecution taskExecution = mock(ITaskExecution.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
+        when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(taskExecution.getTaskInstance()).thenReturn(taskInstance);
         when(taskExecution.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
         dispatcher.start();
@@ -89,6 +92,7 @@ class WorkerGroupDispatcherTest {
     void dispatchTask_withDelay() {
         ITaskExecution taskExecution = mock(ITaskExecution.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
+        when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(taskExecution.getTaskInstance()).thenReturn(taskInstance);
         when(taskExecution.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
         dispatcher.start();
@@ -103,12 +107,14 @@ class WorkerGroupDispatcherTest {
     void dispatchTask_withOneDelayTaskAnotherIsDispatchRetryTask() throws TaskDispatchException {
         final ITaskExecution delayTaskExecution = mock(ITaskExecution.class);
         final TaskInstance delayTaskInstance = mock(TaskInstance.class);
+        when(delayTaskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(delayTaskExecution.getTaskInstance()).thenReturn(delayTaskInstance);
         when(delayTaskExecution.getTaskExecutionContext()).thenReturn(TaskExecutionContext.builder().build());
         when(delayTaskExecution.getId()).thenReturn(1);
 
         final ITaskExecution dispatchRetryTaskExecution = mock(ITaskExecution.class);
         final TaskInstance dispatchRetryTaskInstance = mock(TaskInstance.class);
+        when(dispatchRetryTaskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(dispatchRetryTaskExecution.getTaskInstance()).thenReturn(dispatchRetryTaskInstance);
         when(dispatchRetryTaskExecution.getTaskExecutionContext())
                 .thenReturn(TaskExecutionContext.builder().dispatchFailTimes(1).build());
@@ -130,6 +136,7 @@ class WorkerGroupDispatcherTest {
     void dispatchTask_HasBeenRemoved() {
         ITaskExecution taskExecution = mock(ITaskExecution.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
+        when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(taskExecution.getTaskInstance()).thenReturn(taskInstance);
         when(taskExecution.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
 
@@ -147,6 +154,7 @@ class WorkerGroupDispatcherTest {
         // Arrange
         ITaskExecution taskExecution = mock(ITaskExecution.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
+        when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
         when(taskExecution.getTaskInstance()).thenReturn(taskInstance);
         when(taskExecution.getTaskExecutionContext()).thenReturn(new TaskExecutionContext());
 
@@ -367,10 +375,44 @@ class WorkerGroupDispatcherTest {
         verify(taskExecution.getWorkflowEventBus(), never()).publish(any(TaskFailedLifecycleEvent.class));
     }
 
+    @Test
+    void shouldNotFailUnknownDispatchWhenOverallTimeoutExpires() throws TaskDispatchException {
+        final TaskDispatchPolicy policy = new TaskDispatchPolicy();
+        policy.setDispatchTimeoutEnabled(true);
+        policy.setMaxTaskDispatchDuration(Duration.ofMillis(200));
+        dispatcher = new WorkerGroupDispatcher("TestGroup", taskExecutorClient, policy);
+        final ITaskExecution execution = mockTaskExecutionWithFirstDispatchTime(System.currentTimeMillis() - 500);
+        doThrow(new TaskDispatchResultUnknownException("response lost", null))
+                .when(taskExecutorClient).dispatch(execution);
+        dispatcher.start();
+        dispatcher.dispatchTask(execution, 0);
+
+        await().atMost(Duration.ofSeconds(4)).untilAsserted(() -> {
+            verify(taskExecutorClient, atLeast(2)).dispatch(execution);
+            verify(execution.getWorkflowEventBus(), never()).publish(any(TaskFailedLifecycleEvent.class));
+        });
+    }
+
+    @Test
+    void shouldSkipQueuedRetryAfterTaskHasBeenDispatched() throws TaskDispatchException {
+        final ITaskExecution execution = mockTaskExecutionWithFirstDispatchTime(System.currentTimeMillis());
+        when(execution.getTaskInstance().getState())
+                .thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS, TaskExecutionStatus.DISPATCH);
+        doThrow(new TaskDispatchResultUnknownException("response lost", null))
+                .when(taskExecutorClient).dispatch(execution);
+        dispatcher.start();
+        dispatcher.dispatchTask(execution, 0);
+
+        await().atMost(Duration.ofSeconds(3)).untilAsserted(() -> verify(taskExecutorClient).dispatch(execution));
+        await().during(Duration.ofSeconds(2)).atMost(Duration.ofSeconds(4))
+                .untilAsserted(() -> verify(taskExecutorClient, times(1)).dispatch(execution));
+    }
+
     // Helper to mock TaskExecution with firstDispatchTime
     private ITaskExecution mockTaskExecutionWithFirstDispatchTime(long firstDispatchTime) {
         ITaskExecution taskExecution = mock(ITaskExecution.class);
         TaskInstance taskInstance = mock(TaskInstance.class);
+        when(taskInstance.getState()).thenReturn(TaskExecutionStatus.SUBMITTED_SUCCESS);
         WorkflowInstance workflowInstance = mock(WorkflowInstance.class);
         WorkflowEventBus eventBus = mock(WorkflowEventBus.class);
 

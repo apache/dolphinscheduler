@@ -30,6 +30,7 @@ import org.apache.dolphinscheduler.server.master.config.MasterConfig;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.NoAvailableWorkerException;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchException;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchResultUnknownException;
 import org.apache.dolphinscheduler.server.master.exception.dispatch.WorkerGroupNotFoundException;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchRequest;
@@ -67,17 +68,19 @@ public class PhysicalTaskExecutorClientDelegator implements ITaskExecutorClientD
         final String taskName = taskExecutionContext.getTaskName();
         final String workerGroup = taskExecutionContext.getWorkerGroup();
 
-        // workerGroup not exist
-        if (!clusterManager.getWorkerClusters().containsWorkerGroup(workerGroup)) {
-            throw new WorkerGroupNotFoundException(workerGroup);
+        final String physicalTaskExecutorAddress;
+        if (taskExecutionContext.isDispatchResultUnknown()) {
+            physicalTaskExecutorAddress = taskExecutionContext.getHost();
+        } else {
+            if (!clusterManager.getWorkerClusters().containsWorkerGroup(workerGroup)) {
+                throw new WorkerGroupNotFoundException(workerGroup);
+            }
+            physicalTaskExecutorAddress = workerLoadBalancer
+                    .select(workerGroup)
+                    .map(Host::of)
+                    .map(Host::getAddress)
+                    .orElseThrow(() -> new NoAvailableWorkerException(workerGroup));
         }
-
-        // select an available worker from the worker group; throws NoAvailableWorkerException if none is available.
-        final String physicalTaskExecutorAddress = workerLoadBalancer
-                .select(workerGroup)
-                .map(Host::of)
-                .map(Host::getAddress)
-                .orElseThrow(() -> new NoAvailableWorkerException(workerGroup));
 
         taskExecutionContext.setHost(physicalTaskExecutorAddress);
         taskExecution.getTaskInstance().setHost(physicalTaskExecutorAddress);
@@ -88,15 +91,28 @@ public class PhysicalTaskExecutorClientDelegator implements ITaskExecutorClientD
                     .withHost(physicalTaskExecutorAddress)
                     .dispatchTask(TaskExecutorDispatchRequest.of(taskExecution.getTaskExecutionContext()));
             if (!taskExecutorDispatchResponse.isDispatchSuccess()) {
+                if (taskExecutionContext.isDispatchResultUnknown()) {
+                    // A rejection of this retry cannot resolve the outcome of an earlier request.
+                    throw new TaskDispatchResultUnknownException(
+                            "An earlier dispatch of task: " + taskName + " to " + physicalTaskExecutorAddress
+                                    + " is still unconfirmed: " + taskExecutorDispatchResponse,
+                            null);
+                }
+                taskExecutionContext.setHost(null);
+                taskExecution.getTaskInstance().setHost(null);
                 throw new TaskDispatchException(
                         "Dispatch task: " + taskName + " to " + physicalTaskExecutorAddress + " failed: "
                                 + taskExecutorDispatchResponse);
             }
+            taskExecutionContext.setDispatchResultUnknown(false);
         } catch (TaskDispatchException e) {
             throw e;
         } catch (Exception e) {
-            throw new TaskDispatchException(
-                    "Dispatch task: " + taskName + " to " + physicalTaskExecutorAddress + " failed", e);
+            taskExecutionContext.setDispatchResultUnknown(true);
+            throw new TaskDispatchResultUnknownException(
+                    "Dispatch task: " + taskName + " to " + physicalTaskExecutorAddress
+                            + " has an unknown result; retries must use the same worker",
+                    e);
         }
     }
 

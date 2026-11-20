@@ -17,10 +17,12 @@
 
 package org.apache.dolphinscheduler.server.worker.rpc;
 
+import org.apache.dolphinscheduler.extract.base.exception.RemoteException;
 import org.apache.dolphinscheduler.extract.worker.IPhysicalTaskExecutorOperator;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.server.worker.executor.PhysicalTaskEngineDelegator;
 import org.apache.dolphinscheduler.task.executor.eventbus.ITaskExecutorLifecycleEventReporter;
+import org.apache.dolphinscheduler.task.executor.exceptions.TaskExecutorCapacityExceededException;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchRequest;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorDispatchResponse;
 import org.apache.dolphinscheduler.task.executor.operations.TaskExecutorKillRequest;
@@ -52,9 +54,12 @@ public class PhysicalTaskExecutorOperatorImpl implements IPhysicalTaskExecutorOp
             physicalTaskEngineDelegator.dispatchLogicTask(taskExecutionContext);
             log.info("Handle TaskExecutorDispatchResponse: {} success", taskExecutorDispatchRequest);
             return TaskExecutorDispatchResponse.success();
+        } catch (TaskExecutorCapacityExceededException ex) {
+            log.info("Reject TaskExecutorDispatchRequest: {}: {}", taskExecutorDispatchRequest, ex.getMessage());
+            return TaskExecutorDispatchResponse.failed(ex.getMessage());
         } catch (Throwable throwable) {
             log.error("Handle TaskExecutorDispatchResponse: {} failed", taskExecutorDispatchRequest, throwable);
-            return TaskExecutorDispatchResponse.failed(ExceptionUtils.getMessage(throwable));
+            throw new RemoteException("Cannot confirm task dispatch result", throwable);
         }
     }
 

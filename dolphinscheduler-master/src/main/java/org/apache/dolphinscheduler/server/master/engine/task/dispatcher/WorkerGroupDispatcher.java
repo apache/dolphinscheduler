@@ -19,12 +19,14 @@ package org.apache.dolphinscheduler.server.master.engine.task.dispatcher;
 
 import org.apache.dolphinscheduler.common.thread.BaseDaemonThread;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
 import org.apache.dolphinscheduler.plugin.task.api.utils.LogUtils;
 import org.apache.dolphinscheduler.server.master.config.TaskDispatchPolicy;
 import org.apache.dolphinscheduler.server.master.engine.task.client.ITaskExecutorClient;
 import org.apache.dolphinscheduler.server.master.engine.task.dispatcher.event.TaskDispatchableEvent;
 import org.apache.dolphinscheduler.server.master.engine.task.execution.ITaskExecution;
 import org.apache.dolphinscheduler.server.master.engine.task.lifecycle.event.TaskFailedLifecycleEvent;
+import org.apache.dolphinscheduler.server.master.exception.dispatch.TaskDispatchResultUnknownException;
 import org.apache.dolphinscheduler.task.executor.log.TaskExecutorMDCUtils;
 
 import java.util.Date;
@@ -117,9 +119,15 @@ public class WorkerGroupDispatcher extends BaseDaemonThread {
                         taskInstanceId);
                 return;
             }
+            final TaskExecutionStatus state = taskExecution.getTaskInstance().getState();
+            if (state != TaskExecutionStatus.SUBMITTED_SUCCESS && state != TaskExecutionStatus.DELAY_EXECUTION) {
+                log.info("Task: {} is already in state {}, skip queued dispatch", taskInstanceId, state);
+                return;
+            }
             taskExecutorClient.dispatch(taskExecution);
         } catch (Exception ex) {
-            if (taskDispatchPolicy.isDispatchTimeoutEnabled()) {
+            if (taskDispatchPolicy.isDispatchTimeoutEnabled()
+                    && !(ex instanceof TaskDispatchResultUnknownException)) {
                 // If a dispatch timeout occurs, the task will not be put back into the queue.
                 long elapsed = System.currentTimeMillis() - taskExecutionContext.getFirstDispatchTime();
                 if (elapsed > maxTaskDispatchMillis) {
