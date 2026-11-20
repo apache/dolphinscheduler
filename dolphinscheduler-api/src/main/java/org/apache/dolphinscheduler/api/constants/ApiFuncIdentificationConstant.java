@@ -74,7 +74,6 @@ public class ApiFuncIdentificationConstant {
     public static final String INSTANCE_UPDATE = "project:process-instance:update";
     public static final String VERSION_LIST = "project:version:list";
     public static final String TASK_DEFINITION = "project:task-definition:view";
-    public static final String TASK_DEFINITION_MOVE = "project:task-definition:move";
     public static final String TASK_VERSION_VIEW = "project:task-definition:version";
     public static final String TASK_DEFINITION_DELETE = "project:task-definition:delete";
 
