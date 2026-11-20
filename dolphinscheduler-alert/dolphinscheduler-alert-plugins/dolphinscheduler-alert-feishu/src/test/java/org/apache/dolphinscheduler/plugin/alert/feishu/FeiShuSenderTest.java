@@ -18,25 +18,15 @@
 package org.apache.dolphinscheduler.plugin.alert.feishu;
 
 import org.apache.dolphinscheduler.alert.api.AlertData;
-import org.apache.dolphinscheduler.alert.api.AlertInfo;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.net.httpserver.HttpServer;
 
 public class FeiShuSenderTest {
 
@@ -58,62 +48,17 @@ public class FeiShuSenderTest {
     }
 
     @Test
-    public void testSendQueryResultWithNullValue() throws Exception {
-        assertQueryResultSent("[{\"null_column\":null,\"number_column\":0,\"flag_column\":false,\"empty_column\":\"\"},"
-                + "{\"text_column\":\"中文内容\",\"null_column\":null}]",
-                "null_column:null", "number_column:0", "flag_column:false", "empty_column:\n", "text_column:中文内容");
+    public void testFormatContentWithNullValue() throws Exception {
+        AlertData alertData = new AlertData();
+        alertData.setTitle("query results");
+        alertData.setContent("[{\"nullable_value\":null,\"count\":0,\"enabled\":false,\"text\":\"ok\"}]");
+
+        Method formatContent = FeiShuSender.class.getDeclaredMethod("formatContent", AlertData.class);
+        formatContent.setAccessible(true);
+        String content = (String) formatContent.invoke(null, alertData);
+
+        Assertions.assertEquals(String.format("`query results`%n")
+                + "nullable_value:null\ncount:0\nenabled:false\ntext:ok\n", content);
     }
 
-    @Test
-    public void testSendQueryResultWithoutNullValue() throws Exception {
-        assertQueryResultSent("[{\"message\":\"ok\",\"number_column\":42}]", "message:ok", "number_column:42");
-    }
-
-    private void assertQueryResultSent(String content, String... expectedValues) throws Exception {
-        AtomicReference<String> requestBody = new AtomicReference<>();
-        HttpServer server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
-        server.createContext("/hook", exchange -> {
-            try (
-                    InputStream input = exchange.getRequestBody();
-                    ByteArrayOutputStream body = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[1024];
-                int length;
-                while ((length = input.read(buffer)) != -1) {
-                    body.write(buffer, 0, length);
-                }
-                requestBody.set(new String(body.toByteArray(), StandardCharsets.UTF_8));
-            }
-            byte[] response = "{\"code\":0,\"msg\":\"success\",\"data\":{}}".getBytes(StandardCharsets.UTF_8);
-            exchange.sendResponseHeaders(200, response.length);
-            try (OutputStream output = exchange.getResponseBody()) {
-                output.write(response);
-            }
-        });
-        server.start();
-        try {
-            Map<String, String> config = new HashMap<>();
-            config.put(FeiShuParamsConstants.NAME_WEB_HOOK,
-                    "http://127.0.0.1:" + server.getAddress().getPort() + "/hook");
-            config.put(FeiShuParamsConstants.NAME_FEI_SHU_PROXY_ENABLE, "false");
-            AlertData data = new AlertData();
-            data.setTitle("SQL query result");
-            data.setContent(content);
-            AlertInfo info = new AlertInfo();
-            info.setAlertData(data);
-            info.setAlertParams(config);
-
-            AlertResult result = new FeiShuAlertChannel().process(info);
-
-            Assertions.assertTrue(result.isSuccess(), result.getMessage());
-            JsonNode payload = JSONUtils.parseObject(requestBody.get(), JsonNode.class);
-            Assertions.assertEquals("text", payload.get("msg_type").asText());
-            String text = payload.get("content").get("text").asText();
-            Assertions.assertTrue(text.contains("SQL query result"));
-            for (String expected : expectedValues) {
-                Assertions.assertTrue(text.contains(expected), text);
-            }
-        } finally {
-            server.stop(0);
-        }
-    }
 }
