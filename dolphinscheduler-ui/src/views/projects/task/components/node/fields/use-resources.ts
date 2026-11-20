@@ -28,7 +28,8 @@ import { useClipboard } from '@vueuse/core'
 export function useResources(
   span: number | Ref<number> = 24,
   required: boolean | Ref<boolean> = false,
-  limit: number | Ref<number> = -1
+  limit: number | Ref<number> = -1,
+  field: string = 'resourceList'
 ): IJsonItem {
   const { t } = useI18n()
 
@@ -141,7 +142,7 @@ export function useResources(
 
   return {
     type: 'tree-select',
-    field: 'resourceList',
+    field,
     class: 'resource-select',
     name: t('project.node.resources'),
     span: span,
