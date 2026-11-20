@@ -140,6 +140,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.Lists;
@@ -1431,6 +1432,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                     workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode());
             List<WorkflowTaskRelationLog> taskRelationList =
                     workflowTaskRelations.stream().map(WorkflowTaskRelationLog::new).collect(Collectors.toList());
+            final long sourceProjectCode = workflowDefinition.getProjectCode();
             workflowDefinition.setProjectCode(targetProjectCode);
             log.info("Copy workflow definition...");
             List<TaskDefinitionLog> taskDefinitionLogs =
@@ -1438,6 +1440,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             Map<Long, Long> taskCodeMap = new HashMap<>();
             taskDefinitionLogs.forEach(
                     taskDefinitionLog -> taskCodeMap.put(taskDefinitionLog.getCode(), CodeGenerateUtils.genCode()));
+            final long oldWorkflowDefinitionCode = workflowDefinition.getCode();
+            final long newWorkflowDefinitionCode = CodeGenerateUtils.genCode();
             for (TaskDefinitionLog taskDefinitionLog : taskDefinitionLogs) {
                 taskDefinitionLog.setCode(taskCodeMap.get(taskDefinitionLog.getCode()));
                 taskDefinitionLog.setProjectCode(targetProjectCode);
@@ -1451,6 +1455,11 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                 if (TaskTypeUtils.isConditionTask(taskDefinitionLog.getTaskType())) {
                     replaceTaskCodeForConditionTaskParams(taskDefinitionLog, taskCodeMap);
                 }
+
+                if (TaskTypeUtils.isDependentTask(taskDefinitionLog.getTaskType())) {
+                    replaceSelfReferencesForDependentTaskParams(taskDefinitionLog, sourceProjectCode,
+                            oldWorkflowDefinitionCode, newWorkflowDefinitionCode, taskCodeMap);
+                }
             }
 
             for (WorkflowTaskRelationLog workflowTaskRelationLog : taskRelationList) {
@@ -1463,8 +1472,7 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                             .setPostTaskCode(taskCodeMap.get(workflowTaskRelationLog.getPostTaskCode()));
                 }
             }
-            final long oldWorkflowDefinitionCode = workflowDefinition.getCode();
-            workflowDefinition.setCode(CodeGenerateUtils.genCode());
+            workflowDefinition.setCode(newWorkflowDefinitionCode);
 
             workflowDefinition.setId(null);
             workflowDefinition.setUserId(loginUser.getId());
@@ -1619,6 +1627,30 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             replaceInNodeList(result::getFailedNode, result::setFailedNode, taskCodeMap);
         }
 
+        taskDefLog.setTaskParams(JSONUtils.toJsonString(params));
+    }
+
+    private void replaceSelfReferencesForDependentTaskParams(TaskDefinitionLog taskDefLog,
+                                                             long sourceProjectCode,
+                                                             long sourceWorkflowDefinitionCode,
+                                                             long targetWorkflowDefinitionCode,
+                                                             Map<Long, Long> taskCodeMap) {
+        ObjectNode params = JSONUtils.parseObject(taskDefLog.getTaskParams(), ObjectNode.class);
+        for (JsonNode taskModel : params.path("dependence").path("dependTaskList")) {
+            for (JsonNode item : taskModel.path("dependItemList")) {
+                if (item.path("projectCode").asLong() != sourceProjectCode
+                        || item.path("definitionCode").asLong() != sourceWorkflowDefinitionCode) {
+                    continue;
+                }
+                ObjectNode dependentItem = (ObjectNode) item;
+                dependentItem.put("projectCode", taskDefLog.getProjectCode());
+                dependentItem.put("definitionCode", targetWorkflowDefinitionCode);
+                long oldTaskCode = item.path("depTaskCode").asLong();
+                if (taskCodeMap.containsKey(oldTaskCode)) {
+                    dependentItem.put("depTaskCode", taskCodeMap.get(oldTaskCode));
+                }
+            }
+        }
         taskDefLog.setTaskParams(JSONUtils.toJsonString(params));
     }
 
