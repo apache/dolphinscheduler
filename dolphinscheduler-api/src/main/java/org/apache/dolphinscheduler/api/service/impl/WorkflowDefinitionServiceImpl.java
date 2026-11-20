@@ -75,11 +75,13 @@ import org.apache.dolphinscheduler.dao.entity.User;
 import org.apache.dolphinscheduler.dao.entity.UserWithWorkflowDefinitionCode;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinition;
 import org.apache.dolphinscheduler.dao.entity.WorkflowDefinitionLog;
+import org.apache.dolphinscheduler.dao.entity.WorkflowInstance;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskLineage;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelation;
 import org.apache.dolphinscheduler.dao.entity.WorkflowTaskRelationLog;
 import org.apache.dolphinscheduler.dao.mapper.TaskDefinitionLogMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowDefinitionLogMapper;
+import org.apache.dolphinscheduler.dao.mapper.WorkflowInstanceMapper;
 import org.apache.dolphinscheduler.dao.mapper.WorkflowTaskRelationLogMapper;
 import org.apache.dolphinscheduler.dao.model.PageListingResult;
 import org.apache.dolphinscheduler.dao.model.WorkflowInstanceSummaryDto;
@@ -139,6 +141,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -160,6 +163,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
 
     @Autowired
     private WorkflowDefinitionLogMapper workflowDefinitionLogMapper;
+
+    @Autowired
+    private WorkflowInstanceMapper workflowInstanceMapper;
 
     @Autowired
     private WorkflowDefinitionDao workflowDefinitionDao;
@@ -773,6 +779,9 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
                                                  WorkflowDefinition workflowDefinition,
                                                  WorkflowDefinition workflowDefinitionDeepCopy,
                                                  List<TaskDefinitionLog> taskDefinitionLogs) {
+        workflowRelationValidator.validate(
+                new WorkflowRelationValidator.Context(workflowDefinition.getProjectCode(), workflowDefinition.getCode(),
+                        workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode())));
         taskProjectValidator
                 .validate(new TaskProjectValidator.Context(workflowDefinition.getProjectCode(), taskDefinitionLogs));
         workflowRelationValidator.validate(
@@ -1668,6 +1677,8 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
         if (projectCode != workflowDefinitionLog.getProjectCode()) {
             throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
         }
+        workflowRelationValidator.validate(new WorkflowRelationValidator.Context(projectCode, code,
+                workflowTaskRelationDao.queryByWorkflowDefinitionCode(code)));
         List<WorkflowTaskRelation> workflowTaskRelationList = workflowTaskRelationLogMapper
                 .queryByWorkflowCodeAndVersion(workflowDefinitionLog.getCode(), workflowDefinitionLog.getVersion())
                 .stream()
@@ -1793,13 +1804,10 @@ public class WorkflowDefinitionServiceImpl extends BaseServiceImpl implements Wo
             log.warn("This version: {} of workflow: {} is the main version cannot delete by version", code, version);
             throw new ServiceException(Status.MAIN_TABLE_USING_VERSION);
         }
-        // check whether there exist running workflow instance under the workflow definition
-        List<WorkflowInstanceSummaryDto> workflowInstances = workflowInstanceService.queryByWorkflowCodeVersionStatus(
-                code,
-                version,
-                WorkflowExecutionStatus.NOT_TERMINAL_STATES);
-        if (CollectionUtils.isNotEmpty(workflowInstances)) {
-            throw new ServiceException(Status.DELETE_WORKFLOW_DEFINITION_EXECUTING_FAIL, workflowInstances.size());
+        // Finished instances also need their recorded definition version to remain editable.
+        if (workflowInstanceMapper.selectCount(new QueryWrapper<WorkflowInstance>()
+                .eq("workflow_definition_code", code).eq("workflow_definition_version", version)) > 0) {
+            throw new ServiceException(Status.WORKFLOW_DEFINITION_VERSION_IS_USED);
         }
 
         int deleteLog = workflowDefinitionLogMapper.deleteByWorkflowDefinitionCodeAndVersion(code, version);
