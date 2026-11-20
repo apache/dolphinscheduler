@@ -59,6 +59,8 @@ This document records the incompatible updates between each version. You need to
 
 ## 3.5.0
 
+* Python Gateway no longer provides a default `api.python-gateway.auth-token`. Set a non-blank token when enabling the gateway. API, Master, Worker, Alert and Standalone no longer provide default Actuator credentials; set both `management.security.username` and `management.security.password` to non-blank values before enabling `management.security.enabled`. Missing or blank required credentials cause startup to fail. Disabled features do not require credentials. ([#18812](https://github.com/apache/dolphinscheduler/issues/18812))
+
 * Internal RPC authentication is disabled by default. Upgrade all services before coordinating `rpc.authentication.enabled=true` with the same `rpc.authentication.secret` in each service's `common.properties`; authenticated and unauthenticated services cannot communicate. Credentials are cached for the process lifetime, so enablement and rotation require restarting services. See [RPC authentication](../security/authentication-type.md#inter-service-rpc-authentication).
 
 * Master, Worker and Alert Server now generate heartbeat snapshots on RPC requests and share a thread-safe system-metrics cache with a one-second refresh interval. `BaseHeartBeatTask` and the Master/Worker/Alert heartbeat task subclasses have been removed; custom integrations that extend them must manage scheduling explicitly. Alert Server no longer schedules registry heartbeat writes. It registers stable process identity at startup and restores registration on reconnect. `alert.max-heartbeat-interval` is removed; API queries Alert heartbeat data directly over RPC when requested.
