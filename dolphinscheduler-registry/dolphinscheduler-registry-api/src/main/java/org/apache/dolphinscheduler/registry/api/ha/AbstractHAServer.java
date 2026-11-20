@@ -50,7 +50,7 @@ public abstract class AbstractHAServer implements HAServer {
     public AbstractHAServer(final Registry registry, final String selectorPath, final String serverIdentify) {
         this.registry = registry;
         this.selectorPath = checkNotNull(selectorPath);
-        this.serverIdentify = checkNotNull(serverIdentify);
+        this.serverIdentify = checkNotNull(serverIdentify) + "#" + System.currentTimeMillis();
         this.serverStatus = ServerStatus.STAND_BY;
         this.serverStatusChangeListeners = Lists.newArrayList(new DefaultServerStatusChangeListener());
     }

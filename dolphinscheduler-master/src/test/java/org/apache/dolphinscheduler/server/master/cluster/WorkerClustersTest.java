@@ -33,7 +33,8 @@ class WorkerClustersTest {
     void testOnWorkerGroupDelete() {
         WorkerClusters workerClusters = new WorkerClusters();
         WorkerServerMetadata normalWorkerServerMetadata = getNormalWorkerServerMetadata();
-        workerClusters.onServerAdded(normalWorkerServerMetadata);
+        workerClusters.onServerAdded(normalWorkerServerMetadata.getServerIdentity());
+        workerClusters.onServerUpdate(normalWorkerServerMetadata);
 
         WorkerGroup workerGroup = WorkerGroup.builder()
                 .name("flinkCluster")
@@ -52,7 +53,8 @@ class WorkerClustersTest {
     void testOnWorkerGroupAdd() {
         WorkerClusters workerClusters = new WorkerClusters();
         WorkerServerMetadata normalWorkerServerMetadata = getNormalWorkerServerMetadata();
-        workerClusters.onServerAdded(normalWorkerServerMetadata);
+        workerClusters.onServerAdded(normalWorkerServerMetadata.getServerIdentity());
+        workerClusters.onServerUpdate(normalWorkerServerMetadata);
 
         WorkerGroup workerGroup = WorkerGroup.builder()
                 .name("flinkCluster")
@@ -67,7 +69,8 @@ class WorkerClustersTest {
     void testOnWorkerGroupChange() {
         WorkerClusters workerClusters = new WorkerClusters();
         WorkerServerMetadata normalWorkerServerMetadata = getNormalWorkerServerMetadata();
-        workerClusters.onServerAdded(normalWorkerServerMetadata);
+        workerClusters.onServerAdded(normalWorkerServerMetadata.getServerIdentity());
+        workerClusters.onServerUpdate(normalWorkerServerMetadata);
 
         WorkerGroup workerGroup = WorkerGroup.builder()
                 .name("flinkCluster")
@@ -92,8 +95,10 @@ class WorkerClustersTest {
         WorkerServerMetadata busyWorkerServerMetadata = getBusyWorkerServerMetadata();
 
         WorkerClusters workerClusters = new WorkerClusters();
-        workerClusters.onServerAdded(normalWorkerServerMetadata);
-        workerClusters.onServerAdded(busyWorkerServerMetadata);
+        workerClusters.onServerAdded(normalWorkerServerMetadata.getServerIdentity());
+        workerClusters.onServerUpdate(normalWorkerServerMetadata);
+        workerClusters.onServerAdded(busyWorkerServerMetadata.getServerIdentity());
+        workerClusters.onServerUpdate(busyWorkerServerMetadata);
         assertThat(workerClusters.getDbWorkerServerAddressByGroup("default"))
                 .containsExactly(normalWorkerServerMetadata.getAddress(), busyWorkerServerMetadata.getAddress());
         assertThat(workerClusters.getNormalWorkerServerAddressByGroup("default"))
@@ -106,9 +111,11 @@ class WorkerClustersTest {
         WorkerServerMetadata busyWorkerServerMetadata = getBusyWorkerServerMetadata();
 
         WorkerClusters workerClusters = new WorkerClusters();
-        workerClusters.onServerAdded(normalWorkerServerMetadata);
-        workerClusters.onServerAdded(busyWorkerServerMetadata);
-        workerClusters.onServerRemove(busyWorkerServerMetadata);
+        workerClusters.onServerAdded(normalWorkerServerMetadata.getServerIdentity());
+        workerClusters.onServerUpdate(normalWorkerServerMetadata);
+        workerClusters.onServerAdded(busyWorkerServerMetadata.getServerIdentity());
+        workerClusters.onServerUpdate(busyWorkerServerMetadata);
+        workerClusters.onServerRemove(busyWorkerServerMetadata.getServerIdentity());
 
         assertThat(workerClusters.getDbWorkerServerAddressByGroup("default"))
                 .containsExactly(normalWorkerServerMetadata.getAddress());
@@ -123,8 +130,10 @@ class WorkerClustersTest {
         WorkerServerMetadata busyWorkerServerMetadata = getBusyWorkerServerMetadata();
 
         WorkerClusters workerClusters = new WorkerClusters();
-        workerClusters.onServerAdded(normalWorkerServerMetadata);
-        workerClusters.onServerAdded(busyWorkerServerMetadata);
+        workerClusters.onServerAdded(normalWorkerServerMetadata.getServerIdentity());
+        workerClusters.onServerUpdate(normalWorkerServerMetadata);
+        workerClusters.onServerAdded(busyWorkerServerMetadata.getServerIdentity());
+        workerClusters.onServerUpdate(busyWorkerServerMetadata);
 
         WorkerServerMetadata workerServerMetadata = WorkerServerMetadata.builder()
                 .address("127.0.0.2:1235")
@@ -142,6 +151,44 @@ class WorkerClustersTest {
         assertThat(workerClusters.getNormalWorkerServerAddressByGroup("default"))
                 .containsExactly(normalWorkerServerMetadata.getAddress(), workerServerMetadata.getAddress());
         assertThat(workerClusters.getServers()).containsExactly(normalWorkerServerMetadata, workerServerMetadata);
+    }
+
+    @Test
+    void testFirstMetadataPopulatesConfiguredWorkerGroup() {
+        WorkerClusters clusters = new WorkerClusters();
+        WorkerServerMetadata registration = WorkerServerMetadata.builder().address("localhost:1234")
+                .workerGroup(null).serverStartupTime(1).processId(10).build();
+        clusters.onServerAdded(registration.getServerIdentity());
+        assertThat(clusters.getNormalWorkerServerAddressByGroup("default")).isEmpty();
+        WorkerServerMetadata metadata = WorkerServerMetadata.builder().address("localhost:1234")
+                .workerGroup("analytics").serverStartupTime(1).processId(10).serverStatus(ServerStatus.NORMAL).build();
+        clusters.onServerUpdate(metadata);
+        assertThat(clusters.getNormalWorkerServerAddressByGroup("analytics")).containsExactly("localhost:1234");
+        clusters.onServerRemove(registration.getServerIdentity());
+        assertThat(clusters.getServers()).isEmpty();
+        assertThat(clusters.getConfigWorkerServerAddressByGroup("analytics")).isEmpty();
+    }
+
+    @Test
+    void testWorkerGroupChangeUpdatesMapping() {
+        WorkerClusters clusters = new WorkerClusters();
+        clusters.onServerUpdate(WorkerServerMetadata.builder().address("localhost:1234").workerGroup("old").build());
+        clusters.onServerUpdate(WorkerServerMetadata.builder().address("localhost:1234").workerGroup("new").build());
+        assertThat(clusters.getConfigWorkerServerAddressByGroup("old")).isEmpty();
+        assertThat(clusters.getConfigWorkerServerAddressByGroup("new")).containsExactly("localhost:1234");
+    }
+
+    @Test
+    void testRemovalOfPreviousProcessKeepsRestartedWorker() {
+        WorkerClusters clusters = new WorkerClusters();
+        WorkerServerMetadata restarted = WorkerServerMetadata.builder().address("localhost:1234")
+                .serverStartupTime(2).workerGroup("new").build();
+        clusters.onServerAdded(restarted.getServerIdentity());
+        clusters.onServerUpdate(restarted);
+        clusters.onServerRemove(WorkerServerMetadata.builder().address("localhost:1234")
+                .serverStartupTime(1).workerGroup("old").build().getServerIdentity());
+        assertThat(clusters.getServers()).containsExactly(restarted);
+        assertThat(clusters.getConfigWorkerServerAddressByGroup("new")).containsExactly("localhost:1234");
     }
 
     private WorkerServerMetadata getNormalWorkerServerMetadata() {

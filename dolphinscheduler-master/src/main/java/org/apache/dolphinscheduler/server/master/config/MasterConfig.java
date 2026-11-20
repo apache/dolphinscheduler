@@ -51,9 +51,14 @@ public class MasterConfig implements Validator {
     private LogicTaskConfig logicTaskConfig = new LogicTaskConfig();
 
     /**
-     * Master heart beat task execute interval.
+     * Interval for checking whether this process has been failovered.
      */
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
+
+    /**
+     * Interval for fetching heartbeat data from other services over RPC.
+     */
+    private Duration heartbeatFetchInterval = Duration.ofSeconds(3);
 
     /**
      * Whether to kill Yarn/K8s applications before regenerating a task instance during task failover.
@@ -101,8 +106,12 @@ public class MasterConfig implements Validator {
             errors.rejectValue("workflow-event-bus-fire-thread-count", null, "should be a positive value");
         }
 
-        if (masterConfig.getMaxHeartbeatInterval().toMillis() < 0) {
-            errors.rejectValue("max-heartbeat-interval", null, "should be a valid duration");
+        if (masterConfig.getMaxHeartbeatInterval().toMillis() <= 0) {
+            errors.rejectValue("maxHeartbeatInterval", null, "should be a valid duration");
+        }
+
+        if (heartbeatFetchInterval.toMillis() <= 0) {
+            errors.rejectValue("heartbeatFetchInterval", null, "should be positive");
         }
 
         if (masterConfig.getWorkerGroupRefreshInterval().getSeconds() < 10) {
@@ -139,6 +148,7 @@ public class MasterConfig implements Validator {
                         "\n  workflow-event-bus-fire-thread-count -> " + workflowEventBusFireThreadCount +
                         "\n  logic-task-config -> " + logicTaskConfig +
                         "\n  max-heartbeat-interval -> " + maxHeartbeatInterval +
+                        "\n  heartbeat-fetch-interval -> " + heartbeatFetchInterval +
                         "\n  kill-application-when-task-failover -> " + isKillApplicationWhenTaskFailover() +
                         "\n  server-load-protection -> " + serverLoadProtection +
                         "\n  master-address -> " + masterAddress +

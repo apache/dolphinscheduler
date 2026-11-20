@@ -32,8 +32,10 @@ class MasterClustersTest {
         MasterClusters masterClusters = new MasterClusters();
         MasterServerMetadata normalMasterServerMetadata = getNormalMasterServerMetadata();
         MasterServerMetadata busyMasterServerMetadata = getBusyMasterServerMetadata();
-        masterClusters.onServerAdded(normalMasterServerMetadata);
-        masterClusters.onServerAdded(busyMasterServerMetadata);
+        masterClusters.onServerAdded(normalMasterServerMetadata.getServerIdentity());
+        masterClusters.onServerUpdate(normalMasterServerMetadata);
+        masterClusters.onServerAdded(busyMasterServerMetadata.getServerIdentity());
+        masterClusters.onServerUpdate(busyMasterServerMetadata);
         assertThat(masterClusters.getServers()).containsExactly(normalMasterServerMetadata, busyMasterServerMetadata);
     }
 
@@ -42,8 +44,10 @@ class MasterClustersTest {
         MasterClusters masterClusters = new MasterClusters();
         MasterServerMetadata normalMasterServerMetadata = getNormalMasterServerMetadata();
         MasterServerMetadata busyMasterServerMetadata = getBusyMasterServerMetadata();
-        masterClusters.onServerAdded(normalMasterServerMetadata);
-        masterClusters.onServerAdded(busyMasterServerMetadata);
+        masterClusters.onServerAdded(normalMasterServerMetadata.getServerIdentity());
+        masterClusters.onServerUpdate(normalMasterServerMetadata);
+        masterClusters.onServerAdded(busyMasterServerMetadata.getServerIdentity());
+        masterClusters.onServerUpdate(busyMasterServerMetadata);
         assertThat(masterClusters.getNormalServers()).containsExactly(normalMasterServerMetadata);
     }
 
@@ -53,29 +57,33 @@ class MasterClustersTest {
         AtomicBoolean addServerFlag = new AtomicBoolean(false);
         masterClusters.registerListener(
                 (IClusters.ServerAddedListener<MasterServerMetadata>) server -> addServerFlag.set(true));
-        masterClusters.onServerAdded(getNormalMasterServerMetadata());
+        masterClusters.onServerAdded(getNormalMasterServerMetadata().getServerIdentity());
+        masterClusters.onServerUpdate(getNormalMasterServerMetadata());
         assertThat(addServerFlag.get()).isTrue();
     }
 
     @Test
     void onServerAdded() {
         MasterClusters masterClusters = new MasterClusters();
-        masterClusters.onServerAdded(getNormalMasterServerMetadata());
-        assertThat(masterClusters.getServers()).containsExactly(getNormalMasterServerMetadata());
+        masterClusters.onServerAdded(getNormalMasterServerMetadata().getServerIdentity());
+        assertThat(masterClusters.getServerAddresses()).containsExactly(getNormalMasterServerMetadata().getAddress());
+        assertThat(masterClusters.getServers()).isEmpty();
     }
 
     @Test
     void onServerRemove() {
         MasterClusters masterClusters = new MasterClusters();
-        masterClusters.onServerAdded(getNormalMasterServerMetadata());
-        masterClusters.onServerRemove(getNormalMasterServerMetadata());
+        masterClusters.onServerAdded(getNormalMasterServerMetadata().getServerIdentity());
+        masterClusters.onServerUpdate(getNormalMasterServerMetadata());
+        masterClusters.onServerRemove(getNormalMasterServerMetadata().getServerIdentity());
         assertThat(masterClusters.getServers()).isEmpty();
     }
 
     @Test
     void onServerUpdate() {
         MasterClusters masterClusters = new MasterClusters();
-        masterClusters.onServerAdded(getNormalMasterServerMetadata());
+        masterClusters.onServerAdded(getNormalMasterServerMetadata().getServerIdentity());
+        masterClusters.onServerUpdate(getNormalMasterServerMetadata());
         MasterServerMetadata updatedMasterServerMetadata = MasterServerMetadata.builder()
                 .address("127.0.0.1:5679")
                 .cpuUsage(0.2)

@@ -21,6 +21,7 @@ import org.apache.dolphinscheduler.dao.entity.SerialCommand;
 
 import org.apache.ibatis.annotations.Param;
 
+import java.util.Date;
 import java.util.List;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
@@ -30,5 +31,12 @@ public interface SerialCommandMapper extends BaseMapper<SerialCommand> {
     List<SerialCommand> fetchSerialCommands(@Param("fetchSize") int fetchSize);
 
     int deleteByWorkflowInstanceId(@Param("workflowInstanceId") int workflowInstanceId);
+
+    int launchSerialCommand(@Param("id") Integer id,
+                            @Param("originState") int originState,
+                            @Param("targetState") int targetState,
+                            @Param("updateTime") Date updateTime);
+
+    int deleteByIdAndState(@Param("id") Integer id, @Param("state") int state);
 
 }

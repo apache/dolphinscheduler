@@ -115,6 +115,23 @@ public class K8sNamespaceMapperTest extends BaseDaoTest {
     }
 
     /**
+     * test query k8s namespace by namespace code
+     */
+    @Test
+    public void testQueryByNamespaceCode() {
+        K8sNamespace entity = insertOne();
+
+        K8sNamespace k8sNamespace = k8sNamespaceMapper.queryByNamespaceCode(entity.getCode());
+        Assertions.assertNotNull(k8sNamespace);
+        Assertions.assertEquals(entity.getId(), k8sNamespace.getId());
+        Assertions.assertEquals(entity.getCode(), k8sNamespace.getCode());
+        Assertions.assertEquals(entity.getNamespace(), k8sNamespace.getNamespace());
+        Assertions.assertEquals(entity.getClusterCode(), k8sNamespace.getClusterCode());
+
+        Assertions.assertNull(k8sNamespaceMapper.queryByNamespaceCode(entity.getCode() + 1));
+    }
+
+    /**
      * test query k8sNamespaces list paging
      */
     @Test
