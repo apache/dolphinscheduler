@@ -77,6 +77,7 @@ import org.apache.dolphinscheduler.dao.repository.TaskInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowDefinitionDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceDao;
 import org.apache.dolphinscheduler.dao.repository.WorkflowInstanceMapDao;
+import org.apache.dolphinscheduler.dao.repository.WorkflowTaskRelationDao;
 import org.apache.dolphinscheduler.dao.utils.WorkflowUtils;
 import org.apache.dolphinscheduler.extract.master.command.ICommandParam;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -173,6 +174,9 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
 
     @Autowired
     private WorkflowRelationValidator workflowRelationValidator;
+
+    @Autowired
+    private WorkflowTaskRelationDao workflowTaskRelationDao;
 
     @Autowired
     private TaskDatasourcePermissionChecker taskDatasourcePermissionChecker;
@@ -428,6 +432,11 @@ public class WorkflowInstanceServiceImpl extends BaseServiceImpl implements Work
         }
         if (projectCode != recordedDefinition.getProjectCode()) {
             throw new ServiceException(Status.PROJECT_WORKFLOW_NOT_MATCH);
+        }
+        if (Boolean.TRUE.equals(syncDefine)) {
+            workflowRelationValidator.validate(new WorkflowRelationValidator.Context(projectCode,
+                    workflowDefinition.getCode(),
+                    workflowTaskRelationDao.queryByWorkflowDefinitionCode(workflowDefinition.getCode())));
         }
 
         String timezoneId;
