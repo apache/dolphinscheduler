@@ -20,6 +20,7 @@ package org.apache.dolphinscheduler.plugin.alert.feishu;
 import org.apache.dolphinscheduler.alert.api.AlertData;
 import org.apache.dolphinscheduler.alert.api.AlertResult;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,6 +45,20 @@ public class FeiShuSenderTest {
         FeiShuSender feiShuSender = new FeiShuSender(feiShuConfig);
         AlertResult alertResult = feiShuSender.sendFeiShuMsg(alertData);
         Assertions.assertFalse(alertResult.isSuccess());
+    }
+
+    @Test
+    public void testFormatContentWithNullValue() throws Exception {
+        AlertData alertData = new AlertData();
+        alertData.setTitle("query results");
+        alertData.setContent("[{\"nullable_value\":null,\"count\":0,\"enabled\":false,\"text\":\"ok\"}]");
+
+        Method formatContent = FeiShuSender.class.getDeclaredMethod("formatContent", AlertData.class);
+        formatContent.setAccessible(true);
+        String content = (String) formatContent.invoke(null, alertData);
+
+        Assertions.assertEquals(String.format("`query results`%n")
+                + "nullable_value:null\ncount:0\nenabled:false\ntext:ok\n", content);
     }
 
 }
