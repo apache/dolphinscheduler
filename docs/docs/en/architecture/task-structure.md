@@ -3,7 +3,7 @@
 ## Overall Storage Structure
 
 A workflow is not stored as a single JSON document. Its definition is split into three tables, and each table has a
-`*_log` table that keeps every version:
+`*_log` table that stores version records:
 
 |             Table             |      Version table (`*_log`)      |                         Content                          |
 |-------------------------------|-----------------------------------|----------------------------------------------------------|
@@ -12,7 +12,11 @@ A workflow is not stored as a single JSON document. Its definition is split into
 | `t_ds_workflow_task_relation` | `t_ds_workflow_task_relation_log` | The edges of the DAG, one row per edge between two tasks |
 
 - Workflows and tasks are identified by a globally unique `code` plus a `version`. The main tables hold the current
-  version, and the `*_log` tables hold all versions with two extra columns: `operator` (user id) and `operate_time`.
+  version, and the `*_log` tables store version records with two extra columns: `operator` (user id) and `operate_time`.
+- Non-current versions can be explicitly deleted, so complete historical retention is not guaranteed. A workflow version
+  can be deleted only when no non-terminal workflow instance uses it; deleting it removes both its definition and relation
+  log records. Task version deletion does not check historical task instances. Completed instances can therefore still
+  reference a definition version whose log record has been deleted.
 - Relations reference tasks by `code + version`, and a workflow instance (`t_ds_workflow_instance`) or task instance
   (`t_ds_task_instance`) references the exact definition version it was created from.
 - The task type specific configuration is stored as JSON in `t_ds_task_definition.task_params`, see
