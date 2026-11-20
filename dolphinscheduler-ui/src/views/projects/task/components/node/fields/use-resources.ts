@@ -104,10 +104,11 @@ export const getResourceDirAfter = (
 
 export const spliceUselessResources = (
   value: string[],
-  resources: ResourceOption[]
+  resources: ResourceOption[],
+  loading: boolean
 ): string => {
-  // the resource tree may still be loading; do not treat existing selections as stale before it is ready
-  if (resources.length === 0) {
+  // an empty resource tree may just not have finished loading; defer the check while the request is pending
+  if (loading) {
     return ''
   }
   const errorNames: string[] = []
@@ -149,11 +150,14 @@ export function useResources(
     }
     if (resourcesLoading.value) return
     resourcesLoading.value = true
-    const res = await queryResourceList({ type: 'FILE', fullName: '' })
-    utils.removeUselessChildren(res)
-    resourcesOptions.value = res || []
-    resourcesLoading.value = false
-    taskStore.updateResource(res)
+    try {
+      const res = await queryResourceList({ type: 'FILE', fullName: '' })
+      utils.removeUselessChildren(res)
+      resourcesOptions.value = res || []
+      taskStore.updateResource(res)
+    } finally {
+      resourcesLoading.value = false
+    }
   }
 
   const copyResourceName = async (name: string) => {
@@ -235,7 +239,8 @@ export function useResources(
         if (value) {
           const errorName = spliceUselessResources(
             value,
-            resourcesOptions.value as ResourceOption[]
+            resourcesOptions.value as ResourceOption[],
+            resourcesLoading.value
           )
           if (errorName) {
             return new Error(

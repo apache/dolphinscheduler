@@ -68,6 +68,7 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
   ) as IJsonItemParams
 
   const resourcesOptions = resourcesField.options as Ref<ResourceOption[]>
+  const resourcesLoading = resourcesField.props.loading as Ref<boolean>
 
   const sqlExecutionTypeSpan = computed(() =>
     model.programType === 'SQL' ? 12 : 0
@@ -227,7 +228,8 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
           if (value) {
             const errorName = spliceUselessResources(
               value,
-              resourcesOptions.value
+              resourcesOptions.value,
+              resourcesLoading.value
             )
             if (errorName) {
               return new Error(
@@ -262,7 +264,8 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
           if (value) {
             const errorName = spliceUselessResources(
               value,
-              resourcesOptions.value
+              resourcesOptions.value,
+              resourcesLoading.value
             )
             if (errorName) {
               return new Error(
@@ -310,9 +313,9 @@ export function useSpark(model: { [field: string]: any }): IJsonItem[] {
         trigger: ['blur'],
         validator(validate: any, value: string) {
           if (value) {
-            // the resource tree may still be loading; do not reset an existing keytab before it is ready
+            // the resource tree may still be loading; defer the stale check until it is ready
             if (
-              resourcesOptions.value.length > 0 &&
+              !resourcesLoading.value &&
               !validateResourceExist(value, [], resourcesOptions.value)
             ) {
               model.keytab = null
