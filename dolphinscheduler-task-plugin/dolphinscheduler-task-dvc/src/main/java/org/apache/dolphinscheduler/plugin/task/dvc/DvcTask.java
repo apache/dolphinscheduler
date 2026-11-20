@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
@@ -51,7 +52,7 @@ public class DvcTask extends AbstractTask {
     public void init() {
 
         parameters = JSONUtils.parseObject(taskRequest.getTaskParams(), DvcParameters.class);
-        log.info("Initialize dvc task params {}", JSONUtils.toPrettyJsonString(parameters));
+        log.info("Initialize dvc task params {}", SensitiveLogHelper.toPrettyJson(parameters));
 
         if (parameters == null || !parameters.checkParameters()) {
             throw new TaskException("dvc task params is not valid");

@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -115,7 +116,7 @@ public class EmrServerlessTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         emrServerlessParameters = JSONUtils.parseObject(taskParams, EmrServerlessParameters.class);
-        log.info("Initialize EMR Serverless task params: {}", JSONUtils.toPrettyJsonString(taskParams));
+        log.info("Initialize EMR Serverless task params: {}", SensitiveLogHelper.toPrettyJson(taskParams));
 
         if (emrServerlessParameters == null || !emrServerlessParameters.checkParameters()) {
             throw new EmrServerlessTaskException("EMR Serverless task params are not valid");

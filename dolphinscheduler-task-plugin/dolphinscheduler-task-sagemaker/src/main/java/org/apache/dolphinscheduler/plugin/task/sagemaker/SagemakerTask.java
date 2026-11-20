@@ -31,6 +31,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 import org.apache.dolphinscheduler.spi.enums.DbType;
@@ -102,7 +103,7 @@ public class SagemakerTask extends AbstractRemoteTask {
         parameters.setUsername(sagemakerConnectionParam.getUserName());
         parameters.setPassword(sagemakerConnectionParam.getPassword());
         parameters.setAwsRegion(sagemakerConnectionParam.getAwsRegion());
-        log.info("Initialize Sagemaker task params {}", JSONUtils.toPrettyJsonString(parameters));
+        log.info("Initialize Sagemaker task params {}", SensitiveLogHelper.toPrettyJson(parameters));
 
         client = createClient();
         utils = new PipelineUtils();

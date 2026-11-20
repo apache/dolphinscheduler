@@ -22,6 +22,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -54,7 +55,7 @@ public class DatafactoryTask extends AbstractRemoteTask {
     @Override
     public void init() {
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DatafactoryParameters.class);
-        log.info("Initialize Datafactory task params {}", JSONUtils.toPrettyJsonString(parameters));
+        log.info("Initialize Datafactory task params {}", SensitiveLogHelper.toPrettyJson(parameters));
         hook = new DatafactoryHook();
     }
 

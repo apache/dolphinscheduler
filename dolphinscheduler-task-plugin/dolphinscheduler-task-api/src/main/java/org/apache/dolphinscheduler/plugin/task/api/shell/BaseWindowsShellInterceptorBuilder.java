@@ -59,7 +59,8 @@ public abstract class BaseWindowsShellInterceptorBuilder<T extends BaseWindowsSh
         Path shellAbsolutePath = shellAbsolutePath();
         FileUtils.createFileWith755(shellAbsolutePath);
         Files.write(shellAbsolutePath, finalScript.getBytes(), StandardOpenOption.APPEND);
-        log.info("Final Shell file is : \n{}", finalScript);
+        String scriptForLog = digestMaskedScript(finalScript);
+        log.info("Final Shell file is : \n{}", scriptForLog);
     }
 
     private String shellBody() {

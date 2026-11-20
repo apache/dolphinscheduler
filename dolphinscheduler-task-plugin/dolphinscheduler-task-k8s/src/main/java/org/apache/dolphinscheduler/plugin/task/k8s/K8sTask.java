@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.AbstractK8sTask;
 import org.apache.dolphinscheduler.plugin.task.api.k8s.K8sTaskMainParameters;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Label;
 import org.apache.dolphinscheduler.plugin.task.api.model.NodeSelectorExpression;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
@@ -81,7 +82,7 @@ public class K8sTask extends AbstractK8sTask {
         k8sTaskExecutionContext.setConfigYaml(kubeConfig);
         k8sTaskExecutionContext.setNamespace(k8sConnectionParam.getNamespace());
         taskRequest.setK8sTaskExecutionContext(k8sTaskExecutionContext);
-        log.info("Initialize k8s task params:{}", JSONUtils.toPrettyJsonString(k8sTaskParameters));
+        log.info("Initialize k8s task params:{}", SensitiveLogHelper.toPrettyJson(k8sTaskParameters));
     }
 
     @Override

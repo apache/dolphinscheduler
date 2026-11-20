@@ -24,6 +24,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
 
@@ -56,7 +57,8 @@ public class KubeflowTask extends AbstractRemoteTask {
     @Override
     public void init() throws TaskException {
         kubeflowParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), KubeflowParameters.class);
-        log.info("Initialize Kubeflow task params {}", taskExecutionContext.getTaskParams());
+        log.info("Initialize Kubeflow task params {}",
+                SensitiveLogHelper.toPrettyJson(taskExecutionContext.getTaskParams()));
 
         kubeflowParameters.setClusterYAML(taskExecutionContext.getK8sTaskExecutionContext().getConfigYaml());
         if (!kubeflowParameters.checkParameters()) {
@@ -140,7 +142,7 @@ public class KubeflowTask extends AbstractRemoteTask {
         clusterYAMLPath =
                 Paths.get(taskExecutionContext.getExecutePath(), KubeflowHelper.CONSTANTS.CLUSTER_CONFIG_PATH);
 
-        log.info("Kubeflow task yaml content: \n{}", yamlContent);
+        log.info("Kubeflow task yaml content: \n{}", SensitiveLogHelper.mask(yamlContent, paramsMap));
         try {
             Files.write(yamlPath, yamlContent.getBytes(), StandardOpenOption.CREATE);
             Files.write(clusterYAMLPath, clusterYAML.getBytes(), StandardOpenOption.CREATE);

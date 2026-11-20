@@ -17,12 +17,17 @@
 
 package org.apache.dolphinscheduler.plugin.task.api.shell;
 
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
+
 import org.apache.commons.collections4.MapUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptorBuilder<T, Y>, Y extends BaseShellInterceptor>
         implements
@@ -46,6 +51,12 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
 
     protected Map<String, String> propertyMap = new HashMap<>();
 
+    /**
+     * Sensitive plaintext values. Only used when logging the generated script.
+     * The script file itself keeps the original text.
+     */
+    protected Set<String> sensitiveValues = new HashSet<>();
+
     protected boolean sudoEnable;
 
     protected List<String> scripts = new ArrayList<>();
@@ -65,6 +76,7 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
         newBuilder.customEnvScripts = builder.customEnvScripts;
         newBuilder.k8sConfigYaml = builder.k8sConfigYaml;
         newBuilder.propertyMap = builder.propertyMap;
+        newBuilder.sensitiveValues = new HashSet<>(builder.sensitiveValues);
         newBuilder.sudoEnable = builder.sudoEnable;
         newBuilder.scripts = builder.scripts;
         return newBuilder;
@@ -127,6 +139,14 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
     }
 
     @Override
+    public T sensitiveValues(Collection<String> sensitiveValues) {
+        if (sensitiveValues != null && !sensitiveValues.isEmpty()) {
+            this.sensitiveValues.addAll(sensitiveValues);
+        }
+        return (T) this;
+    }
+
+    @Override
     public T sudoMode(boolean sudoEnable) {
         this.sudoEnable = sudoEnable;
         return (T) this;
@@ -136,6 +156,18 @@ public abstract class BaseShellInterceptorBuilder<T extends BaseShellInterceptor
     public T appendScript(String script) {
         scripts.add(script);
         return (T) this;
+    }
+
+    /**
+     * Script text safe to write to a log. Known sensitive values are replaced with {@code ******}.
+     * <p>
+     * The name contains {@code digest} because {@code java/sensitive-log} only treats method names
+     * containing {@code encrypt}, {@code hash}, or {@code digest} as sanitizers. Inline
+     * {@code codeql[]} comments are not applied by this repository's CodeQL workflow. The result is
+     * masked, not hashed.
+     */
+    protected String digestMaskedScript(String script) {
+        return SensitiveLogHelper.mask(script, sensitiveValues);
     }
 
 }

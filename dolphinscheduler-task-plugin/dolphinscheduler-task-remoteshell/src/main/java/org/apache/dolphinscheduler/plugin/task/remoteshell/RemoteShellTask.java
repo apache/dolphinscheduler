@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.ResourceType;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.resource.DataSourceParameters;
@@ -73,7 +74,7 @@ public class RemoteShellTask extends AbstractTask {
 
     @Override
     public void init() {
-        log.info("shell task params {}", taskExecutionContext.getTaskParams());
+        log.info("shell task params {}", SensitiveLogHelper.toPrettyJson(taskExecutionContext.getTaskParams()));
 
         remoteShellParameters =
                 JSONUtils.parseObject(taskExecutionContext.getTaskParams(), RemoteShellParameters.class);
@@ -154,7 +155,7 @@ public class RemoteShellTask extends AbstractTask {
 
         FileUtils.createFileWith755(path);
         Files.write(path, script.getBytes(), StandardOpenOption.APPEND);
-        log.info("raw script : {}", script);
+        log.info("raw script : {}", SensitiveLogHelper.mask(script, taskExecutionContext.getPrepareParamsMap()));
         return fileName;
     }
 
@@ -177,5 +178,7 @@ public class RemoteShellTask extends AbstractTask {
                 DbType.valueOf(remoteShellParameters.getType()),
                 dbSource.getConnectionParams());
         remoteExecutor = new RemoteExecutor(sshConnectionParam);
+        remoteExecutor.setSensitiveValues(
+                SensitiveLogHelper.sensitiveValues(taskExecutionContext.getPrepareParamsMap()));
     }
 }

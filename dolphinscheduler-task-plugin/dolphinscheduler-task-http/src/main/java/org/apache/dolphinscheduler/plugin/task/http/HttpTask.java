@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.DataType;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -64,7 +65,7 @@ public class HttpTask extends AbstractTask {
     @Override
     public void init() {
         this.httpParameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), HttpParameters.class);
-        log.info("Initialize http task params: {}", JSONUtils.toPrettyJsonString(httpParameters));
+        log.info("Initialize http task params: {}", SensitiveLogHelper.toPrettyJson(httpParameters));
 
         if (httpParameters == null || !httpParameters.checkParameters()) {
             throw new RuntimeException("http task params is not valid");

@@ -26,6 +26,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
@@ -69,7 +70,7 @@ public class LinkisTask extends AbstractRemoteTask {
     @Override
     public void init() {
         linkisParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), LinkisParameters.class);
-        log.info("Initialize Linkis task params {}", JSONUtils.toPrettyJsonString(linkisParameters));
+        log.info("Initialize Linkis task params {}", SensitiveLogHelper.toPrettyJson(linkisParameters));
 
         if (!linkisParameters.checkParameters()) {
             throw new RuntimeException("Linkis task params is not valid");

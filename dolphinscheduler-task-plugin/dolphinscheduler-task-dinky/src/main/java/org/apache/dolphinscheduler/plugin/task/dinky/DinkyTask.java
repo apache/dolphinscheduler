@@ -25,6 +25,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 import org.apache.dolphinscheduler.plugin.task.api.utils.ParameterUtils;
@@ -80,7 +81,7 @@ public class DinkyTask extends AbstractRemoteTask {
     public void init() {
         final String taskParams = taskExecutionContext.getTaskParams();
         this.dinkyParameters = JSONUtils.parseObject(taskParams, DinkyParameters.class);
-        log.info("Initialize dinky task params: {}", JSONUtils.toPrettyJsonString(dinkyParameters));
+        log.info("Initialize dinky task params: {}", SensitiveLogHelper.toPrettyJson(dinkyParameters));
         if (this.dinkyParameters == null || !this.dinkyParameters.checkParameters()) {
             throw new DinkyTaskException("dinky task params is not valid");
         }

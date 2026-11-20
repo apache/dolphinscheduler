@@ -29,6 +29,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveDataConverter;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
@@ -118,7 +119,7 @@ public class DataxTask extends AbstractTask {
     @Override
     public void init() {
         dataXParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), DataxParameters.class);
-        log.info("Initialize datax task params {}", JSONUtils.toPrettyJsonString(dataXParameters));
+        log.info("Initialize datax task params {}", SensitiveLogHelper.toPrettyJson(dataXParameters));
 
         if (dataXParameters == null || !dataXParameters.checkParameters()) {
             throw new RuntimeException("datax task params is not valid");

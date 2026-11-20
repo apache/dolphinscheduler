@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.Direct;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -75,7 +76,7 @@ public class SeatunnelTask extends AbstractRemoteTask {
 
     @Override
     public void init() {
-        log.info("Intialize SeaTunnel task params {}", JSONUtils.toPrettyJsonString(seatunnelParameters));
+        log.info("Intialize SeaTunnel task params {}", SensitiveLogHelper.toPrettyJson(seatunnelParameters));
         if (seatunnelParameters == null || !seatunnelParameters.checkParameters()) {
             throw new TaskException("SeaTunnel task params is not valid");
         }
@@ -134,7 +135,8 @@ public class SeatunnelTask extends AbstractRemoteTask {
         args.addAll(buildOptions());
 
         String command = String.join(" ", args);
-        log.info("SeaTunnel task command: {}", command);
+        log.info("SeaTunnel task command: {}",
+                SensitiveLogHelper.mask(command, taskRequest.getPrepareParamsMap()));
 
         return command;
     }
@@ -193,9 +195,10 @@ public class SeatunnelTask extends AbstractRemoteTask {
     }
 
     private String buildCustomConfigContent() {
-        log.info("raw custom config content : {}", seatunnelParameters.getRawScript());
         String script = seatunnelParameters.getRawScript().replaceAll("\\r\\n", System.lineSeparator());
         script = parseScript(script);
+        log.info("raw custom config content : {}",
+                SensitiveLogHelper.mask(script, taskRequest.getPrepareParamsMap()));
         return script;
     }
 

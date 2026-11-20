@@ -17,9 +17,9 @@
 
 package org.apache.dolphinscheduler.server.master.engine.executor.plugin;
 
-import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
 import org.apache.dolphinscheduler.plugin.task.api.enums.TaskExecutionStatus;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
 
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public abstract class AbstractLogicTask<T extends AbstractParameters> implements
         this.taskParameters = getTaskParameterDeserializer().deserialize(taskExecutionContext.getTaskParams());
         Preconditions.checkNotNull(taskParameters,
                 "Deserialize task parameters: " + taskExecutionContext.getTaskParams());
-        log.info("Success initialize parameters: \n{}", JSONUtils.toPrettyJsonString(taskParameters));
+        log.info("Success initialize parameters: \n{}", SensitiveLogHelper.toPrettyJson(taskParameters));
     }
 
     @Override

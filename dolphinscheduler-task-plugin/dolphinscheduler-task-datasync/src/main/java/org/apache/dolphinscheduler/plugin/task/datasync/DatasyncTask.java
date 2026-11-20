@@ -27,6 +27,7 @@ import org.apache.dolphinscheduler.plugin.task.api.AbstractRemoteTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskConstants;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 
 import software.amazon.awssdk.services.datasync.model.TaskExecutionStatus;
 
@@ -72,7 +73,7 @@ public class DatasyncTask extends AbstractRemoteTask {
     public void init() {
 
         parameters = JSONUtils.parseObject(taskExecutionContext.getTaskParams(), DatasyncParameters.class);
-        log.info("Initialize Datasync task params {}", JSONUtils.toPrettyJsonString(parameters));
+        log.info("Initialize Datasync task params {}", SensitiveLogHelper.toPrettyJson(parameters));
         initParams();
 
         hook = new DatasyncHook();
@@ -88,7 +89,7 @@ public class DatasyncTask extends AbstractRemoteTask {
             } catch (JsonProcessingException e) {
                 throw new TaskException("Convert json to task params failed", e);
             }
-            log.info("Success convert json to task params {}", JSONUtils.toPrettyJsonString(parameters));
+            log.info("Success convert json to task params {}", SensitiveLogHelper.toPrettyJson(parameters));
         }
     }
 

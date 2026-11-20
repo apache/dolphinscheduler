@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.common.utils.JSONUtils;
 import org.apache.dolphinscheduler.plugin.task.api.AbstractYarnTask;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.ResourceInfo;
 import org.apache.dolphinscheduler.plugin.task.api.parameters.AbstractParameters;
@@ -83,7 +84,7 @@ public class SparkTask extends AbstractYarnTask {
             throw new RuntimeException("spark task params is not valid");
         }
 
-        log.info("Initialize spark task params {}", JSONUtils.toPrettyJsonString(sparkParameters));
+        log.info("Initialize spark task params {}", SensitiveLogHelper.toPrettyJson(sparkParameters));
     }
 
     @Override
@@ -260,7 +261,8 @@ public class SparkTask extends AbstractYarnTask {
         if (!Files.exists(path)) {
             String script = replaceParam(sqlContent);
 
-            log.info("raw script : {}", script);
+            log.info("raw script : {}",
+                    SensitiveLogHelper.mask(script, taskExecutionContext.getPrepareParamsMap()));
             log.info("task execute path : {}", taskExecutionContext.getExecutePath());
 
             Set<PosixFilePermission> perms = PosixFilePermissions.fromString(RWXR_XR_X);

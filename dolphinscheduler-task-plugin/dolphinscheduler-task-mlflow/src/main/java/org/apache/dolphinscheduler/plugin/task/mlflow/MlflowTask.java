@@ -28,6 +28,7 @@ import org.apache.dolphinscheduler.plugin.task.api.ShellCommandExecutor;
 import org.apache.dolphinscheduler.plugin.task.api.TaskCallBack;
 import org.apache.dolphinscheduler.plugin.task.api.TaskException;
 import org.apache.dolphinscheduler.plugin.task.api.TaskExecutionContext;
+import org.apache.dolphinscheduler.plugin.task.api.log.SensitiveLogHelper;
 import org.apache.dolphinscheduler.plugin.task.api.model.Property;
 import org.apache.dolphinscheduler.plugin.task.api.model.TaskResponse;
 import org.apache.dolphinscheduler.plugin.task.api.shell.IShellInterceptorBuilder;
@@ -90,7 +91,7 @@ public class MlflowTask extends AbstractTask {
 
         mlflowParameters = JSONUtils.parseObject(taskRequest.getTaskParams(), MlflowParameters.class);
 
-        log.info("Initialize MLFlow task params {}", JSONUtils.toPrettyJsonString(mlflowParameters));
+        log.info("Initialize MLFlow task params {}", SensitiveLogHelper.toPrettyJson(mlflowParameters));
         if (mlflowParameters == null || !mlflowParameters.checkParameters()) {
             throw new RuntimeException("MLFlow task params is not valid");
         }
