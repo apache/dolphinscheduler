@@ -88,8 +88,20 @@ figure:
 
 - **Delete:** Delete the workflow instance and the task instance under the workflow instance
 
-- **Gantt Chart:** The vertical axis of the Gantt chart is the topological sorting of task instances of the workflow
-  instance, and the horizontal axis is the running time of the task instances, as shown in the figure:
+- **Gantt Chart:** Open the chart from a workflow instance to see its task execution timeline. The summary above the
+  chart shows the total and submitted task counts, plus counts for not submitted, queued/waiting, running, succeeded,
+  failed, and paused/stopped tasks. Rows follow the workflow's task order and show each task's state, start and end
+  times, duration, and share of the displayed time range. Parallel tasks can make the shares add up to more than 100%.
+  Select a task name to copy it, or use the icons beside the task to view its log or read-only configuration when
+  available. The log dialog can refresh or download the log; its preview is limited to 20,000 lines.
 
-![instance-gantt](../../../../img/new_ui/dev/project/instance-gantt.png)
+  While the workflow is running, **Refresh every 5s while running** is enabled by default. You can turn it off or use
+  **Refresh** manually. Automatic requests pause when the browser tab is hidden and stop after the workflow finishes.
+  If a refresh fails, the last successful snapshot remains visible.
+
+  The horizontal scale is labeled **Workflow elapsed** when precise workflow timing is available. If workflow dates
+  have only second-level precision and a complete millisecond task range is unavailable, it is labeled **Workflow
+  elapsed (approx.)**; its boundaries and task shares are approximate. When workflow timing cannot be used but task
+  times are available, **Task time span** covers the first task start through the last task end, so it excludes time
+  outside those tasks. These labels describe different denominators for the displayed task shares.
 
